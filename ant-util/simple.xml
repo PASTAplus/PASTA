@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="simple">
+
+  <property file="build.properties"/>
+
+  <!-- Properties for building and deploying -->
+  <property name="build.dir" location="build"/>
+  <property name="src.dir" value="src"/>
+  <property name="web.dir" value="WebRoot"/>
+  <property name="classes.dir" value="${web.dir}/WEB-INF/classes"/>
+  <property name="web.lib.dir" value="${web.dir}/WEB-INF/lib"/>
+  <property name="web.doc.dir" value="${web.dir}/WEB-INF/doc"/>
+  <property name="war.name" value="${webapp.name}.war"/>
+  <property name="deploy.dir" value="${tomcat.home}/webapps"/>
+  <property name="doc.dir" value="documents"/>
+  <property name="api.dir" value="${doc.dir}/web-service-api"/>
+  <property name="javadoc.dir" location="${doc.dir}/javadoc"/>
+  <property name="java.to.xml.dir" value="${doc.dir}/java-to-xml"/>
+  <property name="jaxrs.doc.dir" value="${doc.dir}/jaxrsdocs"/>
+
+  <property name="shared.lib.dir" value="../lib"/>
+  <property name="common.code.dir" value="../common"/>
+  <property name="doc.util.dir" value="../doc-util"/>
+
+  <property name="source.files.to.copy"
+	    value="**/*.properties,**/*.xml"/>
+
+  <!-- Properties for JUnit testing -->
+  <property name="test.dir" location="${build.dir}/test"/>
+  <property name="test.classes.dir" location="${test.dir}/classes"/>
+  <property name="test.data.dir" location="${test.dir}/data"/>
+  <property name="test.reports.dir" location="${test.dir}/reports"/>
+  <property name="test.coverage.dir" location="${test.dir}/coverage"/>
+
+  <!-- Properties for Cobertura JUnit code coverage -->
+  <property name="cobertura.dir"
+	    value="../cobertura/cobertura-1.9.4.1" />
+  <path id="cobertura.classpath">
+    <fileset dir="${cobertura.dir}">
+      <include name="cobertura.jar" />
+      <include name="lib/**/*.jar" />
+    </fileset>
+  </path>
+  <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
+  <!-- Path for compiling the source code -->
+  <path id="compile.classpath">
+    <fileset dir="${web.lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+    <fileset dir="${tomcat.lib}">
+      <include name="servlet*.jar"/>
+    </fileset>
+    <pathelement path="${web.dir}/WEB-INF"/>
+  </path>
+
+  <!-- Path for compiling the JUnit and Quickcheck test code -->
+  <path id="test.compile.classpath">
+    <path refid="compile.classpath"/>
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${shared.lib.dir}/testng/testng-6.1.1.jar"/>
+    <pathelement location="${shared.lib.dir}/quickcheck/quickcheck-0.6.jar"/>
+  </path>
+
+  <!-- Path for executing the JUnit and Quickcheck test code -->
+  <path id="test.classpath">
+    <path refid="test.compile.classpath"/>
+    <pathelement location="${test.classes.dir}"/>
+  </path>
+
+  <target name="_check-repo" unless="repo.lib.present"
+          description="Check for local lib repository">
+    <available file="${shared.lib.dir}" type="dir" property="repo.lib.present"/>
+  </target>
+
+  <target name="clean" description="Deletes compiled classes">
+    <echo>Deleting ${basedir}/${classes.dir}</echo>
+    <delete dir="${build.dir}"/>
+    <delete includeemptydirs="true">
+      <fileset dir="${classes.dir}" includes="**/*"/>
+    </delete>
+  </target>
+
+  <target name="compile" depends="prepare"
+	  description="Compiles all Java source files">
+    <mkdir dir="${classes.dir}"/>
+    <javac destdir="${classes.dir}" debug="true" deprecation="true"
+           failonerror="true" optimize="false" includeantruntime="false">
+      <src path="${src.dir}"/>
+      <classpath refid="compile.classpath"/>
+    </javac>
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}" includes="${source.files.to.copy}"/>
+    </copy>
+  </target>
+
+  <!-- Cleans and initializes the JUnit test directories -->
+  <target name="test-init">
+    <mkdir dir="${test.classes.dir}"/>
+    <delete dir="${test.data.dir}"/>
+    <delete dir="${test.reports.dir}"/>
+    <mkdir dir="${test.data.dir}"/>
+    <mkdir dir="${test.reports.dir}"/>
+  </target>
+
+  <target name="test-compile" depends="compile,test-init"
+          description="Compiles all JUnit and TestNG test files">
+    <javac destdir="${test.classes.dir}" debug="true" srcdir="test">
+      <classpath refid="test.compile.classpath"/>
+    </javac>
+    <copy todir="${test.classes.dir}">
+      <fileset dir="test" includes="${source.files.to.copy}"/>
+    </copy>
+  </target>
+
+  <taskdef resource="testngtasks" classpath="${shared.lib.dir}/testng/testng-6.1.1.jar"/>
+  <target name="test-testng" depends="test-compile"
+	  description="Executes the TestNG test suites">
+    <testng classpathref="test.classpath"
+	    outputDir="${test.dir}/testng"
+	    haltOnFailure="true" verbose="2">
+      <classfileset dir="${test.classes.dir}" includes="**/*.class" />
+    </testng>
+  </target>
+
+  <target name="test" depends="test-compile,web-service-api"
+          description="Executes the JUnit test suites">
+    <junit printsummary="false" haltonfailure="false"
+           errorProperty="test.failed" failureProperty="test.failed"
+	   fork="true">
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <formatter type="brief" usefile="false"/>
+      <formatter type="xml"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${test.data.dir}">
+        <fileset dir="test">
+          <include name="**/*Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${test.data.dir}">
+      <fileset dir="${test.data.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.reports.dir}"/>
+    </junitreport>
+    <fail if="test.failed">
+      One or more JUnit tests failed or had errors.
+      Check ${test.reports.dir}.
+    </fail>
+  </target>
+
+  <target name="help" description="Displays this help summary">
+    <exec executable="ant">
+      <arg value="-p"/>
+    </exec>
+  </target>
+
+  <target name="war" depends="compile" description="Creates a .war">
+    <mkdir dir="${build.dir}"/>
+    <war basedir="${web.dir}" destfile="${build.dir}/${war.name}"
+         webxml="${web.dir}/WEB-INF/web.xml">
+      <include name="demo/**"/>
+      <include name="docs/**"/>
+	  <include name="xsl/**"/>
+      <exclude name="WEB-INF/**"/>
+      <webinf dir="${web.dir}/WEB-INF/">
+        <include name="**/*.*"/>
+        <exclude name="**/.svn*"/>
+        <exclude name="**/.git*"/>
+        <exclude name="**/.#*"/>
+      </webinf>
+      <fileset dir="${web.dir}">
+        <include name="**/*.js"/>
+        <include name="**/*.jsp"/>
+        <include name="**/*.html"/>
+        <include name="**/*.css"/>
+        <include name="**/*.png"/>
+        <include name="**/*.jpg"/>
+        <include name="**/*.gif"/>
+		<include name="**/*.xml"/>
+      </fileset>
+    </war>
+  </target>
+
+  <target name="deploy" depends="web-service-api,war"
+          description="Deploys the web application to Tomcat (default target)">
+
+    <copy file="${build.dir}/${war.name}" todir="${deploy.dir}"
+          preservelastmodified="true" verbose="true" filtering="no"/>
+  </target>
+
+  <path id="jaxrs-doc.classpath">
+    <path refid="compile.classpath"/>
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${shared.lib.dir}/jax-doclets/jax-doclets-0.8.1.jar"/>
+    <pathelement location="${shared.lib.dir}/resteasy/resteasy-jaxrs-2.1.0.GA.jar"/>
+  </path>
+
+  <target name="javadoc" description="Generates Javadoc HTML"
+	  depends="compile">
+    <delete dir="${javadoc.dir}"/>
+    <javadoc sourcepath="${src.dir}"
+	     classpathref="compile.classpath"
+	     destdir="${javadoc.dir}">
+      <link href="http://download.oracle.com/javase/6/docs/api/"/>
+      <link href="http://jersey.java.net/nonav/apidocs/1.5/jersey/"/>
+      <link href="${basedir}/${common.code.dir}/documents/javadoc/"/>
+      <link href="http://www.unboundid.com/products/ldap-sdk/docs/javadoc"/>
+      <link href="http://jaxb.java.net/nonav/2.2.3u1/docs/api/"/>
+    </javadoc>
+  </target>
+
+  <target name="jaxrs-doc" description="Generate JAX-RS documentation"
+	  depends="compile">
+    <delete dir="${jaxrs.doc.dir}"/>
+    <mkdir dir="${jaxrs.doc.dir}"/>
+    <javadoc sourcepath="${src.dir}"
+	     classpathref="jaxrs-doc.classpath"
+	     destdir="${jaxrs.doc.dir}"
+	     doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
+	     docletpathref="jaxrs-doc.classpath"
+	     failonerror="true">
+      <link href="http://download.oracle.com/javase/6/docs/api/"/>
+      <link href="http://jersey.java.net/nonav/apidocs/1.5/jersey/"/>
+    </javadoc>
+  </target>
+
+  <target name="java-to-xml" description="Generates XML from Java source files"
+	  depends="compile">
+    <delete dir="${java.to.xml.dir}"/>
+    <mkdir dir="${java.to.xml.dir}"/>
+    <javadoc sourcepath="${src.dir}"
+	     destdir="${java.to.xml.dir}"
+	     doclet="com.jeldoclet.JELDoclet"
+	     docletpath="${shared.lib.dir}/jeldoclet/jeldoclet-2.0.jar"
+	     failonerror="true">
+      <classpath>
+	<path refid="compile.classpath"/>
+	<pathelement location="${classes.dir}"/>
+      </classpath>
+      <arg value="-multiple"/>
+    </javadoc>
+  </target>
+
+  <target name="web-service-api" description="Generates a web service API document"
+	  depends="java-to-xml">
+    <delete dir="${api.dir}"/>
+    <mkdir dir="${api.dir}"/>
+    <xslt basedir="${java.to.xml.dir}"
+	  includes="*Resource.xml"
+	  destdir="${api.dir}"
+	  style="${doc.util.dir}/xsl-templates/web-service-api.xsl"/>
+    <copy todir="${web.doc.dir}">
+      <fileset dir="${api.dir}"/>
+    </copy>
+  </target>
+
+
+  <target name="test-coverage" depends="compile,test-compile"
+	  description="Determines code coverage of JUnit tests">
+    <delete dir="${test.dir}/instrumented-classes"/>
+    <delete dir="${test.coverage.dir}"/>
+    <mkdir dir="${test.dir}/instrumented-classes"/>
+    <mkdir dir="${test.coverage.dir}"/>
+    <cobertura-instrument todir="${test.dir}/instrumented-classes">
+      <fileset dir="${classes.dir}">
+	<include name="**/*.class"/>
+      </fileset>
+    </cobertura-instrument>
+    <junit printsummary="false" haltonfailure="false"
+           errorProperty="test.failed" failureProperty="test.failed"
+	   fork="true">
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <formatter type="brief" usefile="false"/>
+      <formatter type="xml"/>
+      <classpath location="${cobertura.dir}/cobertura.jar"/>
+      <classpath location="${test.dir}/instrumented-classes"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${test.data.dir}">
+        <fileset dir="test">
+          <include name="**/*Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <cobertura-report srcdir="${src.dir}" destdir="${test.coverage.dir}"/>
+    <delete file="cobertura.ser"/>
+  </target>
+
+</project>

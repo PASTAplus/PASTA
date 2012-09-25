@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="build-with-jpa">
+
+  <!-- Importing standard build.xml file -->
+  <import file="./simple.xml"/>
+
+  <property name="meta.dir" value="META-INF"/>
+
+  <!-- Path for enhancing the Java Persistence API (JPA) classes -->
+  <path id="jpa.enhancement.classpath">
+    <path refid="compile.classpath"/>
+    <pathelement location="${classes.dir}"/>
+  </path>
+
+  <!-- Compile time enhancement for JPA classes -->
+  <target name="enhance" depends="compile">
+
+    <!-- Create a directory to hold persistence.xml -->
+    <mkdir dir="${classes.dir}/${meta.dir}"/>
+
+    <!-- Copy persistence.xml file from src/META-INF dir -->
+    <copy includeemptydirs="false" todir="${classes.dir}/${meta.dir}">
+      <fileset dir="src/${meta.dir}"/>
+    </copy>
+
+    <!-- define the openjpac task -->
+    <taskdef name="openjpac" classname="org.apache.openjpa.ant.PCEnhancerTask">
+        <classpath refid="jpa.enhancement.classpath"/>
+    </taskdef>
+
+    <!-- invoke the enhancer -->
+    <openjpac>
+        <classpath refid="jpa.enhancement.classpath"/>
+    </openjpac>
+    <echo message="Enhancing complete."/>
+  </target>
+
+  <!-- Overriding the 'test-compile' target from simple.xml -->
+  <target name="test-compile" depends="enhance"
+          description="Compiles all JUnit test files">
+    <ant target="simple.test-compile"/>
+  </target>
+
+  <!-- Overriding the 'test' target from simple.xml -->
+  <target name="test" depends="enhance"
+          description="Executes the JUnit test suite">
+    <ant target="simple.test"/>
+  </target>
+
+  <!-- Overriding the 'war' target from simple.xml -->
+  <target name="war" depends="enhance"
+          description="Deploys the web application to Tomcat (default target)">
+    <ant target="simple.war"/>
+  </target>
+
+</project>
