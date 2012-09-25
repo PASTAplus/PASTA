@@ -1,0 +1,192 @@
+<html>
+
+   <head>
+      <title>Event Manager Demo</title>
+
+      <link href="style.css" rel="stylesheet" type="text/css">
+
+      <script type="text/javascript" src="webtoolkit.base64.js">
+</script>
+      <script type="text/javascript" src="web-service-requests.js">
+</script>
+      <script type="text/javascript" src="util.js">
+</script>
+      <script type="text/javascript">
+
+function initializeRequestForm(requestName) {
+
+   clearResponse();
+
+   switch (requestName) {
+
+   case "CHOOSE":
+      clearRequest();
+      return;
+
+   case "CREATE":
+      Requests.initializeCreate(document.requestForm);
+      return;
+
+   case "READ":
+      Requests.initializeRead(document.requestForm);
+      return;
+
+   case "READ_ALL":
+      Requests.initializeReadAll(document.requestForm);
+      return;
+
+   case "DELETE":
+      Requests.initializeDelete(document.requestForm);
+      return;
+   }
+}
+
+</script>
+   </head>
+
+   <body class="content">
+         <h1>
+           Event Manager Demo
+        </h1>
+        <hr/>
+      <div class="demo">
+	<table>
+	  <tr>
+	    <td>
+        <form id="requestForm" name="requestForm" method="POST"
+            action="">
+            <table border="0" cellpadding="4" cellspacing="0"
+                   width="580" class="content">
+               <tr>
+                  <td>
+                     <b>Web Service Requests</b>
+                     <br />
+                     <select id="requestName" name="requestName"
+                        onChange="initializeRequestForm(requestName.value)">
+                        <option value="CHOOSE">
+                           Select one of the following web service
+                           requests:
+                        </option>
+                        <option value="CREATE">
+                           Create subscription
+                        </option>
+                        <option value="READ">
+                           Read subscription
+                        </option>
+                        <option value="READ_ALL">
+                           Read all subscriptions
+                        </option>
+                        <option value="DELETE">
+                           Delete subscription
+                        </option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="100%">
+                     <b>Request Description</b>
+                     <br />
+                     <textarea id="description" name="description"
+                        type="text" class="webServiceDescription"
+                        readonly="readonly" rows="4" cols="">
+                     </textarea>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>Base URL:</b> https://event.lternet.edu
+                     <br />
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>Relative URL</b>
+                     <br />
+                     <input type="text" id="relativeUrl"
+                        name="relativeUrl" class="formTextField">
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>HTTP verb</b>
+                     <br />
+                     <input type="text" id="httpVerb" name="httpVerb"
+                        class="formTextField">
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>User</b>
+                     <br />
+                     <input type="text" id="user" name="user"
+                        class="formTextField">
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>Password</b>
+                     <br />
+                     <input type="password" id="password" name="password"
+                        class="formTextField">
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <b>Request Content-Type</b>
+                     <br />
+                     <input type="text" id="contentType"
+                        name="contentType" class="formTextField">
+                  </td>
+               </tr>
+               <tr>
+                  <td width="100%">
+                     <b>Request Entity</b>
+                     <br />
+                     <textarea id="entity" name="entity"
+                        class="formTextArea" rows="15" cols="">
+              </textarea>
+                  </td>
+               </tr>
+               <tr>
+                  <td align="center">
+                     <input type="button" value="Send Request"
+                        onClick="sendRequest();">
+                     <input type="button" value="Clear"
+                        onClick="clearRequestAndResponse()">
+                  </td>
+               </tr>
+            </table>
+         </form>
+
+         <br />
+      </div>
+      </td>
+      <td>
+      <div class="mainResult">
+         <table class="content">
+            <tr>
+               <td>
+                  <b>Response</b>
+                  <br />
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <textarea id="response" name="response"
+                     class="webServiceResult" readonly="readonly"
+                     rows="50" cols="">
+      </textarea>
+               </td>
+            </tr>
+         </table>
+         <br />
+         <br />
+         <br />
+         <br />
+      </div>
+      </td>
+   </tr>
+   </table>
+  </body>
+
+</html>

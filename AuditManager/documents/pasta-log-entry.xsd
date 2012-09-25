@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="log-entry">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element name="service" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="category" type="CategoryType" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="event-text" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="user-token" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="http-status-code" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="service-method" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="resource-id" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="CategoryType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="error"> </xs:enumeration>
+      <xs:enumeration value="warn"> </xs:enumeration>
+      <xs:enumeration value="info"> </xs:enumeration>
+      <xs:enumeration value="debug"> </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
