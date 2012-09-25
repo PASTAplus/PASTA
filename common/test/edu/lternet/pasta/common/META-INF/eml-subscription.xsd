@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="subscription">
+    <xs:complexType>
+      <xs:all>
+
+        <xs:element name="packageId" type="xs:string" 
+                    minOccurs="1" maxOccurs="1"/>
+
+        <xs:element name="url" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        
+        <xs:element name="accessControlRule" type="xs:string" 
+                    minOccurs="1" maxOccurs="1"/>
+        
+      </xs:all>
+      <xs:attribute name="type" type="xs:string" use="required" fixed="eml"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

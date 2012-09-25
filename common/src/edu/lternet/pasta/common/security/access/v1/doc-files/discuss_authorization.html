@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Authorization — LTER Network Information System</title>
+    <link rel="stylesheet" href="sphinxdoc.css" type="text/css">
+    <link rel="stylesheet" href="pygments.css" type="text/css">
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="underscore.js"></script>
+    <script type="text/javascript" src="doctools.js"></script>
+    <link rel="top" title="LTER Network Information System" href="https://nis.lternet.edu/nis/documents/html/index.html">
+    <link rel="up" title="PASTA Framework Design Concepts" href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/index.html">
+    <link rel="next" title="PASTA Framework Core Services" href="https://nis.lternet.edu/nis/documents/html/CoreServices/index.html">
+    <link rel="prev" title="&lt;no title&gt;" href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/Authentication/index.html"> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="https://nis.lternet.edu/nis/documents/html/genindex.html" title="General Index" accesskey="I">index</a></li>
+        <li class="right">
+          <a href="https://nis.lternet.edu/nis/documents/html/CoreServices/index.html" title="PASTA Framework Core Services" accesskey="N">next</a> |</li>
+        <li class="right">
+          <a href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/Authentication/index.html" title="&lt;no title&gt;" accesskey="P">previous</a> |</li>
+        <li><a href="https://nis.lternet.edu/nis/documents/html/index.html">LTER Network Information System</a> »</li>
+          <li><a href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/index.html" accesskey="U">PASTA Framework Design Concepts</a> »</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="https://nis.lternet.edu/nis/documents/html/index.html">
+              <img class="logo" src="LTER_logo.png" alt="Logo">
+            </a></p>
+  <h3><a href="https://nis.lternet.edu/nis/documents/html/index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authorization</a><ul>
+<li><a class="reference internal" href="#introduction-background">Introduction &amp; Background</a><ul>
+<li><a class="reference internal" href="#id1">EML-Access Module</a></li>
+<li><a class="reference internal" href="#use-of-the-eml-access-module-in-lter">Use of the EML Access Module in LTER</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization-use-cases">Authorization Use Cases</a></li>
+<li><a class="reference internal" href="#premises">Premises</a></li>
+<li><a class="reference internal" href="#acr-processing">ACR Processing</a><ul>
+<li><a class="reference internal" href="#step-1-acr-normalization">Step 1: ACR Normalization</a></li>
+<li><a class="reference internal" href="#step-2-semantic-interpretation-of-acrs">Step 2: Semantic Interpretation of ACRs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#class-organization-and-method-signatures">Class Organization and Method Signatures</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/Authentication/index.html" title="previous chapter">&lt;no title&gt;</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="https://nis.lternet.edu/nis/documents/html/CoreServices/index.html" title="next chapter">PASTA Framework Core Services</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="https://nis.lternet.edu/nis/documents/html/_sources/DesignConcepts/Authorization/discuss_authorization.txt" rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input name="q" size="18" type="text">
+      <input value="Go" type="submit">
+      <input name="check_keywords" value="yes" type="hidden">
+      <input name="area" value="default" type="hidden">
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="authorization">
+<h1>Authorization<a class="headerlink" href="#authorization" title="Permalink to this headline">¶</a></h1>
+<h1><font color="red">Draft - 27 June 2011</font></h1><div class="section" id="introduction-background">
+<h2>Introduction &amp; Background<a class="headerlink" href="#introduction-background" title="Permalink to this headline">¶</a></h2>
+<p>The PASTA Framework will manage multiple web services and countless 
+resources (physical entities such as data packages, quality reports, and
+ event subscriptions) that require protection from non-privileged 
+access.  It is typical that protection of services and resources be 
+performed through the application of a rule that states who may access 
+the service and or resource and at what level of access (e.g., read or 
+write).  Such rules are known simply as “access control rules” (ACRs).</p>
+<p>There are many ways to define an ACR (e.g., <a class="reference external" href="http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-access.html">eml-access</a>, <a class="reference external" href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=xacml">XACML</a>, <a class="reference external" href="http://incubator.apache.org/imperius/">SPL</a>).  Of particular interest is the <em>eml-access</em> module described in the <a class="reference external" href="http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-access.html">Ecological Metadata Language (EML) 2.1.0</a>
+ XML schema specification: it has familarity within the LTER community 
+(especially, the LTER information managers) and PASTA must be able to 
+interpret these ACRs because of their use within EML documents, which 
+are an integral resource within PASTA.  For these reasons, and because a
+ single system-wide approach to authorization simplifies the 
+architectural design, PASTA will adopt the ACR syntax of the EML <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element specificd in the <em>eml-access</em>
+ module to protect all system services and resources.  It is a goal of 
+this approach to be minimally restrictive in terms of rules and 
+guidelines when considering the construction of ACRs.</p>
+<p>This document provides an <a class="reference internal" href="#id1"><em>overview</em></a> of the <em>eml-access</em> module and the syntax of the  <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element.  It then outlines the primary <a class="reference internal" href="#use-case"><em>use-case scenario</em></a> to be satisfied for system-wide authorization and describes how PASTA will <a class="reference internal" href="#guidelines"><em>process and interpret</em></a> ACRs.  It concludes with a general description of <a class="reference internal" href="#methods"><em>service methods</em></a> and their programatic signatures.  It is especially critical that the reader of this document be familiar with use of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element as defined in the <a class="reference external" href="http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-access.html">eml-access module</a> of the EML 2.1.0 specification to understand and follow specific discussion points.</p>
+<div class="section" id="id1">
+<span id="id2"></span><h3>EML-Access Module<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element has been present in the EML revision history since at least 
+version 1.4.0 when EML was specified by a Document Type Definition 
+(DTD).  The current <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element schema definition (see <a class="reference internal" href="#figure-1"><em>Figure 1: XML schema of the EML access module.</em></a>) is unchanged since EML version 2.0.0 (the first version of EML defined by an XML Schema).</p>
+<p>The <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element uses an approach to resource access control similar to that of 
+the Apache HTTPD “allow” and “deny” directives, where each <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> or <tt class="docutils literal"><span class="pre">&lt;deny&gt;</span></tt> block of the EML <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element requires specifying one or more “principals” (the users or 
+groups of users to whom the permissions apply) and one or more 
+“permissions” of the set <tt class="docutils literal"><span class="pre">read</span></tt>, <tt class="docutils literal"><span class="pre">write</span></tt>, <tt class="docutils literal"><span class="pre">changePermission</span></tt>, and <tt class="docutils literal"><span class="pre">all</span></tt> that may be applied to the list of principals.</p>
+<p>Principal identifiers are system dependent strings that uniquely 
+identify a user or a group.  The set of allowed identifiers are 
+determined by the system’s authentication service (e.g., for LDAP, the 
+principal identifier may be based on the LDAP distinguished name; for 
+opendId, the principal identifier may be an opaque alpha-numeric value),
+ which must be defined in the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element attribute <tt class="docutils literal"><span class="pre">authSystem</span></tt>:</p>
+<blockquote>
+<p><em>“The authentication system determines the set of principals (users +
+groups)that can be used in the access control list, and the membership of
+users in groups. This element is intended to provide a reference to the
+authentication system that is used to verify the user or group. This
+reference is typically in the form of a URI, which includes the connection
+protocol, Internet host, and path to the authentication mechanism.”</em></p>
+<p><em>“Example(s): ldap://ldap.ecoinformatics.org:389/dc=ecoinformatics,dc=org”</em></p>
+</blockquote>
+<p>The EML also recognizes a special principal identifier named “public”, which can be used “to indicate that <strong>any</strong> user or group has a particular access permission, thereby making it easier to specify that anonymous access is allowed.”</p>
+<p>Permissions are ordered by increasing capability - <tt class="docutils literal"><span class="pre">read</span></tt> (read the resource), <tt class="docutils literal"><span class="pre">write</span></tt> (modify the resource, with the exception of permissions), or <tt class="docutils literal"><span class="pre">changePermission</span></tt> (modify the resource, including permissions) (<tt class="docutils literal"><span class="pre">all</span></tt> is symbolic notation for the collective read, write, and changePermission).</p>
+<div class="align-center figure align-center" id="figure-1" style="width: 100%">
+<img alt="../../_images/eml-access.png" src="eml-access.png" style="width: 500px;">
+<p class="caption">Figure 1: XML schema of the EML access module.</p>
+</div>
+<p>There are other optional attributes available to the &lt;access&gt; 
+element, including id, system, scope, and order.  Only order has direct 
+implications for processing the ACR based on its value:</p>
+<blockquote>
+<em>“To obtain the desired access control, use the order attribute to define
+which rules should be applied first. The acceptable values are ‘allowFirst’
+and ‘denyFirst’. If ‘allowFirst’ is specified, then all ‘allow’ rules are
+processed, and then overridden by all ‘deny’ rules. If ‘denyFirst’ is
+specified, then all ‘deny’ rules are processed, and then overridden by all
+‘allow’ rules.”</em></blockquote>
+<p>The use of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element varies in EML versions.  EML versions 2.0.0 and 2.0.1 only allow a single, but optional, <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element in each of the top-level EML modules (i.e., dataset, citation, 
+software, or protocol), where as EML version 2.1.0 allows a single, but 
+optional, <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element above the top-level modules and also a single, but optional, <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element for each data entity (see schema for details).  EML versions prior to 2.1.0 required data entity <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ elements to be defined in the additional metadata section of EML and 
+referenced through the “reference/id” mechanism of the EML processing 
+specification (beyond XML schema validation).  If an <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element is not used at the data entity level, then the top-level <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element is applied to each data entity.  If an <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element does not exist at the top-level, then only the “submitter” of the EML document has full access (<tt class="docutils literal"><span class="pre">read</span></tt>, <tt class="docutils literal"><span class="pre">write</span></tt>, and <tt class="docutils literal"><span class="pre">changePermission</span></tt>) to the document, including data entities:</p>
+<blockquote id="submitter">
+<em>“If this access element is omitted from the document, then the package
+submitter should be given full access to the package but all other users
+should be denied all access. To allow the package to be publicly viewable,
+the EML author must explicitly include a rule stating so.”</em></blockquote>
+</div>
+<div class="section" id="use-of-the-eml-access-module-in-lter">
+<h3>Use of the EML Access Module in LTER<a class="headerlink" href="#use-of-the-eml-access-module-in-lter" title="Permalink to this headline">¶</a></h3>
+<p>The LTER community has adopted the use of EML as its metadata 
+standard since early 2000.  There currently exists about 7,000 EML 
+documents in the LTER Metacat (as of March 2011) that have been 
+contributed by the LTER community and the majority of those are based on
+ the EML 2.0.1 version (EML 2.0.0 - 3%, EML 2.0.1 - 87%, and EML 2.1.0 -
+ 10%; see <a class="reference external" href="https://spreadsheets.google.com/ccc?key=0AvmNJnP7eHevdGFzdWJORE14ZWs0NFowX1ZRZkd1V3c&amp;hl=en&amp;authkey=COi89YkO#gid=0">Google spreadsheet</a>).</p>
+<p>Almost all LTER contributed EML documents (99%) explicitly utilize the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element at either the document (top) or data entity level with “knb” as the only defined <tt class="docutils literal"><span class="pre">authSystem</span></tt>, and almost all use only <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> (only SBC utilizes <tt class="docutils literal"><span class="pre">&lt;deny&gt;</span></tt> elements) for providing access.  Most EML documents include either one or two principals (other than “public”) in their <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element, in addition to a single principal “public” given read permission.</p>
+<hr></div>
+</div>
+<div class="section" id="authorization-use-cases">
+<span id="use-case"></span><h2>Authorization Use Cases<a class="headerlink" href="#authorization-use-cases" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Determine whether a user who requests access to a given service or resource is granted such access.</li>
+</ol>
+<hr></div>
+<div class="section" id="premises">
+<span id="id3"></span><h2>Premises<a class="headerlink" href="#premises" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Users requesting access to a service or resource will be denied 
+access unless an ACR explicitly grants that user access to the service 
+or resource.</li>
+<li>Every user requesting access to a service or resource must have a 
+“principal” identifier (i.e., the user is labeled with a unique 
+identifier used for authorization purposes).</li>
+<li>Users are either authenticated through the authentication system or considered non-authenticated. <a class="footnote-reference" href="#non-authenticated" id="id4">[1]</a></li>
+<li>The principal identifier “public” is assigned to any non-authenticated user.</li>
+<li>Zero or more authenticated users may belong to a group.</li>
+<li>A user that belongs to a group inherits the permissions of that group.</li>
+<li>A user may belong to zero or more groups.</li>
+<li>In a <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> element, permissions of greater access imply permissions of lesser access  (i.e., explicitly allowing <tt class="docutils literal"><span class="pre">changePermission</span></tt> permission implicitly allows <tt class="docutils literal"><span class="pre">write</span></tt> and <tt class="docutils literal"><span class="pre">read</span></tt> permissions; explicitly allowing <tt class="docutils literal"><span class="pre">write</span></tt> permission implicitly allows <tt class="docutils literal"><span class="pre">read</span></tt> permission).</li>
+<li>In a <tt class="docutils literal"><span class="pre">&lt;deny&gt;</span></tt> element, permissions of lesser access imply permissions of greater access (i.e., explicitly denying <tt class="docutils literal"><span class="pre">read</span></tt> permission implicitly denies <tt class="docutils literal"><span class="pre">write</span></tt> and <tt class="docutils literal"><span class="pre">changePermission</span></tt> permissions; explicitly denying <tt class="docutils literal"><span class="pre">write</span></tt> permission implicitly denies <tt class="docutils literal"><span class="pre">changePermission</span></tt>).</li>
+<li>There will exist a privileged system user with uid=”pasta” that has 
+full access (read, write, changePermission) to all services and 
+resources regardless of stated ACRs.</li>
+<li>The resource “submitter” retains full access (read, write, changePermission) for all resources regardless of stated ACRs.</li>
+</ol>
+</div>
+<div class="section" id="acr-processing">
+<span id="guidelines"></span><h2>ACR Processing<a class="headerlink" href="#acr-processing" title="Permalink to this headline">¶</a></h2>
+<p>Authorization in the PASTA Framework relys on the basic premise that all services and primary resources <a class="footnote-reference" href="#primary" id="id5">[2]</a>
+ have an ACR and all users that request access to a service or primary 
+resource may be identified by one or more unique principal identifiers 
+(i.e., the identifier of the user and the identifiers of groups to which
+ they belong).  Users who are not members of the LTER Network may still 
+be identified through some other means, but will be assigned the 
+“public” principal identifier for purposes of authorization (Premise 
+#4).</p>
+<p>Authorization will utilize the complete EML 2.1.0 Access-Module specification.  For PASTA, the <tt class="docutils literal"><span class="pre">authSystem</span></tt> attribute of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element should be set (or similar) to <tt class="docutils literal"><span class="pre">authSystem="ldaps://ldap.lternet.edu:636/"</span></tt>; only the LTER authentication system will recognized by PASTA for the purpose of principal identifiers.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The use of “group” identifiers in the current LTER 
+authentication system (i.e., LDAP) is not yet defined.  For this reason,
+ the use of “groups” for the purposes of authentication and 
+authorization will likely not be addressed in Turing phase of PASTA 
+development.</p>
+</div>
+<p>ACRs processing will follow a two-step sequence.  The first step will perform normalization of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element (see <a class="reference internal" href="#acr-normalization"><em>Step 1: ACR Normalization</em></a>)
+ into its canonical “access matrix” form.  This first step can be 
+performed one time when the resource is created or the service is 
+defined.  The second step will perform the semantic interpretation of 
+the ACR to determine whether a user will be allowed or denied access to 
+the requested service or resource (see <a class="reference internal" href="#acr-interpretation"><em>Step 2: Semantic Interpretation of ACRs</em></a>).  This second step would occur each time a user requests access to a service or resource.</p>
+<div class="section" id="step-1-acr-normalization">
+<span id="acr-normalization"></span><h3>Step 1: ACR Normalization<a class="headerlink" href="#step-1-acr-normalization" title="Permalink to this headline">¶</a></h3>
+<p>The XML schema of the EML Access Module permits the construction of 
+multiple XML structures that differ in syntax, but result in the same 
+semantic interpretation of the ACRs. For example, an <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element can include a single principal in multiple <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> blocks where each block grants the next succesive permission to (ultimately) allow <tt class="docutils literal"><span class="pre">changePermission</span></tt> (<a class="reference internal" href="#example-1"><em>Example 1</em></a>) or the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element can use a single <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> block with the same type of sequence within the single block (<a class="reference internal" href="#example-2"><em>Example 2</em></a>) or the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element can use a single <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> block with the single permission <tt class="docutils literal"><span class="pre">changePermission</span></tt> (<a class="reference internal" href="#example-3"><em>Example 3</em></a>).  All three examples result in the same semantic interpretation of the ACRs - the principal is allowed  <tt class="docutils literal"><span class="pre">changePermission</span></tt> access to the service or resource.</p>
+<p id="example-1">Example 1:</p>
+<div class="highlight-xml"><pre>&lt;access authSystem=""ldaps://ldap.lternet.edu:636/""&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;write&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;changePermission&lt;/permission&gt;
+    &lt;/allow&gt;
+ &lt;/access&gt;</pre>
+</div>
+<p id="example-2">Example 2:</p>
+<div class="highlight-xml"><pre>&lt;access authSystem=""ldaps://ldap.lternet.edu:636/""&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+        &lt;permission&gt;write&lt;/permission&gt;
+        &lt;permission&gt;changePermission&lt;/permission&gt;
+    &lt;/allow&gt;
+ &lt;/access&gt;</pre>
+</div>
+<p id="example-3">Example 3:</p>
+<div class="highlight-xml"><pre>&lt;access authSystem=""ldaps://ldap.lternet.edu:636/""&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;changePermission&lt;/permission&gt;
+     &lt;/allow&gt;
+ &lt;/access&gt;</pre>
+</div>
+<p>Because the same semantic rule interpretation can be derived from differently formed <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ elements, ACR processing should normalize the XML structures into a 
+canonical “access matrix” of unique tuples that consist of a principal 
+identifier, the type of access (e.g., “allow” or “deny”), and the 
+corresponding “watermark” permission (i.e., the highest allowed 
+permission “high-watermark” or lowest denied permission “low-watermark” 
+applied to the principal).</p>
+<p>Normalization of the <tt class="docutils literal"><span class="pre">access</span></tt> element for any of the above rules would result in the following one tuple “access matrix”:</p>
+<blockquote>
+<table class="docutils" border="1">
+<colgroup>
+<col width="68%">
+<col width="8%">
+<col width="25%">
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">PRINCIPAL</th>
+<th class="head">TYPE</th>
+<th class="head">PERMISSION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</td>
+<td>allow</td>
+<td>changePermission</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>An example of a more typical <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element is shown in <a class="reference internal" href="#example-4"><em>Example 4</em></a>, where multiple principals are listed in both <tt class="docutils literal"><span class="pre">&lt;allow&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;deny&gt;</span></tt> blocks.</p>
+<p id="example-4">Example 4:</p>
+<div class="highlight-xml"><pre>&lt;access authSystem=""ldaps://ldap.lternet.edu:636/""&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;changePermission&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;allow&gt;
+        &lt;!-- a group --&gt;
+        &lt;principal&gt;uid=LTER-IM,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+        &lt;permission&gt;write&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;allow&gt;
+        &lt;principal&gt;public&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+    &lt;/allow&gt;
+    &lt;deny&gt;
+        &lt;principal&gt;uid=miscreant,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+        &lt;permission&gt;read&lt;/permission&gt;
+    &lt;/deny&gt;
+&lt;/access&gt;</pre>
+</div>
+<p>Normalizing the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element of <a class="reference internal" href="#example-4"><em>Example 4</em></a> would result in the following “access matrix”:</p>
+<blockquote>
+<table class="docutils" border="1">
+<colgroup>
+<col width="68%">
+<col width="8%">
+<col width="24%">
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">PRINCIPAL</th>
+<th class="head">TYPE</th>
+<th class="head">PERMISSION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</td>
+<td>allow</td>
+<td>changePermission</td>
+</tr>
+<tr><td>uid=LTER-IM,o=LTER,dc=ecoinformatics,dc=org</td>
+<td>allow</td>
+<td>write</td>
+</tr>
+<tr><td>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</td>
+<td>allow</td>
+<td>read</td>
+</tr>
+<tr><td>public</td>
+<td>allow</td>
+<td>read</td>
+</tr>
+<tr><td>uid=miscreant,o=LTER,dc=ecoinformatics,dc=org</td>
+<td>deny</td>
+<td>read</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+</div>
+<div class="section" id="step-2-semantic-interpretation-of-acrs">
+<span id="acr-interpretation"></span><h3>Step 2: Semantic Interpretation of ACRs<a class="headerlink" href="#step-2-semantic-interpretation-of-acrs" title="Permalink to this headline">¶</a></h3>
+<p>The semantic interpretation of ACRs is constrained only by the <a class="reference internal" href="#premises"><em>Premises</em></a> stated above; there are no constraints applied to the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element (as long as it is well formed and valid according to the EML 
+XML schema).  Before describing the sequence of processing for semantic 
+interpretation of ACRs, the following points should be emphasized:</p>
+<ul>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">order</span></tt> attribute of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element is relevant only if set to <tt class="docutils literal"><span class="pre">allowFirst</span></tt> or not defined at all (in which case it defaults to <tt class="docutils literal"><span class="pre">allowFirst</span></tt>).  If the <tt class="docutils literal"><span class="pre">order</span></tt> attribute is set to <tt class="docutils literal"><span class="pre">denyFirst</span></tt>,
+ only rules pertaining to “allow” access will be interpreted since all 
+users are implicitly “denied” access as an initial condition (Premise 
+#1).</p>
+</li>
+<li><p class="first">Any group principal identifier found in an <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element may be replaced with the principal identifiers of its users 
+(along with the group’s permission) because users inherit group 
+permissions (Premise #6).  If, however, the user’s principal identifier 
+is already in the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element, the group’s permission may or may not have an affect on the 
+corresponding “watermark” permission found in the “access matrix”.  For 
+example, if <tt class="docutils literal"><span class="pre">uid=ucarrol</span></tt> and <tt class="docutils literal"><span class="pre">uid=miscreant</span></tt> were members of the group <tt class="docutils literal"><span class="pre">uid=LTER-IM</span></tt>, as in <a class="reference internal" href="#example-4"><em>Example 4</em></a>, replacement of the group principal identifier would result in <tt class="docutils literal"><span class="pre">uid=ucarroll</span></tt> being changed from “allow” <tt class="docutils literal"><span class="pre">read</span></tt> to “allow” <tt class="docutils literal"><span class="pre">write</span></tt> permission and <tt class="docutils literal"><span class="pre">uid=miscreant</span></tt> being added with “allow” <tt class="docutils literal"><span class="pre">write</span></tt> permission (note that if <tt class="docutils literal"><span class="pre">order="allowFirst"</span></tt>, then <tt class="docutils literal"><span class="pre">uid=miscreant</span></tt> would still be denied any access to the service or resource):</p>
+<blockquote>
+<table class="docutils" border="1">
+<colgroup>
+<col width="68%">
+<col width="8%">
+<col width="24%">
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head"><p class="first last">PRINCIPAL</p>
+</th>
+<th class="head"><p class="first last">TYPE</p>
+</th>
+<th class="head"><p class="first last">PERMISSION</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><p class="first last">uid=LNO,o=LTER,dc=ecoinformatics,dc=org</p>
+</td>
+<td><p class="first last">allow</p>
+</td>
+<td><p class="first last">changePermission</p>
+</td>
+</tr>
+<tr><td><p class="first last">uid=miscreant,o=LTER,dc=ecoinformatics,dc=org</p>
+</td>
+<td><p class="first last">allow</p>
+</td>
+<td><p class="first last">write</p>
+</td>
+</tr>
+<tr><td><p class="first last">uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</p>
+</td>
+<td><p class="first last">allow</p>
+</td>
+<td><p class="first last">write</p>
+</td>
+</tr>
+<tr><td><p class="first last">public</p>
+</td>
+<td><p class="first last">allow</p>
+</td>
+<td><p class="first last">read</p>
+</td>
+</tr>
+<tr><td><p class="first last">uid=miscreant,o=LTER,dc=ecoinformatics,dc=org</p>
+</td>
+<td><p class="first last">deny</p>
+</td>
+<td><p class="first last">read</p>
+</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This thought exercise may help in understanding ACR 
+processing when there exists both user and group principal identifiers 
+in an <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element. In practice, however, this process would not occur during the normalization of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt>
+ element because group membership is dynamic and users may or may not 
+belong to the group at any instance in time.  It is for this reason why 
+the list of group principal identifiers must accompany the user’s 
+principal identifier as part of the authentication token with every 
+service or resource authorization request.</p>
+</div>
+<ul class="simple">
+<li>If any authenticated user is denied access to a service or resource 
+that is accessible to the principal “public”, the authenticated user may
+ simply end their current session as an authenticated user and make the 
+same access request as a non-authenticated user (i.e., principal 
+“public”; Premise #4), therby successfully accessing the service or 
+resource.  For this reason, PASTA will allow access to the authenticated
+ user even when they are initially denied access if the principal 
+“public” is allowed access to the same service or resource.</li>
+</ul>
+<p>Semantic interpretation of the ACR may occur in two different sequences depending on the value of the <tt class="docutils literal"><span class="pre">order</span></tt> attribute of the <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element:</p>
+<ol class="arabic">
+<li><p class="first">If the user of the given request is either 
+uid=”pasta” or the “submitter” of the resource, return success (Premises
+ #10 and #11).</p>
+</li>
+<li><p class="first">If <tt class="docutils literal"><span class="pre">allowFirst</span></tt> or if the <tt class="docutils literal"><span class="pre">order</span></tt> attribute is not defined, process the given request by:</p>
+<blockquote>
+<ol class="loweralpha simple">
+<li>If the user or any of the user’s group affiliations are in the 
+“allow” access matrix, determine the corresponding “high-watermark” 
+permission for the user and interpret the rules.  If the user is allowed
+ access, proceed to “b”.  If the user is denied access or if the user or
+ any of the user’s group affiliations are not in the “allow” matrix, 
+proceed to “c”.</li>
+<li>If the user or any of the user’s group affiliations are in the 
+“deny” access matrix, determine the corresponding “low-watermark” 
+permission for the user and interpret the rules.  If the user is still 
+allowed access, return success; otherwise, proceed to “c”.</li>
+<li>Repeat steps “a” through “b” with the principal identifier “public”.
+  If allowed access, return success; otherwise, return failure.</li>
+</ol>
+</blockquote>
+</li>
+<li><p class="first">If <tt class="docutils literal"><span class="pre">denyFirst</span></tt>, process the given request by:</p>
+<blockquote>
+<ol class="loweralpha simple">
+<li>If the user or any of the user’s group affiliations are in the 
+“allow” access matrix, determine the corresponding “high-watermark” 
+permission for the user and interpret the rules.  If the user is allowed
+ access, return success.  If the user is denied access or if the user or
+ any of the user’s group affiliations are not in the “allow” matrix, 
+proceed to “b”.</li>
+</ol>
+<ol class="loweralpha simple" start="3">
+<li>Repeat step “a” with the principal identifier “public”.  If allowed access, return success; otherwise, return failure.</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<hr></div>
+</div>
+<div class="section" id="class-organization-and-method-signatures">
+<span id="methods"></span><h2>Class Organization and Method Signatures<a class="headerlink" href="#class-organization-and-method-signatures" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="public.isAuthorized">
+<tt class="descclassname">public.</tt><tt class="descname">isAuthorized</tt><big>(</big><em>principalList</em>, <em>authSystem</em>, <em>accessType</em>, <em>objectId</em><big>)</big><a class="headerlink" href="#public.isAuthorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if any <em>principal</em> in the <em>list</em> has the permission for the requested <em>access</em> to the service or resource identified by <em>objectId</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<colgroup><col class="field-name">
+<col class="field-body">
+</colgroup><tbody valign="top">
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>principalList</em> - list of principal identifiers associated with user</td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>authSystem</em> - the authentication system used to identify users</td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>accessType</em> - type of access being requested (<tt class="docutils literal"><span class="pre">create</span></tt>, <tt class="docutils literal"><span class="pre">read</span></tt>, <tt class="docutils literal"><span class="pre">update</span></tt>, <tt class="docutils literal"><span class="pre">delete</span></tt>) based on possible RESTful web service methods</td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>objectId</em> - the unique identifier of the service or resource being requested</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+<p>The following table maps request permissions to those permitted in the eml-access module:</p>
+<blockquote>
+<table class="docutils" border="1">
+<colgroup>
+<col width="22%">
+<col width="78%">
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">REQUEST</th>
+<th class="head">EML-ACCESS</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>create</td>
+<td>write</td>
+</tr>
+<tr><td>read</td>
+<td>read</td>
+</tr>
+<tr><td>update</td>
+<td>write or changePermission</td>
+</tr>
+<tr><td>delete</td>
+<td>write</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p><em>Create</em> requires <em>write</em> permission for the service method.</p>
+<p><em>Read</em> requires <em>read</em> permission for either the service or resource.</p>
+<p><em>Update</em> requires either <em>write</em> or <em>changePermission</em>
+ permission for sevice or resource and will be dependent on the type of 
+object being modified.  In some instances, the ACR is separated from the
+ actual object (e.g., an event subscription) and would require a 
+separate service method for modifying the ACR, where as other object 
+ACRs are part of the resource (e.g., an EML document) and will require 
+evaluation of the resource modification to determine if the ACR is being
+ modified.</p>
+<p><em>Delete</em> requires <em>write</em> permission for either the service or resource.</p>
+<p>For the purpose of the Turing phase of PASTA, the <tt class="docutils literal"><span class="pre">authSystem</span></tt> is assumed to be the LTER authentication system, which is currently an LDAP directory service found at <a class="reference external" href="ldap://ldap.lternet.edu">ldap://ldap.lternet.edu</a> or ldaps://ldap.lternet.edu:636.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="private.normalize">
+<tt class="descclassname">private.</tt><tt class="descname">normalize</tt><big>(</big><em>accessElement</em><big>)</big><a class="headerlink" href="#private.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize an eml-access module <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element into its canonical access matrix form.</p>
+<blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<colgroup><col class="field-name">
+<col class="field-body">
+</colgroup><tbody valign="top">
+<tr class="field"><th class="field-name">param:</th><td class="field-body"><em>accessElement</em> - an EML <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element as <strong>XML</strong></td>
+</tr>
+<tr class="field"><th class="field-name">return:</th><td class="field-body">accessMatrix - canonicalized form of <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element</td>
+</tr>
+</tbody>
+</table>
+<p>Type of an “access matrix” is to be defined.  An “access matrix” 
+contains a list of unique tuples consisting of a principal identifier, 
+the type access (e.g., “allow” or “deny”), and the corresponding 
+“watermark” permission (i.e., the highest allowed permission 
+“high-watermark” or lowest denied permission “low-watermark” applied to 
+the principal).  See <a class="reference internal" href="#acr-normalization"><em>Step 1: ACR Normalization</em></a> for a discussion about <tt class="docutils literal"><span class="pre">&lt;access&gt;</span></tt> element normalization.</p>
+</blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="private.isEqual">
+<tt class="descclassname">private.</tt><tt class="descname">isEqual</tt><big>(</big><em>authSystem</em>, <em>principalId</em>, <em>principalId</em><big>)</big><a class="headerlink" href="#private.isEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the two principal identifiers are equal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<colgroup><col class="field-name">
+<col class="field-body">
+</colgroup><tbody valign="top">
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>authSystem</em> - the authentication system used to identify users</td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>principalId</em> - a principal identifier as <strong>string</strong></td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>principalId</em> - a principal identifier as <strong>string</strong></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+<p>A comparison of principal identifiers should be performed using the 
+rules of the authentication system to determine if the two principal 
+identifiers are equal; in the absence of such rules, a literal string 
+comparison should be performed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">private.</tt><tt class="descname">isEqual</tt><big>(</big><em>accessMatrix</em>, <em>accessMatrix</em><big>)</big></dt>
+<dd><p>Determine if the two access matrices are equal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<colgroup><col class="field-name">
+<col class="field-body">
+</colgroup><tbody valign="top">
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>accessMatrix</em> - access matrix as <strong>accessMatrix</strong></td>
+</tr>
+<tr class="field"><th class="field-name">Param :</th><td class="field-body"><em>accessMatrix</em> - access matrix as <strong>accessMatrix</strong></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+<p>Type of an “access matrix” is to be defined.  Each access matrix is 
+in canonical form where each tuple of the matrix is unique.  Comparison 
+for equality may be accomplished by ordering the tuple list and 
+performing a tuple-by-tuple comparison.  The goal of this method is to 
+ultimately determine if <tt class="docutils literal"><span class="pre">changePermission</span></tt> access is violated.</p>
+</dd></dl>
+
+<hr><table class="docutils footnote" frame="void" id="non-authenticated" rules="none">
+<colgroup><col class="label"><col></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[1]</a></td><td>Users
+ may be “identified” through another mechanism (e.g., the current Data 
+Access Server user registry), but not be part of the LTER LDAP 
+authentication system.  In this case, the user would be 
+non-authenticated and therefore labeled as the principal “public”.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="primary" rules="none">
+<colgroup><col class="label"><col></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[2]</a></td><td>A
+ primary resource is a resource that has an associated ACR.  Secondary 
+resources can exist in PASTA, such as audit records, but may not have an
+ ACR (it would be too costly for each audit record to have its own ACR);
+ protection of secondary resources would be performed through service 
+method ACRs.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="https://nis.lternet.edu/nis/documents/html/genindex.html" title="General Index">index</a></li>
+        <li class="right">
+          <a href="https://nis.lternet.edu/nis/documents/html/CoreServices/index.html" title="PASTA Framework Core Services">next</a> |</li>
+        <li class="right">
+          <a href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/Authentication/index.html" title="&lt;no title&gt;">previous</a> |</li>
+        <li><a href="https://nis.lternet.edu/nis/documents/html/index.html">LTER Network Information System</a> »</li>
+          <li><a href="https://nis.lternet.edu/nis/documents/html/DesignConcepts/index.html">PASTA Framework Design Concepts</a> »</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        © Copyright 2011, LTER Network.
+      Last updated on Jun 27, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0b2.
+    </div>
+  
+</body></html>

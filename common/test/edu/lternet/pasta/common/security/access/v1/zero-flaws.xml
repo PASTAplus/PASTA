@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns:access
+    xmlns:ns="eml://ecoinformatics.org/access-2.1.0"
+    authSystem="lter" 
+    order="allowFirst">
+    
+  <allow>
+    <principal>uid=ucarroll,o=lter,dc=ecoinformatics,dc=org</principal>
+    <permission>read</permission>
+    <permission>write</permission>
+    <permission>changePermission</permission>
+  </allow>
+
+  <allow>
+    <principal>public</principal>
+    <permission>read</permission>
+  </allow>
+  
+</ns:access>

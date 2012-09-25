@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="common">
+
+  <property file="build.properties"/>
+  <import file="../ant-util/simple.xml"/>
+
+  <!-- Properties for building and deploying -->
+  <property name="classes.dir" location="${build.dir}/classes"/>
+  <property name="jar.dir" location="${build.dir}/jar"/>
+  <property name="lib.dir" value="lib"/>
+
+  <!-- Path for compiling the source code -->
+  <path id="compile.classpath">
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+    <fileset dir="${tomcat.lib}">
+      <include name="servlet*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="prepare" depends="_check-repo" if="repo.lib.present"
+          description="Prepares the build area for compilation">
+    <mkdir dir="${lib.dir}"/>
+    <!-- Copy shared libraries into the local lib directory -->
+    <copy todir="${lib.dir}" preservelastmodified="true" verbose="true"
+          filtering="no">
+      <fileset dir="${shared.lib.dir}/jersey">
+        <include name="jersey-core-1.4.jar"/>
+        <include name="jersey-server-1.4.jar"/>
+        <include name="jersey-client-1.4.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/junit">
+        <include name="junit-4.8.2.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-commons">
+        <include name="commons-codec-1.4.jar"/>
+        <include name="commons-httpclient-3.1.jar"/>
+        <include name="commons-logging-1.1.1.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-logging">
+        <include name="log4j-1.2.13.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/unboundid">
+        <include name="unboundid-ldapsdk-se.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
+        <include name="eml-2.1.0.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jaxb-log-entry-0.1">
+        <include name="log-entry-0.1.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jaxb-pasta-access-0.1">
+        <include name="pasta-access-0.1.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jaxb-pasta-service-0.1">
+        <include name="pasta-service-0.1.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/quickcheck">
+        <include name="quickcheck-0.6.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="clean" description="Deletes compiled classes">
+    <delete dir="${classes.dir}"/>
+    <delete dir="${jar.dir}"/>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${jar.dir}"/>
+    <jar destfile="${jar.dir}/${ant.project.name}.jar"
+         basedir="${classes.dir}"/>
+  </target>
+
+  <target name="test" depends="test-compile"
+          description="Executes the JUnit test suite">
+    <junit printsummary="false" haltonfailure="false"
+           errorProperty="test.failed" failureProperty="test.failed">
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <formatter type="brief" usefile="false"/>
+      <formatter type="xml"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${test.data.dir}">
+        <fileset dir="test">
+          <include name="**/*Test*.java"/>
+	  <exclude name="**/proxy/*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${test.data.dir}">
+      <fileset dir="${test.data.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.reports.dir}"/>
+    </junitreport>
+    <fail if="test.failed">
+      One or more JUnit tests failed or had errors.
+      Check ${test.reports.dir}.
+    </fail>
+  </target>
+
+  <target name="test-proxy" depends="test-compile"
+          description="Executes the JUnit test suite for proxy classes">
+    <junit printsummary="false" haltonfailure="false"
+           errorProperty="test.failed" failureProperty="test.failed">
+      <formatter type="brief" usefile="false"/>
+      <formatter type="xml"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${test.data.dir}">
+        <fileset dir="test">
+          <include name="**/proxy/**/*Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${test.data.dir}">
+      <fileset dir="${test.data.dir}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${test.reports.dir}"/>
+    </junitreport>
+    <fail if="test.failed">
+      One or more JUnit tests failed or had errors.
+      Check ${test.reports.dir}.
+    </fail>
+  </target>
+
+  <target name="deploy" depends="jar,_check-repo" if="repo.lib.present"
+          description="Deploys the jar file into appropriate destination">
+    <copy todir="${shared.lib.dir}" preservelastmodified="true" verbose="true"
+          filtering="no">
+      <fileset dir="${jar.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+</project>

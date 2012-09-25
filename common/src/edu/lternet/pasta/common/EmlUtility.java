@@ -1,0 +1,221 @@
+/*
+ *
+ * $Date$
+ * $Author$
+ * $Revision$
+ *
+ * Copyright 2010 the University of New Mexico.
+ *
+ * This work was supported by National Science Foundation Cooperative
+ * Agreements #DEB-0832652 and #DEB-0936498.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ */
+
+package edu.lternet.pasta.common;
+
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+
+import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
+import eml.ecoinformatics_org.access_2_1.AccessType;
+import eml.ecoinformatics_org.access_2_1.ObjectFactory;
+import eml.ecoinformatics_org.eml_2_1.Eml;
+
+/**
+ * Used to conveniently read EML documents.
+ */
+public final class EmlUtility {
+
+    private EmlUtility() {
+        // preventing instantiation
+    }
+
+    /**
+     * Returns the packageId of the provided EML document without parsing it
+     * (the packageId). If the document does not contain the attribute
+     * {@code //@packageId}, or if it does not have a value, an empty string
+     * is returned.
+     *
+     * @param emlDocument
+     *            an EML document.
+     *
+     * @return the packageId contained in the provided EML document.
+     */
+    public static String getRawEmlPackageId(Document emlDocument) {
+
+        try {
+
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            return xpath.evaluate("//@packageId", emlDocument);
+
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);  // Should never be reached
+        }
+
+    }
+
+    /**
+     * Parses and returns the packageId of the provided EML document. The
+     * provided document must contain the attribute {@code //@packageId},
+     * with values for the full tuple (scope, identifier, revision); otherwise
+     * an {@link IllegalEmlPackageIdException} will be thrown.
+     *
+     * @param emlDocument
+     *            an EML document.
+     *
+     * @return the packageId of the provided EML document.
+     *
+     * @throws IllegalEmlPackageIdException
+     *             if the packageId does not exist, cannot be parsed, or does
+     *             contain all of the required values.
+     */
+    public static EmlPackageId getEmlPackageId(Document emlDocument) {
+
+        String packageId = getRawEmlPackageId(emlDocument);
+
+        EmlPackageIdFormat formatter = new EmlPackageIdFormat(Delimiter.DOT);
+
+        EmlPackageId epi = null;
+
+        try {
+            epi = formatter.parse(packageId);
+        } catch (IllegalArgumentException e) {
+            String s = "The EML packageId attribute '" + packageId +
+                       "' could not be parsed. The parser reported the " +
+                       "following error: " + e.getMessage();
+            throw new IllegalEmlPackageIdException(s, packageId, e);
+        }
+
+        if (epi.getRevision() == null) {
+            String s = "The EML packageId attribute '" + packageId +
+                       "' is missing a revision.";
+            throw new IllegalEmlPackageIdException(s, packageId);
+        }
+
+        if (epi.getIdentifier() == null) {
+            String s = "The EML packageId attribute '" + packageId +
+                       "' is missing both an identifier and a revision.";
+            throw new IllegalEmlPackageIdException(s, packageId);
+        }
+
+        if (epi.getScope() == null) {
+            String s = "A value was not specified for the EML packageId " +
+                       "attribute.";
+            throw new IllegalEmlPackageIdException(s, packageId);
+        }
+
+        return epi;
+    }
+
+    /**
+     * Parses the provided EML 2.1.0 string and returns a corresponding JAXB
+     * object.
+     *
+     * @param emlString
+     *            the EML string.
+     * @return a JAXB object corresponding to the provided EML string.
+     *
+     * @throws IllegalArgumentException
+     *             with a {@linkplain JAXBException} as the cause.
+     */
+    public static Eml getEml2_1_0(String emlString) {
+
+        try {
+            String packageName = Eml.class.getPackage().getName();
+            JAXBContext jc = JAXBContext.newInstance(packageName);
+            Unmarshaller u = jc.createUnmarshaller();
+            StringReader reader = new StringReader(emlString);
+            Eml eml = (Eml) u.unmarshal(reader);
+            return eml;
+        }
+        catch (JAXBException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+    }
+
+    /**
+     * Parses the provided EML 2.1.0 {@code <access>} element string and
+     * returns a corresponding JAXB object.
+     *
+     * @param accessString
+     *            the {@code <access>} element string.
+     * @return a JAXB object corresponding to the provided string.
+     *
+     * @throws IllegalArgumentException
+     *             with a {@linkplain JAXBException} as the cause.
+     */
+    @SuppressWarnings("unchecked")
+    public static AccessType getAccessType2_1_0(String accessString) {
+
+        try {
+            String packageName = AccessType.class.getPackage().getName();
+            JAXBContext jc = JAXBContext.newInstance(packageName);
+            Unmarshaller u = jc.createUnmarshaller();
+            StringReader reader = new StringReader(accessString);
+
+            JAXBElement<AccessType> jaxb =
+                (JAXBElement<AccessType>) u.unmarshal(reader);
+
+            return jaxb.getValue();
+        }
+        catch (JAXBException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+    }
+
+    /**
+     * Creates and returns an EML 2.1.0 {@code <access} element string that
+     * corresponds to the provided JAXB object.
+     *
+     * @param accessType
+     *            the JAXB object to be represented as a string.
+     * @return an EML 2.1.0 {@code <access} element string that corresponds to
+     *         the provided JAXB object.
+     */
+    public static String toString(AccessType accessType) {
+
+        try {
+
+            ObjectFactory factory = new ObjectFactory();
+            JAXBElement<AccessType> jaxb = factory.createAccess(accessType);
+
+            StringWriter writer = new StringWriter();
+
+            String packageName = AccessType.class.getPackage().getName();
+            JAXBContext jc = JAXBContext.newInstance(packageName);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(jaxb, writer);
+
+            return writer.toString();
+        }
+        catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
+}
