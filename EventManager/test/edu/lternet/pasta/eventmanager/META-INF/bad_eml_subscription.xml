@@ -1,0 +1,4 @@
+<subscription type="eml">
+   <packageId>lter-lno.12.74</packageId>
+   <url>htt://foo?bar</url>
+</subscription>

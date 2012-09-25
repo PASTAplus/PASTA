@@ -1,0 +1,69 @@
+.demo {
+    width: 580px;
+    float: left;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 16px;
+    padding-bottom: 0px;
+}
+
+.mainResult {
+    width: 580px;
+    float: left;
+    padding-top: 0px;
+    padding-left: 8px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+.webServiceDescription {
+    width: 580px;
+    height: 80px;
+    float: left;
+    overflow: auto;
+    padding: 4px;
+    margin: 2px;
+    background: #EEEEEE;
+    border-style: solid;
+    border-color: #CFCFCF;
+    border-width: 1px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+.webServiceResult {
+    width: 580px;
+    height: 400px;
+    float: left;
+    overflow: auto;
+    padding: 4px;
+    margin: 2px;
+    background: #CCE6FF;
+    border-style: solid;
+    border-color: #CFCFCF;
+    border-width: 1px;
+}
+
+.formTextField {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    width: 580px;
+}
+
+.formLabelField {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    width: 580px;
+    background: #EEEEEE;
+}
+
+.formTextArea {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    width: 580px;
+}
+
+.content {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
