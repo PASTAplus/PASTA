@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="knb-lter-lno.99999.1" 
+         system="knb" xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://nis.lternet.edu/nis/schemas/eml/eml-2.1.0/eml.xsd">
+    <access authSystem="knb" order="allowFirst" scope="document" system="knb">
+        <allow>
+            <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+            <permission>all</permission>
+        </allow>
+        <allow>
+            <principal>public</principal>
+            <permission>read</permission>
+        </allow>
+    </access>
+    <dataset>
+        <title>Fictional Bug Count in Nonesuch, Utah</title>
+        <creator>
+            <individualName>
+                <givenName>Utah</givenName>
+                <surName>Carroll</surName>
+            </individualName>
+        </creator>
+        <contact>
+            <individualName>
+                <givenName>Nevada</givenName>
+                <surName>Barr</surName>
+            </individualName>
+        </contact>
+    </dataset>
+</eml:eml>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<qr:qualityReport
+  xmlns="eml://ecoinformatics.org/qualityReport"
+  xmlns:qr="eml://ecoinformatics.org/qualityReport"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="eml://ecoinformatics.org/qualityReport http://svn.lternet.edu/svn/NIS/documents/schemas/quality/qualityReportSchema.xsd"
+  >
+  <creationDate>2012-01-24T11:12:36</creationDate>
+  <packageId>knb-lter-lno.2002005.6</packageId>
+  <includeSystem>knb</includeSystem>
+  <includeSystem>lter</includeSystem>
+  <datasetReport>
+  </datasetReport>
+  <entityReport>
+    <entityName>npp_grg.dat</entityName>
+    <qualityCheck qualityType="congruency" system="knb" statusType="error" >
+      <identifier>onlineURLs</identifier>
+      <name>Online URLs are live</name>
+      <description>Check that online URLs return something</description>
+      <expected>true</expected>
+      <found>true</found>
+      <status>valid</status>
+      <explanation>Succeeded in accessing URL: <![CDATA[http://jornada-www.nmsu.edu/studies/lter/datasets/climate/npp_grg/npp_grg.dat]]></explanation>
+      <suggestion></suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="metadata" system="knb" statusType="error" >
+      <identifier>databaseTableCreated</identifier>
+      <name>Create database table</name>
+      <description>Status of creating a database table</description>
+      <expected>A database table is expected to be generated from the EML attributes.</expected>
+      <found>A database table was generated from the attributes description</found>
+      <status>valid</status>
+      <explanation>CREATE TABLE npp_grg_dat("date" TIMESTAMP,"z" TEXT,"site" TEXT,"pp_mm" FLOAT,"p" TEXT,"p_in" FLOAT,"loc_gage" TEXT,"id_gage" TEXT,"type" TEXT,"ownr" TEXT);</explanation>
+      <suggestion></suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="data" system="knb" statusType="info" >
+      <identifier>displayDownloadData</identifier>
+      <name>Display some data</name>
+      <description>Display the first row of data</description>
+      <expected>One row of data should be displayed</expected>
+      <found><![CDATA[07/25/1989, M, NORT, 28.4, 8, 1.12, E   jer,past4A, rabbit-dsrg, dsrg, in us]]></found>
+      <status>info</status>
+      <explanation></explanation>
+      <suggestion></suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="congruency" system="knb" statusType="error" >
+      <identifier>dataLoadStatus</identifier>
+      <name>Data load status</name>
+      <description>Status of loading the data table into a database</description>
+      <expected>No errors expected during data loading or data loading was not attempted for this data entity</expected>
+      <found>One or more errors occurred during data loading</found>
+      <status>error</status>
+      <explanation>Data WELL is NOT a FLOAT : For input string: "WELL"
+SQL insert string:
+INSERT INTO npp_grg_dat("date","z","site","pp_mm","p","p_in","loc_gage","id_gage","type","ownr") VALUES (to_timestamp('07/25/','mm/dd/yyyy'),'P','SMAL',10.1,'0',0.4,'.   cdrrc,past2','vine mesq playa-dsr','dsrg','in cd');</explanation>
+      <suggestion></suggestion>
+      <reference></reference>
+    </qualityCheck>
+  </entityReport>
+</qr:qualityReport>

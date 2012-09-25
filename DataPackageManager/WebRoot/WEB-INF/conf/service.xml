@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pasta:service   
+    xmlns:pasta="pasta://pasta.lternet.edu/service-0.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="pasta://pasta.lternet.edu/service-0.1 http://nis.lternet.edu/schemas/pasta/pasta-service.xsd"
+    >
+    
+    <pasta:service-method name="appendProvenance">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="createDataPackage">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="deleteDataPackage">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="evaluateDataPackage">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listDataEntities">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listDataPackageIdentifiers">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listDataPackageRevisions">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listDataPackageScopes">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listDeletedDataPackages">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="readDataEntity">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="readDataPackage">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="readDataPackageReport">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="readMetadata">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="searchDataPackages">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="updateDataPackage">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+</pasta:service>

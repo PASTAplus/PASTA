@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.0.0"
+    xmlns:stmml="http://www.xml-cml.org/schema/stmml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ds="eml://ecoinformatics.org/dataset-2.0.0" xmlns:htmlcode="http://htmlcode.hja.lter"
+    packageId="test.2.0"
+    system="http://www.fsl.orst.edu/lter/data/mastercatalog.cfm?topnav=137"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.0.0 eml.xsd" scope="system">
+    
+    <!-- Does not contain an /eml/dataset/methods node -->
+    
+    <dataset scope="document">
+        <title>title</title>
+        <creator scope="document">s </creator>
+        <contact scope="document">afg</contact>
+        <dataTable scope="document" id="id1">
+            <entityName>name1</entityName>
+        </dataTable>
+    </dataset>
+
+</eml:eml>

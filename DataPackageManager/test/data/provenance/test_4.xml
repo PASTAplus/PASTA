@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+    xmlns:stmml="http://www.xml-cml.org/schema/stmml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ds="eml://ecoinformatics.org/dataset-2.1.0"
+    xmlns:htmlcode="http://htmlcode.hja.lter"
+    packageId="test.4.0"
+    system="http://www.fsl.orst.edu/lter/data/mastercatalog.cfm?topnav=137"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 eml.xsd" 
+    scope="system">
+    
+    <!-- *Does* contain an /eml/dataset/methods node -->
+    
+    <dataset scope="document">
+        <title>title1</title>
+        <title>title2</title>
+        <title>title3</title>
+        <creator scope="document">creator1</creator>
+        <creator scope="document">creator2</creator>
+        <creator scope="document">creator3</creator>
+        <creator scope="document">creator4</creator>
+        <contact scope="document">contact1</contact>
+        <contact scope="document">contact2</contact>
+        <contact scope="document">contact3</contact>
+        <contact scope="document">contact4</contact>
+        <contact scope="document">contact5</contact>
+        <dataTable scope="document">
+            <entityName>name1</entityName>
+        </dataTable>
+        <dataTable scope="document">
+            <entityName>name2</entityName>
+        </dataTable>
+        <dataTable scope="document" id="1">
+            <entityName>name3</entityName>
+        </dataTable>
+        <dataTable scope="document" id="2">
+            <entityName>name4</entityName>
+        </dataTable>
+        <methods></methods>
+    </dataset>
+
+</eml:eml>

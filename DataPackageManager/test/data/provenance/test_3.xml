@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.0.0"
+    xmlns:stmml="http://www.xml-cml.org/schema/stmml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ds="eml://ecoinformatics.org/dataset-2.0.0" xmlns:htmlcode="http://htmlcode.hja.lter"
+    packageId="test.3.0"
+    system="http://www.fsl.orst.edu/lter/data/mastercatalog.cfm?topnav=137"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.0.0 eml.xsd" scope="system">
+    
+    <dataset scope="document">
+        <title></title>
+        <creator scope="document"></creator>
+        <contact scope="document"></contact>
+        <dataTable scope="document"></dataTable>
+    </dataset>
+
+</eml:eml>
