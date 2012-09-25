@@ -1,0 +1,51 @@
+
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Gatekeeper - PASTA</title>
+    </head>
+    <body>
+        <h1>
+            <font color="#0101DF">Gatekeeper web service API</font>
+        </h1>
+        <hr>
+        <h3>Base URL - https://pasta.lternet.edu</h3>
+        <hr><p>
+        The Gatekeeper web service handles all authentication from incoming requests.
+        </p></hr>
+        <p>The following are the Use Cases for the Gatekeeper:</p>
+        <li>
+        If the user submits only BASIC authentication credentials, a token will be
+        generated and returned upon completion of the requested query.
+        </li>
+        <li>
+        If the user submits a token, the token will be used provided it does not
+        exceed the time to live. In that event, a ServletException is thrown.
+        </li>
+        <li>
+        If no credentials or tokens are submitted, a token for special user public
+        will be created and the remainder of the query will be done as public. The
+        response will return a public token.
+        </li>
+        <hr><p>There is no explicit API for interacting with the Gatekeeper as a service.
+        The requirement for all services is using a basic Authorization header.
+        Once a cookie is received from a request, using that cookie instead of the
+        Authorization header will result in being able to interact with all pasta
+        services without transferring user authentication credentials until the cookie
+        expires or the user determines it necessary to authenticate using alternative
+        credentials.</p></hr>
+        <p>The following services can be used in conjunction with the Gatekeeper:
+        <li><a href="http://package.lternet.edu/package/docs/api">DataPackageManager</a> @ http://pasta.lternet.edu/package/</li>
+        <li>GatekeeperTester @ http://pasta.lternet.edu/test</li>
+        <!--
+        <li><a href="http://event.lternet.edu/eventmanager/docs/api">EventManager</a></li>
+        <li><a href="http://factory.lternet.edu/metadatafactory/docs/api">MetadataFactory</a></li>
+        -->
+        </p>
+        <!--
+        <p>It is recommended to explore DataPackageManager's functionality as
+        EventManager and MetadataFactory's infrastructure has not been revised to
+        operate with cookies at present.</p>
+        -->
+    </body>
+</html>

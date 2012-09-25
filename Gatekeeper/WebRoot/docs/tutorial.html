@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Tutorial - GatekeeperTester - PASTA</title>
+    </head>
+    <body>
+        <h1>
+            <font color="#0101DF">GatekeeperTester
+                web service tutorial</font>
+        </h1>
+        <hr>
+        <h2>Examples</h2>
+
+
+        <p>The command line utility <code>curl</code> will be used to
+        illustrate the following examples.</p>
+
+        <hr>
+        <h3>This service exists for testing the Gatekeeper</h3>
+
+        <p><b>Intial Authentication Command</b></p>
+
+        <p><code>curl -c cookiejar.txt --user uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:mouse -G
+            https://pasta.lternet.edu/test/
+        </code></p>
+
+        <p><b>Description</b></p>
+
+        <p>This command requests that the Gatekeeper create a new
+        token to be returned as a cookie when the request completes. This will then be
+        written to the cookie store <code>cookiejar.txt</code> for future use. The user is
+        encouraged to use <code>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</code>
+        and corresponding password for testing. Should an invalid username or password
+        be used, an appropriate response will be generated indicating such.</p>
+
+        <p>The response from the Gatekeeper depends on the nature of the submitted
+        request, but the Set-Cookie: header should show a Base 64 encoded string has
+        been returned.</p>
+
+<pre>
+HTTP/1.1 200 OK
+Date: Thu, 22 Dec 2011 19:07:50 GMT
+Set-Cookie: auth-token="sz46tDcFxqLby2TtlBARREdqGFSSRFbjSHPvMw0hgXLsG2uGlDWrOzjf/zM7Yd7g4n8pK5qKzohvP9UdYqf/xyx/RBAUU1QYwmUXTA5NnUZ5qHjYCtx3Y+DgwyNsQPoz6dQqR92BWWsWb39BilwfaYGtyAtiztJ0ZK4mx3c94VY9HTXmhfbuMzAErLo437zvX4IZDSHWMWNXYMuxC3eQ+A==";Version=1;Expires=Fri, 12-Dec-2053 14:20:40 GMT;Max-Age=1324581170
+Expires: Thu, 01 Jan 1970 00:00:00 GMT
+Server: Apache-Coyote/1.1
+...
+</pre>
+
+        <p>Omission of the <code>--user &lt;username&gt;:&lt;password&gt;</code> will
+        result in public authentication.
+        </p>
+
+        <hr>
+
+        <p><b>Token Authentication Command</b></p>
+
+        <p><code>curl -b cookiejar.txt -G https://pasta.lternet.edu/test/
+        </code></p>
+
+        <p><b>Description</b></p>
+
+        <p>This command requests that the Gatekeeper use a previously created
+        token for the request. This token will be retreived from the
+        <code>cookiejar.txt</code> and submitted appropriately.
+
+        <p>The response from the Gatekeeper depends on the nature of the submitted
+        request and should not include any headers or content indicating anything
+        other than normal operation. If the token time to live has expired, a response
+        will be generated to indicate so.</p>
+
+<pre>
+HTTP/1.1 200 OK
+Date: Thu, 22 Dec 2011 19:07:50 GMT
+Server: Apache-Coyote/1.1
+...
+</pre>
+
+        </p>
+
+        <hr>
+        <br>
+        <br>
+    </body>
+</html>

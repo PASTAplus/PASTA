@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="Gatekeeper">
+
+  <property name="webapp.name" value="root"/>
+
+  <!-- Importing standard build.xml file -->
+  <import file="../ant-util/simple.xml"/>
+
+  <target name="prepare"
+          description="Prepares the build area for compilation">
+
+    <!-- Compiling PASTA's common utility code -->
+    <subant target="deploy">
+      <fileset dir="${common.code.dir}" includes="build.xml"/>
+    </subant>
+
+    <!-- Copying the compiled utility code jar into the web service -->
+    <!--
+    <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+      filtering="no">
+      <fileset dir="${common.code.dir}/build/jar">
+        <include name="common.jar"/>
+      </fileset>
+    </copy>
+    -->
+
+    <!-- Copy shared libraries into the local lib directory -->
+    <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+      filtering="no">
+      <fileset dir="${shared.lib.dir}">
+        <include name="common.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jersey">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/junit">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-logging">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/unboundid">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${tomcat.lib}">
+        <include name="jetty-client*.jar"/>
+        <include name="jetty-http*.jar"/>
+        <include name="jetty-io*.jar"/>
+        <include name="jetty-servlets*.jar"/>
+        <include name="jetty-util*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+</project>
