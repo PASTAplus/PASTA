@@ -1,0 +1,59 @@
+<project name="jeldoclet-2.0" basedir="." default="main">
+
+    <property name="src.dir"     value="src"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="${build.dir}/jar"/>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}/classes"/>
+        <delete file="${jar.dir}/${ant.project.name}.jar"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}">
+	    <exclude name="test/**"/>
+	</javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="zip" depends="jar">
+        <zip destfile="${ant.project.name}.zip" excludes="CVS,.cvsignore,.svn">
+            <zipfileset dir="src" prefix="src"/>
+            <zipfileset dir="test" prefix="test"/>
+            <zipfileset dir="nbproject" prefix="nbproject"/>
+            <zipfileset dir="build/jar" prefix="build/jar"/>
+            <zipfileset file="build.xml" prefix=""/>
+            <zipfileset file="*.txt" prefix=""/>
+            <zipfileset file="*.bat" prefix=""/>
+            <zipfileset file="*.xsd" prefix=""/>
+            <zipfileset file="*.jpr" prefix=""/>
+        </zip>
+    </target>
+
+    <target name="main" depends="clean,jar"/>
+    
+<!-- thz -->
+    <target name="test" depends="jar">
+        <javadoc doclet="com.jeldoclet.JELDoclet"
+            docletpath="build\jar\${ant.project.name}.jar"
+            sourcefiles="test/*.java"
+            destdir="." 
+            additionalparam="-d ./ -filename test.xml -includeNamespace -outputEncoding ISO-8859-1"
+            private="yes">
+        </javadoc>
+    </target>
+<!-- /thz -->
+
+</project>
