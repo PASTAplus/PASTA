@@ -3,9 +3,8 @@
   <property file="build.properties"/>
 
   <property name="webapp.name" value="package"/>
-  <property name="war.name" value="${webapp.name}.war"/>
 
-  <!-- Import standard build.xml file -->
+  <!-- Import standard build file -->
   <import file="../ant-util/simple.xml"/>
 
   <!-- Copy shared libraries into the local lib directory -->

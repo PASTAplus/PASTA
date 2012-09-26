@@ -4,7 +4,7 @@
 
   <property name="webapp.name" value="audit"/>
 
-  <!-- Importing standard build.xml file -->
+  <!-- Importing build file for JPA build -->
   <import file="../ant-util/build-with-jpa.xml"/>
 
   <target name="prepare" depends="prepare-common">

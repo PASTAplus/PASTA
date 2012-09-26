@@ -41,7 +41,6 @@
       <include name="servlet*.jar"/>
     </fileset>
     <pathelement path="${web.dir}/WEB-INF"/>
-    <pathelement path="${common.code.dir}/classes"/>
   </path>
 
   <!-- Path for compiling the JUnit and Quickcheck test code -->
@@ -77,6 +76,9 @@
   <target name="compile" depends="prepare"
 	  description="Compiles all Java source files">
     <mkdir dir="${classes.dir}"/>
+    <copy todir="${classes.dir}">
+      <fileset dir="${common.code.dir}/${classes.dir}" />
+    </copy>
     <javac destdir="${classes.dir}" debug="true" deprecation="true"
            failonerror="true" optimize="false" includeantruntime="false">
       <src path="${src.dir}"/>
@@ -155,7 +157,7 @@
          webxml="${web.dir}/WEB-INF/web.xml">
       <include name="demo/**"/>
       <include name="docs/**"/>
-	  <include name="xsl/**"/>
+      <include name="xsl/**"/>
       <exclude name="WEB-INF/**"/>
       <webinf dir="${web.dir}/WEB-INF/">
         <include name="**/*.*"/>
@@ -171,7 +173,7 @@
         <include name="**/*.png"/>
         <include name="**/*.jpg"/>
         <include name="**/*.gif"/>
-		<include name="**/*.xml"/>
+        <include name="**/*.xml"/>
       </fileset>
     </war>
   </target>
