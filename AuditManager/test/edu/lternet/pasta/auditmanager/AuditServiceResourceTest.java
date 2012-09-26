@@ -82,7 +82,7 @@ public class AuditServiceResourceTest
           AuthTokenFactory.makeCookieAuthToken(user, AuthSystemDef.KNB, EXPIRATION, s);
 //        LogEntry le = new LogEntryBuilder(CategoryType.DEBUG, "AuditManager", "Test")
 //                                         .setToken(attr).build();
-        LogEntry le = LogEntryFactory.makeDebug("AuditManager", null, attr, null, null, "JUnit Test");
+        LogEntry le = LogEntryFactory.makeDebug("AuditManager", null, attr, null, "JUnit Test");
         QName q = new QName("");
         entry = new JAXBElement<LogEntry>(q, LogEntry.class, le);
     }

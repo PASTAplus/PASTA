@@ -5,20 +5,11 @@
   <property name="webapp.name" value="audit"/>
 
   <!-- Importing standard build.xml file -->
-  <import file="../ant-util/common-handling.xml"/>
   <import file="../ant-util/build-with-jpa.xml"/>
 
-  <!-- Copy shared libraries into the local lib directory -->
-  <target name="prepare" depends="_check-repo,prepare.head,prepare.tagged"
-          if="repo.lib.present"
-          description="Prepares the build area for compilation"/>
-
-  <target name="prepare.head" if="repo.lib.present">
+  <target name="prepare" depends="prepare-common">
      <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
-      <fileset dir="${shared.lib.dir}">
-        <include name="common.jar"/>
-      </fileset>
       <fileset dir="${shared.lib.dir}/apache-logging">
         <include name="**/*.jar"/>
       </fileset>
@@ -44,10 +35,6 @@
         <include name="**/*.jar"/>
       </fileset>
     </copy>
-  </target>
-
-  <target name="prepare.tagged" unless="repo.lib.present">
-    <ant target="common-handling.prepare.common"/>
   </target>
 
 </project>

@@ -11,7 +11,6 @@
   <servlet>
     <servlet-name>GatekeeperEventManagerProxy</servlet-name>
     <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
-    <load-on-startup>1</load-on-startup>
     <init-param>
       <param-name>Prefix</param-name>
       <param-value>/eventmanager</param-value>
@@ -20,11 +19,11 @@
       <param-name>ProxyTo</param-name>
       <param-value>http://event.lternet.edu:8080/eventmanager</param-value>
     </init-param>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>GatekeeperDataPackageManagerProxy</servlet-name>
     <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
-    <load-on-startup>1</load-on-startup>
     <init-param>
       <param-name>Prefix</param-name>
       <param-value>/package</param-value>
@@ -33,11 +32,11 @@
       <param-name>ProxyTo</param-name>
       <param-value>http://package.lternet.edu:8080/package</param-value>
     </init-param>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>GatekeeperAuditManagerProxy</servlet-name>
     <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
-    <load-on-startup>1</load-on-startup>
     <init-param>
       <param-name>Prefix</param-name>
       <param-value>/audit</param-value>
@@ -46,11 +45,11 @@
       <param-name>ProxyTo</param-name>
       <param-value>http://audit.lternet.edu:8080/audit</param-value>
     </init-param>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>GatekeeperTester</servlet-name>
     <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
-    <load-on-startup>1</load-on-startup>
     <init-param>
       <param-name>Prefix</param-name>
       <param-value>/test</param-value>
@@ -59,6 +58,7 @@
       <param-name>ProxyTo</param-name>
       <param-value>http://localhost:8080/gatekeepertester</param-value>
     </init-param>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>api-docs</servlet-name>

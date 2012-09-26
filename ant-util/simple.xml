@@ -32,17 +32,6 @@
   <property name="test.reports.dir" location="${test.dir}/reports"/>
   <property name="test.coverage.dir" location="${test.dir}/coverage"/>
 
-  <!-- Properties for Cobertura JUnit code coverage -->
-  <property name="cobertura.dir"
-	    value="../cobertura/cobertura-1.9.4.1" />
-  <path id="cobertura.classpath">
-    <fileset dir="${cobertura.dir}">
-      <include name="cobertura.jar" />
-      <include name="lib/**/*.jar" />
-    </fileset>
-  </path>
-  <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
-
   <!-- Path for compiling the source code -->
   <path id="compile.classpath">
     <fileset dir="${web.lib.dir}">
@@ -52,6 +41,7 @@
       <include name="servlet*.jar"/>
     </fileset>
     <pathelement path="${web.dir}/WEB-INF"/>
+    <pathelement path="${common.code.dir}/classes"/>
   </path>
 
   <!-- Path for compiling the JUnit and Quickcheck test code -->
@@ -68,17 +58,20 @@
     <pathelement location="${test.classes.dir}"/>
   </path>
 
-  <target name="_check-repo" unless="repo.lib.present"
-          description="Check for local lib repository">
-    <available file="${shared.lib.dir}" type="dir" property="repo.lib.present"/>
-  </target>
-
   <target name="clean" description="Deletes compiled classes">
     <echo>Deleting ${basedir}/${classes.dir}</echo>
     <delete dir="${build.dir}"/>
     <delete includeemptydirs="true">
       <fileset dir="${classes.dir}" includes="**/*"/>
     </delete>
+  </target>
+
+  <target name="prepare-common"
+          description="Prepares the common code">
+    <!-- Compiling PASTA's common code -->
+    <subant target="compile">
+      <fileset dir="${common.code.dir}" includes="build.xml"/>
+    </subant>
   </target>
 
   <target name="compile" depends="prepare"
@@ -254,37 +247,6 @@
     <copy todir="${web.doc.dir}">
       <fileset dir="${api.dir}"/>
     </copy>
-  </target>
-
-
-  <target name="test-coverage" depends="compile,test-compile"
-	  description="Determines code coverage of JUnit tests">
-    <delete dir="${test.dir}/instrumented-classes"/>
-    <delete dir="${test.coverage.dir}"/>
-    <mkdir dir="${test.dir}/instrumented-classes"/>
-    <mkdir dir="${test.coverage.dir}"/>
-    <cobertura-instrument todir="${test.dir}/instrumented-classes">
-      <fileset dir="${classes.dir}">
-	<include name="**/*.class"/>
-      </fileset>
-    </cobertura-instrument>
-    <junit printsummary="false" haltonfailure="false"
-           errorProperty="test.failed" failureProperty="test.failed"
-	   fork="true">
-      <jvmarg value="-Duser.dir=${basedir}"/>
-      <formatter type="brief" usefile="false"/>
-      <formatter type="xml"/>
-      <classpath location="${cobertura.dir}/cobertura.jar"/>
-      <classpath location="${test.dir}/instrumented-classes"/>
-      <classpath refid="test.classpath"/>
-      <batchtest fork="yes" todir="${test.data.dir}">
-        <fileset dir="test">
-          <include name="**/*Test*.java"/>
-        </fileset>
-      </batchtest>
-    </junit>
-    <cobertura-report srcdir="${src.dir}" destdir="${test.coverage.dir}"/>
-    <delete file="cobertura.ser"/>
   </target>
 
 </project>

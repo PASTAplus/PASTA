@@ -43,7 +43,7 @@ public class LogServiceTest
 
         String s = BasicAuthToken.makeTokenString("anonymous", "password");
         token = new BasicAuthToken(s);
-        entry = LogEntryFactory.makeDebug("AuditManager", null, null, null, null, "Test");
+        entry = LogEntryFactory.makeDebug("AuditManager", null, null, null, "Test");
         lib = new LogItemBuilder().setCategory(CategoryType.DEBUG);
     }
 

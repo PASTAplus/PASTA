@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="deploy" name="common">
+<project basedir="." default="compile" name="common">
 
   <property file="build.properties"/>
   <import file="../ant-util/simple.xml"/>
@@ -19,7 +19,7 @@
     </fileset>
   </path>
 
-  <target name="prepare" depends="_check-repo" if="repo.lib.present"
+  <target name="prepare"
           description="Prepares the build area for compilation">
     <mkdir dir="${lib.dir}"/>
     <!-- Copy shared libraries into the local lib directory -->
@@ -125,7 +125,7 @@
     </fail>
   </target>
 
-  <target name="deploy" depends="jar,_check-repo" if="repo.lib.present"
+  <!-- <target name="deploy" depends="jar"
           description="Deploys the jar file into appropriate destination">
     <copy todir="${shared.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
@@ -133,5 +133,6 @@
         <include name="**/*.jar"/>
       </fileset>
     </copy>
-  </target>
+  </target> -->
+	
 </project>

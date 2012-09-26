@@ -78,10 +78,6 @@ public class UserCreds {
         return new DummyBasicHttpHeaders(user, password);
     }
 
-    public static HttpHeaders getCookieHttpHeaders() {
-        return new DummyCookieHttpHeaders(user);
-    }
-
     /* This needs to be getAuthToken() in the future */
     public static AuthToken getBase64AuthToken() {
         Set<String> s = new HashSet<String>();
