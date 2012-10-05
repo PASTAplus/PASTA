@@ -489,8 +489,11 @@ public class DataPackageManagerClient extends PastaClient {
       int statusCode = httpResponse.getStatusLine().getStatusCode();
       HttpEntity httpEntity = httpResponse.getEntity();
       entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
+      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_NOT_FOUND) {
         handleStatusCode(statusCode, entityString);
+      }
+      else if (statusCode == HttpStatus.SC_NOT_FOUND) {
+        entityString = "";
       }
     }
     finally {
