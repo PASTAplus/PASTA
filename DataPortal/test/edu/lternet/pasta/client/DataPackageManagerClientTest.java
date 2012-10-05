@@ -319,7 +319,7 @@ public class DataPackageManagerClientTest {
     final Integer identifier = new Integer("1");
     final Integer revision = new Integer("1");
     final String entityId = "DailyWaterSample-NIN-LTER-1978-1992";
-    final long expectedLength = 982844 ;
+    final long expectedLength = 924291 ;
     
     try {
       byte[] dataEntity = dpmClient.readDataEntity(scope, identifier,
