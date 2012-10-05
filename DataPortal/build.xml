@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="nis">
+  <property file="build.properties"/>
+
+  <property name="webapp.name" value="nis"/>
+  <property name="war.name" value="${webapp.name}.war"/>
+
+  <!-- Importing standard build.xml file -->
+  <import file="../ant-util/simple.xml"/>
+  <import file="../ant-util/common-handling.xml"/>
+  <!-- <import file="../ant-util/build-with-jpa.xml"/> -->
+
+  <!-- Copy shared libraries into the local lib directory -->
+  <target name="prepare" depends="_check-repo,prepare.head,prepare.tagged"
+          if="repo.lib.present"
+          description="Prepares the build area for compilation"/>
+
+  <target name="prepare.head" if="repo.lib.present">
+     <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+          filtering="no">
+      <fileset dir="${shared.lib.dir}">
+        <include name="common.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-commons">
+        <include name="**/commons-configuration*.jar"/>
+        <include name="**/commons-logging*.jar"/>
+        <include name="**/commons-lang*.jar"/>
+        <include name="**/commons-io-2.*.jar"/>
+      	<include name="**/commons-fileupload-*.jar"/>
+        <include name="**/commons-codec-*.jar"/>
+      </fileset>
+        <fileset dir="${shared.lib.dir}/apache-httpcomponents">
+          <include name="**/*.jar"/>
+        </fileset>
+      <fileset dir="${shared.lib.dir}/apache-logging">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xalan">
+        <include name="**/xalan.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xerces">
+        <include name="resolver.jar"/>
+        <include name="serializer.jar"/>
+        <include name="xercesImpl.jar"/>
+        <include name="xml-apis.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jersey">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/junit">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/owasp">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/postgresql">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="prepare.tagged" unless="repo.lib.present">
+    <ant target="common-handling.prepare.common"/>
+  </target>
+
+</project>

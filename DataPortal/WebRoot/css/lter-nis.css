@@ -1,0 +1,254 @@
+html, body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	background-color: white;
+  height: 99%;
+}
+
+form.back {
+	float: right;
+}
+
+.wrapper {
+	width: 100%;
+	position: relative;
+	min-height: 100%;
+	margin: 0px auto 10px auto;
+}
+
+.head {
+  background: #ffffff; /* for non-css3 browsers */
+  background: -webkit-gradient(linear, left bottom, right bottom, from(#ffffff), to(#c9c9c9)); /* Safari and Chrome */
+  background: -moz-linear-gradient(left,  #ffffff,  #c9c9c9); /* Firefox */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#c9c9c9', GradientType=1); /* IE */
+	width: 100%;
+}
+
+.head td {
+	padding: 5px;
+}
+
+.head a {
+	color: blue;
+	font-weight: bold;
+}
+
+.head a:link,.head a:visited {
+	text-decoration: none;
+}
+
+#head-title {
+	font-size: 1.75em;
+	font-weight: bold;
+}
+
+.foot {
+	position: absolute;
+	clear: both;
+	bottom: 0;
+	background-color: lightgrey;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	height: 4.0em;
+}
+
+.foot #foot-copyright {
+	text-align: center;
+	font-size: 65%;
+	margin-left: 10em;
+	margin-right: 10em;
+}
+
+.nav {
+	list-style: none;
+	margin: 0;
+	padding-top: 5px;
+	padding-left: 0px;
+}
+
+.nav li {
+  float: left;
+  min-width: 8em;
+  margin-right: 0.5em;
+  text-align: center;
+  font-style: italic;
+  font-size: 0.75em;
+}
+
+.nav li a:link, 
+.nav li a:visited {
+  background-color: rgb(255, 255, 255);
+  color: rgb(85, 85, 102);
+  display: block;
+  padding: 0.2em;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 0 0.2em 0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 3px 3px 3px 3px rgba(43, 43, 77, 0.5);
+  -moz-box-shadow: 3px 3px 3px 3px rgba(43, 43, 77, 0.5);
+  box-shadow: 3px 3px 3px 3px rgba(43, 43, 77, 0.5);
+}
+
+.nav li a:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: maroon;
+}
+
+div.content {
+	clear: both;
+	width: 100%;
+	padding-top: 25px;
+	padding-bottom: 6.0em;
+}
+
+div.login-form {
+	clear: both;
+}
+
+.warning {
+	clear: both;
+	font-weight: bold;
+	color: red;
+}
+
+.info {
+	clear: both;
+	font-weight: normal;
+	color: green;
+}
+
+div.section {
+	clear: both;
+	margin-top: 1.25em;
+	margin-bottom: 1.25em;
+	margin-right: 1.75em;
+	margin-left: 1.75em;
+}
+
+div.qualityreport table {
+    font-size: 0.85em;
+    border: solid;
+    border-width: 3px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.qualityreport td.header {
+    font-size: 1.0em;
+    font-weight: bold;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.qualityreport td.data {
+    font-size: 1.0em;
+    font-weight: normal;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.valid {
+    color: green;   
+}
+
+div.warn {
+    color: orange;
+}
+
+div.error {
+    color: red;
+}
+
+div.info {
+    color: blue;
+}
+
+div.eml h3 {
+  text-align: center;
+}
+
+div.section-title p {
+  font-size: 1.0em;
+    font-weight: bold;
+}
+
+div.section-title table{
+    font-size: 1.0em;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+div.section-table table {
+    font-size: 1.0em;
+    border: solid;
+    border-width: 1px;
+    border-collapse: collapse;
+    width: 98%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.section-table td.header {
+    font-size: 0.8em;
+    font-weight: bold;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+    text-align: center;
+    background-color: #D0D0D0;
+}
+
+div.section-table td.title {
+    font-size: 0.8em;
+    font-weight: bold;
+    border-right: solid;
+    border-top: solid;
+    border-width: 1px;
+    background-color: #F1F1F1;
+    padding: 5px;
+    width: 150px;
+    text-align: right;
+    vertical-align: top;
+}
+
+div.section-table td.empty {
+    font-size: 0.8em;
+    font-weight: bold;
+    border-right: solid;
+    border-width: 1px;
+    background-color: #F1F1F1;
+    padding: 5px;
+    width: 150px;
+    vertical-align: top;
+}
+
+div.section-table td.data {
+    font-size: 0.8em;
+    font-weight: normal;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+    vertical-align: top;
+}
+
+fieldset {
+  margin-bottom: 20px;
+  padding-top: 15px;
+  padding-bottom: 22px;
+}
+
+legend {
+  font-weight: bold;
+}
+
+.close {
+	position: fixed;
+	bottom: 8px;
+	right: 8px;
+}
