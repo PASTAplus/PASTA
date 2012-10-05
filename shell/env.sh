@@ -43,6 +43,7 @@ export MASTERDIR=$SVN/NIS/master
 export AUDITMANAGER_M=$MASTERDIR/AuditManager
 export COMMON_M=$MASTERDIR/common
 export DATAPACKAGEMANAGER_M=$MASTERDIR/DataPackageManager
+export DATAPORTAL_M=$MASTERDIR/DataPortal
 export EVENTMANAGER_M=$MASTERDIR/EventManager
 export GATEKEEPER_M=$MASTERDIR/Gatekeeper
 
