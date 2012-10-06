@@ -1,0 +1,8 @@
+.classpath
+.project
+.settings
+.mymetadata
+.myeclipse
+.DS_Store
+classes
+build
