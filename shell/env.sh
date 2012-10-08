@@ -29,16 +29,20 @@ export JDK_HOME=$JAVA_HOME
 export JRE_HOME=$JAVA_HOME/jre
 export SDK_HOME=$JAVA_HOME
 
-# LTER Subversion repositories and key project directories, PASTA (Turing)
-export SVN=$HOME/svn
-export NIS_SHELL=$SVN/shell
-export AUDITMANAGER=$SVN/AuditManager/AuditManager
-export DATAPACKAGEMANAGER=$SVN/DataPackageManager/DataPackageManager
-export EVENTMANAGER=$SVN/EventManager/EventManager
-export GATEKEEPER=$SVN/Gatekeeper/Gatekeeper
+# LTER Git repositories and key project directories, PASTA (Turing)
+export GIT=$HOME/git
+export NIS=$GIT/NIS
+export NIS_SHELL=$NIS/shell
+export AUDITMANAGER=$NIS/AuditManager
+export COMMON=$NIS/common
+export DATAPACKAGEMANAGER=$NIS/DataPackageManager
+export DATAPORTAL=$NIS/DataPortal
+export EVENTMANAGER=$NIS/EventManager
+export GATEKEEPER=$NIS/Gatekeeper
 
-# Temporary set of variables (ending in "_M") for working in the 'master' directory
+# Variables (ending in "_M") for working in the Subversion 'master' directory
 # while migrating from Subversion to Git
+export SVN=$HOME/svn
 export MASTERDIR=$SVN/NIS/master
 export AUDITMANAGER_M=$MASTERDIR/AuditManager
 export COMMON_M=$MASTERDIR/common
@@ -48,7 +52,7 @@ export EVENTMANAGER_M=$MASTERDIR/EventManager
 export GATEKEEPER_M=$MASTERDIR/Gatekeeper
 
 # LTER Subversion repositories and key project directories, PASTA (contrib)
-export DATAPORTAL=$SVN/DataPortal/DataPortal
+export SVN_SHELL=$SVN/shell
 export LTERHIVE=$SVN/NIS/contrib/lter-hive
 export LTERHIVEPROTOTYPES=$SVN/NIS/contrib/lter-hive-prototypes
 export UNITREGISTRY=$SVN/NIS/contrib/unitRegistry
@@ -73,7 +77,7 @@ export JETTY=$APPDIR/jetty
 export TOMCAT=$CATALINA_HOME
 export WEBAPPS=$TOMCAT/webapps
 alias jetty_ps='ps auwwx | grep -i jetty' # show Jetty processes
-alias nis_checkout="perl $NIS_SHELL/nis_checkout.pl"
+alias nis_checkout="perl $SVN_SHELL/nis_checkout.pl"
 alias tomcat_stale_webapp_cleaner="pushd ${TOMCAT}/bin && ./shutdown.sh && echo Giving Tomcat a Moment to Shutdown && sleep 10 && pushd ${TOMCAT}/webapps && for i in *.war; do explode=`echo ${i} | sed -e 's:.war::'` && rm -rf ${explode}; done && popd && ./startup.sh && popd"
 alias tomcat_startup="pushd .;cd $TOMCAT/bin;./startup.sh;popd;tail -f $TOMCAT/logs/catalina.out"
 alias tomcat_startup_notail="pushd .;cd $TOMCAT/bin;./startup.sh;popd"
