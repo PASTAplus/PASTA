@@ -5,4 +5,13 @@
 .myeclipse
 .DS_Store
 classes
-build
+DataPortal/.mymetadata
+DataPortal/WebRoot/META-INF
+DataPortal/WebRoot/WEB-INF/lib
+DataPackageManager/.mymetadata
+DataPackageManager/WebRoot/META-INF
+DataPackageManager/WebRoot/WEB-INF/lib
+common/lib
+common/WebRoot
+common/documents/java-to-xml
+common/documents/web-service-api
