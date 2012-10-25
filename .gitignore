@@ -9,6 +9,8 @@ build
 java-to-xml
 web-service-api
 META-INF
+AuditManager/.mymetadata
+AuditManager/WebRoot/WEB-INF/lib
 DataPortal/.mymetadata
 DataPortal/WebRoot/WEB-INF/lib
 DataPackageManager/.mymetadata
