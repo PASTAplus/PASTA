@@ -8,16 +8,13 @@ classes
 build
 java-to-xml
 web-service-api
+META-INF
 DataPortal/.mymetadata
-DataPortal/WebRoot/META-INF
 DataPortal/WebRoot/WEB-INF/lib
 DataPackageManager/.mymetadata
-DataPackageManager/WebRoot/META-INF
 DataPackageManager/WebRoot/WEB-INF/lib
 Gatekeeper/.mymetadata
-Gatekeeper/WebRoot/META-INF
 Gatekeeper/WebRoot/WEB-INF/lib
 common/lib
 common/WebRoot
-common/WebRoot/META-INF
 common/WebRoot/WEB-INF/lib
