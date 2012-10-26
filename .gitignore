@@ -6,3 +6,17 @@
 .DS_Store
 classes
 build
+java-to-xml
+web-service-api
+META-INF
+AuditManager/.mymetadata
+AuditManager/WebRoot/WEB-INF/lib
+DataPortal/.mymetadata
+DataPortal/WebRoot/WEB-INF/lib
+DataPackageManager/.mymetadata
+DataPackageManager/WebRoot/WEB-INF/lib
+Gatekeeper/.mymetadata
+Gatekeeper/WebRoot/WEB-INF/lib
+common/lib
+common/WebRoot
+common/WebRoot/WEB-INF/lib
