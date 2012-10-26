@@ -187,17 +187,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
           EmlUtility emlUtility = new EmlUtility(xml);
           String body = emlUtility.xmlToHtml(cwd + xslpath);
           type = "html";
-
-          message = "<html>\n"
-              + "<head><title>"
-              + packageId
-              + "</title>\n"
-              + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
-              + "<script src=\"./js/jquery-1.7.1.js\" type=\"text/javascript\"></script>\n"
-              + "<script src=\"./js/toggle.js\" type=\"text/javascript\"></script>"
-              + "</head><body>\n" + body
-              + "</body></html>\n";
-
+          message = EmlUtility.assembleEmlHtml(body);
         }
 
       } catch (PastaAuthenticationException e) {

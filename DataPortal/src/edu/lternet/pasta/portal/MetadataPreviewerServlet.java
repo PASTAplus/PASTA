@@ -154,16 +154,8 @@ public class MetadataPreviewerServlet extends HttpServlet {
             String eml = processUploadedFile(item);
 
             EmlUtility emlUtility = new EmlUtility(eml);
-            String body = emlUtility.xmlToHtml(cwd + xslpath);
-            
-            html = "<html>\n"
-                + "<head><title>Metadata Previewer</title>\n"
-                + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
-                + "<script src=\"./js/jquery-1.7.1.js\" type=\"text/javascript\"></script>\n"
-                + "<script src=\"./js/toggle.js\" type=\"text/javascript\"></script>"
-                + "</head><body>\n" + body
-                + "</body></html>\n";
-
+            String body = emlUtility.xmlToHtml(cwd + xslpath);     
+            html = EmlUtility.assembleEmlHtml(body);
           }
           
         }

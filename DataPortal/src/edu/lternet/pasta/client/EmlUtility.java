@@ -59,6 +59,29 @@ public class EmlUtility {
   /*
    * Class variables
    */
+  
+  private static final String emlHtmlHead;
+  private static final String emlHtmlTail;
+  
+  static {
+      emlHtmlHead = String.format("%s%s%s%s%s%s%s%s%s",
+        "<!doctype html>\n",
+        "<html>\n\n",
+        "<head>\n",
+        "    <title>Metadata Previewer</title>\n",
+        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">\n",
+        "    <script src=\"./js/jquery-1.7.1.js\" type=\"text/javascript\"></script>\n",
+        "    <script src=\"./js/toggle.js\" type=\"text/javascript\"></script>\n",
+        "</head>\n\n",
+        "<body>\n"
+      );
+ 
+      emlHtmlTail = String.format("%s%s",
+        "</body>\n\n",
+        "</html>\n"
+      );
+       
+  }
 
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.EmlUtility.class);
@@ -103,7 +126,19 @@ public class EmlUtility {
   /*
    * Methods
    */
+  
+  /**
+   * Assembles an HTML-rendered EML document, surrounding the main body of the
+   * HTML with head and tail portions of boilerplate HTML.
+   * 
+   * @param body  The body portion of the HTML as returned by the XSLT transformation.
+   * @return the assembled HTML document
+   */
+  public static String assembleEmlHtml(String body) {
+    return String.format("%s%s%s", emlHtmlHead, body, emlHtmlTail);                    
+  }
 
+  
   private String emlReferenceExpander(String xslPath) {
 
     String xml = null;
