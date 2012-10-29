@@ -23,6 +23,7 @@
     out.println(message);
   } else {
     response.setContentType("text/html");
+    out.println("<!doctype html>");
     out.println("<html>");
     out.println("<head>");
     out.println("<base href=\"" + basePath + "\">");
