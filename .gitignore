@@ -12,3 +12,4 @@ META-INF
 */WebRoot/WEB-INF/lib/
 common/WebRoot
 common/lib
+DataPortal/WebRoot/WEB-INF/conf/dataportal.properties
