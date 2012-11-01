@@ -185,9 +185,8 @@ public class MetadataViewerServlet extends DataPortalServlet {
           type = "xml";
         } else {
           EmlUtility emlUtility = new EmlUtility(xml);
-          String body = emlUtility.xmlToHtml(cwd + xslpath);
+          message = emlUtility.xmlToHtml(cwd + xslpath);
           type = "html";
-          message = EmlUtility.assembleEmlHtml(body);
         }
 
       } catch (PastaAuthenticationException e) {
