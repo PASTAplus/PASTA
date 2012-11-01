@@ -100,7 +100,7 @@ public class LoginClient {
     this.pastaProtocol = options.getString("pasta.protocol");
     this.pastaPort = options.getInt("pasta.port");
     
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.LOGIN_URL = pastaUrl + "/package/";
 
     String token = this.login(uid, password);

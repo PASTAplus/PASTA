@@ -118,7 +118,7 @@ public class DataPackageManagerClient extends PastaClient {
           throws PastaAuthenticationException, PastaConfigurationException {
     
     super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/package";
   }
 

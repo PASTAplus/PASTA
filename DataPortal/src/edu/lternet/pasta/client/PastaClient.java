@@ -148,10 +148,14 @@ public class PastaClient {
    * 
    * @param pastaProtocol     The PASTA protocol, e.g. "http"
    * @param pastaHostname     The PASTA hostname, e.g. "pasta-s.lternet.edu"
+   * @param pastaPort         The PASTA port value, e.g. 8888 (may be null or empty string)
    * @return
    */
-  public static String composePastaUrl(String pastaProtocol, String pastaHostname) {
+  public static String composePastaUrl(String pastaProtocol, String pastaHostname, int pastaPort) {
     String pastaUrl = pastaProtocol + "://" + pastaHostname;
+    if (pastaPort > 0) {
+      pastaUrl += ":" + pastaPort;
+    }
     return pastaUrl;
   }
   
