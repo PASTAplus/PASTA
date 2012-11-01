@@ -47,6 +47,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.FileUtility;
@@ -395,6 +396,10 @@ public class DataPackageManagerClient extends PastaClient {
   public String evaluateDataPackage(File emlFile) throws Exception {
     String contentType = "application/xml";
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    
+    logger.info("ExpectContinue parameter=false set!");
+    
     HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
     String qualityReport = null;
 
