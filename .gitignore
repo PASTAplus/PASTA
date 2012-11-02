@@ -13,4 +13,5 @@ META-INF
 common/WebRoot
 common/lib
 */WebRoot/WEB-INF/conf/*.properties
+*/WebRoot/WEB-INF/doc/
 /Gatekeeper/WebRoot/WEB-INF/conf/private-key.ser
