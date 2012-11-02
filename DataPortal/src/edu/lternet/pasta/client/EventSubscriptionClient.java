@@ -84,7 +84,7 @@ public class EventSubscriptionClient extends PastaClient {
       throws PastaAuthenticationException, PastaConfigurationException {
 
     super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/eventmanager/";
     BASE_URL_SUBSCRIPTION = BASE_URL + "subscription/eml";
     BASE_URL_EVENT = BASE_URL + "event/eml";

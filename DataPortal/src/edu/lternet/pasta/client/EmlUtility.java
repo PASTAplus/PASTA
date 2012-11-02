@@ -60,29 +60,6 @@ public class EmlUtility {
    * Class variables
    */
   
-  private static final String emlHtmlHead;
-  private static final String emlHtmlTail;
-  
-  static {
-      emlHtmlHead = String.format("%s%s%s%s%s%s%s%s%s",
-        "<!doctype html>\n",
-        "<html>\n\n",
-        "<head>\n",
-        "    <title>Metadata Previewer</title>\n",
-        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">\n",
-        "    <script src=\"./js/jquery-1.7.1.js\" type=\"text/javascript\"></script>\n",
-        "    <script src=\"./js/toggle.js\" type=\"text/javascript\"></script>\n",
-        "</head>\n\n",
-        "<body>\n"
-      );
- 
-      emlHtmlTail = String.format("%s%s",
-        "</body>\n\n",
-        "</html>\n"
-      );
-       
-  }
-
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.EmlUtility.class);
 
@@ -126,18 +103,6 @@ public class EmlUtility {
   /*
    * Methods
    */
-  
-  /**
-   * Assembles an HTML-rendered EML document, surrounding the main body of the
-   * HTML with head and tail portions of boilerplate HTML.
-   * 
-   * @param body  The body portion of the HTML as returned by the XSLT transformation.
-   * @return the assembled HTML document
-   */
-  public static String assembleEmlHtml(String body) {
-    return String.format("%s%s%s", emlHtmlHead, body, emlHtmlTail);                    
-  }
-
   
   private String emlReferenceExpander(String xslPath) {
 
@@ -211,15 +176,20 @@ public class EmlUtility {
   }
 
   /**
-   * @param args
+   * @param args   String array with three arguments:
+   *   arg[0] absolute path to the input XML file
+   *   arg[1] absolute path to the output HTML file
+   *   arg[2] absolute path to the EML XSLT stylesheet
    */
   public static void main(String[] args) {
 
+    String inputPath = args[0];
+    String outputPath = args[1];
+    String emlXslPath = args[2];
     ConfigurationListener.configure();
 
-    String cwd = System.getProperty("user.dir");
-    File inFile = new File(cwd + "/documents/knb-lter-nin.1.1.eml.xml");
-    File outFile = new File(cwd + "/WebRoot/knb-lter-nin.1.1.eml.html");
+    File inFile = new File(inputPath);
+    File outFile = new File(outputPath);
     String eml = null;
 
     try {
@@ -238,10 +208,7 @@ public class EmlUtility {
       e.printStackTrace();
     }
 
-    String html = null;
-    String emlXsl = cwd + "/WebRoot/WEB-INF/xsl/eml-2.1.0.xsl";
-
-    html = eu.xmlToHtml(emlXsl);
+    String html = eu.xmlToHtml(emlXslPath);
 
     try {
       FileUtils.writeStringToFile(outFile, html);

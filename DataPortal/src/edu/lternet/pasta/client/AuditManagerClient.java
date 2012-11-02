@@ -85,7 +85,7 @@ public class AuditManagerClient extends PastaClient {
       PastaConfigurationException {
 
     super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/audit/report";
   }
 

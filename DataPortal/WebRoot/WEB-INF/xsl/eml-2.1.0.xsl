@@ -21,10 +21,11 @@
 	language governing permissions and limitations under the License.
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+<xsl:stylesheet 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
 
-  <xsl:output method="html"/>
+  <xsl:output method="html" encoding="utf-8" indent="yes" />
 
   <xsl:variable name="prov-stmt"
     select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"/>
@@ -32,7 +33,19 @@
   <xsl:template match="/">
 
     <xsl:variable name="packageid" select="/eml:eml/@packageId"/>
+    
+<xsl:text disable-output-escaping='yes'>&lt;!doctype html>&#x0A;</xsl:text>
 
+<html>
+
+<head>
+    <title>Metadata Previewer</title>
+    <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link>
+    <script src="./js/jquery-1.7.1.js" type="text/javascript"></script>
+    <script src="./js/toggle.js" type="text/javascript"></script>
+</head>
+
+<body>
     <div class="eml">
       <h3 id="top" >
         <xsl:value-of select="/eml:eml/dataset/title"/>
@@ -517,6 +530,10 @@
 					}
 
 				</script>
+				
+</body>
+
+</html>
 
   </xsl:template>
 
