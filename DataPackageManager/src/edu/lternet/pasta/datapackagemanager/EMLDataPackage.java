@@ -41,6 +41,7 @@ import org.w3c.dom.Node;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.XMLUtilities;
 
@@ -161,11 +162,26 @@ public class EMLDataPackage {
    public void deleteDataPackageResources(boolean isEvaluate)
            throws IOException {
      if (isEvaluate && this.emlPackageId != null) {
+       // First cleanup the metadata files
        FileSystemResource dataPackageResource = 
            new FileSystemResource(emlPackageId);
        dataPackageResource.setEvaluateMode(isEvaluate);
        String dirPath = dataPackageResource.getDirPath();   
        File dirFile = new File(dirPath);  
+       if (dirFile != null && dirFile.exists()) { 
+         FileUtils.deleteQuietly(dirFile);
+       }
+       
+       // Now cleanup the data entity files  
+       StringBuffer stringBuffer = new StringBuffer("");
+       String baseDir = EMLDataManager.getEntityDir();
+       stringBuffer.append(baseDir);
+       stringBuffer.append("/");
+       String packageId = dataPackage.getPackageId();
+       stringBuffer.append(packageId);
+       stringBuffer.append("/evaluate");
+       dirPath = stringBuffer.toString();
+       dirFile = new File(dirPath);  
        if (dirFile != null && dirFile.exists()) { 
          FileUtils.deleteQuietly(dirFile);
        }
