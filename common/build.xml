@@ -37,6 +37,9 @@
         <include name="commons-httpclient-3.1.jar"/>
         <include name="commons-logging-1.1.1.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/owasp">
+        <include name="esapi-2.0.1.jar"/>
+      </fileset>    
       <fileset dir="${shared.lib.dir}/apache-logging">
         <include name="log4j-1.2.13.jar"/>
       </fileset>
