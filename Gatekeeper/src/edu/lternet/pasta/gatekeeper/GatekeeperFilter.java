@@ -22,6 +22,7 @@ package edu.lternet.pasta.gatekeeper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,6 +87,7 @@ public final class GatekeeperFilter implements Filter
     private static int BAD_REQUEST_CODE = 400;
     private static int UNAUTHORIZED_CODE = 401;
     private boolean publicUser = false;
+    private Integer contentLength = null;
 
     private enum CookieUse {
         EXTERNAL, INTERNAL
@@ -119,8 +121,15 @@ public final class GatekeeperFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletRequest req = (HttpServletRequest) request;        
         HttpServletResponse res = (HttpServletResponse) response;
+
+        // Output HttpServletRequest diagnostic information
+		    logger.info("Request URL: " + req.getMethod() + " - "
+		    		+ req.getRequestURL().toString());
+        this.dumpHeader(req);
+        //this.dumpBody(req);
+        
         try {
             Cookie internalCookie = hasAuthToken(req.getCookies()) ?
                                         doCookie(req) : doHeader(req, res);
@@ -279,6 +288,72 @@ public final class GatekeeperFilter implements Filter
         c.setMaxAge(expiry.intValue());
         return c;
     }
+    
+	/**
+	 * dumpHeader iterates through all request headers and lists both the header
+	 * name and its contents to the designated logger.
+	 * 
+	 * @param req
+	 *          The HttpServletRequest object.
+	 */
+	private void dumpHeader(HttpServletRequest req) {
+		Enumeration<String> headerNames = req.getHeaderNames();
+		String headerName = null;
+
+		String header = null;
+
+		while (headerNames.hasMoreElements()) {
+			headerName = headerNames.nextElement();
+			header = req.getHeader(headerName);
+
+			if (headerName.equals("Content-Length")) {
+				this.contentLength = Integer.valueOf(header);
+			}
+
+			logger.info("Header: " + headerName + " - " + header);
+		}
+
+	}
+  
+	/**
+	 * dumpBody outputs the contents of the request message body to the
+	 * designated logger.  Note that the use of this method will render the
+	 * request object inoperable for and subsequent calls.
+	 * 
+	 * @param req The HttpServletRequest object.
+	 */
+	private void dumpBody(HttpServletRequest req) {
+
+		if (contentLength != null) {
+
+			try {
+				BufferedReader br = req.getReader();
+				String line = null;
+
+				logger.info("Request message body:\n");
+
+				if (br.markSupported()) {
+
+					br.mark(this.contentLength + 1);
+
+					while ((line = br.readLine()) != null) {
+						System.out.println(line);
+					}
+
+					br.reset();
+
+				}
+
+				br.close();
+
+			} catch (IOException e) {
+				logger.error("dumpBody: " + e);
+				e.printStackTrace();
+			}
+
+		}
+
+	}
 
     public static class PastaRequestWrapper extends HttpServletRequestWrapper
     {
