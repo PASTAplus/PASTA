@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -108,6 +109,7 @@ public class AuditManagerClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL + "/" + oid);
 
@@ -163,6 +165,7 @@ public class AuditManagerClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL + "/?" + filter);
 
