@@ -1,0 +1,3 @@
+# Ant properties for building the EventManager
+tomcat.home=/home/pasta/local/apache-tomcat
+tomcat.lib=/home/pasta/local/apache-tomcat/lib
