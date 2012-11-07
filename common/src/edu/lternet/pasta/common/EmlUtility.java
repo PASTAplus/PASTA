@@ -24,6 +24,8 @@
 
 package edu.lternet.pasta.common;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -37,6 +39,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+
+import org.apache.commons.io.FileUtils;
 
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
 import eml.ecoinformatics_org.access_2_1.AccessType;
@@ -218,4 +222,28 @@ public final class EmlUtility {
         }
 
     }
+    
+  	/**
+  	 * Returns an EML metadata document specified by the file as a String object.
+  	 * 
+  	 * @param emlFile
+  	 *          The EML file object.
+  	 * 
+  	 * @return The EML metadata document as a String object.
+  	 */
+  	public static String getEmlDoc(File emlFile) {
+
+  		String eml = null;
+
+  		try {
+  			eml = FileUtils.readFileToString(emlFile);
+  		} catch (IOException e) {
+  			System.out.println(e);
+  			e.printStackTrace();
+  		}
+
+  		return eml;
+
+  	}
+
 }
