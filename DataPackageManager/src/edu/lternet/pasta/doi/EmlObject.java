@@ -54,26 +54,26 @@ public class EmlObject {
 	/*
 	 * Instance variables
 	 */
-	
+
 	private Logger logger = Logger.getLogger(EmlObject.class);
-	
+
 	private String emlString = null;
 	private Eml eml = null;
 
 	/*
 	 * Constructors
 	 */
-	
+
 	/**
 	 * Create the EML 2.1.0 POJO from an EML file.
 	 * 
 	 * @param emlFile
 	 */
 	public EmlObject(File emlFile) {
-		
+
 		this.emlString = EmlUtility.getEmlDoc(emlFile);
 		this.eml = EmlUtility.getEml2_1_0(emlString);
-		
+
 	}
 
 	/*
@@ -83,7 +83,12 @@ public class EmlObject {
 	/*
 	 * Instance methods
 	 */
-	
+
+	/**
+	 * Returns ArrayList of Creators.
+	 * 
+	 * @return Creator array list
+	 */
 	public ArrayList<Creator> getCreators() {
 
 		ArrayList<Creator> creators = new ArrayList<Creator>();
@@ -112,54 +117,105 @@ public class EmlObject {
 				nameType = name.getName().getLocalPart();
 
 				if (nameType.equals(Creator.PERSON)) {
-					
+
 					creator = new Creator(Creator.PERSON);
 					person = (Person) name.getValue();
-					creator.setSurName(person.getSurName().trim());
-					
+
+					try {
+						creator.setSurName(person.getSurName().trim());
+					} catch (Exception e) {
+						logger.error(e);
+						e.printStackTrace();
+					}
+
 					List<String> givenNames = person.getGivenName();
 					Iterator<String> gnItr = givenNames.iterator();
 					StringBuffer givenName = new StringBuffer("");
-					
+
 					while (gnItr.hasNext()) {
 						String namePart = (String) gnItr.next();
 						givenName.append(namePart + " ");
 					}
-					
-					creator.setGivenName(givenName.toString().trim());
-					
+
+					try {
+						creator.setGivenName(givenName.toString().trim());
+					} catch (Exception e) {
+						logger.error(e);
+						e.printStackTrace();
+					}
+
 					creators.add(creator);
-					
+
 				} else if (nameType.equals(Creator.ORGANIZATION)) {
-					
+
 					creator = new Creator(Creator.ORGANIZATION);
 					String organizationName = (String) name.getValue();
-					creator.setOrganizationName(organizationName.trim()); 
-					
-					creators.add(creator);
-					
-				} else { // Creator.POSITION
-					
-					try {
-						creator = new Creator(Creator.POSITION);
 
-						String positionName = (String) name.getValue();
-						creator.setPositionName(positionName.trim()); 
-						
-						creators.add(creator);
-						
-					} catch (IllegalStateException e) {
+					try {
+						creator.setOrganizationName(organizationName.trim());
+					} catch (Exception e) {
 						logger.error(e);
+						e.printStackTrace();
 					}
-					
+
+					creators.add(creator);
+
+				} else { // Creator.POSITION
+
+					creator = new Creator(Creator.POSITION);
+					String positionName = (String) name.getValue();
+
+					try {
+						creator.setPositionName(positionName.trim());
+					} catch (Exception e) {
+						logger.error(e);
+						e.printStackTrace();
+					}
+
+					creators.add(creator);
+
 				}
 
 			}
 
 		}
-		
+
 		return creators;
+
+	}
+
+	/**
+	 * Returns ArrayList of titles.
+	 * 
+	 * @return Title array list
+	 */
+	public ArrayList<Title> getTitles() {
+
+		ArrayList<Title> titles = new ArrayList<Title>();
+
+		List<String> titleList = this.eml.getDataset().getTitle();
+
+		Iterator tItr = titleList.iterator();
+
+		while (tItr.hasNext()) {
+			
+			Title title = new Title();
 		
+			try {
+				title.setTitleType(Title.MAIN);
+			} catch (Exception e) {
+				logger.error(e);
+				e.printStackTrace();
+			}
+
+			String titleName = (String) tItr.next();
+			title.setTitle(titleName.trim());
+
+			titles.add(title);
+		}
+
+		return titles;
+
 	}
 
 	/**
@@ -170,11 +226,17 @@ public class EmlObject {
 		File emlFile = new File("/Users/servilla/tmp/NIN/knb-lter-xyz.1.1.xml");
 
 		EmlObject emlObj = new EmlObject(emlFile);
-		
+
 		ArrayList<Creator> creators = emlObj.getCreators();
-		
-		for (Creator creator: creators) {
+
+		for (Creator creator : creators) {
 			System.out.println(creator.getCreatorName());
+		}
+		
+		ArrayList<Title> titles = emlObj.getTitles();
+		
+		for (Title title : titles) {
+			System.out.println(title.getTite());
 		}
 
 	}
