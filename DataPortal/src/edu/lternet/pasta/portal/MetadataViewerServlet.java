@@ -185,7 +185,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
           type = "xml";
         } else {
           EmlUtility emlUtility = new EmlUtility(xml);
-          message = emlUtility.xmlToHtml(cwd + xslpath);
+          message = emlUtility.xmlToHtmlSaxon(cwd + xslpath);
           type = "html";
         }
 

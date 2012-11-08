@@ -154,7 +154,7 @@ public class MetadataPreviewerServlet extends HttpServlet {
             String eml = processUploadedFile(item);
 
             EmlUtility emlUtility = new EmlUtility(eml);
-            html = emlUtility.xmlToHtml(cwd + xslpath);     
+            html = emlUtility.xmlToHtmlSaxon(cwd + xslpath);     
           }
           
         }

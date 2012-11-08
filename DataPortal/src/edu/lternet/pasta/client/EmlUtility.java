@@ -40,6 +40,14 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XsltCompiler;
+import net.sf.saxon.s9api.XsltExecutable;
+import net.sf.saxon.s9api.XsltTransformer;
+
 import org.apache.log4j.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
@@ -142,7 +150,7 @@ public class EmlUtility {
    * @param xslPath
    *          The path to the quality report XSL stylesheet.
    * 
-   * @return The HTML table as a String object.
+   * @return The HTML document as a String object.
    */
   public String xmlToHtml(String xslPath) {
 
@@ -174,6 +182,49 @@ public class EmlUtility {
 
     return html;
   }
+
+  
+  /**
+   * Transforms an EML XML document to an HTML document using the
+   * Saxon XSLT engine which can process XSLT 2.0.
+   * 
+   * @param xslPath
+   *          The path to the quality report XSL stylesheet.
+   * 
+   * @return The HTML document as a String object.
+   */
+  public String xmlToHtmlSaxon(String xslPath) {
+
+    String html = null;
+    File xsltFile = new File(xslPath);
+    StringReader stringReader = new StringReader(this.eml);
+    StringWriter stringWriter = new StringWriter();
+    StreamSource xsltSource = new StreamSource(xsltFile);
+    Source source = new StreamSource(stringReader);
+
+    try {
+      Processor processor = new Processor(false);
+      XsltCompiler xsltCompiler = processor.newXsltCompiler();
+      XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
+      XdmNode xdmNode = processor.newDocumentBuilder().build(source);
+      Serializer out = new Serializer();
+      out.setOutputProperty(Serializer.Property.METHOD, "html");
+      out.setOutputProperty(Serializer.Property.INDENT, "yes");
+      out.setOutputWriter(stringWriter);
+      XsltTransformer trans = xsltExecutable.load();
+      trans.setInitialContextNode(xdmNode);
+      trans.setDestination(out);
+      trans.transform();
+      html = stringWriter.toString();
+    }
+    catch (SaxonApiException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+    }
+    
+    return html;
+  }
+  
 
   /**
    * @param args   String array with three arguments:

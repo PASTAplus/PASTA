@@ -54,6 +54,9 @@
       <fileset dir="${shared.lib.dir}/postgresql">
         <include name="**/postgresql-8.4-702.jdbc4.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/saxon9">
+        <include name="**/saxon9he.jar"/>
+      </fileset>
     </copy>
   </target>
 
