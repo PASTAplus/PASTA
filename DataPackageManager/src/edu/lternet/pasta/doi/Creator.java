@@ -28,22 +28,13 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager;
  * @author servilla
  * @since Nov 5, 2012
  * 
- * Management for EML responsible party names.
+ *        Management for EML responsible party names.
  * 
  */
 public class Creator {
 
 	public enum CreatorType {
-		
-		PERSON("individualName"),
-		ORGANIZATION("organizationName"), 
-		POSITION("positionName");
-		
-		private CreatorType(String altName) { this.altName = altName; }
-		public String getAltName() { return this.altName; }
-		
-		private String altName;
-
+		individualName, organizationName, positionName;
 	};
 
 	/*
@@ -53,13 +44,13 @@ public class Creator {
 	public static final String PERSON = "individualName";
 	public static final String ORGANIZATION = "organizationName";
 	public static final String POSITION = "positionName";
-	
+
 	/*
 	 * Instance variables
 	 */
 
 	private Logger logger = Logger.getLogger(Creator.class);
-	
+
 	private CreatorType creatorType = null;
 
 	private String surName = null;
@@ -73,17 +64,17 @@ public class Creator {
 	 * Constructors
 	 */
 
+	/**
+	 * Sets creator type at initialization.
+	 * 
+	 * @param creatorType
+	 */
 	public Creator(String creatorType) {
-		
-		if (creatorType.equals(Creator.PERSON)) {
+
+		if (creatorType.equals(PERSON) || creatorType.equals(ORGANIZATION)
+		    || creatorType.equals(POSITION)) {
 			this.creatorType = (CreatorType) Enum.valueOf(CreatorType.class,
-					"PERSON");
-		} else if (creatorType.equals(Creator.ORGANIZATION)) {
-			this.creatorType = (CreatorType) Enum.valueOf(CreatorType.class,
-			    "ORGANIZATION");
-		} else { // creatorType = POSITION
-			this.creatorType = (CreatorType) Enum.valueOf(CreatorType.class,
-			    "POSITION");
+			    creatorType);
 		}
 
 	}
@@ -96,79 +87,133 @@ public class Creator {
 	 * Instance methods
 	 */
 
-	public void setSurName(String surName) throws IllegalStateException {
+	/**
+	 * Sets creator surname.
+	 * 
+	 * @param surName
+	 * @throws Exception
+	 */
+	public void setSurName(String surName) throws Exception {
 
-		if (this.creatorType == CreatorType.PERSON) {
+		if (this.creatorType.toString().equals(Creator.PERSON)) {
 			this.surName = surName;
 		} else {
-			String gripe = "Operation not supported for this \"creator type\": ."
+			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
-			throw new IllegalStateException(gripe);
+			throw new Exception(gripe);
 		}
 
 	}
 
-	public void setGivenName(String givenName) throws IllegalStateException {
+	/**
+	 * Sets creator given name.
+	 * 
+	 * @param givenName
+	 * @throws Exception
+	 */
+	public void setGivenName(String givenName) throws Exception {
 
-		if (this.creatorType == CreatorType.PERSON) {
+		if (this.creatorType.toString().equals(Creator.PERSON)) {
 			this.givenName = givenName;
 		} else {
-			String gripe = "Operation not supported for this \"creator type\": ."
+			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
-			throw new IllegalStateException(gripe);
+			throw new Exception(gripe);
 		}
 
 	}
 
-	public void setOrganizationName(String organizationName) throws IllegalStateException {
+	/**
+	 * Sets creator organization name.
+	 * 
+	 * @param organizationName
+	 * @throws Exception
+	 */
+	public void setOrganizationName(String organizationName) throws Exception {
 
-		if (this.creatorType == CreatorType.ORGANIZATION) {
+		if (this.creatorType.toString().equals(Creator.ORGANIZATION)) {
 			this.organizationName = organizationName;
 		} else {
-			String gripe = "Operation not supported for this \"creator type\": ."
+			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
-			throw new IllegalStateException(gripe);
+			throw new Exception(gripe);
 		}
 
 	}
 
-	public void setPositionName(String positionName) throws IllegalStateException {
+	/**
+	 * Sets creator position name.
+	 * 
+	 * @param positionName
+	 * @throws Exception
+	 */
+	public void setPositionName(String positionName) throws Exception {
 
-		if (this.creatorType == CreatorType.POSITION) {
+		if (this.creatorType.toString().equals(Creator.POSITION)) {
 			this.positionName = positionName;
 		} else {
-			String gripe = "Operation not supported for this \"creator type\": ."
+			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
-			throw new IllegalStateException(gripe);
+			throw new Exception(gripe);
 		}
 
 	}
 
+	/**
+	 * Gets creator type.
+	 * 
+	 * @return Creator type
+	 */
 	public String getCreatorType() {
 		return this.creatorType.toString();
 	}
 
+	/**
+	 * Gets creator surname.
+	 * 
+	 * @return Creator surname
+	 */
 	public String getSurName() {
 		return this.surName;
 	}
 
+	/**
+	 * Gets creator given name.
+	 * 
+	 * @return Creator given name
+	 */
 	public String getGivenName() {
 		return this.givenName;
 	}
 
+	/**
+	 * Gets creator organization name.
+	 * 
+	 * @return Organization name.
+	 */
 	public String getOrganizationName() {
 		return this.organizationName;
 	}
 
+	/**
+	 * Gets creator position name.
+	 * 
+	 * @return Position name.
+	 */
 	public String getPositionName() {
 		return this.positionName;
 	}
 
+	/**
+	 * Gets creator name.
+	 * 
+	 * @return Creator name.
+	 */
 	public String getCreatorName() {
 
-		if (this.creatorType == CreatorType.PERSON) {
+		if (this.creatorType.toString().equals(Creator.PERSON)) {
 			this.creatorName = this.surName + ", " + this.givenName;
-		} else if (this.creatorType == CreatorType.ORGANIZATION) {
+		} else if (this.creatorType.toString().equals(Creator.ORGANIZATION)) {
 			this.creatorName = this.organizationName;
 		} else { // CreatorType.POSITION
 			this.creatorName = this.positionName;
