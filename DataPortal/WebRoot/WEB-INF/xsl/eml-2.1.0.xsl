@@ -520,25 +520,14 @@
 
     <script type="text/javascript">
 
-					jQuery(document).ready(function() {
-					jQuery(".collapsible").hide();
-					jQuery("#toggle").click(function()
-					{
-					jQuery(this).next(".collapsible").slideToggle("fast");
-					});
-					});
+        jQuery(document).ready(function() {
+            jQuery(".collapsible").hide();
+            jQuery("#toggle").click(function() {
+                jQuery(this).next(".collapsible").slideToggle("fast");
+            });
+        });
 
-					jQuery("#show").click(function () {
-					jQuery(".collapsible").show("fast"); });
-					jQuery("#hide").click(function () {
-					jQuery(".collapsible").hide("fast"); });
-
-					function
-					submitform(form_ref) {
-					form_ref.submit();
-					}
-
-				</script>
+    </script>
 				
 </body>
 
