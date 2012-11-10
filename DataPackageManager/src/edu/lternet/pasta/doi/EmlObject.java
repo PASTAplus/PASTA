@@ -223,7 +223,7 @@ public class EmlObject {
 	 */
 	public static void main(String[] args) {
 
-		File emlFile = new File("/Users/servilla/tmp/NIN/knb-lter-xyz.1.1.xml");
+		File emlFile = new File("/Users/servilla/local/pasta/metadata/knb-lter-nin.1.1/Level-1-EML.xml");
 
 		EmlObject emlObj = new EmlObject(emlFile);
 
