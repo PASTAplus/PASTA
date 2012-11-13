@@ -36,7 +36,7 @@ import java.util.Date;
  *        http://developer.marklogic.com/learn/2004-09-dates.
  * 
  */
-class ISO8601Utility {
+public class ISO8601Utility {
 	/*
 	 * Class variables
 	 */
