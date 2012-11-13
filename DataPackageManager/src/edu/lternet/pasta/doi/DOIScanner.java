@@ -30,9 +30,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.quality.QualityReport;
 
-import edu.lternet.pasta.common.PastaResource;
+import edu.lternet.pasta.common.ISO8601Utility;
 
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.ucsb.nceas.utilities.Options;
@@ -105,21 +104,42 @@ public class DOIScanner {
 
 		File emlFile = null;
 		EmlObject emlObject = null;
+		String resourceUrl = null;
+		String publicationYear = null;
+		ArrayList<Creator> creators = null;
+		ArrayList<Title> titles = null;
+		DigitalObjectIdentifier identifier = null;
+		ResourceType resourceType = null;
 		
+		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
-			System.out.print(resource.getResourceId() + " ");
-			System.out.print(resource.getResourceType() + " ");
-			System.out.print(resource.getPackageId() + " ");
 
-			// for each resource
-			// test if it has DOI
-			// if not DOI
-			// get resource EML
-			System.out.println(this.getEmlFilePath(resource.getPackageId()));
+			// Build EML document object
 			emlFile = new File(this.getEmlFilePath(resource.getPackageId()));
 			emlObject = new EmlObject(emlFile);
 			
-			// build resource DOI
+			// Set local metadata attributes
+			resourceUrl = resource.getResourceId();
+			publicationYear = ISO8601Utility.formatYear();
+			creators = emlObject.getCreators();
+			titles = emlObject.getTitles();
+			identifier = new DigitalObjectIdentifier(resource.getResourceId());
+			resourceType = new ResourceType(ResourceType.DATASET);
+			resourceType.setResourceType(resource.getResourceType());
+			
+			DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
+			
+			dataCiteMetadata.setLocationUrl(resourceUrl);
+			dataCiteMetadata.setPublicationYear(publicationYear);
+			dataCiteMetadata.setCreators(creators);
+			dataCiteMetadata.setTitles(titles);
+			dataCiteMetadata.setDigitalObjectIdentifier(identifier);
+			dataCiteMetadata.setResourceType(resourceType);
+			
+			System.out.print(dataCiteMetadata.getLocationUrl() + " ");
+			System.out.print(dataCiteMetadata.getPublicationYear() + " ");
+			System.out.println(dataCiteMetadata.getDigitalObjectIdentifier().getDoi());
+			
 			// register DOI
 			// set DOI to resource registry
 			// if yes - ignore
