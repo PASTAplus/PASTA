@@ -42,10 +42,10 @@ public class CitationMetadata {
 	
 	private Logger logger = Logger.getLogger(CitationMetadata.class);
 	
-	private String locationUrl = null;
-	private String publicationYear = null;
-	private ArrayList<Creator> creators = null;
-	private ArrayList<Title> titles = null;
+	protected String locationUrl = null;
+	protected String publicationYear = null;
+	protected ArrayList<Creator> creators = null;
+	protected ArrayList<Title> titles = null;
 	
 	/*
 	 * Constructors
