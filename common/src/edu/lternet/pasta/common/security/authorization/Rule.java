@@ -39,6 +39,10 @@ public class Rule {
 	/*
 	 * Class fields
 	 */
+	
+	public static final String READ = "read";
+	public static final String WRITE = "write";
+	public static final String CHANGE = "changePermission";
 
 	/*
 	 * Instance fields
