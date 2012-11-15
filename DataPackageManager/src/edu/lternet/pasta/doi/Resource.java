@@ -40,6 +40,7 @@ public class Resource {
 	private String resourceId = null;
 	private String resourceType = null;
 	private String packageId = null;
+	private String dateCreated = null;
 
 	/*
 	 * Constructors
@@ -53,28 +54,76 @@ public class Resource {
 	 * Instance methods
 	 */
 
+	/**
+	 * Set resource identifier.
+	 * 
+	 * @param resourceId
+	 */
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
 	
+	/**
+	 * Set resource type.
+	 * 
+	 * @param resourceType
+	 */
 	public void setResourceType(String resourceType) {
 		this.resourceType = resourceType;
 	}
 	
+	/**
+	 * Set package identifier.
+	 * 
+	 * @param packageId
+	 */
 	public void setPackageId(String packageId) {
 		this.packageId = packageId;
 	}
 	
+	/**
+	 * Set date created.
+	 * 
+	 * @param dateCreated
+	 */
+	public void setDateCreate(String dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+	
+	/**
+	 * Get resource identifier.
+	 * 
+	 * @return Resource identifier
+	 */
 	public String getResourceId() {
 		return this.resourceId;
 	}
 	
+	/**
+	 * Get resource type.
+	 * 
+	 * @return Resource type
+	 */
 	public String getResourceType() {
 		return this.resourceType;
 	}
 	
+	/**
+	 * Get package identifier.
+	 * 
+	 * @return Package identifier
+	 */
 	public String getPackageId() {
 		return this.packageId;
+	}
+	
+	/**
+	 * Get date created.
+	 * 
+	 * @return Date created
+	 */
+	public String getDateCreated() {
+		return this.dateCreated;
 	}
 	
 }
