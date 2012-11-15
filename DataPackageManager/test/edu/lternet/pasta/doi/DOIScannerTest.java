@@ -137,7 +137,7 @@ public class DOIScannerTest {
 		Connection conn = doiScanner.getConnection();
 
 		ArrayList<Resource> resourceList = null;
-		resourceList = doiScanner.getDoiLessResourceList(conn);
+		resourceList = doiScanner.getDoiResourceList();
 		
 	}
 

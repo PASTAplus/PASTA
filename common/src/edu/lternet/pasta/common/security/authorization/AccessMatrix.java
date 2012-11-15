@@ -106,7 +106,7 @@ public class AccessMatrix {
 		// Force principal identifier to lower case for hash table comparison.
 		String principal = authToken.getUserId().toLowerCase();
 
-		if (submitter.equalsIgnoreCase(principal)) {  // The submitter has full access.
+		if (submitter != null && submitter.equalsIgnoreCase(principal)) {  // The submitter has full access.
 			isAuthorized = true;
 			return isAuthorized;
 		}
