@@ -32,6 +32,11 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.ISO8601Utility;
+import edu.lternet.pasta.common.security.authorization.AccessMatrix;
+import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.security.token.AuthTokenFactory;
+import edu.lternet.pasta.common.security.token.BasicAuthToken;
 
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.ucsb.nceas.utilities.Options;
@@ -51,8 +56,8 @@ public class DOIScanner {
 	 */
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
+	private static final String PUBLIC = "public";
 
 	/*
 	 * Instance variables
@@ -72,6 +77,12 @@ public class DOIScanner {
 	 * Constructors
 	 */
 
+	/**
+	 * Creates a new DOI scanning instance to scan the Data Package Manager for
+	 * resources without DOIs.
+	 * 
+	 * @throws SQLException
+	 */
 	public DOIScanner() throws SQLException {
 
 		Options options;
@@ -92,7 +103,7 @@ public class DOIScanner {
 			Connection conn = this.getConnection();
 
 			try {
-				resourceList = this.getDoiLessResourceList(conn);
+				resourceList = this.getDoiResourceList();
 			} finally {
 				conn.close();
 			}
@@ -111,14 +122,14 @@ public class DOIScanner {
 		DigitalObjectIdentifier identifier = null;
 		ResourceType resourceType = null;
 		AlternateIdentifier alternateIdentifier = null;
-		
+
 		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
 
 			// Build EML document object
 			emlFile = new File(this.getEmlFilePath(resource.getPackageId()));
 			emlObject = new EmlObject(emlFile);
-			
+
 			// Set local metadata attributes
 			resourceUrl = resource.getResourceId();
 			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
@@ -129,10 +140,10 @@ public class DOIScanner {
 			resourceType.setResourceType(resource.getResourceType());
 			alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
 			alternateIdentifier.setAlternateIdentifier(resource.getResourceId());
-			
+
 			// Create and populate the DataCite metadata object
 			DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
-			
+
 			dataCiteMetadata.setLocationUrl(resourceUrl);
 			dataCiteMetadata.setPublicationYear(publicationYear);
 			dataCiteMetadata.setCreators(creators);
@@ -140,9 +151,9 @@ public class DOIScanner {
 			dataCiteMetadata.setDigitalObjectIdentifier(identifier);
 			dataCiteMetadata.setResourceType(resourceType);
 			dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
-			
-			System.out.println(dataCiteMetadata.toDataCiteXmlEncoded());
-			
+
+			//System.out.println(dataCiteMetadata.toDataCiteXmlEncoded());
+
 			// register DOI
 			// set DOI to resource registry
 			// if yes - ignore
@@ -224,29 +235,47 @@ public class DOIScanner {
 
 	}
 
-	protected ArrayList<Resource> getDoiLessResourceList(Connection conn)
-	    throws SQLException {
+	/**
+	 * Returns an array list of resources that are both publicly accessible and
+	 * lacking DOIs.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	protected ArrayList<Resource> getDoiResourceList()
+	    throws SQLException, ClassNotFoundException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+		
+		Connection conn = this.getConnection();
 
-		String queryString = 
-				"SELECT resource_id, resource_type, package_id, date_created"
+		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " md5_id IS NULL and date_deactivated IS NULL;";
 
 		Statement stat = conn.createStatement();
 		ResultSet result = stat.executeQuery(queryString);
+		String resourceId = null;
 
 		while (result.next()) {
 
 			Resource resource = new Resource();
+			
+			// Test here for resource public accessibility before adding to list
+			
+			resourceId = result.getString("resource_id");
+			
+			if (isPublicAccessible(resourceId)) {
 
-			resource.setResourceId(result.getString("resource_id"));
-			resource.setResourceType(result.getString("resource_type"));
-			resource.setPackageId(result.getString("package_id"));
-			resource.setDateCreate(result.getString("date_created"));
+				resource.setResourceId(resourceId);
+				resource.setResourceType(result.getString("resource_type"));
+				resource.setPackageId(result.getString("package_id"));
+				resource.setDateCreate(result.getString("date_created"));
 
-			resourceList.add(resource);
+				resourceList.add(resource);
+
+			}
 
 		}
 
@@ -255,24 +284,74 @@ public class DOIScanner {
 	}
 	
 	/**
-	 * Returns file system path to the Level-1 EML document for the given
-	 * package identifier.
+	 * Determines whether the given resource is publicly accessible.
 	 * 
-	 * @param packageId  Level-1 EML package identifier.
-	 * @return File system path to Level-1 EML document
+	 * @param resourceId
+	 * @return Is publicly accessible
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
 	 */
-	private String getEmlFilePath(String packageId) {
+	protected Boolean isPublicAccessible(String resourceId) throws SQLException,
+	    ClassNotFoundException {
 		
-		return this.metadataDir + "/" + packageId + "/" + LEVEL1NAME;
+		Boolean publicAccessible = false;
+		
+		ArrayList<Rule> ruleList = new ArrayList<Rule>();
+		
+		Connection conn = this.getConnection();
+
+		String queryString = "SELECT resource_id, principal, access_type, "
+				+ "access_order, permission FROM datapackagemanager.access_matrix WHERE"
+				+ " resource_id='" + resourceId + "';";
+
+		Statement stat = conn.createStatement();
+		ResultSet result = stat.executeQuery(queryString);
+
+		while (result.next()) {
+			
+			Rule rule = new Rule();
+			
+			rule.setPrincipal(result.getString("principal"));
+			rule.setAccessType(result.getString("access_type"));
+			rule.setOrder(result.getString("access_order"));
+			rule.setPermission((Rule.Permission) Enum.valueOf(Rule.Permission.class,
+			    result.getString("permission")));
+			
+			ruleList.add(rule);
+
+		}
+		
+		String tokenString = BasicAuthToken.makeTokenString(DOIScanner.PUBLIC, DOIScanner.PUBLIC);
+		AuthToken authToken = AuthTokenFactory.makeAuthTokenWithPassword(tokenString);
+		
+		AccessMatrix accessMatrix = new AccessMatrix(ruleList);
+		Rule.Permission permission = (Rule.Permission) Enum.valueOf(Rule.Permission.class, Rule.READ);
+		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
+
+		return publicAccessible;
 		
 	}
 	
+	/**
+	 * Returns file system path to the Level-1 EML document for the given package
+	 * identifier.
+	 * 
+	 * @param packageId
+	 *          Level-1 EML package identifier.
+	 * @return File system path to Level-1 EML document
+	 */
+	private String getEmlFilePath(String packageId) {
+
+		return this.metadataDir + "/" + packageId + "/" + LEVEL1NAME;
+
+	}
+
 	private String getResourceCreateYear(String createDate) {
 		String year = null;
-		
+
 		String[] dateParts = createDate.split("-");
 		year = dateParts[0];
-		
+
 		return year;
 	}
 
