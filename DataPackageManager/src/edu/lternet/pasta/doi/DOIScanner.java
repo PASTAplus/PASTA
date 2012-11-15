@@ -110,6 +110,7 @@ public class DOIScanner {
 		ArrayList<Title> titles = null;
 		DigitalObjectIdentifier identifier = null;
 		ResourceType resourceType = null;
+		AlternateIdentifier alternateIdentifier = null;
 		
 		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
@@ -120,13 +121,16 @@ public class DOIScanner {
 			
 			// Set local metadata attributes
 			resourceUrl = resource.getResourceId();
-			publicationYear = ISO8601Utility.formatYear();
+			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 			creators = emlObject.getCreators();
 			titles = emlObject.getTitles();
 			identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			resourceType = new ResourceType(ResourceType.DATASET);
 			resourceType.setResourceType(resource.getResourceType());
+			alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
+			alternateIdentifier.setAlternateIdentifier(resource.getResourceId());
 			
+			// Create and populate the DataCite metadata object
 			DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
 			
 			dataCiteMetadata.setLocationUrl(resourceUrl);
@@ -135,10 +139,9 @@ public class DOIScanner {
 			dataCiteMetadata.setTitles(titles);
 			dataCiteMetadata.setDigitalObjectIdentifier(identifier);
 			dataCiteMetadata.setResourceType(resourceType);
+			dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
 			
-			System.out.print(dataCiteMetadata.getLocationUrl() + " ");
-			System.out.print(dataCiteMetadata.getPublicationYear() + " ");
-			System.out.println(dataCiteMetadata.getDigitalObjectIdentifier().getDoi());
+			System.out.println(dataCiteMetadata.toDataCiteXmlEncoded());
 			
 			// register DOI
 			// set DOI to resource registry
@@ -225,11 +228,11 @@ public class DOIScanner {
 	    throws SQLException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
-		String resourceId = null;
-		String resourceType = null;
 
-		String queryString = "SELECT resource_id, resource_type, package_id FROM "
-		    + " datapackagemanager.resource_registry WHERE" + " md5_id IS NULL;";
+		String queryString = 
+				"SELECT resource_id, resource_type, package_id, date_created"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " md5_id IS NULL and date_deactivated IS NULL;";
 
 		Statement stat = conn.createStatement();
 		ResultSet result = stat.executeQuery(queryString);
@@ -241,6 +244,7 @@ public class DOIScanner {
 			resource.setResourceId(result.getString("resource_id"));
 			resource.setResourceType(result.getString("resource_type"));
 			resource.setPackageId(result.getString("package_id"));
+			resource.setDateCreate(result.getString("date_created"));
 
 			resourceList.add(resource);
 
@@ -261,6 +265,15 @@ public class DOIScanner {
 		
 		return this.metadataDir + "/" + packageId + "/" + LEVEL1NAME;
 		
+	}
+	
+	private String getResourceCreateYear(String createDate) {
+		String year = null;
+		
+		String[] dateParts = createDate.split("-");
+		year = dateParts[0];
+		
+		return year;
 	}
 
 	/**
