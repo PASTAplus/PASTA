@@ -125,6 +125,18 @@ public class DigitalObjectIdentifier {
 		return doi;
 	}
 
+	
+	/**
+	 * Get the DOI identifier.
+	 * 
+	 * @return DOI identifier
+	 */
+	public String getIdentifier() {
+		String identifier = DigitalObjectIdentifier.prefix + "/"
+		    + DigitalObjectIdentifier.context + "/" + this.md5Id;
+		return identifier;
+	}
+
 	/**
 	 * @param args
 	 */
