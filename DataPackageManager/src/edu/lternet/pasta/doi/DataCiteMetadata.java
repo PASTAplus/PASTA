@@ -203,19 +203,41 @@ public class DataCiteMetadata extends CitationMetadata {
 
 		xml.append("</resource>\n");
 
-		return xml.toString();
+		return DataCiteMetadata.escape(xml.toString());
 
 	}
-
+	
 	/**
-	 * Generate and return the DataCite metadata package as encoded XML.
+	 * EZID percent encoding of reserved characters: '%', '\n', '\r', and ':'.
 	 * 
-	 * @return DataCite metadata package as encoded XML
+	 * @param s String to encode
+	 * @return Encoded string
 	 */
-	public String toDataCiteXmlEncoded() {
-		return XmlUtility.xmlEncode(this.toDataCiteXml());
+	public static String escape(String s) {
+	  return s.replace("%", "%25").replace("\n", "%0A").
+	      replace("\r", "%0D").replace(":", "%3A");
+	  }
+	
+	/**
+	 * EZID percent decoding of reserved characters: '%', '\n', '\r', and ':'.
+	 * 
+	 * @param s String to decode
+	 * @return Decoded string
+	 */
+	public static String unescape(String s) {
+		
+	  StringBuffer b = new StringBuffer();
+	  int i;
+	  while ((i = s.indexOf("%")) >= 0) {
+	    b.append(s.substring(0, i));
+	    b.append((char) Integer.parseInt(s.substring(i+1, i+3), 16));
+	    s = s.substring(i+3);
+	  }
+	  b.append(s);
+	  return b.toString();
+	  
 	}
-
+	
 	/**
 	 * @param args
 	 */
