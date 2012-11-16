@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -55,6 +56,8 @@ public class DOIScanner {
 	 * Class variables
 	 */
 
+	private static Logger logger = Logger.getLogger(DOIScanner.class);
+
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
 	private static final String PUBLIC = "public";
@@ -63,15 +66,14 @@ public class DOIScanner {
 	 * Instance variables
 	 */
 
-	private Logger logger = Logger.getLogger(DOIScanner.class);
-
 	private String dbDriver = null;
 	private String dbURL = null;
 	private String dbUser = null;
 	private String dbPassword = null;
-	private String databaseAdapterName = null;
 	private String metadataDir = null;
-	private String pastaUriHead = null;
+	private String doiTest = null;
+	private String ezidBaseUrl = null;
+	private String ezidStageUrl = null;
 
 	/*
 	 * Constructors
@@ -83,9 +85,9 @@ public class DOIScanner {
 	 * 
 	 * @throws SQLException
 	 */
-	public DOIScanner() throws SQLException {
+	public DOIScanner() throws Exception {
 
-		Options options;
+		Options options = null;
 		options = ConfigurationListener.getOptions();
 
 		if (options == null) {
@@ -96,19 +98,52 @@ public class DOIScanner {
 
 		this.loadOptions(options);
 
+	}
+
+	/*
+	 * Class methods
+	 */
+
+	/*
+	 * Instance methods
+	 */
+
+	/**
+	 * Loads Data Manager options from a configuration file.
+	 * 
+	 * @param options Configuration options object.
+	 */
+	private void loadOptions(Options options) throws Exception {
+
+		if (options != null) {
+
+			// Load database connection options
+			this.dbDriver = options.getOption("dbDriver");
+			this.dbURL = options.getOption("dbURL");
+			this.dbUser = options.getOption("dbUser");
+			this.dbPassword = options.getOption("dbPassword");
+			
+			// Load DOI options
+			this.doiTest = options.getOption("datapackagemanager.doiTest");
+			this.ezidBaseUrl = options.getOption("datapackagemanager.ezidBaseUrl");
+			this.ezidStageUrl = options.getOption("datapackagemanager.ezidStageUrl");
+
+			// Load PASTA service options
+			this.metadataDir = options.getOption("datapackagemanager.metadataDir");
+
+		} else {
+			throw new Exception("Configuration options failed to load.");
+		}
+
+	}
+	
+	public void doScan() {
+		
 		ArrayList<Resource> resourceList = null;
 
 		try {
-
-			Connection conn = this.getConnection();
-
-			try {
-				resourceList = this.getDoiResourceList();
-			} finally {
-				conn.close();
-			}
-
-		} catch (ClassNotFoundException e) {
+			resourceList = this.getDoiResourceList();
+		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
@@ -122,6 +157,7 @@ public class DOIScanner {
 		DigitalObjectIdentifier identifier = null;
 		ResourceType resourceType = null;
 		AlternateIdentifier alternateIdentifier = null;
+		Date time = null;
 
 		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
@@ -135,7 +171,17 @@ public class DOIScanner {
 			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 			creators = emlObject.getCreators();
 			titles = emlObject.getTitles();
-			identifier = new DigitalObjectIdentifier(resource.getResourceId());
+			
+			// If DOI testing, add salt to resource identifier to create unique DOI
+			// so subsequent tests will not result in EZID create errors.
+			if (this.doiTest.equals("true")) {
+				time = new Date();
+				Long salt = time.getTime();
+				identifier = new DigitalObjectIdentifier(resource.getResourceId() + salt.toString());
+			} else {
+				identifier = new DigitalObjectIdentifier(resource.getResourceId());
+			}
+			
 			resourceType = new ResourceType(ResourceType.DATASET);
 			resourceType.setResourceType(resource.getResourceType());
 			alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
@@ -152,7 +198,8 @@ public class DOIScanner {
 			dataCiteMetadata.setResourceType(resourceType);
 			dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
 
-			//System.out.println(dataCiteMetadata.toDataCiteXmlEncoded());
+			System.out.println(dataCiteMetadata.getDigitalObjectIdentifier().getDoi()
+			    + " -- " + dataCiteMetadata.toDataCiteXml());
 
 			// register DOI
 			// set DOI to resource registry
@@ -160,38 +207,7 @@ public class DOIScanner {
 
 		}
 
-	}
-
-	/*
-	 * Class methods
-	 */
-
-	/*
-	 * Instance methods
-	 */
-
-	/**
-	 * Loads Data Manager options from a configuration file.
-	 */
-	private void loadOptions(Options options) {
-
-		if (options != null) {
-
-			// Load database connection options
-			dbDriver = options.getOption("dbDriver");
-			dbURL = options.getOption("dbURL");
-			dbUser = options.getOption("dbUser");
-			dbPassword = options.getOption("dbPassword");
-			databaseAdapterName = options.getOption("dbAdapter");
-
-			// Load PASTA service options
-			metadataDir = options.getOption("datapackagemanager.metadataDir");
-			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
-
-		} else {
-			System.out.println("Configuration options failed to load.");
-		}
-
+		
 	}
 
 	/**
@@ -243,40 +259,56 @@ public class DOIScanner {
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
-	protected ArrayList<Resource> getDoiResourceList()
-	    throws SQLException, ClassNotFoundException {
+	protected ArrayList<Resource> getDoiResourceList() throws SQLException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
 		
-		Connection conn = this.getConnection();
+		Connection conn = null;
+    try {
+	    conn = this.getConnection();
+    } catch (ClassNotFoundException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
 
 		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " md5_id IS NULL and date_deactivated IS NULL;";
 
-		Statement stat = conn.createStatement();
-		ResultSet result = stat.executeQuery(queryString);
-		String resourceId = null;
+		Statement stat = null;
+		
+		try {
 
-		while (result.next()) {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
 
-			Resource resource = new Resource();
-			
-			// Test here for resource public accessibility before adding to list
-			
-			resourceId = result.getString("resource_id");
-			
-			if (isPublicAccessible(resourceId)) {
+			while (result.next()) {
 
-				resource.setResourceId(resourceId);
-				resource.setResourceType(result.getString("resource_type"));
-				resource.setPackageId(result.getString("package_id"));
-				resource.setDateCreate(result.getString("date_created"));
+				Resource resource = new Resource();
 
-				resourceList.add(resource);
+				// Test here for resource public accessibility before adding to list
+
+				resourceId = result.getString("resource_id");
+
+				if (isPublicAccessible(resourceId)) {
+
+					resource.setResourceId(resourceId);
+					resource.setResourceType(result.getString("resource_type"));
+					resource.setPackageId(result.getString("package_id"));
+					resource.setDateCreate(result.getString("date_created"));
+
+					resourceList.add(resource);
+
+				}
 
 			}
 
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();	
 		}
 
 		return resourceList;
@@ -291,34 +323,51 @@ public class DOIScanner {
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
-	protected Boolean isPublicAccessible(String resourceId) throws SQLException,
-	    ClassNotFoundException {
+	protected Boolean isPublicAccessible(String resourceId) throws SQLException  {
 		
 		Boolean publicAccessible = false;
 		
 		ArrayList<Rule> ruleList = new ArrayList<Rule>();
 		
-		Connection conn = this.getConnection();
+		Connection conn = null;
+		
+    try {
+	    conn = this.getConnection();
+    } catch (ClassNotFoundException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
 
 		String queryString = "SELECT resource_id, principal, access_type, "
 				+ "access_order, permission FROM datapackagemanager.access_matrix WHERE"
 				+ " resource_id='" + resourceId + "';";
 
-		Statement stat = conn.createStatement();
-		ResultSet result = stat.executeQuery(queryString);
+		Statement stat = null;
+		
+		try {
+			
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
 
-		while (result.next()) {
-			
-			Rule rule = new Rule();
-			
-			rule.setPrincipal(result.getString("principal"));
-			rule.setAccessType(result.getString("access_type"));
-			rule.setOrder(result.getString("access_order"));
-			rule.setPermission((Rule.Permission) Enum.valueOf(Rule.Permission.class,
-			    result.getString("permission")));
-			
-			ruleList.add(rule);
+			while (result.next()) {
 
+				Rule rule = new Rule();
+
+				rule.setPrincipal(result.getString("principal"));
+				rule.setAccessType(result.getString("access_type"));
+				rule.setOrder(result.getString("access_order"));
+				rule.setPermission((Rule.Permission) Enum.valueOf(
+				    Rule.Permission.class, result.getString("permission")));
+
+				ruleList.add(rule);
+
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
 		}
 		
 		String tokenString = BasicAuthToken.makeTokenString(DOIScanner.PUBLIC, DOIScanner.PUBLIC);
@@ -360,13 +409,16 @@ public class DOIScanner {
 	 */
 	public static void main(String[] args) {
 
+		DOIScanner doiScanner = null;
+    
 		try {
-			DOIScanner doiScanner = new DOIScanner();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		}
-		System.out.println("I am here!");
+	    doiScanner = new DOIScanner();
+    } catch (Exception e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
+    
+		doiScanner.doScan();
 
 	}
 
