@@ -84,3 +84,6 @@ datapackagemanager.test.entity.firstToken=NoneSuchBugCount
 datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-0.3
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
+datapackagemanager.doiTest=true
+datapackagemanager.ezidBaseUrl=https://n2t.net/ezid
+datapackagemanager.ezidStageUrl=https://n2t-stage.cdlib.org/ezid
