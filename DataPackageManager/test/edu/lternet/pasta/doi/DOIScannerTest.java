@@ -134,8 +134,6 @@ public class DOIScannerTest {
 	@Test
 	public void testGetResourceList() throws Exception {
 
-		Connection conn = doiScanner.getConnection();
-
 		ArrayList<Resource> resourceList = null;
 		resourceList = doiScanner.getDoiResourceList();
 		
