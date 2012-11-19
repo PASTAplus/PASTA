@@ -34,21 +34,15 @@
     select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"
   />
 
-  <xsl:variable name="titleArray">
-    <title nr="1">Metadata Previewer -- Testing XSLT 2.0 -- Entry 1</title>
-    <title nr="2">Metadata Previewer -- Testing XSLT 2.0 -- Entry 2</title>
-    <title nr="3">Metadata Previewer -- Testing XSLT 2.0 -- Entry 3</title>
-  </xsl:variable>
-
   <xsl:template match="/">
 
     <xsl:variable name="packageid" select="/eml:eml/@packageId"/>
     <xsl:text disable-output-escaping='yes'>&lt;!doctype html>&#x0A;</xsl:text>
 
-<html>
+<html xsl:exclude-result-prefixes="eml">
 
 <head>
-    <title><xsl:value-of select="$titleArray/title[@nr=3]"/></title>
+    <title><xsl:value-of select="$packageid"/></title>
     <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link>
     <script src="./js/jquery-1.7.1.js" type="text/javascript"></script>
     <script src="./js/toggle.js" type="text/javascript"></script>
