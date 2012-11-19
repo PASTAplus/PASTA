@@ -209,10 +209,10 @@ public class DOIScanner {
 			dataCiteMetadata.setResourceType(resourceType);
 			dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
 
-			System.out.println(dataCiteMetadata.getDigitalObjectIdentifier().getDoi()
-			    + " -- " + dataCiteMetadata.toDataCiteXml());
-
-			// register DOI
+			// Set and register DOI with DatCite metadata
+			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
+			ezidRegistrar.registerDataCiteMetadata();
+			
 			// set DOI to resource registry
 			// if yes - ignore
 
