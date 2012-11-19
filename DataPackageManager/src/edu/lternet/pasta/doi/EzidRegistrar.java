@@ -34,7 +34,9 @@ import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -66,6 +68,8 @@ public class EzidRegistrar {
 	/*
 	 * Instance variables
 	 */
+
+	private DataCiteMetadata dataCiteMetadata = null;
 
 	private String host = null;
 	private String port = null;
@@ -108,19 +112,18 @@ public class EzidRegistrar {
 			this.host = this.ezidStageHost;
 			this.port = this.ezidStagePort;
 			this.protocol = this.ezidStageProtocol;
-			
+
 			System.setProperty("javax.net.ssl.trustStore", this.keystore);
 			System.setProperty("javax.net.ssl.trustStorePassword",
 			    this.keystorePassword);
-			
+
 		} else {
-			
+
 			this.host = this.ezidHost;
 			this.port = this.ezidHostPort;
 			this.protocol = this.ezidHostProtocol;
-			
-		}
 
+		}
 
 	}
 
@@ -164,6 +167,24 @@ public class EzidRegistrar {
 			throw new Exception("Configuration options failed to load.");
 		}
 
+	}
+
+	/**
+	 * Sets the DataCite metadata object.
+	 * 
+	 * @param dataCiteMetadata
+	 */
+	public void setDataCiteMetadata(DataCiteMetadata dataCiteMetadata) {
+		this.dataCiteMetadata = dataCiteMetadata;
+	}
+
+	/**
+	 * Gets the DataCite metadata object.
+	 * 
+	 * @return DataCite metadata object
+	 */
+	public DataCiteMetadata getDataCiteMetadata() {
+		return this.dataCiteMetadata;
 	}
 
 	/**
@@ -258,36 +279,10 @@ public class EzidRegistrar {
 	}
 
 	/**
-	 * Parse the "Set-Cookie" header looking for the "sessionid" key-value pair
-	 * and return the session identifier.
+	 * Logout of the EZID service session.
 	 * 
-	 * @param setCookieHeader
-	 *          The full "Set-Cookie" header.
-	 * 
-	 * @return The session identifier
+	 * @throws Exception
 	 */
-	private String getSessionId(String setCookieHeader) {
-
-		String sessionId = null;
-
-		String[] headerParts = setCookieHeader.split(";");
-		String[] headerPart = null;
-
-		for (int i = 0; i < headerParts.length; i++) {
-
-			// Extract token value from the key-value pair.
-			if (headerParts[i].startsWith("sessionid=")) {
-				int start = "sessionid=".length();
-				int end = headerParts[i].length() - 1;
-				sessionId = headerParts[i].substring(start, end);
-			}
-
-		}
-
-		return sessionId;
-
-	}
-
 	public void logout() throws Exception {
 
 		HttpClient httpClient = new DefaultHttpClient();
@@ -316,6 +311,123 @@ public class EzidRegistrar {
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
+
+	}
+
+	public String registerDataCiteMetadata() throws Exception {
+
+		String ezidResponse = null;
+
+		if (this.dataCiteMetadata == null) {
+			String gripe = "registerDataCiteMetadata: DataCite metadata object is null.";
+			throw new Exception(gripe);
+		} else {
+
+			// Define host parameters
+			HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
+			    this.protocol);
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+
+			// Define user authentication credentials that will be used with the host
+			AuthScope authScope = new AuthScope(httpHost.getHostName(),
+			    httpHost.getPort());
+			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+			    this.ezidUser, this.ezidPassword);
+			httpClient.getCredentialsProvider()
+			    .setCredentials(authScope, credentials);
+
+			// Create AuthCache instance
+			AuthCache authCache = new BasicAuthCache();
+
+			// Generate BASIC scheme object and add it to the local auth cache
+			BasicScheme basicAuth = new BasicScheme();
+			authCache.put(httpHost, basicAuth);
+
+			// Add AuthCache to the execution context
+			BasicHttpContext localcontext = new BasicHttpContext();
+			localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+
+			// HttpGet httpGet = new HttpGet(this.getEzidUrl(EzidRegistrar.loginUrl));
+
+			HttpResponse httpResponse = null;
+			Header[] headers = null;
+			Integer statusCode = null;
+
+			// -----------------
+
+			String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+
+			logger.info(this.dataCiteMetadata.getAlternateIdentifier()
+			    .getAlternateIdentifier());
+
+			// HttpClient httpClient = new DefaultHttpClient();
+			HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+			String url = this.getEzidUrl("/ezid/id/" + doi);
+			HttpPut httpPut = new HttpPut(url);
+			String entityString = null;
+
+			// Set header content
+			/*
+			 * if (this.sessionId != null) { httpPut.setHeader("Cookie", "sessionid="
+			 * + this.sessionId); }
+			 */
+
+			httpPut.setHeader("Content-type", "text/plain");
+
+			String metadata = this.dataCiteMetadata.toDataCiteXml();
+			HttpEntity stringEntity = null;
+			stringEntity = new StringEntity("datacite: " + metadata);
+			httpPut.setEntity(stringEntity);
+			// int statusCode;
+
+			httpResponse = httpClient.execute(httpHost, httpPut, localcontext);
+			// HttpResponse httpResponse = httpClient.execute(httpPut);
+			statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			httpClient.getConnectionManager().shutdown();
+
+			if (statusCode != HttpStatus.SC_CREATED) {
+				String gripe = "Failed to create DOI for: " + doi;
+				throw new Exception(gripe);
+			}
+
+			logger.info("registerDataCiteMetadata: " + entityString);
+
+		}
+
+		return ezidResponse;
+
+	}
+
+	/**
+	 * Parse the "Set-Cookie" header looking for the "sessionid" key-value pair
+	 * and return the session identifier.
+	 * 
+	 * @param setCookieHeader
+	 *          The full "Set-Cookie" header.
+	 * 
+	 * @return The session identifier
+	 */
+	private String getSessionId(String setCookieHeader) {
+
+		String sessionId = null;
+
+		String[] headerParts = setCookieHeader.split(";");
+
+		for (int i = 0; i < headerParts.length; i++) {
+
+			// Extract token value from the key-value pair.
+			if (headerParts[i].startsWith("sessionid=")) {
+				int start = "sessionid=".length();
+				int end = headerParts[i].length() - 1;
+				sessionId = headerParts[i].substring(start, end);
+			}
+
+		}
+
+		return sessionId;
 
 	}
 
