@@ -56,7 +56,7 @@ public class DOIScanner {
 	 * Class variables
 	 */
 
-	private static Logger logger = Logger.getLogger(DOIScanner.class);
+	private static final Logger logger = Logger.getLogger(edu.lternet.pasta.doi.DOIScanner.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
@@ -111,7 +111,8 @@ public class DOIScanner {
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 * 
-	 * @param options Configuration options object.
+	 * @param options
+	 *          Configuration options object.
 	 */
 	private void loadOptions(Options options) throws Exception {
 
@@ -122,7 +123,7 @@ public class DOIScanner {
 			this.dbURL = options.getOption("dbURL");
 			this.dbUser = options.getOption("dbUser");
 			this.dbPassword = options.getOption("dbPassword");
-			
+
 			// Load DOI options
 			this.doiTest = options.getOption("datapackagemanager.doiTest");
 			this.ezidBaseUrl = options.getOption("datapackagemanager.ezidBaseUrl");
@@ -136,10 +137,19 @@ public class DOIScanner {
 		}
 
 	}
-	
-	public void doScan() {
-		
+
+	/**
+	 * Scans the Data Package Manager resource registry for resources that are (1)
+	 * not deactivated (not deleted), (2) publicly accessible and (2) do not have
+	 * a DOI. Resources that meet these criteria have a DataCite DOI registered to
+	 * them on their behalf.
+	 */
+	public void doScan() throws Exception {
+
 		ArrayList<Resource> resourceList = null;
+		
+		EzidRegistrar ezidRegistrar = new EzidRegistrar();
+		ezidRegistrar.login();
 
 		try {
 			resourceList = this.getDoiResourceList();
@@ -171,17 +181,18 @@ public class DOIScanner {
 			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 			creators = emlObject.getCreators();
 			titles = emlObject.getTitles();
-			
+
 			// If DOI testing, add salt to resource identifier to create unique DOI
 			// so subsequent tests will not result in EZID create errors.
 			if (this.doiTest.equals("true")) {
 				time = new Date();
 				Long salt = time.getTime();
-				identifier = new DigitalObjectIdentifier(resource.getResourceId() + salt.toString());
+				identifier = new DigitalObjectIdentifier(resource.getResourceId()
+				    + salt.toString());
 			} else {
 				identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			}
-			
+
 			resourceType = new ResourceType(ResourceType.DATASET);
 			resourceType.setResourceType(resource.getResourceType());
 			alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
@@ -206,8 +217,9 @@ public class DOIScanner {
 			// if yes - ignore
 
 		}
-
 		
+		ezidRegistrar.logout();
+
 	}
 
 	/**
@@ -262,21 +274,21 @@ public class DOIScanner {
 	protected ArrayList<Resource> getDoiResourceList() throws SQLException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
-		
+
 		Connection conn = null;
-    try {
-	    conn = this.getConnection();
-    } catch (ClassNotFoundException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
 
 		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " md5_id IS NULL and date_deactivated IS NULL;";
 
 		Statement stat = null;
-		
+
 		try {
 
 			stat = conn.createStatement();
@@ -308,13 +320,13 @@ public class DOIScanner {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();	
+			conn.close();
 		}
 
 		return resourceList;
 
 	}
-	
+
 	/**
 	 * Determines whether the given resource is publicly accessible.
 	 * 
@@ -323,29 +335,29 @@ public class DOIScanner {
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
-	protected Boolean isPublicAccessible(String resourceId) throws SQLException  {
-		
+	protected Boolean isPublicAccessible(String resourceId) throws SQLException {
+
 		Boolean publicAccessible = false;
-		
+
 		ArrayList<Rule> ruleList = new ArrayList<Rule>();
-		
+
 		Connection conn = null;
-		
-    try {
-	    conn = this.getConnection();
-    } catch (ClassNotFoundException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
+
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
 
 		String queryString = "SELECT resource_id, principal, access_type, "
-				+ "access_order, permission FROM datapackagemanager.access_matrix WHERE"
-				+ " resource_id='" + resourceId + "';";
+		    + "access_order, permission FROM datapackagemanager.access_matrix WHERE"
+		    + " resource_id='" + resourceId + "';";
 
 		Statement stat = null;
-		
+
 		try {
-			
+
 			stat = conn.createStatement();
 			ResultSet result = stat.executeQuery(queryString);
 
@@ -369,18 +381,21 @@ public class DOIScanner {
 		} finally {
 			conn.close();
 		}
-		
-		String tokenString = BasicAuthToken.makeTokenString(DOIScanner.PUBLIC, DOIScanner.PUBLIC);
-		AuthToken authToken = AuthTokenFactory.makeAuthTokenWithPassword(tokenString);
-		
+
+		String tokenString = BasicAuthToken.makeTokenString(DOIScanner.PUBLIC,
+		    DOIScanner.PUBLIC);
+		AuthToken authToken = AuthTokenFactory
+		    .makeAuthTokenWithPassword(tokenString);
+
 		AccessMatrix accessMatrix = new AccessMatrix(ruleList);
-		Rule.Permission permission = (Rule.Permission) Enum.valueOf(Rule.Permission.class, Rule.READ);
+		Rule.Permission permission = (Rule.Permission) Enum.valueOf(
+		    Rule.Permission.class, Rule.READ);
 		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
 
 		return publicAccessible;
-		
+
 	}
-	
+
 	/**
 	 * Returns file system path to the Level-1 EML document for the given package
 	 * identifier.
@@ -410,15 +425,14 @@ public class DOIScanner {
 	public static void main(String[] args) {
 
 		DOIScanner doiScanner = null;
-    
+
 		try {
-	    doiScanner = new DOIScanner();
-    } catch (Exception e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
-    
-		doiScanner.doScan();
+			doiScanner = new DOIScanner();
+			doiScanner.doScan();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
 
 	}
 
