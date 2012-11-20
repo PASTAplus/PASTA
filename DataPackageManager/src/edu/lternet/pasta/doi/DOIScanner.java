@@ -144,13 +144,15 @@ public class DOIScanner {
 	 * not deactivated (not deleted), (2) publicly accessible and (3) do not have
 	 * a DOI. Resources that meet these criteria have a DataCite DOI registered to
 	 * them on their behalf.
+	 * 
+	 * @throws DOIException
 	 */
-	public void doScan() throws DOIException {
+	public void doScanToRegister() throws DOIException {
 
 		ArrayList<Resource> resourceList = null;
 
 		EzidRegistrar ezidRegistrar = null;
-		
+
 		try {
 			ezidRegistrar = new EzidRegistrar();
 		} catch (ConfigurationException e) {
@@ -197,9 +199,9 @@ public class DOIScanner {
 			if (this.doiTest.equals("true")) {
 				time = new Date();
 				Long salt = time.getTime();
-				//identifier = new DigitalObjectIdentifier(resource.getResourceId()
-				//    + salt.toString());
-				identifier = new DigitalObjectIdentifier(resource.getResourceId());
+				identifier = new DigitalObjectIdentifier(resource.getResourceId()
+				+ salt.toString());
+				//identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			} else {
 				identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			}
@@ -222,31 +224,78 @@ public class DOIScanner {
 
 			// Set and register DOI with DatCite metadata
 			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
-			
-			try {
-	      ezidRegistrar.registerDataCiteMetadata();
-      } catch (EzidException e) {
-	      logger.error(e.getMessage());
-	      e.printStackTrace();
-	  
-	      /*
-	       * In the event that a DOI registration succeeded with EZID,
-	       * but failed to be recorded in the resource registry, the following
-	       * exception allows the resource registry to be updated with the
-	       * DOI string.
-	       */
 
-	      if (e.getMessage().equals("identifier already exists")) {
-	      	logger.warn("Proceeding with resource registry update...");
-	      } else {
-					throw new DOIException(e.getMessage());	      	
-	      }
-	      
-      }
+			try {
+				ezidRegistrar.registerDataCiteMetadata();
+			} catch (EzidException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+
+				/*
+				 * In the event that a DOI registration succeeded with EZID, but failed
+				 * to be recorded in the resource registry, the following exception
+				 * allows the resource registry to be updated with the DOI string.
+				 */
+
+				if (e.getMessage().equals("identifier already exists")) {
+					logger.warn("Proceeding with resource registry update...");
+				} else {
+					throw new DOIException(e.getMessage());
+				}
+
+			}
 
 			// Update Data Package Manager resource registry with DOI
 			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-      this.updateRegistryDoi(resourceUrl, doi);
+			this.updateRegistryDoi(resourceUrl, doi);
+
+		}
+
+	}
+
+	/**
+	 * Scans the Data Package Manager resource registry for resources that have
+	 * both (1) a DOI and (2) a deactivated date - indicating that the resource
+	 * has been obsoleted. Resources that meet these criteria are made
+	 * "unavailable" through EZID.
+	 * 
+	 * @throws DOIException
+	 */
+	public void doScanToObsolete() throws DOIException {
+
+		ArrayList<String> doiList = null;
+
+		EzidRegistrar ezidRegistrar = null;
+
+		try {
+			ezidRegistrar = new EzidRegistrar();
+		} catch (ConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw new DOIException(e.getMessage());
+		}
+
+		try {
+			doiList = this.getObsoleteDoiList();
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw new DOIException(e.getMessage());
+		}
+
+		// Obsolete all EZID and resource registy DOIs
+		for (String doi : doiList) {
+			
+			logger.info("DOI to obsolete: " + doi);
+			
+			try {
+				ezidRegistrar.obsoleteDoi(doi);
+			} catch (EzidException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+			
+			this.obsoleteRegistryDoi(doi);
 
 		}
 
@@ -299,7 +348,6 @@ public class DOIScanner {
 	 * 
 	 * @return Array list of resources
 	 * @throws SQLException
-	 * @throws ClassNotFoundException
 	 */
 	protected ArrayList<Resource> getDoiResourceList() throws SQLException {
 
@@ -358,11 +406,59 @@ public class DOIScanner {
 	}
 
 	/**
+	 * Returns an array list of DOIs that are obsolete.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	protected ArrayList<String> getObsoleteDoiList() throws SQLException {
+
+		ArrayList<String> doiList = new ArrayList<String>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT doi"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " doi IS NOT NULL and date_deactivated IS NOT NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
+
+			while (result.next()) {
+				String doi = result.getString("doi");
+				doiList.add(doi);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return doiList;
+
+	}
+
+	/**
 	 * Update the DOI field of the Data Package Manager resource registry with
 	 * DOIs for the resource identified by the resource identifier.
-	 *  
-	 * @param resourceId The resource identifier of the resource to be updated
-	 * @param doi The DOI of the resource
+	 * 
+	 * @param resourceId
+	 *          The resource identifier of the resource to be updated
+	 * @param doi
+	 *          The DOI of the resource
 	 * @throws Exception
 	 */
 	protected void updateRegistryDoi(String resourceId, String doi)
@@ -392,6 +488,46 @@ public class DOIScanner {
 
 		if (rowCount != 1) {
 			String gripe = "updateRegistryDoi: failed to update DOI in resource registry.";
+			throw new DOIException(gripe);
+		}
+
+	}
+
+	/**
+	 * Obsolete the DOI field of the Data Package Manager resource registry with
+	 * for the resource identified by the DOI.
+	 * 
+	 * @param doi
+	 *          The DOI of the resource
+	 * @throws Exception
+	 */
+	protected void obsoleteRegistryDoi(String doi)
+	    throws DOIException {
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET doi=NULL WHERE doi='" + doi + "';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		if (rowCount != 1) {
+			String gripe = "obsoleteRegistryDoi: failed to obsolete DOI in resource registry.";
 			throw new DOIException(gripe);
 		}
 
@@ -495,17 +631,18 @@ public class DOIScanner {
 	public static void main(String[] args) {
 
 		DOIScanner doiScanner = null;
-	
+
 		try {
-	    doiScanner = new DOIScanner();
-			doiScanner.doScan();
-    } catch (ConfigurationException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    } catch (DOIException e) {
-    	logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
+			doiScanner = new DOIScanner();
+			//doiScanner.doScanToRegister();
+			doiScanner.doScanToObsolete();
+		} catch (ConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (DOIException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
 
 	}
 
