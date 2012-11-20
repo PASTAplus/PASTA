@@ -56,7 +56,8 @@ public class DOIScanner {
 	 * Class variables
 	 */
 
-	private static final Logger logger = Logger.getLogger(edu.lternet.pasta.doi.DOIScanner.class);
+	private static final Logger logger = Logger
+	    .getLogger(edu.lternet.pasta.doi.DOIScanner.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
@@ -140,16 +141,15 @@ public class DOIScanner {
 
 	/**
 	 * Scans the Data Package Manager resource registry for resources that are (1)
-	 * not deactivated (not deleted), (2) publicly accessible and (2) do not have
+	 * not deactivated (not deleted), (2) publicly accessible and (3) do not have
 	 * a DOI. Resources that meet these criteria have a DataCite DOI registered to
 	 * them on their behalf.
 	 */
 	public void doScan() throws Exception {
 
 		ArrayList<Resource> resourceList = null;
-		
+
 		EzidRegistrar ezidRegistrar = new EzidRegistrar();
-		ezidRegistrar.login();
 
 		try {
 			resourceList = this.getDoiResourceList();
@@ -168,6 +168,7 @@ public class DOIScanner {
 		ResourceType resourceType = null;
 		AlternateIdentifier alternateIdentifier = null;
 		Date time = null;
+		String doi = null;
 
 		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
@@ -212,13 +213,12 @@ public class DOIScanner {
 			// Set and register DOI with DatCite metadata
 			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
 			ezidRegistrar.registerDataCiteMetadata();
-			
-			// set DOI to resource registry
-			// if yes - ignore
+
+			// Update Data Package Manager resource registry with DOI
+			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+			this.updateRegistryDoi(resourceUrl, doi);
 
 		}
-		
-		ezidRegistrar.logout();
 
 	}
 
@@ -285,7 +285,7 @@ public class DOIScanner {
 
 		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " md5_id IS NULL and date_deactivated IS NULL;";
+		    + " doi IS NULL and date_deactivated IS NULL;";
 
 		Statement stat = null;
 
@@ -324,6 +324,46 @@ public class DOIScanner {
 		}
 
 		return resourceList;
+
+	}
+
+	/**
+	 * Update the DOI field of the Data Package Manager resource registry with
+	 * DOIs for the resource identified by the resource identifier.
+	 *  
+	 * @param resourceId The resource identifier of the resource to be updated
+	 * @param doi The DOI of the resource
+	 * @throws Exception
+	 */
+	protected void updateRegistryDoi(String resourceId, String doi)
+	    throws Exception {
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET doi='" + doi + "' WHERE resource_id='" + resourceId + "';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		if (rowCount != 1) {
+			String gripe = "updateRegistryDoi: failed to update DOI in resource registry.";
+			throw new Exception(gripe);
+		}
 
 	}
 
