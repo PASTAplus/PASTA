@@ -63,7 +63,6 @@ public class EzidRegistrar {
 	    .getLogger(edu.lternet.pasta.doi.EzidRegistrar.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	private static final String loginUrl = "/ezid/login";
 
 	/*
 	 * Instance variables
@@ -93,7 +92,7 @@ public class EzidRegistrar {
 	 * Constructors
 	 */
 
-	public EzidRegistrar() throws Exception {
+	public EzidRegistrar() throws ConfigurationException {
 
 		Options options = null;
 		options = ConfigurationListener.getOptions();
@@ -141,7 +140,7 @@ public class EzidRegistrar {
 	 * @param options
 	 *          Configuration options object.
 	 */
-	private void loadOptions(Options options) throws Exception {
+	private void loadOptions(Options options) throws ConfigurationException {
 
 		if (options != null) {
 
@@ -164,7 +163,7 @@ public class EzidRegistrar {
 			    .getOption("datapackagemanager.keystorePassword");
 
 		} else {
-			throw new Exception("Configuration options failed to load.");
+			throw new ConfigurationException("Configuration options failed to load.");
 		}
 
 	}
@@ -193,7 +192,7 @@ public class EzidRegistrar {
 	 * 
 	 * @return The EZID session id
 	 */
-	public void login() {
+	public void login() throws EzidException {
 
 		String sessionId = null;
 
@@ -205,31 +204,22 @@ public class EzidRegistrar {
 		 * client-ga/tutorial/html/authentication.html#d5e1031
 		 */
 
-		// Define host parameters
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 		    this.protocol);
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-
-		// Define user authentication credentials that will be used with the host
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
 		    this.ezidUser, this.ezidPassword);
 		httpClient.getCredentialsProvider().setCredentials(authScope, credentials);
-
-		// Create AuthCache instance
 		AuthCache authCache = new BasicAuthCache();
-
-		// Generate BASIC scheme object and add it to the local auth cache
 		BasicScheme basicAuth = new BasicScheme();
 		authCache.put(httpHost, basicAuth);
-
-		// Add AuthCache to the execution context
 		BasicHttpContext localcontext = new BasicHttpContext();
 		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
-		HttpGet httpGet = new HttpGet(this.getEzidUrl(EzidRegistrar.loginUrl));
+		HttpGet httpGet = new HttpGet(this.getEzidUrl("/ezid/login"));
 
 		HttpResponse response = null;
 		Header[] headers = null;
@@ -272,6 +262,9 @@ public class EzidRegistrar {
 
 			}
 
+		} else {
+			String gripe = "login: failed EZID login.";
+			throw new EzidException(gripe);
 		}
 
 		this.sessionId = sessionId;
@@ -283,13 +276,14 @@ public class EzidRegistrar {
 	 * 
 	 * @throws Exception
 	 */
-	public void logout() throws Exception {
+	public void logout() throws EzidException {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String url = this.getEzidUrl("/ezid/logout");
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
+		Integer statusCode = null;
 
 		// Set header content
 		if (this.sessionId != null) {
@@ -297,77 +291,104 @@ public class EzidRegistrar {
 		}
 
 		try {
+
 			HttpResponse httpResponse = httpClient.execute(httpGet);
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			entityString = EntityUtils.toString(httpEntity);
-			if (statusCode != HttpStatus.SC_OK) {
-				String gripe = "Failed to logout of EZID cleanly.";
-				throw new Exception(gripe);
-			}
 
-			logger.info("logout: " + entityString);
-
+		} catch (ClientProtocolException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
 
+		if (statusCode != HttpStatus.SC_OK) {
+			String gripe = "Failed to logout of EZID cleanly.";
+			throw new EzidException(gripe);
+		}
+
+		logger.info("logout: " + entityString);
+
 	}
 
-	public String registerDataCiteMetadata() throws Exception {
+	/**
+	 * Registers the resource DOI based on the DataCite metadata object.
+	 * 
+	 * @throws Exception
+	 */
+	public void registerDataCiteMetadata() throws EzidException {
 
 		String ezidResponse = null;
 
 		if (this.dataCiteMetadata == null) {
 			String gripe = "registerDataCiteMetadata: DataCite metadata object is null.";
-			throw new Exception(gripe);
-		} else {
-
-			HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
-			    this.protocol);
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-			AuthScope authScope = new AuthScope(httpHost.getHostName(),
-			    httpHost.getPort());
-			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-			    this.ezidUser, this.ezidPassword);
-			httpClient.getCredentialsProvider()
-			    .setCredentials(authScope, credentials);
-			AuthCache authCache = new BasicAuthCache();
-			BasicScheme basicAuth = new BasicScheme();
-			authCache.put(httpHost, basicAuth);
-			BasicHttpContext localcontext = new BasicHttpContext();
-			localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
-
-			String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-			String url = this.getEzidUrl("/ezid/id/" + doi);
-			StringBuffer metadata = new StringBuffer("");
-			metadata.append("datacite: " + this.dataCiteMetadata.toDataCiteXml()
-			    + "\n");
-			metadata.append("_target: " + this.dataCiteMetadata.getLocationUrl()
-			    + "\n");
-
-			HttpPut httpPut = new HttpPut(url);
-			httpPut.setHeader("Content-type", "text/plain");
-
-			HttpEntity stringEntity = new StringEntity(metadata.toString());
-			httpPut.setEntity(stringEntity);
-			HttpResponse httpResponse = httpClient.execute(httpHost, httpPut, localcontext);
-			Integer statusCode = httpResponse.getStatusLine().getStatusCode();
-			HttpEntity httpEntity = httpResponse.getEntity();
-			String entityString = EntityUtils.toString(httpEntity);
-			httpClient.getConnectionManager().shutdown();
-
-			if (statusCode != HttpStatus.SC_CREATED) {
-				String gripe = "Failed to create DOI for: " + doi;
-				throw new Exception(gripe);
-			}
-
-			logger.info("registerDataCiteMetadata: " + entityString);
-
+			throw new EzidException(gripe);
 		}
 
-		return ezidResponse;
+		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
+		    this.protocol);
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		AuthScope authScope = new AuthScope(httpHost.getHostName(),
+		    httpHost.getPort());
+		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+		    this.ezidUser, this.ezidPassword);
+		httpClient.getCredentialsProvider().setCredentials(authScope, credentials);
+		AuthCache authCache = new BasicAuthCache();
+		BasicScheme basicAuth = new BasicScheme();
+		authCache.put(httpHost, basicAuth);
+		BasicHttpContext localcontext = new BasicHttpContext();
+		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+		String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+		String url = this.getEzidUrl("/ezid/id/" + doi);
+		StringBuffer metadata = new StringBuffer("");
+		metadata
+		    .append("datacite: " + this.dataCiteMetadata.toDataCiteXml() + "\n");
+		metadata
+		    .append("_target: " + this.dataCiteMetadata.getLocationUrl() + "\n");
+		HttpPut httpPut = new HttpPut(url);
+		httpPut.setHeader("Content-type", "text/plain");
+		HttpEntity stringEntity = null;
+		Integer statusCode = null;
+		String entityString = null;
+
+		try {
+			stringEntity = new StringEntity(metadata.toString());
+			httpPut.setEntity(stringEntity);
+			HttpResponse httpResponse = httpClient.execute(httpHost, httpPut,
+			    localcontext);
+			statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		logger.info("registerDataCiteMetadata: " + entityString);
+
+		// Test for DOI collision or DOI registration failure
+		if (statusCode == HttpStatus.SC_BAD_REQUEST
+		    && entityString.contains("identifier already exists")) {
+			String gripe = "identifier already exists";
+			throw new EzidException(gripe);
+		} else if (statusCode != HttpStatus.SC_CREATED) {
+			String gripe = "DOI registration failed for: " + doi;
+			throw new EzidException(gripe);
+		}
 
 	}
 
@@ -426,7 +447,6 @@ public class EzidRegistrar {
 	 */
 	public static void main(String[] args) {
 
-		DataCiteMetadata dataCiteMetadata = null;
 		EzidRegistrar ezidRegistrar = null;
 
 		try {
