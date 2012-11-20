@@ -86,7 +86,7 @@ public class DOIScanner {
 	 * 
 	 * @throws SQLException
 	 */
-	public DOIScanner() throws Exception {
+	public DOIScanner() throws ConfigurationException {
 
 		Options options = null;
 		options = ConfigurationListener.getOptions();
@@ -115,7 +115,7 @@ public class DOIScanner {
 	 * @param options
 	 *          Configuration options object.
 	 */
-	private void loadOptions(Options options) throws Exception {
+	private void loadOptions(Options options) throws ConfigurationException {
 
 		if (options != null) {
 
@@ -134,7 +134,7 @@ public class DOIScanner {
 			this.metadataDir = options.getOption("datapackagemanager.metadataDir");
 
 		} else {
-			throw new Exception("Configuration options failed to load.");
+			throw new ConfigurationException("Configuration options failed to load.");
 		}
 
 	}
@@ -145,17 +145,26 @@ public class DOIScanner {
 	 * a DOI. Resources that meet these criteria have a DataCite DOI registered to
 	 * them on their behalf.
 	 */
-	public void doScan() throws Exception {
+	public void doScan() throws DOIException {
 
 		ArrayList<Resource> resourceList = null;
 
-		EzidRegistrar ezidRegistrar = new EzidRegistrar();
+		EzidRegistrar ezidRegistrar = null;
+		
+		try {
+			ezidRegistrar = new EzidRegistrar();
+		} catch (ConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw new DOIException(e.getMessage());
+		}
 
 		try {
 			resourceList = this.getDoiResourceList();
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			throw new DOIException(e.getMessage());
 		}
 
 		File emlFile = null;
@@ -188,8 +197,9 @@ public class DOIScanner {
 			if (this.doiTest.equals("true")) {
 				time = new Date();
 				Long salt = time.getTime();
-				identifier = new DigitalObjectIdentifier(resource.getResourceId()
-				    + salt.toString());
+				//identifier = new DigitalObjectIdentifier(resource.getResourceId()
+				//    + salt.toString());
+				identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			} else {
 				identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			}
@@ -212,11 +222,31 @@ public class DOIScanner {
 
 			// Set and register DOI with DatCite metadata
 			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
-			ezidRegistrar.registerDataCiteMetadata();
+			
+			try {
+	      ezidRegistrar.registerDataCiteMetadata();
+      } catch (EzidException e) {
+	      logger.error(e.getMessage());
+	      e.printStackTrace();
+	  
+	      /*
+	       * In the event that a DOI registration succeeded with EZID,
+	       * but failed to be recorded in the resource registry, the following
+	       * exception allows the resource registry to be updated with the
+	       * DOI string.
+	       */
+
+	      if (e.getMessage().equals("identifier already exists")) {
+	      	logger.warn("Proceeding with resource registry update...");
+	      } else {
+					throw new DOIException(e.getMessage());	      	
+	      }
+	      
+      }
 
 			// Update Data Package Manager resource registry with DOI
 			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-			this.updateRegistryDoi(resourceUrl, doi);
+      this.updateRegistryDoi(resourceUrl, doi);
 
 		}
 
@@ -336,7 +366,7 @@ public class DOIScanner {
 	 * @throws Exception
 	 */
 	protected void updateRegistryDoi(String resourceId, String doi)
-	    throws Exception {
+	    throws DOIException {
 
 		Connection conn = null;
 		try {
@@ -362,7 +392,7 @@ public class DOIScanner {
 
 		if (rowCount != 1) {
 			String gripe = "updateRegistryDoi: failed to update DOI in resource registry.";
-			throw new Exception(gripe);
+			throw new DOIException(gripe);
 		}
 
 	}
@@ -465,14 +495,17 @@ public class DOIScanner {
 	public static void main(String[] args) {
 
 		DOIScanner doiScanner = null;
-
+	
 		try {
-			doiScanner = new DOIScanner();
+	    doiScanner = new DOIScanner();
 			doiScanner.doScan();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
+    } catch (ConfigurationException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    } catch (DOIException e) {
+    	logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
 
 	}
 
