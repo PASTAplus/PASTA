@@ -34,6 +34,7 @@ import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
@@ -137,8 +138,8 @@ public class EzidRegistrar {
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 * 
-	 * @param options
-	 *          Configuration options object.
+	 * @param options Configuration options object.
+	 * @throws ConfigurationException
 	 */
 	private void loadOptions(Options options) throws ConfigurationException {
 
@@ -191,6 +192,7 @@ public class EzidRegistrar {
 	 * identifier.
 	 * 
 	 * @return The EZID session id
+	 * @throws EzidException
 	 */
 	public void login() throws EzidException {
 
@@ -274,7 +276,7 @@ public class EzidRegistrar {
 	/**
 	 * Logout of the EZID service session.
 	 * 
-	 * @throws Exception
+	 * @throws EzidException
 	 */
 	public void logout() throws EzidException {
 
@@ -319,11 +321,9 @@ public class EzidRegistrar {
 	/**
 	 * Registers the resource DOI based on the DataCite metadata object.
 	 * 
-	 * @throws Exception
+	 * @throws EzidException
 	 */
 	public void registerDataCiteMetadata() throws EzidException {
-
-		String ezidResponse = null;
 
 		if (this.dataCiteMetadata == null) {
 			String gripe = "registerDataCiteMetadata: DataCite metadata object is null.";
@@ -393,6 +393,72 @@ public class EzidRegistrar {
 	}
 
 	/**
+	 * Make the DOI obsolete by setting the EZID metadata field "_status" to
+	 * "unavailable".
+	 * 
+	 * @param doi The DOI to obsolete
+	 * @throws EzidException
+	 */
+	public void obsoleteDoi(String doi) throws EzidException {
+
+		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
+		    this.protocol);
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		AuthScope authScope = new AuthScope(httpHost.getHostName(),
+		    httpHost.getPort());
+		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+		    this.ezidUser, this.ezidPassword);
+		httpClient.getCredentialsProvider().setCredentials(authScope, credentials);
+		AuthCache authCache = new BasicAuthCache();
+		BasicScheme basicAuth = new BasicScheme();
+		authCache.put(httpHost, basicAuth);
+		BasicHttpContext localcontext = new BasicHttpContext();
+		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+		
+		String url = this.getEzidUrl("/ezid/id/" + doi);
+
+		StringBuffer metadata = new StringBuffer("");
+		metadata.append("_status: unavailable | withdrawn by author\n");
+		
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setHeader("Content-type", "text/plain");
+		HttpEntity stringEntity = null;
+		Integer statusCode = null;
+		String entityString = null;
+
+		try {
+			stringEntity = new StringEntity(metadata.toString());
+			httpPost.setEntity(stringEntity);
+			HttpResponse httpResponse = httpClient.execute(httpHost, httpPost,
+			    localcontext);
+			statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		logger.info("obsoleteDoi: " + entityString);
+
+	 if (statusCode != HttpStatus.SC_OK) {
+			String gripe = "DOI obsoletion failed for: " + doi;
+			throw new EzidException(gripe);
+		}
+
+	}
+
+	
+	/**
 	 * Parse the "Set-Cookie" header looking for the "sessionid" key-value pair
 	 * and return the session identifier.
 	 * 
@@ -451,9 +517,7 @@ public class EzidRegistrar {
 
 		try {
 			ezidRegistrar = new EzidRegistrar();
-			ezidRegistrar.login();
-			System.out.println("SessionId: " + ezidRegistrar.getSessionId());
-			ezidRegistrar.logout();
+			ezidRegistrar.obsoleteDoi("doi:10.6073/pasta/dcbd7c1aab57af6a65672aa917bb3faf");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
