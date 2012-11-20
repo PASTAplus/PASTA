@@ -323,69 +323,39 @@ public class EzidRegistrar {
 			throw new Exception(gripe);
 		} else {
 
-			// Define host parameters
 			HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 			    this.protocol);
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-
-			// Define user authentication credentials that will be used with the host
 			AuthScope authScope = new AuthScope(httpHost.getHostName(),
 			    httpHost.getPort());
 			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
 			    this.ezidUser, this.ezidPassword);
 			httpClient.getCredentialsProvider()
 			    .setCredentials(authScope, credentials);
-
-			// Create AuthCache instance
 			AuthCache authCache = new BasicAuthCache();
-
-			// Generate BASIC scheme object and add it to the local auth cache
 			BasicScheme basicAuth = new BasicScheme();
 			authCache.put(httpHost, basicAuth);
-
-			// Add AuthCache to the execution context
 			BasicHttpContext localcontext = new BasicHttpContext();
 			localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
-			// HttpGet httpGet = new HttpGet(this.getEzidUrl(EzidRegistrar.loginUrl));
-
-			HttpResponse httpResponse = null;
-			Header[] headers = null;
-			Integer statusCode = null;
-
-			// -----------------
-
 			String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-
-			logger.info(this.dataCiteMetadata.getAlternateIdentifier()
-			    .getAlternateIdentifier());
-
-			// HttpClient httpClient = new DefaultHttpClient();
-			HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 			String url = this.getEzidUrl("/ezid/id/" + doi);
+			StringBuffer metadata = new StringBuffer("");
+			metadata.append("datacite: " + this.dataCiteMetadata.toDataCiteXml()
+			    + "\n");
+			metadata.append("_target: " + this.dataCiteMetadata.getLocationUrl()
+			    + "\n");
+
 			HttpPut httpPut = new HttpPut(url);
-			String entityString = null;
-
-			// Set header content
-			/*
-			 * if (this.sessionId != null) { httpPut.setHeader("Cookie", "sessionid="
-			 * + this.sessionId); }
-			 */
-
 			httpPut.setHeader("Content-type", "text/plain");
 
-			String metadata = this.dataCiteMetadata.toDataCiteXml();
-			HttpEntity stringEntity = null;
-			stringEntity = new StringEntity("datacite: " + metadata);
+			HttpEntity stringEntity = new StringEntity(metadata.toString());
 			httpPut.setEntity(stringEntity);
-			// int statusCode;
-
-			httpResponse = httpClient.execute(httpHost, httpPut, localcontext);
-			// HttpResponse httpResponse = httpClient.execute(httpPut);
-			statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpResponse httpResponse = httpClient.execute(httpHost, httpPut, localcontext);
+			Integer statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
-			entityString = EntityUtils.toString(httpEntity);
+			String entityString = EntityUtils.toString(httpEntity);
 			httpClient.getConnectionManager().shutdown();
 
 			if (statusCode != HttpStatus.SC_CREATED) {
