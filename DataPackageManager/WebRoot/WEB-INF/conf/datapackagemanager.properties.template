@@ -84,3 +84,18 @@ datapackagemanager.test.entity.firstToken=NoneSuchBugCount
 datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-0.3
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
+datapackagemanager.doiTest=true
+datapackagemanager.ezidHost=n2t.net
+datapackagemanager.ezidHostPort=443
+datapackagemanager.ezidHostProtocol=https
+datapackagemanager.ezidStageHost=n2t-stage.cdlib.org
+datapackagemanager.ezidStagePort=443
+datapackagemanager.ezidStageProtocol=https
+datapackagemanager.ezidUser=lternet
+datapackagemanager.ezidPassword=HIDE_PASSWORD
+
+##
+## For testing with EZID stage environment
+##
+datapackagemanager.keystore=/home/pasta/.keystore
+datapackagemanager.keystorePassword=HIDE_PASSWORD
