@@ -145,9 +145,7 @@ public class DOIScannerTest {
 	public void setUp() throws Exception {
 
 		doiScanner = new DOIScanner();
-		
-		// Explicitly set DOI testing to true
-		doiScanner.doiTest = true;
+		doiScanner.setDoiTest(true);
 		
 		setResourceDoiNull();
 		setResourceDateDeactivatedNull();
