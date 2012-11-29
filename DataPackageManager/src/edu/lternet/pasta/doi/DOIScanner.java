@@ -32,7 +32,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -72,9 +71,7 @@ public class DOIScanner {
 	private String dbUser = null;
 	private String dbPassword = null;
 	private String metadataDir = null;
-	private String doiTest = null;
-	private String ezidBaseUrl = null;
-	private String ezidStageUrl = null;
+	protected Boolean doiTest = null;
 
 	/*
 	 * Constructors
@@ -125,10 +122,13 @@ public class DOIScanner {
 			this.dbUser = options.getOption("dbUser");
 			this.dbPassword = options.getOption("dbPassword");
 
-			// Load DOI options
-			this.doiTest = options.getOption("datapackagemanager.doiTest");
-			this.ezidBaseUrl = options.getOption("datapackagemanager.ezidBaseUrl");
-			this.ezidStageUrl = options.getOption("datapackagemanager.ezidStageUrl");
+			// Are we testing DOI registration?
+			String doiTest = options.getOption("datapackagemanager.doiTest");
+			if (doiTest.equals("true")) {
+				this.doiTest = true;
+			} else {
+				this.doiTest = false;
+			}
 
 			// Load PASTA service options
 			this.metadataDir = options.getOption("datapackagemanager.metadataDir");
@@ -154,7 +154,7 @@ public class DOIScanner {
 		EzidRegistrar ezidRegistrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar();
+			ezidRegistrar = new EzidRegistrar(doiTest);
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -196,7 +196,7 @@ public class DOIScanner {
 
 			// If DOI testing, add salt to resource identifier to create unique DOI
 			// so subsequent tests will not result in EZID create errors.
-			if (this.doiTest.equals("true")) {
+			if (doiTest) {
 				time = new Date();
 				Long salt = time.getTime();
 				identifier = new DigitalObjectIdentifier(resource.getResourceId()
@@ -247,7 +247,13 @@ public class DOIScanner {
 
 			// Update Data Package Manager resource registry with DOI
 			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-			this.updateRegistryDoi(resourceUrl, doi);
+			try {
+	      this.updateRegistryDoi(resourceUrl, doi);
+      } catch (SQLException e) {
+      	logger.error(e.getMessage());
+	      e.printStackTrace();
+	      throw new DOIException(e.getMessage());
+      }
 
 		}
 
@@ -268,7 +274,7 @@ public class DOIScanner {
 		EzidRegistrar ezidRegistrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar();
+			ezidRegistrar = new EzidRegistrar(doiTest);
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -283,7 +289,7 @@ public class DOIScanner {
 			throw new DOIException(e.getMessage());
 		}
 
-		// Obsolete all EZID and resource registy DOIs
+		// Obsolete all EZID and resource registry DOIs
 		for (String doi : doiList) {
 			
 			logger.info("DOI to obsolete: " + doi);
@@ -433,7 +439,6 @@ public class DOIScanner {
 
 			stat = conn.createStatement();
 			ResultSet result = stat.executeQuery(queryString);
-			String resourceId = null;
 
 			while (result.next()) {
 				String doi = result.getString("doi");
@@ -462,7 +467,7 @@ public class DOIScanner {
 	 * @throws Exception
 	 */
 	protected void updateRegistryDoi(String resourceId, String doi)
-	    throws DOIException {
+	    throws DOIException, SQLException {
 
 		Connection conn = null;
 		try {
@@ -484,6 +489,8 @@ public class DOIScanner {
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+		} finally {
+			conn.close();
 		}
 
 		if (rowCount != 1) {
@@ -634,8 +641,8 @@ public class DOIScanner {
 
 		try {
 			doiScanner = new DOIScanner();
-			//doiScanner.doScanToRegister();
-			doiScanner.doScanToObsolete();
+			doiScanner.doScanToRegister();
+			//doiScanner.doScanToObsolete();
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
