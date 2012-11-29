@@ -93,7 +93,7 @@ public class EzidRegistrar {
 	 * Constructors
 	 */
 
-	public EzidRegistrar() throws ConfigurationException {
+	public EzidRegistrar(Boolean doiTest) throws ConfigurationException {
 
 		Options options = null;
 		options = ConfigurationListener.getOptions();
@@ -106,9 +106,9 @@ public class EzidRegistrar {
 
 		this.loadOptions(options);
 
-		// Do special processing if using EZID stage environemnt
-		if (this.doiTest.equals("true")) {
+		if (doiTest) {
 
+			// Use EZID stage environment if DOI testing
 			this.host = this.ezidStageHost;
 			this.port = this.ezidStagePort;
 			this.protocol = this.ezidStageProtocol;
@@ -504,7 +504,7 @@ public class EzidRegistrar {
 	 * 
 	 * @return EZID service session identifier
 	 */
-	String getSessionId() {
+	private String getSessionId() {
 		return this.sessionId;
 	}
 
@@ -514,9 +514,10 @@ public class EzidRegistrar {
 	public static void main(String[] args) {
 
 		EzidRegistrar ezidRegistrar = null;
+		Boolean doiTest = true;
 
 		try {
-			ezidRegistrar = new EzidRegistrar();
+			ezidRegistrar = new EzidRegistrar(doiTest);
 			ezidRegistrar.obsoleteDoi("doi:10.6073/pasta/dcbd7c1aab57af6a65672aa917bb3faf");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
