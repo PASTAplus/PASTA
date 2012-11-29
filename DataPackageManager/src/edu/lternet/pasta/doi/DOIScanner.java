@@ -651,25 +651,4 @@ public class DOIScanner {
 		return year;
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-		DOIScanner doiScanner = null;
-
-		try {
-			doiScanner = new DOIScanner();
-			doiScanner.doScanToRegister();
-			//doiScanner.doScanToObsolete();
-		} catch (ConfigurationException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (DOIException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-	}
-
 }
