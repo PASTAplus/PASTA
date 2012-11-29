@@ -61,6 +61,8 @@ public class DOIScanner {
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
 	private static final String PUBLIC = "public";
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
 
 	/*
 	 * Instance variables
@@ -71,8 +73,9 @@ public class DOIScanner {
 	private String dbUser = null;
 	private String dbPassword = null;
 	private String metadataDir = null;
-	protected Boolean doiTest = null;
-
+	private String doiTest = null;
+	private Boolean isDoiTest = null;
+	
 	/*
 	 * Constructors
 	 */
@@ -95,6 +98,10 @@ public class DOIScanner {
 		}
 
 		this.loadOptions(options);
+		
+		if (this.doiTest.equalsIgnoreCase(TRUE)) {
+			this.setDoiTest(true);
+		}
 
 	}
 
@@ -122,13 +129,7 @@ public class DOIScanner {
 			this.dbUser = options.getOption("dbUser");
 			this.dbPassword = options.getOption("dbPassword");
 
-			// Are we testing DOI registration?
-			String doiTest = options.getOption("datapackagemanager.doiTest");
-			if (doiTest.equals("true")) {
-				this.doiTest = true;
-			} else {
-				this.doiTest = false;
-			}
+			this.doiTest = options.getOption("datapackagemanager.doiTest");
 
 			// Load PASTA service options
 			this.metadataDir = options.getOption("datapackagemanager.metadataDir");
@@ -154,7 +155,10 @@ public class DOIScanner {
 		EzidRegistrar ezidRegistrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar(doiTest);
+			ezidRegistrar = new EzidRegistrar();
+			if (this.isDoiTest) {
+				ezidRegistrar.setDoiTest(true);
+			}
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -196,12 +200,11 @@ public class DOIScanner {
 
 			// If DOI testing, add salt to resource identifier to create unique DOI
 			// so subsequent tests will not result in EZID create errors.
-			if (doiTest) {
+			if (this.isDoiTest) {
 				time = new Date();
 				Long salt = time.getTime();
 				identifier = new DigitalObjectIdentifier(resource.getResourceId()
 				+ salt.toString());
-				//identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			} else {
 				identifier = new DigitalObjectIdentifier(resource.getResourceId());
 			}
@@ -274,7 +277,10 @@ public class DOIScanner {
 		EzidRegistrar ezidRegistrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar(doiTest);
+			ezidRegistrar = new EzidRegistrar();
+			if (this.isDoiTest) {
+				ezidRegistrar.setDoiTest(true);
+			}
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -305,6 +311,19 @@ public class DOIScanner {
 
 		}
 
+	}
+	
+	/**
+	 * Explicitly set whether DOI testing is enabled.
+	 * 
+	 * @param isDoiTest Boolean test flag
+	 */
+	public void setDoiTest(Boolean isDoiTest) {
+		if (isDoiTest) {
+			this.isDoiTest = true;			
+		} else {
+			this.isDoiTest = false;
+		}
 	}
 
 	/**
