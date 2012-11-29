@@ -23,6 +23,11 @@ package edu.lternet.pasta.doi;
 import static org.junit.Assert.*;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import junit.extensions.TestSetup;
@@ -53,9 +58,24 @@ public class DOIScannerTest {
 	 */
 
 	private static final Logger logger = Logger.getLogger(DOIScannerTest.class);
-
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	private DOIScanner doiScanner = null;
+	
+	// The number of test resources that should be available
+	private static final Integer RESOURCES = 16;
+	
+	// The number of test resources with DOIs after performing DOI registration
+	// with DOIScanner.doScanToRegister()
+	private static final Integer DOIS = 7;
+	
+	// The number test resources that have been obsoleted after performing
+	// DOIScanner.doScanToObsolete()
+	private static final Integer DEACTIVATED = 16;
+	
+	private static DOIScanner doiScanner = null;
+	private static String dbDriver = null;
+	private static String dbUser = null;
+	private static String dbPassword = null;
+	private static String dbUrl = null;
 
 	/*
 	 * Instance variables
@@ -84,6 +104,26 @@ public class DOIScannerTest {
 			    .fail("Failed to load the Data Package Manager properties file: 'datapackagemanager.properties'");
 		}
 
+		Assert.assertNotNull("Failed to load 'datapackagemanager.properties'",
+		    options);
+
+		dbDriver = options.getOption("dbDriver");
+		Assert.assertNotNull("Property 'dbDriver' not set", dbDriver);
+
+		dbUser = options.getOption("dbUser");
+		Assert.assertNotNull("Property 'dbUser' not set", dbUser);
+
+		dbPassword = options.getOption("dbPassword");
+		Assert.assertNotNull("Property 'dbPassword' not set", dbPassword);
+
+		dbUrl = options.getOption("dbURL");
+		Assert.assertNotNull("Property 'dbUrl' not set", dbUrl);
+
+		Integer numberResources = getNumberResourcesPresent();
+		if (numberResources != RESOURCES) {
+			Assert.fail("Necessary resources are not present");
+		}
+
 	}
 
 	/**
@@ -105,6 +145,12 @@ public class DOIScannerTest {
 	public void setUp() throws Exception {
 
 		doiScanner = new DOIScanner();
+		
+		// Explicitly set DOI testing to true
+		doiScanner.doiTest = true;
+		
+		setResourceDoiNull();
+		setResourceDateDeactivatedNull();
 
 	}
 
@@ -116,27 +162,282 @@ public class DOIScannerTest {
 
 	}
 
+/**
+ * @throws java.lang.Exception
+ */
+@Test
+public void testDoScanToRegister() throws Exception {
+		
+	doiScanner.doScanToRegister();
+	
+	Integer numberDois = getNumberResourcesWithDois();
+	
+	if (numberDois != DOIS) {
+		Assert.fail("The number of resources with DOIs (" + numberDois.toString() +
+				") does not equal the number test resources that should have DOIs (" +
+				DOIS + ")");
+	}
+	
+}
+
+/**
+ * @throws java.lang.Exception
+ */
+@Test
+public void testDoScanToObsolete() throws Exception {
+	
+	doiScanner.doScanToRegister();
+	
+	setResourceDateDeactivatedNow();
+	doiScanner.doScanToObsolete();
+	
+	Integer numberDeactivated = getNumberResourcesDeactivated();
+	
+	if (numberDeactivated != DEACTIVATED) {
+		Assert.fail("The number of obsoleted resources (" + numberDeactivated +
+				") do not equal the number of test resources expected to be " +
+				"obsoleted (" + DEACTIVATED + ")");
+	}
+	
+}
+
 	/**
-	 * @throws java.lang.Exception
+	 * Returns a connection to the database.
+	 * 
+	 * @return conn The database Connection object
 	 */
-	@Test
-	public void testDBConnection() throws Exception {
+	private static Connection getConnection() throws Exception {
+		Connection conn = null;
+		SQLWarning warn;
 
-		Connection conn = doiScanner.getConnection();
+		Class.forName(dbDriver);
 
-		assertNotNull("Database connection is null", conn);
+		// Make the database connection
+		conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+
+		// If a SQLWarning object is available, print its warning(s).
+		// There may be multiple warnings chained.
+		warn = conn.getWarnings();
+
+		if (warn != null) {
+			while (warn != null) {
+				logger.warn("SQLState: " + warn.getSQLState());
+				logger.warn("Message:  " + warn.getMessage());
+				logger.warn("Vendor: " + warn.getErrorCode());
+				warn = warn.getNextWarning();
+			}
+		}
+
+		return conn;
 
 	}
 
 	/**
-	 * @throws java.lang.Exception
+	 * Determines if the necessary test resources (16 total) are present in the
+	 * Data Package Manager resource registry:
+	 *  knb-lter-atz.1.1 - 4 resources
+	 *  knb-lter-atz.2.1 - 4 resources
+	 *  knb-lter-atz.2.1 - 4 resources
+	 *  knb-lter-atz.2.1 - 4 resources
+	 * 
+	 * @return Boolean of test resource presence
 	 */
-	@Test
-	public void testGetResourceList() throws Exception {
+	private static Integer getNumberResourcesPresent() throws Exception {
 
-		ArrayList<Resource> resourceList = null;
-		resourceList = doiScanner.getDoiResourceList();
-		
+		Integer nResources = null;
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "SELECT count(*)"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " package_id LIKE 'knb-lter-atz.%';";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			result.next();
+			nResources = result.getInt(1);
+
+		} finally {
+			conn.close();
+		}
+
+		return nResources;
+
+	}
+	
+	/**
+	 * Sets the test resource attribute 'doi' to NULL in the resource_registry
+	 * table for all test resources.
+	 * 
+	 * @throws Exception
+	 */
+	private static void setResourceDoiNull() throws Exception {
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET doi=NULL WHERE package_id LIKE 'knb-lter-atz.%';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} finally {
+			conn.close();
+		}
+
+		if (rowCount != 16) {
+			Assert.fail("Did not successfully set resource 'doi' to NULL");
+		}
+
+	}
+	
+	/**
+	 * Sets the test resource attribute 'date_deactivated' to NULL in the
+	 * resource_registry table for all test resources.
+	 * 
+	 * @throws Exception
+	 */
+	private static void setResourceDateDeactivatedNull() throws Exception {
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET date_deactivated=NULL WHERE package_id LIKE 'knb-lter-atz.%';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} finally {
+			conn.close();
+		}
+
+		if (rowCount != 16) {
+			Assert.fail("Did not successfully set resource 'date_deactivated' to NULL");
+		}
+
+	}
+	
+	/**
+	 * Sets the test resource attributes 'date_deactivated' to the current
+	 * date/time in the resource_registry table for all test resources - 
+	 * effectively deleting the resource.
+	 * 
+	 * @throws Exception
+	 */
+	private static void setResourceDateDeactivatedNow() throws Exception {
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET date_deactivated=now() WHERE package_id LIKE 'knb-lter-atz.%';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} finally {
+			conn.close();
+		}
+
+		if (rowCount != 16) {
+			Assert.fail("Did not successfully set resource 'date_deactivated' to now()");
+		}
+
+	}
+
+	/**
+	 * Returns the number of test resources that have DOIs.
+	 * 
+	 * @return The number of test resources that have DOIs
+	 * @throws Exception
+	 */
+	private static Integer getNumberResourcesWithDois() throws Exception {
+
+		Integer nResources = null;
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "SELECT count(*)"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " package_id LIKE 'knb-lter-atz.%' AND doi IS NOT NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			result.next();
+			nResources = result.getInt(1);
+			
+		} finally {
+			conn.close();
+		}
+
+		return nResources;
+
+	}
+
+	/**
+	 * Returns the number of test resources that are deactivated and DO NOT have
+	 * DOIs.
+	 * 
+	 * @return The number of test resources that have DOIs
+	 * @throws Exception
+	 */
+	private static Integer getNumberResourcesDeactivated() throws Exception {
+
+		Integer nResources = null;
+
+		Connection conn = null;
+		conn = getConnection();
+		Assert.assertNotNull("Database connection null", conn);
+
+		String queryString = "SELECT count(*)"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " package_id LIKE 'knb-lter-atz.%' AND date_deactivated IS NOT NULL"
+		    + " AND doi IS NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			result.next();
+			nResources = result.getInt(1);
+			
+		} finally {
+			conn.close();
+		}
+
+		return nResources;
+
 	}
 
 }
