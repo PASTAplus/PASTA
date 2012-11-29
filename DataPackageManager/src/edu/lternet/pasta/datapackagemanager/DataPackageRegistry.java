@@ -39,7 +39,9 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
+import edu.lternet.pasta.doi.EzidRegistrar;
 import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.ucsb.nceas.utilities.Options;
 
 
 /**
@@ -56,12 +58,11 @@ public class DataPackageRegistry {
    * Class fields
    */
   
-  
+  private static Logger logger = Logger.getLogger(DataPackageRegistry.class);
+ 
   /*
    * Instance fields
    */
-  
-  private Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
   // Name of the database table where data packages are registered
   private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
@@ -91,6 +92,7 @@ public class DataPackageRegistry {
   public DataPackageRegistry(String dbDriver, String dbURL, String dbUser,
                       String dbPassword) 
           throws ClassNotFoundException, SQLException {
+  	
     this.dbDriver = dbDriver;
     this.dbURL = dbURL;
     this.dbUser = dbUser;
@@ -765,7 +767,55 @@ public class DataPackageRegistry {
     return oldest;
   }
   
-  
+  /**
+   * Gets the doi value for a given resourceId
+   * 
+   * @param resourceId   the resource identifier
+   * @return  the value of the 'doi' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getDoi(String resourceId) 
+          throws ClassNotFoundException, SQLException {
+    
+  	String doi = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT doi FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        doi = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return doi;
+    
+  }
+    
   /**
    * Gets the principalOwner value for a given resourceId
    * 
@@ -1371,6 +1421,45 @@ public class DataPackageRegistry {
                    e.getMessage());
     }   
   }
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		Options options = null;
+		options = ConfigurationListener.getOptions();
+		
+		String dirPath = "WebRoot/WEB-INF/conf";
+
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
+
+		DataPackageRegistry dpr = null;
+		String dbDriver = "org.postgresql.Driver";
+		String dbURL = "jdbc:postgresql://localhost:5432/pasta";
+		String dbUser = "pasta";
+    String dbPassword = "p@st@";
+		
+		// String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
+    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+
+		try {
+			dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+			if (dpr.getDoi(resourceId) == null) {
+				logger.info("It's NULL");
+			} else {
+				logger.info("It's not NULL");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
 
 
 }
