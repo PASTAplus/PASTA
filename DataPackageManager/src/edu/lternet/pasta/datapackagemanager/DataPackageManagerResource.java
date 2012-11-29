@@ -2841,6 +2841,679 @@ public class DataPackageManagerResource extends PastaWebService {
     return response;
   }
 
+  /**
+   * 
+   * <strong>Read Data Package DOI</strong> operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/doi/knb-lter-lno/1/3</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the data package DOI was successful</td>
+   *     <td>The canonical Digital Object Identifier of the data package.</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the data package</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no DOI associated with the specified data package is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @return a Response object containing a data package DOI
+   *         if found, else returns a 404 Not Found response
+   */
+  @GET
+  @Path("/doi/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readDataPackageDoi(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageDoi";
+    Rule.Permission permission = Rule.Permission.read;
+
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+			String resourceId = "eml/" + scope + "/" + identifier.toString() + "/"
+			    + revision;
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, doi, entryText);
+
+    response = stampHeader(response);
+    return response;
+  }
+  
+
+  /**
+   * 
+   * <strong>Read Metadata DOI</strong> operation, specifying the scope, identifier, and revision of the metadata DOI to be read in the URI, returning the canonical Digital Object Identifier.
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/metadata/doi/knb-lter-lno/1/3</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the metadata DOI was successful</td>
+   *     <td>The canonical Digital Object Identifier of the metadata.</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the metadata</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no DOI associated with the specified metadata is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @return a Response object containing a metadata DOI
+   *         if found, else returns a 404 Not Found response
+   */
+  @GET
+  @Path("/metadata/doi/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readMetadataDoi(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readMetadataDoi";
+    Rule.Permission permission = Rule.Permission.read;
+
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+			String resourceId = "metadata/eml/" + scope + "/" + identifier.toString() + "/"
+			    + revision;
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, doi, entryText);
+
+    response = stampHeader(response);
+    return response;
+  }
+
+  /**
+   * 
+   * <strong>Read Data Entity DOI</strong> operation, specifying the scope, identifier, and revision of the data entity DOI to be read in the URI, returning the canonical Digital Object Identifier.
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/data/doi/knb-lter-lno/1/3/enity_name</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the data entity DOI was successful</td>
+   *     <td>The canonical Digital Object Identifier of the data entity.</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the data entity</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no DOI associated with the specified data entity is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @param entityId    The entity identifier
+   * @return a Response object containing a data entity DOI
+   *         if found, else returns a 404 Not Found response
+   */
+  @GET
+  @Path("/data/doi/{scope}/{identifier}/{revision}/{entityId}")
+  @Produces("text/plain")
+  public Response readDataEntityDoi(
+                                 @Context HttpHeaders headers,
+                                 @PathParam("scope") String scope,
+                                 @PathParam("identifier") Integer identifier,
+                                 @PathParam("revision") String revision,
+                                 @PathParam("entityId") String entityId
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataEntityDoi";
+    Rule.Permission permission = Rule.Permission.read;
+
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+			String resourceId = "data/eml/" + scope + "/" + identifier.toString() + "/"
+			    + revision + "/" + entityId;
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, doi, entryText);
+
+    response = stampHeader(response);
+    return response;
+  }
+
+  
+  /**
+   * 
+   * <strong>Read Report DOI</strong> operation, specifying the scope, identifier, and revision of the report DOI to be read in the URI, returning the canonical Digital Object Identifier.
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/report/doi/knb-lter-lno/1/3</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the report DOI was successful</td>
+   *     <td>The canonical Digital Object Identifier of the report.</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the report</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no DOI associated with the specified report is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @return a Response object containing a report DOI
+   *         if found, else returns a 404 Not Found response
+   */
+  @GET
+  @Path("/report/doi/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readDataPackageReportDoi(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageReportDoi";
+    Rule.Permission permission = Rule.Permission.read;
+
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+			String resourceId = "report/eml/" + scope + "/" + identifier.toString() + "/"
+			    + revision;
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, doi, entryText);
+
+    response = stampHeader(response);
+    return response;
+  }
+
+  
   
   /*
    * Isolates the resourceId for the data package from a resource map 
