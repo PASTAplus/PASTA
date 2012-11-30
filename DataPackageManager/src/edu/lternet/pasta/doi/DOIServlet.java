@@ -49,6 +49,8 @@ public class DOIServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 
+		logger.info("DOI processing...");
+
 		try {
 			DOIScanner doiScanner = new DOIScanner();
 			doiScanner.doScanToRegister();
