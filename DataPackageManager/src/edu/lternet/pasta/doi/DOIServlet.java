@@ -1,6 +1,8 @@
 package edu.lternet.pasta.doi;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +59,13 @@ public class DOIServlet extends HttpServlet {
 		} catch (DOIException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
-		}
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+	    e.printStackTrace();
+    } catch (SQLException e) {
+			logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
 
 	}
 
