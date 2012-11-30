@@ -20,19 +20,11 @@
 
 package edu.lternet.pasta.doi;
 
-import static org.junit.Assert.*;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
-
-import junit.extensions.TestSetup;
-import junit.framework.TestCase;
-import junit.framework.TestFailure;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
