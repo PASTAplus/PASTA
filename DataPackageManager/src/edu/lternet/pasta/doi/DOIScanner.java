@@ -21,24 +21,15 @@
 package edu.lternet.pasta.doi;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.security.authorization.AccessMatrix;
-import edu.lternet.pasta.common.security.authorization.Rule;
-import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.common.security.token.BasicAuthToken;
-
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
+
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -60,7 +51,6 @@ public class DOIScanner {
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
-	private static final String PUBLIC = "public";
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 
@@ -76,6 +66,8 @@ public class DOIScanner {
 	private String doiTest = null;
 	private Boolean isDoiTest = null;
 	
+	private DataPackageRegistry dataPackageRegistry = null;
+	
 	/*
 	 * Constructors
 	 */
@@ -83,10 +75,11 @@ public class DOIScanner {
 	/**
 	 * Creates a new DOI scanning instance to scan the Data Package Manager for
 	 * resources without DOIs.
+	 * @throws ClassNotFoundException 
 	 * 
 	 * @throws SQLException
 	 */
-	public DOIScanner() throws ConfigurationException {
+	public DOIScanner() throws ConfigurationException, ClassNotFoundException, SQLException {
 
 		Options options = null;
 		options = ConfigurationListener.getOptions();
@@ -102,6 +95,8 @@ public class DOIScanner {
 		if (this.doiTest.equalsIgnoreCase(TRUE)) {
 			this.setDoiTest(true);
 		}
+		
+		dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 
 	}
 
@@ -166,7 +161,7 @@ public class DOIScanner {
 		}
 
 		try {
-			resourceList = this.getDoiResourceList();
+			resourceList = dataPackageRegistry.listDoilessResources();
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -251,7 +246,7 @@ public class DOIScanner {
 			// Update Data Package Manager resource registry with DOI
 			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
 			try {
-	      this.updateRegistryDoi(resourceUrl, doi);
+	      dataPackageRegistry.addResourceDoi(resourceUrl, doi);
       } catch (SQLException e) {
       	logger.error(e.getMessage());
 	      e.printStackTrace();
@@ -288,7 +283,7 @@ public class DOIScanner {
 		}
 
 		try {
-			doiList = this.getObsoleteDoiList();
+			doiList = dataPackageRegistry.listObsoleteDois();
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -307,7 +302,7 @@ public class DOIScanner {
 				e.printStackTrace();
 			}
 			
-			this.obsoleteRegistryDoi(doi);
+			dataPackageRegistry.deleteResourceDoi(doi);
 
 		}
 
@@ -324,308 +319,6 @@ public class DOIScanner {
 		} else {
 			this.isDoiTest = false;
 		}
-	}
-
-	/**
-	 * Returns a connection to the database.
-	 * 
-	 * @return conn The database Connection object
-	 */
-	protected Connection getConnection() throws ClassNotFoundException {
-		Connection conn = null;
-		SQLWarning warn;
-
-		// Load the jdbc driver
-		try {
-			Class.forName(dbDriver);
-		} catch (ClassNotFoundException e) {
-			logger.error("Can't load driver " + e.getMessage());
-			throw (e);
-		}
-
-		// Make the database connection
-		try {
-			conn = DriverManager.getConnection(dbURL, dbUser, dbPassword);
-
-			// If a SQLWarning object is available, print its warning(s).
-			// There may be multiple warnings chained.
-			warn = conn.getWarnings();
-
-			if (warn != null) {
-				while (warn != null) {
-					logger.warn("SQLState: " + warn.getSQLState());
-					logger.warn("Message:  " + warn.getMessage());
-					logger.warn("Vendor: " + warn.getErrorCode());
-					warn = warn.getNextWarning();
-				}
-			}
-		} catch (SQLException e) {
-			logger.error("Database access failed " + e);
-		}
-
-		return conn;
-
-	}
-
-	/**
-	 * Returns an array list of resources that are both publicly accessible and
-	 * lacking DOIs.
-	 * 
-	 * @return Array list of resources
-	 * @throws SQLException
-	 */
-	protected ArrayList<Resource> getDoiResourceList() throws SQLException {
-
-		ArrayList<Resource> resourceList = new ArrayList<Resource>();
-
-		Connection conn = null;
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " doi IS NULL and date_deactivated IS NULL;";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-			String resourceId = null;
-
-			while (result.next()) {
-
-				Resource resource = new Resource();
-
-				// Test here for resource public accessibility before adding to list
-
-				resourceId = result.getString("resource_id");
-
-				if (isPublicAccessible(resourceId)) {
-
-					resource.setResourceId(resourceId);
-					resource.setResourceType(result.getString("resource_type"));
-					resource.setPackageId(result.getString("package_id"));
-					resource.setDateCreate(result.getString("date_created"));
-
-					resourceList.add(resource);
-
-				}
-
-			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			conn.close();
-		}
-
-		return resourceList;
-
-	}
-
-	/**
-	 * Returns an array list of DOIs that are obsolete.
-	 * 
-	 * @return Array list of resources
-	 * @throws SQLException
-	 */
-	protected ArrayList<String> getObsoleteDoiList() throws SQLException {
-
-		ArrayList<String> doiList = new ArrayList<String>();
-
-		Connection conn = null;
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryString = "SELECT doi"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " doi IS NOT NULL and date_deactivated IS NOT NULL;";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-
-			while (result.next()) {
-				String doi = result.getString("doi");
-				doiList.add(doi);
-			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			conn.close();
-		}
-
-		return doiList;
-
-	}
-
-	/**
-	 * Update the DOI field of the Data Package Manager resource registry with
-	 * DOIs for the resource identified by the resource identifier.
-	 * 
-	 * @param resourceId
-	 *          The resource identifier of the resource to be updated
-	 * @param doi
-	 *          The DOI of the resource
-	 * @throws Exception
-	 */
-	protected void updateRegistryDoi(String resourceId, String doi)
-	    throws DOIException, SQLException {
-
-		Connection conn = null;
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET doi='" + doi + "' WHERE resource_id='" + resourceId + "';";
-
-		Statement stat = null;
-		Integer rowCount = null;
-
-		try {
-			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			conn.close();
-		}
-
-		if (rowCount != 1) {
-			String gripe = "updateRegistryDoi: failed to update DOI in resource registry.";
-			throw new DOIException(gripe);
-		}
-
-	}
-
-	/**
-	 * Obsolete the DOI field of the Data Package Manager resource registry with
-	 * for the resource identified by the DOI.
-	 * 
-	 * @param doi
-	 *          The DOI of the resource
-	 * @throws Exception
-	 */
-	protected void obsoleteRegistryDoi(String doi)
-	    throws DOIException {
-
-		Connection conn = null;
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET doi=NULL WHERE doi='" + doi + "';";
-
-		Statement stat = null;
-		Integer rowCount = null;
-
-		try {
-			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		if (rowCount != 1) {
-			String gripe = "obsoleteRegistryDoi: failed to obsolete DOI in resource registry.";
-			throw new DOIException(gripe);
-		}
-
-	}
-
-	/**
-	 * Determines whether the given resource is publicly accessible.
-	 * 
-	 * @param resourceId
-	 * @return Is publicly accessible
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 */
-	protected Boolean isPublicAccessible(String resourceId) throws SQLException {
-
-		Boolean publicAccessible = false;
-
-		ArrayList<Rule> ruleList = new ArrayList<Rule>();
-
-		Connection conn = null;
-
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryString = "SELECT resource_id, principal, access_type, "
-		    + "access_order, permission FROM datapackagemanager.access_matrix WHERE"
-		    + " resource_id='" + resourceId + "';";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-
-			while (result.next()) {
-
-				Rule rule = new Rule();
-
-				rule.setPrincipal(result.getString("principal"));
-				rule.setAccessType(result.getString("access_type"));
-				rule.setOrder(result.getString("access_order"));
-				rule.setPermission((Rule.Permission) Enum.valueOf(
-				    Rule.Permission.class, result.getString("permission")));
-
-				ruleList.add(rule);
-
-			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			conn.close();
-		}
-
-		String tokenString = BasicAuthToken.makeTokenString(DOIScanner.PUBLIC,
-		    DOIScanner.PUBLIC);
-		AuthToken authToken = AuthTokenFactory
-		    .makeAuthTokenWithPassword(tokenString);
-
-		AccessMatrix accessMatrix = new AccessMatrix(ruleList);
-		Rule.Permission permission = (Rule.Permission) Enum.valueOf(
-		    Rule.Permission.class, Rule.READ);
-		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
-
-		return publicAccessible;
-
 	}
 
 	/**
