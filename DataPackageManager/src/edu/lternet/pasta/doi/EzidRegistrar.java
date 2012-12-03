@@ -64,6 +64,8 @@ public class EzidRegistrar {
 	    .getLogger(edu.lternet.pasta.doi.EzidRegistrar.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
 
 	/*
 	 * Instance variables
@@ -77,8 +79,8 @@ public class EzidRegistrar {
 
 	private String doiTest = null;
 	private String ezidHost = null;
-	private String ezidHostPort = null;
-	private String ezidHostProtocol = null;
+	private String ezidPort = null;
+	private String ezidProtocol = null;
 	private String ezidStageHost = null;
 	private String ezidStagePort = null;
 	private String ezidStageProtocol = null;
@@ -106,23 +108,8 @@ public class EzidRegistrar {
 
 		this.loadOptions(options);
 
-		// Do special processing if using EZID stage environemnt
-		if (this.doiTest.equals("true")) {
-
-			this.host = this.ezidStageHost;
-			this.port = this.ezidStagePort;
-			this.protocol = this.ezidStageProtocol;
-
-			System.setProperty("javax.net.ssl.trustStore", this.keystore);
-			System.setProperty("javax.net.ssl.trustStorePassword",
-			    this.keystorePassword);
-
-		} else {
-
-			this.host = this.ezidHost;
-			this.port = this.ezidHostPort;
-			this.protocol = this.ezidHostProtocol;
-
+		if (this.doiTest.equalsIgnoreCase(TRUE)) {
+			this.setDoiTest(true);
 		}
 
 	}
@@ -145,30 +132,55 @@ public class EzidRegistrar {
 
 		if (options != null) {
 
-			// Load EZID options
 			this.doiTest = options.getOption("datapackagemanager.doiTest");
+
 			this.ezidHost = options.getOption("datapackagemanager.ezidHost");
-			this.ezidHostPort = options.getOption("datapackagemanager.ezidHostPort");
-			this.ezidHostProtocol = options
-			    .getOption("datapackagemanager.ezidHostProtocol");
-			this.ezidStageHost = options
-			    .getOption("datapackagemanager.ezidStageHost");
-			this.ezidStagePort = options
-			    .getOption("datapackagemanager.ezidStagePort");
-			this.ezidStageProtocol = options
-			    .getOption("datapackagemanager.ezidStageProtocol");
-			this.ezidUser = options.getOption("datapackagemanager.ezidUser");
-			this.ezidPassword = options.getOption("datapackagemanager.ezidPassword");
+			this.ezidPort = options.getOption("datapackagemanager.ezidPort");
+			this.ezidProtocol = options.getOption("datapackagemanager.ezidProtocol");
+
+			this.ezidStageHost = options.getOption("datapackagemanager.ezidStageHost");
+			this.ezidStagePort = options.getOption("datapackagemanager.ezidStagePort");
+			this.ezidStageProtocol = options.getOption("datapackagemanager.ezidStageProtocol");
+
 			this.keystore = options.getOption("datapackagemanager.keystore");
 			this.keystorePassword = options
 			    .getOption("datapackagemanager.keystorePassword");
+			this.ezidUser = options.getOption("datapackagemanager.ezidUser");
+			this.ezidPassword = options.getOption("datapackagemanager.ezidPassword");
 
 		} else {
-			throw new ConfigurationException("Configuration options failed to load.");
+			throw new ConfigurationException("Configuration options failed to load");
 		}
 
 	}
 
+	/**
+	 * Explicitly sets whether to use the EZID stage environment for DOI testing.
+	 * 
+	 * @param doiTest Boolean test flag
+	 */
+	public void setDoiTest(Boolean isDoiTest) {
+		
+		if (isDoiTest) {
+
+			this.host = this.ezidStageHost;
+			this.port = this.ezidStagePort;
+			this.protocol = this.ezidStageProtocol;
+
+			System.setProperty("javax.net.ssl.trustStore", this.keystore);
+			System.setProperty("javax.net.ssl.trustStorePassword",
+			    this.keystorePassword);
+
+		} else {
+
+			this.host = this.ezidHost;
+			this.port = this.ezidPort;
+			this.protocol = this.ezidProtocol;
+		
+		}
+		
+	}
+	
 	/**
 	 * Sets the DataCite metadata object.
 	 * 
@@ -504,7 +516,7 @@ public class EzidRegistrar {
 	 * 
 	 * @return EZID service session identifier
 	 */
-	String getSessionId() {
+	private String getSessionId() {
 		return this.sessionId;
 	}
 
@@ -514,9 +526,11 @@ public class EzidRegistrar {
 	public static void main(String[] args) {
 
 		EzidRegistrar ezidRegistrar = null;
+		Boolean doiTest = true;
 
 		try {
 			ezidRegistrar = new EzidRegistrar();
+			ezidRegistrar.setDoiTest(true);
 			ezidRegistrar.obsoleteDoi("doi:10.6073/pasta/dcbd7c1aab57af6a65672aa917bb3faf");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
