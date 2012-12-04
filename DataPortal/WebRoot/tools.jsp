@@ -35,11 +35,11 @@
 
 			<h4>Manage Your Data Packages</h4>
 			<ul>
-        <li><a href="./dataPackageEvaluate.jsp">Evaluate Data Packages</a>
+        <li><a href="./dataPackageEvaluate.jsp">Evaluate Data Package</a>
         </li>
-				<li><a href="./harvester.jsp">Harvest Data Packages</a>
+				<li><a href="./harvester.jsp">Evaluate/Upload Data Packages</a>
 				</li>
-				<li><a href="./harvestReport.jsp">View Harvest Reports</a>
+				<li><a href="./harvestReport.jsp">View Upload Reports</a>
 				</li>
 				<li><a href="./dataPackageDelete.jsp">Delete Data Packages</a>
 				</li>
