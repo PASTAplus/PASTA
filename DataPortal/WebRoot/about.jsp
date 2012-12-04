@@ -88,6 +88,10 @@
 						technology interface. The NIS Data Portal is the main path for
 						input and retrieval of the varied data products from the NIS PASTA
 						(Provenance Aware Synthesis Tracking Architecture).</p>
+						
+				    <p>The NIS Data Portal uses a "rolling-update" approach to
+				       continuously release improved versions as they are ready for
+				       the community.</p>
 
 				</div>
 
@@ -97,42 +101,54 @@
 				<div class="section">
 
 					<p>
-						The PASTA framework is comprised of the following application
+						The PASTA framework is comprised of the Gatekeeper identity
+						authentication service and the following application
 						programming interfaces (APIs) of the LTER Network Information
 						System (<b><i>user authentication</i> </b> is required for all
 						data input to the PASTA system):
 					</p>
 
 					<ol>
-						<li>The Provenance Factory API</li>
 						<li>The Audit Service API</li>
 						<li>The Event Manager API</li>
-						<li>The Data Package Manager (including the Data Manager and
-							the Data Catalog) API</li>
-						<li>The Metadata Manager (including the Metadata Catalog) API</li>
+						<li>The Data Package Manager API, includes:
+						  <ul>
+						      <li>Data Manager</li>
+						      <li>Metadata Manager</li>
+						      <li>Provenance Factory</li>
+						  </ul>
+						</li>
 					</ol>
+					
+					<p>The Gatekeeper is a reverse proxy service that performs user
+					   identity verification and service forwarding; it does not
+					   perform any direct PASTA function and does not have a web-service
+					   API.</p>
+					
+					<p>The Audit Manager collects information about operations that
+					   are executed within the PASTA environment and provides an
+					   API for searching and viewing recorded events.</p>
 
-					<p>Identity Management Services (Gatekeeper) and Persistent
-						Identifier Services have been adopted from community and industry
-						standards.</p>
-
-					<p>The Audit Services API supports and complies with the LTER
-						Data Policy to track LTER data access and usage.</p>
-
-					<p>LTER Site Information Managers can choose to interact
-						directly with the Data Package Manager component to configure and
-						schedule metadata harvests into the Data Catalog and to identify
-						"PASTA-compliant" data (i.e., data that are made available to
-						PASTA and conform to the necessary metadata standards).</p>
+					<p>The Event Manager is an extended feature of PASTA and allows
+						users to subscribe their own workflows to PASTA data package upload
+						(insert and or update) events.</p>
+					
+					<p>The Data Package Manager is designed for users to configure
+						and schedule data package uploads into PASTA and to
+						search for data packages that reside in PASTA</p>
+						
+				    <p>Like the NIS Data Portal, all of PASTA services use a
+				       "rolling-update" approach to adding bug fixes, improvements,
+				       and new features to each of the services.</p>
 
 					<p>
 						Information about the structure and functions of the APIs and the
-						overall source-code documentation for PASTA is available at the <a
-							href="https://nis.lternet.edu:8443/display/pasta/Home"
-							target="_blank">LTER NIS developer's documentation wiki.</a>
+						overall source-code documentation for PASTA is available at the
+						<a href="https://nis.lternet.edu:8443/display/pasta/Home"
+					    target="_blank">LTER NIS developer's documentation wiki.</a>
 					</p>
 
-				</div>
+			</div>
 
 				<table>
 					<tbody>
