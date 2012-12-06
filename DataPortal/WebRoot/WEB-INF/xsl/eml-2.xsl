@@ -27,7 +27,7 @@
   exclude-result-prefixes="eml"
   version="2.0"
 >
-
+  
   <!-- mob: 2010-03-19 
     note on encoding: These stylesheets use &#160; for a non-breaking space, which is utf-8. 
     So setting encoding to iso-8859 renders these incorrectly. Metacat seems to map between the two
@@ -36,136 +36,102 @@
     expected of all transformers or applications?
   -->
   
+  <!-- *** Output *** -->
   <xsl:output method="html" encoding="utf-8" indent="yes" /> 
   
+  <!-- *** Variables *** -->
   <xsl:variable name="packageID" select="/eml:eml/@packageId"/>
   <xsl:variable name="docid" select="$packageID"/>
   <xsl:variable name="resourcetitle" select="/eml:eml/dataset/title"/>
-  
   <!-- global variables to store id node set in case to be referenced -->
   <xsl:variable name="ids" select="//*[@id != '']"/>
-  
-  <!-- <xsl:param name="displaymodule">allmodules</xsl:param> -->
+
+  <!-- *** Parameters ***
+       Note that the default values specified below may be overridden by passing parameters to
+       the XSLT processor programatically, although the procedure for doing so is vendor-specific.
+  -->
+  <!-- change debugmessages value to 1 to enable debugging output -->
+  <xsl:param name="debugmessages">0</xsl:param>
   <xsl:param name="entitytype"></xsl:param>
   <xsl:param name="entityindex">1</xsl:param>
-  
-  <!--
-    * eml-settings-2.0.0.xsl
-    * Note that the values given below may be overridden by passing parameters to
-    * the XSLT processor programatically, although the procedure for doing so is
-    * vendor-specific.
-  -->
-  
   <xsl:param name="contextURL">https://pasta.lternet.edu</xsl:param>
-  <xsl:param name="cgi-prefix">http://pasta.lternet.edu</xsl:param>
-  
+  <xsl:param name="cgi-prefix">http://pasta.lternet.edu</xsl:param>  
   <!-- To show the links for the Entities in the dataset display module -->
   <xsl:param name="withEntityLinks">1</xsl:param>
-  
   <!-- To show the link for the Original XML in the dataset display module -->
   <xsl:param name="withOriginalXMLLink">1</xsl:param>
-  
   <!-- To show the Attributes table in the entity display -->
   <xsl:param name="withAttributes">1</xsl:param>
-  
   <!-- the index of physical part in entity part-->
   <xsl:param name="physicalindex"/>
-  
   <!-- the index of distribution in physical part  -->
   <xsl:param name="distributionindex"/>
-  
   <!-- the level of distribution -->
   <xsl:param name="distributionlevel"/>
-  
   <!-- the index of attribute in attribute list-->
   <xsl:param name="attributeindex"/>
-  
   <!-- attribute set to get rid of cell spacing-->
   <xsl:attribute-set name="cellspacing">
     <xsl:attribute name="cellpadding">0</xsl:attribute>
     <xsl:attribute name="cellspacing">0</xsl:attribute>
   </xsl:attribute-set>
-  
   <!-- URL for the app which suppies the xslt with their parameters  -->
   <xsl:param name="useridDirectoryApp1_URI"><xsl:value-of select="$cgi-prefix" /><![CDATA[/ldapweb2012.cgi?stage=showindividual&lter_id=]]></xsl:param>
   <xsl:param name="useridDirectory1">sbclter-directory</xsl:param>
   <xsl:param name="useridDirectoryLabel1">SBC LTER</xsl:param>
-  
   <!--
     *   Most of the html pages are currently laid out as a 2-column table, with
     *   highlights for more-major rows containing subsection titles etc.
-    
     *   The following parameters are used within the
     *           <td width="whateverWidth" class="whateverClass">
     *   tags to define the column widths and (css) styles.
-    *
     *   The values of the "xxxColWidth" parameters can be percentages (need to
     *   include % sign) or pixels (number only). Note that if a width is defined
     *   in the CSS stylesheet (see next paragraph), it will override this local
     *   width setting in browsers newer than NN4
   -->
-  
   <!-- the style for major rows containing subsection titles etc. -->
   <xsl:param name="subHeaderStyle" select="'tablehead'"/>
-  
   <!-- the style for major rows containing links, such as additional metadata, original xml file, etc. -->
-  <xsl:param name="linkedHeaderStyle" select="'linkedHeaderStyle'"/>
-  
+  <xsl:param name="linkedHeaderStyle" select="'linkedHeaderStyle'"/>  
   <!-- the width for the first column (but see note above) -->
   <xsl:param name="firstColWidth" select="'15%'"/>
-  
   <!-- the style for the first column -->
   <xsl:param name="firstColStyle" select="'rowodd'"/>
-  
   <!-- the width for the second column (but see note above) -->
   <xsl:param name="secondColWidth" select="'85%'"/>
-  
   <!-- the style for the second column -->
   <xsl:param name="secondColStyle" select="'roweven'"/>
-  
   <!-- the style for the attribute table -->
   <xsl:param name="tableattributeStyle" select="'tableattribute'"/>
-  
   <!-- the style for the border -->
   <xsl:param name="borderStyle" select="'bordered'"/>
-  
   <!-- the style for the even col in attributes table -->
   <xsl:param name="colevenStyle" select="'coleven'"/>
-  
   <!-- the style for the inner even col in attributes table -->
   <xsl:param name="innercolevenStyle" select="'innercoleven'"/>
-  
   <!-- the style for the odd col in attributes table -->
   <xsl:param name="coloddStyle" select="'colodd'"/>
-  
   <!-- the style for the inner odd col in attributes table -->
   <xsl:param name="innercoloddStyle" select="'innercolodd'"/>
-  
   <!-- the default alignment style for the wrapper around the main tables -->
   <!-- <xsl:param name="mainTableAligmentStyle" select="'mainTableAligmentStyle'"/> -->
-  <xsl:param name="mainTableAligmentStyle" select="'content'"/>
-  
+  <xsl:param name="mainTableAligmentStyle" select="'content'"/>  
   <!-- the default style for the main container table -->
   <xsl:param name="mainContainerTableStyle" select="'group group_border'"/>
-  
   <!-- the default style for all other tables -->
   <xsl:param name="tabledefaultStyle" select="'subGroup subGroup_border onehundred_percent'"/>
-  
   <!-- the style for table party -->
-  <xsl:param name="tablepartyStyle" select="'tableparty'"/>
-  
-  <!-- 
-     Some html pages use a nested table in the second column.
-     Some of these nested tables set their first column to the following width: 
-  -->
+  <xsl:param name="tablepartyStyle" select="'tableparty'"/> 
+  <!-- Some html pages use a nested table in the second column.
+       Some of these nested tables set their first column to the following width: -->
   <xsl:param name="secondColIndent" select="'10%'"/>
-  
   <!-- the first column width of attribute table-->
   <xsl:param name="attributefirstColWidth" select="'15%'"/>
   
   <xsl:template match="/">
     <xsl:param name="docid" select="$docid"></xsl:param>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: /</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: /</xsl:text></xsl:message></xsl:if>
     <!-- HTML5 DOCTYPE declaration -->
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html>&#x0A;</xsl:text>
     <html>
@@ -211,6 +177,7 @@
   </xsl:template>
   
   <xsl:template match="error">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: error</xsl:text></xsl:message></xsl:if>
     <xsl:value-of select="."/>
   </xsl:template>
 
@@ -218,7 +185,7 @@
     <!-- hang onto first title to pass to child pages -->
     <xsl:param name="resourcetitle"><xsl:value-of select="*/title"/> </xsl:param> 
     <xsl:param name="packageID"><xsl:value-of select="@packageId"/></xsl:param>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: *[local-name()='eml']</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: *[local-name()='eml']</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="dataset">
       <xsl:call-template name="emldataset">
         <xsl:with-param name="resourcetitle" select="$resourcetitle"></xsl:with-param>
@@ -235,14 +202,14 @@
       <xsl:call-template name="emlprotocol"/>
     </xsl:for-each>
     <fieldset>
-      <legend>Other Metadata and Links</legend>
+      <legend>Other Metadata</legend>
       <xsl:for-each select="additionalMetadata">
-      <xsl:call-template name="additionalmetadata"/>
-    </xsl:for-each> 
+        <xsl:call-template name="additionalmetadata"/>
+      </xsl:for-each> 
+    </fieldset>
     <xsl:if test="$withOriginalXMLLink='1'">
       <xsl:call-template name="xml"/>
     </xsl:if>
-    </fieldset>
   </xsl:template>
 
   <!-- dataset part -->
@@ -251,70 +218,111 @@
     <xsl:param name="entitytype" select="$entitytype"/>
     <xsl:param name="entityindex" select="$entityindex"/> 
     <xsl:param name="packageID"/>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: emldataset</xsl:text></xsl:message>
-    
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emldataset</xsl:text></xsl:message></xsl:if>   
     <xsl:call-template name="datasettitle">
       <xsl:with-param name="packageID" select="$packageID"/> 
     </xsl:call-template>
-
     <fieldset>
       <legend>Summary Information</legend>
-       <xsl:call-template name="datasetpart">
-         <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
-       </xsl:call-template>
-    </fieldset>
-    
+      <xsl:call-template name="datasetpart">
+        <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
+      </xsl:call-template>
+    </fieldset> 
+    <button id="showAll">Show Metadata</button><button id="hideAll">Hide Metadata</button>
     <fieldset>
       <legend>Detailed Metadata</legend>
       <h3 id="toggleEntities" class="toggleButton"><button>+/-</button> Data Entities</h3>
-    <div class="collapsible">
-      <xsl:call-template name="entitypart"/>
-    </div> <!-- end collapsible -->
-    
-    <h3 id="togglePeople" class="toggleButton"><button>+/-</button> People and Organizations</h3>
-    <div class="collapsible">
-      <!-- Organization/Personnel Information -->
-      <!-- mob added 2010-03-26 -->
-       <xsl:call-template name="responsiblepartiespart">
-         <xsl:with-param name="docid" select="$docid"/>
-         <xsl:with-param name="resourcetitle" select="$resourcetitle"/>
-        <xsl:with-param name="packageID" select="$packageID"/> 
-       </xsl:call-template>
-    </div> <!-- end collapsible -->
-    
-     <!-- mob added 2010-03-26. this one only used by attribute-level coverage  -->
-     <!-- <xsl:if test="$displaymodule='coverage' "> -->     
-     <xsl:if test="boolean(0)">
-       <xsl:call-template name="coveragepart">
-         <xsl:with-param name="docid" select="$docid"/>
-         <xsl:with-param name="resourcetitle" select="$resourcetitle"/>
-       </xsl:call-template>
-     </xsl:if>
-    
-    <h3 id="toggleCoverage" class="toggleButton"><button>+/-</button> Temporal, Geographic and Taxonomic Coverage</h3>
-    <div class="collapsible">
-      <!-- mob added 2010-03-26  -->
-       <xsl:call-template name="ifcoverage">
-         <!-- <xsl:with-param name="docid" select="$docid"/> -->
-         <!-- <xsl:with-param name="resourcetitle" select="$resourcetitle"/> -->
-         <xsl:with-param name="packageID" select="$packageID"/>
-       </xsl:call-template>
-    </div> <!-- end collapsible -->
-    
-    <h3 id="toggleMethods" class="toggleButton"><button>+/-</button> Methods and Protocols</h3>
-    <div class="collapsible">
-      <!-- mob added 2010-03-26  -->
-       <xsl:call-template name="ifmethods">
-         <xsl:with-param name="docid" select="$docid"/>
-         <!-- <xsl:with-param name="resourcetitle" select="$resourcetitle"/> -->
-         <xsl:with-param name="packageID" select="$packageID"/>
-       </xsl:call-template>
-    </div> <!-- end collapsible -->
+      <div class="collapsible">
+        <xsl:call-template name="entitypart"/>
+      </div> <!-- end collapsible --> 
+      <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Set Usage Rights</h3>
+      <div class="collapsible">
+        <!-- add in the intellectual rights info -->
+        <table class="subGroup subGroup_border onehundred_percent">  
+          <tr>
+            <td>
+              <xsl:if test="intellectualRights">
+                <xsl:for-each select="intellectualRights">
+                  <xsl:call-template name="resourceintellectualRights">
+                    <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
+                    <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:if>
+            </td>
+          </tr>
+        </table>
+      </div> <!-- end collapsible -->
+      <h3 id="toggleKeywords" class="toggleButton"><button>+/-</button> Keywords</h3>
+      <div class="collapsible">
+        <!-- the keywords table. -->
+        <xsl:if test="keywordSet">
+          <table class="{$tabledefaultStyle}"> 
+            <tr>
+              <th colspan="2">By Thesaurus:</th>
+            </tr>
+            <tr>
+              <td>
+                <xsl:for-each select="keywordSet">
+                  <table class="{$tabledefaultStyle}">
+                    <tr>
+                      <td class="{$firstColStyle}">
+                        <xsl:choose>
+                          <xsl:when test="keywordThesaurus"> 
+                            <xsl:value-of select="keywordThesaurus" />
+                          </xsl:when>
+                          <xsl:otherwise>      
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </td>
+                      <td class="{$secondColStyle}">
+                        <xsl:call-template name="resourcekeywordsAsPara" ></xsl:call-template>
+                      </td>
+                    </tr>
+                  </table>
+                </xsl:for-each>
+              </td> 
+            </tr>
+          </table>
+        </xsl:if>
+      </div> <!-- end collapsible -->   
+      <h3 id="toggleMethods" class="toggleButton"><button>+/-</button> Methods and Protocols</h3>
+      <div class="collapsible">
+        <!-- mob added 2010-03-26  -->
+        <xsl:call-template name="ifmethods">
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="packageID" select="$packageID"/>
+        </xsl:call-template>
+      </div> <!-- end collapsible -->
+      <h3 id="togglePeople" class="toggleButton"><button>+/-</button> People and Organizations</h3>
+      <div class="collapsible">
+        <!-- Organization/Personnel Information -->
+        <!-- mob added 2010-03-26 -->
+        <xsl:call-template name="responsiblepartiespart">
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="resourcetitle" select="$resourcetitle"/>
+          <xsl:with-param name="packageID" select="$packageID"/> 
+        </xsl:call-template>
+      </div> <!-- end collapsible -->
+      <!-- mob added 2010-03-26. this one only used by attribute-level coverage  -->
+      <!-- <xsl:if test="$displaymodule='coverage' "> -->     
+      <xsl:if test="boolean(0)">
+        <xsl:call-template name="coveragepart">
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="resourcetitle" select="$resourcetitle"/>
+        </xsl:call-template>
+      </xsl:if>
+      <h3 id="toggleCoverage" class="toggleButton"><button>+/-</button> Temporal, Geographic and Taxonomic Coverage</h3>
+      <div class="collapsible">
+        <!-- mob added 2010-03-26  -->
+        <xsl:call-template name="ifcoverage">
+          <xsl:with-param name="packageID" select="$packageID"/>
+        </xsl:call-template>
+      </div> <!-- end collapsible -->
     </fieldset>
-    
     <!-- <xsl:if test="$displaymodule='attribute'"> -->
     <xsl:if test="boolean(0)">
-        <xsl:call-template name="attributepart"/>
+      <xsl:call-template name="attributepart"/>
     </xsl:if>
     <!-- <xsl:if test="$displaymodule='attributedomain'"> -->
     <xsl:if test="boolean(0)">
@@ -324,8 +332,8 @@
     <xsl:if test="boolean(0)">
       <xsl:call-template name="datasetattributecoverage">
         <xsl:with-param name="entitytype" select="$entitytype"/>
-         <xsl:with-param name="entityindex" select="$entityindex"/>
-       </xsl:call-template>
+        <xsl:with-param name="entityindex" select="$entityindex"/>
+      </xsl:call-template>
     </xsl:if>
     <!-- <xsl:if test="$displaymodule='attributemethod'"> -->
     <xsl:if test="boolean(0)">
@@ -341,33 +349,31 @@
     </xsl:if>
   </xsl:template>
 
-   <!-- *************** Data set display *************-->
+  <!-- *************** Data set display *************-->
   <xsl:template name="datasetpart">
-       <xsl:param name="packageID"/>  
-       <xsl:apply-templates select="." mode="dataset">
-        <xsl:with-param name="packageID" select="$packageID"></xsl:with-param> 
-       </xsl:apply-templates> 
+    <xsl:param name="packageID"/>  
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetpart</xsl:text></xsl:message></xsl:if>
+    <xsl:apply-templates select="." mode="dataset">
+      <xsl:with-param name="packageID" select="$packageID"></xsl:with-param> 
+    </xsl:apply-templates> 
   </xsl:template>
 
-   <!--************ Entity diplay *****************-->
+  <!--************ Entity diplay *****************-->
   <xsl:template name="entitypart">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entitypart</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
         <xsl:variable name="references" select="$ids[@id=$ref_id]" />
         <xsl:for-each select="$references">
           <tr>
-            <td colspan="2">
-              <xsl:call-template name="entityparam"/>
-            </td>
+            <td colspan="2"><xsl:call-template name="entityparam"/></td>
           </tr>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
         <tr>
-          <td colspan="2">
-            <xsl:call-template name="entityparam"/>
-          </td>
+          <td colspan="2"><xsl:call-template name="entityparam"/></td>
         </tr>
       </xsl:otherwise>
     </xsl:choose>
@@ -378,6 +384,7 @@
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
     <xsl:param name="packageID" select="$packageID"/> 
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: responsiblepartiespart</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -404,61 +411,58 @@
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
     <xsl:param name="packageID" select="$packageID"/> 
-    
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: responsibleparties</xsl:text></xsl:message></xsl:if>
     <table class="onehundred_percent">            
-      <tr><td>
-        
-      <!-- a 2-column table with the involved parties in boxes across the entire page -->
-      <table class="subGroup onehundred_percent">
-        
-      <xsl:if test="publisher">
-        <th colspan="2">Publishers:</th>
-        <xsl:for-each select="publisher">
-          <tr>
-            <xsl:if test="position() mod 2 = 1">
-              <td class="fortyfive_percent">
-                <xsl:call-template name="party">
-                  <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </td>
-              <xsl:for-each select="following-sibling::publisher[position()=1]">
-                <td class="fortyfive_percent">
-                  <xsl:call-template name="party">
-                    <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                    <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                  </xsl:call-template>
-                </td>
+      <tr>
+        <td>
+          <!-- a 2-column table with the involved parties in boxes across the entire page -->
+          <table class="subGroup onehundred_percent">
+            <xsl:if test="publisher">
+              <th colspan="2">Publishers:</th>
+              <xsl:for-each select="publisher">
+                <tr>
+                  <xsl:if test="position() mod 2 = 1">
+                    <td class="fortyfive_percent">
+                      <xsl:call-template name="party">
+                        <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                        <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                      </xsl:call-template>
+                    </td>
+                    <xsl:for-each select="following-sibling::publisher[position()=1]">
+                      <td class="fortyfive_percent">
+                        <xsl:call-template name="party">
+                          <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                          <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                        </xsl:call-template>
+                      </td>
+                    </xsl:for-each>
+                  </xsl:if>
+                </tr>
               </xsl:for-each>
-            </xsl:if>
-          </tr>
-        </xsl:for-each>
-      </xsl:if>
-        
-    <xsl:if test="creator">
-      <th colspan="2">Owners:</th>
-      <xsl:for-each select="creator">
-        <tr>
-          <xsl:if test="position() mod 2 = 1">
-            <td class="fortyfive_percent">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-              </xsl:call-template>
-            </td>
-            <xsl:for-each select="following-sibling::creator[position()=1]">
-              <td class="fortyfive_percent">
-                <xsl:call-template name="party">
-                  <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </td>
-            </xsl:for-each>
-          </xsl:if>
-        </tr>
-      </xsl:for-each>
-    </xsl:if> 
-      
+            </xsl:if>     
+            <xsl:if test="creator">
+              <th colspan="2">Owners:</th>
+              <xsl:for-each select="creator">
+                <tr>
+                  <xsl:if test="position() mod 2 = 1">
+                    <td class="fortyfive_percent">
+                      <xsl:call-template name="party">
+                        <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                        <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                      </xsl:call-template>
+                    </td>
+                    <xsl:for-each select="following-sibling::creator[position()=1]">
+                      <td class="fortyfive_percent">
+                        <xsl:call-template name="party">
+                          <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                          <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                        </xsl:call-template>
+                      </td>
+                    </xsl:for-each>
+                  </xsl:if>
+                </tr>
+              </xsl:for-each>
+            </xsl:if>      
       <!-- add in the contacts using a two column table -->
       <xsl:if test="contact">
         <th colspan="2">Contacts:</th>
@@ -482,8 +486,7 @@
             </xsl:if>
           </tr>
         </xsl:for-each>
-      </xsl:if>
-      
+      </xsl:if>     
       <!-- add in the associatedParty using a two column table -->
       <xsl:if test="associatedParty">
         <th colspan="2">Associated Parties:</th>
@@ -507,8 +510,7 @@
             </xsl:if>
           </tr>
         </xsl:for-each>
-      </xsl:if>
-      
+      </xsl:if>     
       <!-- add in the metadataProviders using a two column table -->
       <xsl:if test="metadataProvider">
         <th colspan="2">Metadata Providers:</th>
@@ -533,17 +535,16 @@
           </tr>
         </xsl:for-each>
       </xsl:if>
-        
        </table>
-        
-      </td></tr>
+      </td>
+      </tr>
     </table> <!-- closes the table wrapping the dataset-menu  -->
   </xsl:template>
   
   <xsl:template name="coveragepart">
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: coveragepart</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: coveragepart</xsl:text></xsl:message></xsl:if>
     <h3>Data Set Coverage</h3>
     <!-- add in the coverage info -->
     <table class="subGroup onehundred_percent">  
@@ -594,168 +595,150 @@
   <xsl:template name="coverageall">
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
-    <xsl:param name="packageID" select="$packageID"/>
-    
+    <xsl:param name="packageID" select="$packageID"/>  
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: coverageall</xsl:text></xsl:message></xsl:if>
     <table>            
-      <tr><td>
-      </td></tr>
-      <tr><td>
-        <!-- <xsl:call-template name="datasetmixed"/> -->
-    <h4>
-      <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to all data in this dataset: </xsl:text></h4>
-    <table class="subGroup onehundred_percent">  
       <tr>
-          <!-- add in the resource-level temporal coverage info -->
-          <td class="fortyfive_percent">
-            <xsl:if test="./coverage">
-            <!-- print the type of parent element, and title or description -->
-          
-           <xsl:for-each select="./coverage/temporalCoverage">
-          <xsl:call-template name="temporalCoverage">
-          <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-          <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-          </xsl:call-template>
-            </xsl:for-each>
-              <!-- mob: wrap all the geocov in a table to be treated as a unit. -->
-              <xsl:if test="./coverage/geographicCoverage">
-                <table  class="subGroup subGroup_border onehundred_percent">
-                  <!-- header for the geographic coverage area -->
-                  <tr><th colspan="2">Geographic Coverage</th></tr>
-                  <tr>
-                    <!-- <td class="fortyfive_percent"> -->
-                    <td class="">
-                      
-            <xsl:for-each select="./coverage/geographicCoverage">
-              <xsl:call-template name="geographicCoverage">
-                <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
-                <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-              </xsl:call-template>
-            </xsl:for-each>
-                      
-                </td>
-                    <!-- td class=" fortyfive_percent"> -->
-                    <td class="">
-                      
-                    <div class="eml_map">
-                      <div id="map_canvas" style="width: 400px; height: 300px;"></div>
-                    </div>    
-                     <xsl:call-template name="geoCovMap">
-                       <xsl:with-param name="currentmodule">coverageall</xsl:with-param>
-                     </xsl:call-template>
-                    </td>
-                  </tr>
-                </table>
-              </xsl:if>
-                
-            <xsl:for-each select="./coverage/taxonomicCoverage">
-              <xsl:call-template name="taxonomicCoverage">
-                <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-              </xsl:call-template>
-            </xsl:for-each>
-            
-          </xsl:if> 
-          </td>
+        <td></td>
       </tr>
-      </table>
-      <!-- next comes the entity level coverages. attribute-level stuff under it's entity name -->
-    
-  <!--     <table class="subGroup onehundred_percent">
-      <tr> -->
-        <!--  TO DO: this needs to work for all entity types. choose label based on element name  -->
-        <xsl:for-each select="dataTable">
-        <xsl:if test="coverage or *//attribute/coverage">
-          <h4>
-            <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to Data Table: </xsl:text>
-          <xsl:value-of select="entityName"/> 
-          </h4>
-       <!--    <table     class="subGroup onehundred_percent">
+      <tr>
+        <td>
+        <!-- <xsl:call-template name="datasetmixed"/> -->
+          <h4><xsl:text>Temporal, Geographic and/or Taxonomic information that applies to all data in this dataset:</xsl:text></h4>
+          <table class="subGroup onehundred_percent">  
             <tr>
-                     <th>
-         <xsl:text>Applies to Data Table: </xsl:text>
-          <xsl:value-of select="entityName"/>
-        </th>
-            </tr>  -->
-                      <xsl:if test="coverage"> <!-- if an entity-level cov tree -->
-                        <xsl:for-each select="./coverage/temporalCoverage">
-                          <xsl:call-template name="temporalCoverage">
-                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+              <!-- add in the resource-level temporal coverage info -->
+              <td class="fortyfive_percent">
+                <xsl:if test="./coverage">
+                  <!-- print the type of parent element, and title or description -->
+                  <xsl:for-each select="./coverage/temporalCoverage">
+                    <xsl:call-template name="temporalCoverage">
+                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                  <!-- mob: wrap all the geocov in a table to be treated as a unit. -->
+                  <xsl:if test="./coverage/geographicCoverage">
+                    <table  class="subGroup subGroup_border onehundred_percent">
+                      <!-- header for the geographic coverage area -->
+                      <tr>
+                        <th colspan="2">Geographic Coverage</th>
+                      </tr>
+                      <tr>
+                        <!-- <td class="fortyfive_percent"> -->
+                        <td class="">              
+                          <xsl:for-each select="./coverage/geographicCoverage">
+                            <xsl:call-template name="geographicCoverage">
+                              <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
+                              <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                            </xsl:call-template>
+                          </xsl:for-each>  
+                        </td>
+                        <!-- td class=" fortyfive_percent"> -->
+                        <td class="">          
+                          <div class="eml_map">
+                            <div id="map_canvas" style="width: 400px; height: 300px;"></div>
+                          </div>    
+                          <xsl:call-template name="geoCovMap">
+                            <xsl:with-param name="currentmodule">coverageall</xsl:with-param>
                           </xsl:call-template>
-                        </xsl:for-each>
-                        <xsl:for-each select="./coverage/geographicCoverage">
-                          <xsl:call-template name="geographicCoverage">
-                            <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
-                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                          </xsl:call-template>
-                        </xsl:for-each>
-                        <xsl:for-each select="./coverage/taxonomicCoverage">
-                          <xsl:call-template name="taxonomicCoverage">
-                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                          </xsl:call-template>
-                        </xsl:for-each>
-                      </xsl:if>
-          
-            <xsl:if test=".//attribute/coverage"> <!-- an attribute descendant has a cov tree -->
-               <xsl:for-each select=".//attribute/coverage">
-                 <table  class="subGroup">
-                <tr>
-                  <th>
-                    <!-- create a label for that attribute's coverage info. use the orientation and attr label if it has one -->                 
-                <xsl:choose>
-                  <xsl:when test="ancestor::dataTable/*//attributeOrientation ='column' ">
-                    <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to the data table column:&#160;</xsl:text>
-                  </xsl:when>
-                  <xsl:when test="ancestor::dataTable/*//attributeOrientation ='row' ">
-                    <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to the data table row:&#160;</xsl:text>
-                   </xsl:when>
-                </xsl:choose>
-                <xsl:choose>
-                  <xsl:when test="../attributeLabel">
-                    <xsl:value-of select="../attributeLabel"/>
-                    <xsl:text>&#160;(</xsl:text><xsl:value-of select="../attributeName"/><xsl:text>)</xsl:text>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="../attributeName"/>
-                  </xsl:otherwise>
-                </xsl:choose> <!-- end of cov info label  -->
-                  </th>
-                </tr>
-                   <tr><td>
-                <xsl:for-each select="temporalCoverage">            
+                        </td>
+                      </tr>
+                    </table>
+                  </xsl:if>
+                  <xsl:for-each select="./coverage/taxonomicCoverage">
+                    <xsl:call-template name="taxonomicCoverage">
+                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:if> 
+              </td>
+            </tr>
+          </table>
+          <!-- next comes the entity level coverages. attribute-level stuff under its entity name --> 
+          <!--  TO DO: this needs to work for all entity types. choose label based on element name  -->
+          <xsl:for-each select="dataTable">
+            <xsl:if test="coverage or *//attribute/coverage">
+              <h4>
+                <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to Data Table: </xsl:text>
+                <xsl:value-of select="entityName"/> 
+              </h4>
+              <xsl:if test="coverage"> <!-- if an entity-level cov tree -->
+                <xsl:for-each select="./coverage/temporalCoverage">
                   <xsl:call-template name="temporalCoverage">
                     <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-                <xsl:for-each select="geographicCoverage">            
+                <xsl:for-each select="./coverage/geographicCoverage">
                   <xsl:call-template name="geographicCoverage">
-                    <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                    <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-                <xsl:for-each select="taxonomicCoverage">            
+                <xsl:for-each select="./coverage/taxonomicCoverage">
                   <xsl:call-template name="taxonomicCoverage">
                     <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-                   </td></tr>
-                   </table>    <!-- closes the table for the attribute -->
-               </xsl:for-each> 
+              </xsl:if>      
+              <xsl:if test=".//attribute/coverage"> <!-- an attribute descendant has a cov tree -->
+                <xsl:for-each select=".//attribute/coverage">
+                  <table  class="subGroup">
+                    <tr>
+                      <th>
+                        <!-- create a label for that attribute's coverage info. use the orientation and attr label if it has one -->                 
+                        <xsl:choose>
+                          <xsl:when test="ancestor::dataTable/*//attributeOrientation ='column' ">
+                            <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to the data table column:&#160;</xsl:text>
+                          </xsl:when>
+                          <xsl:when test="ancestor::dataTable/*//attributeOrientation ='row' ">
+                            <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to the data table row:&#160;</xsl:text>
+                          </xsl:when>
+                        </xsl:choose>
+                        <xsl:choose>
+                          <xsl:when test="../attributeLabel">
+                            <xsl:value-of select="../attributeLabel"/>
+                            <xsl:text>&#160;(</xsl:text><xsl:value-of select="../attributeName"/><xsl:text>)</xsl:text>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="../attributeName"/>
+                          </xsl:otherwise>
+                        </xsl:choose> <!-- end of cov info label  -->
+                      </th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <xsl:for-each select="temporalCoverage">            
+                          <xsl:call-template name="temporalCoverage">
+                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                        <xsl:for-each select="geographicCoverage">            
+                          <xsl:call-template name="geographicCoverage">
+                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                        <xsl:for-each select="taxonomicCoverage">            
+                          <xsl:call-template name="taxonomicCoverage">
+                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                          </xsl:call-template>
+                        </xsl:for-each>
+                      </td>
+                    </tr>
+                  </table>    <!-- closes the table for the attribute -->
+                </xsl:for-each> 
+              </xsl:if>
             </xsl:if>
-         <!-- </table>  closes the table for the data entity  -->
-         </xsl:if>
-      </xsl:for-each>
-        
- <!--      </tr>
- </table> -->
-    
-    
-      </td></tr>
+          </xsl:for-each> 
+        </td>
+      </tr>
     </table> <!-- closes the table wrapping the dataset-menu  -->
-     
   </xsl:template>
   
   <!-- 
@@ -765,6 +748,7 @@
   <xsl:template name="ifmethods">
     <xsl:param name="packageID"></xsl:param>
     <xsl:param name="docid"></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: ifmethods</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="(//method) or (//methods)">
         <xsl:call-template name="methodsall">
@@ -783,6 +767,7 @@
   
   <xsl:template name="ifcoverage">
     <xsl:param name="packageID"></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: ifcoverage</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="(//coverage) or (//coverage)">
         <xsl:call-template name="coverageall">
@@ -801,6 +786,7 @@
   
   <xsl:template name="nodemissing">
     <xsl:param name="nodemissing_message"></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: nodemissing</xsl:text></xsl:message></xsl:if>
     <table class="onehundred_percent">            
       <tr>
         <td align="center"><h4><xsl:value-of select="$nodemissing_message"/></h4></td>
@@ -811,127 +797,120 @@
   <xsl:template name="methodsall">
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
-    <xsl:param name="packageID" select="$packageID"/>
-    
+    <xsl:param name="packageID" select="$packageID"/> 
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: methodsall</xsl:text></xsl:message></xsl:if>
     <table  class="onehundred_percent">            
-      <tr><td>  
-        <h4>
-          <xsl:text>These methods, instrumentation and/or protocols apply to all data in this dataset: </xsl:text></h4>
-        <table class="subGroup onehundred_percent">  
-          <tr>
-            <!-- add in the resource-level temporal coverage info -->
-            <td class="fortyfive_percent">
-              <xsl:if test="./methods">
-                <!-- print the type of parent element, and title or description -->
-                
-                <xsl:for-each select="./methods">
+      <tr>
+        <td>  
+          <h4><xsl:text>These methods, instrumentation and/or protocols apply to all data in this dataset:</xsl:text></h4>
+          <table class="subGroup onehundred_percent">  
+            <tr>
+              <!-- add in the resource-level temporal coverage info -->
+              <td class="fortyfive_percent">
+                <xsl:if test="./methods">
+                  <!-- print the type of parent element, and title or description -->
+                  <xsl:for-each select="./methods">
+                    <xsl:call-template name="datasetmethod">
+                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:if> 
+              </td>
+            </tr>
+          </table>
+          <!-- next comes the entity level coverages. attribute-level stuff under it's entity name -->
+          <!--  TO DO: this needs to work for all entity types. choose label based on element name -->
+          <xsl:for-each select="dataTable">
+            <xsl:if test="(./methods) or (*//attribute/methods) or (./method) or (*//attribute/method)">
+              <h4>
+                <xsl:text>These methods, instrumentation and/or protocols apply  to Data Table: </xsl:text>
+                <xsl:value-of select="entityName"/> 
+              </h4>  
+              <xsl:if test="(./method) or (./methods)"> <!-- first find an entity-level methods tree -->
+                <!--  this becomes METHODS in eml 2.1 -->
+                <xsl:for-each select="method | methods">     
                   <xsl:call-template name="datasetmethod">
                     <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-              </xsl:if> 
-            </td>
-          </tr>
-        </table>
-        <!-- 
-          next comes the entity level coverages. attribute-level stuff under it's entity name -->
-        
-        <!--     <table class="subGroup onehundred_percent">
-          <tr> -->
-        <!--  TO DO: this needs to work for all entity types. choose label based on element name  -->
-        <xsl:for-each select="dataTable">
-          <xsl:if test="(./methods) or (*//attribute/methods) or (./method) or (*//attribute/method) ">
-            <h4>
-              <xsl:text>These methods, instrumentation and/or protocols apply  to Data Table: </xsl:text>
-              <xsl:value-of select="entityName"/> 
-            </h4>
-            
-            <xsl:if test="(./method) or (./methods) "> <!-- first find an entity-level methods tree -->
-             <!--  this becomes METHODS in eml 2.1 -->
-              <xsl:for-each select="method | methods">
-                
-                <xsl:call-template name="datasetmethod">
-                  <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </xsl:for-each>
+              </xsl:if>
+              <xsl:if test="(*//attribute/methods)  or (*//attribute/method)"> <!-- an attribute descendant has a method tree -->  
+                <xsl:for-each select="*//attribute/method | *//attribute/methods"> <!-- mob fixed 2011-12-23 - missing 'or' -->
+                  <table class="subGroup">
+                    <tr>
+                      <th>
+                        <!-- create a label for that attribute's coverage info. use the orientation and attr label if it has one -->                 
+                        <xsl:choose>
+                          <xsl:when test="ancestor::dataTable/*//attributeOrientation ='column' ">
+                            <xsl:text>These methods, instrumentation and/or protocols apply to the data table column:&#160;</xsl:text>
+                          </xsl:when>
+                          <xsl:when test="ancestor::dataTable/*//attributeOrientation ='row' ">
+                            <xsl:text>These methods, instrumentation and/or protocols apply to the data table row:&#160;</xsl:text>
+                          </xsl:when>
+                        </xsl:choose>
+                        <xsl:choose>
+                          <xsl:when test="../attributeLabel">
+                            <xsl:value-of select="../attributeLabel"/>
+                            <xsl:text>&#160;(</xsl:text><xsl:value-of select="../attributeName"/>
+                            <xsl:text>)</xsl:text>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="../attributeName"/>
+                          </xsl:otherwise>
+                        </xsl:choose> <!-- end of cov info label  -->
+                      </th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <xsl:for-each select=".">            
+                          <xsl:call-template name="datasetmethod">
+                            <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                            <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                          </xsl:call-template>
+                        </xsl:for-each>      
+                      </td>
+                    </tr>
+                  </table>    <!-- closes the table for the attribute -->
+                </xsl:for-each> 
+              </xsl:if>
             </xsl:if>
-            <xsl:if test="(*//attribute/methods)  or (*//attribute/method)"> <!-- an attribute descendant has a method tree -->
-             
-              <xsl:for-each select="*//attribute/method | *//attribute/methods"> <!-- mob fixed 2011-12-23 - missing 'or'  -->
-                 
-                <table  class="subGroup">
-                  <tr>
-                    <th>
-                      <!-- create a label for that attribute's coverage info. use the orientation and attr label if it has one -->                 
-                      <xsl:choose>
-                        <xsl:when test="ancestor::dataTable/*//attributeOrientation ='column' ">
-                          <xsl:text>These methods, instrumentation and/or protocols apply  to the data table column:&#160;</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="ancestor::dataTable/*//attributeOrientation ='row' ">
-                          <xsl:text>These methods, instrumentation and/or protocols apply  to the data table row:&#160;</xsl:text>
-                        </xsl:when>
-                      </xsl:choose>
-                      <xsl:choose>
-                        <xsl:when test="../attributeLabel">
-                          <xsl:value-of select="../attributeLabel"/>
-                          <xsl:text>&#160;(</xsl:text><xsl:value-of select="../attributeName"/><xsl:text>)</xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="../attributeName"/>
-                        </xsl:otherwise>
-                      </xsl:choose> <!-- end of cov info label  -->
-                    </th>
-                  </tr>
-                  <tr><td>
-                    <xsl:for-each select=".">            
-                      <xsl:call-template name="datasetmethod">
-                        <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                        <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                      </xsl:call-template>
-                    </xsl:for-each>
-                    
-                  </td></tr>
-                </table>    <!-- closes the table for the attribute -->
-              </xsl:for-each> 
-            </xsl:if>
-            <!-- </table>  closes the table for the data entity  -->
-          </xsl:if>
-        </xsl:for-each>
-        <!--      </tr>
-          </table> -->   
-      </td></tr>
+          </xsl:for-each>
+        </td>
+      </tr>
     </table> <!-- closes the table wrapping the dataset-menu  -->
   </xsl:template>
   
-   <!--************ Attribute display *****************-->
-   <xsl:template name="attributedetailpart">
-   </xsl:template>
-
-    <xsl:template name="attributepart">
-      <tr><td>
-      <h3>Attributes Description</h3>
-      </td></tr>
-      <tr>
-     <td>
+  <!--************ Attribute display *****************-->
+  <xsl:template name="attributedetailpart">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributedetailpart</xsl:text></xsl:message></xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="attributepart">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributepart</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td><h3>Attributes Description</h3></td>
+    </tr>
+    <tr>
+      <td>
         <!-- find the subtree to process -->
-      <xsl:if test="$entitytype='dataTable'">
-        <xsl:for-each select="dataTable">
+        <xsl:if test="$entitytype='dataTable'">
+          <xsl:for-each select="dataTable">
             <xsl:if test="position()=$entityindex">
-                <xsl:for-each select="attributeList">
-                   <xsl:call-template name="attributelist">
-                      <xsl:with-param name="docid" select="$docid"/>
-                      <xsl:with-param name="entitytype" select="$entitytype"/>
-                      <xsl:with-param name="entityindex" select="$entityindex"/>
-                   </xsl:call-template>
-                </xsl:for-each>
+              <xsl:for-each select="attributeList">
+                <xsl:call-template name="attributelist">
+                  <xsl:with-param name="docid" select="$docid"/>
+                  <xsl:with-param name="entitytype" select="$entitytype"/>
+                  <xsl:with-param name="entityindex" select="$entityindex"/>
+                </xsl:call-template>
+              </xsl:for-each>
             </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-    </td>
-      </tr>
-   </xsl:template>
+          </xsl:for-each>
+        </xsl:if>
+      </td>
+    </tr>
+  </xsl:template>
 
    <!--************************Attribute Domain display module************************-->
    <xsl:template name="datasetattributedomain">
@@ -942,6 +921,7 @@
      <xsl:param name="entityindex" select="$entityindex"/>
      <xsl:param name="entitytype" select="$entitytype"/>
      <xsl:param name="attributeindex" select="$attributeindex"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributedomain</xsl:text></xsl:message></xsl:if>
      <xsl:variable name="attribute_label">
        <xsl:choose>
          <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
@@ -962,8 +942,7 @@
               <h3>Codes and Definitions for: <xsl:value-of select="$attribute_label"/></h3>
             </td>
           </tr>
-        </table>  
-        
+        </table>       
      <!-- <h3>Attribute Domain</h3> -->
       </td></tr>
       <tr>
@@ -974,7 +953,7 @@
       </tr>
    </xsl:template>
 
-   <!--************************Attribute Method display module************************-->
+   <!-- Attribute Method display module -->
    <xsl:template name="datasetattributemethod">
      <!-- 
        these params are used to construct links back and to provide the 
@@ -983,6 +962,7 @@
      <xsl:param name="entityindex" select="$entityindex"/>
      <xsl:param name="entitytype" select="$entitytype"/>
      <xsl:param name="attributeindex" select="$attributeindex"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributemethod</xsl:text></xsl:message></xsl:if>
      <xsl:variable name="attribute_label">
        <xsl:choose>
          <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
@@ -1014,12 +994,13 @@
       </tr>
    </xsl:template>
 
-   <!--************************Attribute Coverage display module************************-->
+   <!-- Attribute Coverage display module -->
    <xsl:template name="datasetattributecoverage">
      <!-- These params are used to provide the attribute name or label as a variable -->
      <xsl:param name="entityindex" select="$entityindex"/>
      <xsl:param name="entitytype" select="$entitytype"/>
      <xsl:param name="attributeindex" select="$attributeindex"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributecoverage</xsl:text></xsl:message></xsl:if>
      <xsl:variable name="attribute_label">
        <xsl:choose>
          <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
@@ -1051,7 +1032,7 @@
    </xsl:template>
 
    <xsl:template name="entityparam">
-     <xsl:message terminate="no"><xsl:text>TEMPLATE: entityparam</xsl:text></xsl:message>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityparam</xsl:text></xsl:message></xsl:if>
      <xsl:choose>
       <xsl:when test="$entitytype=''">
         <xsl:variable name="dataTableCount" select="0"/>
@@ -1060,9 +1041,7 @@
         <xsl:variable name="storedProcedureCount" select="0"/>
         <xsl:variable name="viewCount" select="0"/>
         <xsl:variable name="otherEntityCount" select="0"/>
-        <xsl:message><xsl:text>  NAME: </xsl:text><xsl:value-of select="name()"/></xsl:message>
         <xsl:for-each select="dataTable|spatialRaster|spatialVector|storedProcedure|view|otherEntity">
-          <xsl:message><xsl:text>  NAME: </xsl:text><xsl:value-of select="name()"/></xsl:message>
           <xsl:if test="'dataTable' = name()">          
             <xsl:variable name="currentNode" select="."/>          
             <xsl:variable name="dataTableCount">
@@ -1291,7 +1270,7 @@
   <xsl:template name="chooseentity" match='dataset'>
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: chooseentity</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: chooseentity</xsl:text></xsl:message></xsl:if>
     <xsl:if test="$entitytype='dataTable'">
       <xsl:for-each select="dataTable">
         <xsl:if test="position()=$entityindex">
@@ -1559,7 +1538,7 @@
    </xsl:template>
 
   <xsl:template name="chooseattributelist">
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: chooseattributelist</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: chooseattributelist</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="attributeList">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -1577,12 +1556,11 @@
   </xsl:template>
 
   <xsl:template name="chooseattribute">
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: chooseattribute</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: chooseattribute</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="attribute">
-      <xsl:message terminate="no"><xsl:text>  Processing attribute: </xsl:text><xsl:value-of select="./attributeName"/></xsl:message>
+      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>  Processing attribute: </xsl:text><xsl:value-of select="./attributeName"/></xsl:message></xsl:if>
       <xsl:if test="boolean(0)">
         <xsl:if test="boolean(1)">
-          <xsl:message terminate="no"><xsl:text>    attributedomain</xsl:text></xsl:message>
           <xsl:for-each select="measurementScale/*/*">
             <xsl:call-template name="nonNumericDomain">
               <xsl:with-param name="nondomainfirstColStyle" select="$firstColStyle"/>
@@ -1590,7 +1568,6 @@
           </xsl:for-each>
         </xsl:if>
         <xsl:if test="boolean(1)">
-          <xsl:message terminate="no"><xsl:text>    attributecoverage</xsl:text></xsl:message>
           <xsl:for-each select="coverage">
             <xsl:call-template name="coverage">
               <xsl:with-param name="coveragefirstColStyle" select="$firstColStyle"/>
@@ -1598,7 +1575,6 @@
           </xsl:for-each>
         </xsl:if>
         <xsl:if test="boolean(1)">
-          <xsl:message terminate="no"><xsl:text>    attributemethod</xsl:text></xsl:message>
           <xsl:for-each select="method | methods"> <!-- mob kludge for eml2.1 -->
             <xsl:call-template name="method">
                 <xsl:with-param name="methodfirstColStyle" select="$firstColStyle"/>
@@ -1610,9 +1586,10 @@
     </xsl:for-each>
   </xsl:template>
 
-   <!--*************************Distribution Inline Data display module*****************-->
+   <!-- Distribution Inline Data display module -->
    <xsl:template name="emlinlinedata">
-      <tr><td>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlinlinedata</xsl:text></xsl:message></xsl:if>
+     <tr><td>
       <h3>Data (inline):</h3>
       </td></tr>
       <tr>
@@ -1759,26 +1736,28 @@
       </tr>
    </xsl:template>
 
-   <xsl:template name="choosephysical">
-      <xsl:for-each select="physical">
-   <xsl:if test="position()=$physicalindex">
-      <xsl:choose>
-         <xsl:when test="references!=''">
+  <xsl:template name="choosephysical">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: choosephysical</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="physical">
+      <xsl:if test="position()=$physicalindex">
+        <xsl:choose>
+          <xsl:when test="references!=''">
             <xsl:variable name="ref_id" select="references"/>
             <xsl:variable name="references" select="$ids[@id=$ref_id]" />
             <xsl:for-each select="$references">
-               <xsl:call-template name="choosedistribution"/>
+              <xsl:call-template name="choosedistribution"/>
             </xsl:for-each>
-         </xsl:when>
-         <xsl:otherwise>
+          </xsl:when>
+          <xsl:otherwise>
             <xsl:call-template name="choosedistribution"/>
-        </xsl:otherwise>
-     </xsl:choose>
-  </xsl:if>
-      </xsl:for-each>
-   </xsl:template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
 
   <xsl:template name="choosedistribution">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: choosedistribution</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="distribution">
       <xsl:if test="$distributionindex=position()">
         <xsl:choose>
@@ -1806,10 +1785,9 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
-
-
   <!-- Citation part -->
   <xsl:template name="emlcitation">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlcitation</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <!-- <xsl:when test="$displaymodule='inlinedata'"> -->
       <xsl:when test="boolean(0)">
@@ -1836,9 +1814,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
   <!-- Software part -->
   <xsl:template name="emlsoftware">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlsoftware</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <!-- <xsl:when test="$displaymodule='inlinedata'"> -->
       <xsl:when test="boolean(0)">
@@ -1865,9 +1843,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- Protocol part -->
   <xsl:template name="emlprotocol">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlprotocol</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <!-- <xsl:when test="$displaymodule='inlinedata'"> -->
       <xsl:when test="boolean(0)">
@@ -1894,9 +1873,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- download xml part -->
   <xsl:template name="xml">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: xml</xsl:text></xsl:message></xsl:if>
     <br /><a target="_blank" href="http://portal.lternet.edu/nis/metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
     Original XML file
     </a> (in Ecological Metadata Language)
@@ -1905,6 +1885,7 @@
   <!-- This module is for dataset -->
   <xsl:template match="dataset" mode="dataset">
     <xsl:param name="packageID" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dataset</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references != ''">
         <xsl:variable name="ref_id" select="references"/>
@@ -1929,8 +1910,9 @@
   
   <xsl:template name="datasettitle">
     <xsl:param name="packageID" ></xsl:param>
-    <h4 class="EML-dataset-supratitle">Data Set (<xsl:value-of select="$packageID"/>)</h4>
-    <h3 class="EML-datasettitle">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasettitle</xsl:text></xsl:message></xsl:if>
+    <!-- <h4 class="EML-dataset-supratitle">Data Set (<xsl:value-of select="$packageID"/>)</h4> -->
+    <h3>
       <xsl:for-each select="./title">
         <xsl:value-of select="."/>
       </xsl:for-each>
@@ -1939,7 +1921,7 @@
   
   <xsl:template name="datasetmixed">
     <xsl:param name="packageID"></xsl:param>
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: datasetmixed</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmixed</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <tr>
         <th colspan="2">Data Set General Information:</th>
@@ -1998,22 +1980,6 @@
          </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
-      <!-- put in the keyword sets -->
-      <!-- 
-      <xsl:if test="keywordSet">
-        <tr>
-          <td class="{$firstColStyle}"><xsl:text>Keywords:</xsl:text></td>
-          <td class="{$secondColStyle}">
-            <xsl:for-each select="keywordSet">
-              <xsl:call-template name="resourcekeywordSet" >
-                <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
-                <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </td>
-        </tr>
-      </xsl:if>
-      -->
       <!-- put in the publication date -->
       <xsl:if test="./pubDate">
         <xsl:for-each select="pubDate">
@@ -2318,51 +2284,17 @@
       </table>
     </xsl:if>           
     <!-- dataset citation  -->   
-    <h3 id="toggleDataSetCitation" class="toggleButton"><button>+/-</button> Data Set Citation</h3>
-    <div class="collapsible">
+    <table class="{$tabledefaultStyle}">
+      <tr>
+        <th colspan="2">Data Set Citation:</th>
+      </tr>
       <xsl:call-template name="howtoCite">
         <xsl:with-param name="citetabledefaultStyle"  select="$tabledefaultStyle"/>
         <xsl:with-param name="citefirstColStyle"  select="$firstColStyle"/>
         <xsl:with-param name="citesecondColStyle"  select="$secondColStyle"/>
         <xsl:with-param name="contextURL" select="$contextURL"/>
       </xsl:call-template>
-    </div> <!-- end collapsible -->   
-    <h3 id="toggleKeywords" class="toggleButton"><button>+/-</button> Key Words and Terms</h3>
-    <div class="collapsible">
-      <!-- the keywords table. -->
-      <xsl:if test="keywordSet">
-      <table class="{$tabledefaultStyle}"> 
-        <tr>
-          <th colspan="2">By Thesaurus:</th>
-        </tr>
-        <tr>
-          <td>
-          <xsl:for-each select="keywordSet">
-            <table class="{$tabledefaultStyle}">
-              <tr>
-                <td class="{$firstColStyle}">
-                <xsl:choose>
-                  <xsl:when test="keywordThesaurus"> 
-                    <xsl:value-of select="keywordThesaurus" />
-                  </xsl:when>
-                  <xsl:otherwise>      
-                  </xsl:otherwise>
-                </xsl:choose>
-                </td>
-                <td class="{$secondColStyle}">
-                <xsl:call-template name="resourcekeywordsAsPara" >
-                  <!-- <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
-                       <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/> -->
-                </xsl:call-template>
-                </td>
-              </tr>
-            </table>
-          </xsl:for-each>
-          </td> 
-        </tr>
-      </table>
-      </xsl:if>
-    </div> <!-- end collapsible -->   
+    </table>
      <!-- add in the method info
      <h3>Sampling, Processing and Quality Control Methods</h3>
      <table class="subGroup onehundred_percent">  
@@ -2380,24 +2312,6 @@
        </tr>
      </table> 
      -->
-    <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Set Usage Rights</h3>
-    <div class="collapsible">
-        <!-- add in the intellectual rights info -->
-     <table class="subGroup onehundred_percent">  
-       <tr>
-         <td>
-           <xsl:if test="intellectualRights">
-             <xsl:for-each select="intellectualRights">
-               <xsl:call-template name="resourceintellectualRights">
-                 <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
-                 <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
-               </xsl:call-template>
-             </xsl:for-each>
-           </xsl:if>
-         </td>
-       </tr>
-     </table>
-    </div> <!-- end collapsible -->
     <xsl:if test="boolean(0)">
       <!-- add in the access control info -->
       <table class="subGroup onehundred_percent">  
@@ -2419,6 +2333,7 @@
 
   <xsl:template name="datasetpurpose">
     <xsl:param name="packageID"></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetpurpose</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="purpose">
       <tr>
         <td colspan="2"><xsl:text>Purpose:</xsl:text></td>
@@ -2435,6 +2350,7 @@
   </xsl:template>
 
   <xsl:template name="datasetmaintenance">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmaintenance</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="maintenance">
       <tr>
         <td colspan="2"><xsl:text>Maintenance:</xsl:text></td>
@@ -2449,6 +2365,7 @@
   </xsl:template>
 
   <xsl:template name="mantenancedescription">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: mantenancedescription</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="description">
       <tr>
         <td class="{$firstColStyle}">Description:</td>
@@ -2462,6 +2379,7 @@
   </xsl:template>
 
   <xsl:template name="datasetchangehistory">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetchangehistory</xsl:text></xsl:message></xsl:if>
     <xsl:if test="changeHistory">
       <tr>
         <td class="{$firstColStyle}">History:</td>
@@ -2477,6 +2395,7 @@
   </xsl:template>
 
   <xsl:template name="historydetails">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: historydetails</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}">scope:</td>
       <td class="{$secondColStyle}"><xsl:value-of select="changeScope"/></td>
@@ -2498,6 +2417,7 @@
   </xsl:template>
 
   <xsl:template name="datasetcontact">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetcontact</xsl:text></xsl:message></xsl:if>
     <tr>
       <td colspan="2"><xsl:text>Contact:</xsl:text></td>
     </tr>
@@ -2513,6 +2433,7 @@
   </xsl:template>
 
   <xsl:template name="datasetpublisher">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetpublisher</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="publisher">
       <tr>
         <td colspan="2"><xsl:text>Publisher:</xsl:text></td>
@@ -2528,6 +2449,7 @@
   </xsl:template>
 
   <xsl:template name="datasetpubplace">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetpubplace</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="pubPlace">
       <tr>
         <td class="{$firstColStyle}">Publish Place:</td>
@@ -2539,6 +2461,7 @@
   <xsl:template name="datasetmethod">
     <xsl:param name="firstColStyle"></xsl:param>
     <xsl:param name="secondColStyle"></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmethod</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select=".">
       <xsl:call-template name="method">
         <xsl:with-param name="methodfirstColStyle" select="$firstColStyle"/>
@@ -2547,6 +2470,7 @@
   </xsl:template>
 
   <xsl:template name="datasetproject">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetproject</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="project">
       <tr>
         <td colspan="2"><h3><xsl:text>Parent Project Information:</xsl:text></h3></td>
@@ -2566,6 +2490,7 @@
     <xsl:param name="showtype"/>
     <xsl:param name="type"/>
     <xsl:param name="index"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityurl</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references != ''">
         <xsl:variable name="ref_id" select="references"/>
@@ -2612,6 +2537,7 @@
     <xsl:param name="useridDirectoryLabel1"/>
     <xsl:param name="partyfirstColStyle"/>
     <xsl:param name="partysecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: party</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -2634,37 +2560,46 @@
   
   <xsl:template match="individualName" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: individualName</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}" >
-        Individual:</td><td class="{$secondColStyle}" >
-          <b><xsl:value-of select="./salutation"/><xsl:text> </xsl:text>
+      <tr>
+        <td class="{$partyfirstColStyle}" >Individual:</td>
+        <td class="{$secondColStyle}" >
+          <strong>
+            <xsl:value-of select="./salutation"/><xsl:text> </xsl:text>
             <xsl:value-of select="./givenName"/><xsl:text> </xsl:text>
-            <xsl:value-of select="./surName"/></b>
-        </td></tr>
+            <xsl:value-of select="./surName"/>
+          </strong>
+        </td>
+      </tr>
     </xsl:if>
   </xsl:template>
   
   <xsl:template match="organizationName" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: organizationName</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}" >
-        Organization:</td><td class="{$secondColStyle}">
-          <b><xsl:value-of select="."/></b>
-        </td></tr>
+      <tr>
+        <td class="{$partyfirstColStyle}" >Organization:</td>
+        <td class="{$secondColStyle}"><strong><xsl:value-of select="."/></strong></td>
+      </tr>
     </xsl:if>
   </xsl:template>
   
   <xsl:template match="positionName" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: positionName</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}">
-        Position:</td><td class="{$secondColStyle}">
-          <xsl:value-of select="."/></td></tr>
+      <tr>
+        <td class="{$partyfirstColStyle}">Position:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:if>
   </xsl:template>
   
   <xsl:template match="address" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: address; mode: party</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
       <xsl:call-template name="addressCommon">
         <xsl:with-param name="partyfirstColStyle" select="$partyfirstColStyle"/>
@@ -2675,6 +2610,7 @@
   <!-- This template will be call by other place-->
   <xsl:template name="address">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: address</xsl:text></xsl:message></xsl:if>
     <table class="{$tablepartyStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -2697,38 +2633,40 @@
   
   <xsl:template name="addressCommon">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: addressCommon</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}">
-        Address:</td><td>
+      <tr>
+        <td class="{$partyfirstColStyle}">Address:</td>
+        <td>
           <table class="{$tablepartyStyle}">
             <xsl:for-each select="deliveryPoint">
-              <tr><td class="{$secondColStyle}"><xsl:value-of select="."/><xsl:text>, </xsl:text></td></tr>
+              <tr>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/><xsl:text>, </xsl:text></td>
+              </tr>
             </xsl:for-each>
             <!-- only include comma if city exists... -->
-            <tr><td class="{$secondColStyle}" >
-              <xsl:if test="normalize-space(city)!=''">
-                <xsl:value-of select="city"/><xsl:text>, </xsl:text>
-              </xsl:if>
-              <xsl:if test="normalize-space(administrativeArea)!='' or normalize-space(postalCode)!=''">
-                <!--   <xsl:if test="normalize-space(postalCode)!=''"> 
-      <xsl:choose>
-        <xsl:when test="boolean('true')"> 
-          
-        </xsl:when> -->
-                
-                <xsl:value-of select="administrativeArea"/><xsl:text> </xsl:text><xsl:value-of select="postalCode"/><xsl:text> </xsl:text>
-                <!-- </xsl:choose> 
-      </xsl:if>  -->
-              </xsl:if>
-              <xsl:if test="normalize-space(country)!=''">
-                <xsl:value-of select="country"/>
-              </xsl:if></td></tr>
-          </table></td></tr>
+            <tr>
+              <td class="{$secondColStyle}" >
+                <xsl:if test="normalize-space(city)!=''">
+                  <xsl:value-of select="city"/><xsl:text>, </xsl:text>
+                </xsl:if>
+                <xsl:if test="normalize-space(administrativeArea)!= '' or normalize-space(postalCode) != ''">
+                  <xsl:value-of select="administrativeArea"/><xsl:text> </xsl:text><xsl:value-of select="postalCode"/><xsl:text> </xsl:text>
+                </xsl:if>
+                <xsl:if test="normalize-space(country)!=''">
+                  <xsl:value-of select="country"/>
+                </xsl:if>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     </xsl:if>
   </xsl:template>
   
   <xsl:template match="phone" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: phone</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$partyfirstColStyle}" >
       Phone:
     </td>
@@ -2748,6 +2686,7 @@
   
   <xsl:template match="electronicMailAddress" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: electronicMailAddress</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
       <tr><td class="{$partyfirstColStyle}" >
         Email Address:
@@ -2767,6 +2706,7 @@
   
   <xsl:template match="onlineUrl" mode="party">
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: onlineUrl</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
       <tr><td class="{$partyfirstColStyle}" >
         Web Address:
@@ -2795,11 +2735,13 @@
     <xsl:param name="useridDirectoryApp1_URI" select="$useridDirectoryApp1_URI"/>
     <xsl:param name="useridDirectoryLabel1" select="$useridDirectoryLabel1"/>
     <xsl:param name="partyfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: userId</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test=" @directory=$useridDirectory1 ">
         <xsl:if test="normalize-space(.)!=''">
-          <tr><td class="{$partyfirstColStyle}" >
-            Profile:</td><td class="{$secondColStyle}">
+          <tr>
+            <td class="{$partyfirstColStyle}" >Profile:</td>
+            <td class="{$secondColStyle}">
               <xsl:element name="a">
                 <xsl:attribute name="href">
                   <xsl:value-of select="$useridDirectoryApp1_URI"/><xsl:value-of select="."/>
@@ -2808,24 +2750,25 @@
                 <xsl:text> Profile for </xsl:text>
                 <xsl:value-of select="../individualName/surName"/>
               </xsl:element>
-              
-            </td></tr>
+            </td>
+          </tr>
         </xsl:if>
       </xsl:when>
       <xsl:when test=" @directory='LTERnetwork-directory' ">
         <!-- finish when lter dir available by ID.
-            <xsl:if test="normalize-space(.)!=''">
-              <tr><td class="{$partyfirstColStyle}" >
-                Link to Profile:</td><td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>LTER Network Personnel Directory</td></tr>
-            </xsl:if>
-            -->
+        <xsl:if test="normalize-space(.)!=''">
+          <tr>
+            <td class="{$partyfirstColStyle}" >Link to Profile:</td>
+            <td class="{$secondColStyle}"><xsl:value-of select="."/>LTER Network Personnel Directory</td>
+          </tr>
+        </xsl:if> -->
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="normalize-space(.)!=''">
-          <tr><td class="{$partyfirstColStyle}" >
-            Id:</td><td class="{$secondColStyle}">
-              <xsl:value-of select="."/></td></tr>
+        <xsl:if test="normalize-space(.) != ''">
+          <tr>
+            <td class="{$partyfirstColStyle}" >Id:</td>
+            <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+          </tr>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -2833,12 +2776,15 @@
   
   <xsl:template match="role" mode="party">
     <xsl:param name="partyfirstColStyle" select="$firstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: role</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}" >
-        Role:</td><td class="{$secondColStyle}">
-          <xsl:value-of select="."/></td></tr>
+      <tr>
+        <td class="{$partyfirstColStyle}" >Role:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:if>
   </xsl:template>
+  
   <xsl:template match="text()" mode="party" />
 
   <!-- This module is for coverage and it is self contained. (It is a table
@@ -2847,6 +2793,7 @@
        also in geo, temporal and taxonomic templates -->
   <xsl:template name="coverage">
     <xsl:param name="coveragefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: coverage</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -2901,6 +2848,7 @@
   <xsl:template name="geographicCoverage">
     <xsl:param name="firstColStyle" ></xsl:param>
     <xsl:param name="secondColStyle" ></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geographicCoverage</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -2925,6 +2873,7 @@
   </xsl:template>
 
   <xsl:template name="geographicCovCommon">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geographicCovCommon</xsl:text></xsl:message></xsl:if>
     <!-- use the bounding coordinates to determine if  lats and longs are alike. 
          set a boolean  that can be used to choose labels -->
     <xsl:variable name="west" select="./boundingCoordinates/westBoundingCoordinate"/>
@@ -2972,6 +2921,7 @@
   </xsl:template>
 
   <xsl:template match="geographicDescription">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geographicDescription</xsl:text></xsl:message></xsl:if>
     <table>
       <tr>
         <td class="{$firstColStyle}">Description:</td>
@@ -2982,6 +2932,7 @@
 
   <xsl:template match="boundingCoordinates">
     <xsl:param name="lat-lon-identical"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: boundingCoordinates</xsl:text></xsl:message></xsl:if>
     <table>
       <tr>
         <td class="{$firstColStyle}">
@@ -3005,6 +2956,7 @@
   </xsl:template>
 
   <xsl:template name="boundingCoordinatesSingleLatLon">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: boundingCoordinatesSingleLatLon</xsl:text></xsl:message></xsl:if>
     <table>
       <tr> 
         <td class="{$firstColStyle}"><xsl:text>Longitude (degree):&#160;</xsl:text></td>
@@ -3017,6 +2969,7 @@
   </xsl:template>
   
   <xsl:template name="boundingCoordinatesBox">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: boundingCoordinatesBox</xsl:text></xsl:message></xsl:if>
     <table>
       <tr>
         <td class="{$firstColStyle}"><xsl:text>Northern: &#160;</xsl:text></td>
@@ -3057,6 +3010,7 @@
   -->
 
   <xsl:template match="boundingAltitudes">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: boundingAltitudes</xsl:text></xsl:message></xsl:if>
     <xsl:variable name="altitude-minimum" select="./altitudeMinimum"/>
     <xsl:variable name="altitude-maximum" select="./altitudeMaximum"/>
     <xsl:variable name="min-max-identical">
@@ -3094,6 +3048,7 @@
  -->
   
   <xsl:template match="datasetGPolygonOuterGRing">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetGPolygonOuterGRing</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>G-Ploygon(Outer Ring): </xsl:text></td>
       <td class="{$secondColStyle}">
@@ -3104,6 +3059,7 @@
   </xsl:template>
 
   <xsl:template match="datasetGPolygonExclusionGRing">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetGPolygonExclusionGRing</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>G-Ploygon(Exclusion Ring): </xsl:text></td>
       <td class="{$secondColStyle}">
@@ -3114,6 +3070,7 @@
   </xsl:template>
 
   <xsl:template match="gRing">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: gRing</xsl:text></xsl:message></xsl:if>
     <xsl:text>(GRing) &#160;</xsl:text>
     <xsl:text>Latitude: </xsl:text>
     <xsl:value-of select="gRingLatitude"/>,
@@ -3122,6 +3079,7 @@
   </xsl:template>
 
   <xsl:template match="gRingPoint">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: gRingPoint</xsl:text></xsl:message></xsl:if>
     <xsl:text>Latitude: </xsl:text>
     <xsl:value-of select="gRingLatitude"/>,
     <xsl:text>Longitude: </xsl:text>
@@ -3132,6 +3090,7 @@
   <xsl:template name="temporalCoverage">
     <xsl:param name="firstColStyle" ></xsl:param>
     <xsl:param name="secondColStyle" ></xsl:param>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: temporalCoverage</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -3150,14 +3109,17 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="temporalCovCommon" >
-     <tr><th colspan="2">
-      <xsl:text>Time Period:</xsl:text></th></tr>
-      <xsl:apply-templates select="singleDateTime"/>
-      <xsl:apply-templates select="rangeOfDates"/>
+  <xsl:template name="temporalCovCommon">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: temporalCovCommon</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <th colspan="2"><xsl:text>Time Period:</xsl:text></th>
+    </tr>
+    <xsl:apply-templates select="singleDateTime"/>
+    <xsl:apply-templates select="rangeOfDates"/>
   </xsl:template>
 
   <xsl:template match="singleDateTime">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: singleDateTime</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}">Date:</td>
       <td><xsl:call-template name="singleDateType" /></td>
@@ -3165,6 +3127,7 @@
   </xsl:template>
 
   <xsl:template match="rangeOfDates">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: rangeOfDates</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}">Begin:</td>
       <td><xsl:apply-templates select="beginDate"/></td>
@@ -3176,14 +3139,17 @@
   </xsl:template>
 
   <xsl:template match="beginDate">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: beginDate</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="singleDateType"/>
   </xsl:template>
 
   <xsl:template match="endDate">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: endDate</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="singleDateType"/>
   </xsl:template>
 
   <xsl:template name="singleDateType">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: singleDateType</xsl:text></xsl:message></xsl:if>
     <table>
       <xsl:if test="calendarDate">
         <tr>
@@ -3202,6 +3168,7 @@
   </xsl:template>
 
   <xsl:template match="alternativeTimeScale">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: alternativeTimeScale</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}">Timescale:</td>
       <td class="{$secondColStyle}"><xsl:value-of select="timeScaleName"/></td>
@@ -3231,7 +3198,8 @@
   </xsl:template>
 
   <xsl:template match="timeScaleCitation">
-     <!-- Using citation module here -->
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: timeScaleCitation</xsl:text></xsl:message></xsl:if>
+    <!-- Using citation module here -->
      <xsl:call-template name="citation"></xsl:call-template>
   </xsl:template>
 
@@ -3258,16 +3226,19 @@
   </xsl:template>
 
   <xsl:template name="taxonomicCovCommon">
-      <tr><th colspan="2">
-      <xsl:text>Taxonomic Range:</xsl:text></th></tr>
-      <xsl:apply-templates select="taxonomicSystem"/>
-      <xsl:apply-templates select="generalTaxonomicCoverage"/>
-      <xsl:for-each select="taxonomicClassification">
-          <xsl:apply-templates select="."/>
-      </xsl:for-each>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonomicCovCommon</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <th colspan="2"><xsl:text>Taxonomic Range:</xsl:text></th>
+    </tr>
+    <xsl:apply-templates select="taxonomicSystem"/>
+    <xsl:apply-templates select="generalTaxonomicCoverage"/>
+    <xsl:for-each select="taxonomicClassification">
+      <xsl:apply-templates select="."/>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="taxonomicSystem">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonomicSystem</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Taxonomic System:</xsl:text></td>
       <td>
@@ -3279,7 +3250,8 @@
   </xsl:template>
 
   <xsl:template match="classificationSystem">
-     <xsl:for-each select="classificationSystemCitation">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: classificationSystem</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="classificationSystemCitation">
         <tr><td class="{$firstColStyle}">Classification Citation:</td>
           <td>
            <xsl:call-template name="citation">
@@ -3299,7 +3271,8 @@
   </xsl:template>
 
   <xsl:template match="identificationReference">
-      <tr><td class="{$firstColStyle}">ID Reference:</td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: identificationReference</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$firstColStyle}">ID Reference:</td>
           <td>
              <xsl:call-template name="citation">
                 <xsl:with-param name="citationfirstColStyle" select="$firstColStyle"/>
@@ -3310,7 +3283,8 @@
   </xsl:template>
 
   <xsl:template match="identifierName">
-      <tr><td class="{$firstColStyle}">ID Name:</td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: identifierName</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$firstColStyle}">ID Name:</td>
           <td>
              <xsl:call-template name="party">
                <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
@@ -3326,41 +3300,51 @@
   </xsl:template>
 
   <xsl:template match="taxonomicCompleteness">
-    <tr><td class="{$firstColStyle}">
-        <xsl:text>Completeness:</xsl:text></td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonomicCompleteness</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}"><xsl:text>Completeness:</xsl:text></td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="vouchers">
-      <tr><td class="{$firstColStyle}">Vouchers:</td>
-        <td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: vouchers</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Vouchers:</td>
+      <td>
         <table class="{$tabledefaultStyle}">
-        <xsl:apply-templates select="specimen"/>
-        <xsl:apply-templates select="repository"/>
+          <xsl:apply-templates select="specimen"/>
+          <xsl:apply-templates select="repository"/>
         </table>
-        </td></tr>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="specimen">
-    <tr><td class="{$firstColStyle}">
-        <xsl:text>Specimen:</xsl:text></td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: specimen</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}"><xsl:text>Specimen:</xsl:text></td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="repository">
-    <tr><td class="{$firstColStyle}">Repository:</td>
-        <td>
-            <xsl:for-each select="originator">
-               <xsl:call-template name="party">
-                 <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-               </xsl:call-template>
-            </xsl:for-each>
-        </td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: repository</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Repository:</td>
+      <td>
+        <xsl:for-each select="originator">
+          <xsl:call-template name="party">
+            <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </td>
     </tr>
   </xsl:template>
 
   <xsl:template match="generalTaxonomicCoverage">
-      <tr><td class="{$firstColStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: generalTaxonomicCoverage</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$firstColStyle}">
              <xsl:text>General Coverage:</xsl:text></td>
            <td class="{$secondColStyle}">
              <xsl:value-of select="."/>
@@ -3369,6 +3353,7 @@
   </xsl:template>
 
   <xsl:template match="taxonomicClassification">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonomicClassification</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Classification:</xsl:text></td>
       <td>
@@ -3380,6 +3365,7 @@
   </xsl:template>
 
   <xsl:template match="taxonRankName" mode="nest" >
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonRankName</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Rank Name:</xsl:text></td>
       <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
@@ -3387,6 +3373,7 @@
   </xsl:template>
 
   <xsl:template match="taxonRankValue" mode="nest">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonRankValue</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Rank Value:</xsl:text></td>
       <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
@@ -3394,6 +3381,7 @@
   </xsl:template>
 
   <xsl:template match="commonName" mode="nest">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: commonName</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Common Name:</xsl:text></td>
       <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
@@ -3401,6 +3389,7 @@
   </xsl:template>
 
   <xsl:template match="taxonomicClassification" mode="nest">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonomicClassification</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Classification:</xsl:text></td>
       <td>
@@ -3426,6 +3415,7 @@
         <xsl:value-of select="count(attributeList/attribute/attributeName)"/>
       </xsl:if>
     </xsl:param>  
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dataTable</xsl:text></xsl:message></xsl:if>
     <table class="dataset-entity-part">
       <tr>
         <td class="dataset-entity-part-header"><h3>Data Table</h3></td>
@@ -3521,6 +3511,7 @@
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="numberOfColumns"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datatablecommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="physical">
       <xsl:call-template name="showdistribution">
         <xsl:with-param name="docid" select="$docid"/>
@@ -3605,23 +3596,28 @@
   </xsl:template>
 
   <xsl:template name="datatablecaseSensitive">
-       <xsl:param name="datatablefirstColStyle"/>
-       <tr><td class="{$datatablefirstColStyle}">
-       Case Sensitive?</td><td class="{$secondColStyle}">
-       <xsl:value-of select="."/></td></tr>
+    <xsl:param name="datatablefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datatablecaseSensitive</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$datatablefirstColStyle}">Case Sensitive?</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="datatablenumberOfRecords">
-       <xsl:param name="datatablefirstColStyle"/>
-       <tr><td class="{$datatablefirstColStyle}">
-            Number of Records:</td><td class="{$secondColStyle}">
-       <xsl:value-of select="."/></td></tr>
+    <xsl:param name="datatablefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datatablenumberOfRecords</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$datatablefirstColStyle}">Number of Records:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="datatablenumberOfColumns">
      <xsl:param name="numberOfColumns"/>      
      <xsl:param name="datatablefirstColStyle"/>
-     <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datatablenumberOfColumns</xsl:text></xsl:message></xsl:if>
+    <tr>
        <td class="{$datatablefirstColStyle}">Number of Columns:</td>
        <td class="{$secondColStyle}">
          <xsl:value-of select="$numberOfColumns"/>
@@ -3637,9 +3633,10 @@
     <xsl:param name="entitytype">dataTable</xsl:param>
     <xsl:param name="entityindex"/>
     <xsl:param name="physicalindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: showdistribution</xsl:text></xsl:message></xsl:if>
     <xsl:if test="distribution">
       <tr>
-        <th colspan="2">REQUEST DATA:</th>
+        <th colspan="2">Data:</th>
       </tr>
     </xsl:if>
     <xsl:for-each select="distribution">
@@ -3666,6 +3663,7 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">dataTable</xsl:param>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datatableattributeList</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$datatablesubHeaderStyle}" colspan="2"><!-- <xsl:text>Attribute(s) Info:</xsl:text> --></td>
     </tr>
@@ -3683,6 +3681,7 @@
   <xsl:template name="access">
     <xsl:param name="accessfirstColStyle"/>
     <xsl:param name="accesssubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: access</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -3708,6 +3707,7 @@
   <xsl:template name="accessCommon">
     <xsl:param name="accessfirstColStyle" />
     <xsl:param name="accesssubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: accessCommon</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="accesssystem">
       <xsl:with-param name="accessfirstColStyle" select="$accessfirstColStyle"/>
       <!-- <xsl:with-param name="accesssubHeaderStyle" select="$accesssubHeaderStyle"/> -->
@@ -3735,6 +3735,7 @@
   <xsl:template name="allow_deny">
     <xsl:param name="permission"/>
     <xsl:param name="accessfirstColStyle" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: allow_deny</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="$permission='allow'">
         <xsl:for-each select="allow">
@@ -3779,6 +3780,7 @@
   
   <xsl:template name="accesssystem">
     <xsl:param name="accessfirstColStyle" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: accesssystem</xsl:text></xsl:message></xsl:if>
     <tr>
       <th colspan="3">
         <xsl:text>Access Control:</xsl:text>
@@ -3827,6 +3829,7 @@
   <xsl:variable name="apos">'</xsl:variable>
 
   <xsl:template name="additionalmetadata">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: additionalmetadata</xsl:text></xsl:message></xsl:if>
     <h3 class="toggleButton"><button>+/-</button> Additional Metadata</h3>
     <div class="collapsible">
 <pre>
@@ -3837,7 +3840,7 @@
   </xsl:template>
 
   <xsl:template match="*" mode="ascii-art">
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: *; mode: ascii-art</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: *; mode: ascii-art</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="ascii-art-hierarchy" />
     <xsl:text />___element '<xsl:value-of select="local-name()" />'<xsl:text />
     <xsl:if test="namespace-uri()"> in ns '<xsl:value-of select="namespace-uri()"/>' ('<xsl:value-of select="name()"/>')</xsl:if>
@@ -3853,7 +3856,7 @@
   </xsl:template>
 
   <xsl:template match="@*" mode="ascii-art">
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: @*; mode: ascii-art</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: @*; mode: ascii-art</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="ascii-art-hierarchy" />
     <xsl:text />  \___attribute '<xsl:value-of select="local-name()" />'<xsl:text />
     <xsl:if test="namespace-uri()"> in ns '<xsl:value-of select="namespace-uri()"/>' ('<xsl:value-of select="name()"/>')</xsl:if>
@@ -3865,7 +3868,7 @@
   </xsl:template>
 
   <xsl:template match="text()" mode="ascii-art">
-    <xsl:message terminate="no"><xsl:text>TEMPLATE: text(); mode: ascii-art</xsl:text></xsl:message>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: text(); mode: ascii-art</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="ascii-art-hierarchy" />
     <xsl:text>___text '</xsl:text>
     <xsl:call-template name="escape-ws">
@@ -3875,16 +3878,19 @@
   </xsl:template>
 
   <xsl:template match="comment()" mode="ascii-art">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: comment()</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="ascii-art-hierarchy" />
     <xsl:text />___comment '<xsl:value-of select="." />'&#xA;<xsl:text />
   </xsl:template>
 
   <xsl:template match="processing-instruction()" mode="ascii-art">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: processing-instruction()</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="ascii-art-hierarchy" />
     <xsl:text />___processing instruction target='<xsl:value-of select="name()" />' instruction='<xsl:value-of select="." />'&#xA;<xsl:text />
   </xsl:template>
 
   <xsl:template name="ascii-art-hierarchy">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: ascii-art-hierarchy</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="ancestor::*">
       <xsl:choose>
         <xsl:when test="local-name() != 'additionalMetadata'">
@@ -3904,6 +3910,7 @@
   <!-- recursive template to escape backslashes, apostrophes, newlines and tabs -->
   <xsl:template name="escape-ws">
     <xsl:param name="text" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: escape-ws</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
         <xsl:when test="contains($text, '\')">
             <xsl:call-template name="escape-ws">
@@ -3948,6 +3955,7 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributelist</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -3976,9 +3984,9 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributecommon</xsl:text></xsl:message></xsl:if>
     <!-- First row for headers (attributeLabel) the pretty one. Element is optional,
-         so could be empty. 
-    -->
+         so could be empty. -->
     <!-- upper left cell has nbsp -->
     <tr>
       <th>&#160;</th>
@@ -4608,6 +4616,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: singleattribute</xsl:text></xsl:message></xsl:if>
     <table class="{$tableattributeStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -4639,6 +4648,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: singleattributecommon</xsl:text></xsl:message></xsl:if>
     <!-- First row for attribute name-->
     <tr>
       <th class="rowodd">Column Name</th>
@@ -5283,6 +5293,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: measurementscale</xsl:text></xsl:message></xsl:if>
     <table>
       <xsl:for-each select="nominal">
         <xsl:call-template name="attributenonnumericdomain">
@@ -5326,6 +5337,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributenonnumericdomain</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="nonNumericDomain">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -5360,6 +5372,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributenonnumericdomaincommon</xsl:text></xsl:message></xsl:if>
     <!-- if numericdomain only has one test domain,
         it will be displayed inline otherwith will be show a link-->
     <xsl:choose>
@@ -5390,6 +5403,7 @@
 
   <xsl:template name="intervalratio">
     <xsl:param name="stripes"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: intervalratio</xsl:text></xsl:message></xsl:if>
     <xsl:if test="unit/standardUnit">
       <tr>
         <td class="{$stripes}">
@@ -5429,6 +5443,7 @@
 
   <xsl:template name="numericDomain">
     <xsl:param name="stripes"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: numericDomain</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -5499,6 +5514,7 @@
 
   <xsl:template name="datetime">
     <xsl:param name="stripes"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datetime</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$stripes}">
         <b>Format</b>
@@ -5520,6 +5536,7 @@
 
   <xsl:template name="timedomain">
     <xsl:param name="stripes"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: timedomain</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -5527,18 +5544,14 @@
         <xsl:for-each select="$references">
           <xsl:for-each select="bounds">
             <tr>
-              <td class="{$stripes}">
-                <b>Min</b>
-              </td>
+              <td class="{$stripes}"><strong>Min</strong></td>
               <td class="{$stripes}">
                 <xsl:for-each select="minimum">
                   <xsl:value-of select="."/>&#160; </xsl:for-each>
               </td>
             </tr>
             <tr>
-              <td class="{$stripes}">
-                <b>Max</b>
-              </td>
+              <td class="{$stripes}"><strong>Max</strong></td>
               <td class="{$stripes}">
                 <xsl:for-each select="maximum">
                   <xsl:value-of select="."/>&#160; </xsl:for-each>
@@ -5550,18 +5563,14 @@
       <xsl:otherwise>
         <xsl:for-each select="bounds">
           <tr>
-            <td class="{$stripes}">
-              <b>Min</b>
-            </td>
+            <td class="{$stripes}"><strong>Min</strong></td>
             <td class="{$stripes}">
               <xsl:for-each select="minimum">
                 <xsl:value-of select="."/>&#160; </xsl:for-each>
             </td>
           </tr>
           <tr>
-            <td class="{$stripes}">
-              <b>Max</b>
-            </td>
+            <td class="{$stripes}"><strong>Max</strong></td>
             <td class="{$stripes}">
               <xsl:for-each select="maximum">
                 <xsl:value-of select="."/>&#160; </xsl:for-each>
@@ -5577,6 +5586,7 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributecoverage</xsl:text></xsl:message></xsl:if>
     <strong>Coverage Info</strong>
   </xsl:template>
 
@@ -5585,12 +5595,14 @@
     <xsl:param name="entitytype"/>
     <xsl:param name="entityindex"/>
     <xsl:param name="attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributemethod</xsl:text></xsl:message></xsl:if>
     <strong>Method Info</strong>
   </xsl:template>
 
   <!-- eml-attribute-enumeratedDomain-2.0.0.xsl -->
    <xsl:template name="nonNumericDomain">
      <xsl:param name="nondomainfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: nonNumericDomain</xsl:text></xsl:message></xsl:if>
      <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -5613,6 +5625,7 @@
 
   <xsl:template name="nonNumericDomainCommon">
     <xsl:param name="nondomainfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: nonNumericDomainCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="enumeratedDomain">
       <xsl:call-template name="enumeratedDomain">
         <xsl:with-param name="nondomainfirstColStyle" select="$nondomainfirstColStyle"/>
@@ -5626,88 +5639,88 @@
   </xsl:template>
 
   <xsl:template name="textDomain">
-       <xsl:param name="nondomainfirstColStyle"/>
-       <tr><td class="{$nondomainfirstColStyle}"><b>Text Domain</b></td>
-            <td class="{$secondColStyle}">&#160;
-            </td>
-       </tr>
-       <tr><td class="{$nondomainfirstColStyle}">Definition</td>
-            <td class="{$secondColStyle}"><xsl:value-of select="definition"/>
-            </td>
-        </tr>
-        <xsl:for-each select="parttern">
-          <tr><td class="{$nondomainfirstColStyle}">Pattern</td>
-            <td class="{$secondColStyle}"><xsl:value-of select="."/>
-            </td>
-          </tr>
-        </xsl:for-each>
-        <xsl:if test="source">
-          <tr><td class="{$nondomainfirstColStyle}">Source</td>
-            <td class="{$secondColStyle}"><xsl:value-of select="source"/>
-            </td>
-          </tr>
-        </xsl:if>
+    <xsl:param name="nondomainfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: textDomain</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$nondomainfirstColStyle}"><strong>Text Domain</strong></td>
+      <td class="{$secondColStyle}">&#160;</td>
+    </tr>
+    <tr>
+      <td class="{$nondomainfirstColStyle}">Definition</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="definition"/></td>
+    </tr>
+    <xsl:for-each select="parttern">
+      <tr>
+        <td class="{$nondomainfirstColStyle}">Pattern</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
+    </xsl:for-each>
+    <xsl:if test="source">
+      <tr>
+        <td class="{$nondomainfirstColStyle}">Source</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="source"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="enumeratedDomain">
-     <xsl:param name="nondomainfirstColStyle"/>
-     <xsl:if test="codeDefinition">
-        <tr><td class="{$nondomainfirstColStyle}"><b>Enumerated Domain</b></td>
-            <td class="{$secondColStyle}">&#160;
-            </td>
-       </tr>
-       <xsl:for-each select="codeDefinition">
-              <tr><td class="{$nondomainfirstColStyle}">Code Definition</td>
-                   <td>
-                      <table class="{$tabledefaultStyle}">
-                          <tr><td class="{$nondomainfirstColStyle}">
-                               Code
-                              </td>
-                               <td class="{$secondColStyle}"><xsl:value-of select="code"/></td>
-
-                           </tr>
-                           <tr><td class="{$nondomainfirstColStyle}">
-                               Definition
-                              </td>
-                               <td class="{$secondColStyle}"><xsl:value-of select="definition"/></td>
-
-                           </tr>
-                           <tr><td class="{$nondomainfirstColStyle}">
-                               Source
-                              </td>
-                               <td class="{$secondColStyle}"><xsl:value-of select="source"/></td>
-                          </tr>
-                      </table>
-                   </td>
-               </tr>
-         </xsl:for-each>
-     </xsl:if>
-     <xsl:if test="externalCodeSet">
-        <tr><td class="{$nondomainfirstColStyle}"><b>Enumerated Domain(External Set)</b></td>
-            <td>&#160;
-           </td>
+    <xsl:param name="nondomainfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: enumeratedDomain</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="codeDefinition">
+      <tr>
+        <td class="{$nondomainfirstColStyle}"><strong>Enumerated Domain</strong></td>
+        <td class="{$secondColStyle}">&#160;</td>
+      </tr>
+      <xsl:for-each select="codeDefinition">
+        <tr>
+          <td class="{$nondomainfirstColStyle}">Code Definition</td>
+          <td>
+            <table class="{$tabledefaultStyle}">
+              <tr>
+                <td class="{$nondomainfirstColStyle}">Code</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="code"/></td>
+              </tr>
+              <tr>
+                <td class="{$nondomainfirstColStyle}">Definition</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="definition"/></td>
+              </tr>
+              <tr>
+                <td class="{$nondomainfirstColStyle}">Source</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="source"/></td>
+              </tr>
+            </table>
+          </td>
         </tr>
-        <tr><td class="{$nondomainfirstColStyle}">Set Name:</td>
-            <td class="{$secondColStyle}"><xsl:value-of select="externalCodeSet/codesetName"/>
-           </td>
+      </xsl:for-each>
+    </xsl:if>
+    <xsl:if test="externalCodeSet">
+      <tr>
+        <td class="{$nondomainfirstColStyle}"><strong>Enumerated Domain(External Set)</strong></td>
+        <td>&#160;</td>
+      </tr>
+      <tr>
+        <td class="{$nondomainfirstColStyle}">Set Name:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="externalCodeSet/codesetName"/></td>
+      </tr>
+      <xsl:for-each select="externalCodeSet/citation">
+        <tr>
+          <td class="{$nondomainfirstColStyle}">Citation:</td>
+          <td>
+            <xsl:call-template name="citation">
+              <xsl:with-param name="citationfirstColStyle" select="$nondomainfirstColStyle"/>
+            </xsl:call-template>
+          </td>
         </tr>
-        <xsl:for-each select="externalCodeSet/citation">
-           <tr><td class="{$nondomainfirstColStyle}">Citation:</td>
-               <td>
-                  <xsl:call-template name="citation">
-                      <xsl:with-param name="citationfirstColStyle" select="$nondomainfirstColStyle"/>
-                   </xsl:call-template>
-               </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="externalCodeSet/codesetURL">
-           <tr><td class="{$nondomainfirstColStyle}">URL</td>
-               <td class="{$secondColStyle}">
-                 <a><xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a>
-              </td>
-           </tr>
-        </xsl:for-each>
-     </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="externalCodeSet/codesetURL">
+        <tr>
+          <td class="{$nondomainfirstColStyle}">URL</td>
+          <td class="{$secondColStyle}">
+            <a><xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute><xsl:value-of select="."/></a>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </xsl:if>
     <!-- 
      <xsl:if test="entityCodeList">
         <tr><td class="{$nondomainfirstColStyle}"><b>Enumerated Domain (Entity)</b></td>
@@ -5730,14 +5743,18 @@
 -->
     <!-- mob, 2012-06-04 -->
     <xsl:if test="entityCodeList">
-      <tr><td class="{$nondomainfirstColStyle}" colspan="2"><b>The allowed values and their definitions can be found in another data entity in this package. 
-        Please follow link to description, then download:</b></td>
-      <!--   <td class="{$secondColStyle}">&#160;
-        </td> -->
+      <tr>
+        <td class="{$nondomainfirstColStyle}" colspan="2">
+          <strong>The allowed values and their definitions can be found in another data entity in this package. 
+                  Please follow link to description, then download:
+          </strong>
+        </td>
+        <!-- <td class="{$secondColStyle}">&#160;</td> -->
       </tr> 
       <tr>
         <td class="{$nondomainfirstColStyle}">Data link:</td>
-        <td>  <table  class="subGroup onehundred_percent {$tabledefaultStyle}">
+        <td>
+          <table  class="subGroup onehundred_percent {$tabledefaultStyle}">
           <!-- when you call the entityurl template, include a param to label the type of entity  -->
           <!-- also, need 
           http://stackoverflow.com/questions/4449810/using-position-function-in-xslt
@@ -5832,7 +5849,8 @@
   <!-- This module is for constraint. And it is self contained-->
   <xsl:template name="constraint">
      <xsl:param name="constraintfirstColStyle"/>
-     <table class="{$tabledefaultStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: constraint</xsl:text></xsl:message></xsl:if>
+    <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -5854,6 +5872,7 @@
 
   <xsl:template name="constraintCommon">
     <xsl:param name="constraintfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: constraintCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="primaryKey">
        <xsl:call-template name="primaryKey">
           <xsl:with-param name="constraintfirstColStyle" select="$constraintfirstColStyle"/>
@@ -5889,6 +5908,7 @@
   <!--Keys part-->
   <xsl:template name="primaryKey">
     <xsl:param name="constraintfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: primaryKey</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$constraintfirstColStyle}">
           Primary Key:</td>
           <td>
@@ -5910,48 +5930,48 @@
 
   <xsl:template name="uniqueKey">
     <xsl:param name="constraintfirstColStyle"/>
-    <tr><td class="{$constraintfirstColStyle}">
-          Unique Key:</td>
-          <td>
-             <table class="{$tabledefaultStyle}">
-                  <xsl:call-template name="constraintBaseGroup">
-                     <xsl:with-param name="constraintfirstColStyle" select="$constraintfirstColStyle"/>
-                  </xsl:call-template>
-                  <xsl:for-each select="key/attributeReference">
-                     <tr><td class="{$constraintfirstColStyle}">
-                             <xsl:text>Key:</xsl:text></td>
-                          <td class="{$secondColStyle}">
-                            <xsl:value-of select="."/></td>
-                      </tr>
-                  </xsl:for-each>
-             </table>
-          </td>
-     </tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: uniqueKey</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$constraintfirstColStyle}">Unique Key:</td>
+      <td>
+        <table class="{$tabledefaultStyle}">
+          <xsl:call-template name="constraintBaseGroup">
+            <xsl:with-param name="constraintfirstColStyle" select="$constraintfirstColStyle"/>
+          </xsl:call-template>
+          <xsl:for-each select="key/attributeReference">
+            <tr>
+              <td class="{$constraintfirstColStyle}"><xsl:text>Key:</xsl:text></td>
+              <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </td>
+    </tr>
   </xsl:template>
 
-   <xsl:template name="checkConstraint">
+  <xsl:template name="checkConstraint">
     <xsl:param name="constraintfirstColStyle"/>
-    <tr><td class="{$constraintfirstColStyle}">
-          Checking Constraint: </td>
-          <td>
-              <table class="{$tabledefaultStyle}">
-                    <xsl:call-template name="constraintBaseGroup">
-                       <xsl:with-param name="constraintfirstColStyle" select="$constraintfirstColStyle"/>
-                    </xsl:call-template>
-                    <xsl:for-each select="checkCondition">
-                         <tr><td class="{$constraintfirstColStyle}">
-                                   <xsl:text>Check Condition:</xsl:text></td>
-                             <td class="{$secondColStyle}">
-                                   <xsl:value-of select="."/></td>
-                         </tr>
-                    </xsl:for-each>
-              </table>
-          </td>
-     </tr>
-   </xsl:template>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: checkConstraint</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$constraintfirstColStyle}">Checking Constraint: </td><td>
+        <table class="{$tabledefaultStyle}">
+          <xsl:call-template name="constraintBaseGroup">
+            <xsl:with-param name="constraintfirstColStyle" select="$constraintfirstColStyle"/>
+          </xsl:call-template>
+          <xsl:for-each select="checkCondition">
+            <tr>
+              <td class="{$constraintfirstColStyle}"><xsl:text>Check Condition:</xsl:text></td>
+              <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </td>
+    </tr>
+  </xsl:template>
 
   <xsl:template name="foreignKey">
      <xsl:param name="constraintfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: foreignKey</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$constraintfirstColStyle}">
           Foreign Key:</td>
           <td>
@@ -6005,6 +6025,7 @@
 
   <xsl:template name="joinCondition">
     <xsl:param name="constraintfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: joinCondition</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$constraintfirstColStyle}">
           Join Condition:</td>
           <td>
@@ -6026,6 +6047,7 @@
 
   <xsl:template name="notNullConstraint">
     <xsl:param name="constraintfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: notNullConstraint</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$constraintfirstColStyle}">
           Not Null Constraint:</td>
           <td>
@@ -6047,7 +6069,8 @@
 
   <xsl:template name="constraintBaseGroup">
     <xsl:param name="constraintfirstColStyle"/>
-     <tr><td class="{$constraintfirstColStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: constraintBaseGroup</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$constraintfirstColStyle}">
           <xsl:text>Name:</xsl:text></td>
           <td class="{$secondColStyle}">
          <xsl:value-of select="constraintName"/></td>
@@ -6077,7 +6100,8 @@
       2010-06-01 mob added  for the data use agreement form. prefix is in the eml-settings. 
       -->
       <xsl:param name="cgi-prefix"/>
-      <table class="{$tabledefaultStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: distribution</xsl:text></xsl:message></xsl:if>
+    <table class="{$tabledefaultStyle}">
        <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -6131,6 +6155,7 @@
   <xsl:template match="online">
     <xsl:param name="disfirstColStyle"/>
     <xsl:param name="dissubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: online</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$dissubHeaderStyle}" colspan="2">
         <xsl:text>Available Online:</xsl:text>
     </td></tr>
@@ -6147,6 +6172,7 @@
 
   <xsl:template match="url">
     <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: url</xsl:text></xsl:message></xsl:if>
     <xsl:variable name="URL" select="."/>
     <xsl:variable name="entity_name">
       <xsl:value-of select="../../../../entityName"/>
@@ -6178,6 +6204,7 @@
 
   <xsl:template match="connection">
     <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: connection</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -6199,6 +6226,7 @@
   <!-- A template shared by connection references and connection in line-->
   <xsl:template name="connectionCommon">
     <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: connectionCommon</xsl:text></xsl:message></xsl:if>
     <xsl:if test="parameter">
       <tr>
         <td class="{$disfirstColStyle}">
@@ -6218,6 +6246,7 @@
 
   <xsl:template name="renderParameters">
     <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: renderParameters</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="parameter" >
       <tr>
         <td class="{$disfirstColStyle}">
@@ -6232,6 +6261,7 @@
 
   <xsl:template match="connectionDefinition">
     <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: connectionDefinition</xsl:text></xsl:message></xsl:if>
     <xsl:choose>
       <xsl:when test="references!=''">
         <xsl:variable name="ref_id" select="references"/>
@@ -6252,7 +6282,8 @@
 
    <!-- This template will be shared by both reference and inline connectionDefinition-->
    <xsl:template name="connectionDefinitionCommon">
-    <xsl:param name="disfirstColStyle"/>
+     <xsl:param name="disfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: connectionDefinitionCommon</xsl:text></xsl:message></xsl:if>
       <tr>
           <td class="{$disfirstColStyle}">
             <xsl:text>Schema Name:</xsl:text>
@@ -6280,6 +6311,7 @@
 
    <xsl:template match="description">
      <xsl:param name="disfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: description</xsl:text></xsl:message></xsl:if>
      <xsl:call-template name="text">
         <xsl:with-param name="textfirstColStyle" select="$secondColStyle" />
      </xsl:call-template>
@@ -6287,6 +6319,7 @@
 
    <xsl:template name="renderParameterDefinition">
      <xsl:param name="disfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: renderParameterDefinition</xsl:text></xsl:message></xsl:if>
      <tr>
         <td class="{$disfirstColStyle}">
           <xsl:text>&#160;&#160;&#160;&#160;&#160;</xsl:text><xsl:value-of select="name" /><xsl:text>:</xsl:text>
@@ -6318,28 +6351,38 @@
   <xsl:template match="offline">
     <xsl:param name="disfirstColStyle"/>
     <xsl:param name="dissubHeaderStyle"/>
-    <tr><td class="{$dissubHeaderStyle}" colspan="2">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: offline</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$dissubHeaderStyle}" colspan="2">
         <xsl:text>Data are Offline:</xsl:text>
-    </td></tr>
+      </td>
+    </tr>
     <xsl:if test="(mediumName) and normalize-space(mediumName)!=''">
-      <tr><td class="{$disfirstColStyle}"><xsl:text>Medium:</xsl:text></td>
-      <td class="{$secondColStyle}"><xsl:value-of select="mediumName"/></td></tr>
+      <tr>
+        <td class="{$disfirstColStyle}"><xsl:text>Medium:</xsl:text></td>
+        <td class="{$secondColStyle}"><xsl:value-of select="mediumName"/></td>
+      </tr>
     </xsl:if>
     <xsl:if test="(mediumDensity) and normalize-space(mediumDensity)!=''">
-    <tr><td class="{$disfirstColStyle}"><xsl:text>Medium Density:</xsl:text></td>
-    <td class="{$secondColStyle}"><xsl:value-of select="mediumDensity"/>
-    <xsl:if test="(mediumDensityUnits) and normalize-space(mediumDensityUnits)!=''">
-    <xsl:text> (</xsl:text><xsl:value-of select="mediumDensityUnits"/><xsl:text>)</xsl:text>
-    </xsl:if>
-    </td></tr>
+      <tr>
+        <td class="{$disfirstColStyle}"><xsl:text>Medium Density:</xsl:text></td>
+        <td class="{$secondColStyle}"><xsl:value-of select="mediumDensity"/>
+          <xsl:if test="(mediumDensityUnits) and normalize-space(mediumDensityUnits)!=''">
+            <xsl:text> (</xsl:text><xsl:value-of select="mediumDensityUnits"/><xsl:text>)</xsl:text>
+          </xsl:if>
+        </td>
+      </tr>
     </xsl:if>
     <xsl:if test="(mediumVol) and normalize-space(mediumVol)!=''">
-    <tr><td class="{$disfirstColStyle}"><xsl:text>Volume:</xsl:text></td>
-    <td class="{$secondColStyle}"><xsl:value-of select="mediumVol"/></td></tr>
+    <tr>
+      <td class="{$disfirstColStyle}"><xsl:text>Volume:</xsl:text></td>
+      <td class="{$secondColStyle}"><xsl:value-of select="mediumVol"/></td></tr>
     </xsl:if>
     <xsl:if test="(mediumFormat) and normalize-space(mediumFormat)!=''">
-    <tr><td class="{$disfirstColStyle}"><xsl:text>Format:</xsl:text></td>
-    <td class="{$secondColStyle}"><xsl:value-of select="mediumFormat"/></td></tr>
+      <tr>
+        <td class="{$disfirstColStyle}"><xsl:text>Format:</xsl:text></td>
+        <td class="{$secondColStyle}"><xsl:value-of select="mediumFormat"/></td>
+      </tr>
     </xsl:if>
     <xsl:if test="(mediumNote) and normalize-space(mediumNote)!=''">
     <tr><td class="{$disfirstColStyle}"><xsl:text>Notes:</xsl:text></td>
@@ -6375,7 +6418,7 @@
             <xsl:attribute name="name" >body</xsl:attribute>        
           </input> -->
           <input type="submit" class="view-data-button" >
-            <xsl:attribute name="value">Request data vial email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" />
+            <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" />
             </xsl:attribute>       
           </input> 
             </form>
@@ -6393,7 +6436,7 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="physicalindex"/>
     <xsl:param name="distributionindex"/>
-
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: inline</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$dissubHeaderStyle}" colspan="2">
         <xsl:text>Data:</xsl:text>
     </td></tr>
@@ -6413,6 +6456,7 @@
   <!-- eml-entity-2.0.0.xsl-->
   <xsl:template name="entityName">
     <xsl:param name="entityfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityName</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$entityfirstColStyle}">Name:</td>
       <td class="{$secondColStyle}"><strong><xsl:value-of select="."/></strong></td>
@@ -6421,6 +6465,7 @@
   
   <xsl:template name="entityalternateIdentifier">
     <xsl:param name="entityfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityalternateIdentifier</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$entityfirstColStyle}">Identifier:</td>
       <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
@@ -6429,6 +6474,7 @@
   
   <xsl:template name="entityDescription">
     <xsl:param name="entityfirstColStyle"/> 
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityDescription</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$entityfirstColStyle}">Description:</td>
       <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
@@ -6437,6 +6483,7 @@
   
   <xsl:template name="entityadditionalInfo">
     <xsl:param name="entityfirstColStyle"/> 
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityadditionalInfo</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$entityfirstColStyle}">Additional Info:</td>
       <td><xsl:call-template name="text"/></td>
@@ -6463,7 +6510,8 @@
     <xsl:param name="mapsecondColStyle"/>
     <xsl:param name="currentmodule"/>
     <xsl:param name="packageID"><xsl:value-of select="../@packageId"/></xsl:param>   
-
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geoCovMap</xsl:text></xsl:message></xsl:if>
+    
     <script type="text/javascript"
             src="http://maps.googleapis.com/maps/api/js?sensor=false">
     </script>
@@ -6631,6 +6679,7 @@
     <xsl:param name="organizationName"><xsl:value-of select="creator/organizationName"/></xsl:param>
     <xsl:param name="pubDate"><xsl:value-of select="pubDate"/></xsl:param>
     <xsl:param name="givenName"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: howtoCite</xsl:text></xsl:message></xsl:if>
     <table class="{$citetabledefaultStyle}" id="howToCite">
       <tr>
         <td class="{$citefirstColStyle}">How to cite this data set:</td>
@@ -6710,6 +6759,7 @@
     <xsl:param name="IDsecondColStyle"/>
     <xsl:param name="packageID"/>
     <xsl:param name="system"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: identifier</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)">
       <tr>
         <td class="{$IDfirstColStyle}">Identifier:</td>
@@ -6726,6 +6776,7 @@
   <xsl:template name="citation">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citation</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
     <xsl:choose>
       <xsl:when test="references!=''">
@@ -6751,6 +6802,7 @@
   <xsl:template name="citationCommon">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationCommon</xsl:text></xsl:message></xsl:if>
     <tr>
       <td colspan="2">
       <xsl:call-template name="resource">
@@ -6852,53 +6904,65 @@
   </xsl:template>
 
   <xsl:template name="citationarticle">
-     <xsl:param name="citationfirstColStyle"/>
-     <xsl:param name="citationsubHeaderStyle"/>
-        <tr><td class="{$citationsubHeaderStyle}" colspan="2"><xsl:text>ARTICLE:</xsl:text></td></tr>
-           <tr><td class="{$citationfirstColStyle}">
-            Journal:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="journal"/></td></tr>
-           <tr><td class="{$citationfirstColStyle}">
-            Volume:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="volume"/></td></tr>
-        <xsl:if test="issue and normalize-space(issue)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Issue:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="issue"/></td></tr>
-        </xsl:if>
-           <tr><td class="{$citationfirstColStyle}">
-            Page Range:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="pageRange"/></td></tr>
-        <xsl:if test="publisher and normalize-space(publisher)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Publisher:</td><td class="{$secondColStyle}">
-            &#160;</td></tr>
-           <xsl:for-each select="publisher">
-            <tr><td colspan="2">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
-                <!-- <xsl:with-param name="partysubHeaderStyle" select="$citationsubHeaderStyle"/> -->
-              </xsl:call-template>
-            </td></tr>
-          </xsl:for-each>
-        </xsl:if>
-         <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Publication Place:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="publicationPlace"/></td></tr>
-        </xsl:if>
-        <xsl:if test="ISSN and normalize-space(ISSN)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            ISSN:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="ISSN"/></td></tr>
-        </xsl:if>
+    <xsl:param name="citationfirstColStyle"/>
+    <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationarticle</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$citationsubHeaderStyle}" colspan="2"><xsl:text>ARTICLE:</xsl:text></td>
+    </tr>
+    <tr>
+      <td class="{$citationfirstColStyle}">Journal:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="journal"/></td>
+    </tr>
+    <tr>
+      <td class="{$citationfirstColStyle}">Volume:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="volume"/></td>
+    </tr>
+    <xsl:if test="issue and normalize-space(issue)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Issue:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="issue"/></td>
+      </tr>
+    </xsl:if>
+    <tr>
+      <td class="{$citationfirstColStyle}">Page Range:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="pageRange"/></td>
+    </tr>
+    <xsl:if test="publisher and normalize-space(publisher)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publisher:</td>
+        <td class="{$secondColStyle}">&#160;</td>
+      </tr>
+      <xsl:for-each select="publisher">
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="party">
+              <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
+            </xsl:call-template>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </xsl:if>
+    <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publication Place:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="publicationPlace"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="ISSN and normalize-space(ISSN)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">ISSN:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="ISSN"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="citationbook">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:param name="notshow" />
-       <xsl:if test="$notshow =''">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationbook</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="$notshow =''">
           <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>BOOK:</xsl:text></td></tr>
         </xsl:if>
         <tr><td class="{$citationfirstColStyle}">
@@ -6954,7 +7018,8 @@
    <xsl:template name="citationchapter">
       <xsl:param name="citationfirstColStyle"/>
       <xsl:param name="citationsubHeaderStyle"/>
-       <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>CHAPTER:</xsl:text></td></tr>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationchapter</xsl:text></xsl:message></xsl:if>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>CHAPTER:</xsl:text></td></tr>
         <xsl:if test="chapterNumber and normalize-space(chapterNumber)!=''">
            <tr><td class="{$citationfirstColStyle}">
             Chapter Number:</td><td class="{$secondColStyle}">
@@ -6988,7 +7053,8 @@
    <xsl:template name="citationeditedBook">
       <xsl:param name="citationfirstColStyle"/>
       <xsl:param name="citationsubHeaderStyle"/>
-       <xsl:call-template name="citationbook">
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationeditedBook</xsl:text></xsl:message></xsl:if>
+     <xsl:call-template name="citationbook">
           <xsl:with-param name="citationfirstColStyle" select="$citationfirstColStyle"/>
           <xsl:with-param name="citationsubHeaderStyle" select="$citationsubHeaderStyle"/>
         </xsl:call-template>
@@ -6997,7 +7063,8 @@
    <xsl:template name="citationmanuscript">
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
-       <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MANUSCRIPT:</xsl:text></td></tr>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationmanuscript</xsl:text></xsl:message></xsl:if>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MANUSCRIPT:</xsl:text></td></tr>
        <tr><td class="{$citationfirstColStyle}">
             Institution:
             </td>
@@ -7023,6 +7090,7 @@
    <xsl:template name="citationreport">
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationreport</xsl:text></xsl:message></xsl:if>
      <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>REPORT:</xsl:text></td></tr>
        <xsl:if test="reportNumber and normalize-space(reportNumber)!=''">
           <tr><td class="{$citationfirstColStyle}">
@@ -7056,6 +7124,7 @@
    <xsl:template name="citationthesis">
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationthesis</xsl:text></xsl:message></xsl:if>
      <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>THESIS:</xsl:text></td></tr>
         <tr><td class="{$citationfirstColStyle}">
         Degree:</td><td class="{$secondColStyle}">
@@ -7081,6 +7150,7 @@
    <xsl:template name="citationconferenceProceedings">
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationconferenceProceedings</xsl:text></xsl:message></xsl:if>
      <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>CONFERENCE PROCEEDINGS:</xsl:text></td></tr>
       <xsl:if test="conferenceName and normalize-space(conferenceName)!=''">
          <tr><td class="{$citationfirstColStyle}">
@@ -7115,6 +7185,7 @@
   <xsl:template name="citationpersonalCommunication">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationpersonalCommunication</xsl:text></xsl:message></xsl:if>
     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>PERSONAL COMMUNICATION:</xsl:text></td></tr>
      <xsl:if test="publisher and normalize-space(publisher)!=''">
           <tr><td class="{$citationfirstColStyle}">
@@ -7155,6 +7226,7 @@
   <xsl:template name="citationmap">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationmap</xsl:text></xsl:message></xsl:if>
     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MAP:</xsl:text></td></tr>
       <xsl:if test="publisher and normalize-space(publisher)!=''">
           <tr><td class="{$citationfirstColStyle}">
@@ -7189,6 +7261,7 @@
   <xsl:template name="citationgeneric">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationgeneric</xsl:text></xsl:message></xsl:if>
     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Generic Citation:</xsl:text></td></tr>
     <tr><td class="{$citationfirstColStyle}">
             Publisher:</td><td class="{$secondColStyle}">
@@ -7271,6 +7344,7 @@
   <xsl:template name="citationaudioVisual">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationaudioVisual</xsl:text></xsl:message></xsl:if>
     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Media Citation:</xsl:text></td></tr>
       <tr><td class="{$citationfirstColStyle}">
             Publisher:</td><td class="{$secondColStyle}">
@@ -7317,6 +7391,7 @@
   <xsl:template name="citationpresentation">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationpresentation</xsl:text></xsl:message></xsl:if>
     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Presentation:</xsl:text></td></tr>
       <xsl:if test="conferenceName and normalize-space(conferenceName)!=''">
          <tr><td class="{$citationfirstColStyle}">
@@ -7347,7 +7422,8 @@
   <xsl:template name="method">
     <xsl:param name="methodfirstColStyle"/>
     <xsl:param name="methodsubHeaderStyle"/>
-	  <!-- <table class="{$tabledefaultStyle}">  use this class to unbox the table  -->
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: method</xsl:text></xsl:message></xsl:if>
+    <!-- <table class="{$tabledefaultStyle}">  use this class to unbox the table  -->
       <table class="subGroup onehundred_percent">
         <tr>
 	        <!-- changed table title. usually protocol refs, sometimes procedural steps -->
@@ -7420,6 +7496,7 @@
  <xsl:template name="methodStep">
    <xsl:param name="methodfirstColStyle"/>
    <xsl:param name="methodsubHeaderStyle"/>
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: methodStep</xsl:text></xsl:message></xsl:if>
    <xsl:call-template name="step">
      <xsl:with-param name="protocolfirstColStyle" select="$methodfirstColStyle"/>
      <xsl:with-param name="protocolsubHeaderStyle" select="$methodsubHeaderStyle"/>
@@ -7437,8 +7514,9 @@
  <xsl:template name="sampling">
    <xsl:param name="methodfirstColStyle"/>
    <xsl:param name="methodsubHeaderStyle"/>
-	   <xsl:for-each select="samplingDescription">
-		 <table  class="{$tabledefaultStyle}">
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: sampling</xsl:text></xsl:message></xsl:if>
+   <xsl:for-each select="samplingDescription">
+		 <table class="{$tabledefaultStyle}">
      	<tr>
 				<td class="{$methodfirstColStyle}">
          Sampling Description:
@@ -7475,37 +7553,37 @@
     </xsl:for-each>
  </xsl:template>
 
- <xsl:template name="studyExtent">
+  <xsl:template name="studyExtent">
     <xsl:param name="methodfirstColStyle"/>
     <xsl:param name="methodsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: studyExtent</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="coverage">
-		<!-- this table call puts each coverage node in a box -->
-		 <table class="{$tabledefaultStyle}">
-        <tr><td class="{$methodfirstColStyle}">
-         Sampling Extent:
-         </td>
-         <td width="${secondColWidth}">
+		  <!-- this table call puts each coverage node in a box -->
+		  <table class="{$tabledefaultStyle}">
+        <tr>
+          <td class="{$methodfirstColStyle}">Sampling Extent:</td>
+          <td width="${secondColWidth}">
             <xsl:call-template name="coverage">
             </xsl:call-template>
-         </td>
-       </tr>
-		</table>
+           </td>
+         </tr>
+		  </table>
     </xsl:for-each>
     <xsl:for-each select="description">
-      <tr><td class="{$methodfirstColStyle}">
-         Sampling Area And Frequency:
-         </td>
-         <td width="${secondColWidth}" >
-           <xsl:call-template name="text">
-              <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
-           </xsl:call-template>
-         </td>
-       </tr>
+      <tr>
+        <td class="{$methodfirstColStyle}">Sampling Area And Frequency:</td>
+        <td width="${secondColWidth}" >
+          <xsl:call-template name="text">
+            <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
  </xsl:template>
 
  <xsl:template name="spatialSamplingUnits">
    <xsl:param name="methodfirstColStyle"/>
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialSamplingUnits</xsl:text></xsl:message></xsl:if>
    <xsl:for-each select="referenceEntityId">
       <tr><td class="{$methodfirstColStyle}">
          Sampling Unit Reference:
@@ -7531,7 +7609,8 @@
   <xsl:template name="qualityControl">
    <xsl:param name="methodfirstColStyle"/>
    <xsl:param name="methodsubHeaderStyle"/>
-   <xsl:call-template name="step">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: qualityControl</xsl:text></xsl:message></xsl:if>
+    <xsl:call-template name="step">
      <xsl:with-param name="protocolfirstColStyle" select="$methodfirstColStyle"/>
      <xsl:with-param name="protocolsubHeaderStyle" select="$methodsubHeaderStyle"/>
    </xsl:call-template>
@@ -7541,7 +7620,8 @@
  <xsl:template name="method-original">
   <xsl:param name="methodfirstColStyle"/>
   <xsl:param name="methodsubHeaderStyle"/>
-  <table class="{$tabledefaultStyle}">
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: method-original</xsl:text></xsl:message></xsl:if>
+   <table class="{$tabledefaultStyle}">
     <tr>
       <th colspan="2">
         Step by Step Procedures
@@ -7586,6 +7666,7 @@
  <xsl:template name="methodStep-original">
    <xsl:param name="methodfirstColStyle"/>
    <xsl:param name="methodsubHeaderStyle"/>
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: methodStep-original</xsl:text></xsl:message></xsl:if>
    <xsl:call-template name="step">
      <xsl:with-param name="protocolfirstColStyle" select="$methodfirstColStyle"/>
      <xsl:with-param name="protocolsubHeaderStyle" select="$methodsubHeaderStyle"/>
@@ -7600,72 +7681,71 @@
  </xsl:template>
 
  <!-- Sampling -->
- <xsl:template name="sampling-original">
-   <xsl:param name="methodfirstColStyle"/>
-   <xsl:param name="methodsubHeaderStyle"/>
-   <xsl:for-each select="studyExtent">
-      <xsl:call-template name="studyExtent">
-         <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
-      </xsl:call-template>
-   </xsl:for-each>
-   <xsl:for-each select="samplingDescription">
-     <tr><td class="{$methodfirstColStyle}">
-         Sampling Description:
-         </td>
-         <td width="${secondColWidth}">
-          <xsl:call-template name="text">
-           <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
-         </xsl:call-template>
-         </td>
-     </tr>
-   </xsl:for-each>
-   <xsl:for-each select="spatialSamplingUnits">
-      <xsl:call-template name="spatialSamplingUnits">
-         <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
-      </xsl:call-template>
-   </xsl:for-each>
-   <xsl:for-each select="citation">
-      <tr><td class="{$methodfirstColStyle}">
-         Sampling Citation:
-         </td>
-         <td width="${secondColWidth}">
-           <xsl:call-template name="citation">
-            <xsl:with-param name="citationfirstColStyle" select="$methodfirstColStyle"/>
-            <xsl:with-param name="citationsubHeaderStyle" select="$methodsubHeaderStyle"/>
-         </xsl:call-template>
-         </td>
-      </tr>
-    </xsl:for-each>
- </xsl:template>
-
- <xsl:template name="studyExtent-original">
+  <xsl:template name="sampling-original">
     <xsl:param name="methodfirstColStyle"/>
     <xsl:param name="methodsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: sampling-original</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="studyExtent">
+      <xsl:call-template name="studyExtent">
+        <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
+      </xsl:call-template>
+    </xsl:for-each>
+    <xsl:for-each select="samplingDescription">
+      <tr>
+        <td class="{$methodfirstColStyle}">Sampling Description:</td>
+        <td width="${secondColWidth}">
+           <xsl:call-template name="text">
+             <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
+           </xsl:call-template>
+        </td>
+      </tr>
+    </xsl:for-each>
+    <xsl:for-each select="spatialSamplingUnits">
+      <xsl:call-template name="spatialSamplingUnits">
+        <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
+      </xsl:call-template>
+    </xsl:for-each>
+    <xsl:for-each select="citation">
+      <tr>
+        <td class="{$methodfirstColStyle}">Sampling Citation:</td>
+        <td width="${secondColWidth}">
+          <xsl:call-template name="citation">
+            <xsl:with-param name="citationfirstColStyle" select="$methodfirstColStyle"/>
+            <xsl:with-param name="citationsubHeaderStyle" select="$methodsubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="studyExtent-original">
+    <xsl:param name="methodfirstColStyle"/>
+    <xsl:param name="methodsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: studyExtent-original</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="coverage">
-        <tr><td class="{$methodfirstColStyle}">
-         Sampling Coverage:
-         </td>
-         <td width="${secondColWidth}">
-            <xsl:call-template name="coverage">
-            </xsl:call-template>
-         </td>
-       </tr>
+      <tr>
+        <td class="{$methodfirstColStyle}">Sampling Coverage:</td>
+        <td width="${secondColWidth}">
+          <xsl:call-template name="coverage">
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="description">
-      <tr><td class="{$methodfirstColStyle}">
-         Sampling Area And Frequency:
-         </td>
-         <td width="${secondColWidth}" >
-           <xsl:call-template name="text">
-              <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
-           </xsl:call-template>
-         </td>
-       </tr>
+      <tr>
+        <td class="{$methodfirstColStyle}">Sampling Area And Frequency:</td>
+        <td width="${secondColWidth}" >
+          <xsl:call-template name="text">
+            <xsl:with-param name="textfirstColStyle" select="$methodfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
  </xsl:template>
 
  <xsl:template name="spatialSamplingUnits-original">
    <xsl:param name="methodfirstColStyle"/>
+   <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialSamplingUnits-original</xsl:text></xsl:message></xsl:if>
    <xsl:for-each select="referenceEntityId">
       <tr><td class="{$methodfirstColStyle}">
          Sampling Unit Reference:
@@ -7691,7 +7771,8 @@
   <xsl:template name="qualityControl-original">
    <xsl:param name="methodfirstColStyle"/>
    <xsl:param name="methodsubHeaderStyle"/>
-   <xsl:call-template name="step">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: qualityControl-original</xsl:text></xsl:message></xsl:if>
+    <xsl:call-template name="step">
      <xsl:with-param name="protocolfirstColStyle" select="$methodfirstColStyle"/>
      <xsl:with-param name="protocolsubHeaderStyle" select="$methodsubHeaderStyle"/>
    </xsl:call-template>
@@ -7705,6 +7786,7 @@
       <xsl:param name="docid"/>
       <xsl:param name="entityindex"/>
       <xsl:param name="entitytype"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntity</xsl:text></xsl:message></xsl:if>
     <table class="dataset-entity-part">
       <tr>
         <td class="dataset-entity-part-header"><h3>Data Resource, other</h3></td>
@@ -7741,6 +7823,7 @@
     <xsl:param name="otherentitysubHeaderStyle"/>
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntityCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
        <xsl:call-template name="entityName">
           <xsl:with-param name="entityfirstColStyle" select="$otherentityfirstColStyle"/>
@@ -7851,7 +7934,8 @@
      <xsl:param name="entitytype">otherEntity</xsl:param>
      <xsl:param name="entityindex"/>
      <xsl:param name="physicalindex"/>
-     <xsl:for-each select="distribution">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntityShowDistribution</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="distribution">
       <tr><td colspan="2">
         <xsl:call-template name="distribution">
           <xsl:with-param name="docid" select="$docid"/>
@@ -7873,6 +7957,7 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">otherEntity</xsl:param>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntityAttributeList</xsl:text></xsl:message></xsl:if>
     <tr><td class="{$otherentitysubHeaderStyle}" colspan="2">
         <xsl:text>Attribute(s) Info:</xsl:text>
     </td></tr>
@@ -7896,7 +7981,8 @@
       <xsl:param name="distributionindex"/>
       <xsl:param name="physicalfirstColStyle"/>
       <xsl:param name="notshowdistribution"/>
-      <table class="{$tabledefaultStyle}">
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physical</xsl:text></xsl:message></xsl:if>
+     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -7927,6 +8013,7 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="physicalindex"/>
     <xsl:param name="distributionindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalcommon</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="physicalobjectName">
       <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
     </xsl:call-template>
@@ -7972,6 +8059,7 @@
 
   <xsl:template name="physicalobjectName">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalobjectName</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="objectName">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -7984,6 +8072,7 @@
 
   <xsl:template name="physicalsize">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalsize</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="size">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -7996,6 +8085,7 @@
 
   <xsl:template name="physicalauthentication">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalauthentication</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="authentication">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8012,6 +8102,7 @@
 
   <xsl:template name="physicalcompressionMethod">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalcompressionMethod</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="compressionMethod">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8024,6 +8115,7 @@
 
   <xsl:template name="physicalencodingMethod">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalencodingMethod</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="encodingMethod">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8036,6 +8128,7 @@
 
   <xsl:template name="physicalcharacterEncoding">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalcharacterEncoding</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="characterEncoding">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8049,7 +8142,8 @@
   <!-- TextFormat templates -->
   <xsl:template name="physicaltextFormat">
    <xsl:param name="physicalfirstColStyle"/>
-   <xsl:for-each select="dataFormat/textFormat">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicaltextFormat</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="dataFormat/textFormat">
       <tr>
         <td class="{$physicalfirstColStyle}">
         Text Format:</td>
@@ -8065,32 +8159,36 @@
   </xsl:template>
 
   <xsl:template match="numHeaderLines">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Number of Header Lines:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: numHeaderLines</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Number of Header Lines:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="numFooterLines">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Number of Foot Lines:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: numFooterLines</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Number of Foot Lines:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="recordDelimiter">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Record Delimiter:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: recordDelimiter</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Record Delimiter:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="physicalLineDelimiter">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalLineDelimiter</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$physicalfirstColStyle}">Line Delimiter:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
@@ -8098,7 +8196,8 @@
 
   <xsl:template match="numPhysicalLinesPerRecord">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: numPhysicalLinesPerRecord</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$physicalfirstColStyle}">Line Number For One Record:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
@@ -8106,36 +8205,40 @@
 
   <xsl:template match="maxRecordLength">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: maxRecordLength</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$physicalfirstColStyle}">Maximum Record Length:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
   </xsl:template>
 
   <xsl:template match="attributeOrientation">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Orientation:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: attributeOrientation</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Orientation:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="simpleDelimited">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Simple Delimited:</td>
-        <td >
-          <table class="{$tabledefaultStyle}">
-            <xsl:apply-templates>
-              <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
-            </xsl:apply-templates>
-          </table>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: simpleDelimited</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Simple Delimited:</td>
+      <td>
+        <table class="{$tabledefaultStyle}">
+          <xsl:apply-templates>
+            <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
+          </xsl:apply-templates>
+        </table>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="complex">
-        <xsl:param name="physicalfirstColStyle"/>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: complex</xsl:text></xsl:message></xsl:if>
         <tr>
         <td class="{$physicalfirstColStyle}">Complex Delimited:</td>
         <td >
@@ -8152,44 +8255,48 @@
   </xsl:template>
 
   <xsl:template name="textFixed">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Text Fixed:</td>
-        <td >
-          <table class="{$tabledefaultStyle}">
-            <xsl:apply-templates>
-              <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
-            </xsl:apply-templates>
-          </table>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: textFixed</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Text Fixed:</td>
+      <td>
+        <table class="{$tabledefaultStyle}">
+          <xsl:apply-templates>
+            <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
+          </xsl:apply-templates>
+        </table>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="textDelimited">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Text Delimited:</td>
-        <td >
-          <table class="{$tabledefaultStyle}">
-            <xsl:apply-templates>
-              <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
-            </xsl:apply-templates>
-          </table>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: textDelimited</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Text Delimited:</td>
+      <td>
+        <table class="{$tabledefaultStyle}">
+          <xsl:apply-templates>
+            <xsl:with-param name="physicalfirstColStyle" select="$physicalfirstColStyle"/>
+          </xsl:apply-templates>
+        </table>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="quoteCharacter">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Quote Character:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: quoteCharacter</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Quote Character:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
    <xsl:template match="literalCharacter">
        <xsl:param name="physicalfirstColStyle"/>
-       <tr>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: literalCharacter</xsl:text></xsl:message></xsl:if>
+     <tr>
         <td class="{$firstColStyle}">Literal Character:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
@@ -8197,7 +8304,8 @@
 
   <xsl:template match="fieldDelimiter">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: fieldDelimiter</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$firstColStyle}">Field Delimeter:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
@@ -8205,21 +8313,24 @@
 
   <xsl:template match="fieldWidth">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr><td class="{$firstColStyle}">Field Width:</td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: fieldWidth</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$firstColStyle}">Field Width:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
   </xsl:template>
 
   <xsl:template match="lineNumber">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr><td class="{$firstColStyle}">Line Number:</td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: lineNumber</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$firstColStyle}">Line Number:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
   </xsl:template>
 
   <xsl:template match="fieldStartColumn">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: fieldStartColumn</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$firstColStyle}">Field Start Column:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
@@ -8228,6 +8339,7 @@
   <!-- externallyDefinedFormat templates -->
   <xsl:template name="physicalexternallyDefinedFormat">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalexternallyDefinedFormat</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="dataFormat/externallyDefinedFormat">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8245,6 +8357,7 @@
   
   <xsl:template match="formatName">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalfirstColStyle</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
         <tr>
         <td class="{$firstColStyle}">Format Name:</td>
@@ -8255,28 +8368,31 @@
 
   <xsl:template match="formatVersion">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: formatVersion</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$firstColStyle}">Format Version:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
   </xsl:template>
 
   <xsl:template match="citation">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$physicalfirstColStyle}">Citation: </td>
-        <td>
-          <xsl:call-template name="citation">
-            <xsl:with-param name="citationfirstColStyle" select="$physicalfirstColStyle"/>
-             <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
-          </xsl:call-template>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citation (match)</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$physicalfirstColStyle}">Citation: </td>
+      <td>
+        <xsl:call-template name="citation">
+          <xsl:with-param name="citationfirstColStyle" select="$physicalfirstColStyle"/>
+          <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
+        </xsl:call-template>
+      </td>
+    </tr>
   </xsl:template>
 
   <!-- binaryRasterFormat templates -->
   <xsl:template name="physicalbinaryRasterFormat">
     <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: physicalbinaryRasterFormat</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="dataFormat/binaryRasterFormat">
       <tr>
         <td class="{$physicalfirstColStyle}">
@@ -8293,18 +8409,18 @@
   </xsl:template>
 
   <xsl:template match="rowColumnOrientation">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Orientation:</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: rowColumnOrientation</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Orientation:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="multiBand">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: multiBand</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$firstColStyle}">Multiple Bands:</td>
         <td>
          <table class="{$tabledefaultStyle}">
@@ -8327,7 +8443,8 @@
 
   <xsl:template match="nbits">
         <xsl:param name="physicalfirstColStyle"/>
-        <tr>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: nbits</xsl:text></xsl:message></xsl:if>
+    <tr>
         <td class="{$firstColStyle}">Number of Bits (/pixel/band):</td>
         <td class="{$secondColStyle}">
           <xsl:value-of select="."/>
@@ -8336,59 +8453,55 @@
   </xsl:template>
 
   <xsl:template match="byteorder">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Byte Order:</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: byteorder</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Byte Order:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="skipbytes">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Skipped Bytes:</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: skipbytes</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Skipped Bytes:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="bandrowbytes">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Number of Bytes (/band/row):</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: bandrowbytes</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Number of Bytes (/band/row):</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="totalrowbytes">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Total Number of Byte (/row):</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: totalrowbytes</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Total Number of Byte (/row):</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="bandgapbytes">
-        <xsl:param name="physicalfirstColStyle"/>
-        <tr>
-        <td class="{$firstColStyle}">Number of Bytes between Bands:</td>
-        <td class="{$secondColStyle}">
-          <xsl:value-of select="."/>
-        </td>
-        </tr>
+    <xsl:param name="physicalfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: bandgapbytes</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$firstColStyle}">Number of Bytes between Bands:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
 <!-- eml-project-2.0.0.xsl -->
    <xsl:template name="project">
       <xsl:param name="projectfirstColStyle"/>
-      <table class="{$tabledefaultStyle}">
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: project</xsl:text></xsl:message></xsl:if>
+     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -8410,6 +8523,7 @@
 
   <xsl:template name="projectcommon">
     <xsl:param name="projectfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectcommon</xsl:text></xsl:message></xsl:if>
     <xsl:call-template name="projecttitle">
       <xsl:with-param name="projectfirstColStyle" select="$projectfirstColStyle"/>
     </xsl:call-template>
@@ -8435,6 +8549,7 @@
 
    <xsl:template name="projecttitle">
      <xsl:param name="projectfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projecttitle</xsl:text></xsl:message></xsl:if>
      <xsl:for-each select="title">
         <tr><td class="{$projectfirstColStyle}">
              Title:
@@ -8448,7 +8563,8 @@
 
   <xsl:template name="projectpersonnel">
      <xsl:param name="projectfirstColStyle"/>
-     <tr><td class="{$projectfirstColStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectpersonnel</xsl:text></xsl:message></xsl:if>
+    <tr><td class="{$projectfirstColStyle}">
           Personnel:
           </td>
           <td>
@@ -8482,6 +8598,7 @@
 
    <xsl:template name="projectabstract">
      <xsl:param name="projectfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectabstract</xsl:text></xsl:message></xsl:if>
      <xsl:for-each select="abstract">
        <tr><td class="{$projectfirstColStyle}">
           Abstract:
@@ -8497,7 +8614,8 @@
 
   <xsl:template name="projectfunding">
      <xsl:param name="projectfirstColStyle"/>
-     <xsl:for-each select="funding">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectfunding</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="funding">
        <tr><td class="{$projectfirstColStyle}">
           Funding:
           </td>
@@ -8512,6 +8630,7 @@
 
    <xsl:template name="projectstudyareadescription">
      <xsl:param name="projectfirstColStyle"/>
+     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectstudyareadescription</xsl:text></xsl:message></xsl:if>
      <xsl:for-each select="studyAreaDescription">
        <tr><td class="{$projectfirstColStyle}">
            <xsl:text>Study Area:</xsl:text>
@@ -8575,6 +8694,7 @@
 
   <xsl:template name="projectdesigndescription">
     <xsl:param name="projectfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectdesigndescription</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="designDescription">
        <xsl:for-each select="description">
         <tr><td class="{$projectfirstColStyle}">
@@ -8599,6 +8719,7 @@
 
   <xsl:template name="projectrelatedproject">
     <xsl:param name="projectfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: projectrelatedproject</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="relatedProject">
        <tr><td class="{$projectfirstColStyle}">
           Related Project:
@@ -8620,7 +8741,8 @@
   <xsl:template name="protocol">
     <xsl:param name="protocolfirstColStyle"/>
     <xsl:param name="protocolsubHeaderStyle"/>
-   <table class="{$tabledefaultStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: protocol</xsl:text></xsl:message></xsl:if>
+    <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -8642,28 +8764,28 @@
      </table>
   </xsl:template>
 
-   <xsl:template name="protocolcommon">
-        <xsl:param name="protocolfirstColStyle"/>
-        <xsl:param name="protocolsubHeaderStyle"/> 
-	<!-- template for protocol shows minimum elements (author, title, dist) -->
-       <xsl:call-template name="protocol_simple">
-           <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
-           <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
-        </xsl:call-template>
-        <xsl:for-each select="proceduralStep">
-          <tr><td colspan="2" class="{$protocolsubHeaderStyle}">
-              Step<xsl:text> </xsl:text><xsl:value-of select="position()"/>:
-              </td>
-          </tr>
-          <xsl:call-template name="step">
-              <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
-              <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
-          </xsl:call-template>
-        </xsl:for-each>
-        <xsl:call-template name="protocolAccess">
-              <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
-              <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
-        </xsl:call-template>
+  <xsl:template name="protocolcommon">
+    <xsl:param name="protocolfirstColStyle"/>
+    <xsl:param name="protocolsubHeaderStyle"/> 
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: protocolcommon</xsl:text></xsl:message></xsl:if>
+    <!-- template for protocol shows minimum elements (author, title, dist) -->
+    <xsl:call-template name="protocol_simple">
+      <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
+      <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+    </xsl:call-template>
+    <xsl:for-each select="proceduralStep">
+      <tr>
+        <td colspan="2" class="{$protocolsubHeaderStyle}">Step<xsl:text> </xsl:text><xsl:value-of select="position()"/>:</td>
+      </tr>
+      <xsl:call-template name="step">
+        <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
+        <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+      </xsl:call-template>
+    </xsl:for-each>
+    <xsl:call-template name="protocolAccess">
+      <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
+      <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- this template creates a small table for a protocol tree with minimum required 
@@ -8672,140 +8794,121 @@
        toplevel, and that style is too prominent for this location. use modes? 
        but all calls to resource templates would be affected.
   -->
-	<xsl:template name="protocol_simple">
-	  <xsl:param name="protocolfirstColStyle"/>
-		<xsl:param name="protocolsubHeaderStyle"/>
-	<!--	<table class="{$tabledefaultStyle}">  -->
-		<xsl:for-each select="creator/individualName/surName">
+  <xsl:template name="protocol_simple">
+    <xsl:param name="protocolfirstColStyle"/>
+    <xsl:param name="protocolsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: protocol_simple</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="creator/individualName/surName">
       <tr>	
-				<td class="{$protocolfirstColStyle}">
-				<xsl:text>Author: </xsl:text>
-				</td>
-				<td><xsl:value-of select="."/>
-				</td>
+				<td class="{$protocolfirstColStyle}"><xsl:text>Author: </xsl:text></td>
+				<td><xsl:value-of select="."/></td>
       </tr>
-	</xsl:for-each>
+  	</xsl:for-each>
     <xsl:for-each select="title">
       <tr>
-        <td class="{$protocolfirstColStyle}">
-        <xsl:text>Title: </xsl:text>
-        </td>
-        <td><xsl:value-of select="."/>
-        </td>
+        <td class="{$protocolfirstColStyle}"><xsl:text>Title: </xsl:text></td>
+        <td><xsl:value-of select="."/></td>
       </tr>
-  </xsl:for-each>
-  <xsl:for-each select="distribution">
-      <!--<tr>
-        <td>
-         the template 'distribution' in eml-distribution.2.0.0.xsl. seems to be for
-				data tables. use the resourcedistribution template instead (eml-resource.2.0.0.xsl)  -->
-            <xsl:call-template name="resourcedistribution">
-              <xsl:with-param name="resfirstColStyle" select="$protocolfirstColStyle"/>
-              <xsl:with-param name="ressubHeaderStyle" select="$protocolsubHeaderStyle"/> 
-					  </xsl:call-template>
-			 <!-- </td>
-      </tr>  -->
-  </xsl:for-each>
-  <!-- </table> -->
+    </xsl:for-each>
+    <xsl:for-each select="distribution">
+      <!--the template 'distribution' in eml-distribution.2.0.0.xsl. seems to be for
+			  	data tables. use the resourcedistribution template instead (eml-resource.2.0.0.xsl) -->
+      <xsl:call-template name="resourcedistribution">
+        <xsl:with-param name="resfirstColStyle" select="$protocolfirstColStyle"/>
+        <xsl:with-param name="ressubHeaderStyle" select="$protocolsubHeaderStyle"/> 
+	    </xsl:call-template>
+    </xsl:for-each>
 	</xsl:template>
 
   <!-- 'step' refers to ProcedureStepType, ie, methodStep (w/o optional dataSource)
-	(called from method.xsl, and here, from nested subStep)
-	mob added the table element to box each step 
-	-->
+	     (called from method.xsl, and here, from nested subStep)
+	     mob added the table element to box each step -->
   <xsl:template name="step">
     <xsl:param name="protocolfirstColStyle"/>
     <xsl:param name="protocolsubHeaderStyle"/>
-		<table class="{$tabledefaultStyle}">
-    <xsl:for-each select="description">
-      <tr><td class="{$protocolfirstColStyle}">
-          Description:
-          </td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: step</xsl:text></xsl:message></xsl:if>
+    <table class="{$tabledefaultStyle}">
+      <xsl:for-each select="description">
+        <tr>
+          <td class="{$protocolfirstColStyle}">Description:</td>
           <td>
-             <xsl:call-template name="text">
-               <xsl:with-param name="textfirstColStyle" select="$protocolfirstColStyle"/>
-             </xsl:call-template>
+            <xsl:call-template name="text">
+              <xsl:with-param name="textfirstColStyle" select="$protocolfirstColStyle"/>
+            </xsl:call-template>
           </td>
-      </tr>
-     </xsl:for-each>
-    <xsl:for-each select="citation">
-      <tr><td class="{$protocolfirstColStyle}">
-          Citation:
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="citation">
+        <tr>
+          <td class="{$protocolfirstColStyle}">Citation:</td>
+          <td class="{$secondColStyle}">&#160;</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="citation">
+              <xsl:with-param name="citationfirstColStyle" select="$protocolfirstColStyle"/>
+              <xsl:with-param name="citationsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+            </xsl:call-template>
           </td>
-          <td class="{$secondColStyle}">
-           &#160;
-          </td>
-      </tr>
-      <tr><td colspan="2">
-          <xsl:call-template name="citation">
-            <xsl:with-param name="citationfirstColStyle" select="$protocolfirstColStyle"/>
-            <xsl:with-param name="citationsubHeaderStyle" select="$protocolsubHeaderStyle"/>
-          </xsl:call-template>
-          </td>
-      </tr>
-    </xsl:for-each>
-     <xsl:for-each select="protocol">
-      <tr><td class="{$protocolfirstColStyle}">
-          Protocol:
-          </td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="protocol">
+        <tr>
+          <td class="{$protocolfirstColStyle}">Protocol:</td>
           <td class="{$secondColStyle}">    
 					<!-- mob nested this table in col2, instead of new row. -->
-	       <xsl:call-template name="protocol">
-            <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
-            <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
-          </xsl:call-template>
+	          <xsl:call-template name="protocol">
+              <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
+              <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+            </xsl:call-template>
           </td>
 	      </tr>  
-    </xsl:for-each>
-    <xsl:for-each select="instrumentation">
-        <tr><td class="{$protocolfirstColStyle}">
-          Instrument(s):
-          </td>
-          <td class="{$secondColStyle}">
-            <xsl:value-of select="."/>
-          </td>
+      </xsl:for-each>
+      <xsl:for-each select="instrumentation">
+        <tr>
+          <td class="{$protocolfirstColStyle}">Instrument(s):</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>        
-    </xsl:for-each>	
-    <xsl:for-each select="software">
-     <tr><td colspan="2">
-          <xsl:call-template name="software">
-            <xsl:with-param name="softwarefirstColStyle" select="$protocolfirstColStyle"/>
-            <xsl:with-param name="softwaresubHeaderStyle" select="$protocolsubHeaderStyle"/>
-          </xsl:call-template>
+      </xsl:for-each>	
+      <xsl:for-each select="software">
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="software">
+              <xsl:with-param name="softwarefirstColStyle" select="$protocolfirstColStyle"/>
+              <xsl:with-param name="softwaresubHeaderStyle" select="$protocolsubHeaderStyle"/>
+            </xsl:call-template>
           </td>
-      </tr>
-    </xsl:for-each>
-    <xsl:for-each select="subStep">
-      <tr><td class="{$protocolfirstColStyle}">
-          Substep<xsl:text> </xsl:text><xsl:value-of select="position()"/>
-          </td>
-          <td class="{$secondColStyle}">
-           &#160;
-          </td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="subStep">
+        <tr>
+          <td class="{$protocolfirstColStyle}">Substep<xsl:text> </xsl:text><xsl:value-of select="position()"/></td>
+          <td class="{$secondColStyle}">&#160;</td>
 					<td>  <!-- correct? was outside of table -->
-						<xsl:call-template name="step">
-						<xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
-						<xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
+            <xsl:call-template name="step">
+						  <xsl:with-param name="protocolfirstColStyle" select="$protocolfirstColStyle"/>
+						  <xsl:with-param name="protocolsubHeaderStyle" select="$protocolsubHeaderStyle"/>
 						</xsl:call-template>
 					</td>
-		  </tr>						
-    </xsl:for-each>
-		</table>  <!-- matches table at start of step -->
+		    </tr>						
+      </xsl:for-each>
+		</table>
   </xsl:template> 
-	<!-- end of template name="step" -->
   
 	<!-- ? needed? no access elements here. -->
   <xsl:template name="protocolAccess">
     <xsl:param name="protocolfirstColStyle"/>
     <xsl:param name="protocolsubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: protocolAccess</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="access">
-      <tr><td colspan="2">
-         <xsl:call-template name="access">
-           <xsl:with-param name="accessfirstColStyle" select="$protocolfirstColStyle"/>
-           <xsl:with-param name="accesssubHeaderStyle" select="$protocolsubHeaderStyle"/>
-         </xsl:call-template>
-         </td>
-       </tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="access">
+            <xsl:with-param name="accessfirstColStyle" select="$protocolfirstColStyle"/>
+            <xsl:with-param name="accesssubHeaderStyle" select="$protocolsubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -8815,7 +8918,8 @@
     <xsl:param name="resfirstColStyle"/>
     <xsl:param name="ressubHeaderStyle"/>
     <xsl:param name="creator">Data Set Owner(s):</xsl:param>
-      <!--
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resource</xsl:text></xsl:message></xsl:if>
+    <!--
       <xsl:for-each select="alternateIdentifier">
         <xsl:call-template name="resourcealternateIdentifier">
           <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
@@ -8927,100 +9031,117 @@
 
   <!-- style the alternate identifier elements -->
   <xsl:template name="resourcealternateIdentifier" >
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:param name="ressecondColStyle"/>
-      <xsl:if test="normalize-space(.)!=''">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcealternateIdentifier</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(.)!=''">
       <tr>
         <td class="{$resfirstColStyle}">Alternate Identifier:</td>
         <td class="{$ressecondColStyle}"><xsl:value-of select="."/></td>
       </tr>
-      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <!-- style the short name elements -->
   <xsl:template name="resourceshortName">
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:param name="ressecondColStyle"/>
-      <xsl:if test="normalize-space(.)!=''">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceshortName</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(.)!=''">
       <tr>
         <td class="{$resfirstColStyle}">Short Name:</td>
         <td class="{$ressecondColStyle}"><xsl:value-of select="."/></td>
       </tr>
-      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <!-- style the title element -->
   <xsl:template name="resourcetitle" >
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:param name="ressecondColStyle"/>
-      <xsl:if test="normalize-space(.)!=''">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcetitle</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(.)!=''">
       <tr>
         <td class="{$resfirstColStyle}">Title:</td>
-        <td class="{$ressecondColStyle}">
-          <em class="bold"><xsl:value-of select="."/></em>
-        </td>
+        <td class="{$ressecondColStyle}"><em class="bold"><xsl:value-of select="."/></em></td>
       </tr>
-      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="resourcecreator" >
-      <xsl:param name="resfirstColStyle"/>
-      <tr><td colspan="2">
-       <xsl:call-template name="party">
-              <xsl:with-param name="partyfirstColStyle" select="$resfirstColStyle"/>
-       </xsl:call-template>
-      </td></tr>
-   </xsl:template>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcecreator</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="party">
+          <xsl:with-param name="partyfirstColStyle" select="$resfirstColStyle"/>
+        </xsl:call-template>
+      </td>
+    </tr>
+  </xsl:template>
 
   <xsl:template name="resourcemetadataProvider" >
-      <xsl:param name="resfirstColStyle"/>
-      <tr><td colspan="2">
-      <xsl:call-template name="party">
-            <xsl:with-param name="partyfirstColStyle" select="$resfirstColStyle"/>
-      </xsl:call-template>
-      </td></tr>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcemetadataProvider</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="party">
+          <xsl:with-param name="partyfirstColStyle" select="$resfirstColStyle"/>
+        </xsl:call-template>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="resourceassociatedParty">
-      <xsl:param name="resfirstColStyle"/>
-      <tr><td colspan="2">
-      <xsl:call-template name="party">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceassociatedParty</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="party">
           <xsl:with-param name="partyfirstColStyle" select="$resfirstColStyle"/>
-      </xsl:call-template>
-      </td></tr>
+        </xsl:call-template>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="resourcepubDate">
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:if test="normalize-space(../pubDate)!=''">
-      <tr><td class="{$resfirstColStyle}">
-        Publication Date:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="../pubDate"/></td></tr>
-      </xsl:if>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcepubDate</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(../pubDate)!=''">
+      <tr>
+        <td class="{$resfirstColStyle}">Publication Date:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="../pubDate"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="resourcelanguage">
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$resfirstColStyle}">
-        Language:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
-      </xsl:if>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcelanguage</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(.) != ''">
+      <tr>
+        <td class="{$resfirstColStyle}">Language:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="resourceseries">
-      <xsl:param name="resfirstColStyle"/>
-      <xsl:if test="normalize-space(../series)!=''">
-      <tr><td class="{$resfirstColStyle}">
-        Series:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="../series"/></td></tr>
-      </xsl:if>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceseries</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(../series)!=''">
+      <tr>
+        <td class="{$resfirstColStyle}">Series:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="../series"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="resourceabstract">
-     <xsl:param name="resfirstColStyle"/>
-     <xsl:param name="ressecondColStyle"/>
-     <tr>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceabstract</xsl:text></xsl:message></xsl:if>
+    <tr>
        <td class="{$resfirstColStyle}"><xsl:text>Abstract:</xsl:text></td>
        <td>
          <xsl:call-template name="abstracttext">
@@ -9042,14 +9163,15 @@
   </xsl:template>-->
 
   <xsl:template name="resourcekeywordSet">
-      <xsl:for-each select="keywordThesaurus">
-   <!--
-	 <xsl:if test="normalize-space(.)!=''">
-          <xsl:value-of select="."/>
-          <xsl:text>: </xsl:text>
-        </xsl:if>
-   -->
-        <xsl:if test="normalize-space(keyword)!=''">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcekeywordSet</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="keywordThesaurus">
+      <!--
+	    <xsl:if test="normalize-space(.)!=''">
+        <xsl:value-of select="."/>
+        <xsl:text>: </xsl:text>
+      </xsl:if>
+      -->
+      <xsl:if test="normalize-space(keyword)!=''">
         <ul>
           <xsl:for-each select="keyword">
             <li><xsl:value-of select="."/>
@@ -9061,67 +9183,73 @@
             </li>
           </xsl:for-each>
         </ul>
-        </xsl:if>
-      </xsl:for-each>
-        <xsl:if test="normalize-space(keyword)!=''">
-        <ul>
-          <xsl:for-each select="keyword">
-            <li><xsl:value-of select="."/>
-            <!--            <xsl:if test="./@keywordType and normalize-space(./@keywordType)!=''">
-              (<xsl:value-of select="./@keywordType"/>)
-            </xsl:if>
-            -->
-            </li>
-          </xsl:for-each>
-        </ul>
-        </xsl:if>
-  </xsl:template>
-
-  <xsl:template name="resourcekeywordsAsPara">
-    <xsl:if test="normalize-space(keyword[1])!=''">
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:if test="normalize-space(keyword)!=''">
+      <ul>
         <xsl:for-each select="keyword">
-          <xsl:value-of select="."/>
-          <xsl:if test="position() != last()">
-          <xsl:text>,&#160;</xsl:text>
+          <li><xsl:value-of select="."/>
+          <!--            <xsl:if test="./@keywordType and normalize-space(./@keywordType)!=''">
+            (<xsl:value-of select="./@keywordType"/>)
           </xsl:if>
-            <!-- don't print the icky-looking attribute!            
-              <xsl:if test="./@keywordType and normalize-space(./@keywordType)!=''">
-              (<xsl:value-of select="./@keywordType"/>)
-              </xsl:if>
-            -->      
+          -->
+          </li>
         </xsl:for-each>
+      </ul>
     </xsl:if>
   </xsl:template>
 
-   <xsl:template name="resourceadditionalInfo">
-     <xsl:param name="ressubHeaderStyle"/>
-     <xsl:param name="resfirstColStyle"/>
-     <tr><td class="{$ressubHeaderStyle}" colspan="2">
-        <xsl:text>Additional Information:</xsl:text>
-     </td></tr>
-     <tr><td class="{$resfirstColStyle}">&#160;</td>
-         <td>
-           <xsl:call-template name="text">
-             <xsl:with-param name="textfirstColStyle" select="$resfirstColStyle"/>
-           </xsl:call-template>
-         </td>
-     </tr>
+  <xsl:template name="resourcekeywordsAsPara">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcekeywordsAsPara</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(keyword[1])!=''">
+      <xsl:for-each select="keyword">
+        <xsl:value-of select="."/>
+        <xsl:if test="position() != last()">
+          <xsl:text>,&#160;</xsl:text>
+        </xsl:if>
+        <!-- don't print the icky-looking attribute!            
+        <xsl:if test="./@keywordType and normalize-space(./@keywordType)!=''">
+          (<xsl:value-of select="./@keywordType"/>)
+        </xsl:if>
+        -->      
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
-   <xsl:template name="resourceintellectualRights">
-     <xsl:param name="resfirstColStyle"/>
-     <xsl:param name="ressecondColStyle"/>
-       <xsl:call-template name="text">
-         <xsl:with-param name="textsecondColStyle" select="$ressecondColStyle"/>
-       </xsl:call-template>
+  <xsl:template name="resourceadditionalInfo">
+    <xsl:param name="ressubHeaderStyle"/>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceadditionalInfo</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$ressubHeaderStyle}" colspan="2"><xsl:text>Additional Information:</xsl:text></td>
+    </tr>
+    <tr>
+      <td class="{$resfirstColStyle}">&#160;</td>
+      <td>
+        <xsl:call-template name="text">
+          <xsl:with-param name="textfirstColStyle" select="$resfirstColStyle"/>
+        </xsl:call-template>
+      </td>
+    </tr>
   </xsl:template>
 
-   <xsl:template name="resourcedistribution">
-     <xsl:param name="ressubHeaderStyle"/>
-     <xsl:param name="resfirstColStyle"/>
-     <xsl:param name="index"/>
-     <xsl:param name="docid"/>
-     <tr><td colspan="2">
+  <xsl:template name="resourceintellectualRights">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourceintellectualRights</xsl:text></xsl:message></xsl:if>
+    <xsl:call-template name="text">
+      <xsl:with-param name="textsecondColStyle" select="$ressecondColStyle"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="resourcedistribution">
+    <xsl:param name="ressubHeaderStyle"/>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="index"/>
+    <xsl:param name="docid"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcedistribution</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td colspan="2">
         <xsl:call-template name="distribution">
           <xsl:with-param name="disfirstColStyle" select="$resfirstColStyle"/>
           <xsl:with-param name="dissubHeaderStyle" select="$ressubHeaderStyle"/>
@@ -9129,22 +9257,26 @@
           <xsl:with-param name="distributionindex" select="$index"/>
           <xsl:with-param name="docid" select="$docid"/>
         </xsl:call-template>
-     </td></tr>
+     </td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="resourcecoverage">
-     <xsl:param name="ressubHeaderStyle"/>
-     <xsl:param name="resfirstColStyle"/>
-     <tr><td colspan="2">
-        <xsl:call-template name="coverage">
-        </xsl:call-template>
-     </td></tr>
+    <xsl:param name="ressubHeaderStyle"/>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcecoverage</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="coverage"></xsl:call-template>
+     </td>
+    </tr>
   </xsl:template>
 
   <!-- eml-software-2.0.0.xsl -->
   <xsl:template name="software">
     <xsl:param name="softwarefirstColStyle"/>
     <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: software</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -9168,194 +9300,159 @@
   </xsl:template>
 
   <xsl:template name="softwarecommon">
-        <xsl:param name="softwarefirstColStyle"/>
-        <xsl:param name="softwaresubHeaderStyle"/>
-        <tr><td class="{$softwaresubHeaderStyle}" colspan="2">
+    <xsl:param name="softwarefirstColStyle"/>
+    <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: softwarecommon</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$softwaresubHeaderStyle}" colspan="2">
         <xsl:text>Software:</xsl:text></td></tr>
         <xsl:call-template name="resource">
-           <xsl:with-param name="resfirstColStyle" select="$softwarefirstColStyle"/>
-           <xsl:with-param name="ressubHeaderStyle" select="$softwaresubHeaderStyle"/>
-           <xsl:with-param name="creator">Author(s):</xsl:with-param>
+          <xsl:with-param name="resfirstColStyle" select="$softwarefirstColStyle"/>
+          <xsl:with-param name="ressubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          <xsl:with-param name="creator">Author(s):</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="implementation">
-           <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-           <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
         </xsl:call-template>
-         <xsl:for-each select="dependency">
-          <tr><td class="{$softwarefirstColStyle}">
-                Dependency
-                </td>
-                <td class="{$secondColStyle}">
-                 &#160;
-                </td>
-           </tr>
-           <xsl:call-template name="dependency">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
-           </xsl:call-template>
+        <xsl:for-each select="dependency">
+          <tr>
+            <td class="{$softwarefirstColStyle}">Dependency</td>
+            <td class="{$secondColStyle}">&#160;</td>
+          </tr>
+          <xsl:call-template name="dependency">
+            <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+            <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          </xsl:call-template>
         </xsl:for-each>
         <xsl:call-template name="licenseURL">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
         </xsl:call-template>
         <xsl:call-template name="license">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
         </xsl:call-template>
         <xsl:call-template name="version">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <!-- <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
         </xsl:call-template>
         <xsl:call-template name="softwareAccess">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
         </xsl:call-template>
         <xsl:call-template name="softwareProject">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
         </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="implementation">
-     <xsl:param name="softwarefirstColStyle"/>
-     <xsl:param name="softwaresubHeaderStyle"/>
-     <xsl:for-each select="implementation">
-        <tr><td colspan="2" class="{$softwaresubHeaderStyle}">
-             Implementation Info:
-            </td>
+    <xsl:param name="softwarefirstColStyle"/>
+    <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: implementation</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="implementation">
+      <tr>
+        <td colspan="2" class="{$softwaresubHeaderStyle}">Implementation Info:</td>
+      </tr>
+      <xsl:for-each select="distribution">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Distribution:</td>
+          <td>
+            <xsl:call-template name="distribution">
+              <xsl:with-param name="disfirstColStyle" select="$softwarefirstColStyle"/>
+              <xsl:with-param name="dissubHeaderStyle" select="$softwaresubHeaderStyle"/>
+            </xsl:call-template>
+          </td>
         </tr>
-        <xsl:for-each select="distribution">
-           <tr><td class="{$softwarefirstColStyle}">
-             Distribution:
-            </td>
-            <td>
-               <xsl:call-template name="distribution">
-                 <xsl:with-param name="disfirstColStyle" select="$softwarefirstColStyle"/>
-                 <xsl:with-param name="dissubHeaderStyle" select="$softwaresubHeaderStyle"/>
-               </xsl:call-template>
-            </td>
+      </xsl:for-each>
+      <xsl:for-each select="size">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Size:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
         </tr>
-        </xsl:for-each>
-        <xsl:for-each select="size">
-           <tr><td class="{$softwarefirstColStyle}">
-             Size:
-            </td>
-            <td class="{$secondColStyle}">
-             <xsl:value-of select="."/>
-            </td>
+      </xsl:for-each>
+      <xsl:for-each select="language">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Language:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="LanguageValue"/></td>
         </tr>
-        </xsl:for-each>
-        <xsl:for-each select="language">
-           <tr><td class="{$softwarefirstColStyle}">
-                Language:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="LanguageValue"/>
-                </td>
-           </tr>
-           <xsl:if test="LanguageCodeStandard">
-             <tr><td class="{$softwarefirstColStyle}">
-                Language Code Standard:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="LanguageValue"/>
-                </td>
-             </tr>
-           </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select="operatingSystem">
-          <tr><td class="{$softwarefirstColStyle}">
-                Operating System:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="machineProcessor">
-          <tr><td class="{$softwarefirstColStyle}">
-                Operating System:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="virtualMachine">
-          <tr><td class="{$softwarefirstColStyle}">
-                Virtual Machine:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-         <xsl:for-each select="diskUsage">
-          <tr><td class="{$softwarefirstColStyle}">
-                Disk Usage:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="runtimeMemoryUsage">
-          <tr><td class="{$softwarefirstColStyle}">
-                Run Time Memory Usage:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="programmingLanguage">
-          <tr><td class="{$softwarefirstColStyle}">
-                Programming Language:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="checksum">
-          <tr><td class="{$softwarefirstColStyle}">
-                Check Sum:
-                </td>
-                <td class="{$secondColStyle}">
-                  <xsl:value-of select="."/>
-                </td>
-           </tr>
-        </xsl:for-each>
-        <xsl:for-each select="dependency">
-          <tr><td class="{$softwarefirstColStyle}">
-                Dependency:
-                </td>
-                <td class="{$secondColStyle}">
-                 &#160;
-                </td>
-           </tr>
-           <xsl:call-template name="dependency">
-              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-              <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
-           </xsl:call-template>
-        </xsl:for-each>
-     </xsl:for-each>
+        <xsl:if test="LanguageCodeStandard">
+          <tr>
+            <td class="{$softwarefirstColStyle}">Language Code Standard:</td>
+            <td class="{$secondColStyle}"><xsl:value-of select="LanguageValue"/></td>
+          </tr>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="operatingSystem">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Operating System:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="machineProcessor">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Operating System:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="virtualMachine">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Virtual Machine:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="diskUsage">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Disk Usage:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="runtimeMemoryUsage">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Run Time Memory Usage:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="programmingLanguage">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Programming Language:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="checksum">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Check Sum:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="dependency">
+        <tr>
+          <td class="{$softwarefirstColStyle}">Dependency:</td>
+          <td class="{$secondColStyle}">&#160;</td>
+        </tr>
+        <xsl:call-template name="dependency">
+          <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+          <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="dependency">
     <xsl:param name="softwarefirstColStyle"/>
     <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dependency</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="../dependency">
-      <tr><td class="{$softwarefirstColStyle}">
-           <b><xsl:value-of select="action"/></b> <xsl:text> Depend on</xsl:text>
-        </td>
+      <tr>
+        <td class="{$softwarefirstColStyle}"><strong><xsl:value-of select="action"/></strong> <xsl:text> Depend on</xsl:text></td>
         <td>
-            <xsl:for-each select="software">
-               <xsl:call-template name="software">
-                  <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
-                  <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
-               </xsl:call-template>
-            </xsl:for-each>
+          <xsl:for-each select="software">
+            <xsl:call-template name="software">
+              <xsl:with-param name="softwarefirstColStyle" select="$softwarefirstColStyle"/>
+              <xsl:with-param name="softwaresubHeaderStyle" select="$softwaresubHeaderStyle"/>
+            </xsl:call-template>
+          </xsl:for-each>
         </td>
       </tr>
     </xsl:for-each>
@@ -9363,56 +9460,67 @@
 
   <xsl:template name="version">
     <xsl:param name="softwarefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: version</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="version">
-        <tr><td class="{$firstColStyle}">
-        Version Number:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
+      <tr>
+        <td class="{$firstColStyle}">Version Number:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="licenseURL">
     <xsl:param name="softwarefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: licenseURL</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="licenseURL">
-        <tr><td class="{$firstColStyle}">
-            License URL:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
+      <tr>
+        <td class="{$firstColStyle}">License URL:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="license">
     <xsl:param name="softwarefirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: license</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="license">
-        <tr><td class="{$firstColStyle}">
-            License:</td><td class="{$secondColStyle}">
-        <xsl:value-of select="."/></td></tr>
+      <tr>
+        <td class="{$firstColStyle}">License:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="softwareAccess">
     <xsl:param name="softwarefirstColStyle"/>
     <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: softwareAccess</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="access">
-      <tr><td colspan="2">
-         <xsl:call-template name="access">
-           <xsl:with-param name="accessfirstColStyle" select="$softwarefirstColStyle"/>
-           <xsl:with-param name="accesssubHeaderStyle" select="$softwaresubHeaderStyle"/>
-         </xsl:call-template>
-         </td>
-       </tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="access">
+            <xsl:with-param name="accessfirstColStyle" select="$softwarefirstColStyle"/>
+            <xsl:with-param name="accesssubHeaderStyle" select="$softwaresubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="softwareProject">
     <xsl:param name="softwarefirstColStyle"/>
     <xsl:param name="softwaresubHeaderStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: softwareProject</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="project">
-      <tr><td class="{$softwaresubHeaderStyle}" colspan="2">
-        <xsl:text>Project Info:</xsl:text></td></tr>
-      <tr><td colspan="2">
-        <xsl:call-template name="project">
-          <xsl:with-param name="projectfirstColStyle" select="$softwarefirstColStyle"/>
-          <!-- <xsl:with-param name="projectsubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
-        </xsl:call-template>
+      <tr>
+        <td class="{$softwaresubHeaderStyle}" colspan="2"><xsl:text>Project Info:</xsl:text></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="project">
+            <xsl:with-param name="projectfirstColStyle" select="$softwarefirstColStyle"/>
+            <!-- <xsl:with-param name="projectsubHeaderStyle" select="$softwaresubHeaderStyle"/> -->
+          </xsl:call-template>
         </td>
       </tr>
     </xsl:for-each>
@@ -9421,11 +9529,12 @@
   <!-- eml-spatialraster-2.0.0.xsl -->
   <!-- This module is for datatable module-->
   <xsl:template name="spatialRaster">
-      <xsl:param name="spatialrasterfirstColStyle"/>
-      <xsl:param name="spatialrastersubHeaderStyle"/>
-      <xsl:param name="docid"/>
-      <xsl:param name="entityindex"/>
-      <xsl:param name="entitytype"/>
+    <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:param name="spatialrastersubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="entitytype"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRaster</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -9457,6 +9566,7 @@
     <xsl:param name="spatialrastersubHeaderStyle"/>
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRastercommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
        <xsl:call-template name="entityName">
           <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
@@ -9689,28 +9799,30 @@
   </xsl:template>
 
   <!-- spatial reference -->
-    <xsl:template name="spatialReference">
-      <xsl:param name="spatialrasterfirstColStyle"/>
-       <xsl:choose>
-         <xsl:when test="references!=''">
-          <xsl:variable name="ref_id" select="references"/>
-          <xsl:variable name="references" select="$ids[@id=$ref_id]" />
-          <xsl:for-each select="$references">
-            <xsl:call-template name="spatialReferenceCommon">
-              <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise>
-           <xsl:call-template name="spatialReferenceCommon">
-              <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-            </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+  <xsl:template name="spatialReference">
+    <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialReference</xsl:text></xsl:message></xsl:if>
+    <xsl:choose>
+      <xsl:when test="references!=''">
+        <xsl:variable name="ref_id" select="references"/>
+        <xsl:variable name="references" select="$ids[@id=$ref_id]" />
+        <xsl:for-each select="$references">
+          <xsl:call-template name="spatialReferenceCommon">
+            <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="spatialReferenceCommon">
+          <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="spatialReferenceCommon">
     <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialReferenceCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="horizCoordSysName">
        <tr><td class="{$spatialrasterfirstColStyle}">
             Name of Coordinate System:
@@ -9877,7 +9989,8 @@
 
   <xsl:template name="geogCoordSysType">
    <xsl:param name="spatialrasterfirstColStyle"/>
-   <table class="{$tabledefaultStyle}">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geogCoordSysType</xsl:text></xsl:message></xsl:if>
+    <table class="{$tabledefaultStyle}">
       <xsl:for-each select="datum">
         <tr><td class="{$spatialrasterfirstColStyle}">
              Datum:
@@ -9915,7 +10028,6 @@
                        </td>
                    </tr>
                </table>
-
             </td>
         </tr>
       </xsl:for-each>
@@ -9958,6 +10070,7 @@
   <!-- georeferenceinfo -->
   <xsl:template name="georeferenceInfo">
     <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: georeferenceInfo</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="cornerPoint">
         <tr><td class="{$spatialrasterfirstColStyle}">
             Corner Point:
@@ -10109,47 +10222,39 @@
 
   <!-- data quality -->
   <xsl:template name="dataQuality">
-   <xsl:param name="spatialrasterfirstColStyle"/>
-   <xsl:for-each select="accuracyReport">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-             Report:
-            </td>
-            <td class="{$secondColStyle}">
-                <xsl:value-of select="."/>
-            </td>
-       </tr>
-   </xsl:for-each>
-   <xsl:if test="quantitativeAccuracyReport">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-             Quantitative Report:
-            </td>
-            <td>
-                <table class="{$tabledefaultStyle}">
-                  <xsl:for-each select="quantitativeAccuracyReport">
-                     <tr><td class="{$spatialrasterfirstColStyle}">
-                         Accuracy Value:
-                      </td>
-                      <td class="{$secondColStyle}">
-                        <xsl:value-of select="quantitativeAccuracyValue"/>
-                      </td>
-                    </tr>
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                         Method:
-                      </td>
-                      <td class="{$secondColStyle}">
-                        <xsl:value-of select="quantitativeAccuracyMethod"/>
-                      </td>
-                    </tr>
-                  </xsl:for-each>
-                </table>
-            </td>
-       </tr>
-   </xsl:if>
+    <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dataQuality</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="accuracyReport">
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Report:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
+    </xsl:for-each>
+    <xsl:if test="quantitativeAccuracyReport">
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Quantitative Report:</td>
+        <td>
+          <table class="{$tabledefaultStyle}">
+            <xsl:for-each select="quantitativeAccuracyReport">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Accuracy Value:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="quantitativeAccuracyValue"/></td>
+              </tr>
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Method:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="quantitativeAccuracyMethod"/></td>
+              </tr>
+            </xsl:for-each>
+          </table>
+        </td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <!-- imageDescription -->
   <xsl:template name="imageDescription">
     <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: imageDescription</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="illuminationElevationAngle">
         <tr><td class="{$spatialrasterfirstColStyle}">
              Illumination Elevation:
@@ -10283,6 +10388,7 @@
   <!-- band description -->
   <xsl:template name="bandDescription">
     <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: bandDescription</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <xsl:for-each select="sequenceIdentifier">
         <tr><td class="{$spatialrasterfirstColStyle}">
@@ -10333,26 +10439,29 @@
   </xsl:template>
 
   <xsl:template name="spatialRasterShowDistribution">
-     <xsl:param name="spatialrasterfirstColStyle"/>
-     <xsl:param name="spatialrastersubHeaderStyle"/>
-     <xsl:param name="docid"/>
-     <xsl:param name="level">entitylevel</xsl:param>
-     <xsl:param name="entitytype">spatialRaster</xsl:param>
-     <xsl:param name="entityindex"/>
-     <xsl:param name="physicalindex"/>
+    <xsl:param name="spatialrasterfirstColStyle"/>
+    <xsl:param name="spatialrastersubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="level">entitylevel</xsl:param>
+    <xsl:param name="entitytype">spatialRaster</xsl:param>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="physicalindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRasterShowDistribution</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="distribution">
-      <tr><td colspan="2">
-        <xsl:call-template name="distribution">
-          <xsl:with-param name="docid" select="$docid"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="entitytype" select="$entitytype"/>
-          <xsl:with-param name="entityindex" select="$entityindex"/>
-          <xsl:with-param name="physicalindex" select="$physicalindex"/>
-          <xsl:with-param name="distributionindex" select="position()"/>
-          <xsl:with-param name="disfirstColStyle" select="$spatialrasterfirstColStyle"/>
-          <xsl:with-param name="dissubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="distribution">
+            <xsl:with-param name="docid" select="$docid"/>
+            <xsl:with-param name="level" select="$level"/>
+            <xsl:with-param name="entitytype" select="$entitytype"/>
+            <xsl:with-param name="entityindex" select="$entityindex"/>
+            <xsl:with-param name="physicalindex" select="$physicalindex"/>
+            <xsl:with-param name="distributionindex" select="position()"/>
+            <xsl:with-param name="disfirstColStyle" select="$spatialrasterfirstColStyle"/>
+            <xsl:with-param name="dissubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -10362,27 +10471,30 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">spatialRaster</xsl:param>
     <xsl:param name="entityindex"/>
-    <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        <xsl:text>Attribute(s) Info:</xsl:text>
-    </td></tr>
-    <tr><td colspan="2">
-         <xsl:call-template name="attributelist">
-           <xsl:with-param name="docid" select="$docid"/>
-           <xsl:with-param name="entitytype" select="$entitytype"/>
-           <xsl:with-param name="entityindex" select="$entityindex"/>
-         </xsl:call-template>
-       </td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRasterAttributeList</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$spatialrastersubHeaderStyle}" colspan="2"><xsl:text>Attribute(s) Info:</xsl:text></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="attributelist">
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="entitytype" select="$entitytype"/>
+          <xsl:with-param name="entityindex" select="$entityindex"/>
+        </xsl:call-template>
+      </td>
     </tr>
   </xsl:template>
 
   <!-- eml-spatialvector-2.0.0.xsl -->
   <!-- This module is for datatable module-->
   <xsl:template name="spatialVector">
-      <xsl:param name="spatialvectorfirstColStyle"/>
-      <xsl:param name="spatialvectorsubHeaderStyle"/>
-      <xsl:param name="docid"/>
-      <xsl:param name="entityindex"/>
-      <xsl:param name="entitytype"/>
+    <xsl:param name="spatialvectorfirstColStyle"/>
+    <xsl:param name="spatialvectorsubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="entitytype"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVector</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -10414,6 +10526,7 @@
     <xsl:param name="spatialvectorsubHeaderStyle"/>
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVectorcommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
        <xsl:call-template name="entityName">
           <xsl:with-param name="entityfirstColStyle" select="$spatialvectorfirstColStyle"/>
@@ -10558,26 +10671,29 @@
   </xsl:template>
 
   <xsl:template name="spatialVectorShowDistribution">
-     <xsl:param name="spatialvectorfirstColStyle"/>
-     <xsl:param name="spatialvectorsubHeaderStyle"/>
-     <xsl:param name="docid"/>
-     <xsl:param name="level">entitylevel</xsl:param>
-     <xsl:param name="entitytype">spatialVector</xsl:param>
-     <xsl:param name="entityindex"/>
-     <xsl:param name="physicalindex"/>
-     <xsl:for-each select="distribution">
-      <tr><td colspan="2">
-        <xsl:call-template name="distribution">
-          <xsl:with-param name="docid" select="$docid"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="entitytype" select="$entitytype"/>
-          <xsl:with-param name="entityindex" select="$entityindex"/>
-          <xsl:with-param name="physicalindex" select="$physicalindex"/>
-          <xsl:with-param name="distributionindex" select="position()"/>
-          <xsl:with-param name="disfirstColStyle" select="$spatialvectorfirstColStyle"/>
-          <xsl:with-param name="dissubHeaderStyle" select="$spatialvectorsubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+    <xsl:param name="spatialvectorfirstColStyle"/>
+    <xsl:param name="spatialvectorsubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="level">entitylevel</xsl:param>
+    <xsl:param name="entitytype">spatialVector</xsl:param>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="physicalindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVectorShowDistribution</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="distribution">
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="distribution">
+            <xsl:with-param name="docid" select="$docid"/>
+            <xsl:with-param name="level" select="$level"/>
+            <xsl:with-param name="entitytype" select="$entitytype"/>
+            <xsl:with-param name="entityindex" select="$entityindex"/>
+            <xsl:with-param name="physicalindex" select="$physicalindex"/>
+            <xsl:with-param name="distributionindex" select="position()"/>
+            <xsl:with-param name="disfirstColStyle" select="$spatialvectorfirstColStyle"/>
+            <xsl:with-param name="dissubHeaderStyle" select="$spatialvectorsubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -10587,51 +10703,54 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">spatialVector</xsl:param>
     <xsl:param name="entityindex"/>
-    <tr><td class="{$spatialvectorsubHeaderStyle}" colspan="2">
-        <xsl:text>Attribute(s) Info:</xsl:text>
-    </td></tr>
-    <tr><td colspan="2">
-         <xsl:call-template name="attributelist">
-           <xsl:with-param name="docid" select="$docid"/>
-           <xsl:with-param name="entitytype" select="$entitytype"/>
-           <xsl:with-param name="entityindex" select="$entityindex"/>
-         </xsl:call-template>
-       </td>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVectorAttributeList</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$spatialvectorsubHeaderStyle}" colspan="2"><xsl:text>Attribute(s) Info:</xsl:text></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <xsl:call-template name="attributelist">
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="entitytype" select="$entitytype"/>
+          <xsl:with-param name="entityindex" select="$entityindex"/>
+        </xsl:call-template>
+      </td>
     </tr>
   </xsl:template>
 
   <!-- eml-storedprocedure-2.0.0.xsl -->
   <!-- This module is for datatable module-->
   <xsl:template name="storedProcedure">
-      <xsl:param name="storedprocedurefirstColStyle"/>
-      <xsl:param name="storedproceduresubHeaderStyle"/>
-      <xsl:param name="docid"/>
-      <xsl:param name="entityindex"/>
-      <xsl:param name="entitytype"/>
+    <xsl:param name="storedprocedurefirstColStyle"/>
+    <xsl:param name="storedproceduresubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="entitytype"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedure</xsl:text></xsl:message></xsl:if>
     <table xsl:use-attribute-sets="cellspacing" class="{$tabledefaultStyle}">
-        <xsl:choose>
-         <xsl:when test="references!=''">
+      <xsl:choose>
+        <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
           <xsl:variable name="references" select="$ids[@id=$ref_id]" />
           <xsl:for-each select="$references">
             <xsl:call-template name="storedProcedureCommon">
-             <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
-             <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-             <xsl:with-param name="docid" select="$docid"/>
-             <xsl:with-param name="entityindex" select="$entityindex"/>
+              <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
+              <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
+              <xsl:with-param name="docid" select="$docid"/>
+              <xsl:with-param name="entityindex" select="$entityindex"/>
             </xsl:call-template>
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-           <xsl:call-template name="storedProcedureCommon">
-             <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
-             <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-             <xsl:with-param name="docid" select="$docid"/>
-             <xsl:with-param name="entityindex" select="$entityindex"/>
-            </xsl:call-template>
-         </xsl:otherwise>
+          <xsl:call-template name="storedProcedureCommon">
+            <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
+            <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
+            <xsl:with-param name="docid" select="$docid"/>
+            <xsl:with-param name="entityindex" select="$entityindex"/>
+          </xsl:call-template>
+        </xsl:otherwise>
       </xsl:choose>
-      </table>
+   </table>
   </xsl:template>
 
   <xsl:template name="storedProcedureCommon">
@@ -10639,6 +10758,7 @@
     <xsl:param name="storedproceduresubHeaderStyle"/>
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedureCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
        <xsl:call-template name="entityName">
           <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
@@ -10778,26 +10898,29 @@
   </xsl:template>
 
   <xsl:template name="storedProcedureShowDistribution">
-     <xsl:param name="storedprocedurefirstColStyle"/>
-     <xsl:param name="storedproceduresubHeaderStyle"/>
-     <xsl:param name="docid"/>
-     <xsl:param name="level">entitylevel</xsl:param>
-     <xsl:param name="entitytype">storedProcedure</xsl:param>
-     <xsl:param name="entityindex"/>
-     <xsl:param name="physicalindex"/>
-     <xsl:for-each select="distribution">
-      <tr><td colspan="2">
-        <xsl:call-template name="distribution">
-          <xsl:with-param name="docid" select="$docid"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="entitytype" select="$entitytype"/>
-          <xsl:with-param name="entityindex" select="$entityindex"/>
-          <xsl:with-param name="physicalindex" select="$physicalindex"/>
-          <xsl:with-param name="distributionindex" select="position()"/>
-          <xsl:with-param name="disfirstColStyle" select="$storedprocedurefirstColStyle"/>
-          <xsl:with-param name="dissubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+    <xsl:param name="storedprocedurefirstColStyle"/>
+    <xsl:param name="storedproceduresubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="level">entitylevel</xsl:param>
+    <xsl:param name="entitytype">storedProcedure</xsl:param>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="physicalindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedureShowDistribution</xsl:text></xsl:message></xsl:if>
+    <xsl:for-each select="distribution">
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="distribution">
+            <xsl:with-param name="docid" select="$docid"/>
+            <xsl:with-param name="level" select="$level"/>
+            <xsl:with-param name="entitytype" select="$entitytype"/>
+            <xsl:with-param name="entityindex" select="$entityindex"/>
+            <xsl:with-param name="physicalindex" select="$physicalindex"/>
+            <xsl:with-param name="distributionindex" select="position()"/>
+            <xsl:with-param name="disfirstColStyle" select="$storedprocedurefirstColStyle"/>
+            <xsl:with-param name="dissubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -10807,16 +10930,18 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">storedProcedure</xsl:param>
     <xsl:param name="entityindex"/>
-    <tr><td class="{$storedproceduresubHeaderStyle}" colspan="2">
-        <xsl:text>Attribute(s) Info:</xsl:text>
-    </td></tr>
-    <tr><td colspan="2">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedureAttributeList</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$storedproceduresubHeaderStyle}" colspan="2"><xsl:text>Attribute(s) Info:</xsl:text></td>
+    </tr>
+    <tr>
+      <td colspan="2">
          <xsl:call-template name="attributelist">
            <xsl:with-param name="docid" select="$docid"/>
            <xsl:with-param name="entitytype" select="$entitytype"/>
            <xsl:with-param name="entityindex" select="$entityindex"/>
          </xsl:call-template>
-       </td>
+      </td>
     </tr>
   </xsl:template>
 
@@ -10828,19 +10953,21 @@
   maybe, if only text children, then use mode=lowlevel? NEED A REAL XSLT PROGRAMMER!
   -->
   <xsl:template name="text">
-        <xsl:param name="textfirstColStyle" />
-        <xsl:param name="textsecondColStyle" />
+    <xsl:param name="textfirstColStyle" />
+    <xsl:param name="textsecondColStyle" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: text</xsl:text></xsl:message></xsl:if>
     <xsl:if test="(section and normalize-space(section[1])!='') or (para and normalize-space(para[1])!='')">
-          <xsl:apply-templates mode="text">
-            <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
-            <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
-          </xsl:apply-templates>
-      </xsl:if>
+      <xsl:apply-templates mode="text">
+        <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
+        <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template name="abstracttext">
     <xsl:param name="textfirstColStyle" />
     <xsl:param name="textsecondColStyle" />
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: abstracttext</xsl:text></xsl:message></xsl:if>
     <xsl:if test="(section and normalize-space(section[1])!='') or (para and normalize-space(para[1])!='')">
   <!-- was <xsl:apply-templates mode="text"> (mgb 7Jun2011) use mode="lowlevel" to make abstract use p for para -->
     <div class="abstract-text">
@@ -10853,23 +10980,25 @@
   </xsl:template>
 
   <!-- Template for section-->
-   <xsl:template match="section" mode="text">
-      <xsl:if test="normalize-space(.)!=''">
-        <xsl:if test="title and normalize-space(title)!=''">
-          <!-- <h4 class="bold"><xsl:value-of select="title"/></h4> -->
-	  <h4><xsl:value-of select="title"/></h4>
-        </xsl:if>
-        <xsl:if test="para and normalize-space(para[1])!=''">
-              <xsl:apply-templates select="para" mode="text"/>
-         </xsl:if>
-         <xsl:if test="section and normalize-space(section)!=''">
-              <xsl:apply-templates select="section" mode="text"/>
-        </xsl:if>
+  <xsl:template match="section" mode="text">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section</xsl:text></xsl:message></xsl:if>
+    <xsl:if test="normalize-space(.)!=''">
+      <xsl:if test="title and normalize-space(title)!=''">
+        <!-- <h4 class="bold"><xsl:value-of select="title"/></h4> -->
+	      <h4><xsl:value-of select="title"/></h4>
       </xsl:if>
+      <xsl:if test="para and normalize-space(para[1])!=''">
+        <xsl:apply-templates select="para" mode="text"/>
+      </xsl:if>
+      <xsl:if test="section and normalize-space(section)!=''">
+        <xsl:apply-templates select="section" mode="text"/>
+      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <!-- Section template for low level. Cteate a nested table and second column -->
   <xsl:template match="section" mode="lowlevel">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section; mode: lowlevel</xsl:text></xsl:message></xsl:if>
     <div>
       <xsl:if test="title and normalize-space(title) != ''">
         <!-- <h4 class="bold"><xsl:value-of select="title"/></h4>  -->
@@ -10887,6 +11016,7 @@
   <!-- para template for text mode-->
   <xsl:template match="para" mode="text">
     <xsl:param name="textfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para</xsl:text></xsl:message></xsl:if>
     <p>
       <xsl:apply-templates/>
     </p>
@@ -10896,12 +11026,14 @@
   <!-- para template without any other structure. It does actually transfer.
        Currently, only get the text and it need more revision-->
   <xsl:template match="para" mode="lowlevel">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para; mode: lowlevel</xsl:text></xsl:message></xsl:if>
     <p>
       <xsl:value-of select="."/>
     </p>
   </xsl:template>
   
   <xsl:template match="itemizedlist">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: itemizedlist</xsl:text></xsl:message></xsl:if>
     <ul>
       <xsl:for-each select="listitem">
         <li><xsl:apply-templates select="."/></li>
@@ -10910,6 +11042,7 @@
   </xsl:template>
   
   <xsl:template match="orderedlist">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: orderedlist</xsl:text></xsl:message></xsl:if>
     <ol>
       <xsl:for-each select="listitem">
         <li><xsl:value-of select="."/></li>
@@ -10918,6 +11051,7 @@
   </xsl:template>
   
   <xsl:template match="emphasis">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emphasis</xsl:text></xsl:message></xsl:if>
     <em><xsl:value-of select="."/></em>
   </xsl:template>
   
@@ -10931,6 +11065,7 @@
   
   <!-- note: EML is using docbook 4, citetitle is optional, unbounded. -->
   <xsl:template match="ulink">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: ulink</xsl:text></xsl:message></xsl:if>
     <xsl:element name="a">
       <xsl:attribute name="href">
         <xsl:value-of select="@url"/>
@@ -10947,6 +11082,7 @@
   </xsl:template>
   
   <xsl:template match="literalLayout">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: literalLayout</xsl:text></xsl:message></xsl:if>
     <pre>
       <xsl:value-of  select="." xml:space="preserve"/>
     </pre>
@@ -10954,14 +11090,15 @@
   
   <!-- eml-view-2.0.0.xsl -->
   <xsl:template name="view">
-      <xsl:param name="viewfirstColStyle"/>
-      <xsl:param name="viewsubHeaderStyle"/>
-      <xsl:param name="docid"/>
-      <xsl:param name="entityindex"/>
-      <xsl:param name="entitytype"/>
+    <xsl:param name="viewfirstColStyle"/>
+    <xsl:param name="viewsubHeaderStyle"/>
+    <xsl:param name="docid"/>
+    <xsl:param name="entityindex"/>
+    <xsl:param name="entitytype"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: view</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
-        <xsl:choose>
-         <xsl:when test="references!=''">
+      <xsl:choose>
+        <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
           <xsl:variable name="references" select="$ids[@id=$ref_id]" />
           <xsl:for-each select="$references">
@@ -10980,9 +11117,9 @@
              <xsl:with-param name="docid" select="$docid"/>
              <xsl:with-param name="entityindex" select="$entityindex"/>
             </xsl:call-template>
-         </xsl:otherwise>
+        </xsl:otherwise>
       </xsl:choose>
-      </table>
+    </table>
   </xsl:template>
 
   <xsl:template name="viewCommon">
@@ -10990,6 +11127,7 @@
     <xsl:param name="viewsubHeaderStyle"/>
     <xsl:param name="docid"/>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: viewCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
        <xsl:call-template name="entityName">
           <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
@@ -11101,6 +11239,7 @@
     <xsl:param name="entitytype">view</xsl:param>
     <xsl:param name="entityindex"/>
     <xsl:param name="physicalindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: viewShowDistribution</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="distribution">
       <tr>
         <td colspan="2">
@@ -11125,6 +11264,7 @@
     <xsl:param name="docid"/>
     <xsl:param name="entitytype">view</xsl:param>
     <xsl:param name="entityindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: viewAttributeList</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$viewsubHeaderStyle}" colspan="2"><xsl:text>Attribute(s) Info:</xsl:text></td>
     </tr>
