@@ -4,6 +4,7 @@ CREATE SCHEMA datapackagemanager AUTHORIZATION pasta;
 CREATE TYPE resource_type AS ENUM ('data', 'dataPackage', 'metadata', 'report');
 CREATE TABLE datapackagemanager.resource_registry (
   resource_id VARCHAR(350) NOT NULL,     -- resource id, the primary key
+  doi VARCHAR(256),                      -- digital object identifier (DOI)
   resource_type RESOURCE_TYPE NOT NULL,  -- resource type
   resource_location VARCHAR(500),        -- root location for this resource (referenced by entity resources only)
   package_id VARCHAR(100) NOT NULL,      -- the EML 'packageId' attribute value
