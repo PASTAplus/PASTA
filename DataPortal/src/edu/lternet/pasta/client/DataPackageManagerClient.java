@@ -780,6 +780,133 @@ public class DataPackageManagerClient extends PastaClient {
   }
 
 
+	public String readDataPackageDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+  
+	public String readMetadataDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/metadata/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}
+	
+	
+	public String readDataPackageReportDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/report/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+
+	
+	public String readDataEntityDoi(String scope, Integer identifier,
+	    String revision, String entityId) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, entityId);
+		String url = BASE_URL + "/data/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+
+	
   /**
    * Executes the 'searchDataPackages' web service method.
    * @param pathQuery an XML pathquery string (conforming to Metacat pathquery syntax)
@@ -881,6 +1008,13 @@ public class DataPackageManagerClient extends PastaClient {
   public String getContentType() {
     String contentType = this.contentType;
     return contentType;
+  }
+  
+  public String getPastaPackageUri(String scope, Integer identifier, String revision) {
+
+  	String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		return BASE_URL + "/eml" + urlTail;
+
   }
   
 }
