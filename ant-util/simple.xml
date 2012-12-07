@@ -20,6 +20,7 @@
 
   <property name="shared.lib.dir" value="../lib"/>
   <property name="common.code.dir" value="../common"/>
+  <property name="common.jar.dir" value="${common.code.dir}/build/jar"/>
   <property name="doc.util.dir" value="../doc-util"/>
 
   <property name="source.files.to.copy"
@@ -68,17 +69,20 @@
   <target name="prepare-common"
           description="Prepares the common code">
     <!-- Compiling PASTA's common code -->
-    <subant target="compile">
+    <subant target="jar">
       <fileset dir="${common.code.dir}" includes="build.xml"/>
     </subant>
+    <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+          filtering="no">
+      <fileset dir="${common.jar.dir}">
+        <include name="common.jar"/>
+      </fileset>
+    </copy>
   </target>
 
   <target name="compile" depends="prepare"
 	  description="Compiles all Java source files">
     <mkdir dir="${classes.dir}"/>
-    <copy todir="${classes.dir}">
-      <fileset dir="${common.code.dir}/${classes.dir}" />
-    </copy>
     <javac destdir="${classes.dir}" debug="true" deprecation="true"
            failonerror="true" optimize="false" includeantruntime="false">
       <src path="${src.dir}"/>
@@ -180,7 +184,6 @@
 
   <target name="deploy" depends="web-service-api,war"
           description="Deploys the web application to Tomcat (default target)">
-
     <copy file="${build.dir}/${war.name}" todir="${deploy.dir}"
           preservelastmodified="true" verbose="true" filtering="no"/>
   </target>
