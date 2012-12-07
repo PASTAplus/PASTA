@@ -25,6 +25,8 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,6 +43,10 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.portal.eml.EmlObject;
+import edu.lternet.pasta.portal.eml.Title;
+import edu.lternet.pasta.portal.eml.Creator;
+
 
 public class MapBrowseServlet extends DataPortalServlet {
 
@@ -53,7 +59,6 @@ public class MapBrowseServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
  
   private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a URL to view the resource:";
 
   /**
    * Instance variables
@@ -61,7 +66,9 @@ public class MapBrowseServlet extends DataPortalServlet {
 
   private Integer count = 0;
   private String pastaUriHead;
-
+  private String uid = null;
+  private String browseMessage = null;
+  
   /**
    * Constructor of the object.
    */
@@ -117,14 +124,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 
     HttpSession httpSession = request.getSession();
 
-    String uid = (String) httpSession.getAttribute("uid");
+    this.uid = (String) httpSession.getAttribute("uid");
 
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+    if (this.uid == null || this.uid.isEmpty())
+      this.uid = "public";
 
-    String text = null;
     String html = null;
-    String packageId = null;
     Integer id = null;
     boolean isPackageId = false;
 
@@ -137,7 +142,6 @@ public class MapBrowseServlet extends DataPortalServlet {
     if (scope != null && !(scope.isEmpty()) &&
         identifier != null && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
 
-      packageId = scope + "." + identifier + "." + revision;
       id = Integer.valueOf(identifier);
       isPackageId = true;
 
@@ -150,7 +154,6 @@ public class MapBrowseServlet extends DataPortalServlet {
         identifier = tokens[tokens.length - 2];
         id = Integer.valueOf(identifier);
         revision = tokens[tokens.length - 1];
-        packageId = scope + "." + identifier + "." + revision;
         isPackageId = true;
       }
 
@@ -161,28 +164,7 @@ public class MapBrowseServlet extends DataPortalServlet {
       
     if (isPackageId) {
 
-      try {
-
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        text = dpmClient.readDataPackage(scope, id, revision);
-
-        StrTokenizer tokens = new StrTokenizer(text);
-
-        html = this.mapFormatter(tokens, packageId);
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      }
+      html = this.mapFormatter(scope, id, revision);
 
     } else {
       html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
@@ -214,13 +196,17 @@ public class MapBrowseServlet extends DataPortalServlet {
   /**
    * Formats the output for the data package resource map.
    * 
-   * @param tokens PASTA resource map URIs tokenized as a StrTokenizer object.
+   * @param scope The data package scope (namespace) value
+   * @param id The data package identifier (accession number) value
+   * @param revision The data package revision value
    * 
    * @return The formatted resource map as HTML
    */
-  private String mapFormatter(StrTokenizer tokens, String packageId) {
+  private String mapFormatter(String scope, Integer identifier, String revision) {
 
-    String html = null;
+    String html = "";
+    
+    String packageId = scope + "." + identifier.toString() + "." + revision;
 
     String metadataUri = pastaUriHead + "metadata/eml";
     String reportUri = pastaUriHead + "report";
@@ -233,9 +219,80 @@ public class MapBrowseServlet extends DataPortalServlet {
     String metadata = null;
     String report = null;
     String data = null;
+    
+    String map = null;
+    StrTokenizer tokens = null;
+    String emlString = null;
+    EmlObject emlObject = null;
+    ArrayList<Title> titles = null;
+    ArrayList<Creator> creators = null;
+    String abs = null;
+
+    try {
+
+      DataPackageManagerClient dpmClient = new DataPackageManagerClient(this.uid);
+     
+      emlString = dpmClient.readMetadata(scope, identifier, revision);
+      emlObject = new EmlObject(emlString);
+      
+      html += "<h4 align=\"left\">Pakcage Identification</h4>\n";
+      html += "<ul>\n";
+      html += "<li>PASTA: " + dpmClient.getPastaPackageUri(scope, identifier, revision) + "</li>\n";
+      html += "<li>DOI: " + dpmClient.readDataPackageDoi(scope, identifier, revision) +  "</li>\n";
+      html += "</ul>\n";
+      
+      titles = emlObject.getTitles();
+      
+			if (titles != null) {
+				
+	      html += "<h4 align=\"left\">Title</h4>\n";
+	      html += "<ul style=\"list-style: none;\">\n";
+				
+	      for (Title title : titles) {
+					html += "<li>" + title.getTite() + "</li>\n";
+				}
+	      
+	      html += "</ul>\n";
+	      
+			}
+      
+      creators = emlObject.getCreators();
+
+      if (creators != null) {
+
+      	html += "<h4 align=\"left\">Owners/Creators</h4>\n";
+        html += "<ul style=\"list-style: disc;\">\n";
+        
+      	for (Creator creator: creators) {
+      		html += "<li>" + creator.getCreatorName() + "</li>";
+      	}
+	      
+	      html += "</ul>\n";
+	      
+      }
+    
+      map = dpmClient.readDataPackage(scope, identifier, revision);
+      tokens = new StrTokenizer(map);
+
+    } catch (PastaAuthenticationException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+      return html;
+    } catch (PastaConfigurationException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+      return html;
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+      return html;
+    }
 
     URLCodec urlCodec = new URLCodec();
-
+    
     while (tokens.hasNext()) {
       resource = tokens.nextToken();
 
@@ -274,7 +331,7 @@ public class MapBrowseServlet extends DataPortalServlet {
     }
     
 
-    html = "<h4 align=\"left\">Metadata</h4>\n";
+    html += "<h4 align=\"left\">Metadata</h4>\n";
     html += "<ul>\n";
     html += metadata;
     html += "</ul>\n";
