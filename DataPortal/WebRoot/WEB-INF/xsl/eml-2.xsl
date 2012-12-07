@@ -1874,12 +1874,11 @@
     </xsl:choose>
   </xsl:template>
   
-  <!-- download xml part -->
+  <!-- download XML part -->
   <xsl:template name="xml">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: xml</xsl:text></xsl:message></xsl:if>
-    <br /><a target="_blank" href="http://portal.lternet.edu/nis/metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
-    Original XML file
-    </a> (in Ecological Metadata Language)
+    <br/><a target="_blank" href="http://portal.lternet.edu/nis/metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
+    Original XML file</a> (in Ecological Metadata Language)
   </xsl:template>
   
   <!-- This module is for dataset -->
@@ -6742,12 +6741,9 @@
               <xsl:text>.&#160;</xsl:text>
             </xsl:otherwise>
           </xsl:choose>   
-          <xsl:text>( </xsl:text><a>
-            <xsl:attribute name="href">
-              <xsl:value-of select="$contextURL"/>/package/eml/<xsl:value-of select="$packageID"/>
-            </xsl:attribute>
-            <xsl:value-of select="$contextURL"/>/package/eml/<xsl:value-of select="$packageID"/>
-          </a><xsl:text> )</xsl:text>
+          <xsl:text> ( </xsl:text>
+          <xsl:value-of select="$contextURL"/>/package/eml/<xsl:value-of select="$packageID"/>
+          <xsl:text> )</xsl:text>
         </td>
       </tr>
     </table>
