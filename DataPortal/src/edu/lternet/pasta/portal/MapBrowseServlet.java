@@ -25,6 +25,8 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,256 +43,362 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.portal.eml.EmlObject;
+import edu.lternet.pasta.portal.eml.Title;
+import edu.lternet.pasta.portal.eml.Creator;
 
 public class MapBrowseServlet extends DataPortalServlet {
 
-  /**
-   * Class variables
-   */
+	/**
+	 * Class variables
+	 */
 
-  private static final Logger logger = Logger
-      .getLogger(edu.lternet.pasta.portal.MapBrowseServlet.class);
-  private static final long serialVersionUID = 1L;
- 
-  private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a URL to view the resource:";
+	private static final Logger logger = Logger
+	    .getLogger(edu.lternet.pasta.portal.MapBrowseServlet.class);
+	private static final long serialVersionUID = 1L;
 
-  /**
-   * Instance variables
-   */
+	private static final String forward = "./dataPackageBrowser.jsp";
 
-  private Integer count = 0;
-  private String pastaUriHead;
+	/**
+	 * Instance variables
+	 */
 
-  /**
-   * Constructor of the object.
-   */
-  public MapBrowseServlet() {
-    super();
-  }
+	private Integer count = 0;
+	private String pastaUriHead;
+	private String uid = null;
+	private String browseMessage = null;
 
-  /**
-   * Destruction of the servlet. <br>
-   */
-  public void destroy() {
-    super.destroy(); // Just puts "destroy" string in log
-    // Put your code here
-  }
+	/**
+	 * Constructor of the object.
+	 */
+	public MapBrowseServlet() {
+		super();
+	}
 
-  /**
-   * The doGet method of the servlet. <br>
-   * 
-   * This method is called when a form has its tag value method equals to get.
-   * 
-   * @param request
-   *          the request send by the client to the server
-   * @param response
-   *          the response send by the server to the client
-   * @throws ServletException
-   *           if an error occurred
-   * @throws IOException
-   *           if an error occurred
-   */
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+	/**
+	 * Destruction of the servlet. <br>
+	 */
+	public void destroy() {
+		super.destroy(); // Just puts "destroy" string in log
+		// Put your code here
+	}
 
-    doPost(request, response);
+	/**
+	 * The doGet method of the servlet. <br>
+	 * 
+	 * This method is called when a form has its tag value method equals to get.
+	 * 
+	 * @param request
+	 *          the request send by the client to the server
+	 * @param response
+	 *          the response send by the server to the client
+	 * @throws ServletException
+	 *           if an error occurred
+	 * @throws IOException
+	 *           if an error occurred
+	 */
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
-  }
+		doPost(request, response);
 
-  /**
-   * The doPost method of the servlet. <br>
-   * 
-   * This method is called when a form has its tag value method equals to post.
-   * 
-   * @param request
-   *          the request send by the client to the server
-   * @param response
-   *          the response send by the server to the client
-   * @throws ServletException
-   *           if an error occurred
-   * @throws IOException
-   *           if an error occurred
-   */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+	}
 
-    HttpSession httpSession = request.getSession();
+	/**
+	 * The doPost method of the servlet. <br>
+	 * 
+	 * This method is called when a form has its tag value method equals to post.
+	 * 
+	 * @param request
+	 *          the request send by the client to the server
+	 * @param response
+	 *          the response send by the server to the client
+	 * @throws ServletException
+	 *           if an error occurred
+	 * @throws IOException
+	 *           if an error occurred
+	 */
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
-    String uid = (String) httpSession.getAttribute("uid");
+		HttpSession httpSession = request.getSession();
 
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+		this.uid = (String) httpSession.getAttribute("uid");
 
-    String text = null;
-    String html = null;
-    String packageId = null;
-    Integer id = null;
-    boolean isPackageId = false;
+		if (this.uid == null || this.uid.isEmpty())
+			this.uid = "public";
 
-    // Accept either packageId or url parameters
-    String scope = request.getParameter("scope");
-    String identifier = request.getParameter("identifier");
-    String revision = request.getParameter("revision");
-    String url = request.getParameter("url");
+		String html = null;
+		Integer id = null;
+		boolean isPackageId = false;
 
-    if (scope != null && !(scope.isEmpty()) &&
-        identifier != null && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
+		// Accept either packageId or url parameters
+		String scope = request.getParameter("scope");
+		String identifier = request.getParameter("identifier");
+		String revision = request.getParameter("revision");
+		String url = request.getParameter("url");
 
-      packageId = scope + "." + identifier + "." + revision;
-      id = Integer.valueOf(identifier);
-      isPackageId = true;
+		if (scope != null && !(scope.isEmpty()) && identifier != null
+		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
 
-    } else if (url != null && !url.isEmpty()) {
-      
-      String[] tokens = url.split("/");
+			id = Integer.valueOf(identifier);
+			isPackageId = true;
 
-      if (tokens.length >= 3) {
-        scope = tokens[tokens.length - 3];
-        identifier = tokens[tokens.length - 2];
-        id = Integer.valueOf(identifier);
-        revision = tokens[tokens.length - 1];
-        packageId = scope + "." + identifier + "." + revision;
-        isPackageId = true;
-      }
+		} else if (url != null && !url.isEmpty()) {
 
-    } else {
-      html = "<p class=\"warning\">Error: a packageId or metadata URL was not found.</p>\n";
-    }
- 
-      
-    if (isPackageId) {
+			String[] tokens = url.split("/");
 
-      try {
+			if (tokens.length >= 3) {
+				scope = tokens[tokens.length - 3];
+				identifier = tokens[tokens.length - 2];
+				id = Integer.valueOf(identifier);
+				revision = tokens[tokens.length - 1];
+				isPackageId = true;
+			}
 
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        text = dpmClient.readDataPackage(scope, id, revision);
+		} else {
+			html = "<p class=\"warning\">Error: a packageId or metadata URL was not found.</p>\n";
+		}
 
-        StrTokenizer tokens = new StrTokenizer(text);
+		if (isPackageId) {
 
-        html = this.mapFormatter(tokens, packageId);
+			html = this.mapFormatter(scope, id, revision);
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      }
+		} else {
+			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
+		}
 
-    } else {
-      html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
-    }
+		httpSession.setAttribute("browsemessage", browseMessage);
+		httpSession.setAttribute("html", html);
+		httpSession.setAttribute("count", this.count.toString());
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+		requestDispatcher.forward(request, response);
 
-    httpSession.setAttribute("browsemessage", browseMessage);
-    httpSession.setAttribute("html", html);
-    httpSession.setAttribute("count", this.count.toString());
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-    requestDispatcher.forward(request, response);
+	}
 
-  }
+	/**
+	 * Initialization of the servlet. <br>
+	 * 
+	 * @throws ServletException
+	 *           if an error occurs
+	 */
+	public void init() throws ServletException {
+		PropertiesConfiguration options = ConfigurationListener.getOptions();
+		pastaUriHead = options.getString("pasta.uriHead");
 
-  /**
-   * Initialization of the servlet. <br>
-   * 
-   * @throws ServletException
-   *           if an error occurs
-   */
-  public void init() throws ServletException {
-    PropertiesConfiguration options = ConfigurationListener.getOptions();
-    pastaUriHead = options.getString("pasta.uriHead");
-    
-    if ((pastaUriHead == null) || (pastaUriHead.equals(""))) {
-      throw new ServletException("No value defined for 'pasta.uriHead' property.");
-    }
-  }
+		if ((pastaUriHead == null) || (pastaUriHead.equals(""))) {
+			throw new ServletException(
+			    "No value defined for 'pasta.uriHead' property.");
+		}
+	}
 
-  /**
-   * Formats the output for the data package resource map.
-   * 
-   * @param tokens PASTA resource map URIs tokenized as a StrTokenizer object.
-   * 
-   * @return The formatted resource map as HTML
-   */
-  private String mapFormatter(StrTokenizer tokens, String packageId) {
+	/**
+	 * Formats the output for the data package resource map.
+	 * 
+	 * @param scope
+	 *          The data package scope (namespace) value
+	 * @param id
+	 *          The data package identifier (accession number) value
+	 * @param revision
+	 *          The data package revision value
+	 * 
+	 * @return The formatted resource map as HTML
+	 */
+	private String mapFormatter(String scope, Integer identifier, String revision) {
 
-    String html = null;
+		String html = "";
 
-    String metadataUri = pastaUriHead + "metadata/eml";
-    String reportUri = pastaUriHead + "report";
-    String dataUri = pastaUriHead + "data/eml";
+		String packageId = scope + "." + identifier.toString() + "." + revision;
 
-    String[] uriTokens = null;
-    String entityName = null;
-    String resource = null;
+		String metadataUri = pastaUriHead + "metadata/eml";
+		String reportUri = pastaUriHead + "report";
+		String dataUri = pastaUriHead + "data/eml";
 
-    String metadata = null;
-    String report = null;
-    String data = null;
+		String[] uriTokens = null;
+		String entityName = null;
+		String resource = null;
 
-    URLCodec urlCodec = new URLCodec();
+		String map = null;
+		StrTokenizer tokens = null;
+		String emlString = null;
+		EmlObject emlObject = null;
+		ArrayList<Title> titles = null;
+		ArrayList<Creator> creators = null;
 
-    while (tokens.hasNext()) {
-      resource = tokens.nextToken();
+		DataPackageManagerClient dpmClient = null;
 
-      if (resource.contains(metadataUri)) {
-        metadata = "<li><a href=\"./metadataviewer?packageid=" + packageId
-            + "\" target=\"_blank\">" + resource + "</a></li>\n";
-      } else if (resource.contains(reportUri)) {
-        report = "<li><a href=\"./reportviewer?packageid=" + packageId
-            + "\" target=\"_blank\">" + resource + "</a></li>\n";
-      } else if (resource.contains(dataUri)) {
+		try {
 
-        uriTokens = resource.split("/");
+			dpmClient = new DataPackageManagerClient(this.uid);
 
-        // Safe URL encoding of entity name
-        try {
-          entityName = urlCodec.encode(uriTokens[uriTokens.length - 1]);
-        } catch (EncoderException e) {
-          logger.error(e.getMessage());
-          e.printStackTrace();
+			emlString = dpmClient.readMetadata(scope, identifier, revision);
+			emlObject = new EmlObject(emlString);
+
+			titles = emlObject.getTitles();
+
+			if (titles != null) {
+
+				html += "<h4 align=\"left\">Title</h4>\n";
+				html += "<ul style=\"list-style: none;\">\n";
+
+				for (Title title : titles) {
+					html += "<li>" + title.getTite() + "</li>\n";
+				}
+
+				html += "</ul>\n";
+
+			}
+
+			creators = emlObject.getCreators();
+
+			if (creators != null) {
+
+				html += "<h4 align=\"left\">Owners/Creators</h4>\n";
+				html += "<ul style=\"list-style: none;\">\n";
+
+				for (Creator creator : creators) {
+					html += "<li>" + creator.getCreatorName() + "</li>";
+				}
+
+				html += "</ul>\n";
+
+			}
+
+			map = dpmClient.readDataPackage(scope, identifier, revision);
+			
+		} catch (PastaAuthenticationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+			return html;
+		} catch (PastaConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+			return html;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+			return html;
+		}
+
+		tokens = new StrTokenizer(map);
+
+		URLCodec urlCodec = new URLCodec();
+		
+		String dataPackage = null;
+		String metadata = null;
+		String report = null;
+		String data = null;
+		String doi = null;
+
+		while (tokens.hasNext()) {
+			resource = tokens.nextToken();
+
+			if (resource.contains(metadataUri)) {
+
+				try {
+	        doi = " (" + dpmClient.readMetadataDoi(scope, identifier, revision) + ")";
+        } catch (Exception e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        doi = "";
         }
+				
+				metadata = "<li><a href=\"./metadataviewer?packageid=" + packageId
+				    + "\" target=\"_blank\">Metadata</a>" + doi + "</li>\n";
+				
+			} else if (resource.contains(reportUri)) {
 
-        if (data == null) {
-          data = "<li><a href=\"./dataviewer?packageid=" + packageId
-              + "&entityname=" + entityName + "\" target=\"_blank\">"
-              + resource + "</a></li>\n";
-        } else {
-          data += "<li><a href=\"./dataviewer?packageid=" + packageId
-              + "&entityname=" + entityName + "\" target=\"_blank\">"
-              + resource + "</a></li>\n";
+				try {
+	        doi = " (" + dpmClient.readDataPackageReportDoi(scope, identifier, revision) + ")";
+        } catch (Exception e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        doi = "";
         }
+				
+				report = "<li><a href=\"./reportviewer?packageid=" + packageId
+				    + "\" target=\"_blank\">Report</a>" + doi + "</li>\n";
+			} else if (resource.contains(dataUri)) {
 
-      }
+				uriTokens = resource.split("/");
 
-      this.count++;
-      
-    }
-    
+				// Safe URL encoding of entity name
+				try {
+					entityName = urlCodec.encode(uriTokens[uriTokens.length - 1]);
+				} catch (EncoderException e) {
+					logger.error(e.getMessage());
+					e.printStackTrace();
+				}
 
-    html = "<h4 align=\"left\">Metadata</h4>\n";
-    html += "<ul>\n";
-    html += metadata;
-    html += "</ul>\n";
-    html += "<h4 align=\"left\">Data</h4>\n";
-    html += "<ol>\n";
-    html += data;
-    html += "</ol>\n";
-    html += "<h4 align=\"left\">Quality Report</h4>\n";
-    html += "<ul>\n";
-    html += report;
-    html += "</ul>\n";
+				if (data == null) {
+					
+					try {
+		        doi = " (" + dpmClient.readDataEntityDoi(scope, identifier, revision, entityName) + ")";
+	        } catch (Exception e) {
+		        logger.error(e.getMessage());
+		        e.printStackTrace();
+		        doi = "";
+	        }					
+					
+					data = "<li><a href=\"./dataviewer?packageid=" + packageId
+					    + "&entityname=" + entityName + "\" target=\"_blank\">"
+					    + entityName + "</a>" + doi + "</li>\n";
+				} else {
+					
+					try {
+		        doi = " (" + dpmClient.readDataEntityDoi(scope, identifier, revision, entityName) + ")";
+	        } catch (Exception e) {
+		        logger.error(e.getMessage());
+		        e.printStackTrace();
+		        doi = "";
+	        }										
+					
+					data += "<li><a href=\"./dataviewer?packageid=" + packageId
+					    + "&entityname=" + entityName + "\" target=\"_blank\">"
+					    + entityName + "</a>" + doi + "</li>\n";
+				}
 
-    this.count += 6; // Two for each header
+			} else {
 
-    return html;
+				try {
+	        doi = " (" + dpmClient.readDataPackageDoi(scope, identifier, revision) + ")";
+        } catch (Exception e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        doi = "";
+        }										
+				
+				dataPackage = packageId + " " + doi + "\n";
+				
+			}
+				
 
-  }
+			this.count++;
+
+		}
+
+		html += "<h4 align=\"left\">Package Identification</h4>\n";
+		html += "<ul style=\"list-style: none;\">\n";
+		html += dataPackage;
+		html += "</ul>\n";
+		html += "<h4 align=\"left\">Resources</h4>\n";
+		html += "<ul style=\"list-style: none;\">\n";
+		html += metadata;
+		html += report;
+		html += "<li>Data\n";
+		html += "<ol>\n";
+		html += data;
+		html += "</ol>\n";
+		html += "</li>\n";
+		html += "</ul>\n";
+
+		this.count += 6; // Two for each header
+
+		return html;
+
+	}
 
 }
