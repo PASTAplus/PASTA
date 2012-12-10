@@ -26,6 +26,7 @@ package edu.lternet.pasta.portal;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -176,7 +177,6 @@ public class MetadataViewerServlet extends DataPortalServlet {
       try {
 
         String xml = null;
-
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
         xml = dpmClient.readMetadata(scope, identifier, revision);
 
@@ -185,7 +185,14 @@ public class MetadataViewerServlet extends DataPortalServlet {
           type = "xml";
         } else {
           EmlUtility emlUtility = new EmlUtility(xml);
-          message = emlUtility.xmlToHtmlSaxon(cwd + xslpath);
+          HashMap<String, String> parameterMap = new HashMap<String, String>();
+          String pastUriHead = dpmClient.getPastaUriHead();
+          String resourceId = packageIdToResourceId(pastUriHead, packageId);
+          // Pass the resourceId as a parameter to the XSLT
+          if (resourceId != null && !resourceId.equals("")) {
+            parameterMap.put("resourceId", resourceId);
+          }
+          message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
           type = "html";
         }
 

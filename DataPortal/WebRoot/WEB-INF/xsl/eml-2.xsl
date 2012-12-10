@@ -54,8 +54,8 @@
   <xsl:param name="debugmessages">0</xsl:param>
   <xsl:param name="entitytype"></xsl:param>
   <xsl:param name="entityindex">1</xsl:param>
-  <xsl:param name="contextURL">https://pasta.lternet.edu</xsl:param>
-  <xsl:param name="cgi-prefix">http://pasta.lternet.edu</xsl:param>  
+  <xsl:param name="resourceId"></xsl:param>
+  <xsl:param name="cgi-prefix"></xsl:param>  
   <!-- To show the links for the Entities in the dataset display module -->
   <xsl:param name="withEntityLinks">1</xsl:param>
   <!-- To show the link for the Original XML in the dataset display module -->
@@ -75,7 +75,7 @@
     <xsl:attribute name="cellpadding">0</xsl:attribute>
     <xsl:attribute name="cellspacing">0</xsl:attribute>
   </xsl:attribute-set>
-  <!-- URL for the app which suppies the xslt with their parameters  -->
+  <!-- URL for the app which supplies the xslt with their parameters  -->
   <xsl:param name="useridDirectoryApp1_URI"><xsl:value-of select="$cgi-prefix" /><![CDATA[/ldapweb2012.cgi?stage=showindividual&lter_id=]]></xsl:param>
   <xsl:param name="useridDirectory1">sbclter-directory</xsl:param>
   <xsl:param name="useridDirectoryLabel1">SBC LTER</xsl:param>
@@ -2291,7 +2291,6 @@
         <xsl:with-param name="citetabledefaultStyle"  select="$tabledefaultStyle"/>
         <xsl:with-param name="citefirstColStyle"  select="$firstColStyle"/>
         <xsl:with-param name="citesecondColStyle"  select="$secondColStyle"/>
-        <xsl:with-param name="contextURL" select="$contextURL"/>
       </xsl:call-template>
     </table>
      <!-- add in the method info
@@ -6085,7 +6084,6 @@
 
   <!-- eml-distribution-2.0.0.xsl -->
   <!-- This module is for distribution and it is self-contained-->
-
   <xsl:template name="distribution">
       <xsl:param name="disfirstColStyle"/>
       <xsl:param name="dissubHeaderStyle"/>
@@ -6095,10 +6093,6 @@
       <xsl:param name="entityindex"/>
       <xsl:param name="physicalindex"/>
       <xsl:param name="distributionindex"/>
-      <!-- 
-      2010-06-01 mob added  for the data use agreement form. prefix is in the eml-settings. 
-      -->
-      <xsl:param name="cgi-prefix"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: distribution</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
        <xsl:choose>
@@ -6671,7 +6665,6 @@
     <xsl:param name="citetabledefaultStyle"/>
     <xsl:param name="citefirstColStyle"/>
     <xsl:param name="citesecondColStyle"/>
-    <xsl:param name="contextURL"/>
     <xsl:param name="packageID"><xsl:value-of select="../@packageId"/></xsl:param>
     <xsl:param name="datasetTitle"><xsl:value-of select="title"/></xsl:param>
     <xsl:param name="publisherOrganizationName"><xsl:value-of select="publisher/organizationName"/></xsl:param>
@@ -6741,9 +6734,7 @@
               <xsl:text>.&#160;</xsl:text>
             </xsl:otherwise>
           </xsl:choose>   
-          <xsl:text> ( </xsl:text>
-          <xsl:value-of select="$contextURL"/>/package/eml/<xsl:value-of select="$packageID"/>
-          <xsl:text> )</xsl:text>
+          <xsl:text> ( </xsl:text><xsl:value-of select="$resourceId"/><xsl:text> )</xsl:text>
         </td>
       </tr>
     </table>
