@@ -55,6 +55,7 @@
   <xsl:param name="entitytype"></xsl:param>
   <xsl:param name="entityindex">1</xsl:param>
   <xsl:param name="resourceId"></xsl:param>
+  <xsl:param name="dataPackageDOI"></xsl:param>
   <xsl:param name="cgi-prefix"></xsl:param>  
   <!-- To show the links for the Entities in the dataset display module -->
   <xsl:param name="withEntityLinks">1</xsl:param>
@@ -6733,8 +6734,14 @@
               <xsl:value-of select="$publisherOrganizationName"/>
               <xsl:text>.&#160;</xsl:text>
             </xsl:otherwise>
-          </xsl:choose>   
-          <xsl:text> ( </xsl:text><xsl:value-of select="$resourceId"/><xsl:text> )</xsl:text>
+          </xsl:choose>
+          <br/>
+          <xsl:choose>
+            <xsl:when test="string-length($dataPackageDOI) > 0">
+              <label>Identifier:</label><xsl:value-of select="$dataPackageDOI"/><br/>
+            </xsl:when>
+          </xsl:choose>     
+          <label>Alternate Identifier:</label><xsl:value-of select="$resourceId"/>
         </td>
       </tr>
     </table>

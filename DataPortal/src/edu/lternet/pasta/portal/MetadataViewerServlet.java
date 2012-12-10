@@ -192,6 +192,11 @@ public class MetadataViewerServlet extends DataPortalServlet {
           if (resourceId != null && !resourceId.equals("")) {
             parameterMap.put("resourceId", resourceId);
           }
+          // Pass the data package DOI as a parameter to the XSLT
+          String dataPackageDOI = dpmClient.readDataPackageDoi(scope, identifier, revision);
+          if (dataPackageDOI != null && !dataPackageDOI.equals("")) {
+            parameterMap.put("dataPackageDOI", dataPackageDOI);
+          }
           message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
           type = "html";
         }
