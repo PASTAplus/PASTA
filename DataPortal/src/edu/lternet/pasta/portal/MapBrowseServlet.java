@@ -371,9 +371,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	        doi = "";
         }										
 				
-				dataPackage = "<li><a href=\"./mapbrowse?scope=" + scope
-						+ "&identifier=" + identifier.toString() + "&revision=" + revision
-						+ "\">" + packageId + "</a>" + doi + "</li>\n";
+				dataPackage = packageId + " " + doi + "\n";
 				
 			}
 				
