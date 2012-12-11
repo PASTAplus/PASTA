@@ -51,9 +51,6 @@
 				</p>
 
 				<%=html%>
-				
-				<p><em>*DOIs are generated hourly for all data packages that are "publicly"
-				   accessible.</em></p>
 
 			</fieldset>
 
