@@ -56,11 +56,11 @@
 
 		<div class="content">
 
-			<h2 align="center">Data Package Audit Reports</h2>
+			<h2 align="center">Data Package Audit Report Viewer</h2>
 
 
 			<fieldset>
-				<legend>View accesses to a data package</legend>
+				<legend>Data Package Audit Reports</legend>
 
 				<p>Enter the Package ID value (e.g. <code>knb-lter-xyz.1.1</code>) and, optionally, a user identifier (e.g. <code>jdoe</code>) and date range. Dates are formatted as <code>YYYY-MM-DD</code>.</p>
 
