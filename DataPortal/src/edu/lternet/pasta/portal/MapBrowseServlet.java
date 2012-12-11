@@ -29,7 +29,6 @@ import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -263,6 +262,17 @@ public class MapBrowseServlet extends DataPortalServlet {
 				html += "</ul>\n";
 
 			}
+			
+			String pubDate = emlObject.getPubDate();
+			
+			if (pubDate != null) {
+				
+				html += "<h4 align=\"left\">Publication Date</h4>\n";
+				html += "<ul style=\"list-style: none;\">\n";
+				html += "<li>" + pubDate + "</li>";
+				html += "</ul>";				
+
+			}
 
 			map = dpmClient.readDataPackage(scope, identifier, revision);
 			
@@ -291,7 +301,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String metadata = null;
 		String report = null;
 		String data = null;
-		String doi = null;
 
 		while (tokens.hasNext()) {
 			resource = tokens.nextToken();
@@ -353,6 +362,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "</ol>\n";
 		html += "</li>\n";
 		html += "</ul>\n";
+		
+		html += "<p><br/><a href=\"./dataPackageCitation?scope=" + scope + "&"
+				+ "identifier=" + identifier.toString() + "&"
+				+ "revision=" + revision
+		    + "\">How to cite this data package...</a></p>";
 
 		this.count += 6; // Two for each header
 
