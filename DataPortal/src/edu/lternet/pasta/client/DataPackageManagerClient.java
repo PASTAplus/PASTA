@@ -780,6 +780,16 @@ public class DataPackageManagerClient extends PastaClient {
   }
 
 
+  /**
+	 * Returns the DOI for the data package map resource identified by the scope,
+	 * identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the data package
+	 * @throws Exception
+	 */
 	public String readDataPackageDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 		
@@ -810,7 +820,17 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 		
 	}  
-  
+
+	/**
+	 * Returns the DOI for the metadata resource identified by the scope,
+	 * identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the metadata resource
+	 * @throws Exception
+	 */
 	public String readMetadataDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 		
@@ -843,6 +863,16 @@ public class DataPackageManagerClient extends PastaClient {
 	}
 	
 	
+	/**
+	 * Returns the DOI for the data package quality report resource identified by
+	 * the scope, identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the data package quality report resource
+	 * @throws Exception
+	 */
 	public String readDataPackageReportDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 		
@@ -874,7 +904,18 @@ public class DataPackageManagerClient extends PastaClient {
 		
 	}  
 
-	
+
+	/**
+	 * Returns the DOI for the data entity resource identified by the scope,
+	 * identifier, revision, and entity identifier.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @param entityId
+	 * @return DOI for the data entity resource
+	 * @throws Exception
+	 */
 	public String readDataEntityDoi(String scope, Integer identifier,
 	    String revision, String entityId) throws Exception {
 		
@@ -1010,6 +1051,14 @@ public class DataPackageManagerClient extends PastaClient {
     return contentType;
   }
   
+  /**
+   * Returns the PASTA data package resource URI.
+   * 
+   * @param scope
+   * @param identifier
+   * @param revision
+   * @return PASTA data package resource URI
+   */
   public String getPastaPackageUri(String scope, Integer identifier, String revision) {
 
   	String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
