@@ -1878,7 +1878,7 @@
   <!-- download XML part -->
   <xsl:template name="xml">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: xml</xsl:text></xsl:message></xsl:if>
-    <br/><a target="_blank" href="http://portal.lternet.edu/nis/metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
+    <br/><a target="_blank" href="./metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
     Original XML file</a> (in Ecological Metadata Language)
   </xsl:template>
   
@@ -2283,7 +2283,7 @@
         </xsl:for-each>
       </table>
     </xsl:if>           
-    <!-- dataset citation  -->   
+    <!-- dataset citation  
     <table class="{$tabledefaultStyle}">
       <tr>
         <th colspan="2">Data Package Citation:</th>
@@ -2292,25 +2292,24 @@
         <xsl:with-param name="citetabledefaultStyle"  select="$tabledefaultStyle"/>
         <xsl:with-param name="citefirstColStyle"  select="$firstColStyle"/>
         <xsl:with-param name="citesecondColStyle"  select="$secondColStyle"/>
-      </xsl:call-template>
-    </table>
-     <!-- add in the method info
-     <h3>Sampling, Processing and Quality Control Methods</h3>
-     <table class="subGroup onehundred_percent">  
-       <tr>
-         <td colspan="2" class="onehundred_percent">
-           <xsl:if test="./methods">
-             <xsl:for-each select="./methods">
-               <xsl:call-template name="datasetmethod">
-                 <xsl:with-param name="methodfirstColStyle" select="$firstColStyle"/>
-                 <xsl:with-param name="methodsecondColStyle" select="$secondColStyle"/>
-               </xsl:call-template>
-             </xsl:for-each>
-           </xsl:if>
-         </td>
-       </tr>
-     </table> 
-     -->
+      </xsl:call-template>   
+    </table> --> 
+    <!-- add in the method info
+    <h3>Sampling, Processing and Quality Control Methods</h3>
+    <table class="subGroup onehundred_percent">  
+      <tr>
+        <td colspan="2" class="onehundred_percent">
+          <xsl:if test="./methods">
+            <xsl:for-each select="./methods">
+              <xsl:call-template name="datasetmethod">
+                <xsl:with-param name="methodfirstColStyle" select="$firstColStyle"/>
+                <xsl:with-param name="methodsecondColStyle" select="$secondColStyle"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:if>
+        </td>
+      </tr>
+    </table> -->
     <xsl:if test="boolean(0)">
       <!-- add in the access control info -->
       <table class="subGroup onehundred_percent">  
