@@ -52,7 +52,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	 * Class variables
 	 */
 
-	private static final Logger logger = Logger.getLogger(DataPackageCitationServlet.class);
+	private static final Logger logger = Logger
+	    .getLogger(DataPackageCitationServlet.class);
 	private static final long serialVersionUID = 1L;
 
 	private static final String forward = "./dataPackageCitation.jsp";
@@ -209,12 +210,13 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		EmlObject emlObject = null;
 		ArrayList<Title> titles = null;
 		ArrayList<Creator> creators = null;
-		
+
 		String titleText = "";
 		String creatorText = "";
 		String orgText = "";
 		String pubDateText = "";
 		String citationId = "";
+		String caveat = "";
 
 		DataPackageManagerClient dpmClient = null;
 
@@ -234,20 +236,17 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 						titleText += title.getTite() + ". ";
 					}
 				}
-				
-				
 
 			}
 
 			creators = emlObject.getCreators();
-			
+
 			if (creators != null) {
-				
+
 				Integer personCount = emlObject.getPersonCount();
 				Integer orgCount = emlObject.getOrgCount();
 				Integer cnt = 0;
-				
-				
+
 				// Citations should include only person names, if possible
 				if (personCount != 0) {
 
@@ -265,7 +264,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 					}
 
 				} else if (orgCount != 0) { // otherwise, use organization names
-					
+
 					for (Creator creator : creators) {
 
 						if (creator.getCreatorType().equals(Creator.ORGANIZATION)) {
@@ -278,20 +277,20 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 						}
 
 					}
-					
+
 				}
 
 			}
-			
+
 			creators = emlObject.getCreators();
-			
+
 			if (creators != null) {
-				
+
 				Integer orgCount = emlObject.getOrgCount();
 				Integer cnt = 0;
-				
+
 				if (orgCount != 0) {
-					
+
 					for (Creator creator : creators) {
 
 						if (creator.getCreatorType().equals(Creator.ORGANIZATION)) {
@@ -304,25 +303,27 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 						}
 
 					}
-					
+
 				}
 
 			}
 
 			try {
 				citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();
 				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
+				caveat = "<p><em>*DOIs are generated hourly for all data packages"
+				    + " that are \"publicly\" accessible.</em></p>";
 			}
-			
+
 			String pubDate = emlObject.getPubDate();
-			
+
 			if (pubDate != null) {
 				pubDateText += "(" + pubDate + "): ";
 			}
-			
+
 		} catch (PastaAuthenticationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -340,7 +341,9 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			return html;
 		}
 
-		html = creatorText + pubDateText + titleText + orgText + PUBLISHER + citationId;
+		html = creatorText + pubDateText + titleText + orgText + PUBLISHER
+		    + citationId + caveat;
+		
 		return html;
 
 	}
