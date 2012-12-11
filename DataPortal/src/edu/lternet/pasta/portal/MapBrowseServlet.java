@@ -297,30 +297,15 @@ public class MapBrowseServlet extends DataPortalServlet {
 			resource = tokens.nextToken();
 
 			if (resource.contains(metadataUri)) {
-
-				try {
-	        doi = " (" + dpmClient.readMetadataDoi(scope, identifier, revision) + ")";
-        } catch (Exception e) {
-	        logger.error(e.getMessage());
-	        e.printStackTrace();
-	        doi = "";
-        }
 				
 				metadata = "<li><a href=\"./metadataviewer?packageid=" + packageId
-				    + "\" target=\"_blank\">Metadata</a>" + doi + "</li>\n";
+				    + "\" target=\"_blank\">Metadata</a></li>\n";
 				
 			} else if (resource.contains(reportUri)) {
-
-				try {
-	        doi = " (" + dpmClient.readDataPackageReportDoi(scope, identifier, revision) + ")";
-        } catch (Exception e) {
-	        logger.error(e.getMessage());
-	        e.printStackTrace();
-	        doi = "";
-        }
 				
 				report = "<li><a href=\"./reportviewer?packageid=" + packageId
-				    + "\" target=\"_blank\">Report</a>" + doi + "</li>\n";
+				    + "\" target=\"_blank\">Report</a></li>\n";
+				
 			} else if (resource.contains(dataUri)) {
 
 				uriTokens = resource.split("/");
@@ -334,47 +319,18 @@ public class MapBrowseServlet extends DataPortalServlet {
 				}
 
 				if (data == null) {
-					
-					try {
-		        doi = " (" + dpmClient.readDataEntityDoi(scope, identifier, revision, entityName) + ")";
-	        } catch (Exception e) {
-		        logger.error(e.getMessage());
-		        e.printStackTrace();
-		        doi = "";
-	        }					
-					
 					data = "<li><a href=\"./dataviewer?packageid=" + packageId
 					    + "&entityname=" + entityName + "\" target=\"_blank\">"
-					    + entityName + "</a>" + doi + "</li>\n";
-				} else {
-					
-					try {
-		        doi = " (" + dpmClient.readDataEntityDoi(scope, identifier, revision, entityName) + ")";
-	        } catch (Exception e) {
-		        logger.error(e.getMessage());
-		        e.printStackTrace();
-		        doi = "";
-	        }										
-					
+					    + entityName + "</a></li>\n";
+				} else {					
 					data += "<li><a href=\"./dataviewer?packageid=" + packageId
 					    + "&entityname=" + entityName + "\" target=\"_blank\">"
-					    + entityName + "</a>" + doi + "</li>\n";
+					    + entityName + "</a></li>\n";
 				}
 
 			} else {
-
-				try {
-	        doi = " (" + dpmClient.readDataPackageDoi(scope, identifier, revision) + ")";
-        } catch (Exception e) {
-	        logger.error(e.getMessage());
-	        e.printStackTrace();
-	        doi = "";
-        }										
 				
-				dataPackage = "<li><a href=\"./mapbrowse?scope=" + scope
-						+ "&identifier=" + identifier.toString() + "&revision=" + revision
-						+ "\">" + packageId + "</a>" + doi + "</li>\n";
-				
+				dataPackage = "<li>" + packageId + "</li>\n";
 			}
 				
 
@@ -387,7 +343,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += dataPackage;
 		html += "</ul>\n";
 		html += "<h4 align=\"left\">Resources</h4>\n";
-		html += "<ul style=\"list-style: none;\">\n";
+		html += "<ul>\n";
 		html += metadata;
 		html += report;
 		html += "<li>Data\n";
