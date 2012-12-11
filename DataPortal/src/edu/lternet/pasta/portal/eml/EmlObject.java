@@ -60,6 +60,8 @@ public class EmlObject {
 
 	private String emlString = null;
 	private Eml eml = null;
+	private Integer personCount = 0;
+	private Integer orgCount = 0;
 
 	/*
 	 * Constructors
@@ -117,6 +119,8 @@ public class EmlObject {
 				nameType = name.getName().getLocalPart();
 
 				if (nameType.equals(Creator.PERSON)) {
+					
+					personCount++;
 
 					creator = new Creator(Creator.PERSON);
 					person = (Person) name.getValue();
@@ -147,6 +151,8 @@ public class EmlObject {
 					creators.add(creator);
 
 				} else if (nameType.equals(Creator.ORGANIZATION)) {
+					
+					this.orgCount++;
 
 					creator = new Creator(Creator.ORGANIZATION);
 					String organizationName = (String) name.getValue();
@@ -183,6 +189,26 @@ public class EmlObject {
 		return creators;
 
 	}
+	
+	/**
+	 * Returns the number of creators of type PERSON after the call to 
+	 * getCreators().
+	 * 
+	 * @return Person count
+	 */
+	public Integer getPersonCount()	{
+		return this.personCount;
+	}
+	
+	/**
+	 * Returns the number of creators of type ORGANIZATION after the call to 
+	 * getCreators().
+	 * 
+	 * @return Organization count
+	 */
+	public Integer getOrgCount() {
+		return this.orgCount;
+	}
 
 	/**
 	 * Returns ArrayList of titles.
@@ -216,6 +242,21 @@ public class EmlObject {
 
 		return titles;
 
+	}
+	
+	/**
+	 * Returns the publication date form the EML document.
+	 * 
+	 * @return Publication date
+	 */
+	public String getPubDate() {
+		
+		String pubDate = null;
+		
+		pubDate = this.eml.getDataset().getPubDate();
+		
+		return pubDate;
+		
 	}
 	
 	/*
