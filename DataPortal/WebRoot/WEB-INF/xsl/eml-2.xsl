@@ -236,7 +236,7 @@
       <div class="collapsible">
         <xsl:call-template name="entitypart"/>
       </div> <!-- end collapsible --> 
-      <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Set Usage Rights</h3>
+      <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Package Usage Rights</h3>
       <div class="collapsible">
         <!-- add in the intellectual rights info -->
         <table class="subGroup subGroup_border onehundred_percent">  
@@ -546,7 +546,7 @@
     <xsl:param name="docid" select="$docid"></xsl:param>
     <xsl:param name="resourcetitle" select="$resourcetitle"></xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: coveragepart</xsl:text></xsl:message></xsl:if>
-    <h3>Data Set Coverage</h3>
+    <h3>Data Package Coverage</h3>
     <!-- add in the coverage info -->
     <table class="subGroup onehundred_percent">  
       <tr>
@@ -1911,7 +1911,7 @@
   <xsl:template name="datasettitle">
     <xsl:param name="packageID" ></xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasettitle</xsl:text></xsl:message></xsl:if>
-    <!-- <h4 class="EML-dataset-supratitle">Data Set (<xsl:value-of select="$packageID"/>)</h4> -->
+    <!-- <h4 class="EML-dataset-supratitle">Data Package (<xsl:value-of select="$packageID"/>)</h4> -->
     <h3>
       <xsl:for-each select="./title">
         <xsl:value-of select="."/>
@@ -1924,7 +1924,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmixed</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <tr>
-        <th colspan="2">Data Set General Information:</th>
+        <th colspan="2">Data Package General Information:</th>
       </tr>
       <!-- put in the identifier and system that the ID belongs to -->
       <xsl:if test="../@packageId">
@@ -2286,7 +2286,7 @@
     <!-- dataset citation  -->   
     <table class="{$tabledefaultStyle}">
       <tr>
-        <th colspan="2">Data Set Citation:</th>
+        <th colspan="2">Data Package Citation:</th>
       </tr>
       <xsl:call-template name="howtoCite">
         <xsl:with-param name="citetabledefaultStyle"  select="$tabledefaultStyle"/>
@@ -6675,7 +6675,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: howtoCite</xsl:text></xsl:message></xsl:if>
     <table class="{$citetabledefaultStyle}" id="howToCite">
       <tr>
-        <td class="{$citefirstColStyle}">How to cite this data set:</td>
+        <td class="{$citefirstColStyle}">How to cite this data package:</td>
         <td class="{$citesecondColStyle}">
           <!-- count the creators, set a var -->
           <xsl:variable name="creator_count" select="count(creator/individualName)"/>
@@ -8911,7 +8911,7 @@
   <xsl:template name="resource">
     <xsl:param name="resfirstColStyle"/>
     <xsl:param name="ressubHeaderStyle"/>
-    <xsl:param name="creator">Data Set Owner(s):</xsl:param>
+    <xsl:param name="creator">Data Package Owner(s):</xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resource</xsl:text></xsl:message></xsl:if>
     <!--
       <xsl:for-each select="alternateIdentifier">
