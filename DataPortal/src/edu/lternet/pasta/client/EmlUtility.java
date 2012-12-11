@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.HashMap;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -40,9 +41,12 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.s9api.ItemType;
 import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
@@ -193,7 +197,7 @@ public class EmlUtility {
    * 
    * @return The HTML document as a String object.
    */
-  public String xmlToHtmlSaxon(String xslPath) {
+  public String xmlToHtmlSaxon(String xslPath, HashMap<String, String> parameters) {
 
     String html = null;
     File xsltFile = new File(xslPath);
@@ -211,10 +215,20 @@ public class EmlUtility {
       out.setOutputProperty(Serializer.Property.METHOD, "html");
       out.setOutputProperty(Serializer.Property.INDENT, "yes");
       out.setOutputWriter(stringWriter);
-      XsltTransformer trans = xsltExecutable.load();
-      trans.setInitialContextNode(xdmNode);
-      trans.setDestination(out);
-      trans.transform();
+      XsltTransformer xsltTransformer = xsltExecutable.load();
+      xsltTransformer.setInitialContextNode(xdmNode);
+      if (parameters != null) {
+        for (String parameterName : parameters.keySet()) {
+          String parameterValue = parameters.get(parameterName);
+          if (parameterValue != null && !parameterValue.equals("")) {
+            QName qName = new QName(parameterName);
+            XdmAtomicValue xdmAtomicValue = new XdmAtomicValue(parameterValue, ItemType.STRING);
+            xsltTransformer.setParameter(qName, xdmAtomicValue);
+          }
+        }
+      }
+      xsltTransformer.setDestination(out);
+      xsltTransformer.transform();
       html = stringWriter.toString();
     }
     catch (SaxonApiException e) {

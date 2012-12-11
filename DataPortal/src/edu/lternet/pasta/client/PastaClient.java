@@ -64,6 +64,7 @@ public class PastaClient {
   protected String pastaHost = null;
   protected String pastaProtocol = null;
   protected int pastaPort;
+  protected String pastaUriHead = null;
 
   protected String uid = null;
   protected String token = null;
@@ -86,6 +87,7 @@ public class PastaClient {
     this.pastaHost = options.getString("pasta.hostname");
     this.pastaProtocol = options.getString("pasta.protocol");
     this.pastaPort = options.getInt("pasta.port");
+    this.pastaUriHead = options.getString("pasta.uriHead");
 
     if (this.uid == null) {
 
@@ -170,6 +172,14 @@ public class PastaClient {
    */
   public String getPastaHost() {
     return pastaHost;
+  }
+  
+  
+  /*
+   * Gets the pastaHost instance variable.
+   */
+  public String getPastaUriHead() {
+    return pastaUriHead;
   }
   
   
