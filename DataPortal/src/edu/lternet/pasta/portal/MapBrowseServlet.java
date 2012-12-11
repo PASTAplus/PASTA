@@ -331,6 +331,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			} else {
 				
 				dataPackage = "<li>" + packageId + "</li>\n";
+				
 			}
 				
 
