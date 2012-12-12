@@ -51,7 +51,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>NIS Data Portal - View Reports</title>
+<title>NIS Data Portal - View Upload Reports</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -74,7 +74,7 @@
 
 		<div class="content">
 
-			<h2 align="center">View Harvest Reports</h2>
+			<h2 align="center">View Upload Reports</h2>
 
 			<%=warningMessage%>
 
