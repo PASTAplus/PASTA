@@ -229,7 +229,7 @@ public class HarvesterServlet extends DataPortalServlet {
         }
     
         /*
-         * "mode" can have a value of "evaluate" or "insert". It is set as the
+         * "mode" can have a value of "evaluate" or "upgrade". It is set as the
          * value of the submit button in each of the harvester forms.
          */
         String mode = request.getParameter("submit");
@@ -325,7 +325,7 @@ public class HarvesterServlet extends DataPortalServlet {
       this.reportId = uid + "-evaluate-" + harvestId;
     }
     else {
-      this.reportId = uid + "-insert-" + harvestId;
+      this.reportId = uid + "-upload-" + harvestId;
     }
     
     harvestDirPath = harvesterPath + "/" + this.reportId;

@@ -113,7 +113,7 @@ public class HarvestReport {
   public String harvestReportHTML(String reportId) {
     String reportPath = HarvestReportServlet.getHarvesterPath() + "/" + reportId;
     boolean isEvaluate = (reportId != null && reportId.contains("-evaluate-"));
-    String verb = isEvaluate ? "evaluated" : "inserted";
+    String verb = isEvaluate ? "evaluated" : "uploaded";
     StringBuffer stringBuffer = new StringBuffer("");
     
     stringBuffer.append("<fieldset>\n");
