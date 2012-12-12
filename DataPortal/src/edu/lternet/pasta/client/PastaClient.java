@@ -153,10 +153,10 @@ public class PastaClient {
    * @param pastaPort         The PASTA port value, e.g. 8888 (may be null or empty string)
    * @return
    */
-  public static String composePastaUrl(String pastaProtocol, String pastaHostname, int pastaPort) {
+  public static String composePastaUrl(String pastaProtocol, String pastaHostname, Integer pastaPort) {
     String pastaUrl = pastaProtocol + "://" + pastaHostname;
-    if (pastaPort > 0) {
-      pastaUrl += ":" + pastaPort;
+    if (pastaPort != null && pastaPort > 0) {
+      pastaUrl += ":" + pastaPort.toString();
     }
     return pastaUrl;
   }
