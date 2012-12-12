@@ -1,0 +1,188 @@
+
+
+  
+
+
+
+
+/*
+The navigation rules were separated out in 2010-03-25
+so that they could be called from xslt without requiring the wrapper.css
+It also has been placed in the css subfolder.
+
+
+*/
+
+
+
+/* describe the main menu, right below the header
+	 see the nav classes below for more on this menu */
+#menu-top {
+		height: 22px;
+		background-color:   #CCCC99;
+		border-top:	1px solid black;
+		border-bottom:	1px solid black;
+		padding:	0 0 0 110px;  /*  110px to line up with titles */
+
+}
+
+
+
+/*
+rules to control position of menus in the navigation bar
+* mostly from suckerfish, some hints from fce
+* http://www.htmldog.com/articles/suckerfish/dropdowns/ */
+#nav, #nav ul {
+	float: left;
+	width: 100%; 
+	list-style: none;
+	line-height: 1em;
+	font-weight: normal;
+/*	font-weight: bold;  */
+	font-size:14px;
+	padding: 0;
+	margin: 0;
+
+}
+
+
+#nav a {
+	display: block;  /* gets overridden in #nav li */
+	/* suckerfish: width: 10em;   */
+    padding: 0.25em;
+/* add space around each link
+	padding-left: .25em;
+	padding-right: .25em;
+    padding-top: .25em;
+    padding-bottom: .25em; */
+
+}
+
+
+/* position the lists.
+* padding: .1 seems to make the border line up better with background box.
+*  width: use % to spread them out, change to accomodate more or fewer items
+*					use 12em to fix width
+					use auto for current look, and add the vertical bar to html, as in
+					<li class="divider">&nbsp;|&nbsp;</li>
+					CHECK THAT AUTO is OK IN OPERA - suckerfish says you need to specify one*/
+#nav li {
+		position: relative;
+		float: left;
+		/* suckerfish: width: 10em;  */
+		/* fce:		width: 12%; */
+		padding: .1px;   /* from fce */
+		width: auto;
+
+
+}
+
+/* pad the vertical bar between top level menu items */
+#nav li.divider {
+		padding: 0.1em;
+}
+
+/* use this if you want to add an arrow image to parent li  */
+#nav li.parent {
+		/* background: url(arrow.png) center right no-repeat; */
+    background:   url(../brown_arrow7x12.gif) center right no-repeat;
+
+}
+
+/*
+* rules for sub-menus of nav (li/ul)
+* sent out of view with the left: -999 (dont use display: none)
+* left: auto under hover rule lets it show
+* top border on ul is here, bottom and sides on links (pay homage to fce) */
+#nav li ul {
+	position: absolute;
+	left: -999em;
+	height: auto;
+	width: 13.5em;
+	border-top: 1px solid black;
+	background-color:   #CCCC99;
+
+
+}
+
+/* nav lists of lists are same width */
+#nav li li {
+	width: 13.5em
+
+
+}
+
+/* applies to menus dropping from top-level list item
+	they should start just below
+	margin here should match line height set above for ul, and width for li li */
+#nav li ul ul {
+	margin: -1em 0 0 13.5em;
+
+}
+
+
+/* the l-r-bottom borders on the links, not the list items. (fce) */
+/* they had set a narrower width here (12.85), but not sure why.  removed it. */
+/* see a.menu for colors, hover, visited behavior */
+#nav li ul a {
+	border-left: 1px solid black;
+	border-right:  1px solid black;
+	border-bottom:  1px solid black;
+}
+
+/* rules for the links in the nav bar menus. color is reddish brown
+*/
+#nav a.menu:link {
+    color:                      #330000;
+    background:                 transparent;
+    text-decoration:            none;
+  }
+#nav a.menu:visited {
+    color:                      #330000;
+    background:                 transparent;
+    text-decoration:            none;
+  }
+#nav a.menu:hover {
+    color:                      #330000;
+    background:                 transparent;
+    text-decoration:            underline;
+  }
+#nav a.menu:active { 
+    color:                      #330000;
+    background:                 transparent;
+    text-decoration:            none;
+  }
+
+
+/* margin-top: -2em puts the submenu almost alongside the parent, 
+	margin-left: (width -.1) lets it overlap the right edge just a smidge  */
+#nav li ul ul {
+		margin: -2em 0 0 13.4em;  
+}
+
+/* need to explicitly hide submenus untill they're hovered. 	
+	also include rules for the suckerfish sfhover class created by javascript for IE. 
+Handles 4 menu levels - enough?*/
+#nav li:hover ul ul, 
+#nav li:hover ul ul ul, 
+#nav li:hover ul ul ul ul, 
+#nav li.sfhover ul ul, 
+#nav li.sfhover ul ul ul, 
+#nav li.sfhover ul ul ul ul {
+	left: -999em;
+}
+
+/* display the ul when hovered on the parent li */
+#nav li:hover ul, 
+#nav li li:hover ul, 
+#nav li li li:hover ul, 
+#nav li li li li:hover ul, 
+#nav li.sfhover ul, 
+#nav li li.sfhover ul, 
+#nav li li li.sfhover ul, 
+#nav li li li li.sfhover ul {
+	left: auto;
+}
+
+
+

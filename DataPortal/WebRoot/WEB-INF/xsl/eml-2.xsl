@@ -137,12 +137,12 @@
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html>&#x0A;</xsl:text>
     <html>
       <head>
-        <link rel="stylesheet" type="text/css" href="http://sbc.lternet.edu//w3_recommended.css" />
-        <link rel="stylesheet" type="text/css" href="http://sbc.lternet.edu//css/navigation.css" />
-        <link rel="stylesheet" type="text/css" href="http://sbc.lternet.edu//css/sbclter.css" />
+        <link rel="stylesheet" type="text/css" href="./css/w3_recommended.css" />
+        <link rel="stylesheet" type="text/css" href="./css/navigation.css" />
+        <link rel="stylesheet" type="text/css" href="./css/sbclter.css" />
         <!-- <link rel="stylesheet" type="text/css" href="http://portal.lternet.edu/nis/css/lter-nis.css"></link>--> <xsl:text>&#x0A;</xsl:text> 
-        <script src="http://portal.lternet.edu/nis/js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
-        <script src="http://portal.lternet.edu/nis/js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
+        <script src="./js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
+        <script src="./js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
         <title><xsl:value-of select="$docid"/></title>
       </head>
       <body>
@@ -913,30 +913,32 @@
     </tr>
   </xsl:template>
 
-   <!--************************Attribute Domain display module************************-->
-   <xsl:template name="datasetattributedomain">
-     <!-- 
-       these params are used to construct links back and to provide the 
-       attribute name or label as a variable
-     -->
-     <xsl:param name="entityindex" select="$entityindex"/>
-     <xsl:param name="entitytype" select="$entitytype"/>
-     <xsl:param name="attributeindex" select="$attributeindex"/>
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributedomain</xsl:text></xsl:message></xsl:if>
-     <xsl:variable name="attribute_label">
-       <xsl:choose>
-         <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel "/>
-           <xsl:text>&#160;(</xsl:text><xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/><xsl:text>)</xsl:text>
-         </xsl:when>
-         <xsl:otherwise>
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
-         </xsl:otherwise>
-       </xsl:choose>
-     </xsl:variable>
-     <!-- 
-       begin the display -->
-      <tr><td>
+  <!-- Attribute Domain display module -->
+  <xsl:template name="datasetattributedomain">
+    <!-- 
+     these params are used to construct links back and to provide the 
+     attribute name or label as a variable
+    -->
+    <xsl:param name="entityindex" select="$entityindex"/>
+    <xsl:param name="entitytype" select="$entitytype"/>
+    <xsl:param name="attributeindex" select="$attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributedomain</xsl:text></xsl:message></xsl:if>
+    <xsl:variable name="attribute_label">
+      <xsl:choose>
+        <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel">
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel"/>
+          <xsl:text>&#160;(</xsl:text>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName"/>
+          <xsl:text>)</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- begin the display -->
+    <tr>
+      <td>
         <table class="dataset-entity-part">
           <tr>
             <td class="dataset-entity-part-header">
@@ -944,97 +946,97 @@
             </td>
           </tr>
         </table>       
-     <!-- <h3>Attribute Domain</h3> -->
-      </td></tr>
-      <tr>
-     <td>
-       <!-- find the subtree to process -->
-       <xsl:call-template name="entityparam"/>
-    </td>
-      </tr>
-   </xsl:template>
-
-   <!-- Attribute Method display module -->
-   <xsl:template name="datasetattributemethod">
-     <!-- 
-       these params are used to construct links back and to provide the 
-       attribute name or label as a variable 
-     -->
-     <xsl:param name="entityindex" select="$entityindex"/>
-     <xsl:param name="entitytype" select="$entitytype"/>
-     <xsl:param name="attributeindex" select="$attributeindex"/>
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributemethod</xsl:text></xsl:message></xsl:if>
-     <xsl:variable name="attribute_label">
-       <xsl:choose>
-         <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel "/>
-           <xsl:text>&#160;(</xsl:text><xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/><xsl:text>)</xsl:text>
-         </xsl:when>
-         <xsl:otherwise>
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
-         </xsl:otherwise>
-       </xsl:choose>
-     </xsl:variable>
-     <!-- 
-       begin the display -->
-     <tr><td>
-       <table class="dataset-entity-part">
-         <tr>
-           <td class="dataset-entity-part-header">
-             <h3>Method for Attribute: <xsl:value-of select="$attribute_label"/></h3>
-           </td>
-         </tr>
-       </table>  
-     </td>
-       </tr>
-       <tr>
-     <td>
-       <!-- find the subtree to process -->
-       <xsl:call-template name="entityparam"/>
-    </td>
-      </tr>
-   </xsl:template>
-
-   <!-- Attribute Coverage display module -->
-   <xsl:template name="datasetattributecoverage">
-     <!-- These params are used to provide the attribute name or label as a variable -->
-     <xsl:param name="entityindex" select="$entityindex"/>
-     <xsl:param name="entitytype" select="$entitytype"/>
-     <xsl:param name="attributeindex" select="$attributeindex"/>
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributecoverage</xsl:text></xsl:message></xsl:if>
-     <xsl:variable name="attribute_label">
-       <xsl:choose>
-         <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel "/>
-           <xsl:text>&#160;(</xsl:text><xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/><xsl:text>)</xsl:text>
-         </xsl:when>
-         <xsl:otherwise>
-           <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
-         </xsl:otherwise>
-       </xsl:choose>
-     </xsl:variable>
-     <!-- begin the display -->
-     <tr><td>
-       <table class="dataset-entity-part">
-         <tr>
-           <td class="dataset-entity-part-header">
-             <h3>Coverage for Attribute: <xsl:value-of select="$attribute_label"/></h3>
-           </td>
-         </tr>
-       </table>  
+        <!-- <h3>Attribute Domain</h3> -->
       </td>
-     </tr>
-      <tr>
-     <td>
-       <!-- find the subtree to process -->
-       <xsl:call-template name="entityparam"/>
-    </td>
-      </tr>
-   </xsl:template>
+    </tr>
+    <tr>
+      <!-- find the subtree to process -->
+      <td><xsl:call-template name="entityparam"/></td>
+    </tr>
+  </xsl:template>
 
-   <xsl:template name="entityparam">
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityparam</xsl:text></xsl:message></xsl:if>
-     <xsl:choose>
+  <!-- Attribute Method display module -->
+  <xsl:template name="datasetattributemethod">
+    <!-- 
+      these params are used to construct links back and to provide the 
+      attribute name or label as a variable 
+    -->
+    <xsl:param name="entityindex" select="$entityindex"/>
+    <xsl:param name="entitytype" select="$entitytype"/>
+    <xsl:param name="attributeindex" select="$attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributemethod</xsl:text></xsl:message></xsl:if>
+    <xsl:variable name="attribute_label">
+      <xsl:choose>
+        <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel "/>
+          <xsl:text>&#160;(</xsl:text>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
+          <xsl:text>)</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- begin the display -->
+    <tr>
+      <td>
+        <table class="dataset-entity-part">
+          <tr>
+            <td class="dataset-entity-part-header">
+              <h3>Method for Attribute: <xsl:value-of select="$attribute_label"/></h3>
+            </td>
+          </tr>
+        </table>  
+      </td>
+    </tr>
+    <tr>
+      <!-- find the subtree to process -->
+      <td><xsl:call-template name="entityparam"/></td>
+    </tr>
+  </xsl:template>
+
+  <!-- Attribute Coverage display module -->
+  <xsl:template name="datasetattributecoverage">
+    <!-- These params are used to provide the attribute name or label as a variable -->
+    <xsl:param name="entityindex" select="$entityindex"/>
+    <xsl:param name="entitytype" select="$entitytype"/>
+    <xsl:param name="attributeindex" select="$attributeindex"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetattributecoverage</xsl:text></xsl:message></xsl:if>
+    <xsl:variable name="attribute_label">
+      <xsl:choose>
+        <xsl:when test="*/attributeList/attribute[number($attributeindex)]/attributeLabel ">
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeLabel "/>
+          <xsl:text>&#160;(</xsl:text>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
+          <xsl:text>)</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="*/attributeList/attribute[number($attributeindex)]/attributeName "/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- begin the display -->
+    <tr>
+      <td>
+        <table class="dataset-entity-part">
+          <tr>
+            <td class="dataset-entity-part-header">
+              <h3>Coverage for Attribute: <xsl:value-of select="$attribute_label"/></h3>
+            </td>
+          </tr>
+        </table>  
+      </td>
+    </tr>
+    <tr>
+      <!-- find the subtree to process -->
+      <td><xsl:call-template name="entityparam"/></td>
+    </tr>
+  </xsl:template>
+
+  <xsl:template name="entityparam">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: entityparam</xsl:text></xsl:message></xsl:if>
+    <xsl:choose>
       <xsl:when test="$entitytype=''">
         <xsl:variable name="dataTableCount" select="0"/>
         <xsl:variable name="spatialRasterCount" select="0"/>
@@ -1587,155 +1589,155 @@
     </xsl:for-each>
   </xsl:template>
 
-   <!-- Distribution Inline Data display module -->
-   <xsl:template name="emlinlinedata">
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlinlinedata</xsl:text></xsl:message></xsl:if>
-     <tr><td>
-      <h3>Data (inline):</h3>
-      </td></tr>
-      <tr>
-     <td>
-      <xsl:if test="$distributionlevel='toplevel'">
-         <xsl:for-each select="distribution">
+  <!-- Distribution Inline Data display module -->
+  <xsl:template name="emlinlinedata">
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: emlinlinedata</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td><h3>Data (inline):</h3></td>
+    </tr>
+    <tr>
+      <td>
+        <xsl:if test="$distributionlevel='toplevel'">
+          <xsl:for-each select="distribution">
             <xsl:if test="position()=$distributionindex">
-               <xsl:choose>
-                 <xsl:when test="references!=''">
-                    <xsl:variable name="ref_id1" select="references"/>
-                    <xsl:variable name="references1" select="$ids[@id=$ref_id1]" />
-                    <xsl:for-each select="$references1">
-                        <xsl:for-each select="inline">
-                          <pre>
-                            <xsl:value-of  select="." xml:space="preserve"/>
-                          </pre>
-                          <!--   <xsl:value-of select="."/> -->
-                        </xsl:for-each>
+              <xsl:choose>
+                <xsl:when test="references!=''">
+                  <xsl:variable name="ref_id1" select="references"/>
+                  <xsl:variable name="references1" select="$ids[@id=$ref_id1]" />
+                  <xsl:for-each select="$references1">
+                    <xsl:for-each select="inline">
+                      <pre>
+                        <xsl:value-of  select="." xml:space="preserve"/>
+                      </pre>
+                      <!--   <xsl:value-of select="."/> -->
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:for-each select="inline">
-                       <pre>
-                            <xsl:value-of  select="." xml:space="preserve"/>
-                          </pre>
-                        <!--    <xsl:value-of select="."/> -->
-                     </xsl:for-each>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-         </xsl:for-each>
-      </xsl:if>
-      <xsl:if test="$distributionlevel='entitylevel'">
-        <xsl:if test="$entitytype='dataTable'">
-          <xsl:for-each select="dataTable">
-            <xsl:if test="position()=$entityindex">
-                <xsl:choose>
-                 <xsl:when test="references!=''">
-                    <xsl:variable name="ref_id2" select="references"/>
-                    <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
-                    <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
-                    </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:for-each select="inline">
+                    <pre>
+                      <xsl:value-of  select="." xml:space="preserve"/>
+                    </pre>
+                    <!-- <xsl:value-of select="."/> -->
+                  </xsl:for-each>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:if>
           </xsl:for-each>
         </xsl:if>
-        <xsl:if test="$entitytype='spatialRaster'">
-          <xsl:for-each select="spatialRaster">
-            <xsl:if test="position()=$entityindex">
+        <xsl:if test="$distributionlevel='entitylevel'">
+          <xsl:if test="$entitytype='dataTable'">
+            <xsl:for-each select="dataTable">
+              <xsl:if test="position()=$entityindex">
                 <xsl:choose>
-                 <xsl:when test="references!=''">
+                  <xsl:when test="references!=''">
                     <xsl:variable name="ref_id2" select="references"/>
                     <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
                     <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
+                      <xsl:call-template name="choosephysical"/>
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="$entitytype='spatialVector'">
-          <xsl:for-each select="spatialVector">
-            <xsl:if test="position()=$entityindex">
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$entitytype='spatialRaster'">
+            <xsl:for-each select="spatialRaster">
+              <xsl:if test="position()=$entityindex">
                 <xsl:choose>
-                 <xsl:when test="references!=''">
+                  <xsl:when test="references!=''">
                     <xsl:variable name="ref_id2" select="references"/>
                     <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
                     <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
+                      <xsl:call-template name="choosephysical"/>
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="$entitytype='storedProcedure'">
-          <xsl:for-each select="storedProcedure">
-            <xsl:if test="position()=$entityindex">
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$entitytype='spatialVector'">
+            <xsl:for-each select="spatialVector">
+              <xsl:if test="position()=$entityindex">
                 <xsl:choose>
-                 <xsl:when test="references!=''">
+                  <xsl:when test="references!=''">
                     <xsl:variable name="ref_id2" select="references"/>
                     <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
                     <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
+                      <xsl:call-template name="choosephysical"/>
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="$entitytype='view'">
-          <xsl:for-each select="view">
-            <xsl:if test="position()=$entityindex">
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$entitytype='storedProcedure'">
+            <xsl:for-each select="storedProcedure">
+              <xsl:if test="position()=$entityindex">
                 <xsl:choose>
-                 <xsl:when test="references!=''">
+                  <xsl:when test="references!=''">
                     <xsl:variable name="ref_id2" select="references"/>
                     <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
                     <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
+                      <xsl:call-template name="choosephysical"/>
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:if test="$entitytype='otherEntity'">
-          <xsl:for-each select="otherEntity">
-            <xsl:if test="position()=$entityindex">
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$entitytype='view'">
+            <xsl:for-each select="view">
+              <xsl:if test="position()=$entityindex">
                 <xsl:choose>
-                 <xsl:when test="references!=''">
+                  <xsl:when test="references!=''">
                     <xsl:variable name="ref_id2" select="references"/>
                     <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
                     <xsl:for-each select="$references2">
-                       <xsl:call-template name="choosephysical"/>
+                      <xsl:call-template name="choosephysical"/>
                     </xsl:for-each>
-                 </xsl:when>
-                 <xsl:otherwise>
-                     <xsl:call-template name="choosephysical"/>
-                 </xsl:otherwise>
-               </xsl:choose>
-            </xsl:if>
-          </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="$entitytype='otherEntity'">
+            <xsl:for-each select="otherEntity">
+              <xsl:if test="position()=$entityindex">
+                <xsl:choose>
+                  <xsl:when test="references!=''">
+                    <xsl:variable name="ref_id2" select="references"/>
+                    <xsl:variable name="references2" select="$ids[@id=$ref_id2]" />
+                    <xsl:for-each select="$references2">
+                      <xsl:call-template name="choosephysical"/>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:call-template name="choosephysical"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
         </xsl:if>
-      </xsl:if>
-    </td>
-      </tr>
-   </xsl:template>
+      </td>
+    </tr>
+  </xsl:template>
 
   <xsl:template name="choosephysical">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: choosephysical</xsl:text></xsl:message></xsl:if>
@@ -7409,7 +7411,7 @@
         </tr>
   </xsl:template>
 
-<!-- eml-method-2.0.0.xsl -->
+  <!-- eml-method-2.0.0.xsl -->
   <!-- changes labeled "mob 2005-12-xx to clean up protocols. not sure of
        impact on other elements. arghh. -->
   <xsl:template name="method">
@@ -7417,71 +7419,66 @@
     <xsl:param name="methodsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: method</xsl:text></xsl:message></xsl:if>
     <!-- <table class="{$tabledefaultStyle}">  use this class to unbox the table  -->
-      <table class="subGroup onehundred_percent">
-        <tr>
-	        <!-- changed table title. usually protocol refs, sometimes procedural steps -->
-          <!-- Step by Step Procedures  -->
-          <th colspan="2">Protocols and/or Procedures</th>
-        </tr>
-    <xsl:for-each select="methodStep">
-		<!-- methodStep (defined below) calls step (defined in protocol.xsl).  -->
-		<!-- mob added a table element to the step template so that each methodStep 
-		is boxed, but without position labels. Could add step labels back in, or just 
-		for subSteps with 'if test=substep'? proceduralStep? -->
-		 <tr>
-		 	<td>
-				<xsl:call-template name="methodStep">
-				<xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
-				<xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
-			 </xsl:call-template>
-			 </td>
-		</tr>
-    </xsl:for-each>
-    <!-- SAMPLING descr, extent -->
-    <xsl:if test="sampling">   
-		<xsl:for-each select="sampling">
-		<!-- <table class="{$tabledefaultStyle}">  
-			use this class to unbox the table  -->
-			<table class="subGroup onehundred_percent">
-          <tr>
-				  <th colspan="2">
-					Sampling Area and Study Extent
-				  </th>
-				 </tr>
-				 <tr><td>
-				  <xsl:call-template name="sampling">
-						<xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
-						<xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
-					</xsl:call-template>
-				</td></tr>
-			</table>
-		</xsl:for-each> 
-  </xsl:if>
-     <!-- QUALITY CONTROL -->
-		<!-- dont have any files to test this on yet, working? -->
-        <xsl:if test="qualityControl">
-            <table class="{$tabledefaultStyle}">
-				<tr>
-					<th colspan="2">
-					  Quality Control
-					</th>
+    <table class="subGroup onehundred_percent">
+      <tr>
+	      <!-- changed table title. usually protocol refs, sometimes procedural steps -->
+        <!-- Step by Step Procedures  -->
+        <th colspan="2">Protocols and/or Procedures</th>
+      </tr>
+      <xsl:for-each select="methodStep">
+		    <!-- methodStep (defined below) calls step (defined in protocol.xsl).  -->
+		    <!-- mob added a table element to the step template so that each methodStep 
+		         is boxed, but without position labels. Could add step labels back in, or just 
+		         for subSteps with 'if test=substep'? proceduralStep? -->
+		    <tr>
+		 	    <td>
+				    <xsl:call-template name="methodStep">
+				      <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
+				      <xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
+			      </xsl:call-template>
+			    </td>
+		    </tr>
+      </xsl:for-each>
+      <!-- SAMPLING descr, extent -->
+      <xsl:if test="sampling">   
+		    <xsl:for-each select="sampling">
+		      <!-- <table class="{$tabledefaultStyle}">  use this class to unbox the table  -->
+			    <table class="subGroup onehundred_percent">
+            <tr>
+				      <th colspan="2">Sampling Area and Study Extent</th>
+				    </tr>
+				    <tr>
+				      <td>
+				        <xsl:call-template name="sampling">
+						      <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
+						      <xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
+					      </xsl:call-template>
+				      </td>
+				    </tr>
+			    </table>
+		    </xsl:for-each> 
+      </xsl:if>
+      <!-- QUALITY CONTROL -->
+		  <!-- dont have any files to test this on yet, working? -->
+      <xsl:if test="qualityControl">
+        <table class="{$tabledefaultStyle}">
+				  <tr>
+					  <th colspan="2">Quality Control</th>
 			    </tr>
-			<xsl:for-each select="qualityControl">
-				<tr>
-				  <td class="{$methodfirstColStyle}">
-					  <b>Quality Control Step<xsl:text> </xsl:text><xsl:value-of select="position()"/>:</b>
-				  </td>
-				 <td width="${secondColWidth}" class="{$secondColStyle}">
-				   &#160;
-				 </td>
-				</tr> 
-				 <xsl:call-template name="qualityControl">
-					 <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
-					 <xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
-				 </xsl:call-template>
-		    </xsl:for-each>
-		</table>
-		</xsl:if>
+			    <xsl:for-each select="qualityControl">
+				    <tr>
+				      <td class="{$methodfirstColStyle}">
+					      <strong>Quality Control Step<xsl:text> </xsl:text><xsl:value-of select="position()"/>:</strong>
+				      </td>
+				      <td width="${secondColWidth}" class="{$secondColStyle}">&#160;</td>
+				    </tr> 
+				    <xsl:call-template name="qualityControl">
+					    <xsl:with-param name="methodfirstColStyle" select="$methodfirstColStyle"/>
+					    <xsl:with-param name="methodsubHeaderStyle" select="$methodsubHeaderStyle"/>
+				    </xsl:call-template>
+		      </xsl:for-each>
+		    </table>
+		  </xsl:if>
     </table>   <!-- matches table onehundredpercent, entire methodStep-->
   </xsl:template>
 
