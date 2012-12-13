@@ -311,8 +311,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				logger.error(e.getMessage());
 				e.printStackTrace();
 				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
-				caveat = "<p><em>*DOIs are generated hourly for all data packages"
-				    + " that are \"publicly\" accessible.</em></p>";
+				caveat = "<p>Note: DOIs are generated hourly for all data packages"
+				    + " that are \"publicly\" accessible.</p>";
 			}
 
 			String pubDate = emlObject.getPubDate();
@@ -338,8 +338,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			return html;
 		}
 
-		html = creatorText + pubDateText + titleText + orgText + PUBLISHER
-		    + citationId + caveat;
+		html = "<ul style=\"list-style: none;\"><li><em>" + creatorText + pubDateText + titleText + orgText + PUBLISHER
+		    + citationId + "</em></li></ul>" + caveat;
 		
 		return html;
 

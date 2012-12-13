@@ -58,11 +58,8 @@
 						out.println(citationMessage);
 				%>
 
-				<ul style="list-style: none;">
-					<li><em> <%=html%> </em>
-					</li>
-				</ul>
-
+				<%=html%>
+				
 				<p>
 					Please refer to the LTER Network <a
 						href="http://www.lternet.edu/policies/data-access" target="_blank">Data
