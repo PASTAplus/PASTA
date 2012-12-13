@@ -1,16 +1,17 @@
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName()
+	    + ":" + request.getServerPort() + path + "/";
 
-  HttpSession httpSession = request.getSession();
-  String citationMessage = (String) httpSession.getAttribute("citationmessage");
-  String html = (String) httpSession.getAttribute("html");
+	HttpSession httpSession = request.getSession();
+	String citationMessage = (String) httpSession
+	    .getAttribute("citationmessage");
+	String html = (String) httpSession.getAttribute("html");
 
-  if (html == null) {
-    html = "";
-  }
+	if (html == null) {
+		html = "";
+	}
 %>
 
 <!doctype html>
@@ -43,14 +44,30 @@
 
 			<fieldset>
 				<legend>Data Package Citation</legend>
-				<p>
-					<%
-					  if (citationMessage != null)
-					    out.println(citationMessage);
-					%>
-				</p>
 
-				<%=html%>
+				<p>
+					The LTER Network considers it a matter of professional ethics to
+					acknowledge the work of other scientists. Thus, you, the <em>Data User</em>
+					should properly cite the <em>Data Package</em> you utilize in any
+					publication or in the metadata of any derived data product that is
+					produced using the <em>Data Package</em>.
+				<p>The citation should have the following general form:</p>
+
+				<%
+					if (citationMessage != null)
+						out.println(citationMessage);
+				%>
+
+				<ul style="list-style: none;">
+					<li><em> <%=html%> </em>
+					</li>
+				</ul>
+
+				<p>
+					Please refer to the LTER Network <a
+						href="http://www.lternet.edu/policies/data-access" target="_blank">Data
+						Access Policy</a> for additional information.
+				</p>
 
 			</fieldset>
 
