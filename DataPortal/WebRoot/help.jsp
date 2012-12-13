@@ -24,9 +24,9 @@
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName()
+	    + ":" + request.getServerPort() + path + "/";
 %>
 
 <!doctype html>
@@ -50,22 +50,56 @@
 
 <body>
 
-		<div class="wrapper">
+	<div class="wrapper">
 
-			<jsp:include page="/WEB-INF/jsp/head.jsp" />
-			<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
+		<jsp:include page="/WEB-INF/jsp/head.jsp" />
+		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
 
-			<div class="content">
+		<div class="content">
 
-				<h3 align="center">[Links to general help about the NIS Data Portal and Frequently Asked Questions]</h3>
+			<h3 align="center">Need Help, Have Questions?</h3>
 
-			</div>
-			<!-- end content -->
+			<h4 align="left">How do I...</h4>
 
-			<jsp:include page="/WEB-INF/jsp/foot.jsp" />
+			<ul>
+				<li>Learn about the PASTA Software Developer's Application
+					Programming Interface (API) - <a
+					href="https://nis.lternet.edu:8443/x/BAAF" target="_blank">NIS
+						Software Developer's Guide</a>
+				</li>
+				<li>Search for LTER data - <a
+					href="https://nis.lternet.edu:8443/x/IoBH" target="_blank">NIS
+						Users' Guide</a>
+				</li>
+				<li>Find out more about the LTER Network Information System
+					(NIS) and its Mission - <a
+					href="https://nis.lternet.edu:8443/x/agBP" target="_blank">NIS
+						Community Website</a>
+				</li>
+				<li>Use the NIS Data Portal to create synthetic data - <a
+					href="https://nis.lternet.edu:8443/x/NQFZ" target="_blank">Synthesis</a>
+				</li>
+				<li>Find out who has been downloading my data - <a
+					href="https://nis.lternet.edu:8443/x/OwFZ" target="_blank">Reports</a>
+				</li>
+			</ul>
+
+			<p>
+				Have more questions, go to the <a
+					href="https://nis.lternet.edu:8443/x/OwFZ" target="_blank">Frequently
+					Asked Questions</a> page, enter your question as a comment in either
+				the NIS User's Guide or the NIS Software Developer's Guide, or you
+				can always email <a href="mailto:tech-support@lternet.edu"
+					target="_blank">tech-support@lternet.edu</a>.
+			</p>
 
 		</div>
-		<!-- end wrapper -->
+		<!-- end content -->
+
+		<jsp:include page="/WEB-INF/jsp/foot.jsp" />
+
+	</div>
+	<!-- end wrapper -->
 
 </body>
 </html>
