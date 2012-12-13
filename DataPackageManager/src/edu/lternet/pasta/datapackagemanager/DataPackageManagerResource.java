@@ -91,6 +91,7 @@ import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.token.AuthTokenFactory;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.metadatafactory.MetadataFactory;
 
 /**
@@ -2935,6 +2936,7 @@ public class DataPackageManagerResource extends PastaWebService {
     AuthToken authToken = null;
     String doi = null;
     String entryText = null;
+    String resourceId = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readDataPackageDoi";
@@ -2954,15 +2956,17 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			String resourceId = "eml/" + scope + "/" + identifier.toString() + "/"
-			    + revision;
-      
+			resourceId = DataPackageManager.composeResourceId(
+			    ResourceType.dataPackage, scope, identifier,
+			    Integer.valueOf(revision), null);
+
       DataPackageManager dataPackageManager = new DataPackageManager(); 
       doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-
+      
       if (doi != null) {
         responseBuilder = Response.ok(doi);
         response = responseBuilder.build();
+        entryText = doi;
       }
       else {
         Exception e = new Exception(
@@ -3002,7 +3006,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, doi, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
 
     response = stampHeader(response);
     return response;
@@ -3103,6 +3107,7 @@ public class DataPackageManagerResource extends PastaWebService {
     AuthToken authToken = null;
     String doi = null;
     String entryText = null;
+    String resourceId = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readMetadataDoi";
@@ -3122,15 +3127,17 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			String resourceId = "metadata/eml/" + scope + "/" + identifier.toString() + "/"
-			    + revision;
-      
+			resourceId = DataPackageManager.composeResourceId(
+			    ResourceType.metadata, scope, identifier,
+			    Integer.valueOf(revision), null);
+
       DataPackageManager dataPackageManager = new DataPackageManager(); 
       doi = dataPackageManager.readResourceDoi(resourceId, authToken);
 
-      if (doi != null) {
+			if (doi != null) {
         responseBuilder = Response.ok(doi);
         response = responseBuilder.build();
+        entryText = doi;
       }
       else {
         Exception e = new Exception(
@@ -3145,7 +3152,7 @@ public class DataPackageManagerResource extends PastaWebService {
     }
     catch (UnauthorizedException e) {
       entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    	response = WebExceptionFactory.makeUnauthorized(e).getResponse();
     }
     catch (ResourceNotFoundException e) {
       entryText = e.getMessage();
@@ -3170,7 +3177,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, doi, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
 
     response = stampHeader(response);
     return response;
@@ -3272,6 +3279,7 @@ public class DataPackageManagerResource extends PastaWebService {
     AuthToken authToken = null;
     String doi = null;
     String entryText = null;
+    String resourceId = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readDataEntityDoi";
@@ -3291,16 +3299,18 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			String resourceId = "data/eml/" + scope + "/" + identifier.toString() + "/"
-			    + revision + "/" + entityId;
-      
+			resourceId = DataPackageManager.composeResourceId(
+			    ResourceType.data, scope, identifier,
+			    Integer.valueOf(revision), entityId);
+
       DataPackageManager dataPackageManager = new DataPackageManager(); 
       doi = dataPackageManager.readResourceDoi(resourceId, authToken);
 
       if (doi != null) {
         responseBuilder = Response.ok(doi);
         response = responseBuilder.build();
-      }
+        entryText = doi;
+     }
       else {
         Exception e = new Exception(
             "Read resource DOI operation failed for unknown reason");
@@ -3339,7 +3349,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, doi, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
 
     response = stampHeader(response);
     return response;
@@ -3440,6 +3450,7 @@ public class DataPackageManagerResource extends PastaWebService {
     AuthToken authToken = null;
     String doi = null;
     String entryText = null;
+    String resourceId = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readDataPackageReportDoi";
@@ -3459,8 +3470,9 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			String resourceId = "report/eml/" + scope + "/" + identifier.toString() + "/"
-			    + revision;
+			resourceId = DataPackageManager.composeResourceId(
+			    ResourceType.report, scope, identifier,
+			    Integer.valueOf(revision), null);
       
       DataPackageManager dataPackageManager = new DataPackageManager(); 
       doi = dataPackageManager.readResourceDoi(resourceId, authToken);
@@ -3468,6 +3480,7 @@ public class DataPackageManagerResource extends PastaWebService {
       if (doi != null) {
         responseBuilder = Response.ok(doi);
         response = responseBuilder.build();
+        entryText = doi;
       }
       else {
         Exception e = new Exception(
@@ -3507,7 +3520,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, doi, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
 
     response = stampHeader(response);
     return response;

@@ -1565,8 +1565,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 		String doi = null;
 		String user = authToken.getUserId();
 		
-		resourceId = this.pastaUriHead + resourceId;
-		
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
