@@ -45,7 +45,8 @@
   <xsl:variable name="resourcetitle" select="/eml:eml/dataset/title"/>
   <!-- global variables to store id node set in case to be referenced -->
   <xsl:variable name="ids" select="//*[@id != '']"/>
-
+  <xsl:variable name="prov-stmt" select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"/>
+  
   <!-- *** Parameters ***
        Note that the default values specified below may be overridden by passing parameters to
        the XSLT processor programatically, although the procedure for doing so is vendor-specific.
@@ -6304,43 +6305,38 @@
        </xsl:for-each>
    </xsl:template>
 
-   <xsl:template match="description">
-     <xsl:param name="disfirstColStyle"/>
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: description</xsl:text></xsl:message></xsl:if>
-     <xsl:call-template name="text">
-        <xsl:with-param name="textfirstColStyle" select="$secondColStyle" />
-     </xsl:call-template>
-   </xsl:template>
+  <xsl:template match="description">
+    <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: description</xsl:text></xsl:message></xsl:if>
+    <xsl:call-template name="text">
+      <xsl:with-param name="textfirstColStyle" select="$secondColStyle" />
+    </xsl:call-template>
+  </xsl:template>
 
-   <xsl:template name="renderParameterDefinition">
-     <xsl:param name="disfirstColStyle"/>
-     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: renderParameterDefinition</xsl:text></xsl:message></xsl:if>
-     <tr>
-        <td class="{$disfirstColStyle}">
-          <xsl:text>&#160;&#160;&#160;&#160;&#160;</xsl:text><xsl:value-of select="name" /><xsl:text>:</xsl:text>
-        </td>
-        <td>
-          <table class="{$tabledefaultStyle}">
-            <tr>
-              <td class="{$disfirstColStyle}">
-                <xsl:choose>
-                  <xsl:when test="defaultValue">
-                    <xsl:value-of select="defaultValue" />
-                  </xsl:when>
-                  <xsl:otherwise>
-                    &#160;
-                  </xsl:otherwise>
-                </xsl:choose>
-
-              </td>
-              <td class="{$secondColStyle}">
-                <xsl:value-of select="definition" />
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-   </xsl:template>
+  <xsl:template name="renderParameterDefinition">
+    <xsl:param name="disfirstColStyle"/>
+    <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: renderParameterDefinition</xsl:text></xsl:message></xsl:if>
+    <tr>
+      <td class="{$disfirstColStyle}">
+        <xsl:text>&#160;&#160;&#160;&#160;&#160;</xsl:text><xsl:value-of select="name"/><xsl:text>:</xsl:text>
+      </td>
+      <td>
+        <table class="{$tabledefaultStyle}">
+          <tr>
+            <td class="{$disfirstColStyle}">
+              <xsl:choose>
+                <xsl:when test="defaultValue">
+                  <xsl:value-of select="defaultValue" />
+                </xsl:when>
+                <xsl:otherwise>&#160;</xsl:otherwise>
+              </xsl:choose>
+            </td>
+            <td class="{$secondColStyle}"><xsl:value-of select="definition"/></td>
+         </tr>
+       </table>
+     </td>
+   </tr>
+  </xsl:template>
 
   <!-- *******************************  Offline data  ********************** -->
   <xsl:template match="offline">
@@ -9513,233 +9509,208 @@
     <xsl:param name="entityindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRastercommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
-       <xsl:call-template name="entityName">
-          <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityName">
+        <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="alternateIdentifier">
-       <xsl:call-template name="entityalternateIdentifier">
-          <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityalternateIdentifier">
+        <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="entityDescription">
-       <xsl:call-template name="entityDescription">
-          <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityDescription">
+        <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="additionalInfo">
-       <xsl:call-template name="entityadditionalInfo">
-          <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityadditionalInfo">
+        <xsl:with-param name="entityfirstColStyle" select="$spatialrasterfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <!-- call physical moduel without show distribution(we want see it later)-->
     <xsl:if test="physical">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Physical Structure Description:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Physical Structure Description:</td>
+      </tr>
       <xsl:for-each select="physical">
-      <tr><td colspan="2">
-        <xsl:call-template name="physical">
-         <xsl:with-param name="physicalfirstColStyle" select="$spatialrasterfirstColStyle"/>
-         <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
-        </xsl:call-template>
-         </td></tr>
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="physical">
+              <xsl:with-param name="physicalfirstColStyle" select="$spatialrasterfirstColStyle"/>
+              <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
+            </xsl:call-template>
+          </td>
+        </tr>
       </xsl:for-each>
     </xsl:if>
     <xsl:if test="coverage">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Coverage Description:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Coverage Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="coverage">
-      <tr><td colspan="2">
-        <xsl:call-template name="coverage">
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="coverage">
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="method">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Method Description:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Method Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="method">
-      <tr><td colspan="2">
-        <xsl:call-template name="method">
-          <xsl:with-param name="methodfirstColStyle" select="$spatialrasterfirstColStyle"/>
-          <xsl:with-param name="methodsubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="method">
+            <xsl:with-param name="methodfirstColStyle" select="$spatialrasterfirstColStyle"/>
+            <xsl:with-param name="methodsubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="constraint">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Constraint:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Constraint:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="constraint">
-      <tr><td colspan="2">
-        <xsl:call-template name="constraint">
-          <xsl:with-param name="constraintfirstColStyle" select="$spatialrasterfirstColStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="constraint">
+            <xsl:with-param name="constraintfirstColStyle" select="$spatialrasterfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="spatialReference">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Spatial Reference:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Spatial Reference:</td>
+      </tr>
       <xsl:call-template name="spatialReference">
         <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
       </xsl:call-template>
     </xsl:for-each>
-     <xsl:for-each select="georeferenceInfo">
-       <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Grid Postion:
-      </td></tr>
+    <xsl:for-each select="georeferenceInfo">
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Grid Postion:</td>
+      </tr>
       <xsl:call-template name="georeferenceInfo">
         <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
       </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="horizontalAccuracy">
-      <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Horizontal Accuracy:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Horizontal Accuracy:</td>
+      </tr>
       <xsl:call-template name="dataQuality">
         <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
       </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="verticalAccuracy">
-      <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Vertical Accuracy:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Vertical Accuracy:</td>
+      </tr>
       <xsl:call-template name="dataQuality">
         <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
       </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="cellSizeXDirection">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Cell Size(X):
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Cell Size(X):</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="cellSizeYDirection">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Cell Size(Y):
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Cell Size(Y):</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="numberOfBands">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Number of Bands:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Number of Bands:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="rasterOrigin">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Origin:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Origin:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="columns">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Max Raster Objects(X):
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Max Raster Objects(X):</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="rows">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Max Raster Objects(Y):
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Max Raster Objects(Y):</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="verticals">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Max Raster Objects(Z):
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Max Raster Objects(Z):</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="cellGeometry">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Cell Geometry:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Cell Geometry:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="toneGradation">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Number of Colors:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Number of Colors:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="scaleFactor">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Scale Factor:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Scale Factor:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
-     <xsl:for-each select="offset">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Offset:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+    <xsl:for-each select="offset">
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Offset:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="imageDescription">
-      <tr><td class="{$spatialrastersubHeaderStyle}" colspan="2">
-        Image Info:
-      </td></tr>
+      <tr>
+        <td class="{$spatialrastersubHeaderStyle}" colspan="2">Image Info:</td>
+      </tr>
       <xsl:call-template name="imageDescription">
         <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
       </xsl:call-template>
     </xsl:for-each>
     <xsl:if test="$withAttributes='1'">
-    <xsl:for-each select="attributeList">
-      <xsl:call-template name="spatialRasterAttributeList">
-        <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-        <xsl:with-param name="spatialrastersubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
-        <xsl:with-param name="docid" select="$docid"/>
-        <xsl:with-param name="entityindex" select="$entityindex"/>
-      </xsl:call-template>
-    </xsl:for-each>
+      <xsl:for-each select="attributeList">
+        <xsl:call-template name="spatialRasterAttributeList">
+          <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+          <xsl:with-param name="spatialrastersubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="entityindex" select="$entityindex"/>
+        </xsl:call-template>
+      </xsl:for-each>
     </xsl:if>
     <!-- Here to display distribution info-->
     <xsl:for-each select="physical">
-       <xsl:call-template name="spatialRasterShowDistribution">
-          <xsl:with-param name="docid" select="$docid"/>
-          <xsl:with-param name="entityindex" select="$entityindex"/>
-          <xsl:with-param name="physicalindex" select="position()"/>
-          <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-          <xsl:with-param name="spatialrastersubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="spatialRasterShowDistribution">
+        <xsl:with-param name="docid" select="$docid"/>
+        <xsl:with-param name="entityindex" select="$entityindex"/>
+        <xsl:with-param name="physicalindex" select="position()"/>
+        <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+        <xsl:with-param name="spatialrastersubHeaderStyle" select="$spatialrastersubHeaderStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
   </xsl:template>
 
@@ -9769,166 +9740,130 @@
     <xsl:param name="spatialrasterfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialReferenceCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="horizCoordSysName">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Name of Coordinate System:
-            </td>
-            <td class="{$secondColStyle}">
-              <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Name of Coordinate System:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="horizCoordSysDef/geogCoordSys">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Definition of <xsl:text> </xsl:text><xsl:value-of select="../@name"/> <xsl:text> </xsl:text> (Geographic Coordinate System):
-            </td>
-            <td>
-              <xsl:call-template name="geogCoordSysType">
-                 <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-              </xsl:call-template>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">
+          Definition of <xsl:text> </xsl:text><xsl:value-of select="../@name"/> <xsl:text> </xsl:text> (Geographic Coordinate System):
+        </td>
+        <td>
+          <xsl:call-template name="geogCoordSysType">
+            <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="horizCoordSysDef/projCoordSys">
       <xsl:for-each select="geogCoordSys">
-       <tr><td class="{$spatialrasterfirstColStyle}">
+        <tr>
+          <td class="{$spatialrasterfirstColStyle}">
             Definition of<xsl:text> </xsl:text><xsl:value-of select="../../@name"/><xsl:text> </xsl:text>(Geographic Coordinate System):
-            </td>
-            <td>
-              <xsl:call-template name="geogCoordSysType">
-                 <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
-              </xsl:call-template>
-            </td>
-       </tr>
-     </xsl:for-each>
-     <xsl:for-each select="projection">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Projection in Geo Coord. System:
-            </td>
-            <td>
-               <table class="{$tabledefaultStyle}">
-                 <xsl:for-each select="parameter">
-                     <tr><td class="{$spatialrasterfirstColStyle}">
-                          <xsl:value-of select="./@name"/>:
-                         </td>
-                         <td>
-                             <table class="{$tabledefaultStyle}">
-                                <tr>
-                                    <td class="{$secondColStyle}">
-                                      <xsl:value-of select="./@value"/>
-                                    </td>
-                                    <td class="{$secondColStyle}">
-                                       <xsl:value-of select="./@description"/>
-                                    </td>
-                                 </tr>
-                             </table>
-                          </td>
+          </td>
+          <td>
+            <xsl:call-template name="geogCoordSysType">
+              <xsl:with-param name="spatialrasterfirstColStyle" select="$spatialrasterfirstColStyle"/>
+            </xsl:call-template>
+          </td>
+        </tr>
+      </xsl:for-each>
+      <xsl:for-each select="projection">
+        <tr>
+          <td class="{$spatialrasterfirstColStyle}">Projection in Geo Coord. System:</td>
+          <td>
+            <table class="{$tabledefaultStyle}">
+              <xsl:for-each select="parameter">
+                <tr>
+                  <td class="{$spatialrasterfirstColStyle}"><xsl:value-of select="./@name"/>:</td>
+                  <td>
+                    <table class="{$tabledefaultStyle}">
+                      <tr>
+                        <td class="{$secondColStyle}"><xsl:value-of select="./@value"/></td>
+                        <td class="{$secondColStyle}"><xsl:value-of select="./@description"/></td>
                       </tr>
-                 </xsl:for-each>
-                 <xsl:for-each select="unit">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Unit:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="./@name"/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-              </table>
-            </td>
-       </tr>
-     </xsl:for-each>
+                    </table>
+                  </td>
+                </tr>
+              </xsl:for-each>
+              <xsl:for-each select="unit">
+                <tr>
+                  <td class="{$spatialrasterfirstColStyle}">Unit:</td>
+                  <td class="{$secondColStyle}"><xsl:value-of select="./@name"/></td>
+                </tr>
+              </xsl:for-each>
+            </table>
+          </td>
+        </tr>
+      </xsl:for-each>
     </xsl:for-each>
     <xsl:for-each select="vertCoordSys/altitudeSysDef">
-       <tr><td class="{$spatialrasterfirstColStyle}">
-            Altitude System Definition:
-            </td>
-            <td>
-               <table class="{$tabledefaultStyle}">
-                 <xsl:for-each select="altitudeDatumName">
-                     <tr><td class="{$spatialrasterfirstColStyle}">
-                          Datum:
-                         </td>
-                         <td class="{$secondColStyle}">
-                            <xsl:value-of select="."/>
-                          </td>
-                      </tr>
-                 </xsl:for-each>
-                 <xsl:for-each select="altitudeResolution">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Resolution:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-                <xsl:for-each select="altitudeDistanceUnits">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Distance Unit:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-                <xsl:for-each select="altitudeEncodingMethod">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Encoding Method:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-              </table>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Altitude System Definition:</td>
+        <td>
+          <table class="{$tabledefaultStyle}">
+            <xsl:for-each select="altitudeDatumName">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Datum:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="altitudeResolution">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Resolution:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="altitudeDistanceUnits">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Distance Unit:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="altitudeEncodingMethod">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Encoding Method:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+          </table>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="vertCoordSys/depthSysDef">
-        <tr><td class="{$spatialrasterfirstColStyle}">
-            Depth System Definition:
-            </td>
-            <td>
-               <table class="{$tabledefaultStyle}">
-                 <xsl:for-each select="depthDatumName">
-                     <tr><td class="{$spatialrasterfirstColStyle}">
-                          Datum:
-                         </td>
-                         <td class="{$secondColStyle}">
-                            <xsl:value-of select="."/>
-                          </td>
-                      </tr>
-                 </xsl:for-each>
-                 <xsl:for-each select="depthResolution">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Resolution:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-                <xsl:for-each select="depthDistanceUnits">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Distance Unit:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-                <xsl:for-each select="depthEncodingMethod">
-                    <tr><td class="{$spatialrasterfirstColStyle}">
-                          Encoding Method:
-                        </td>
-                        <td class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                        </td>
-                   </tr>
-                </xsl:for-each>
-              </table>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$spatialrasterfirstColStyle}">Depth System Definition:</td>
+        <td>
+          <table class="{$tabledefaultStyle}">
+            <xsl:for-each select="depthDatumName">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Datum:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="depthResolution">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Resolution:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="depthDistanceUnits">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Distance Unit:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="depthEncodingMethod">
+              <tr>
+                <td class="{$spatialrasterfirstColStyle}">Encoding Method:</td>
+                <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+          </table>
+        </td>
+      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -10705,140 +10640,132 @@
     <xsl:param name="entityindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedureCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
-       <xsl:call-template name="entityName">
-          <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityName">
+         <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="alternateIdentifier">
-       <xsl:call-template name="entityalternateIdentifier">
-          <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityalternateIdentifier">
+        <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="entityDescription">
-       <xsl:call-template name="entityDescription">
-          <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityDescription">
+        <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="additionalInfo">
-       <xsl:call-template name="entityadditionalInfo">
-          <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityadditionalInfo">
+        <xsl:with-param name="entityfirstColStyle" select="$storedprocedurefirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <!-- call physical moduel without show distribution(we want see it later)-->
     <xsl:if test="physical">
-       <tr><td class="{$storedproceduresubHeaderStyle}" colspan="2">
-        Physical Structure Description:
-      </td></tr>
+      <tr>
+        <td class="{$storedproceduresubHeaderStyle}" colspan="2">Physical Structure Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="physical">
-       <tr><td colspan="2">
-        <xsl:call-template name="physical">
-         <xsl:with-param name="physicalfirstColStyle" select="$storedprocedurefirstColStyle"/>
-         <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
-        </xsl:call-template>
-        </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="physical">
+            <xsl:with-param name="physicalfirstColStyle" select="$storedprocedurefirstColStyle"/>
+            <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="coverage">
-       <tr><td class="{$storedproceduresubHeaderStyle}" colspan="2">
-        Coverage Description:
-      </td></tr>
+       <tr>
+         <td class="{$storedproceduresubHeaderStyle}" colspan="2">Coverage Description:</td>
+       </tr>
     </xsl:if>
     <xsl:for-each select="coverage">
-      <tr><td colspan="2">
-        <xsl:call-template name="coverage">
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2"><xsl:call-template name="coverage"></xsl:call-template></td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="method">
-       <tr><td class="{$storedproceduresubHeaderStyle}" colspan="2">
-        Method Description:
-      </td></tr>
+       <tr>
+         <td class="{$storedproceduresubHeaderStyle}" colspan="2">Method Description:</td>
+       </tr>
     </xsl:if>
     <xsl:for-each select="method">
-      <tr><td colspan="2">
-        <xsl:call-template name="method">
-          <xsl:with-param name="methodfirstColStyle" select="$storedprocedurefirstColStyle"/>
-          <xsl:with-param name="methodsubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="method">
+            <xsl:with-param name="methodfirstColStyle" select="$storedprocedurefirstColStyle"/>
+            <xsl:with-param name="methodsubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="constraint">
-       <tr><td class="{$storedproceduresubHeaderStyle}" colspan="2">
-        Constraint:
-      </td></tr>
+      <tr>
+        <td class="{$storedproceduresubHeaderStyle}" colspan="2">Constraint:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="constraint">
-      <tr><td colspan="2">
-        <xsl:call-template name="constraint">
-          <xsl:with-param name="constraintfirstColStyle" select="$storedprocedurefirstColStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="constraint">
+            <xsl:with-param name="constraintfirstColStyle" select="$storedprocedurefirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="parameter">
-       <tr><td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">
-            Parameter:
-            </td>
-            <td width="{$secondColWidth}">
-               <table xsl:use-attribute-sets="cellspacing" class="{$tabledefaultStyle}">
-                  <xsl:for-each select="name">
-                    <tr><td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">
-                          Name:
-                         </td>
-                         <td width="{$secondColWidth}" class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                         </td>
-                     </tr>
-                  </xsl:for-each>
-                  <xsl:for-each select="domainDescription">
-                    <tr><td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">
-                          Domain:
-                         </td>
-                         <td width="{$secondColWidth}" class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                         </td>
-                     </tr>
-                  </xsl:for-each>
-                  <xsl:for-each select="required">
-                    <tr><td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">
-                          Required:
-                         </td>
-                         <td width="{$secondColWidth}" class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                         </td>
-                     </tr>
-                  </xsl:for-each>
-                  <xsl:for-each select="repeats">
-                    <tr><td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">
-                         Repeatable:
-                         </td>
-                         <td width="{$secondColWidth}" class="{$secondColStyle}">
-                           <xsl:value-of select="."/>
-                         </td>
-                     </tr>
-                  </xsl:for-each>
-               </table>
-            </td>
-       </tr>
+      <tr>
+        <td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">Parameter:</td>
+        <td width="{$secondColWidth}">
+          <table xsl:use-attribute-sets="cellspacing" class="{$tabledefaultStyle}">
+            <xsl:for-each select="name">
+              <tr>
+                <td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">Name:</td>
+                <td width="{$secondColWidth}" class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="domainDescription">
+              <tr>
+                <td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">Domain:</td>
+                <td width="{$secondColWidth}" class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="required">
+              <tr>
+                <td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">Required:</td>
+                <td width="{$secondColWidth}" class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+            <xsl:for-each select="repeats">
+              <tr>
+                <td width="{$firstColWidth}" class="{$storedprocedurefirstColStyle}">Repeatable:</td>
+                <td width="{$secondColWidth}" class="{$secondColStyle}"><xsl:value-of select="."/></td>
+              </tr>
+            </xsl:for-each>
+          </table>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="$withAttributes='1'">
-    <xsl:for-each select="attributeList">
-      <xsl:call-template name="storedProcedureAttributeList">
-        <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
-        <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-        <xsl:with-param name="docid" select="$docid"/>
-        <xsl:with-param name="entityindex" select="$entityindex"/>
-      </xsl:call-template>
-    </xsl:for-each>
-    </xsl:if>
-     <!-- Here to display distribution info-->
-    <xsl:for-each select="physical">
-       <xsl:call-template name="storedProcedureShowDistribution">
-          <xsl:with-param name="docid" select="$docid"/>
-          <xsl:with-param name="entityindex" select="$entityindex"/>
-          <xsl:with-param name="physicalindex" select="position()"/>
+      <xsl:for-each select="attributeList">
+        <xsl:call-template name="storedProcedureAttributeList">
           <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
           <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
-       </xsl:call-template>
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="entityindex" select="$entityindex"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
+    <!-- Here to display distribution info-->
+    <xsl:for-each select="physical">
+      <xsl:call-template name="storedProcedureShowDistribution">
+        <xsl:with-param name="docid" select="$docid"/>
+        <xsl:with-param name="entityindex" select="$entityindex"/>
+        <xsl:with-param name="physicalindex" select="position()"/>
+        <xsl:with-param name="storedprocedurefirstColStyle" select="$storedprocedurefirstColStyle"/>
+        <xsl:with-param name="storedproceduresubHeaderStyle" select="$storedproceduresubHeaderStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
   </xsl:template>
 
@@ -10895,13 +10822,12 @@
   
   <!-- This module is for text module in eml2 document. It is a table and self contained-->
   <!-- note: text type is mixed content, so template should be able to handle simple string content, too.
-  maybe, if only text children, then use mode=lowlevel? NEED A REAL XSLT PROGRAMMER!
-  -->
+       maybe, if only text children, then use mode=lowlevel? NEED A REAL XSLT PROGRAMMER! -->
   <xsl:template name="text">
     <xsl:param name="textfirstColStyle" />
     <xsl:param name="textsecondColStyle" />
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: text</xsl:text></xsl:message></xsl:if>
-    <xsl:if test="(section and normalize-space(section[1])!='') or (para and normalize-space(para[1])!='')">
+    <xsl:if test="(section and normalize-space(section[1]) != '') or (para and normalize-space(para[1]) != '')">
       <xsl:apply-templates mode="text">
         <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
         <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
@@ -10914,13 +10840,13 @@
     <xsl:param name="textsecondColStyle" />
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: abstracttext</xsl:text></xsl:message></xsl:if>
     <xsl:if test="(section and normalize-space(section[1])!='') or (para and normalize-space(para[1])!='')">
-  <!-- was <xsl:apply-templates mode="text"> (mgb 7Jun2011) use mode="lowlevel" to make abstract use p for para -->
-    <div class="abstract-text">
-      <xsl:apply-templates mode="text">
-        <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
-        <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
-      </xsl:apply-templates>
-    </div>  
+      <!-- was <xsl:apply-templates mode="text"> (mgb 7Jun2011) use mode="lowlevel" to make abstract use p for para -->
+      <div class="abstract-text">
+        <xsl:apply-templates mode="text">
+          <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
+          <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
+        </xsl:apply-templates>
+      </div>  
     </xsl:if>
   </xsl:template>
 
@@ -10962,9 +10888,7 @@
   <xsl:template match="para" mode="text">
     <xsl:param name="textfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para</xsl:text></xsl:message></xsl:if>
-    <p>
-      <xsl:apply-templates/>
-    </p>
+    <p><xsl:apply-templates/></p>
     <!-- <xsl:apply-templates mode="lowlevel"/> -->
   </xsl:template>
 
@@ -10972,9 +10896,7 @@
        Currently, only get the text and it need more revision-->
   <xsl:template match="para" mode="lowlevel">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para; mode: lowlevel</xsl:text></xsl:message></xsl:if>
-    <p>
-      <xsl:value-of select="."/>
-    </p>
+    <p><xsl:value-of select="."/></p>
   </xsl:template>
   
   <xsl:template match="itemizedlist">
@@ -11028,9 +10950,7 @@
   
   <xsl:template match="literalLayout">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: literalLayout</xsl:text></xsl:message></xsl:if>
-    <pre>
-      <xsl:value-of  select="." xml:space="preserve"/>
-    </pre>
+    <pre><xsl:value-of  select="." xml:space="preserve"/></pre>
   </xsl:template>
   
   <!-- eml-view-2.0.0.xsl -->
@@ -11074,106 +10994,108 @@
     <xsl:param name="entityindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: viewCommon</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="entityName">
-       <xsl:call-template name="entityName">
-          <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityName">
+        <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="queryStatement">
-       <tr><td class="{$viewfirstColStyle}">
-            Query Statement:
-            </td>
-            <td class="{$secondColStyle}">
-            <xsl:value-of select="."/>
-            </td>
-       </tr>
+      <tr>
+        <td class="{$viewfirstColStyle}">Query Statement:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      </tr>
     </xsl:for-each>
     <xsl:for-each select="alternateIdentifier">
-       <xsl:call-template name="entityalternateIdentifier">
-          <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityalternateIdentifier">
+        <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="entityDescription">
-       <xsl:call-template name="entityDescription">
-          <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityDescription">
+        <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <xsl:for-each select="additionalInfo">
-       <xsl:call-template name="entityadditionalInfo">
-          <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
-       </xsl:call-template>
+      <xsl:call-template name="entityadditionalInfo">
+        <xsl:with-param name="entityfirstColStyle" select="$viewfirstColStyle"/>
+      </xsl:call-template>
     </xsl:for-each>
     <!-- call physical moduel without show distribution(we want see it later)-->
     <xsl:if test="physical">
-       <tr><td class="{$viewsubHeaderStyle}" colspan="2">
-        Physical Structure Description:
-      </td></tr>
+      <tr>
+        <td class="{$viewsubHeaderStyle}" colspan="2">Physical Structure Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="physical">
-       <tr><td colspan="2">
-        <xsl:call-template name="physical">
-         <xsl:with-param name="physicalfirstColStyle" select="$viewfirstColStyle"/>
-         <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
-        </xsl:call-template>
-        </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="physical">
+            <xsl:with-param name="physicalfirstColStyle" select="$viewfirstColStyle"/>
+            <xsl:with-param name="notshowdistribution">yes</xsl:with-param>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="coverage">
-       <tr><td class="{$viewsubHeaderStyle}" colspan="2">
-        Coverage Description:
-      </td></tr>
+      <tr>
+        <td class="{$viewsubHeaderStyle}" colspan="2">Coverage Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="coverage">
-      <tr><td colspan="2">
-        <xsl:call-template name="coverage">
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2"><xsl:call-template name="coverage"></xsl:call-template></td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="method">
-       <tr><td class="{$viewsubHeaderStyle}" colspan="2">
-        Method Description:
-      </td></tr>
+      <tr>
+        <td class="{$viewsubHeaderStyle}" colspan="2">Method Description:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="method">
-      <tr><td colspan="2">
-        <xsl:call-template name="method">
-          <xsl:with-param name="methodfirstColStyle" select="$viewfirstColStyle"/>
-          <xsl:with-param name="methodsubHeaderStyle" select="$viewsubHeaderStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="method">
+            <xsl:with-param name="methodfirstColStyle" select="$viewfirstColStyle"/>
+            <xsl:with-param name="methodsubHeaderStyle" select="$viewsubHeaderStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="constraint">
-       <tr><td class="{$viewsubHeaderStyle}" colspan="2">
-        Constraint:
-      </td></tr>
+      <tr>
+        <td class="{$viewsubHeaderStyle}" colspan="2">Constraint:</td>
+      </tr>
     </xsl:if>
     <xsl:for-each select="constraint">
-      <tr><td colspan="2">
-        <xsl:call-template name="constraint">
-          <xsl:with-param name="constraintfirstColStyle" select="$viewfirstColStyle"/>
-        </xsl:call-template>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="constraint">
+            <xsl:with-param name="constraintfirstColStyle" select="$viewfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
     </xsl:for-each>
     <xsl:if test="$withAttributes='1'">
-     <xsl:for-each select="attributeList">
-       <xsl:call-template name="viewAttributeList">
-         <xsl:with-param name="viewfirstColStyle" select="$viewfirstColStyle"/>
-         <xsl:with-param name="viewsubHeaderStyle" select="$viewsubHeaderStyle"/>
-         <xsl:with-param name="docid" select="$docid"/>
-         <xsl:with-param name="entityindex" select="$entityindex"/>
-       </xsl:call-template>
-     </xsl:for-each>
+      <xsl:for-each select="attributeList">
+        <xsl:call-template name="viewAttributeList">
+          <xsl:with-param name="viewfirstColStyle" select="$viewfirstColStyle"/>
+          <xsl:with-param name="viewsubHeaderStyle" select="$viewsubHeaderStyle"/>
+          <xsl:with-param name="docid" select="$docid"/>
+          <xsl:with-param name="entityindex" select="$entityindex"/>
+        </xsl:call-template>
+      </xsl:for-each>
     </xsl:if>
     <xsl:if test="$withAttributes='1'">
-     <!-- Here to display distribution info-->
-    <xsl:for-each select="physical">
-       <xsl:call-template name="viewShowDistribution">
+      <!-- Here to display distribution info-->
+      <xsl:for-each select="physical">
+        <xsl:call-template name="viewShowDistribution">
           <xsl:with-param name="docid" select="$docid"/>
           <xsl:with-param name="entityindex" select="$entityindex"/>
           <xsl:with-param name="physicalindex" select="position()"/>
           <xsl:with-param name="viewfirstColStyle" select="$viewfirstColStyle"/>
           <xsl:with-param name="viewsubHeaderStyle" select="$viewsubHeaderStyle"/>
-       </xsl:call-template>
-    </xsl:for-each>
-   </xsl:if>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="viewShowDistribution">
