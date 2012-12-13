@@ -767,7 +767,7 @@ public class DataPackageManagerClient extends PastaClient {
       HttpResponse httpResponse = httpClient.execute(httpGet);
       int statusCode = httpResponse.getStatusLine().getStatusCode();
       HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
+      entityString = EntityUtils.toString(httpEntity, "UTF-8");
       if (statusCode != HttpStatus.SC_OK) {
         handleStatusCode(statusCode, entityString);
       }
