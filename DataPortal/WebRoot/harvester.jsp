@@ -57,14 +57,14 @@
 
 			<%=warningMessage%>
 
-			<p>Data packages may be evaluated without adding them to the NIS
+			<p>Data packages may be evaluated without uploading them to the NIS
 				by selecting "evaluate". Once you are satisfied that data packages
-				are ready to be added to the NIS, you may do so by selecting
+				are ready to be uploaded to the NIS, you may do so by selecting
 				"upload". Several alternatives for supplying the EML metadata for
 				your data packages are available below.</p>
 
             <fieldset>
-                <legend>Add EML Metadata File</legend>
+                <legend>EML Metadata File</legend>
                 <p>Add an EML metadata file to the form and then select "evaluate" or
                     "upload".</p>
                 <div class="section">
@@ -94,7 +94,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>List of EML Document URLs</legend>
+                <legend>EML Document URLs</legend>
                 <p>Enter a list of EML document URLs into the text area below,
                     one per line, and then select "evaluate" or "upload".</p>
                 <div class="section">
