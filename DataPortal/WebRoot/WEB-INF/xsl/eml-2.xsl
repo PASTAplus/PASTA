@@ -229,7 +229,7 @@
         <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
       </xsl:call-template>
     </fieldset> 
-    <button id="showAll">Show Metadata</button><button id="hideAll">Hide Metadata</button>
+    <button id="showAll">Show Details</button><button id="hideAll">Hide Details</button>
     <fieldset>
       <legend>Detailed Metadata</legend>
       <h3 id="toggleEntities" class="toggleButton"><button>+/-</button> Data Entities</h3>
@@ -10973,14 +10973,14 @@
   <xsl:template match="section" mode="text">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <xsl:if test="title and normalize-space(title)!=''">
+      <xsl:if test="title and normalize-space(title[1])!=''">
         <!-- <h4 class="bold"><xsl:value-of select="title"/></h4> -->
 	      <h4><xsl:value-of select="title"/></h4>
       </xsl:if>
       <xsl:if test="para and normalize-space(para[1])!=''">
         <xsl:apply-templates select="para" mode="text"/>
       </xsl:if>
-      <xsl:if test="section and normalize-space(section)!=''">
+      <xsl:if test="section and normalize-space(section[1])!=''">
         <xsl:apply-templates select="section" mode="text"/>
       </xsl:if>
     </xsl:if>
@@ -10990,14 +10990,14 @@
   <xsl:template match="section" mode="lowlevel">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section; mode: lowlevel</xsl:text></xsl:message></xsl:if>
     <div>
-      <xsl:if test="title and normalize-space(title) != ''">
+      <xsl:if test="title and normalize-space(title[1]) != ''">
         <!-- <h4 class="bold"><xsl:value-of select="title"/></h4>  -->
         <h5><xsl:value-of select="title"/></h5>
       </xsl:if>
-      <xsl:if test="para and normalize-space(para) != ''">
+      <xsl:if test="para and normalize-space(para[1]) != ''">
         <xsl:apply-templates select="para" mode="lowlevelvel"/>
       </xsl:if>
-      <xsl:if test="section and normalize-space(section) != ''">
+      <xsl:if test="section and normalize-space(section[1]) != ''">
         <xsl:apply-templates select="section" mode="lowlevel"/>
       </xsl:if>
     </div>
