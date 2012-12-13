@@ -62,7 +62,22 @@
 					Network Information System (NIS) Data Portal
 				</h3>
 
+				<p>The NIS Data Portal is the cumulative effort of the NIS
+					Development Team to provide a public facing information management and
+					technology interface. The NIS Data Portal is the main path for
+					input and retrieval of the varied data products from the NIS PASTA
+					(Provenance Aware Synthesis Tracking Architecture).</p>
+					
+			    <p>Visit the <a href="https://nis.lternet.edu:8443/x/agBP" target="_blank">
+			        NIS Community Website</a> for information about
+			        upcoming updates to the LTER Network Portal.</p>
 
+                <p>What is a DOI and what is its purpose? Find the answer to
+                    this question and others in the
+                    <a href="https://nis.lternet.edu:8443/x/swBP" target="_blank">
+                    Frequently Asked Questions</a>
+                    section of the NIS Community Website.</p>
+					
 				<h4>For Scientists, Researchers, Students, and the General
 					Public</h4>
 
@@ -83,19 +98,23 @@
 						<li>the knowledge gained from the synthesis of LTER data.</li>
 					</ol>
 
-					<p>The NIS Data Portal is the cumulative effort of the NIS
-						Development Team to provide a public facing information management and
-						technology interface. The NIS Data Portal is the main path for
-						input and retrieval of the varied data products from the NIS PASTA
-						(Provenance Aware Synthesis Tracking Architecture).</p>
-						
 				    <p>The NIS Data Portal uses a "rolling-update" approach to
 				       continuously release improved versions as they are ready for
 				       the community.</p>
+				       
+				    <p>Visit the <a href="https://nis.lternet.edu:8443/x/BIBH" target="_blank">
+				        NIS User's Guide</a> for detailed information on
+				        how to best utilize the LTER Network Data Portal.</p>
+				        
+				    <p>Any questions not answered by the
+				       NIS User's Guide may be addressed in either the comments
+				       section (at the bottom of every page in the User Guide) or
+				       by emailing <a href="mailto:tech-support@lternet.edu">
+				       tech-support@lternet.edu</a>.
 
 				</div>
 
-				<h4>For LTER Site Information Managers, Programmers, and Other
+				<h4>For LTER Site Information Managers, Software Developers, and Other
 					Interested Parties</h4>
 
 				<div class="section">
@@ -135,18 +154,24 @@
 					
 					<p>The Data Package Manager is designed for users to configure
 						and schedule data package uploads into PASTA and to
-						search for data packages that reside in PASTA</p>
+						search for data packages that reside in PASTA.</p>
 						
-				    <p>Like the NIS Data Portal, all of PASTA services use a
+				    <p>Like the NIS Data Portal, all of PASTA's services use a
 				       "rolling-update" approach to adding bug fixes, improvements,
 				       and new features to each of the services.</p>
 
 					<p>
 						Information about the structure and functions of the APIs and the
 						overall source-code documentation for PASTA is available at the
-						<a href="https://nis.lternet.edu:8443/display/pasta/Home"
-					    target="_blank">LTER NIS developer's documentation wiki.</a>
+						<a href="https://nis.lternet.edu:8443/x/BAAF"
+					    target="_blank">NIS Software Developer's Guide</a>.
 					</p>
+					
+					<p>Any questions not answered by the NIS Software Developer's Guide
+					   may be addressed in either the comments
+				       section (at the bottom of every page in the Software Developer's Guide) or
+				       by emailing <a href="mailto:tech-support@lternet.edu">
+				       tech-support@lternet.edu</a>.
 
 			</div>
 
