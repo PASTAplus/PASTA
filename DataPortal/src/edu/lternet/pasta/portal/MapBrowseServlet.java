@@ -252,7 +252,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			if (creators != null) {
 
-				html += "<h4 align=\"left\">Owners/Creators</h4>\n";
+				html += "<h4 align=\"left\">Creators</h4>\n";
 				html += "<ul style=\"list-style: none;\">\n";
 
 				for (Creator creator : creators) {
