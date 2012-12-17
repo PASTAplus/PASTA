@@ -390,7 +390,7 @@ public class EzidRegistrar {
 			httpClient.getConnectionManager().shutdown();
 		}
 
-		logger.info("registerDataCiteMetadata: " + entityString);
+		logger.info("registerDataCiteMetadata: " + this.dataCiteMetadata.getLocationUrl() + "\n" + entityString);
 
 		// Test for DOI collision or DOI registration failure
 		if (statusCode == HttpStatus.SC_BAD_REQUEST
@@ -398,6 +398,7 @@ public class EzidRegistrar {
 			String gripe = "identifier already exists";
 			throw new EzidException(gripe);
 		} else if (statusCode != HttpStatus.SC_CREATED) {
+			logger.error(this.dataCiteMetadata.toDataCiteXml());
 			String gripe = "DOI registration failed for: " + doi;
 			throw new EzidException(gripe);
 		}
