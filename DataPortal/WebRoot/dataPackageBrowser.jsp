@@ -5,6 +5,7 @@
       + ":" + request.getServerPort() + path + "/";
 
   HttpSession httpSession = request.getSession();
+  
   String browseMessage = (String) httpSession.getAttribute("browsemessage");
   String html = (String) httpSession.getAttribute("html");
   String cnt = (String) httpSession.getAttribute("count");
