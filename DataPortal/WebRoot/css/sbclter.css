@@ -1,10 +1,3 @@
-
-
-  
-
-
-
-
 /*   '$RCSfile: sbclter.css,v $'                                            */
 /*     Purpose: Default style sheet for PISCO project web pages             */
 /*              Using this stylesheet rather than placing styles directly   */
@@ -21,7 +14,6 @@
 /*  '$Revision: 1.1 $'                                                      */
 /*                                                                          */
 
-
 /* Color Scheme:
  *    dark blue:                  #003366
  *    aqua blue:                  #0066CC
@@ -33,10 +25,19 @@
  *    greenish tan:               #EEEECC
  */
 
+/*
+ * This style rule tells the browser to treat the new HTML5 elements the same as a <div>.
+ * In other words, the element occupies a line of its own with no extra vertical or horizontal spacing.
+ */
+article, aside, figure, footer, header, nav, section {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
 
 /*
-*  import eml css:
-*/
+ *  import eml css:
+ */
 
 body {
     /* width:                   100%; */
@@ -61,10 +62,6 @@ body {
 body>div img {
     padding:                    0px 0px 0px 0px;
     }
-
-
-
-
 
 #header {
   width:                        100%;
@@ -93,7 +90,6 @@ html>body #header {
     min-width:                  900px; /* end hack for ie5win */
     }
 
-
 /* div "content" should be sibling to div "header" */ 
 /* top margin required to clear sibling (logo is 100px tall)*/
 
@@ -104,82 +100,6 @@ html>body #header {
     margin:                     0px 0px 0px 0px;
     
     }
-
-
-
-/* these elements positioned to be in header below */
-
-#left_logo {
-    position:                   absolute;
-    top:                        5px;
-    z-index:                    2;  /* stack on top of header menu */
-    left:                       10px; /* we want the logo on the left */
-    margin:                     0px 0px 0px 0px; /* T R B L */
-    padding:                    0px;
-    border:                     0px;
-    background-image:           url('../images/sbclter-logo.gif');
-    background-position:        top left;     /* No NN4 */
-    background-repeat:          no-repeat;         /* No NN4 */
-    width:                      99px; /* begin hack for 1e5win */
-    height:                     100px; 
-    voice-family:               "\"}\"";
-    voice-family:               inherit;
-    width:                      99px;
-    height:                     100px;
-    }
-
-html>body #left_logo {
-    width:                      99px;
-    height:                     100px; /* end hack for ie5win */
-    }
-
-#right_logo {
-    position:                   absolute;
-    top:                        0px;
-    right:                      10px; /* we want the logo near the right */
-    margin:                     0px 0px 0px 0px; /* T R B L */
-    padding:                    0px;
-    border:                     0px;
-    background-image:           url('../images/sbclter-coastal-header.jpg');
-    background-position:        top right;     /* No NN4 */
-    background-repeat:          no-repeat;         /* No NN4 */
-    height:                     60px; /* begin hack for 1e5win */
-    width:                      223px;
-    voice-family:               "\"}\"";
-    voice-family:               inherit;
-    height:                     60px;
-    width:                      223px;
-    }
-
-html>body #right_logo {
-    width:                      223px;
-    height:                     60px; /* end hack for ie5win */
-    }
-
-/* banner holds the title and subtitle */
-#banner {
-    margin:                     0px 0px 0px 110px; /* T R B L */
-    padding:                    0px;
-    border:                     0px;
-    background-color:           #ffffff;
-/*  background-image:           url('images/data_catalog_header_search.jpg') */
-    background-position:        top left;     /* No NN4 */
-    background-repeat:          no-repeat;         /* No NN4 */
-/*  height:                     60px; /* begin hack for ie5win */
-    voice-family:               "\"}\"";
-    voice-family:               inherit;
-/*  height:                     60px;
- */
-    }
-
-html>body #banner {
-/*  height:                     60px; /* end hack for ie5win */
-    }
-
-
-
-/* Header Sub-Title Classes
- * title and subtitle in the left portion of the banner */
 
 div.header-title {
     position:           absolute;
@@ -193,7 +113,6 @@ div.header-title {
     font-style:         normal;
     font-weight:        800;
 }
-
 
 div.header-subtitle {
     position:           absolute;
@@ -218,9 +137,6 @@ div.header-menu {
     font-size:          14px;                                     
 }                                                                 
 
-
-
-
 /* header doesnt currently accomodate this class  */
 div.header-submenu {                                              
     color:              #003366;                                  
@@ -229,9 +145,6 @@ div.header-submenu {
     font-size:          14px;                                     
 }                                                                 
                                                                   
-
-
-
 #left_sidebar {
     position:                   absolute;
     top:                        0px;
@@ -268,19 +181,7 @@ html>body #right_sidebar {
     width:                      10px; /* end hack for ie5win */
     }
 
-
-
-
-
-
-
-
-
-
-
-
 /* these classes to be children of div "content" */
-
 
 /* for the skip-to box */
 
@@ -318,7 +219,6 @@ div.r-box {
  /*   clear:              both; */
 }
 
-
 div.content-area {
        /* for padding area within parent area */
     background-color:   #FFFFFF;
@@ -339,14 +239,11 @@ div.content-area-dense {
 
 }
 
-
-
 div.hanging-paragraph {
 	margin-left:	20px;
 	text-indent:	-20px;
 
 }
-
 
 div.abstract-text {
     	font-size:		0.93em;
@@ -372,7 +269,6 @@ div.left-padding {
   /* top: 110px; */
  }
 
-
 #search-box_right {
     text-align:     right;
     }
@@ -383,6 +279,7 @@ div.left-padding {
     top:                        55px;
     right:                      65px;
     }
+    
 /* old
 #footer {
     position:                   absolute;
@@ -392,6 +289,7 @@ div.left-padding {
     margin:                     0px 10px 10px 177px;
     }
 */
+
 /* using a table to force inner divs to stay inside (mgb) */
 table#footer {
 	background-color: #003366;
@@ -433,14 +331,11 @@ ul,ol {
     /* margin:                     0px 0px 0px 15px; */
     }
 
-
-
 .ol-lower-alpha { 
     list-style-type: lower-alpha;
     margin-top:       2px;
 
   }
-
 
 .ul-bulleted-list { 
     list-style-type:  disc;
@@ -453,9 +348,6 @@ ul,ol {
 /* ol li { margin-top : 5px; } */
 /* ul li { margin-top : 5px; } */
 
-
-
-
 div {
     color:                      #003366;
     font-style:                 normal;
@@ -464,7 +356,6 @@ div {
     text-decoration:            none;
   }
 
-  
 /* NN 4.xx needs the font weight reset for b and strong tags */ 
 strong, b {
     font-weight:                800;
@@ -566,7 +457,6 @@ h3 {
    /*  margin-bottom:                 0px; */
   }
 
-
 /* an italic header w border */
 /*
 h3 {
@@ -581,8 +471,6 @@ h3 {
   }
 */
 
-
-
  /* NOTE: mob removed the clear:both from the h4 tag so that it could appear next 
  to a floated element. watch that this doesnt cause a problem */
 
@@ -590,7 +478,6 @@ h4 {
     font-size:                  1em;
     font-weight:                bold;
 }
-
 
 /* slightly smaller font */  
 /* moz-net-fox and ie have different default margins for h5 - make them uniform */
@@ -620,8 +507,6 @@ h6 {
     text-decoration:            none;
   }  
 
-
-
 /* Old style hr command - will be depreciated
  * Netscape 4.x does not like this
  * should use new style below
@@ -648,30 +533,33 @@ hr {
     margin:                     4px 4px
   }
   
- /* Default link properties
+/* Default link properties
  * currently set the links to the dark tan
  * with no additional decorations
  * except underline on hover
-*/
+ */
+ 
 a:link {
     color:                      #666600;
     background:                 transparent;
 /*    background-color:           #FFFFFF; */
-    text-decoration:            none;
-    
+    text-decoration:            none;    
   }
+  
 a:visited {
     color:                      #666600;
     background:                  transparent;
 /*    background-color:           #FFFFFF; */
     text-decoration:            none;
   } 
+  
 a:hover {
     color:                      #666600;
     background:                 transparent;
 /*    background-color:           #FFFFFF; */
     text-decoration:            underline;
   } 
+  
 a:active { 
     color:                      #666600;
     background:                 transparent;
@@ -682,25 +570,29 @@ a:active {
 /* Menu Link properties
  * the Menu is currently identical to the dafault
  * but this may change so it is defined here                      
- */                                                               
+ */  
+                                                              
 a.menu:link {                                                     
     color:                      #666600;                          
     background:                 transparent;                      
     /*background-color:           #CCCC9A;*/                      
     text-decoration:            none;                             
-  }                                                               
+  }  
+                                                               
 a.menu:visited {                                                  
     color:                      #666600;                          
     background:                 transparent;                      
     /*background-color:           #CCCC9A;*/
     text-decoration:            none;                             
-  }                                                               
+  }  
+                                                               
 a.menu:hover {                                                    
     color:                      #666600;                          
     background:                 transparent;                      
    /* background-color:           #CCCC9A;*/                      
     text-decoration:            underline;                        
-  }                                                               
+  }  
+                                                               
 a.menu:active {                                                   
     color:                      #666600;                          
     background:                 transparent;                      
@@ -717,21 +609,24 @@ a.submenu:link {
     background:                 transparent;                      
     /*background-color:           #CCCC9A;*/                      
     text-decoration:            none;                             
-  }                                                               
+  }        
+                                                         
 a.submenu:visited {                                               
     color:                      #666600;                          
 /*  color:                      #003366; */                       
     background:                 transparent;                      
     /*background-color:           #CCCC9A;*/                      
     text-decoration:            none;                             
-  }                                                               
+  }     
+                                                            
 a.submenu:hover {                                                 
     color:                      #666600;                          
 /*  color:                      #003366; */                       
     background:                 transparent;                      
    /* background-color:           #CCCC9A;*/                      
     text-decoration:            underline;                        
-  }                                                               
+  }  
+                                                               
 a.submenu:active {                                                
     color:                      #666600;                          
 /*  color:                      #003366; */                       
@@ -740,7 +635,6 @@ a.submenu:active {
     text-decoration:            none;                             
   }                                                               
                                                                   
-
 /* image styles */
 /* no padding or border around images by default */
 img {
@@ -867,10 +761,12 @@ a img {
     font-family:                Arial, Helvetica, sans-serif;
     text-decoration:            none;
   }
+  
 */
 /* copied from sbclter_wrapper.css */
 /* to control the content inside the blue footer.
 nother little footer, or here, a blue strip */
+
 div.footer-float-left {
   float:                                left;
   vertical-align:     middle;
@@ -888,7 +784,6 @@ div.footer-float-right {
 
 
 }
-
 
 /* Classes for positioning: use with div tags for desired effect */
 .indent1 {
@@ -940,6 +835,7 @@ div.footer-float-right {
     voice-family:               inherit;
     -moz-border-radius:         10px; /* end ie5win hack */
     }
+    
 /* Children of the group get some padding */
 .group * {
     padding:                    2px;
@@ -1062,7 +958,6 @@ th.rowheader {
     width:                      80%;
     }
 
-
 .seventyfive_percent {
     width:                      75%;
     }
@@ -1087,27 +982,27 @@ th.rowheader {
     width:                      25%;
     }
 
-
 .twenty_percent {
     width:                      20%;
     }
-
 
 .fifteen_percent {
     width:                      15%;
     }
 
 /* the classes used on the pubs page should add to 100. in 2012, all three are used. */
+
 td.pubs_citation {
     width:                      84%;
     }
+    
 td.pubs_doi_link {
     width:                      8%;
     }
+    
 td.pubs_data_link {
     width:                      8%;
     }
-
 
 input, select, textarea {
     color:                      #003366;
@@ -1146,6 +1041,7 @@ label {
    	  -moz-border-radius: 3px;
    	  color: #003366;
    	  }
+   	  
 input.view-data-button:hover {
     border-color: #003300;
     background: #FFCC33;
@@ -1156,7 +1052,6 @@ input.view-data-button:hover {
 form.entity-link {
 padding: 0px;
 margin: 0px;
-
 }
 
 /*input.view-data-button{
@@ -1184,7 +1079,6 @@ padding-top: none;
 padding-left: 90px;
 padding-right: 90px;
 margin: 0px;
-
 }
 
 /* THIS GROUP FOR THE PSEUDO-TABS */
@@ -1197,7 +1091,6 @@ border-spacing: 0px;
 /* border-bottom: 1px solid #003366; 
 border-collapse: collapse;*/
 padding:0;
-
 }
 
 table.emltopmenu td {
@@ -1216,7 +1109,6 @@ border-bottom: none;
 background: #ffffff;
 }
 
-
 table.emltopmenu td.empty {
 border-bottom: 1px solid #003366;
 border-top: none;
@@ -1231,7 +1123,6 @@ table.emltopmenu td {
 font-size: .95em;
 font-weight: bold; 
 color:                      #003366;                          
-
 }
                                                            
 a.datasetmenu:link {                                                     
@@ -1240,21 +1131,24 @@ a.datasetmenu:link {
     text-decoration:            none;  
    /* display: block;  */
     width: 100%              
-  }                                                               
+  }      
+                                                           
 a.datasetmenu:visited {                                                  
     color:                      #003366;                          
     background:                 transparent;                      
     text-decoration:            none;
     display: block; 
     width: 100%                                
-  }                                                               
+  }       
+                                                          
 a.datasetmenu:hover {                                                    
     color:                      #003366;                          
     background:                 transparent;                      
     text-decoration:            underline;                        
     display: block; 
     width: 100%   
-      }                                                               
+      }    
+                                                                 
 a.datasetmenu:active {                                                   
     color:                      #003366;                          
     background:                 transparent;                      
@@ -1297,10 +1191,7 @@ padding-bottom: 3px;
 voice-family:               "\"}\""; /* begin ie5win hack */
 voice-family:               inherit;
 -moz-border-radius: 6px;/* end ie5win hack */
-
 }
-
-
 
 /* copied from sbclter_wrapper.css */
 /* The footer menu currently is set to use the Menu style */
@@ -1331,4 +1222,3 @@ a.footer-link:active {
     background:                 transparent;
     text-decoration:            none;
   }
-
