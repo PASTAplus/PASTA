@@ -25,8 +25,6 @@
 					<p id="head-title">LTER Network Data Portal</p>
 				</td>
 				<td align="right" valign="bottom" width="25%">
-					<p><%=uname%></p>
-					<p><%=identity%></p>
 				</td>
 			</tr>
 		</tbody>

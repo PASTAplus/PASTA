@@ -173,7 +173,10 @@
           <tr>
             <td>Zoom in to the region you would like to search<br/>
 <script language="javascript" type="text/javascript">var mapPage="advancedSearch";</script>
+<!-- 
 <script src="http://maps.google.com/maps?file=api&v=3" type="text/javascript"></script>
+ -->
+<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" type="text/javascript"></script>
 <script src="./js/dragzoom.js" type="text/javascript"></script>
 <script src="./js/map_functions.js" type="text/javascript"></script>      
              <div id="map" style="width: 300px; height: 240px"></div>

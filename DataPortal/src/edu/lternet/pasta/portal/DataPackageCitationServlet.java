@@ -338,8 +338,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			return html;
 		}
 
-		html = "<ul style=\"list-style: none;\"><li><em>" + creatorText + pubDateText + titleText + orgText + PUBLISHER
-		    + citationId + "</em></li></ul>" + caveat;
+		html = "<p id=\"cite\">" + creatorText + pubDateText + titleText + orgText + PUBLISHER
+		    + citationId + "</p>" + caveat;
 		
 		return html;
 
