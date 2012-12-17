@@ -175,7 +175,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
     if (isValidPackageId) {
 
       try {
-
+        String dataPackageDOI = null;
         String xml = null;
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
         xml = dpmClient.readMetadata(scope, identifier, revision);
@@ -193,9 +193,14 @@ public class MetadataViewerServlet extends DataPortalServlet {
             parameterMap.put("resourceId", resourceId);
           }
           // Pass the data package DOI as a parameter to the XSLT
-          String dataPackageDOI = dpmClient.readDataPackageDoi(scope, identifier, revision);
-          if (dataPackageDOI != null && !dataPackageDOI.equals("")) {
-            parameterMap.put("dataPackageDOI", dataPackageDOI);
+          try {
+            dataPackageDOI = dpmClient.readDataPackageDoi(scope, identifier, revision);
+            if (dataPackageDOI != null && !dataPackageDOI.equals("")) {
+              parameterMap.put("dataPackageDOI", dataPackageDOI);
+            }
+          }
+          catch (Exception e) {
+            // No DOI was read. Just continue on.
           }
           message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
           type = "html";
