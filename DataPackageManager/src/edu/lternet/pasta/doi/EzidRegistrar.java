@@ -398,6 +398,7 @@ public class EzidRegistrar {
 			String gripe = "identifier already exists";
 			throw new EzidException(gripe);
 		} else if (statusCode != HttpStatus.SC_CREATED) {
+			logger.error(this.dataCiteMetadata.toDataCiteXml());
 			String gripe = "DOI registration failed for: " + doi;
 			throw new EzidException(gripe);
 		}
