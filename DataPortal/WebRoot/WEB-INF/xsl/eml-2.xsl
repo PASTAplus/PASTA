@@ -139,9 +139,8 @@
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href="./css/w3_recommended.css" />
-        <link rel="stylesheet" type="text/css" href="./css/navigation.css" />
         <link rel="stylesheet" type="text/css" href="./css/sbclter.css" />
-        <!-- <link rel="stylesheet" type="text/css" href="http://portal.lternet.edu/nis/css/lter-nis.css"></link>--> <xsl:text>&#x0A;</xsl:text> 
+        <!-- <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link>--> <xsl:text>&#x0A;</xsl:text> 
         <script src="./js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
         <script src="./js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
         <title><xsl:value-of select="$docid"/></title>
@@ -8776,8 +8775,8 @@
           <xsl:choose>
             <xsl:when test="(./para/literalLayout[1] = $prov-stmt) or (./para[1] = $prov-stmt)">
               <xsl:variable name="url" select="../dataSource/distribution/online/url"/>
-              <p><strong>The following data package was used in the creation of this product:</strong></p>
-              <p><xsl:value-of select="../dataSource/title"/> (<a href="./metadataviewer?url={$url}" target="_blank">Click here to view metadata</a>)</p>
+              <strong>The following data package was used in the creation of this product:</strong><br/>
+              <xsl:value-of select="../dataSource/title"/> (<a href="./metadataviewer?url={$url}" target="_blank">Click here to view metadata</a>)
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="text">
