@@ -50,31 +50,34 @@
 
 				<p class="warning" align="center"><%=message%></p>
 
-				<div class="login-form">
 					<form id="login" name="loginform" method="post" action="./login"
 						target="_top">
-						<table align="center" width="270px">
+						<table id="login-form">
 							<tbody>
 								<tr>
-									<td><label for="uid">User Name:</label></td>
-									<td align="right"><input type="text" name="uid"
-										required="required" /></td>
+									<td align="right"><label for="uid">User Name:</label></td>
+									<td align="right">
+									   <input type="text" name="uid"
+										size="25px" required="required" autocomplete="on" autofocus />
+									</td>
 								</tr>
 								<tr>
-									<td><label for="password">Password:</label></td>
-									<td align="right"><input type="password" name="password"
-										required="required" /></td>
+									<td align="right"><label for="password">Password:</label></td>
+									<td align="right">
+									   <input type="password" name="password"
+										size="25px" required="required" />
+									</td>
 								</tr>
 								<tr>
-									<td colspan="2" align="right"><input type="submit"
-										name="login" value="login" /> <input type="reset"
-										name="reset" value="reset" />
+									<td></td>
+									<td>
+									   <input type="submit" name="login" value="login" />
+									   <input type="reset" name="reset" value="reset" />
 									</td>
 								</tr>
 							</tbody>
 						</table>
 					</form>
-				</div>
 
 			</div>
 			<!-- end content -->
