@@ -50,7 +50,8 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.IdentifierBrowseServlet.class);
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a scope/identifier value to see a list of associated revisions:";
+  private static final String browseMessage = "Select a data package " + 
+  		"<em>scope.identifier</em> value to see the most current <em>data package</em>:";
 
   /**
    * Constructor of the object.
@@ -139,9 +140,9 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
         
         // Output sorted set of scope/identifier values
         for (String identifier: arrayList) {
-          html += "<li><a href=\"./revisionbrowse?scope=" + scope
-              + "&identifier=" + identifier + "\">" + scope + "/" + identifier
-              + "</a></li>\n";          
+          html += "<li><a href=\"./mapbrowse?scope=" + scope
+              + "&identifier=" + identifier + "\">" + scope + ".<em>" + identifier
+              + "</em></a></li>\n";          
         }
 
         html += "</ol>\n";
