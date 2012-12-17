@@ -138,7 +138,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String packageid = request.getParameter("packageid");
 
 		if (scope != null && !(scope.isEmpty()) && identifier != null
-		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
+		    && !(identifier.isEmpty())) {
+			
+			if (revision == null || revision.isEmpty()) {
+				revision = "newest";
+			}
 
 			id = Integer.valueOf(identifier);
 			isPackageId = true;
