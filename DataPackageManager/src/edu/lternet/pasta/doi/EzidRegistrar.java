@@ -390,7 +390,7 @@ public class EzidRegistrar {
 			httpClient.getConnectionManager().shutdown();
 		}
 
-		logger.info("registerDataCiteMetadata: " + entityString);
+		logger.info("registerDataCiteMetadata: " + this.dataCiteMetadata.getLocationUrl() + "\n" + entityString);
 
 		// Test for DOI collision or DOI registration failure
 		if (statusCode == HttpStatus.SC_BAD_REQUEST
