@@ -224,11 +224,12 @@ public class DOIScanner {
 			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
 
 			try {
+				
 				ezidRegistrar.registerDataCiteMetadata();
+				doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+				
 			} catch (EzidException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-
+				
 				/*
 				 * In the event that a DOI registration succeeded with EZID, but failed
 				 * to be recorded in the resource registry, the following exception
@@ -238,20 +239,23 @@ public class DOIScanner {
 				if (e.getMessage().equals("identifier already exists")) {
 					logger.warn("Proceeding with resource registry update...");
 				} else {
-					throw new DOIException(e.getMessage());
+					logger.error(e.getMessage());
+					e.printStackTrace();
+					doi = null;
 				}
 
 			}
 
-			// Update Data Package Manager resource registry with DOI
-			doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-			try {
-	      dataPackageRegistry.addResourceDoi(resourceUrl, doi);
-      } catch (SQLException e) {
-      	logger.error(e.getMessage());
-	      e.printStackTrace();
-	      throw new DOIException(e.getMessage());
-      }
+			if (doi != null) {
+				// Update Data Package Manager resource registry with DOI
+				try {
+					dataPackageRegistry.addResourceDoi(resourceUrl, doi);
+				} catch (SQLException e) {
+					logger.error(e.getMessage());
+					e.printStackTrace();
+					throw new DOIException(e.getMessage());
+				}
+			}
 
 		}
 
