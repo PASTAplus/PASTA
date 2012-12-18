@@ -623,11 +623,13 @@
                     <table  class="subGroup subGroup_border onehundred_percent">
                       <!-- header for the geographic coverage area -->
                       <tr>
-                        <th colspan="2">Geographic Coverage</th>
+                        <!-- Disable the google map until we figure out why it's not rendering well -->
+                        <!-- <th colspan="2">Geographic Coverage</th> -->
+                        <th>Geographic Coverage</th>
                       </tr>
                       <tr>
                         <!-- <td class="fortyfive_percent"> -->
-                        <td class="">              
+                        <td>              
                           <xsl:for-each select="./coverage/geographicCoverage">
                             <xsl:call-template name="geographicCoverage">
                               <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
@@ -635,15 +637,16 @@
                             </xsl:call-template>
                           </xsl:for-each>  
                         </td>
-                        <!-- td class=" fortyfive_percent"> -->
-                        <td class="">          
+                        <!-- Disable the google map until we figure out why it's not rendering well -->
+                        <!--
+                        <td>          
                           <div class="eml_map">
                             <div id="map_canvas" style="width: 400px; height: 300px;"></div>
                           </div>    
                           <xsl:call-template name="geoCovMap">
                             <xsl:with-param name="currentmodule">coverageall</xsl:with-param>
                           </xsl:call-template>
-                        </td>
+                        </td> -->
                       </tr>
                     </table>
                   </xsl:if>
