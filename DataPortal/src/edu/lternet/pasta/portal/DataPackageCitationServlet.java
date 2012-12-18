@@ -128,11 +128,11 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		Integer id = null;
 		boolean isPackageId = false;
 
-		// Accept either packageId or url parameters
+		// Accept packageId by parts or whole
 		String scope = request.getParameter("scope");
 		String identifier = request.getParameter("identifier");
 		String revision = request.getParameter("revision");
-		String url = request.getParameter("url");
+		String packageid = request.getParameter("packageid");
 
 		if (scope != null && !(scope.isEmpty()) && identifier != null
 		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
@@ -140,20 +140,20 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			id = Integer.valueOf(identifier);
 			isPackageId = true;
 
-		} else if (url != null && !url.isEmpty()) {
+		} else if (packageid != null && !packageid.isEmpty()) {
 
-			String[] tokens = url.split("/");
+			String[] tokens = packageid.split("\\.");
 
-			if (tokens.length >= 3) {
-				scope = tokens[tokens.length - 3];
-				identifier = tokens[tokens.length - 2];
+			if (tokens.length == 3) {
+				scope = tokens[0];
+				identifier = tokens[1];
 				id = Integer.valueOf(identifier);
-				revision = tokens[tokens.length - 1];
+				revision = tokens[2];
 				isPackageId = true;
 			}
 
 		} else {
-			html = "<p class=\"warning\">Error: a packageId or metadata URL was not found.</p>\n";
+			html = "<p class=\"warning\">Error: a well-formed packageId was not found.</p>\n";
 		}
 
 		if (isPackageId) {
