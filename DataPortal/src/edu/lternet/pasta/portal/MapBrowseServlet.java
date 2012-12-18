@@ -138,7 +138,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String packageid = request.getParameter("packageid");
 
 		if (scope != null && !(scope.isEmpty()) && identifier != null
-		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
+		    && !(identifier.isEmpty())) {
+			
+			if (revision == null || revision.isEmpty()) {
+				revision = "newest";
+			}
 
 			id = Integer.valueOf(identifier);
 			isPackageId = true;
@@ -207,7 +211,14 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		String html = "";
 
-		String packageId = scope + "." + identifier.toString() + "." + revision;
+		String packageId = null;
+
+		Integer size = null;
+		Integer predecessor = null;
+		Integer successor = null;
+		String previous = "";
+		String next = "";
+		String revisions = "";
 
 		String metadataUri = pastaUriHead + "metadata/eml";
 		String reportUri = pastaUriHead + "report";
@@ -225,10 +236,21 @@ public class MapBrowseServlet extends DataPortalServlet {
 		ArrayList<Creator> creators = null;
 
 		DataPackageManagerClient dpmClient = null;
+		RevisionUtility revUtil = null;
 
 		try {
 
 			dpmClient = new DataPackageManagerClient(this.uid);
+			
+			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier);
+			revUtil = new RevisionUtility(revisionList);
+			size = revUtil.getSize();
+			
+			if (revision.equals("newest")) revision = revUtil.getNewest().toString();
+			
+			packageId = scope + "." + identifier.toString() + "." + revision;
+			predecessor = revUtil.getPredecessor(Integer.valueOf(revision));
+			successor = revUtil.getSuccessor(Integer.valueOf(revision));
 
 			emlString = dpmClient.readMetadata(scope, identifier, revision);
 			emlObject = new EmlObject(emlString);
@@ -341,6 +363,24 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 				dataPackage = "<li>" + packageId + "</li>\n";
 				
+				if (predecessor != null) {
+					previous = "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
+							+ identifier.toString() + "&revision=" + predecessor.toString()
+							+ "\">previous revision</a></li>\n";
+				}
+				
+				if (successor != null) {
+					next = "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
+							+ identifier.toString() + "&revision=" + successor.toString()
+							+ "\">next revision</a></li>\n";
+				}
+				
+				if (size > 1) {
+					revisions = "<li><a href=\"./revisionbrowse?scope=" + scope
+							+ "&identifier=" + identifier.toString()
+							+ "\">all revisions</a></li>\n";
+				}
+				
 			}
 				
 
@@ -351,6 +391,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "<h4 align=\"left\">Package Identification</h4>\n";
 		html += "<ul style=\"list-style: none;\">\n";
 		html += dataPackage;
+		html += "<ul>";
+		html += previous;
+		html += next;
+		html += revisions;
+		html += "</ul>";
 		html += "</ul>\n";
 		html += "<h4 align=\"left\">Resources</h4>\n";
 		html += "<ul>\n";

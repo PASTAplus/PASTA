@@ -50,7 +50,8 @@ public class ScopeBrowseServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.ScopeBrowseServlet.class);
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a scope value to see a list of associated identifiers:";
+	private static final String browseMessage = "Select a data package " +
+			"<em>scope</em> value to see a list of associated <em>identifiers</em>:";
 
   /**
    * Constructor of the object.
