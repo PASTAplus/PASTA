@@ -50,8 +50,9 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.IdentifierBrowseServlet.class);
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a data package " + 
-  		"<em>scope.identifier</em> value to see the most current <em>data package</em>:";
+  private static final String browseMessage = "Select a data package "
+  		+ "<em>scope.identifier</em> value to see the most current "
+  		+ "<em>revision</em> of the data package lineage:";
 
   /**
    * Constructor of the object.
