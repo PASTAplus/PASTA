@@ -49,7 +49,9 @@ public class RevisionBrowseServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.RevisionBrowseServlet.class);
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
-  private static final String browseMessage = "Select a scope/identifer/revision value to see a resource map of the data package:";
+  private static final String browseMessage = "Select a data package "
+  		+ "<em>scope.identifer.revision</em> value to see an overview of the "
+  		+ "data package for the selected <em>revision</em>:";
 
 
   /**
@@ -136,8 +138,8 @@ public class RevisionBrowseServlet extends DataPortalServlet {
         while (tokens.hasNext()) {
           String revision = tokens.nextToken();
           html += "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
-              + identifier + "&revision=" + revision + "\">" + scope + "/"
-              + identifier + "/" + revision + "</a></li>\n";
+              + identifier + "&revision=" + revision + "\">" + scope + "."
+              + identifier + ".<em>" + revision + "</em></a></li>\n";
           count++;
         }
 
