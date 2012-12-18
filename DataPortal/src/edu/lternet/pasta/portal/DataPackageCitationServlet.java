@@ -297,11 +297,9 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 						String organizationName = creator.getOrganizationName();
 						
 						if (organizationName != null) {
-							cnt++;
-							if (cnt == orgCount) {
-								orgText += organizationName + ". ";
-							} else {
-								orgText += organizationName + "; ";
+							if (!orgText.contains(organizationName)) {
+								cnt++;
+									orgText += organizationName + "; ";
 							}
 						}
 
