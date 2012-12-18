@@ -248,13 +248,15 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				if (personCount != 0) {
 
 					for (Creator creator : creators) {
+						
+						String individualName = creator.getIndividualName();
 
-						if (creator.getCreatorType().equals(Creator.PERSON)) {
+						if (individualName != null) {
 							cnt++;
 							if (cnt == personCount) {
-								creatorText += creator.getCreatorName() + " ";
+								creatorText += individualName + " ";
 							} else {
-								creatorText += creator.getCreatorName() + "; ";
+								creatorText += individualName + "; ";
 							}
 						}
 
@@ -264,12 +266,14 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 					for (Creator creator : creators) {
 
-						if (creator.getCreatorType().equals(Creator.ORGANIZATION)) {
+						String organizationName = creator.getOrganizationName();
+
+						if (organizationName != null) {
 							cnt++;
 							if (cnt == orgCount) {
-								creatorText += creator.getCreatorName() + " ";
+								creatorText += organizationName + " ";
 							} else {
-								creatorText += creator.getCreatorName() + "; ";
+								creatorText += organizationName + "; ";
 							}
 						}
 
@@ -290,12 +294,14 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 					for (Creator creator : creators) {
 
-						if (creator.getCreatorType().equals(Creator.ORGANIZATION)) {
+						String organizationName = creator.getOrganizationName();
+						
+						if (organizationName != null) {
 							cnt++;
 							if (cnt == orgCount) {
-								orgText += creator.getCreatorName() + ". ";
+								orgText += organizationName + ". ";
 							} else {
-								orgText += creator.getCreatorName() + "; ";
+								orgText += organizationName + "; ";
 							}
 						}
 
