@@ -112,7 +112,7 @@ public class EmlObject {
 
 			String nameType = null;
 			Person person = null;
-			Creator creator = null;
+			Creator creator =  new Creator();
 
 			while (nItr.hasNext()) {
 				name = (JAXBElement<?>) nItr.next();
@@ -122,7 +122,6 @@ public class EmlObject {
 					
 					personCount++;
 
-					creator = new Creator(Creator.PERSON);
 					person = (Person) name.getValue();
 
 					try {
@@ -148,13 +147,10 @@ public class EmlObject {
 						e.printStackTrace();
 					}
 
-					creators.add(creator);
-
 				} else if (nameType.equals(Creator.ORGANIZATION)) {
 					
 					this.orgCount++;
 
-					creator = new Creator(Creator.ORGANIZATION);
 					String organizationName = (String) name.getValue();
 
 					try {
@@ -164,11 +160,8 @@ public class EmlObject {
 						e.printStackTrace();
 					}
 
-					creators.add(creator);
-
 				} else { // Creator.POSITION
 
-					creator = new Creator(Creator.POSITION);
 					String positionName = (String) name.getValue();
 
 					try {
@@ -178,11 +171,11 @@ public class EmlObject {
 						e.printStackTrace();
 					}
 
-					creators.add(creator);
-
 				}
 
 			}
+
+			creators.add(creator);
 
 		}
 
