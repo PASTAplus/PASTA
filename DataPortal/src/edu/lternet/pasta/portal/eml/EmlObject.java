@@ -120,7 +120,7 @@ public class EmlObject {
 
 				if (nameType.equals(Creator.PERSON)) {
 					
-					personCount++;
+					this.personCount++;
 
 					person = (Person) name.getValue();
 
