@@ -278,7 +278,33 @@ public class MapBrowseServlet extends DataPortalServlet {
 				html += "<ul style=\"list-style: none;\">\n";
 
 				for (Creator creator : creators) {
-					html += "<li>" + creator.getCreatorName() + "</li>";
+					html += "<li>";
+					
+					String individualName = creator.getIndividualName();
+					String positionName = creator.getPositionName();
+					String organizationName = creator.getOrganizationName();
+					
+					if (individualName != null) {
+						html += individualName;
+					}
+					
+					if (positionName != null) {
+						if (individualName != null) {
+							html += "; " + positionName;
+						} else {
+							html += positionName;
+						}
+					}
+					
+					if (organizationName != null) {
+						if (positionName != null || individualName != null) {
+							html += "; " + organizationName;
+						} else {
+							html += organizationName;
+						}
+					}
+					
+					html += "</li>\n";
 				}
 
 				html += "</ul>\n";
