@@ -116,9 +116,6 @@
   <xsl:param name="coloddStyle" select="'colodd'"/>
   <!-- the style for the inner odd col in attributes table -->
   <xsl:param name="innercoloddStyle" select="'innercolodd'"/>
-  <!-- the default alignment style for the wrapper around the main tables -->
-  <!-- <xsl:param name="mainTableAligmentStyle" select="'mainTableAligmentStyle'"/> -->
-  <xsl:param name="mainTableAligmentStyle" select="'content'"/>  
   <!-- the default style for the main container table -->
   <xsl:param name="mainContainerTableStyle" select="'group group_border'"/>
   <!-- the default style for all other tables -->
@@ -140,7 +137,7 @@
       <head>
         <link rel="stylesheet" type="text/css" href="./css/w3_recommended.css" />
         <link rel="stylesheet" type="text/css" href="./css/sbclter.css" />
-        <!-- <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link>--> <xsl:text>&#x0A;</xsl:text> 
+        <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link> <xsl:text>&#x0A;</xsl:text> 
         <script src="./js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
         <script src="./js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
         <title><xsl:value-of select="$docid"/></title>
@@ -150,7 +147,7 @@
         <xsl:attribute name="onload">initialize_map()</xsl:attribute>
         <!-- begin the content area -->
         <xsl:element name="div">
-          <xsl:attribute name="id">{$mainTableAligmentStyle}</xsl:attribute>
+          <xsl:attribute name="id">content</xsl:attribute>
           <xsl:apply-templates select="*[local-name()='eml']"/>              
         </xsl:element> <!-- closes the div element around the page. -->      
         <!-- mob 2010-03-24 mob added to catch error msgs. -->
@@ -1916,7 +1913,6 @@
   <xsl:template name="datasettitle">
     <xsl:param name="packageID" ></xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasettitle</xsl:text></xsl:message></xsl:if>
-    <!-- <h4 class="EML-dataset-supratitle">Data Package (<xsl:value-of select="$packageID"/>)</h4> -->
     <h3>
       <xsl:for-each select="./title">
         <xsl:value-of select="."/>
@@ -3454,6 +3450,8 @@
             </xsl:choose>
           </table>
         </td>
+      </tr>
+      <tr>
         <td>
           <table class="{$tabledefaultStyle}">
             <!-- moved this out of datatablecommon, to break up linear arrangment  -->
@@ -6378,45 +6376,33 @@
       </tr>
     </xsl:if>
     <xsl:if test="(mediumNote) and normalize-space(mediumNote)!=''">
-    <tr><td class="{$disfirstColStyle}"><xsl:text>Notes:</xsl:text></td>
-    <td class="{$secondColStyle}"><xsl:value-of select="mediumNote"/></td></tr>
+      <tr>
+        <td class="{$disfirstColStyle}"><xsl:text>Notes:</xsl:text></td>
+        <td class="{$secondColStyle}"><xsl:value-of select="mediumNote"/></td>
+      </tr>
     </xsl:if>
     <!-- added the request-data button oct 2012 mob -->
-    <tr><td class="{$disfirstColStyle}"><xsl:text>Request data:</xsl:text></td>
+    <tr>
+      <td class="{$disfirstColStyle}"><xsl:text>Request data:</xsl:text></td>
       <td class="{$secondColStyle}">   
-        <!-- as a simple link: -->
-       <!--  <a><xsl:attribute name="href">mailto:<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/>
-          <xsl:text>?subject=Request for dataset: </xsl:text>
-          <xsl:value-of select="//dataset/title[1]"/>
-        </xsl:attribute>
-          <xsl:value-of select="./entityName"/>Send email request to primary contact (<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/>)
-          </a>
-        <br /> -->
         <!-- as a form button. -->
         <form method="GET"  class="entity-link" >
           <xsl:attribute name="action">
             mailto:<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/>
           </xsl:attribute>          
-           <input type="hidden">
+          <input type="hidden">
             <xsl:attribute name="value">
               <xsl:value-of select="../../../entityName"/> 
             </xsl:attribute>       
-          <xsl:attribute name="name" >subject</xsl:attribute>        
-        </input>   
-          <!-- some mail clients will embed plus signs. icky 
-          <input type="hidden">
-            <xsl:attribute name="value">
-              <xsl:value-of select="//dataset/title"/> 
-            </xsl:attribute>       
-            <xsl:attribute name="name" >body</xsl:attribute>        
-          </input> -->
+            <xsl:attribute name="name" >subject</xsl:attribute>        
+          </input>   
           <input type="submit" class="view-data-button" >
             <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" />
             </xsl:attribute>       
           </input> 
-            </form>
-        
-        </td></tr>
+        </form>
+      </td>
+    </tr>
   </xsl:template>
 
   <!-- *******************************  Inline data  *********************** -->
