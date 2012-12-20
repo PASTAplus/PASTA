@@ -106,8 +106,6 @@
   <xsl:param name="secondColStyle" select="'roweven'"/>
   <!-- the style for the attribute table -->
   <xsl:param name="tableattributeStyle" select="'tableattribute'"/>
-  <!-- the style for the border -->
-  <xsl:param name="borderStyle" select="'bordered'"/>
   <!-- the style for the even col in attributes table -->
   <xsl:param name="colevenStyle" select="'coleven'"/>
   <!-- the style for the inner even col in attributes table -->
@@ -233,7 +231,7 @@
       <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Package Usage Rights</h3>
       <div class="collapsible">
         <!-- add in the intellectual rights info -->
-        <table class="subGroup subGroup_border onehundred_percent">  
+        <table class="subGroup onehundred_percent">  
           <tr>
             <td>
               <xsl:if test="intellectualRights">
@@ -491,7 +489,7 @@
     <table class="subGroup onehundred_percent">  
       <tr>
         <!-- add in the geographic coverage info -->
-        <td class="fortyfive_percent">
+        <td>
           <xsl:if test="./coverage/geographicCoverage">
             <xsl:for-each select="./coverage/geographicCoverage">
               <xsl:call-template name="geographicCoverage">
@@ -503,7 +501,7 @@
         </td>
         <!-- mob 2010-03-24: moved up to general information area -->
         <!-- add in the temporal coverage info
-          <td class="fortyfive_percent">
+          <td>
           <xsl:if test="./coverage/temporalCoverage">
           <xsl:for-each select="./coverage/temporalCoverage">
           <xsl:call-template name="temporalCoverage">
@@ -734,7 +732,7 @@
           <table class="subGroup onehundred_percent">  
             <tr>
               <!-- add in the resource-level temporal coverage info -->
-              <td class="fortyfive_percent">
+              <td>
                 <xsl:if test="./methods">
                   <!-- print the type of parent element, and title or description -->
                   <xsl:for-each select="./methods">
@@ -2827,7 +2825,7 @@
     </tr>
     <xsl:apply-templates select="geographicDescription"/>
     <tr>
-      <td class="fortyfive_percent">
+      <td>
         <xsl:apply-templates select="boundingCoordinates">
           <xsl:with-param name="lat-lon-identical" select="$lat-lon-identical"/>
         </xsl:apply-templates>
@@ -3333,11 +3331,8 @@
       </xsl:if>
     </xsl:param>  
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dataTable</xsl:text></xsl:message></xsl:if>
-    <table class="dataset-entity-part">
-      <tr>
-        <td class="dataset-entity-part-header"><h3>Data Table</h3></td>
-      </tr>
-    </table>
+    <hr></hr>
+    <label><big>Data Table:</big></label>
     <table class="subGroup onehundred_percent">
       <tr>
         <td>
@@ -3553,11 +3548,6 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="physicalindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: showdistribution</xsl:text></xsl:message></xsl:if>
-    <xsl:if test="distribution">
-      <tr>
-        <th colspan="2">Data:</th>
-      </tr>
-    </xsl:if>
     <xsl:for-each select="distribution">
       <tr>
         <td colspan="2">
@@ -6015,7 +6005,6 @@
       <xsl:param name="physicalindex"/>
       <xsl:param name="distributionindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: distribution</xsl:text></xsl:message></xsl:if>
-    <table class="{$tabledefaultStyle}">
        <xsl:choose>
          <xsl:when test="references!=''">
           <xsl:variable name="ref_id" select="references"/>
@@ -6062,7 +6051,6 @@
             </xsl:apply-templates>
         </xsl:otherwise>
        </xsl:choose>
-      </table>
   </xsl:template>
 
   <!-- *******************************  Online data  *********************** -->
@@ -6089,7 +6077,7 @@
       <xsl:value-of select="../../../../entityName"/>
     </xsl:variable>
     <tr>
-      <td class="{$disfirstColStyle}"><xsl:text>&#160;</xsl:text><xsl:text>View:</xsl:text></td>
+      <td class="{$firstColStyle}">Data:</td>
       <td class="{$secondColStyle}">
         <a>
 		      <xsl:attribute name="href"><xsl:value-of select="$URL"/></xsl:attribute>
@@ -7801,8 +7789,6 @@
     <xsl:param name="physicalindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntityShowDistribution</xsl:text></xsl:message></xsl:if>
     <xsl:for-each select="distribution">
-      <tr>
-        <td colspan="2">
           <xsl:call-template name="distribution">
             <xsl:with-param name="docid" select="$docid"/>
             <xsl:with-param name="level" select="$level"/>
@@ -7813,8 +7799,6 @@
             <xsl:with-param name="disfirstColStyle" select="$otherentityfirstColStyle"/>
             <xsl:with-param name="dissubHeaderStyle" select="$otherentitysubHeaderStyle"/>
           </xsl:call-template>
-        </td>
-      </tr>
     </xsl:for-each>
   </xsl:template>
 
@@ -8161,7 +8145,8 @@
   <xsl:template match="fieldDelimiter">
     <xsl:param name="physicalfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: fieldDelimiter</xsl:text></xsl:message></xsl:if>
-      <label>Field Delimiter:</label><xsl:value-of select="."/>
+    <td class="{$firstColStyle}">Field Delimiter:</td>
+    <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
   </xsl:template>
 
   <xsl:template match="fieldWidth">

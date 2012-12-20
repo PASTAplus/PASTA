@@ -178,20 +178,6 @@ a img {
     text-decoration:            none;
 }
 
-/* Default for table cells. No border or padding. 
- * Keep the relative font size
- */
- td {
-    font-style:                 normal;
-    font-size:                  95%;
-    font-weight:                normal;
-    font-family:                Arial, Helvetica, sans-serif;
-    text-decoration:            none;    
-    border:                     0px;
-    padding:                    0px;
-    vertical-align:             top; 
-}
-  
 .bold {
     font-style:                 normal;
     font-weight:                bold;
@@ -314,7 +300,7 @@ th.rowheader {
 }
 
 .fortyfive_percent {
-    /*width:                      45%;*/
+    width:                      45%;
 }
 
 .forty_percent {
@@ -340,7 +326,7 @@ th.rowheader {
 label {
     text-align:                 right;
     vertical-align:             middle;
-    padding-right:              5px;
+    padding:                    0.25em;
     margin-right:               3px;
     background-color:           lightgrey;                
 }
@@ -372,8 +358,8 @@ table.dataset-entity-part {
 
 table td.dataset-entity-part-header {
     width:                      50%;
-}*/
+}
 
 table td.dataset-entity-part-header h3 {
     margin:                     0px;
-}
+}*/
