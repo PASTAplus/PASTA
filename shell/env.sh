@@ -21,7 +21,7 @@ export ANT_BINDIR=$ANT_HOME/bin
 export JAVA_HOME=$APPDIR/java
 export JAVA_BINDIR=$JAVA_HOME/bin
 # Uncomment for pasta and PASTA
-export JAVA_OPTS="-Xms256M -Xmx1536M -Djava.awt.headless=true -Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"
+export JAVA_OPTS="-Xms256M -Xmx1536M -XX:MaxPermSize=512M -Djava.awt.headless=true -Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"
 # Uncomment for tcat and Metacat
 #export JAVA_OPTS="-Xms256M -Xmx8192M -XX:MaxPermSize=512M -Djava.awt.headless=true"
 export JAVA_ROOT=$JAVA_HOME
