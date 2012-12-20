@@ -97,11 +97,11 @@
   <!-- the style for major rows containing links, such as additional metadata, original xml file, etc. -->
   <xsl:param name="linkedHeaderStyle" select="'linkedHeaderStyle'"/>  
   <!-- the width for the first column (but see note above) -->
-  <xsl:param name="firstColWidth" select="'15%'"/>
+  <xsl:param name="firstColWidth" select="''"/>
   <!-- the style for the first column -->
   <xsl:param name="firstColStyle" select="'rowodd'"/>
   <!-- the width for the second column (but see note above) -->
-  <xsl:param name="secondColWidth" select="'85%'"/>
+  <xsl:param name="secondColWidth" select="''"/>
   <!-- the style for the second column -->
   <xsl:param name="secondColStyle" select="'roweven'"/>
   <!-- the style for the attribute table -->
@@ -116,10 +116,8 @@
   <xsl:param name="coloddStyle" select="'colodd'"/>
   <!-- the style for the inner odd col in attributes table -->
   <xsl:param name="innercoloddStyle" select="'innercolodd'"/>
-  <!-- the default style for the main container table -->
-  <xsl:param name="mainContainerTableStyle" select="'group group_border'"/>
   <!-- the default style for all other tables -->
-  <xsl:param name="tabledefaultStyle" select="'subGroup subGroup_border onehundred_percent'"/>
+  <xsl:param name="tabledefaultStyle" select="'subGroup onehundred_percent'"/>
   <!-- the style for table party -->
   <xsl:param name="tablepartyStyle" select="'tableparty'"/> 
   <!-- Some html pages use a nested table in the second column.
@@ -147,7 +145,6 @@
         <xsl:attribute name="onload">initialize_map()</xsl:attribute>
         <!-- begin the content area -->
         <xsl:element name="div">
-          <xsl:attribute name="id">content</xsl:attribute>
           <xsl:apply-templates select="*[local-name()='eml']"/>              
         </xsl:element> <!-- closes the div element around the page. -->      
         <!-- mob 2010-03-24 mob added to catch error msgs. -->
@@ -413,128 +410,74 @@
     <table class="onehundred_percent">            
       <tr>
         <td>
-          <!-- a 2-column table with the involved parties in boxes across the entire page -->
           <table class="subGroup onehundred_percent">
             <xsl:if test="publisher">
-              <th colspan="2">Publishers:</th>
+              <th>Publishers:</th>
               <xsl:for-each select="publisher">
                 <tr>
-                  <xsl:if test="position() mod 2 = 1">
-                    <td class="fortyfive_percent">
-                      <xsl:call-template name="party">
-                        <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                        <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                      </xsl:call-template>
-                    </td>
-                    <xsl:for-each select="following-sibling::publisher[position()=1]">
-                      <td class="fortyfive_percent">
-                        <xsl:call-template name="party">
-                          <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                          <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                        </xsl:call-template>
-                      </td>
-                    </xsl:for-each>
-                  </xsl:if>
+                  <td>
+                    <xsl:call-template name="party">
+                      <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </td>
                 </tr>
               </xsl:for-each>
             </xsl:if>     
             <xsl:if test="creator">
-              <th colspan="2">Owners:</th>
+              <th>Owners:</th>
               <xsl:for-each select="creator">
                 <tr>
-                  <xsl:if test="position() mod 2 = 1">
-                    <td class="fortyfive_percent">
+                  <td>
+                    <xsl:call-template name="party">
+                      <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </td>
+                </tr>
+              </xsl:for-each>
+            </xsl:if>      
+            <xsl:if test="contact">
+              <th>Contacts:</th>
+              <xsl:for-each select="contact">
+                <tr>
+                  <td>
+                    <xsl:call-template name="party">
+                      <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </td>
+                </tr>
+              </xsl:for-each>
+            </xsl:if>     
+            <xsl:if test="associatedParty">
+              <th>Associated Parties:</th>
+                <xsl:for-each select="associatedParty">
+                  <tr>
+                    <td>
                       <xsl:call-template name="party">
                         <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
                         <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
                       </xsl:call-template>
                     </td>
-                    <xsl:for-each select="following-sibling::creator[position()=1]">
-                      <td class="fortyfive_percent">
-                        <xsl:call-template name="party">
-                          <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                          <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                        </xsl:call-template>
-                      </td>
-                    </xsl:for-each>
-                  </xsl:if>
                 </tr>
               </xsl:for-each>
-            </xsl:if>      
-      <!-- add in the contacts using a two column table -->
-      <xsl:if test="contact">
-        <th colspan="2">Contacts:</th>
-        <xsl:for-each select="contact">
-          <tr>
-            <xsl:if test="position() mod 2 = 1">
-              <td class="fortyfive_percent">
-                <xsl:call-template name="party">
-                  <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </td>
-              <xsl:for-each select="following-sibling::contact[position()=1]">
-                <td class="fortyfive_percent">
-                  <xsl:call-template name="party">
-                    <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                    <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                  </xsl:call-template>
-                </td>
+            </xsl:if>     
+            <xsl:if test="metadataProvider">
+              <th>Metadata Providers:</th>
+              <xsl:for-each select="metadataProvider">
+                <tr>
+                  <td>
+                    <xsl:call-template name="party">
+                      <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
+                      <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
+                    </xsl:call-template>
+                  </td>
+                </tr>
               </xsl:for-each>
             </xsl:if>
-          </tr>
-        </xsl:for-each>
-      </xsl:if>     
-      <!-- add in the associatedParty using a two column table -->
-      <xsl:if test="associatedParty">
-        <th colspan="2">Associated Parties:</th>
-        <xsl:for-each select="associatedParty">
-          <tr>
-            <xsl:if test="position() mod 2 = 1">
-              <td class="fortyfive_percent">
-                <xsl:call-template name="party">
-                  <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </td>
-              <xsl:for-each select="following-sibling::associatedParty[position()=1]">
-                <td class="fortyfive_percent">
-                  <xsl:call-template name="party">
-                    <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                    <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                  </xsl:call-template>
-                </td>
-              </xsl:for-each>
-            </xsl:if>
-          </tr>
-        </xsl:for-each>
-      </xsl:if>     
-      <!-- add in the metadataProviders using a two column table -->
-      <xsl:if test="metadataProvider">
-        <th colspan="2">Metadata Providers:</th>
-        <xsl:for-each select="metadataProvider">
-          <tr>
-            <xsl:if test="position() mod 2 = 1">
-              <td class="fortyfive_percent">
-                <xsl:call-template name="party">
-                  <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                  <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                </xsl:call-template>
-              </td>
-              <xsl:for-each select="following-sibling::metadataProvider[position()=1]">
-                <td class="fortyfive_percent">
-                  <xsl:call-template name="party">
-                    <xsl:with-param name="partyfirstColStyle" select="$firstColStyle"/>
-                    <xsl:with-param name="partysecondColStyle" select="$secondColStyle"/>
-                  </xsl:call-template>
-                </td>
-              </xsl:for-each>
-            </xsl:if>
-          </tr>
-        </xsl:for-each>
-      </xsl:if>
-       </table>
-      </td>
+          </table>
+        </td>
       </tr>
     </table> <!-- closes the table wrapping the dataset-menu  -->
   </xsl:template>
@@ -597,66 +540,50 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: coverageall</xsl:text></xsl:message></xsl:if>
     <table>            
       <tr>
-        <td></td>
+        <th colspan="2"><xsl:text>Temporal, Geographic and/or Taxonomic information that applies to all data in this dataset:</xsl:text></th>
       </tr>
       <tr>
         <td>
-        <!-- <xsl:call-template name="datasetmixed"/> -->
-          <h4><xsl:text>Temporal, Geographic and/or Taxonomic information that applies to all data in this dataset:</xsl:text></h4>
-          <table class="subGroup onehundred_percent">  
-            <tr>
-              <!-- add in the resource-level temporal coverage info -->
-              <td class="fortyfive_percent">
-                <xsl:if test="./coverage">
-                  <!-- print the type of parent element, and title or description -->
-                  <xsl:for-each select="./coverage/temporalCoverage">
-                    <xsl:call-template name="temporalCoverage">
-                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                  <!-- mob: wrap all the geocov in a table to be treated as a unit. -->
-                  <xsl:if test="./coverage/geographicCoverage">
-                    <table  class="subGroup subGroup_border onehundred_percent">
-                      <!-- header for the geographic coverage area -->
-                      <tr>
-                        <!-- Disable the google map until we figure out why it's not rendering well -->
-                        <!-- <th colspan="2">Geographic Coverage</th> -->
-                        <th>Geographic Coverage</th>
-                      </tr>
-                      <tr>
-                        <!-- <td class="fortyfive_percent"> -->
-                        <td>              
-                          <xsl:for-each select="./coverage/geographicCoverage">
-                            <xsl:call-template name="geographicCoverage">
-                              <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
-                              <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                            </xsl:call-template>
-                          </xsl:for-each>  
-                        </td>
-                        <!-- Disable the google map until we figure out why it's not rendering well -->
-                        <!--
-                        <td>          
-                          <div class="eml_map">
-                            <div id="map_canvas" style="width: 400px; height: 300px;"></div>
-                          </div>    
-                          <xsl:call-template name="geoCovMap">
-                            <xsl:with-param name="currentmodule">coverageall</xsl:with-param>
-                          </xsl:call-template>
-                        </td> -->
-                      </tr>
-                    </table>
-                  </xsl:if>
-                  <xsl:for-each select="./coverage/taxonomicCoverage">
-                    <xsl:call-template name="taxonomicCoverage">
-                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:if> 
-              </td>
-            </tr>
-          </table>
+          <xsl:if test="./coverage">
+            <!-- print the type of parent element, and title or description -->
+            <xsl:for-each select="./coverage/temporalCoverage">
+              <xsl:call-template name="temporalCoverage">
+                <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+              </xsl:call-template>
+            </xsl:for-each>
+            <!-- mob: wrap all the geocov in a table to be treated as a unit. -->
+            <xsl:if test="./coverage/geographicCoverage">
+              <xsl:for-each select="./coverage/geographicCoverage">
+                <xsl:call-template name="geographicCoverage">
+                  <xsl:with-param  name="firstColStyle" select="$firstColStyle"/>
+                  <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                </xsl:call-template>
+              </xsl:for-each>  
+              <!-- Disable the google map until we figure out why it's not rendering well -->
+              <!--
+              <td>          
+                <div class="eml_map">
+                  <div id="map_canvas" style="width: 400px; height: 300px;"></div>
+                </div>    
+                <xsl:call-template name="geoCovMap">
+                  <xsl:with-param name="currentmodule">coverageall</xsl:with-param>
+                </xsl:call-template>
+              </td> -->
+            </xsl:if>
+            <xsl:for-each select="./coverage/taxonomicCoverage">
+              <xsl:call-template name="taxonomicCoverage">
+                <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:if> 
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td>
           <!-- next comes the entity level coverages. attribute-level stuff under its entity name --> 
           <!--  TO DO: this needs to work for all entity types. choose label based on element name  -->
           <xsl:for-each select="dataTable">
@@ -825,7 +752,7 @@
           <xsl:for-each select="dataTable">
             <xsl:if test="(./methods) or (*//attribute/methods) or (./method) or (*//attribute/method)">
               <h4>
-                <xsl:text>These methods, instrumentation and/or protocols apply  to Data Table: </xsl:text>
+                <xsl:text>These methods, instrumentation, and/or protocols apply to Data Table: </xsl:text>
                 <xsl:value-of select="entityName"/> 
               </h4>  
               <xsl:if test="(./method) or (./methods)"> <!-- first find an entity-level methods tree -->
@@ -946,7 +873,6 @@
             </td>
           </tr>
         </table>       
-        <!-- <h3>Attribute Domain</h3> -->
       </td>
     </tr>
     <tr>
@@ -1880,8 +1806,7 @@
   <!-- download XML part -->
   <xsl:template name="xml">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: xml</xsl:text></xsl:message></xsl:if>
-    <br/><a target="_blank" href="./metadataviewer?packageid={$packageID}&#38;contentType=application/xml">
-    Original XML file</a> (in Ecological Metadata Language)
+    <br/><a target="_blank" href="./metadataviewer?packageid={$packageID}&#38;contentType=application/xml">Download as XML</a> (in Ecological Metadata Language)
   </xsl:template>
   
   <!-- This module is for dataset -->
@@ -1897,15 +1822,9 @@
         </xsl:for-each>    
       </xsl:when>
       <xsl:otherwise>
-        <table>            
-          <tr>
-            <td>
               <xsl:call-template name="datasetmixed">
                 <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
               </xsl:call-template>
-            </td>
-          </tr>
-        </table>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1923,7 +1842,7 @@
   <xsl:template name="datasetmixed">
     <xsl:param name="packageID"></xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmixed</xsl:text></xsl:message></xsl:if>
-    <table class="{$tabledefaultStyle}">
+    <table class="subGroup onehundred_percent">
       <tr>
         <th colspan="2">Data Package General Information:</th>
       </tr>
@@ -2041,7 +1960,7 @@
         </xsl:call-template>
       </xsl:for-each>
     </xsl:if>
-    <table class="{$tabledefaultStyle}">
+    <table class="subgroup onehundred_percent">
       <tr>
         <th colspan="2">People and Organizations:</th>
       </tr>
@@ -2222,7 +2141,7 @@
                 </xsl:if>
                 <xsl:if test="organizationName">
                   <!-- Organization appears alone if alone under party -->
-                  <td>Organization</td>
+                  <td>Organization:</td>
                   <td><xsl:value-of select="organizationName"/></td>
                 </xsl:if>
               </xsl:otherwise>
@@ -2666,17 +2585,17 @@
   <xsl:template match="phone" mode="party">
     <xsl:param name="partyfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: phone</xsl:text></xsl:message></xsl:if>
-    <tr><td class="{$partyfirstColStyle}" >
-      Phone:
-    </td>
+    <tr>
+      <td class="{$partyfirstColStyle}" >Phone:</td>
       <td>
         <table class="{$tablepartyStyle}">
-          <tr><td class="{$secondColStyle}">
-            <xsl:value-of select="."/>
-            <xsl:if test="normalize-space(./@phonetype)!=''">
-              <xsl:text> (</xsl:text><xsl:value-of select="./@phonetype"/><xsl:text>)</xsl:text>
-            </xsl:if>
-          </td>
+          <tr>
+            <td class="{$secondColStyle}">
+              <xsl:value-of select="."/>
+              <xsl:if test="normalize-space(./@phonetype)!=''">
+                <xsl:text> (</xsl:text><xsl:value-of select="./@phonetype"/><xsl:text>)</xsl:text>
+              </xsl:if>
+            </td>
           </tr>
         </table>
       </td>
@@ -2687,15 +2606,18 @@
     <xsl:param name="partyfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: electronicMailAddress</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}" >
-        Email Address:
-      </td>
+      <tr>
+        <td class="{$partyfirstColStyle}" >Email Address:</td>
         <td>
           <table class="{$tablepartyStyle}">
-            <tr><td class="{$secondColStyle}">
-              <a><xsl:attribute name="href">mailto:<xsl:value-of select="."/></xsl:attribute><xsl:value-of select="./entityName"/>
-                <xsl:value-of select="."/></a>
-            </td>
+            <tr>
+              <td class="{$secondColStyle}">
+                <a>
+                  <xsl:attribute name="href">mailto:<xsl:value-of select="."/></xsl:attribute>
+                  <xsl:value-of select="./entityName"/>
+                  <xsl:value-of select="."/>
+                </a>
+              </td>
             </tr>
           </table>
         </td>
@@ -2707,15 +2629,18 @@
     <xsl:param name="partyfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: onlineUrl</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
-      <tr><td class="{$partyfirstColStyle}" >
-        Web Address:
-      </td>
+      <tr>
+        <td class="{$partyfirstColStyle}" >Web Address:</td>
         <td>
           <table class="{$tablepartyStyle}">
-            <tr><td class="{$secondColStyle}">
-              <a><xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute><xsl:value-of select="./entityName"/>
-                <xsl:value-of select="."/></a>
-            </td>
+            <tr>
+              <td class="{$secondColStyle}">
+                <a>
+                  <xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
+                  <xsl:value-of select="./entityName"/>
+                  <xsl:value-of select="."/>
+                </a>
+              </td>
             </tr>
           </table>
         </td>
@@ -2857,14 +2782,14 @@
           <!-- letting the foreach select the current node instead of geographicCoverage lets this work for
           either dataset/coverage or attribute/coverage, but I do not know why (oh no!).  -->
           <xsl:for-each select=".">
-            <table class="{$tabledefaultStyle}">
+            <table class="subgroup onehundred_percent">
               <xsl:call-template name="geographicCovCommon" />
             </table>
           </xsl:for-each>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
-        <table class="{$tabledefaultStyle}">
+        <table class="subgroup onehundred_percent">
             <xsl:call-template name="geographicCovCommon" />
           </table>
       </xsl:otherwise>
@@ -2900,13 +2825,12 @@
         </xsl:choose>
       </th>
     </tr>
+    <xsl:apply-templates select="geographicDescription"/>
     <tr>
-      <td class="fortyfive_percent"><xsl:apply-templates select="geographicDescription"/></td>
       <td class="fortyfive_percent">
-      <!-- <xsl:apply-templates select="geographicDescription"/> -->
-      <xsl:apply-templates select="boundingCoordinates">
-        <xsl:with-param name="lat-lon-identical" select="$lat-lon-identical"/>
-      </xsl:apply-templates>
+        <xsl:apply-templates select="boundingCoordinates">
+          <xsl:with-param name="lat-lon-identical" select="$lat-lon-identical"/>
+        </xsl:apply-templates>
       </td>
     </tr>
     <xsl:for-each select="datasetGPolygon">
@@ -2921,37 +2845,33 @@
 
   <xsl:template match="geographicDescription">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: geographicDescription</xsl:text></xsl:message></xsl:if>
-    <table>
-      <tr>
-        <td class="{$firstColStyle}">Description:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-      </tr>
-    </table>
+    <tr>
+      <td class="{$firstColStyle}">Description:</td>
+      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="boundingCoordinates">
     <xsl:param name="lat-lon-identical"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: boundingCoordinates</xsl:text></xsl:message></xsl:if>
-    <table>
-      <tr>
-        <td class="{$firstColStyle}">
-          <xsl:choose>
-            <xsl:when test="$lat-lon-identical= 'true' ">Site Coordinates:</xsl:when>
-            <xsl:otherwise>Bounding Coordinates:</xsl:otherwise>
-          </xsl:choose>
-        </td>
-        <td>
-          <xsl:choose>
-            <xsl:when test="$lat-lon-identical = 'true' ">
-              <xsl:call-template name="boundingCoordinatesSingleLatLon"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="boundingCoordinatesBox"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </td>
-      </tr>
-    </table>
+    <tr>
+      <td class="{$firstColStyle}">
+        <xsl:choose>
+          <xsl:when test="$lat-lon-identical= 'true' ">Site Coordinates:</xsl:when>
+          <xsl:otherwise>Bounding Coordinates:</xsl:otherwise>
+        </xsl:choose>
+      </td>
+      <td>
+        <xsl:choose>
+          <xsl:when test="$lat-lon-identical = 'true' ">
+            <xsl:call-template name="boundingCoordinatesSingleLatLon"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="boundingCoordinatesBox"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template name="boundingCoordinatesSingleLatLon">
@@ -2959,9 +2879,9 @@
     <table>
       <tr> 
         <td class="{$firstColStyle}"><xsl:text>Longitude (degree):&#160;</xsl:text></td>
-        <td> <xsl:value-of select="westBoundingCoordinate"/></td>
+        <td><xsl:value-of select="westBoundingCoordinate"/></td>
         <td class="{$firstColStyle}"><xsl:text>Latitude (degree):&#160;</xsl:text></td>
-        <td> <xsl:value-of select="northBoundingCoordinate"/></td>
+        <td><xsl:value-of select="northBoundingCoordinate"/></td>
       </tr>
       <xsl:apply-templates select="boundingAltitudes"/>
     </table>
@@ -3024,19 +2944,17 @@
         <td class="{$secondColStyle}"><xsl:value-of select="altitudeMinimum"/></td>
       </xsl:when>
       <xsl:otherwise>
-              <tr>
-                <td class="{$firstColStyle}">Altitude Minimum:</td>
-                <td class="{$secondColStyle}"><xsl:value-of select="altitudeMinimum"/></td>
-           <!--   </tr>
-           <tr>  -->
-                <td class="{$firstColStyle}">Altitude Maximum:</td>
-        <td class="{$secondColStyle}"><xsl:value-of select="altitudeMaximum"/></td>
-      </tr>
+        <tr>
+          <td class="{$firstColStyle}">Altitude Minimum:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="altitudeMinimum"/></td>
+          <td class="{$firstColStyle}">Altitude Maximum:</td>
+          <td class="{$secondColStyle}"><xsl:value-of select="altitudeMaximum"/></td>
+        </tr>
       </xsl:otherwise>
     </xsl:choose>
-   </xsl:template>
+  </xsl:template>
 
-<!-- 
+  <!-- 
   <xsl:template match="altitudeMinimum">
      <xsl:value-of select="."/> &#160;<xsl:value-of select="../altitudeUnits"/>
   </xsl:template>
@@ -3044,7 +2962,7 @@
   <xsl:template match="altitudeMaximum">
     <xsl:value-of select="."/> &#160;<xsl:value-of select="../altitudeUnits"/>
   </xsl:template>
- -->
+  -->
   
   <xsl:template match="datasetGPolygonOuterGRing">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetGPolygonOuterGRing</xsl:text></xsl:message></xsl:if>
@@ -3085,7 +3003,7 @@
     <xsl:value-of select="gRingLongitude"/><br/>
   </xsl:template>
 
-<!-- ****************  T E M P O R A L   C O V E R A G E  **************** -->
+  <!-- ****************  T E M P O R A L   C O V E R A G E  **************** -->
   <xsl:template name="temporalCoverage">
     <xsl:param name="firstColStyle" ></xsl:param>
     <xsl:param name="secondColStyle" ></xsl:param>
@@ -3095,13 +3013,13 @@
         <xsl:variable name="ref_id" select="references"/>
         <xsl:variable name="references" select="$ids[@id=$ref_id]" />
         <xsl:for-each select="$references">
-          <table class="{$tabledefaultStyle}">
+          <table class="subgroup onehundred_percent">
             <xsl:call-template name="temporalCovCommon" />
           </table>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
-          <table class="{$tabledefaultStyle}">
+        <table class="subgroup onehundred_percent">
             <xsl:call-template name="temporalCovCommon" />
           </table>
       </xsl:otherwise>
@@ -3202,7 +3120,7 @@
      <xsl:call-template name="citation"></xsl:call-template>
   </xsl:template>
 
-<!-- ***************  T A X O N O M I C   C O V E R A G E  *************** -->
+  <!-- ***************  T A X O N O M I C   C O V E R A G E  *************** -->
   <xsl:template name="taxonomicCoverage">
     <xsl:param name="firstColStyle" ></xsl:param>
     <xsl:param name="secondColStyle" ></xsl:param>
@@ -6152,9 +6070,6 @@
     <xsl:param name="disfirstColStyle"/>
     <xsl:param name="dissubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: online</xsl:text></xsl:message></xsl:if>
-    <tr><td class="{$dissubHeaderStyle}" colspan="2">
-        <xsl:text>Available Online:</xsl:text>
-    </td></tr>
     <xsl:apply-templates select="url">
       <xsl:with-param name="disfirstColStyle" select="$disfirstColStyle" />
     </xsl:apply-templates>
@@ -6416,9 +6331,9 @@
     <xsl:param name="physicalindex"/>
     <xsl:param name="distributionindex"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: inline</xsl:text></xsl:message></xsl:if>
-    <tr><td class="{$dissubHeaderStyle}" colspan="2">
-        <xsl:text>Data:</xsl:text>
-    </td></tr>
+    <tr>
+      <td class="{$dissubHeaderStyle}" colspan="2"><xsl:text>Data:</xsl:text></td>
+    </tr>
     <tr><td class="{$disfirstColStyle}">
       <xsl:text>&#160;</xsl:text></td>
       <td class="{$secondColStyle}">
@@ -6741,11 +6656,11 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: identifier</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)">
       <tr>
-        <td class="{$IDfirstColStyle}">Local Identifier:</td>
-        <td class="{$IDsecondColStyle}"><xsl:value-of select="$packageID"/>
+        <td class="{$firstColStyle}">Local&#160;Identifier:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="$packageID"/>
           <!-- 
           <xsl:if test="normalize-space(../@system) != ''">
-            <xsl:text> (in the </xsl:text><em class="italic"><xsl:value-of select="$system"/></em><xsl:text> catalog system)</xsl:text>
+            <xsl:text> (in the </xsl:text><em><xsl:value-of select="$system"/></em><xsl:text> catalog system)</xsl:text>
           </xsl:if> 
           -->
         </td>
@@ -7735,7 +7650,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntity</xsl:text></xsl:message></xsl:if>
     <table class="dataset-entity-part">
       <tr>
-        <td class="dataset-entity-part-header"><h3>Data Resource, other</h3></td>
+        <td class="dataset-entity-part-header"><h3>Data Resource, Other</h3></td>
       </tr>
     </table>
     <table class="{$tabledefaultStyle}">
@@ -8246,10 +8161,7 @@
   <xsl:template match="fieldDelimiter">
     <xsl:param name="physicalfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: fieldDelimiter</xsl:text></xsl:message></xsl:if>
-    <tr>
-      <td class="{$firstColStyle}">Field Delimeter:</td>
-      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
-    </tr>
+      <label>Field Delimiter:</label><xsl:value-of select="."/>
   </xsl:template>
 
   <xsl:template match="fieldWidth">
@@ -9047,7 +8959,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resourcepubDate</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(../pubDate)!=''">
       <tr>
-        <td class="{$resfirstColStyle}">Publication Date:</td>
+        <td class="{$resfirstColStyle}">Publication&#160;Date:</td>
         <td class="{$secondColStyle}"><xsl:value-of select="../pubDate"/></td>
       </tr>
     </xsl:if>

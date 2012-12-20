@@ -1,7 +1,6 @@
 /*   '$RCSfile: sbclter.css,v $'                                            */
 /*     Purpose: Default style sheet for PISCO project web pages             */
 /*              Using this stylesheet rather than placing styles directly   */
-/*              into PISCO web documents allows us to globally change the   */
 /*              formatting styles of the entire site in one easy place.     */
 /*              Versioning information for this document can be found at    */
 /*              cvs.piscoweb.org.                                           */
@@ -14,104 +13,67 @@
 /*  '$Revision: 1.1 $'                                                      */
 /*                                                                          */
 
-/* Color Scheme:
- *    dark blue:                  #003366
- *    aqua blue:                  #0066CC
- *    aqua green:                 #006666
- *    white:                      #FFFFFF
- *    dark tan(kelp color):       #666600
- *    light tan:                  #CCCC99
- *    light blue:                 #E5F5FD
- *    greenish tan:               #EEEECC
- */
-
 /*
  * This style rule tells the browser to treat the new HTML5 elements the same as a <div>.
  * In other words, the element occupies a line of its own with no extra vertical or horizontal spacing.
  */
 article, aside, figure, footer, header, nav, section {
-    display: block;
-    margin: 0;
-    padding: 0;
+    display:                    block;
+    margin:                     0;
+    padding:                    0;
 }
-
-#content {
-    /* margin:                     105px 0px 0px 0px ;  */
-    background-color:           #ffffff;
-    border:                     0px;
-    margin:                     0px 0px 0px 0px;
-}
-
-/* these classes to be children of div "content" */
 
 div.r-box {
-    float:              right;
-    border:             1px solid;
-    margin:             0px;
-    width:              260px;
-    height:             auto;
-    margin-right:       0px;  
-    font-size:          .8em;
-    padding:            6px 6px;
-}
-
-div.content-area {
-    /* for padding area within parent area */
-    background-color:   #FFFFFF;
-    text-align:         left;
-    padding:            30px 40px 15px 40px; 
-}
-
-div.content-area-dense {
-    /* for padding area within parent area */
-    background-color:   #FFFFFF;
-    text-align:         left;
-    /*  padding:            30px 40px 15px 40px; */
-    padding:            0px 0px 0px 0px; 
+    float:                      right;
+    border:                     1px solid;
+    margin:                     0px;
+    width:                      260px;
+    height:                     auto;
+    margin-right:               0px;  
+    font-size:                  .8em;
+    padding:                    6px 6px;
 }
 
 div.hanging-paragraph {
-	  margin-left:	20px;
-	  text-indent:	-20px;
+	  margin-left:	              20px;
+	  text-indent:	              -20px;
 }
 
 div.abstract-text {
-    font-size:    0.93em;
+    font-size:                  0.93em;
 }
 
 div.smaller-font {
-    font-size:		smaller;
+    font-size:		              smaller;
 }
 
 div.bottom-padding {
-    padding-bottom:		6px;
+    padding-bottom:		          6px;
 }
 
 div.left-padding {
-    padding-left:		10px;
+    padding-left:		            10px;
 }
 
 /* drop the top margin put on by the w3 in the wrapper */
 td p {
-  margin: 0 0 15px 0;
+    margin:                     0 0 15px 0;
 }
 
-ul,ol {
+ul, ol {
     padding:                    0px;
-    /* margin:                  0px 0px 0px 15px; */
 }
 
 .ol-lower-alpha { 
-    list-style-type: lower-alpha;
-    margin-top:       2px;
-
+    list-style-type:            lower-alpha;
+    margin-top:                 2px;
 }
 
 .ul-bulleted-list { 
-    list-style-type:  disc;
-    margin-top:       2px;
-    margin-bottom:    10px;
-    margin-left:      15px;
+    list-style-type:            disc;
+    margin-top:                 2px;
+    margin-bottom:              10px;
+    margin-left:                15px;
 }
 
 /* to emphasize words, use it inline with a <span> class*/ 
@@ -124,8 +86,7 @@ small {
     font-size:                  smaller;
 }
   
-/* for pre-formated text: adds a small padding around it
- * font is set to the default style, 
+/* for pre-formated text: adds a small padding around it font is set to the default style, 
  * but could be changed for different effect
  */
 pre {
@@ -136,10 +97,8 @@ pre {
     text-decoration:            none;
 }
 
-/* for creating block quotes. 
- * set off with a slight indent to the left & right margins
- * font is set to default style,
- * but could be changed for different effect
+/* for creating block quotes. set off with a slight indent to the left & right margins.
+ * font is set to default style, but could be changed for different effect.
  */
 blockquote {
     padding:                    0;
@@ -149,85 +108,6 @@ blockquote {
     text-decoration:            none;
 }
 
-/* Headings Tags : 
- * Headings are used to break up straight text. 
- * They are used to present topics, or subsections, chapters, etc.
- * There are 6 headings tag which can be styled as we wish.
- * All of our headings will be rendered in the same font and color as the
- * default settings.
- */  
-
-/* these 2 classes adjust the size of the h1 tag for different pages */
-h1.home-page-h1 {
-  font-size:      2.25em;
-/*  font-size:     112.5%;*/ 
-}
-
-h1.page-h1 {
-  font-size:    1.75em;
-  margin:       1.2em 0 .5em 0;
-  /* font-size:   87.5%*/
-}
- 
-h2.page-h2 {
- font-size:     1.25em; 
-}
-
-h2.pubs-pubtype-h2 {
-/* font-size:     1.25em;  */
- margin:       0em;
-}
-
-h3.page-EML-h3 {
- font-size:     1.25em;
- text-align:    center; 
-}
-
-h3.pubs-year-h3 {
- /*font-size:     1.25em; */
-  margin:       0em;
-}
-
- /* NOTE: mob removed the clear:both from the h4 tag so that it could appear next 
- to a floated element. watch that this doesnt cause a problem */
-
-h4 {
-    font-size:                  1em;
-    font-weight:                bold;
-}
-
-/* very small font */  
-h6 {
-    background-color:           #FFFFFF;
-    padding:                    0;
-    font-size:                  0.5em;
-    font-style:                 normal;
-    font-weight:                normal;
-    font-family:                Arial, Helvetica, sans-serif;
-    text-decoration:            none;
-}  
-
-/* Old style hr command - will be depreciated
- * Netscape 4.x does not like this
- * should use new style below
- * used anywhere? remove?
- */
-hr {
-    border-top:                 0px solid;
-    width:                      450px;
-    height:                     2px;
-}
-
-/* New horizontal rule. Netscape 4.x should render this fine.
- * apply this class to a <div> tag for the desired effect.
- * the rule is 1px wide, blue with a slight margin on the left and right.
- */
-.rule {
-    border-top-width:           2px;
-    border-top-style:           solid;
-    margin:                     4px 4px
-}
-  
 /* image styles */
 /* no padding or border around images by default */
 img {
@@ -245,8 +125,6 @@ img {
 img.vtop {  
     vertical-align:             top;
 }
-
-/* Add a blue border around an image */
 
 img.border {
     border:                     medium;
@@ -300,9 +178,8 @@ a img {
     text-decoration:            none;
 }
 
-/* Default for table cells. 
- * No border or padding. 
- * Keep the relative font size and set color to blue
+/* Default for table cells. No border or padding. 
+ * Keep the relative font size
  */
  td {
     font-style:                 normal;
@@ -315,31 +192,6 @@ a img {
     vertical-align:             top; 
 }
   
-/* Classes for positioning: use with div tags for desired effect */
-.indent1 {
-    white-space:                nowrap;
-    padding-left:               10px;
-}
-
-.indent2 {
-    padding-left:               15px;
-}
-
-.indent3 {
-    padding-left:               50px;
-}
-
-/* Classes for the <em> tag (emphasis) */
-.italic {
-    font-style:                 italic;
-    font-weight:                normal;
-}
-
-.italics {
-    font-style:                 italic;
-    font-weight:                normal;
-}
-
 .bold {
     font-style:                 normal;
     font-weight:                bold;
@@ -348,31 +200,6 @@ a img {
 .waybold {
     font-style:                 italic;
     font-weight:                bolder;
-}
-
-/* Additions for the data catalog pages */
-
-/* Define a border for groups of elements.  This uses the 
-   -moz-border-radius (Mozilla, Netscape, Opera only) 
-   attribute for the time being.  Once
-   browsers support the CSS3 border-radius attribute, this 
-   should be switched.*/
-.group {
-    padding:                    0;
-    min-width:                  900px;
-    voice-family:               "\"}\""; /* begin ie5win hack */
-    voice-family:               inherit;
-    -moz-border-radius:         10px; /* end ie5win hack */
-}
-    
-/* Children of the group get some padding */
-.group * {
-    padding:                    2px;
-}
- 
-.group_border {
-    /* aqua-green border */
-    border:                     solid 1px;
 }
 
 .subGroup {
@@ -410,9 +237,6 @@ table.right {
 }
 
 th {
-    border-bottom:              solid 1px;
-    padding:                    0;
-    margin:                     0;
     text-align:                 left;
     font-style:                 italic;
     font-weight:                700;
@@ -427,12 +251,12 @@ th.rowheader {
     border-bottom:              1px;
     border-top:                 1px;
     background-color:           lightgrey;
-    padding:                    0;
+    padding:                    0.25em;
     margin:                     0;
 } 
 
 .roweven {
-    padding:                    0;
+    padding:                    0.25em;
     margin:                     0;
 } 
 
@@ -442,7 +266,7 @@ th.rowheader {
     background-color:           lightgrey;
     padding-left:               2px;
     padding-right:              2px;
-    text-align: left;
+    text-align:                 left;
 }
 
 .colodd {
@@ -469,9 +293,8 @@ th.rowheader {
 }    
 
 .onehundred_percent {
-    min-width: 1100px;
-    max-width: 1100px;    
-    
+    min-width:                  100px;
+    /*width:                      100%;*/
 }
 
 .eighty_percent {
@@ -491,7 +314,7 @@ th.rowheader {
 }
 
 .fortyfive_percent {
-    width:                      45%;
+    /*width:                      45%;*/
 }
 
 .forty_percent {
@@ -510,39 +333,47 @@ th.rowheader {
     width:                      15%;
 }
 
+.width_100 {
+	  width:                      100px;
+}
+
 label {
     text-align:                 right;
     vertical-align:             middle;
+    padding-right:              5px;
+    margin-right:               3px;
+    background-color:           lightgrey;                
 }
 
 input.view-data-button{
-    font-weight:		bold; 
-    background: #FFFF99;
-   	border-bottom: 2px solid;
-   	border-right: 2px solid;
-   	-moz-border-radius: 3px;
+    font-weight:		            bold; 
+    background:                 #FFFF99;
+   	border-bottom:              2px solid;
+   	border-right:               2px solid;
+   	-moz-border-radius:         3px;
 }
    	  
 input.view-data-button:hover {
-    background: #FFCC33;
+    background:                 #FFCC33;
 }
 
 form.entity-link {
-    padding: 0px;
-    margin: 0px;
+    padding:                    0px;
+    margin:                     0px;
 }
 
 /* Dataset Entity views - citation, header and links */ 
 
+/*
 table.dataset-entity-part {
-    width: 100%;
-    margin-top: 20px;
+    width:                      100%;
+    margin-top:                 20px;
 }
 
 table td.dataset-entity-part-header {
-    width: 50%;
-}
+    width:                      50%;
+}*/
 
 table td.dataset-entity-part-header h3 {
-    margin: 0px;
+    margin:                     0px;
 }
