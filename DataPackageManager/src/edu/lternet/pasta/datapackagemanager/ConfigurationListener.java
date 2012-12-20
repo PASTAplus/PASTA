@@ -74,7 +74,7 @@ public class ConfigurationListener implements ServletContextListener {
    */
   
   /**
-   * Accessor methor for the options class variable
+   * Accessor method for the options class variable
    * 
    * @return  the options class variable
    */

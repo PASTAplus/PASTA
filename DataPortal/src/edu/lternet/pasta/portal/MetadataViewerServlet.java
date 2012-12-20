@@ -26,6 +26,7 @@ package edu.lternet.pasta.portal;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -174,9 +175,8 @@ public class MetadataViewerServlet extends DataPortalServlet {
     if (isValidPackageId) {
 
       try {
-
+        String dataPackageDOI = null;
         String xml = null;
-
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
         xml = dpmClient.readMetadata(scope, identifier, revision);
 
@@ -185,9 +185,25 @@ public class MetadataViewerServlet extends DataPortalServlet {
           type = "xml";
         } else {
           EmlUtility emlUtility = new EmlUtility(xml);
-          String body = emlUtility.xmlToHtml(cwd + xslpath);
+          HashMap<String, String> parameterMap = new HashMap<String, String>();
+          String pastUriHead = dpmClient.getPastaUriHead();
+          String resourceId = packageIdToResourceId(pastUriHead, packageId);
+          // Pass the resourceId as a parameter to the XSLT
+          if (resourceId != null && !resourceId.equals("")) {
+            parameterMap.put("resourceId", resourceId);
+          }
+          // Pass the data package DOI as a parameter to the XSLT
+          try {
+            dataPackageDOI = dpmClient.readDataPackageDoi(scope, identifier, revision);
+            if (dataPackageDOI != null && !dataPackageDOI.equals("")) {
+              parameterMap.put("dataPackageDOI", dataPackageDOI);
+            }
+          }
+          catch (Exception e) {
+            // No DOI was read. Just continue on.
+          }
+          message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
           type = "html";
-          message = EmlUtility.assembleEmlHtml(body);
         }
 
       } catch (PastaAuthenticationException e) {

@@ -126,32 +126,56 @@ public class AuditReportServlet extends DataPortalServlet {
     
     String begin = (String) request.getParameter("begin");
     if (begin != null && !begin.isEmpty()) {
-      filter.append("fromTime=" + begin + "&");
+    	if (filter.length() == 0) {
+    		filter.append("fromTime=" + begin);
+    	} else {
+    		filter.append("&fromTime=" + begin);
+    	}
     }
     
     String end = (String) request.getParameter("end");
     if (end != null && !end.isEmpty()) {
-      filter.append("toTime=" + end + "&");
+    	if (filter.length() == 0) {
+    		filter.append("toTime=" + end);
+    	} else {
+    		filter.append("&toTime=" + end);
+    	}
     }
     
     String debug = (String) request.getParameter("debug");
     if (debug != null && !debug.isEmpty()) {
-      filter.append("category=" + debug + "&");
+    	if (filter.length() == 0) {
+    		filter.append("category=" + debug);
+    	} else {
+    		filter.append("&category=" + debug);
+    	}
     }
     
     String info = (String) request.getParameter("info");
     if (info != null && !info.isEmpty()) {
-      filter.append("category=" + info + "&");
+    	if (filter.length() == 0) {
+    		filter.append("category=" + info);
+    	} else {
+    		filter.append("&category=" + info);
+    	}
     }
 
     String warn = (String) request.getParameter("warn");
     if (warn != null && !warn.isEmpty()) {
-      filter.append("category=" + warn + "&");
+    	if (filter.length() == 0) {
+    		filter.append("category=" + warn);
+    	} else {
+    		filter.append("&category=" + warn);
+    	}
     }
 
     String error = (String) request.getParameter("error");
     if (error != null && !error.isEmpty()) {
-      filter.append("category=" + error + "&");
+    	if (filter.length() == 0) {
+        filter.append("category=" + error);    		
+    	} else {
+        filter.append("&category=" + error);
+    	}
     }
 
     String userIdParam = (String) request.getParameter("userId");
@@ -160,17 +184,29 @@ public class AuditReportServlet extends DataPortalServlet {
       if (!userIdParam.equalsIgnoreCase(userParam)) {
         userParam = PastaClient.composeDistinguishedName(userIdParam);
       }
-      filter.append("user=" + userParam + "&");
+    	if (filter.length() == 0) {
+    		filter.append("user=" + userParam);
+    	} else {
+    		filter.append("&user=" + userParam);
+    	}
     }
 
     String group = (String) request.getParameter("group");
     if (group != null && !group.isEmpty()) {
-      filter.append("group=" + group + "&");
+    	if (filter.length() == 0) {
+    		filter.append("group=" + group);
+    	} else {
+    		filter.append("&group=" + group);
+    	}
     }
     
     String code = (String) request.getParameter("code");
     if (code != null && !code.isEmpty()) {
-      filter.append("status=" + code + "&");
+    	if (filter.length() == 0) {
+    		filter.append("status=" + code);
+    	} else {
+    		filter.append("&status=" + code);
+    	}
     }
     
 

@@ -97,37 +97,6 @@ public class DataPackageAuditServlet extends DataPortalServlet {
   }
   
   
-  /*
-   * Composes a data package resource identifier based on PASTA host name
-   * and packageId values.
-   */
-  private String packageIdToResourceId(String pastaHost, String packageId) {
-    String resourceId = null;
-    final String SLASH = "/";
-    
-    if (pastaHost != null) {
-      EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-      
-      try {
-        EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
-        String scope = emlPackageId.getScope();
-        Integer identifier = emlPackageId.getIdentifier();
-        Integer revision = emlPackageId.getRevision();
-      
-        if (scope != null && identifier != null && revision != null) {        
-          resourceId = "https://" + pastaHost + "/package/eml/" + 
-                       scope + SLASH + identifier + SLASH + revision;
-        } 
-      }
-      catch (IllegalArgumentException e) {
-        
-      }
-    }
-    
-    return resourceId;
-  }
-
-  
   /**
    * The doPost method of the servlet. <br>
    * 
@@ -150,7 +119,7 @@ public class DataPackageAuditServlet extends DataPortalServlet {
     StringBuffer filter = new StringBuffer();
     String message = null;
     String type = null;
-    String pastaHost = null;
+    String pastaUriHead = null;
     String uid = (String) httpSession.getAttribute("uid");
 
     if (uid == null || uid.isEmpty()) {
@@ -161,7 +130,7 @@ public class DataPackageAuditServlet extends DataPortalServlet {
 
     try {
       auditClient = new AuditManagerClient(uid);
-      pastaHost = auditClient.getPastaHost();
+      pastaUriHead = auditClient.getPastaUriHead();
     }
     catch (PastaAuthenticationException e) {
       logger.error(e.getMessage());
@@ -181,7 +150,7 @@ public class DataPackageAuditServlet extends DataPortalServlet {
      */
     
     String packageId = request.getParameter("packageId");
-    String resourceId = packageIdToResourceId(pastaHost, packageId);
+    String resourceId = packageIdToResourceId(pastaUriHead, packageId);
     
     if (resourceId != null && !resourceId.isEmpty()) {
       filter.append("resourceId=" + resourceId + "&");

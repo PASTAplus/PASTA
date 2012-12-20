@@ -32,6 +32,34 @@
 
 			<h2 align="center">Data Package Viewer</h2>
 
+            <fieldset>
+                <legend>View Data Package</legend>
+
+                <p>View data package using the package identifier</p>
+
+                <div class="section">
+                    <form id="mapbrowse" name="mapbrowse" method="post"
+                        action="./mapbrowse">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                       <label for="packageid">PackageId:</label>
+                                    </td>
+                                    <td>
+                                       <input type="text" name="packageid" required="required" size="30" />
+                                    </td>
+                                    <td>
+                                       <input type="submit" name="view" value="view" />
+                                       <input type="reset" name="reset" value="reset" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </fieldset>
+
 			<fieldset>
 				<legend>View Metadata</legend>
 
@@ -40,18 +68,18 @@
 				<div class="section">
 					<form id="metadataviewer" name="metadataviewer" method="post"
 						action="./metadataviewer" target="_blank">
-						<table align="left" cellpadding="4em">
+						<table>
 							<tbody>
 								<tr>
-									<td align="left" width="130px"><label for="packageid">PackageId:</label>
+									<td>
+									   <label for="packageid">PackageId:</label>
 									</td>
-									<td align="left" width="200px"><input type="text"
-										name="packageid" required="required" size="30" /></td>
-									<td align="center" width="70px"><input type="submit"
-										name="view" value="view" />
+									<td>
+									   <input type="text" name="packageid" required="required" size="30" />
 									</td>
-									<td align="center" width="40px"><input type="reset"
-										name="reset" value="reset" />
+									<td>
+									   <input type="submit" name="view" value="view" />
+									   <input type="reset" name="reset" value="reset" />
 									</td>
 								</tr>
 							</tbody>
@@ -68,19 +96,19 @@
 				<div class="section">
 					<form id="reportviewer" name="reportviewer" method="post"
 						action="./reportviewer" target="_blank">
-						<table align="left" cellpadding="4em">
+						<table>
 							<tbody>
 								<tr>
-									<td align="left" width="130px"><label for="packageid">PackageId:</label>
-									</td>
-									<td align="left" width="200px"><input type="text"
-										name="packageid" required="required" size="30" /></td>
-									<td align="center" width="70px"><input type="submit"
-										name="view" value="view" />
-									</td>
-									<td align="center" width="40px"><input type="reset"
-										name="reset" value="reset" />
-									</td>
+                                <td>
+                                       <label for="packageid">PackageId:</label>
+                                    </td>
+                                    <td>
+                                       <input type="text" name="packageid" required="required" size="30" />
+                                    </td>
+                                    <td>
+                                       <input type="submit" name="view" value="view" />
+                                       <input type="reset" name="reset" value="reset" />
+                                    </td>
 								</tr>
 							</tbody>
 						</table>

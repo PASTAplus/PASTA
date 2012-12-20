@@ -1546,6 +1546,63 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
   
   
   /**
+   * Returns the Digital Object Identifier for the given resource identifier if
+   * it exists; otherwise, throw a ResourceNotFoundException.
+   * 
+   * @param resourceId
+   * @param authToken
+   * @return
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws UnauthorizedException
+   * @throws ResourceNotFoundException
+   * @throws Exception
+   */
+	public String readResourceDoi(String resourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String doi = null;
+		String user = authToken.getUserId();
+		
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+		
+	    /*
+	     * Check whether user is authorized to read the data package report
+	     */
+	    Authorizer authorizer = new Authorizer(dataPackageRegistry);
+	    boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User " + user
+				    + " does not have permission to read thw DOI for this resource: "
+				    + resourceId;
+				throw new UnauthorizedException(gripe);
+			}
+			
+			doi = dataPackageRegistry.getDoi(resourceId);
+			
+			if (doi == null) {
+				String gripe = "A DOI does not exist for this resource: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+		
+		
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return doi;
+
+	}  
+  
+  /**
    * Rollback the creation of data entities in the data manager for
    * the specified scope and identifier
    * 

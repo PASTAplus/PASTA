@@ -47,6 +47,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.FileUtility;
@@ -118,7 +119,7 @@ public class DataPackageManagerClient extends PastaClient {
           throws PastaAuthenticationException, PastaConfigurationException {
     
     super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/package";
   }
 
@@ -315,6 +316,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String createDataPackage(File emlFile) throws Exception {
     String contentType = "application/xml";
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpPost httpPost = new HttpPost(BASE_URL + "/eml");
     String resourceMap = null;
 
@@ -358,6 +360,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String deleteDataPackage(String scope, Integer identifier) 
           throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
     HttpDelete httpDelete = new HttpDelete(BASE_URL + "/eml" + urlTail);
     String entityString = null;
@@ -395,6 +398,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String evaluateDataPackage(File emlFile) throws Exception {
     String contentType = "application/xml";
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
     String qualityReport = null;
 
@@ -439,6 +443,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String listDataEntities(String scope, Integer identifier, String revision) 
           throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
     String url = BASE_URL + "/data/eml" + urlTail;
     HttpGet httpGet = new HttpGet(url);
@@ -475,6 +480,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String listDataPackageIdentifiers(String scope)
           throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String url = BASE_URL + "/eml/" + scope;
     HttpGet httpGet = new HttpGet(url);
     String entityString = null;
@@ -514,6 +520,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String listDataPackageRevisions(String scope, Integer identifier)
       throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
     String url = BASE_URL + "/eml" + urlTail;
     HttpGet httpGet = new HttpGet(url);
@@ -549,6 +556,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String listDataPackageScopes() 
           throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String url = BASE_URL + "/eml";
     HttpGet httpGet = new HttpGet(url);
     String entityString = null;
@@ -584,6 +592,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String listDeletedDataPackages()
           throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String url = BASE_URL + "/eml/deleted";
     HttpGet httpGet = new HttpGet(url);
     String entityString = null;
@@ -622,6 +631,7 @@ public class DataPackageManagerClient extends PastaClient {
   public byte[] readDataEntity(String scope, Integer identifier,
       String revision, String entityId) throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), revision,
         entityId);
     String url = BASE_URL + "/data/eml" + urlTail;
@@ -665,6 +675,7 @@ public class DataPackageManagerClient extends PastaClient {
                                 String revision) 
         throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
     String url = BASE_URL + "/eml" + urlTail;
     HttpGet httpGet = new HttpGet(url);
@@ -741,6 +752,7 @@ public class DataPackageManagerClient extends PastaClient {
   public String readMetadata(String scope, Integer identifier, String revision)
       throws Exception {
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
     String url = BASE_URL + "/metadata/eml" + urlTail;
     HttpGet httpGet = new HttpGet(url);
@@ -755,7 +767,7 @@ public class DataPackageManagerClient extends PastaClient {
       HttpResponse httpResponse = httpClient.execute(httpGet);
       int statusCode = httpResponse.getStatusLine().getStatusCode();
       HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
+      entityString = EntityUtils.toString(httpEntity, "UTF-8");
       if (statusCode != HttpStatus.SC_OK) {
         handleStatusCode(statusCode, entityString);
       }
@@ -769,6 +781,174 @@ public class DataPackageManagerClient extends PastaClient {
 
 
   /**
+	 * Returns the DOI for the data package map resource identified by the scope,
+	 * identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the data package
+	 * @throws Exception
+	 */
+	public String readDataPackageDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+
+	/**
+	 * Returns the DOI for the metadata resource identified by the scope,
+	 * identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the metadata resource
+	 * @throws Exception
+	 */
+	public String readMetadataDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/metadata/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}
+	
+	
+	/**
+	 * Returns the DOI for the data package quality report resource identified by
+	 * the scope, identifier, and revision.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return DOI for the data package quality report resource
+	 * @throws Exception
+	 */
+	public String readDataPackageReportDoi(String scope, Integer identifier,
+	    String revision) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/report/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+
+
+	/**
+	 * Returns the DOI for the data entity resource identified by the scope,
+	 * identifier, revision, and entity identifier.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @param entityId
+	 * @return DOI for the data entity resource
+	 * @throws Exception
+	 */
+	public String readDataEntityDoi(String scope, Integer identifier,
+	    String revision, String entityId) throws Exception {
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, entityId);
+		String url = BASE_URL + "/data/doi" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+		
+	}  
+
+	
+  /**
    * Executes the 'searchDataPackages' web service method.
    * @param pathQuery an XML pathquery string (conforming to Metacat pathquery syntax)
    * @return an XML resultset document (conforming to Metacat pathquery syntax)
@@ -778,6 +958,7 @@ public class DataPackageManagerClient extends PastaClient {
     throws Exception {
     String contentType = "application/xml";
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpPut httpPut = new HttpPut(BASE_URL + "/eml/search");
     String resultSetXML = null;
 
@@ -825,6 +1006,7 @@ public class DataPackageManagerClient extends PastaClient {
           throws Exception {
       final String contentType = "application/xml";
       HttpClient httpClient = new DefaultHttpClient();
+      HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
       String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
       final String url = BASE_URL + "/eml" + urlTail;
       HttpPut httpPut = new HttpPut(url);
@@ -867,6 +1049,30 @@ public class DataPackageManagerClient extends PastaClient {
   public String getContentType() {
     String contentType = this.contentType;
     return contentType;
+  }
+  
+  /**
+   * Returns the PASTA data package resource URI.
+   * 
+   * @param scope
+   * @param identifier
+   * @param revision
+   * @return PASTA data package resource URI
+   */
+  public String getPastaPackageUri(String scope, Integer identifier, String revision) {
+
+  	String uri = null;
+  	
+  	String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+  	
+  	if (this.pastaPort == 80 || this.pastaPort == 443) {
+  		uri = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, null) + "/eml" + urlTail;
+  	} else {
+  		uri = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort) + "/eml" + urlTail;
+  	}
+  	
+  	return uri;
+
   }
   
 }

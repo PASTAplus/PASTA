@@ -64,6 +64,7 @@ public class PastaClient {
   protected String pastaHost = null;
   protected String pastaProtocol = null;
   protected int pastaPort;
+  protected String pastaUriHead = null;
 
   protected String uid = null;
   protected String token = null;
@@ -86,6 +87,7 @@ public class PastaClient {
     this.pastaHost = options.getString("pasta.hostname");
     this.pastaProtocol = options.getString("pasta.protocol");
     this.pastaPort = options.getInt("pasta.port");
+    this.pastaUriHead = options.getString("pasta.uriHead");
 
     if (this.uid == null) {
 
@@ -148,10 +150,14 @@ public class PastaClient {
    * 
    * @param pastaProtocol     The PASTA protocol, e.g. "http"
    * @param pastaHostname     The PASTA hostname, e.g. "pasta-s.lternet.edu"
+   * @param pastaPort         The PASTA port value, e.g. 8888 (may be null or empty string)
    * @return
    */
-  public static String composePastaUrl(String pastaProtocol, String pastaHostname) {
+  public static String composePastaUrl(String pastaProtocol, String pastaHostname, Integer pastaPort) {
     String pastaUrl = pastaProtocol + "://" + pastaHostname;
+    if (pastaPort != null && pastaPort > 0) {
+      pastaUrl += ":" + pastaPort.toString();
+    }
     return pastaUrl;
   }
   
@@ -166,6 +172,14 @@ public class PastaClient {
    */
   public String getPastaHost() {
     return pastaHost;
+  }
+  
+  
+  /*
+   * Gets the pastaHost instance variable.
+   */
+  public String getPastaUriHead() {
+    return pastaUriHead;
   }
   
   

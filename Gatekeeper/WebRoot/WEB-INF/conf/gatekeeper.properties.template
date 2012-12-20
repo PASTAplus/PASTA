@@ -1,0 +1,7 @@
+web.service.version = GateKeeper-0.1
+token.name = auth-token
+token.ttl = 28800000
+token.authgroup = authenticated
+token.publicuser = public
+ldap.keystore = keystore.jks
+token.privatekey = private-key.ser

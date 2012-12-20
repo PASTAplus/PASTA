@@ -42,6 +42,7 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.log4j.Logger;
 
@@ -100,7 +101,7 @@ public class LoginClient {
     this.pastaProtocol = options.getString("pasta.protocol");
     this.pastaPort = options.getInt("pasta.port");
     
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.LOGIN_URL = pastaUrl + "/package/";
 
     String token = this.login(uid, password);
@@ -173,6 +174,7 @@ public class LoginClient {
     // Define host parameters
     HttpHost httpHost = new HttpHost(this.pastaHost, this.pastaPort, this.pastaProtocol);
     DefaultHttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 
     // Define user authentication credentials that will be used with the host
     AuthScope authScope = new AuthScope(httpHost.getHostName(),

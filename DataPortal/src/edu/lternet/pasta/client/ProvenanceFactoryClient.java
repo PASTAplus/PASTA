@@ -34,6 +34,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -75,7 +76,7 @@ public class ProvenanceFactoryClient extends PastaClient {
 	public ProvenanceFactoryClient(String uid)
 	    throws PastaAuthenticationException, PastaConfigurationException {
 		super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/package/eml/provenance";
 	}
 	
@@ -96,6 +97,7 @@ public class ProvenanceFactoryClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpPut httpPut = new HttpPut(BASE_URL + "/?" + pid);
 

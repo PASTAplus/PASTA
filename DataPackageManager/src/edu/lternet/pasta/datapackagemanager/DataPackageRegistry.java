@@ -39,7 +39,14 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
+import edu.lternet.pasta.doi.DOIException;
+import edu.lternet.pasta.doi.Resource;
+import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.security.token.AuthTokenFactory;
+import edu.lternet.pasta.common.security.token.BasicAuthToken;
+import edu.ucsb.nceas.utilities.Options;
 
 
 /**
@@ -56,12 +63,13 @@ public class DataPackageRegistry {
    * Class fields
    */
   
+  private static Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
+  private static final String PUBLIC = "public";
+ 
   /*
    * Instance fields
    */
-  
-  private Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
   // Name of the database table where data packages are registered
   private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
@@ -69,6 +77,7 @@ public class DataPackageRegistry {
   private final String DATA_PACKAGE_MANAGER_SCHEMA = "datapackagemanager";
   private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
   private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
+ 
   private String dbDriver;           // database driver
   private String dbURL;              // database URL
   private String dbUser;             // database user name
@@ -91,6 +100,7 @@ public class DataPackageRegistry {
   public DataPackageRegistry(String dbDriver, String dbURL, String dbUser,
                       String dbPassword) 
           throws ClassNotFoundException, SQLException {
+  	
     this.dbDriver = dbDriver;
     this.dbURL = dbURL;
     this.dbUser = dbUser;
@@ -402,7 +412,51 @@ public class DataPackageRegistry {
 	  }
   }
 
-	
+	/**
+	 * Add the DOI of resource to the resource registry..
+	 * 
+	 * @param resourceId
+	 *          The resource identifier of the resource to be updated
+	 * @param doi
+	 *          The DOI of the resource
+	 * @throws DOIException
+	 * @throws SQLException
+	 */
+	public void addResourceDoi(String resourceId, String doi)
+	    throws DOIException, SQLException {
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET doi='" + doi + "' WHERE resource_id='" + resourceId + "';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		if (rowCount != 1) {
+			String gripe = "updateRegistryDoi: failed to update DOI in resource registry.";
+			throw new DOIException(gripe);
+		}
+
+	}
+
+
 	/**
 	 * Delete all resources associated with a data package based on
 	 * the specified scope and identifier values.
@@ -466,6 +520,47 @@ public class DataPackageRegistry {
 	 */
 	public boolean deleteDataPackage(String scope, String identifier, String revision){
 		return false;   // Not yet supported
+	}
+	
+	
+	/**
+	 * Delete the DOI field of the Data Package Manager resource registry
+	 * for the resource identified by the DOI.
+	 * 
+	 * @param doi
+	 *          The DOI of the resource
+	 * @throws Exception
+	 */
+	public void deleteResourceDoi(String doi)
+	    throws DOIException {
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "UPDATE datapackagemanager.resource_registry"
+		    + " SET doi=NULL WHERE doi='" + doi + "';";
+
+		Statement stat = null;
+		Integer rowCount = null;
+
+		try {
+			stat = conn.createStatement();
+			rowCount = stat.executeUpdate(queryString);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		if (rowCount != 1) {
+			String gripe = "obsoleteRegistryDoi: failed to obsolete DOI in resource registry.";
+			throw new DOIException(gripe);
+		}
+
 	}
 
 	
@@ -765,7 +860,55 @@ public class DataPackageRegistry {
     return oldest;
   }
   
-  
+  /**
+   * Gets the doi value for a given resourceId
+   * 
+   * @param resourceId   the resource identifier
+   * @return  the value of the 'doi' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getDoi(String resourceId) 
+          throws ClassNotFoundException, SQLException {
+    
+  	String doi = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT doi FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        doi = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return doi;
+    
+  }
+    
   /**
    * Gets the principalOwner value for a given resourceId
    * 
@@ -1104,7 +1247,75 @@ public class DataPackageRegistry {
     return isDeactivated;
   }
   
+	/**
+	 * Determines whether the given resource is publicly accessible.
+	 * 
+	 * @param resourceId
+	 * @return Is publicly accessible
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public Boolean isPublicAccessible(String resourceId) throws SQLException {
 
+		Boolean publicAccessible = false;
+
+		ArrayList<Rule> ruleList = new ArrayList<Rule>();
+
+		Connection conn = null;
+
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, principal, access_type, "
+		    + "access_order, permission FROM datapackagemanager.access_matrix WHERE"
+		    + " resource_id='" + resourceId + "';";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+
+				Rule rule = new Rule();
+
+				rule.setPrincipal(result.getString("principal"));
+				rule.setAccessType(result.getString("access_type"));
+				rule.setOrder(result.getString("access_order"));
+				rule.setPermission((Rule.Permission) Enum.valueOf(
+				    Rule.Permission.class, result.getString("permission")));
+
+				ruleList.add(rule);
+
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		String tokenString = BasicAuthToken.makeTokenString(PUBLIC, PUBLIC);
+		AuthToken authToken = AuthTokenFactory
+		    .makeAuthTokenWithPassword(tokenString);
+
+		AccessMatrix accessMatrix = new AccessMatrix(ruleList);
+		Rule.Permission permission = (Rule.Permission) Enum.valueOf(
+		    Rule.Permission.class, Rule.READ);
+		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
+
+		return publicAccessible;
+
+	}
+
+  
   /**
    * 
    * @param scope
@@ -1348,7 +1559,115 @@ public class DataPackageRegistry {
     return docidList;
   }
 
+	/**
+	 * Returns an array list of resources that are both publicly accessible and
+	 * lacking DOIs.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listDoilessResources() throws SQLException {
 
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " doi IS NULL and date_deactivated IS NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
+
+			while (result.next()) {
+
+				Resource resource = new Resource();
+
+				// Test here for resource public accessibility before adding to list
+
+				resourceId = result.getString("resource_id");
+
+				if (this.isPublicAccessible(resourceId)) {
+
+					resource.setResourceId(resourceId);
+					resource.setResourceType(result.getString("resource_type"));
+					resource.setPackageId(result.getString("package_id"));
+					resource.setDateCreate(result.getString("date_created"));
+
+					resourceList.add(resource);
+
+				}
+
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	/**
+	 * Returns an array list of DOIs that are obsolete.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<String> listObsoleteDois() throws SQLException {
+
+		ArrayList<String> doiList = new ArrayList<String>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT doi"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " doi IS NOT NULL and date_deactivated IS NOT NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+				String doi = result.getString("doi");
+				doiList.add(doi);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return doiList;
+
+	}
+
+	
   /**
    * Closes the connection to the database.
    */
@@ -1371,6 +1690,45 @@ public class DataPackageRegistry {
                    e.getMessage());
     }   
   }
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		Options options = null;
+		options = ConfigurationListener.getOptions();
+		
+		String dirPath = "WebRoot/WEB-INF/conf";
+
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
+
+		DataPackageRegistry dpr = null;
+		String dbDriver = "org.postgresql.Driver";
+		String dbURL = "jdbc:postgresql://localhost:5432/pasta";
+		String dbUser = "pasta";
+    String dbPassword = "p@st@";
+		
+		// String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
+    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+
+		try {
+			dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+			if (dpr.getDoi(resourceId) == null) {
+				logger.info("It's NULL");
+			} else {
+				logger.info("It's not NULL");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
 
 
 }

@@ -12,18 +12,21 @@
      <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
       <fileset dir="${shared.lib.dir}/apache-commons">
-        <include name="**/commons-configuration*.jar"/>
-        <include name="**/commons-logging*.jar"/>
-        <include name="**/commons-lang*.jar"/>
-        <include name="**/commons-io-2.*.jar"/>
-        <include name="**/commons-fileupload-*.jar"/>
-        <include name="**/commons-codec-*.jar"/>
+        <include name="**/commons-configuration-1.8.jar"/>
+        <include name="**/commons-logging-1.1.1.jar"/>
+        <include name="**/commons-lang3-3.1.jar"/>
+        <include name="**/commons-io-2.1.jar"/>
+        <include name="**/commons-fileupload-1.2.2.jar"/>
+        <include name="**/commons-codec-1.7.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-httpcomponents">
-        <include name="**/*.jar"/>
+        <include name="**/httpclient-4.1.2.jar"/>
+        <include name="**/httpcore-4.2.jar"/>
+        <include name="**/httpclient-cache-4.1.2.jar"/>
+        <include name="**/httpmime-4.1.2.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-logging">
-        <include name="**/*.jar"/>
+        <include name="**/log4j-1.2.13.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-xalan">
         <include name="**/xalan.jar"/>
@@ -35,16 +38,27 @@
         <include name="xml-apis.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/jersey">
-        <include name="**/*.jar"/>
+        <include name="**/asm-3.1.jar"/>
+        <include name="**/jersey-client-1.4.jar"/>
+        <include name="**/jersey-server-1.4.jar"/>
+        <include name="**/jersey-apache-client-1.4.jar"/>
+        <include name="**/jersey-core-1.4.jar"/>
+        <include name="**/jsr311-api-1.1.1.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/junit">
-        <include name="**/*.jar"/>
+        <include name="**/junit-4.8.2.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/owasp">
-        <include name="**/*.jar"/>
+        <include name="**/esapi-2.0.1.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
-        <include name="**/*.jar"/>
+        <include name="**/postgresql-8.4-702.jdbc4.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/saxon9">
+        <include name="**/saxon9he.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
+        <include name="eml-2.1.0.jar"/>
       </fileset>
     </copy>
   </target>

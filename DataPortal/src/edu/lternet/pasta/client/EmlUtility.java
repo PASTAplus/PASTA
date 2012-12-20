@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.HashMap;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -39,6 +40,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import net.sf.saxon.s9api.ItemType;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XsltCompiler;
+import net.sf.saxon.s9api.XsltExecutable;
+import net.sf.saxon.s9api.XsltTransformer;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -60,29 +72,6 @@ public class EmlUtility {
    * Class variables
    */
   
-  private static final String emlHtmlHead;
-  private static final String emlHtmlTail;
-  
-  static {
-      emlHtmlHead = String.format("%s%s%s%s%s%s%s%s%s",
-        "<!doctype html>\n",
-        "<html>\n\n",
-        "<head>\n",
-        "    <title>Metadata Previewer</title>\n",
-        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">\n",
-        "    <script src=\"./js/jquery-1.7.1.js\" type=\"text/javascript\"></script>\n",
-        "    <script src=\"./js/toggle.js\" type=\"text/javascript\"></script>\n",
-        "</head>\n\n",
-        "<body>\n"
-      );
- 
-      emlHtmlTail = String.format("%s%s",
-        "</body>\n\n",
-        "</html>\n"
-      );
-       
-  }
-
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.EmlUtility.class);
 
@@ -127,18 +116,6 @@ public class EmlUtility {
    * Methods
    */
   
-  /**
-   * Assembles an HTML-rendered EML document, surrounding the main body of the
-   * HTML with head and tail portions of boilerplate HTML.
-   * 
-   * @param body  The body portion of the HTML as returned by the XSLT transformation.
-   * @return the assembled HTML document
-   */
-  public static String assembleEmlHtml(String body) {
-    return String.format("%s%s%s", emlHtmlHead, body, emlHtmlTail);                    
-  }
-
-  
   private String emlReferenceExpander(String xslPath) {
 
     String xml = null;
@@ -177,7 +154,7 @@ public class EmlUtility {
    * @param xslPath
    *          The path to the quality report XSL stylesheet.
    * 
-   * @return The HTML table as a String object.
+   * @return The HTML document as a String object.
    */
   public String xmlToHtml(String xslPath) {
 
@@ -210,16 +187,74 @@ public class EmlUtility {
     return html;
   }
 
+  
   /**
-   * @param args
+   * Transforms an EML XML document to an HTML document using the
+   * Saxon XSLT engine which can process XSLT 2.0.
+   * 
+   * @param xslPath
+   *          The path to the quality report XSL stylesheet.
+   * 
+   * @return The HTML document as a String object.
+   */
+  public String xmlToHtmlSaxon(String xslPath, HashMap<String, String> parameters) {
+
+    String html = null;
+    File xsltFile = new File(xslPath);
+    StringReader stringReader = new StringReader(this.eml);
+    StringWriter stringWriter = new StringWriter();
+    StreamSource xsltSource = new StreamSource(xsltFile);
+    Source source = new StreamSource(stringReader);
+
+    try {
+      Processor processor = new Processor(false);
+      XsltCompiler xsltCompiler = processor.newXsltCompiler();
+      XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
+      XdmNode xdmNode = processor.newDocumentBuilder().build(source);
+      Serializer out = new Serializer();
+      out.setOutputProperty(Serializer.Property.METHOD, "html");
+      out.setOutputProperty(Serializer.Property.INDENT, "yes");
+      out.setOutputWriter(stringWriter);
+      XsltTransformer xsltTransformer = xsltExecutable.load();
+      xsltTransformer.setInitialContextNode(xdmNode);
+      if (parameters != null) {
+        for (String parameterName : parameters.keySet()) {
+          String parameterValue = parameters.get(parameterName);
+          if (parameterValue != null && !parameterValue.equals("")) {
+            QName qName = new QName(parameterName);
+            XdmAtomicValue xdmAtomicValue = new XdmAtomicValue(parameterValue, ItemType.STRING);
+            xsltTransformer.setParameter(qName, xdmAtomicValue);
+          }
+        }
+      }
+      xsltTransformer.setDestination(out);
+      xsltTransformer.transform();
+      html = stringWriter.toString();
+    }
+    catch (SaxonApiException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+    }
+    
+    return html;
+  }
+  
+
+  /**
+   * @param args   String array with three arguments:
+   *   arg[0] absolute path to the input XML file
+   *   arg[1] absolute path to the output HTML file
+   *   arg[2] absolute path to the EML XSLT stylesheet
    */
   public static void main(String[] args) {
 
+    String inputPath = args[0];
+    String outputPath = args[1];
+    String emlXslPath = args[2];
     ConfigurationListener.configure();
 
-    String cwd = System.getProperty("user.dir");
-    File inFile = new File(cwd + "/documents/knb-lter-nin.1.1.eml.xml");
-    File outFile = new File(cwd + "/WebRoot/knb-lter-nin.1.1.eml.html");
+    File inFile = new File(inputPath);
+    File outFile = new File(outputPath);
     String eml = null;
 
     try {
@@ -238,10 +273,7 @@ public class EmlUtility {
       e.printStackTrace();
     }
 
-    String html = null;
-    String emlXsl = cwd + "/WebRoot/WEB-INF/xsl/eml-2.1.0.xsl";
-
-    html = eu.xmlToHtml(emlXsl);
+    String html = eu.xmlToHtml(emlXslPath);
 
     try {
       FileUtils.writeStringToFile(outFile, html);

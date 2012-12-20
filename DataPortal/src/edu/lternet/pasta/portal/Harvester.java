@@ -91,7 +91,7 @@ public class Harvester implements Runnable {
    * 
    * @param harvestDirPath  the directory under which harvest results are stored
    * @param uid  the user identifier, e.g. "ucarroll"
-   * @param isEvaluate  true if evaluate, false if insert
+   * @param isEvaluate  true if evaluate, false if upload
    */
   public Harvester(String harvestDirPath, String uid, boolean isEvaluate) {
     this.harvestDirPath = harvestDirPath;
@@ -306,11 +306,11 @@ public class Harvester implements Runnable {
       }
       
       String packageIdPath = harvestDirPath + "/" + packageId;
-      String verb = isEvaluate ? "Evaluating" : "Inserting";
+      String verb = isEvaluate ? "Evaluating" : "Uploading";
 
       Harvester.createDirectory(packageIdPath);
 
-      /* Process insert operation */
+      /* Process upload operation */
       if (!isEvaluate) {
         if (emlPackageId != null) {
           String scope = emlPackageId.getScope();
@@ -520,7 +520,7 @@ public class Harvester implements Runnable {
           }
           
           /*
-           * Save the EML to file then process it for evaluation or insert
+           * Save the EML to file then process it for evaluation or upload
            */
           if (emlString != null) {
             File emlFile = saveEmlToFile(harvestEMLPath, emlString, isEvaluate);
@@ -550,7 +550,7 @@ public class Harvester implements Runnable {
     Harvester.createDirectory(harvestEMLPath);
 
     /*
-     * Save the EML to file then process it for evaluation or insert
+     * Save the EML to file then process it for evaluation or upload
      */
     if (emlString != null) {
       File emlFile = saveEmlToFile(harvestEMLPath, emlString, isEvaluate);

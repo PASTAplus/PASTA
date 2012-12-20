@@ -21,23 +21,37 @@
 	language governing permissions and limitations under the License.
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
+<xsl:stylesheet 
+  version="2.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+  exclude-result-prefixes="eml"
+>
 
-  <xsl:output method="html"/>
+  <xsl:output method="html" encoding="utf-8" indent="yes" />
 
-  <xsl:variable name="prov-stmt"
-    select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"/>
+  <xsl:variable 
+    name="prov-stmt"
+    select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"
+  />
 
   <xsl:template match="/">
 
     <xsl:variable name="packageid" select="/eml:eml/@packageId"/>
+    <xsl:text disable-output-escaping='yes'>&lt;!doctype html>&#x0A;</xsl:text>
 
+<html>
+
+<head>
+    <title><xsl:value-of select="$packageid"/></title>
+    <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link> <xsl:text>&#x0A;</xsl:text>
+    <script src="./js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
+    <script src="./js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
+</head>
+
+<body>
     <div class="eml">
-      <h3 id="top" >
-        <xsl:value-of select="/eml:eml/dataset/title"/>
-      </h3>
-
+      <h3 id="top" ><xsl:value-of select="/eml:eml/dataset/title"/></h3>
       <fieldset>
         <legend>Summary Information</legend>
         <div class="section-table">
@@ -45,15 +59,11 @@
             <tbody>
               <tr>
                 <td class="title">Data Package Identifier:</td>
-                <td class="data">
-                  <xsl:value-of select="$packageid"/>
-                </td>
+                <td class="data"><xsl:value-of select="$packageid"/></td>
               </tr>
               <tr>
                 <td class="title">Title:</td>
-                <td class="data">
-                  <xsl:value-of select="/eml:eml/dataset/title"/>
-                </td>
+                <td class="data"><xsl:value-of select="/eml:eml/dataset/title"/></td>
               </tr>
               <!-- Prefer individual name; otherwise, test for organization name -->
               <xsl:for-each select="/eml:eml/dataset/creator">
@@ -75,88 +85,86 @@
                 </tr>
               </xsl:for-each>
               <xsl:apply-templates select="/eml:eml/dataset/abstract"/>
-              <xsl:apply-templates select="/eml:eml/dataset/coverage/temporalCoverage"
-                mode="summary"/>
-              <xsl:apply-templates
-                select="/eml:eml/dataset/coverage/geographicCoverage/geographicDescription"/>
+              <xsl:apply-templates select="/eml:eml/dataset/coverage/temporalCoverage" mode="summary"/>
+              <xsl:apply-templates select="/eml:eml/dataset/coverage/geographicCoverage/geographicDescription"/>
+
               <!-- Iterate over each of six possible data entity types -->
+
               <!-- Data Table -->
               <xsl:for-each select="/eml:eml/dataset/dataTable">
                 <tr>
                   <td class="title">Data Table:</td>
-                  <td class="data">
-                    <xsl:value-of select="./entityName"/>
-                  </td>
+                  <td class="data"><xsl:value-of select="./entityName"/></td>
                 </tr>
               </xsl:for-each>
+
               <!-- Spatial Raster -->
               <xsl:for-each select="/eml:eml/dataset/spatialRaster">
                 <tr>
                   <td class="title">Spatial Raster:</td>
                   <td class="data">
                     <xsl:value-of select="./entityName"/>
-                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"
-                      />
-                    </xsl:if>
+                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"/></xsl:if>
                   </td>
                 </tr>
               </xsl:for-each>
+
               <!-- Spatial Vector -->
               <xsl:for-each select="/eml:eml/dataset/spatialVector">
                 <tr>
                   <td class="title">Spatial Vector:</td>
                   <td class="data">
                     <xsl:value-of select="./entityName"/>
-                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"
-                      />
+                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"/>
                     </xsl:if>
                   </td>
                 </tr>
               </xsl:for-each>
+              
               <!-- Stored Procedure -->
               <xsl:for-each select="/eml:eml/dataset/storedProcedure">
                 <tr>
                   <td class="title">Stored Procedure:</td>
                   <td class="data">
                     <xsl:value-of select="./entityName"/>
-                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"
-                      />
+                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"/>
                     </xsl:if>
                   </td>
                 </tr>
               </xsl:for-each>
+              
               <!-- View -->
               <xsl:for-each select="/eml:eml/dataset/view">
                 <tr>
                   <td class="title">View:</td>
                   <td class="data">
                     <xsl:value-of select="./entityName"/>
-                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"
-                      />
+                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"/>
                     </xsl:if>
                   </td>
                 </tr>
               </xsl:for-each>
+              
               <!-- Other Entity -->
               <xsl:for-each select="/eml:eml/dataset/otherEntity">
                 <tr>
                   <td class="title">Other Entity:</td>
                   <td class="data">
                     <xsl:value-of select="./entityName"/>
-                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"
-                      />
+                    <xsl:if test="./physical/size"> - <xsl:apply-templates select="./physical/size"/>
                     </xsl:if>
                   </td>
                 </tr>
               </xsl:for-each>
+              
             </tbody>
           </table>
         </div>
         <!-- end of section-table -->
-      </fieldset>
+      </fieldset> 
+      <!-- end of Summary Information -->
 
-      <p id="toggle"> Show/hide full metadata <button>+/-</button>
-      </p>
+      <p id="toggle"> Show/Hide full metadata <button>+/-</button></p>
       <div class="collapsible">
 
         <!-- Table of contents -->
@@ -170,15 +178,16 @@
               <a href="#methods">Data Set Methods</a>
             </li>
           </xsl:if>
+          
           <!-- Iterate over each of six possible data entity types -->
+          
           <!-- Data Table -->
           <xsl:if test="/eml:eml/dataset/dataTable">
             <li> Data Table(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/dataTable">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -186,14 +195,14 @@
               </ul>
             </li>
           </xsl:if>
+          
           <!-- Spatial Raster -->
           <xsl:if test="/eml:eml/dataset/spatialRaster">
             <li> Spatial Raster(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/spatialRaster">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -201,14 +210,14 @@
               </ul>
             </li>
           </xsl:if>
+          
           <!-- Spatial Vector -->
           <xsl:if test="/eml:eml/dataset/spatialVector">
             <li> Spatial Vector(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/spatialVector">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -216,14 +225,14 @@
               </ul>
             </li>
           </xsl:if>
+          
           <!-- Stored Procedure -->
           <xsl:if test="/eml:eml/dataset/storedProcedure">
             <li> Stored Procedure(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/storedProcedure">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -231,14 +240,14 @@
               </ul>
             </li>
           </xsl:if>
+          
           <!-- View -->
           <xsl:if test="/eml:eml/dataset/view">
             <li> View(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/view">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -246,14 +255,14 @@
               </ul>
             </li>
           </xsl:if>
+          
           <!-- Other Entity -->
           <xsl:if test="/eml:eml/dataset/otherEntity">
             <li> Other Entity(s) <ul>
                 <xsl:for-each select="/eml:eml/dataset/otherEntity">
                   <li>
                     <xsl:element name="a">
-                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"
-                        /></xsl:attribute>
+                      <xsl:attribute name="href">#<xsl:value-of select="./entityName"/></xsl:attribute>
                       <xsl:value-of select="./entityName"/>
                     </xsl:element>
                   </li>
@@ -261,12 +270,12 @@
               </ul>
             </li>
           </xsl:if>
+          
         </ul>
 
         <!-- Organization/Personnel Information -->
         <fieldset>
-          <legend id="org"> Organization/Personnel Information ( <a href="#top"
-              >top</a> ) </legend>
+          <legend id="org"> Organization/Personnel Information ( <a href="#top">top</a> )</legend>
           <div class="section-table">
             <table>
               <tbody>
@@ -313,9 +322,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -345,9 +352,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -377,9 +382,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -409,9 +412,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -441,9 +442,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -473,9 +472,7 @@
                   </tr>
                   <tr>
                     <td class="title">Description:</td>
-                    <td class="data">
-                      <xsl:value-of select="./entityDescription"/>
-                    </td>
+                    <td class="data"><xsl:value-of select="./entityDescription"/></td>
                   </tr>
                   <xsl:apply-templates select="./physical"/>
                   <xsl:apply-templates select="./coverage/temporalCoverage" mode="dataset"/>
@@ -489,34 +486,26 @@
 
         <p> To view this document as XML, click <a
             href="./metadataviewer?packageid={$packageid}&#38;contentType=application/xml"
-            target="_blank">here</a>. </p>
-
+            target="_blank">here</a>.</p>
       </div>
       <!-- end of collapsible -->
     </div>
     <!-- end of eml -->
 
-    <script type="text/javascript">
+  <xsl:text>&#x0A;</xsl:text><script type="text/javascript">
 
-					jQuery(document).ready(function() {
-					jQuery(".collapsible").hide();
-					jQuery("#toggle").click(function()
-					{
-					jQuery(this).next(".collapsible").slideToggle("fast");
-					});
-					});
+        jQuery(document).ready(function() {
+            jQuery(".collapsible").hide();
+            jQuery("#toggle").click(function() {
+                jQuery(this).next(".collapsible").slideToggle("fast");
+            });
+        });
 
-					jQuery("#show").click(function () {
-					jQuery(".collapsible").show("fast"); });
-					jQuery("#hide").click(function () {
-					jQuery(".collapsible").hide("fast"); });
+    </script> <xsl:text>&#x0A;</xsl:text>
+				
+</body>
 
-					function
-					submitform(form_ref) {
-					form_ref.submit();
-					}
-
-				</script>
+</html>
 
   </xsl:template>
 
@@ -542,18 +531,14 @@
   <xsl:template match="individualName" mode="summary">
     <tr>
       <td class="title">Creator:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="organizationName" mode="summary">
     <tr>
       <td class="title">Creator:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
@@ -565,8 +550,7 @@
           <xsl:value-of select="./singleDateTime"/>
         </xsl:if>
         <xsl:if test="./rangeOfDates">
-          <xsl:value-of select="./rangeOfDates/beginDate"/> to <xsl:value-of
-            select="./rangeOfDates/endDate"/>
+          <xsl:value-of select="./rangeOfDates/beginDate"/> to <xsl:value-of select="./rangeOfDates/endDate"/>
         </xsl:if>
       </td>
     </tr>
@@ -580,23 +564,17 @@
       <xsl:when test="./singleDateTime">
         <tr>
           <td class="title">Singe Date/Time:</td>
-          <td class="data">
-            <xsl:value-of select="./singleDateTime"/>
-          </td>
+          <td class="data"><xsl:value-of select="./singleDateTime"/></td>
         </tr>
       </xsl:when>
       <xsl:when test="./rangeOfDates">
         <tr>
           <td class="title">Begin Date/Time:</td>
-          <td class="data">
-            <xsl:value-of select="./rangeOfDates/beginDate"/>
-          </td>
+          <td class="data"><xsl:value-of select="./rangeOfDates/beginDate"/></td>
         </tr>
         <tr>
           <td class="title">End Date/Time:</td>
-          <td class="data">
-            <xsl:value-of select="./rangeOfDates/endDate"/>
-          </td>
+          <td class="data"><xsl:value-of select="./rangeOfDates/endDate"/></td>
         </tr>
       </xsl:when>
     </xsl:choose>
@@ -613,9 +591,7 @@
   <xsl:template match="geographicDescription">
     <tr>
       <td class="title">Geographic Description:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
@@ -650,24 +626,18 @@
     <xsl:variable name="data-type" select="parent::node()"/>
     <tr>
       <td class="title">Object Name:</td>
-      <td class="data">
-        <xsl:value-of select="./objectName"/>
-      </td>
+      <td class="data"><xsl:value-of select="./objectName"/></td>
     </tr>
     <xsl:if test="./size">
       <tr>
         <td class="title">Size:</td>
-        <td class="data">
-          <xsl:apply-templates select="./size"/>
-        </td>
+        <td class="data"><xsl:apply-templates select="./size"/></td>
       </tr>
     </xsl:if>
     <xsl:if test="not(./distribution/online/url/@function = 'information')">
       <tr>
         <td class="title">Download URI:</td>
-        <td class="data">
-          <xsl:value-of select="./distribution/online/url"/>
-        </td>
+        <td class="data"><xsl:value-of select="./distribution/online/url"/></td>
       </tr>
     </xsl:if>
     <!-- Data type specific information -->
@@ -705,9 +675,7 @@
       <xsl:when test="local-name($data-type) = 'otherEntity'">
         <tr>
           <td class="title">Other Entity Type:</td>
-          <td class="data">
-            <xsl:value-of select="$data-type/entityType"/>
-          </td>
+          <td class="data"><xsl:value-of select="$data-type/entityType"/></td>
         </tr>
       </xsl:when>
     </xsl:choose>
@@ -732,11 +700,8 @@
             </xsl:when>
             <xsl:when test="./description/para[1] = $prov-stmt">
               <xsl:variable name="url" select="dataSource/distribution/online/url"/>
-              <p>
-                <b>The following data package was used in the creation of this product:</b>
-              </p>
-              <p><xsl:value-of select="./dataSource/title"/> (<a href="./metadataviewer?url={$url}"
-                >Click here to view metadata</a>)</p>
+              <p><strong>The following data package was used in the creation of this product:</strong></p>
+              <p><xsl:value-of select="./dataSource/title"/> (<a href="./metadataviewer?url={$url}">Click here to view metadata</a>)</p>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="./description"/>
@@ -761,14 +726,10 @@
 
   <xsl:template match="section">
     <xsl:if test="./title">
-      <p>
-        <xsl:value-of select="./title"/>
-      </p>
+      <p><xsl:value-of select="./title"/></p>
     </xsl:if>
     <xsl:for-each select="./para">
-      <p>
-        <xsl:value-of select="."/>
-      </p>
+      <p><xsl:value-of select="."/></p>
     </xsl:for-each>
     <xsl:for-each select="./section">
       <xsl:apply-templates select="."/>
@@ -776,9 +737,7 @@
   </xsl:template>
 
   <xsl:template match="para">
-    <p>
-      <xsl:value-of select="."/>
-    </p>
+    <p><xsl:value-of select="."/></p>
   </xsl:template>
 
   <xsl:template match="creator" mode="org">
@@ -838,17 +797,13 @@
     <xsl:if test="/eml:eml/dataset/pubDate">
       <tr>
         <td class="title">Publication Date:</td>
-        <td class="data">
-          <xsl:value-of select="/eml:eml/dataset/pubDate"/>
-        </td>
+        <td class="data"><xsl:value-of select="/eml:eml/dataset/pubDate"/></td>
       </tr>
     </xsl:if>
     <xsl:if test="/eml:eml/dataset/pubPlace">
       <tr>
         <td class="title">Place of Publication:</td>
-        <td class="data">
-          <xsl:value-of select="/eml:eml/dataset/pubPlace"/>
-        </td>
+        <td class="data"><xsl:value-of select="/eml:eml/dataset/pubPlace"/></td>
       </tr>
     </xsl:if>
   </xsl:template>
@@ -856,27 +811,21 @@
   <xsl:template match="individualName" mode="org">
     <tr>
       <td class="title">Individual Name:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="organizationName" mode="org">
     <tr>
       <td class="title">Organization Name:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="positionName" mode="org">
     <tr>
       <td class="title">Position Name:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
@@ -910,40 +859,32 @@
   <xsl:template match="phone" mode="org">
     <tr>
       <td class="title"> Phone - <xsl:choose>
-          <xsl:when test="./@phonetype"> ( <xsl:value-of select="./@phonetype"/> ): </xsl:when>
+          <xsl:when test="./@phonetype"> (<xsl:value-of select="./@phonetype"/>): </xsl:when>
           <xsl:otherwise> (voice): </xsl:otherwise>
         </xsl:choose>
       </td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="electronicMailAddress" mode="org">
     <tr>
       <td class="title">Email:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="onlineUrl" mode="org">
     <tr>
       <td class="title">Online URL:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="userId" mode="org">
     <tr>
       <td class="title">User Id:</td>
-      <td class="data">
-        <xsl:value-of select="."/>
-      </td>
+      <td class="data"><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 

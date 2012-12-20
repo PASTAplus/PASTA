@@ -26,6 +26,9 @@ package edu.lternet.pasta.portal;
 
 import javax.servlet.http.HttpServlet;
 
+import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
+
 
 public class DataPortalServlet extends HttpServlet {
   
@@ -62,6 +65,37 @@ public class DataPortalServlet extends HttpServlet {
   /*
    * Instance methods
    */
+  
+  /*
+   * Composes a data package resource identifier based on the PASTA URI
+   * head value and a specific packageId value.
+   */
+  protected String packageIdToResourceId(String pastaUriHead, String packageId) {
+    String resourceId = null;
+    final String SLASH = "/";
+    
+    if (pastaUriHead != null) {
+      EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+      
+      try {
+        EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
+        String scope = emlPackageId.getScope();
+        Integer identifier = emlPackageId.getIdentifier();
+        Integer revision = emlPackageId.getRevision();
+      
+        if (scope != null && identifier != null && revision != null) {        
+          resourceId = pastaUriHead + "eml" + SLASH + 
+                       scope + SLASH + identifier + SLASH + revision;
+        } 
+      }
+      catch (IllegalArgumentException e) {
+        
+      }
+    }
+    
+    return resourceId;
+  }
+
   
   /**
    * Destruction of the servlet. <br>

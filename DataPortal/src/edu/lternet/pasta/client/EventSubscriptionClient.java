@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -84,7 +85,7 @@ public class EventSubscriptionClient extends PastaClient {
       throws PastaAuthenticationException, PastaConfigurationException {
 
     super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost);
+    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
     this.BASE_URL = pastaUrl + "/eventmanager/";
     BASE_URL_SUBSCRIPTION = BASE_URL + "subscription/eml";
     BASE_URL_EVENT = BASE_URL + "event/eml";
@@ -113,6 +114,7 @@ public class EventSubscriptionClient extends PastaClient {
     String statusMessage = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpPost httpPost = new HttpPost(BASE_URL_SUBSCRIPTION);
 
@@ -206,6 +208,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "/" + sid);
 
@@ -265,6 +268,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "?" + filter);
 
@@ -321,6 +325,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "/" + "schema");
 
@@ -377,6 +382,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
 
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     HttpDelete httpDelete = new HttpDelete(BASE_URL_SUBSCRIPTION + "/" + sid);
 
@@ -431,6 +437,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
     String statusMessage = null;
     HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     HttpResponse response = null;
     String subscriptionURL = BASE_URL_EVENT + "/" + subscriptionId;
     HttpPost httpPost = new HttpPost(subscriptionURL);

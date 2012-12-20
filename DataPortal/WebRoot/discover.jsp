@@ -35,9 +35,14 @@
 
 			<h4>Discover Data Packages</h4>
 			<ul>
-				<li><a href="./scopebrowse">Browse Data Packages</a>
+				<li>Browse Data Packages by
+				    <ul>
+				        <li><a href="./scopebrowse">Package Identifier</a></li>
+                        <li>Site</li>
+                        <li>Key Word</li>
+				    </ul>
 				</li>
-				<li>Search for Data Packages
+				<li>Search for Data Packages using
 				    <ul>
 				        <li><a href="./simpleSearch.jsp">Basic Search</a></li>
 				        <li><a href="./advancedSearch.jsp">Advanced Search</a></li>	        
