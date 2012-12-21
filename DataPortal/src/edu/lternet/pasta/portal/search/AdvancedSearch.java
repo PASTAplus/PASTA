@@ -898,7 +898,10 @@ public class AdvancedSearch  {
           qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
                                        attributeValue, indent);
           qg.addQueryTerm(qt);
-          //termsList.addTerm(attributeValue);
+          String siteName = lterSite.getSiteName();
+          if ((siteName != null) && (!siteName.equals(""))) {
+            termsList.addTerm(siteName);
+          }
         }
       }
 

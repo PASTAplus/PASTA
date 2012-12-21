@@ -89,10 +89,10 @@
   <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
   <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
-  <script language="JavaScript" type="text/javascript" src="./js/utilities.js"></script>
-  <script language="JavaScript" type="text/javascript" src="./js/validation.js"></script>
+  <script type="text/javascript" src="./js/utilities.js"></script>
+  <script type="text/javascript" src="./js/validation.js"></script>
 
-  <script language="javascript" type="text/javascript">
+  <script type="text/javascript">
 
       function submitRequest(form) {
         var canSearch = true;
@@ -345,14 +345,10 @@
                       </tr>
                       <tr>
                          <td align="center">
-                           Start Date:
-                           <input type="text" name="startDate" maxlength="10" value="" />                        
-                           <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>YYYY-MM-DD</small>
+                           <label>Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
                          </td>
                          <td align="center">
-                           End Date:
-                           <input type="text" name="endDate" maxlength="10" value="" />
-                           <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>YYYY-MM-DD</small>
+                           <label>End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
                          </td>
                       </tr>
                       <tr>

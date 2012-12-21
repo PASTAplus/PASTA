@@ -134,7 +134,8 @@ public static final String[] siteNames = {
    * Instance fields
    */
 
-  private String site;      // The three-letter uppercase acronym for this site.
+  private String site;      // The three-letter uppercase acronym for this site
+  private String siteName;  // The long name for this site
   
   
   /* 
@@ -147,6 +148,14 @@ public static final String[] siteNames = {
   public LTERSite(final String site) {
     if (site != null) {
       this.site = site.toUpperCase();
+
+      for (int i = 0; i < sites.length; i++) {
+        String shortName = sites[i];
+        String longName = siteNames[i];
+        if (site.equalsIgnoreCase(shortName)) {
+          this.siteName = longName;
+        }
+      }
     }
   }
 
@@ -348,6 +357,16 @@ public static final String[] siteNames = {
   }
 
 
+  /**
+   * Gets the siteName value
+   * 
+   * @return     the siteName string, e.g. "Georgia Coastal Ecosystems"
+   */
+  public String getSiteName() {
+    return this.siteName;
+  }
+  
+  
   /**
    * For a given site, return system attribute search string for that
    * site's EML documents.
