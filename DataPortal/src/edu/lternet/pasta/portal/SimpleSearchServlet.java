@@ -144,7 +144,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
       DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
       xml = dpmClient.searchDataPackages(query);
       
-      logger.debug("XML: " + xml);
+      logger.info("XML: " + xml);
       
       ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
       html = "<p> Terms used in this search: " + termsList.toHTML() + "</p>\n";
@@ -197,6 +197,8 @@ public class SimpleSearchServlet extends DataPortalServlet {
         + "  <meta_file_id>unspecified</meta_file_id>\n"
         + "  <querytitle>unspecified</querytitle>\n"
         + "  <returnfield>dataset/title</returnfield>\n"
+        + "  <returnfield>dataset/creator/individualName/surName</returnfield>\n"
+        + "  <returnfield>dataset/pubDate</returnfield>\n"
         + "  <returnfield>keyword</returnfield>\n"
         + "  <returnfield>originator/individualName/surName</returnfield>\n"
         + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n"
