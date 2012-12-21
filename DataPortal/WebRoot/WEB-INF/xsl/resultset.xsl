@@ -58,8 +58,8 @@
         <xsl:for-each select="./param">
           <xsl:if test="./@name = 'dataset/title'">
             <xsl:variable name="title" select="."/>
-            <xsl:variable name="url" select="../resourceId"/>
-            <a href="./mapbrowse?url={$url}">
+            <xsl:variable name="packageId" select="../packageId"/>
+            <a href="./mapbrowse?packageid={$packageId}">
               <xsl:value-of select="$title"/>
             </a>
           </xsl:if>
