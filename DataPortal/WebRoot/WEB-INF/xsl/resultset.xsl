@@ -37,8 +37,9 @@
       <table width="100%">
         <tbody>
           <tr>
-            <td class="header" width="20%">Package Identifier</td>
-            <td class="header" width="80%">Data Package Title</td>
+            <td class="header" width="15%">Package Identifier</td>
+            <td class="header" widht="10%">Creators</td>
+            <td class="header" width="75%">Data Package Title</td>
           </tr>
           <xsl:for-each select="/resultset/document">
             <xsl:sort select="./packageId" data-type="text"/>
@@ -49,6 +50,36 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="document">
+    <tr>
+      <td class="data" align="center">
+        <xsl:variable name="pid" select="./packageId"/>
+        <xsl:value-of select="$pid"/>
+      </td>
+      <td class="data" align="center">
+        <xsl:apply-templates select="./param" mode="creator" />
+      </td>
+      <td class="data" align="center">
+      <xsl:for-each select="./param">
+        <xsl:if test="./@name = 'dataset/title'">
+          <xsl:variable name="title" select="."/>
+          <xsl:variable name="packageId" select="../packageId"/>
+            <a href="./mapbrowse?packageid={$packageId}">
+              <xsl:value-of select="$title"/>
+            </a>
+        </xsl:if>
+      </xsl:for-each>
+      </td>
+    </tr>
+  </xsl:template>
+  
+  <xsl:template match="param" mode="creator">
+    <xsl:if test="./@name = 'dataset/creator/individualName/surName'">
+      <xsl:value-of select="."/>&#160;
+    </xsl:if>  
+  </xsl:template>
+
+<!--
   <xsl:template match="document">
     <tr>
       <td class="data" align="center">
@@ -67,5 +98,6 @@
       </td>
     </tr>
   </xsl:template>
-
+-->
+  
 </xsl:stylesheet>
