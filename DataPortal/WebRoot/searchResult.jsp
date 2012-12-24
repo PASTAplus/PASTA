@@ -15,7 +15,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>Simple Search</title>
+<title>Advanced Search Results</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -38,7 +38,8 @@
 
 		<div class="content">
 
-			<h3 align="center">Data Packages Matching Your Search Criteria</h3>
+			<h2 align="center">Search for Data Packages</h2>
+			<h3 align="center"><a href="./advancedSearch">Advanced Search</a> Results</h3>
 
 			<div class="section-table">
 				<%=searchResult%>
