@@ -22,7 +22,7 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-  
+
   <xsl:output method="html"/>
 
   <xsl:template match="/">
@@ -37,9 +37,10 @@
       <table width="100%">
         <tbody>
           <tr>
-            <td class="header" width="15%">Package Identifier</td>
-            <td class="header" widht="10%">Creators</td>
-            <td class="header" width="75%">Data Package Title</td>
+            <td class="header" width="15%">Data Package Identifier</td>
+            <td class="header" width="10%">Creators</td>
+            <td class="header" width="10%">Publication Date</td>
+            <td class="header" width="65%">Title</td>
           </tr>
           <xsl:for-each select="/resultset/document">
             <xsl:sort select="./packageId" data-type="text"/>
@@ -54,32 +55,41 @@
     <tr>
       <td class="data" align="center">
         <xsl:variable name="pid" select="./packageId"/>
+        <a href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
+        </a>
       </td>
       <td class="data" align="center">
-        <xsl:apply-templates select="./param" mode="creator" />
+        <xsl:apply-templates select="./param" mode="creator"/>
       </td>
       <td class="data" align="center">
-      <xsl:for-each select="./param">
-        <xsl:if test="./@name = 'dataset/title'">
-          <xsl:variable name="title" select="."/>
-          <xsl:variable name="packageId" select="../packageId"/>
-            <a href="./mapbrowse?packageid={$packageId}">
-              <xsl:value-of select="$title"/>
-            </a>
-        </xsl:if>
-      </xsl:for-each>
+        <xsl:apply-templates select="./param" mode="pubdate"/>
+      </td>
+      <td class="data" align="left">
+        <xsl:apply-templates select="./param" mode="title"/>
       </td>
     </tr>
   </xsl:template>
-  
+
   <xsl:template match="param" mode="creator">
     <xsl:if test="./@name = 'dataset/creator/individualName/surName'">
-      <xsl:value-of select="."/>&#160;
-    </xsl:if>  
+      <xsl:value-of select="."/><br/></xsl:if>
   </xsl:template>
 
-<!--
+  <xsl:template match="param" mode="title">
+    <xsl:if test="./@name = 'dataset/title'">
+      <xsl:variable name="title" select="."/>
+      <xsl:value-of select="$title"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="param" mode="pubdate">
+    <xsl:if test="./@name = 'dataset/pubDate'">
+      <xsl:value-of select="."/>
+    </xsl:if>    
+  </xsl:template>
+
+  <!--
   <xsl:template match="document">
     <tr>
       <td class="data" align="center">
@@ -99,5 +109,5 @@
     </tr>
   </xsl:template>
 -->
-  
+
 </xsl:stylesheet>
