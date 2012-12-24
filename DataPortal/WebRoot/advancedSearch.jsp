@@ -136,17 +136,18 @@
 
 		<div class="content">
 
-			<h2 align="center">Advanced Search</h2>
+			<h2 align="center">Search for Data Packages</h2>
+			<h3 align="center">Advanced Search</h3>
 				<div class="section">
 				
 			<%=warningMessage%>
 
-					<form id="advancedSearchForm" 
-                       name="advancedSearchForm" 
-                       method="post"
-                       action="./advancedSearch"
-                       onsubmit="return submitRequest(this)"
-                      >
+		<form id="advancedSearchForm" 
+	                   name="advancedSearchForm" 
+	                   method="post"
+	                   action="./advancedSearch"
+	                   onsubmit="return submitRequest(this)"
+	                  >
 
       <table>
       <tr>
