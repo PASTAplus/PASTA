@@ -59,7 +59,7 @@
 
 			<h3 align="center">Need Help, Have Questions?</h3>
 
-			<h4 align="left">How do I...</h4>
+			<h4 align="left">How do I ...</h4>
 
 			<ul>
 				<li>Learn about the PASTA Software Developer's Application
