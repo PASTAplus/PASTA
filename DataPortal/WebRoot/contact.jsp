@@ -59,60 +59,47 @@
 
 			<h3 align="center">Contact Us</h3>
 
-			<fieldset>
-				<legend>People</legend>
+			<h4 align="left">People</h4>
 
-				<ul>
-					<li><a
-						href="http://search.lternet.edu/directory_view.php?personid=10391">James
-							Brunt</a>, LTER Chief Information Officer</li>
-					<li><a
-						href="http://search.lternet.edu/directory_view.php?personid=13823">Mark
-							Servilla</a>, NIS Lead Scientist</li>
-					<li><a
-						href="http://search.lternet.edu/directory_view.php?personid=13757">Duane
-							Costa</a>, NIS Analyst/Programmer III</li>
-				</ul>
+			<ul>
+				<li><a
+					href="http://search.lternet.edu/directory_view.php?personid=10391">James
+						Brunt</a>, LTER Chief Information Officer</li>
+				<li><a
+					href="http://search.lternet.edu/directory_view.php?personid=13823">Mark
+						Servilla</a>, NIS Lead Scientist</li>
+				<li><a
+					href="http://search.lternet.edu/directory_view.php?personid=13757">Duane
+						Costa</a>, NIS Analyst/Programmer III</li>
+			</ul>
 
-			</fieldset>
+			<h4 align="left">Websites</h4>
 
-			<fieldset>
-				<legend>Websites</legend>
+			<ul>
+				<li><a href="https://www.lternet.edu">LTER Network</a></li>
+				<li><a href="https://lno.lternet.edu">LTER Network Office</a></li>
+				<li><a href="https://nis.lternet.edu:8443/x/agBP">NIS
+						Guides</a></li>
+			</ul>
 
-				<ul>
-					<li><a href="https://www.lternet.edu">LTER Network</a>
-					</li>
-					<li><a href="https://lno.lternet.edu">LTER Network Office</a>
-					</li>
-					<li><a href="https://nis.lternet.edu:8443/x/agBP">NIS
-							Guides</a>
-					</li>
-				</ul>
+			<h4 align="left">Physical Address</h4>
 
-			</fieldset>
+			<ul style="list-style: none;">
+				<li>LTER Network Office<br /> Suite 320, CERIA Bldg #83,<br />
+					University of New Mexico (Main Campus)<br /> Albuquerque, New
+					Mexico, USA<br /> Phone: 505 277-2597<br /> Fax: 505 277-2541<br />
+					Email: <a href="mailto:tech-support@lternet.edu">tech-support@lternet.edu</a><br />
+					URL: <a href="https://lno.lternet.edu">https://lno.lternet.edu</a>
+				</li>
+			</ul>
 
-			<fieldset>
-				<legend>Physical Address</legend>
+			<h4 align="left">Mailing Address</h4>
 
-				<ul style="list-style: none;">
-					<li>LTER Network Office<br /> Suite 320, CERIA Bldg #83,<br />
-						University of New Mexico (Main Campus)<br /> Albuquerque, New
-						Mexico, USA<br /> Phone: 505 277-2597<br /> Fax: 505 277-2541<br />
-						Email: <a href="mailto:tech-support@lternet.edu">tech-support@lternet.edu</a><br />
-						URL: <a href="https://lno.lternet.edu">https://lno.lternet.edu</a>
-					</li>
-				</ul>
-			</fieldset>
-
-			<fieldset>
-				<legend>Mailing Address</legend>
-
-				<ul style="list-style: none;">
-					<li>LTER Network Office<br /> UNM Dept of Biology, MSC03 2020<br />
-						1 University of New Mexico<br /> Albuquerque, New Mexico, USA<br />
-						87131-0001</li>
-				</ul>
-			</fieldset>
+			<ul style="list-style: none;">
+				<li>LTER Network Office<br /> UNM Dept of Biology, MSC03 2020<br />
+					1 University of New Mexico<br /> Albuquerque, New Mexico, USA<br />
+					87131-0001</li>
+			</ul>
 
 		</div>
 		<!-- end content -->
