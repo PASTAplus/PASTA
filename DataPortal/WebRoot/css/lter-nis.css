@@ -286,6 +286,10 @@ legend {
 	color: black;
 }
 
+.menu #selected a {
+	color: maroon;
+}
+
 .menu a:link,.head a:visited {
     text-decoration: none;
 }

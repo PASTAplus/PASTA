@@ -24,6 +24,9 @@
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%
+  HttpSession httpSession = request.getSession();
+  httpSession.setAttribute("menuid", "home");
+
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
