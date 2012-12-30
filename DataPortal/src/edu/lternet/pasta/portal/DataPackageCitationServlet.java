@@ -55,6 +55,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 	private static final String forward = "./dataPackageCitation.jsp";
 	private static final String PUBLISHER = "Long Term Ecological Research Network. ";
+	private static final String DxDoiOrg = "http://dx.doi.org/";
 
 	/**
 	 * Instance variables
@@ -311,6 +312,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 			try {
 				citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
+				citationId = citationId.replace("doi:", DxDoiOrg);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();
