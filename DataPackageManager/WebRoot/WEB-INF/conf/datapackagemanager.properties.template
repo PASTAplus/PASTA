@@ -93,6 +93,7 @@ datapackagemanager.ezidStagePort=443
 datapackagemanager.ezidStageProtocol=https
 datapackagemanager.ezidUser=lternet
 datapackagemanager.ezidPassword=HIDE_PASSWORD
+datapackagemanager.doiUrlHead=https://portal.lternet.edu/nis/mapbrowse?packageid=
 
 ##
 ## For testing with EZID stage environment
