@@ -63,6 +63,7 @@ public class DOIScanner {
 	private String dbUser = null;
 	private String dbPassword = null;
 	private String metadataDir = null;
+	private String doiUrlHead = null;
 	private String doiTest = null;
 	private Boolean isDoiTest = null;
 	
@@ -124,6 +125,7 @@ public class DOIScanner {
 			this.dbUser = options.getOption("dbUser");
 			this.dbPassword = options.getOption("dbPassword");
 
+			this.doiUrlHead = options.getOption("datapackagemanager.doiUrlHead");
 			this.doiTest = options.getOption("datapackagemanager.doiTest");
 
 			// Load PASTA service options
@@ -171,6 +173,7 @@ public class DOIScanner {
 		File emlFile = null;
 		EmlObject emlObject = null;
 		String resourceUrl = null;
+		String doiUrl = null;
 		String publicationYear = null;
 		ArrayList<Creator> creators = null;
 		ArrayList<Title> titles = null;
@@ -189,6 +192,7 @@ public class DOIScanner {
 
 			// Set local metadata attributes
 			resourceUrl = resource.getResourceId();
+			doiUrl = this.doiUrlHead + resource.getPackageId();
 			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 			creators = emlObject.getCreators();
 			titles = emlObject.getTitles();
@@ -212,7 +216,7 @@ public class DOIScanner {
 			// Create and populate the DataCite metadata object
 			DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
 
-			dataCiteMetadata.setLocationUrl(resourceUrl);
+			dataCiteMetadata.setLocationUrl(doiUrl);
 			dataCiteMetadata.setPublicationYear(publicationYear);
 			dataCiteMetadata.setCreators(creators);
 			dataCiteMetadata.setTitles(titles);
