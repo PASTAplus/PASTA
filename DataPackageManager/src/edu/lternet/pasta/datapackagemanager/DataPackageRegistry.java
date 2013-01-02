@@ -1580,7 +1580,7 @@ public class DataPackageRegistry {
 
 		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " doi IS NULL and date_deactivated IS NULL;";
+		    + " resource_type='dataPackage' AND doi IS NULL AND date_deactivated IS NULL;";
 
 		Statement stat = null;
 
