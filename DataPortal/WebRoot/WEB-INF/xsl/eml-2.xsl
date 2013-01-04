@@ -6944,159 +6944,192 @@
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationpersonalCommunication</xsl:text></xsl:message></xsl:if>
-    <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>PERSONAL COMMUNICATION:</xsl:text></td></tr>
-     <xsl:if test="publisher and normalize-space(publisher)!=''">
-          <tr><td class="{$citationfirstColStyle}">
-            Publisher:</td><td class="{$secondColStyle}">
-            &#160;</td></tr>
-          <xsl:for-each select="publisher">
-           <tr><td colspan="2">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
-               </xsl:call-template>
-           </td></tr>
-          </xsl:for-each>
-       </xsl:if>
-       <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Publication Place:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="publicationPlace"/></td></tr>
-       </xsl:if>
-       <xsl:if test="communicationType and normalize-space(communicationType)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Communication Type:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="communicationType"/></td></tr>
-       </xsl:if>
-      <xsl:if test="recipient and normalize-space(recipient)!=''">
-          <tr><td class="{$citationfirstColStyle}">
-            Recipient:</td><td class="{$secondColStyle}">
-            &#160;</td></tr>
-          <xsl:for-each select="recipient">
-           <tr><td colspan="2">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
-              </xsl:call-template>
-           </td></tr>
-          </xsl:for-each>
-      </xsl:if>
+    <tr>
+      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>PERSONAL COMMUNICATION:</xsl:text></td>
+    </tr>
+    <xsl:if test="publisher and normalize-space(publisher)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publisher:</td>
+        <td class="{$secondColStyle}">&#160;</td>
+      </tr>
+      <xsl:for-each select="publisher">
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="party">
+              <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
+            </xsl:call-template>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </xsl:if>
+    <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publication Place:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="publicationPlace"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="communicationType and normalize-space(communicationType)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Communication Type:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="communicationType"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="recipient and normalize-space(recipient)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Recipient:</td>
+        <td class="{$secondColStyle}">&#160;</td>
+      </tr>
+      <xsl:for-each select="recipient">
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="party">
+              <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
+            </xsl:call-template>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="citationmap">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationmap</xsl:text></xsl:message></xsl:if>
-    <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MAP:</xsl:text></td></tr>
-      <xsl:if test="publisher and normalize-space(publisher)!=''">
-          <tr><td class="{$citationfirstColStyle}">
-            Publisher:</td><td class="{$secondColStyle}">
-            &#160;</td></tr>
-          <xsl:for-each select="publisher">
-           <tr><td colspan="2">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
-               </xsl:call-template>
-           </td></tr>
-          </xsl:for-each>
-       </xsl:if>
-       <xsl:if test="edition and normalize-space(edition)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Edition:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="edition"/></td></tr>
-       </xsl:if>
-       <xsl:if test="geographicCoverage and normalize-space(geographicCoverage)!=''">
-          <xsl:for-each select="geographicCoverage">
-            <xsl:call-template name="geographicCoverage">
+    <tr>
+      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MAP:</xsl:text></td>
+    </tr>
+    <xsl:if test="publisher and normalize-space(publisher)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publisher:</td>
+        <td class="{$secondColStyle}">&#160;</td>
+      </tr>
+      <xsl:for-each select="publisher">
+        <tr>
+          <td colspan="2">
+            <xsl:call-template name="party">
+              <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
             </xsl:call-template>
-          </xsl:for-each>
-       </xsl:if>
-       <xsl:if test="scale and normalize-space(scale)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Scale:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="scale"/></td></tr>
-       </xsl:if>
- </xsl:template>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </xsl:if>
+    <xsl:if test="edition and normalize-space(edition)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Edition:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="edition"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="geographicCoverage and normalize-space(geographicCoverage)!=''">
+      <xsl:for-each select="geographicCoverage">
+        <xsl:call-template name="geographicCoverage"></xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
+    <xsl:if test="scale and normalize-space(scale)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Scale:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="scale"/></td>
+      </tr>
+    </xsl:if>
+  </xsl:template>
 
   <xsl:template name="citationgeneric">
     <xsl:param name="citationfirstColStyle"/>
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationgeneric</xsl:text></xsl:message></xsl:if>
-    <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Generic Citation:</xsl:text></td></tr>
-    <tr><td class="{$citationfirstColStyle}">
-            Publisher:</td><td class="{$secondColStyle}">
-            &#160;
-      </td></tr>
-      <xsl:for-each select="publisher">
-         <tr><td colspan="2">
-              <xsl:call-template name="party">
-                <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
-              </xsl:call-template>
-         </td></tr>
-      </xsl:for-each>
-      <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Publication Place:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="publicationPlace"/></td></tr>
-      </xsl:if>
-      <xsl:if test="referenceType and normalize-space(referenceType)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Reference Type:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="referenceType"/></td></tr>
-      </xsl:if>
-      <xsl:if test="volume and normalize-space(volume)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Volume:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="volume"/></td></tr>
-      </xsl:if>
-      <xsl:if test="numberOfVolumes and normalize-space(numberOfVolumes)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Number of Volumes:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="numberOfVolumes"/></td></tr>
-      </xsl:if>
-      <xsl:if test="totalPages and normalize-space(totalPages)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Total Pages:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="totalPages"/></td></tr>
-      </xsl:if>
-      <xsl:if test="totalFigures and normalize-space(totalFigures)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Total Figures:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="totalFigures"/></td></tr>
-      </xsl:if>
-      <xsl:if test="totalTables and normalize-space(totalTables)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Total Tables:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="totalTables"/></td></tr>
-      </xsl:if>
-      <xsl:if test="edition and normalize-space(edition)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Edition:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="edition"/></td></tr>
-      </xsl:if>
-      <xsl:if test="originalPublication and normalize-space(originalPublication)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Supplemental Info for Original Publication:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="originalPublication"/></td></tr>
-      </xsl:if>
-      <xsl:if test="reprintEdition and normalize-space(reprintEdition)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Reprint Edition:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="reprintEdition"/></td></tr>
-      </xsl:if>
-      <xsl:if test="reviewedItem and normalize-space(reviewedItem)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            Review Item:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="reviewedItem"/></td></tr>
-      </xsl:if>
-      <xsl:if test="ISBN and normalize-space(ISBN)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            ISBN:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="ISBN"/></td></tr>
-      </xsl:if>
-      <xsl:if test="ISSN and normalize-space(ISSN)!=''">
-           <tr><td class="{$citationfirstColStyle}">
-            ISSN:</td><td class="{$secondColStyle}">
-            <xsl:value-of select="ISSN"/></td></tr>
-      </xsl:if>
+    <tr>
+      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Generic Citation:</xsl:text></td>
+    </tr>
+    <tr>
+      <td class="{$citationfirstColStyle}">Publisher:</td>
+      <td class="{$secondColStyle}">&#160;</td>
+    </tr>
+    <xsl:for-each select="publisher">
+      <tr>
+        <td colspan="2">
+          <xsl:call-template name="party">
+            <xsl:with-param name="partyfirstColStyle" select="$citationfirstColStyle"/>
+          </xsl:call-template>
+        </td>
+      </tr>
+    </xsl:for-each>
+    <xsl:if test="publicationPlace and normalize-space(publicationPlace)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Publication Place:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="publicationPlace"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="referenceType and normalize-space(referenceType)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Reference Type:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="referenceType"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="volume and normalize-space(volume)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Volume:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="volume"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="numberOfVolumes and normalize-space(numberOfVolumes)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Number of Volumes:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="numberOfVolumes"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="totalPages and normalize-space(totalPages)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Total Pages:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="totalPages"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="totalFigures and normalize-space(totalFigures)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Total Figures:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="totalFigures"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="totalTables and normalize-space(totalTables)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Total Tables:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="totalTables"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="edition and normalize-space(edition)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Edition:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="edition"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="originalPublication and normalize-space(originalPublication)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Supplemental Info for Original Publication:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="originalPublication"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="reprintEdition and normalize-space(reprintEdition)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Reprint Edition:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="reprintEdition"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="reviewedItem and normalize-space(reviewedItem)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">Review Item:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="reviewedItem"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="ISBN and normalize-space(ISBN)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">ISBN:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="ISBN"/></td>
+      </tr>
+    </xsl:if>
+    <xsl:if test="ISSN and normalize-space(ISSN)!=''">
+      <tr>
+        <td class="{$citationfirstColStyle}">ISSN:</td>
+        <td class="{$secondColStyle}"><xsl:value-of select="ISSN"/></td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="citationaudioVisual">
