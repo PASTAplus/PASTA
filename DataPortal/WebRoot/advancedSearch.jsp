@@ -77,21 +77,16 @@
 
 <head>
   <base href="<%=basePath%>">
-
   <title>Advanced Search</title>
-
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
   <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
   <meta http-equiv="description" content="This is my page">
-
   <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
-
   <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
   <script type="text/javascript" src="./js/utilities.js"></script>
   <script type="text/javascript" src="./js/validation.js"></script>
-
   <script type="text/javascript">
 
       function submitRequest(form) {
@@ -128,90 +123,67 @@
 </head>
 
 <body>
-
 	<div class="wrapper">
-
 		<jsp:include page="/WEB-INF/jsp/head.jsp" />
 		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
-
 		<div class="content">
-
 			<h2 align="center">Search for Data Packages</h2>
 			<h3 align="center">Advanced Search</h3>
-				<div class="section">
-				
-			<%=warningMessage%>
-
-		<form id="advancedSearchForm" 
-	                   name="advancedSearchForm" 
-	                   method="post"
-	                   action="./advancedSearch"
-	                   onsubmit="return submitRequest(this)"
-	                  >
-
-      <table>
-      <tr>
-        
-      <td>
-      <fieldset>
-        <legend>LTER Sites</legend>
-        <table>
-          <tr>
-            <td>
-              <select name="siteValues" multiple="multiple" size="21">
-                <%= siteOptions %>
-              </select>
-             </td>
-           </tr>
-         </table>
-      </fieldset>
-      </td>
-
-      <td>
-      <fieldset>
-        <legend>Spatial Criteria</legend>
-        <table align="center">
-          <tr>
-            <td>Zoom in to the region you would like to search<br/>
-<script language="javascript" type="text/javascript">var mapPage="advancedSearch";</script>
-<!-- 
-<script src="http://maps.google.com/maps?file=api&v=3" type="text/javascript"></script>
- -->
-<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" type="text/javascript"></script>
-<script src="./js/dragzoom.js" type="text/javascript"></script>
-<script src="./js/map_functions.js" type="text/javascript"></script>      
-             <div id="map" style="width: 300px; height: 240px"></div>
-           </td>
-           <td>
-             <table align="center">
+		  <div class="section">
+			  <%=warningMessage%>
+        <form id="advancedSearchForm" 
+              name="advancedSearchForm" 
+              method="post"
+              action="./advancedSearch"
+              onsubmit="return submitRequest(this)"
+        >
+          <p>
+            <label for="sites">LTER Sites</label>
+            <select name="siteValues" multiple="multiple" size="21">
+              <%= siteOptions %>
+            </select>
+          </p>
+            <label for="spatial">Spatial Criteria</label>
+            <table>
+              <tr>
+                <td>Zoom in to the region you would like to search<br/>
+  <script language="javascript" type="text/javascript">var mapPage="advancedSearch";</script>
+  <!-- <script src="http://maps.google.com/maps?file=api&v=3" type="text/javascript"></script> -->
+  <script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" type="text/javascript"></script>
+  <script src="./js/dragzoom.js" type="text/javascript"></script>
+  <script src="./js/map_functions.js" type="text/javascript"></script>      
+                  <div id="map" style="width: 300px; height: 240px"></div>
+                </td>
+                <td>
+                  <table>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td><label>North: <input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></label></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                 <td></td>
+               </tr>
+               <tr>
+                 <td><label>West: <input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label></td>
+                 <td></td>
+                 <td><label>East: <input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label></td>
+               </tr>
                <tr>
                  <td></td>
-                 <td style="text-align: center">North</td>
+                 <td></td>
                  <td></td>
                </tr>
                <tr>
                  <td></td>
-                 <td><input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td style="text-align: center">West</td>
-                 <td></td>
-                 <td style="text-align: center">East</td>
-               </tr>
-               <tr>
-                 <td><input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></td>
-                 <td></td>
-                 <td><input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></td>
-               </tr>
-               <tr>
-                 <td></td>
-                 <td style="text-align: center">South</td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td></td>
-                 <td><input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></td>
+                 <td><label>South: <input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></label></td>
                  <td></td>
                </tr>
                <tr>
@@ -235,19 +207,8 @@
            </td>
          </tr>
        </table>
-     </fieldset>
-     </td>
-                  
-     </tr>
-     </table>
 
-
-     <table>
-     <tr>
-      
-      <td>
-      <fieldset>
-        <legend>Subject</legend>
+      <h3>Subject</h3>
         <table>
           <tr>
             <td>
@@ -280,16 +241,9 @@
             </td>
           </tr>
         </table>
-      </fieldset>
-      </td>
-      
-      <td>
-      <fieldset>
-        <legend>Creators/Organizations</legend>
+
+      <h3>Creators/Organizations</h3>
         <table>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
           <tr>
             <td>Creator's Last Name:
               <select name="creatorSurnameQueryType">
@@ -302,9 +256,6 @@
             </td>
           </tr>
           <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
             <td>Creator's Organization:
               <select name="creatorOrganizationQueryType">
                 <option value="0" selected="selected">contains</option>
@@ -315,23 +266,9 @@
               <input type="text" name="creatorOrganization" value="" />
             </td>
           </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
         </table>       
-      </fieldset>
-      </td>      
-      
-      </tr>
-      </table>
-                      
-      <table>
-      <tr>
 
-      
-      <td>
-      <fieldset>
-        <legend>Temporal Criteria</legend>
+      <h3>Temporal Criteria</h3>
         <table>
                       <tr>
                         <td colspan="2" align="center">
@@ -339,10 +276,6 @@
                           <input type="radio" name="dateField" value="PUBLICATION" />Publication Date&nbsp;
                           <input type="radio" name="dateField" value="ALL" />Either&nbsp;
                         </td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
                       </tr>
                       <tr>
                          <td align="center">
@@ -359,10 +292,6 @@
                          </td>
                       </tr>
                          <tr>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                         </tr>
-                         <tr>
                            <td colspan="2" align="center">Named Timescale:
                              <select name="namedTimescaleQueryType">
                                <option value="0" selected="selected">contains</option>
@@ -374,20 +303,9 @@
                            </td>
                          </tr>
         </table>
-      </fieldset>
-      </td>
 
-      <td>
-      <fieldset>
-        <br/>
-        <legend>Taxonomic Criteria</legend>
+      <h3>Taxonomic Criteria</h3>
         <table>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
           <tr>
             <td>Taxon:
               <select name="taxonQueryType">
@@ -399,22 +317,11 @@
               <input type="text" name="taxon" value='<%=taxon%>' />
             </td>
           </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
         </table>
-      </fieldset>
-      </td>
-      
-      </tr>
-      </table>
 
-      <table align="center">
+      <h3>Search Options:</h3>
+      <table>
         <tr>
-          <td>Search Options:</td>
           <td>
             <input type="radio" name="formAllAny" value="0" checked="checked" />"And" all search criteria&nbsp;
             <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;
@@ -423,8 +330,7 @@
         </tr>
       </table>
       
-      <br/>
-      <table align="center">
+      <table>
         <tr>
           <td>
             <input type="submit" value="Search" />
