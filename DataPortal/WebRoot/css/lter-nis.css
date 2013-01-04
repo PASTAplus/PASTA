@@ -12,7 +12,7 @@ form.back {
 	width: 100%;
 	position: relative;
 	min-height: 100%;
-	margin: 0px auto 10px auto;
+  margin: 0px auto 10px auto;
 }
 
 .head {
@@ -305,4 +305,49 @@ legend {
 .menu td#login {
 	float: right;
 	text-align: right;
+}
+
+label {
+    display: inline-block;
+    width: 140px;
+    font-weight: bold;
+}
+
+label[for="sites"], label[for="spatial"] {
+    display: block;
+    width: auto;
+}
+
+label[for="geo"] {
+    font-size: small
+}
+
+.floatleft {
+    float: left;
+    margin: 3px 10px 3px 0;
+}
+
+.floatright {
+    float: right;
+    margin: 3px 0 3px 10px;
+}
+
+.imgcentered {
+    margin: 10px auto;
+    display: block;
+}
+
+.figure.floatleft {
+    margin-left: 40px;
+}
+
+.figure.floatright {
+    margin-right: 10px;
+}
+
+.figcaption {
+    display: block;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
 }
