@@ -19,3 +19,4 @@ common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
 /Gatekeeper/WebRoot/WEB-INF/web.xml
 */build.properties
 */src/META-INF/persistence.xml
+*/documents/javadoc
