@@ -3012,8 +3012,8 @@ public class DataPackageManagerResource extends PastaWebService {
     return response;
   }
   
-
-  /**
+  
+  /*
    * 
    * <strong>Read Metadata DOI</strong> operation, specifying the scope, identifier, and revision of the metadata DOI to be read in the URI, returning the canonical Digital Object Identifier.
    * 
@@ -3095,6 +3095,8 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return a Response object containing a metadata DOI
    *         if found, else returns a 404 Not Found response
    */
+  
+  /*
   @GET
   @Path("/metadata/doi/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
@@ -3183,7 +3185,9 @@ public class DataPackageManagerResource extends PastaWebService {
     return response;
   }
 
-  /**
+	*/
+
+  /*
    * 
    * <strong>Read Data Entity DOI</strong> operation, specifying the scope, identifier, and revision of the data entity DOI to be read in the URI, returning the canonical Digital Object Identifier.
    * 
@@ -3266,6 +3270,8 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return a Response object containing a data entity DOI
    *         if found, else returns a 404 Not Found response
    */
+  
+  /*
   @GET
   @Path("/data/doi/{scope}/{identifier}/{revision}/{entityId}")
   @Produces("text/plain")
@@ -3354,9 +3360,10 @@ public class DataPackageManagerResource extends PastaWebService {
     response = stampHeader(response);
     return response;
   }
-
+	
+	*/
   
-  /**
+  /*
    * 
    * <strong>Read Report DOI</strong> operation, specifying the scope, identifier, and revision of the report DOI to be read in the URI, returning the canonical Digital Object Identifier.
    * 
@@ -3438,6 +3445,8 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return a Response object containing a report DOI
    *         if found, else returns a 404 Not Found response
    */
+  
+  /*
   @GET
   @Path("/report/doi/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
@@ -3526,7 +3535,7 @@ public class DataPackageManagerResource extends PastaWebService {
     return response;
   }
 
-  
+  */
   
   /*
    * Isolates the resourceId for the data package from a resource map 
