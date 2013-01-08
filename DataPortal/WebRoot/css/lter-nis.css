@@ -313,9 +313,11 @@ label {
     font-weight: bold;
 }
 
-label[for="sites"], label[for="spatial"] {
+label[for="advancedsearch"] {
     display: block;
     width: auto;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
 
 label[for="geo"] {
@@ -351,3 +353,10 @@ label[for="geo"] {
     padding: 10px;
     text-align: center;
 }
+
+.small {
+    font-size: small;
+    vertical-align: center;
+}
+
+

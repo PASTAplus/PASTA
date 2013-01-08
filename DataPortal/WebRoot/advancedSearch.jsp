@@ -140,14 +140,14 @@
         <div class="section">
 
           <div class="figure floatleft">
-            <label for="sites">LTER Sites</label>
+            <label for="advancedsearch">LTER Sites</label>
             <select name="siteValues" multiple="multiple" size="28">
               <%= siteOptions %>
             </select>
           </div>
           
           <div class="figure floatleft">            
-            <label for="spatial">Spatial Criteria</label>
+            <label for="advancedsearch">Spatial Criteria</label>
             <script type="text/javascript">var mapPage="advancedSearch";</script>
             <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=3"></script>
             <!--<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" 
@@ -158,12 +158,12 @@
             <figcaption><small>Zoom in to the region you would like to search</small></figcaption>
             <table>
               <tr>
-                <td><label for="geo">North: <input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></label></td>
-                <td><label for="geo">South: <input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></label></td>
+                <td><label for="geo">North:&nbsp;<input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></label></td>
+                <td><label for="geo">South:&nbsp;<input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></label></td>
               </tr>
               <tr>
-                <td><label for="geo">East: <input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label></td>
-                <td><label for="geo">West: <input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label></td>
+                <td><label for="geo">East:&nbsp;<input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label></td>
+                <td><label for="geo">West:&nbsp;<input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label></td>
               </tr>
               <tr>
                 <td colspan="2">
@@ -172,13 +172,13 @@
                 </td>     
               </tr>
               <tr>
-                <td colspan="2">Geographic Place Name: <input type="text" name="locationName" value=""/></td>
+                <td colspan="2"><label for="geo">Geographic&nbsp;Place&nbsp;Name:<input type="text" name="locationName" size="40" value=""/></label></td>
               </tr>
             </table>    
           </div>    
 
           <div class="figure floatleft">
-            <label for="spatial">Subject</label>
+            <label for="advancedsearch">Subject</label>
             <table>
               <tr>
                 <td>
@@ -214,10 +214,10 @@
           </div>
 
           <div class="figure floatleft">
-            <label for="spatial">Creators/Organizations</label>
+            <label for="advancedsearch">Creators/Organizations</label>
             <table>
               <tr>
-                <td>Creator's Last Name:
+                <td><label for="geo">Creator's Last Name:</label>
                   <select name="creatorSurnameQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -228,7 +228,7 @@
                 </td>
               </tr>
               <tr>
-                <td>Creator's Organization:
+                <td><label for="geo">Creator's Organization:</label>
                   <select name="creatorOrganizationQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -242,7 +242,7 @@
           </div>    
 
           <div class="figure floatleft">
-            <label for="spatial">Temporal Criteria</label>
+            <label for="advancedsearch">Temporal Criteria</label>
             <table>
               <tr>
                 <td colspan="2" align="center">
@@ -252,11 +252,11 @@
                 </td>
               </tr>
               <tr>
-                <td align="center">
-                  <label>Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
+                <td>
+                  <label for="geo">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
                 </td>
-                <td align="center">
-                  <label>End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
+                <td>
+                  <label for="geo">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
                 </td>
               </tr>
               <tr>
@@ -266,7 +266,8 @@
                 </td>
               </tr>
               <tr>
-                <td colspan="2" align="center">Named Timescale:
+                <td colspan="2">
+                  <label for="geo">Named Timescale:</label>
                   <select name="namedTimescaleQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -280,27 +281,28 @@
           </div>
 
           <div class="figure floatleft">
-            <label for="spatial">Taxonomic Criteria</label>
-           <table>
-             <tr>
-               <td>Taxon:
-                 <select name="taxonQueryType">
-                   <option value="0" selected="selected">contains</option>
-                   <option value="1">matches exactly</option>
-                   <option value="2">starts with</option>
-                   <option value="3">ends with</option>
-                 </select>
-                 <input type="text" name="taxon" value='<%=taxon%>' />
-               </td>
-             </tr>
-           </table>
+            <label for="advancedsearch">Taxonomic Criteria</label>
+            <table>
+              <tr>
+                <td>
+                  <label for="geo">Taxon:</label>
+                  <select name="taxonQueryType">
+                    <option value="0" selected="selected">contains</option>
+                    <option value="1">matches exactly</option>
+                    <option value="2">starts with</option>
+                    <option value="3">ends with</option>
+                  </select>
+                  <input type="text" name="taxon" value='<%=taxon%>' />
+                </td>
+              </tr>
+            </table>
          </div>
 
          </div>
       
-         <div class="section">
+         <div class="section figure">
            <p align="center">
-             <label for="spatial">Search Options</label>
+             <label for="advancedsearch">Search Options</label>
              <input type="radio" name="formAllAny" value="0" checked="checked" />"And" all search criteria&nbsp;
              <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;
              <input type="checkbox" name="caseSensitive" value="on" />Case sensitive
