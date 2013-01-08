@@ -318,6 +318,8 @@ label[for="advancedsearch"] {
     width: auto;
     margin-top: 1em;
     margin-bottom: 0.5em;
+    background-color: lightgrey;   
+    text-align: center;             
 }
 
 label[for="geo"] {
@@ -340,11 +342,13 @@ label[for="geo"] {
 }
 
 .figure.floatleft {
-    margin-left: 40px;
+    margin-left: 20px;
+    margin-bottom: 10px;
 }
 
 .figure.floatright {
     margin-right: 10px;
+    margin-bottom: 20px;
 }
 
 .figcaption {
