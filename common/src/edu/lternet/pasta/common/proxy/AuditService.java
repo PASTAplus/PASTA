@@ -170,16 +170,17 @@ public final class AuditService
     public static synchronized void joinAll() {
 
         // join all threads
-        Iterator<Thread> it = serviceList.listIterator();
-        while (it.hasNext()) {
-            Thread t = it.next();
-            try {
+        try {
+            Iterator<Thread> it = serviceList.listIterator();
+            while (it.hasNext()) {
+                Thread t = it.next();
                 t.join();
+                it.remove();
             }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            it.remove();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
+    
 }

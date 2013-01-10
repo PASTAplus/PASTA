@@ -1064,13 +1064,8 @@ public class DataPackageManagerClient extends PastaClient {
   	String uri = null;
   	
   	String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-  	
-  	if (this.pastaPort == 80 || this.pastaPort == 443) {
-  		uri = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, null) + "/eml" + urlTail;
-  	} else {
-  		uri = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort) + "/eml" + urlTail;
-  	}
-  	
+  	uri = this.pastaUriHead + "eml" + urlTail;
+
   	return uri;
 
   }
