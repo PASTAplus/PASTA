@@ -126,8 +126,11 @@
 	<div class="wrapper">
 		<jsp:include page="/WEB-INF/jsp/head.jsp" />
 		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
-		<div class="content">
-			<h2 align="center">Advanced Search for Data Packages</h2>
+		<div class="content advancedsearch">
+			<h2 align="center">Search for Data Packages</h2>
+			<fieldset>
+				<legend>Advanced Search</legend>
+
 		  <div class="section">
 			  <%=warningMessage%>
         <form id="advancedSearchForm" 
@@ -141,50 +144,31 @@
 
           <div class="figure floatleft">
             <label for="advancedsearch">LTER Sites</label>
-            <select name="siteValues" multiple="multiple" size="28">
+            <select name="siteValues" multiple="multiple" size="17">
               <%= siteOptions %>
             </select>
-          </div>
-          
-          <div class="figure floatleft">            
-            <label for="advancedsearch">Spatial Criteria</label>
-            <script type="text/javascript">var mapPage="advancedSearch";</script>
-            <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=3"></script>
-            <!--<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" 
-                        type="text/javascript"></script>-->
-            <script type="text/javascript" src="./js/dragzoom.js" ></script>
-            <script type="text/javascript" src="./js/map_functions.js" ></script>      
-            <div id="map" style="width: 330px; height: 258px"></div>
-            <figcaption><small>Zoom in to the region you'd like to search</small></figcaption>
+            <label for="advancedsearch">Taxonomic Criteria</label>
             <table>
               <tr>
                 <td>
-                  <label for="geo">North:&nbsp;<input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></label>
-                  <label for="geo">South:&nbsp;<input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></label>
-                  </td>
-              </tr>
-              <tr>
-                <td>
-                  <label for="geo">East:&nbsp;<input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label>
-                  <label for="geo">West:&nbsp;<input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label>
+                  <label for="labelsmall">Taxon:
+                    <select name="taxonQueryType">
+                      <option value="0" selected="selected">contains</option>
+                      <option value="1">matches exactly</option>
+                      <option value="2">starts with</option>
+                      <option value="3">ends with</option>
+                    </select>
+                  </label>
+                  <input type="text" name="taxon" value='<%=taxon%>' />
                 </td>
               </tr>
-              <tr>
-                <td>
-                  <input type="checkbox" name="boundaryContained" value="on" />      
-                  <small>Dataset fully contained within boundaries</small>
-                </td>   
-              </tr>
-              <tr>
-                <td colspan="2"><label for="geo">Geographic&nbsp;Place&nbsp;Name:<input type="text" name="locationName" size="40" value=""/></label></td>
-              </tr>
-            </table>    
-             <label for="advancedsearch">Search Options</label>
-             <input type="radio" name="formAllAny" value="0" checked="checked" />"And" all search criteria&nbsp;
-             <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;<br/>
-             <input type="checkbox" name="caseSensitive" value="on" />Case sensitive
-          </div>    
-
+            </table>
+            <label for="advancedsearch">Search Options</label>
+            <input type="radio" name="formAllAny" value="0" checked="checked" />"And" all search criteria&nbsp;
+            <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;<br/>
+            <input type="checkbox" name="caseSensitive" value="on" />Case sensitive
+          </div>
+          
           <div class="figure floatleft">
             <label for="advancedsearch">Subject</label>
             <table>
@@ -222,7 +206,7 @@
             <label for="advancedsearch">Creators/Organizations</label>
             <table>
               <tr>
-                <td><label for="geo">Creator's Last Name:</label>
+                <td><label for="labelsmall">Creator's Last Name:</label>
                   <select name="creatorSurnameQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -233,7 +217,7 @@
                 </td>
               </tr>
               <tr>
-                <td><label for="geo">Creator's Organization:</label>
+                <td><label for="labelsmall">Creator's Organization:</label>
                   <select name="creatorOrganizationQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -244,9 +228,6 @@
                 </td>
               </tr>
             </table>   
-          </div>
-
-          <div class="figure floatleft">
             <label for="advancedsearch">Temporal Criteria</label>
             <table>
               <tr>
@@ -258,48 +239,67 @@
               </tr>
               <tr>
                 <td>
-                  <label for="geo">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
+                  <label for="labelsmall">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
                 </td>
                 <td>
-                  <label for="geo">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
+                  <label for="labelsmall">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
                 </td>
               </tr>
               <tr>
                 <td colspan="2">
                   <input type="checkbox" name="datesContained" />
-                  <small>Dataset must be fully contained within start and end dates</small>
+                  <small>Dataset is fully contained within start and end dates</small>
                 </td>
               </tr>
               <tr>
                 <td colspan="2">
-                  <label for="geo">Named Timescale:</label>
+                  <label for="labelsmall">Named&nbsp;Timescale:
                   <select name="namedTimescaleQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
                     <option value="2">starts with</option>
                     <option value="3">ends with</option>
-                  </select>
+                  </select></label>
                   <input type="text" name="namedTimescale" value="">
                 </td>
               </tr>
             </table>
-            <label for="advancedsearch">Taxonomic Criteria</label>
+          </div>
+
+          <div class="figure floatleft">
+            <label for="advancedsearch">Spatial Criteria</label>
+            <script type="text/javascript">var mapPage="advancedSearch";</script>
+            <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=3"></script>
+            <!--<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" 
+                        type="text/javascript"></script>-->
+            <script type="text/javascript" src="./js/dragzoom.js" ></script>
+            <script type="text/javascript" src="./js/map_functions.js" ></script>      
+            <div id="map" style="width: 330px; height: 258px"></div>
+            <figcaption>Zoom in to the region you'd like to search</figcaption>
             <table>
               <tr>
                 <td>
-                  <label for="geo">Taxon:
-                    <select name="taxonQueryType">
-                      <option value="0" selected="selected">contains</option>
-                      <option value="1">matches exactly</option>
-                      <option value="2">starts with</option>
-                      <option value="3">ends with</option>
-                    </select>
-                  </label>
-                  <input type="text" name="taxon" value='<%=taxon%>' />
+                  <label for="labelsmall">North:&nbsp;<input type="text" name="northBound" size="8" maxlength="10" value="90.0" /></label>
+                  <label for="labelsmall">South:&nbsp;<input type="text" name="southBound" size="8" maxlength="10" value="-90.0" /></label>
+                  </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="labelsmall">East:&nbsp;<input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label>
+                  <label for="labelsmall">West:&nbsp;<input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label>
                 </td>
               </tr>
-            </table>
-          </div>
+              <tr>
+                <td>
+                  <input type="checkbox" name="boundaryContained" value="on" />      
+                  <small>Dataset is fully contained within boundaries</small>
+                </td>   
+              </tr>
+              <tr>
+                <td colspan="2"><label for="labelsmall">Geographic&nbsp;Place&nbsp;Name:<input type="text" name="locationName" size="40" value=""/></label></td>
+              </tr>
+            </table>    
+         </div>
 
          <div class="section">
             <br/>
@@ -310,6 +310,8 @@
       
     </form>
     
+			</fieldset>
+
     <!-- end of section -->
 
     <div class="section-table">

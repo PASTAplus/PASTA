@@ -322,7 +322,7 @@ label[for="advancedsearch"] {
     text-align: center;             
 }
 
-label[for="geo"] {
+label[for="labelsmall"] {
     font-size: small
 }
 
@@ -358,9 +358,8 @@ label[for="geo"] {
     text-align: center;
 }
 
-.small {
-    font-size: small;
-    vertical-align: center;
+div.advancedsearch {
+	  font-size: 90%;
 }
 
 
