@@ -1,3 +1,27 @@
+<!--
+
+ $Date$
+ $Author$
+ $Revision$
+ 
+ Copyright 2011,2012 the University of New Mexico.
+ 
+ This work was supported by National Science Foundation Cooperative
+ Agreements #DEB-0832652 and #DEB-0936498.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0.
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ either express or implied. See the License for the specific
+ language governing permissions and limitations under the License.
+
+ -->
+
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
@@ -279,14 +303,14 @@
             <table>
               <tr>
                 <td>
-                  <label for="labelsmall">North:&nbsp;<input type="text" name="northBound" size="8" maxlength="10" value="90.0" /></label>
-                  <label for="labelsmall">South:&nbsp;<input type="text" name="southBound" size="8" maxlength="10" value="-90.0" /></label>
-                  </td>
+                  <label for="labelsmall">North:&nbsp;<input type="text" name="northBound" size="9" maxlength="10" value="90.0" /></label>
+                  <label for="labelsmall">South:&nbsp;<input type="text" name="southBound" size="9" maxlength="10" value="-90.0" /></label>
+                </td>
               </tr>
               <tr>
                 <td>
-                  <label for="labelsmall">East:&nbsp;<input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></label>
-                  <label for="labelsmall">West:&nbsp;<input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></label>
+                  <label for="labelsmall">East:&nbsp;&nbsp;<input type="text" name="eastBound" size="9" maxlength="10" value="180.0" /></label>
+                  <label for="labelsmall">West:&nbsp;&nbsp;<input type="text" name="westBound" size="9" maxlength="10" value="-180.0" /></label>
                 </td>
               </tr>
               <tr>
