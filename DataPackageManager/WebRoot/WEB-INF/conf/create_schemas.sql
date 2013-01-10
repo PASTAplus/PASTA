@@ -23,9 +23,9 @@ CREATE TABLE datapackagemanager.resource_registry (
 CREATE TYPE order_type AS ENUM ('allowFirst', 'denyFirst');
 CREATE TYPE access_type AS ENUM ('allow', 'deny');
 CREATE TYPE permission AS ENUM ('read', 'write', 'changePermission');
-CREATE SEQUENCE access_matrix_id_seq;
+CREATE SEQUENCE datapackagemanager.access_matrix_id_seq;
 CREATE TABLE datapackagemanager.access_matrix (
-  access_matrix_id INT8 default nextval('access_matrix_id_seq'), -- access matrix id, the primary key
+  access_matrix_id INT8 default nextval('datapackagemanager.access_matrix_id_seq'), -- access matrix id, the primary key
   resource_id VARCHAR(350) NOT NULL,                             -- resource id, a foreign key
   principal VARCHAR(250) NOT NULL,                               -- the principal for whom this access rule applies
   access_type ACCESS_TYPE NOT NULL,                              -- the EML access type ('allow', 'deny')
