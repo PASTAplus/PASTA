@@ -1,7 +1,7 @@
 CREATE SCHEMA datapackagemanager AUTHORIZATION pasta;
 
 
-CREATE TYPE resource_type AS ENUM ('data', 'dataPackage', 'metadata', 'report');
+CREATE TYPE datapackagemanager.resource_type AS ENUM ('data', 'dataPackage', 'metadata', 'report');
 CREATE TABLE datapackagemanager.resource_registry (
   resource_id VARCHAR(350) NOT NULL,     -- resource id, the primary key
   doi VARCHAR(256),                      -- digital object identifier (DOI)
@@ -20,9 +20,9 @@ CREATE TABLE datapackagemanager.resource_registry (
 );
 
 
-CREATE TYPE order_type AS ENUM ('allowFirst', 'denyFirst');
-CREATE TYPE access_type AS ENUM ('allow', 'deny');
-CREATE TYPE permission AS ENUM ('read', 'write', 'changePermission');
+CREATE TYPE datapackagemanager.order_type AS ENUM ('allowFirst', 'denyFirst');
+CREATE TYPE datapackagemanager.access_type AS ENUM ('allow', 'deny');
+CREATE TYPE datapackagemanager.permission AS ENUM ('read', 'write', 'changePermission');
 CREATE SEQUENCE datapackagemanager.access_matrix_id_seq;
 CREATE TABLE datapackagemanager.access_matrix (
   access_matrix_id INT8 default nextval('datapackagemanager.access_matrix_id_seq'), -- access matrix id, the primary key
