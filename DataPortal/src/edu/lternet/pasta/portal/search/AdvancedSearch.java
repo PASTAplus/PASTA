@@ -811,19 +811,21 @@ public class AdvancedSearch  {
    * Check whether a user's input date range is valid.
    */
   private void validateDateRange(String startDateStr, String endDateStr) {
+    Date startDate = null;
+    Date endDate = null;
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
+    
     try {
-      Date startDate = dateFormat.parse(startDateStr);
-      Date endDate = dateFormat.parse(endDateStr);
+      if ((startDateStr != null) && (endDateStr != null)) {
+        startDate = dateFormat.parse(startDateStr);
+        endDate = dateFormat.parse(endDateStr);
       
-      if (startDate.after(endDate)) {
-        throw new IllegalArgumentException(
-           "The date range is invalid. Start date ('" +
-           startDateStr + 
-           "') should be less than end date ('" +
-           endDateStr + "').");
-           	
+        if ((startDate != null) && (endDate != null) && (startDate.after(endDate))) {
+          throw new IllegalArgumentException(
+            "The date range is invalid. Start date ('" + startDateStr + 
+            "') should be less than end date ('" + endDateStr + "').");   	
+        }
       }
     }
     catch (ParseException e) {
