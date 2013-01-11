@@ -319,11 +319,14 @@ label[for="advancedsearch"] {
     margin-top: 1em;
     margin-bottom: 0.5em;
     background-color: lightgrey;   
-    text-align: center;             
+    text-align: center;   
+    font-size: 110%;          
 }
 
-label[for="labelsmall"] {
-    font-size: small
+label[for="advancedsearchleft"] {
+    display: inline-block;
+    width: auto;
+    font-size: 95%;
 }
 
 .floatleft {
@@ -359,7 +362,7 @@ label[for="labelsmall"] {
 }
 
 div.advancedsearch {
-	  font-size: 90%;
+	  font-size: 70%;
 }
 
 

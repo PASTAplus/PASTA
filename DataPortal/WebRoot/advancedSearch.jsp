@@ -150,12 +150,12 @@
 	<div class="wrapper">
 		<jsp:include page="/WEB-INF/jsp/head.jsp" />
 		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
-		<div class="content advancedsearch">
+		<div class="content">
 			<h2 align="center">Search for Data Packages</h2>
 			<fieldset>
 				<legend>Advanced Search</legend>
 
-		  <div class="section">
+		  <div class="section advancedsearch">
 			  <%=warningMessage%>
         <form id="advancedSearchForm" 
               name="advancedSearchForm" 
@@ -175,7 +175,7 @@
             <table>
               <tr>
                 <td>
-                  <label for="labelsmall">Taxon:
+                  <label for="advancedsearchleft">Taxon:
                     <select name="taxonQueryType">
                       <option value="0" selected="selected">contains</option>
                       <option value="1">matches exactly</option>
@@ -230,7 +230,7 @@
             <label for="advancedsearch">Creators/Organizations</label>
             <table>
               <tr>
-                <td><label for="labelsmall">Creator's Last Name:</label>
+                <td><label for="advancedsearchleft">Creator's Last Name:</label>
                   <select name="creatorSurnameQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -241,7 +241,7 @@
                 </td>
               </tr>
               <tr>
-                <td><label for="labelsmall">Creator's Organization:</label>
+                <td><label for="advancedsearchleft">Creator's Organization:</label>
                   <select name="creatorOrganizationQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -263,21 +263,21 @@
               </tr>
               <tr>
                 <td>
-                  <label for="labelsmall">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
+                  <label for="advancedsearchleft">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
                 </td>
                 <td>
-                  <label for="labelsmall">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
+                  <label for="advancedsearchleft">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
                 </td>
               </tr>
               <tr>
                 <td colspan="2">
                   <input type="checkbox" name="datesContained" />
-                  <small>Dataset is fully contained within start and end dates</small>
+                  Dataset is fully contained within start and end dates
                 </td>
               </tr>
               <tr>
                 <td colspan="2">
-                  <label for="labelsmall">Named&nbsp;Timescale:
+                  <label for="advancedsearchleft">Named&nbsp;Timescale:
                   <select name="namedTimescaleQueryType">
                     <option value="0" selected="selected">contains</option>
                     <option value="1">matches exactly</option>
@@ -303,24 +303,24 @@
             <table>
               <tr>
                 <td>
-                  <label for="labelsmall">North:&nbsp;<input type="text" name="northBound" size="9" maxlength="10" value="90.0" /></label>
-                  <label for="labelsmall">South:&nbsp;<input type="text" name="southBound" size="9" maxlength="10" value="-90.0" /></label>
+                  <label for="advancedsearchleft">North:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" /></label>
+                  <label for="advancedsearchleft">South:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" /></label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <label for="labelsmall">East:&nbsp;&nbsp;<input type="text" name="eastBound" size="9" maxlength="10" value="180.0" /></label>
-                  <label for="labelsmall">West:&nbsp;&nbsp;<input type="text" name="westBound" size="9" maxlength="10" value="-180.0" /></label>
+                  <label for="advancedsearchleft">East:&nbsp;&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" /></label>
+                  <label for="advancedsearchleft">West:&nbsp;&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" /></label>
                 </td>
               </tr>
               <tr>
                 <td>
                   <input type="checkbox" name="boundaryContained" value="on" />      
-                  <small>Dataset is fully contained within boundaries</small>
+                  Dataset is fully contained within boundaries
                 </td>   
               </tr>
               <tr>
-                <td colspan="2"><label for="labelsmall">Geographic&nbsp;Place&nbsp;Name:<input type="text" name="locationName" size="40" value=""/></label></td>
+                <td colspan="2"><label for="advancedsearchleft">Geographic Place Name:</label><br/><input type="text" name="locationName" size="40" value=""/></td>
               </tr>
             </table>    
          </div>
