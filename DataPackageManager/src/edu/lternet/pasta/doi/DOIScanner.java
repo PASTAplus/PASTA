@@ -95,6 +95,8 @@ public class DOIScanner {
 		
 		if (this.doiTest.equalsIgnoreCase(TRUE)) {
 			this.setDoiTest(true);
+		} else {
+			this.setDoiTest(false);
 		}
 		
 		dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
@@ -155,6 +157,8 @@ public class DOIScanner {
 			ezidRegistrar = new EzidRegistrar();
 			if (this.isDoiTest) {
 				ezidRegistrar.setDoiTest(true);
+			} else {
+				ezidRegistrar.setDoiTest(false);
 			}
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
