@@ -1,3 +1,27 @@
+<!--
+
+ $Date$
+ $Author$
+ $Revision$
+ 
+ Copyright 2011,2012 the University of New Mexico.
+ 
+ This work was supported by National Science Foundation Cooperative
+ Agreements #DEB-0832652 and #DEB-0936498.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0.
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ either express or implied. See the License for the specific
+ language governing permissions and limitations under the License.
+
+ -->
+
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
@@ -77,21 +101,16 @@
 
 <head>
   <base href="<%=basePath%>">
-
   <title>Advanced Search</title>
-
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
   <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
   <meta http-equiv="description" content="This is my page">
-
   <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
-
   <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
   <script type="text/javascript" src="./js/utilities.js"></script>
   <script type="text/javascript" src="./js/validation.js"></script>
-
   <script type="text/javascript">
 
       function submitRequest(form) {
@@ -128,314 +147,195 @@
 </head>
 
 <body>
-
 	<div class="wrapper">
-
 		<jsp:include page="/WEB-INF/jsp/head.jsp" />
 		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
-
 		<div class="content">
-
 			<h2 align="center">Search for Data Packages</h2>
-			<h3 align="center">Advanced Search</h3>
-				<div class="section">
-				
-			<%=warningMessage%>
+			<fieldset>
+				<legend>Advanced Search</legend>
 
-		<form id="advancedSearchForm" 
-	                   name="advancedSearchForm" 
-	                   method="post"
-	                   action="./advancedSearch"
-	                   onsubmit="return submitRequest(this)"
-	                  >
+		  <div class="section advancedsearch">
+			  <%=warningMessage%>
+        <form id="advancedSearchForm" 
+              name="advancedSearchForm" 
+              method="post"
+              action="./advancedSearch"
+              onsubmit="return submitRequest(this)"
+        >
 
-      <table>
-      <tr>
-        
-      <td>
-      <fieldset>
-        <legend>LTER Sites</legend>
-        <table>
-          <tr>
-            <td>
-              <select name="siteValues" multiple="multiple" size="21">
-                <%= siteOptions %>
-              </select>
-             </td>
-           </tr>
-         </table>
-      </fieldset>
-      </td>
+        <div class="section">
 
-      <td>
-      <fieldset>
-        <legend>Spatial Criteria</legend>
-        <table align="center">
-          <tr>
-            <td>Zoom in to the region you would like to search<br/>
-<script language="javascript" type="text/javascript">var mapPage="advancedSearch";</script>
-<!-- 
-<script src="http://maps.google.com/maps?file=api&v=3" type="text/javascript"></script>
- -->
-<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" type="text/javascript"></script>
-<script src="./js/dragzoom.js" type="text/javascript"></script>
-<script src="./js/map_functions.js" type="text/javascript"></script>      
-             <div id="map" style="width: 300px; height: 240px"></div>
-           </td>
-           <td>
-             <table align="center">
-               <tr>
-                 <td></td>
-                 <td style="text-align: center">North</td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td></td>
-                 <td><input type="text" name="northBound" size="10" maxlength="10" value="90.0" /></td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td style="text-align: center">West</td>
-                 <td></td>
-                 <td style="text-align: center">East</td>
-               </tr>
-               <tr>
-                 <td><input type="text" name="westBound" size="10" maxlength="10" value="-180.0" /></td>
-                 <td></td>
-                 <td><input type="text" name="eastBound" size="10" maxlength="10" value="180.0" /></td>
-               </tr>
-               <tr>
-                 <td></td>
-                 <td style="text-align: center">South</td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td></td>
-                 <td><input type="text" name="southBound" size="10" maxlength="10" value="-90.0" /></td>
-                 <td></td>
-               </tr>
-               <tr>
-                 <td colspan="3">&nbsp;</td>
-               </tr>
-               <tr>
-                 <td colspan="3" align="center">
-                   <input type="checkbox" name="boundaryContained" value="on" />
-                   <small>Dataset must be fully contained within boundaries</small>
-                 </td>     
-               </tr>
-               <tr>
-                 <td colspan="3">&nbsp;</td>
-               </tr>
-               <tr>
-                 <td colspan="3">
-                   Geographic Place Name:&nbsp;<input type="text" name="locationName" value="" />
-                 </td>
-               </tr>
-             </table>        
-           </td>
-         </tr>
-       </table>
-     </fieldset>
-     </td>
-                  
-     </tr>
-     </table>
-
-
-     <table>
-     <tr>
-      
-      <td>
-      <fieldset>
-        <legend>Subject</legend>
-        <table>
-          <tr>
-            <td>
-              <select name="subjectField">
-                <option value="ALL" <%= subjectFieldAll %>>Subject</option>
-                <option value="TITLE" <%= subjectFieldTitle %>>Title Only</option>
-                <option value="ABSTRACT" <%= subjectFieldAbstract %>>Abstract Only</option>
-                <option value="KEYWORDS" <%= subjectFieldKeywords %> selected>Keywords Only</option>
-              </select>
-              <select name="subjectQueryType">
-                <option value="0" selected="selected">contains</option>
-                <option value="1">matches exactly</option>
-                <option value="2">starts with</option>
-                <option value="3">ends with</option>
-              </select>
-              <input type="text" name="subjectValue" value='<%= subjectValue %>' />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="radio" name="subjectAllAny" value="0" checked="checked" />Match All Terms
-              <input type="radio" name="subjectAllAny" value="1" />Match Any Term
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input type="checkbox" name="specific" value="on"  checked="checked" />Add more specific terms
-              <br/><input type="checkbox" name="related" value="on" />Add related terms
-              <br/><input type="checkbox" name="relatedSpecific" value="on" />Add related terms and their more specific terms
-            </td>
-          </tr>
-        </table>
-      </fieldset>
-      </td>
-      
-      <td>
-      <fieldset>
-        <legend>Creators/Organizations</legend>
-        <table>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>Creator's Last Name:
-              <select name="creatorSurnameQueryType">
-                <option value="0" selected="selected">contains</option>
-                <option value="1">matches exactly</option>
-                <option value="2">starts with</option>
-                <option value="3">ends with</option>
-              </select>
-              <input type="text" name="creatorSurname" value='<%=creatorSurname%>' />
-            </td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>Creator's Organization:
-              <select name="creatorOrganizationQueryType">
-                <option value="0" selected="selected">contains</option>
-                <option value="1">matches exactly</option>
-                <option value="2">starts with</option>
-                <option value="3">ends with</option>
-              </select>
-              <input type="text" name="creatorOrganization" value="" />
-            </td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-        </table>       
-      </fieldset>
-      </td>      
-      
-      </tr>
-      </table>
-                      
-      <table>
-      <tr>
-
-      
-      <td>
-      <fieldset>
-        <legend>Temporal Criteria</legend>
-        <table>
-                      <tr>
-                        <td colspan="2" align="center">
-                          <input type="radio" name="dateField" value="COLLECTION" checked="checked" />Collection Date&nbsp;
-                          <input type="radio" name="dateField" value="PUBLICATION" />Publication Date&nbsp;
-                          <input type="radio" name="dateField" value="ALL" />Either&nbsp;
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr>
-                         <td align="center">
-                           <label>Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
-                         </td>
-                         <td align="center">
-                           <label>End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
-                         </td>
-                      </tr>
-                      <tr>
-                         <td align="center" colspan="2">
-                           <input type="checkbox" name="datesContained" />
-                           <small>Dataset must be fully contained within start and end dates</small>
-                         </td>
-                      </tr>
-                         <tr>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                         </tr>
-                         <tr>
-                           <td colspan="2" align="center">Named Timescale:
-                             <select name="namedTimescaleQueryType">
-                               <option value="0" selected="selected">contains</option>
-                               <option value="1">matches exactly</option>
-                               <option value="2">starts with</option>
-                               <option value="3">ends with</option>
-                             </select>
-                             <input type="text" name="namedTimescale" value="">
-                           </td>
-                         </tr>
-        </table>
-      </fieldset>
-      </td>
-
-      <td>
-      <fieldset>
-        <br/>
-        <legend>Taxonomic Criteria</legend>
-        <table>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>Taxon:
-              <select name="taxonQueryType">
-                <option value="0" selected="selected">contains</option>
-                <option value="1">matches exactly</option>
-                <option value="2">starts with</option>
-                <option value="3">ends with</option>
-              </select>
-              <input type="text" name="taxon" value='<%=taxon%>' />
-            </td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-        </table>
-      </fieldset>
-      </td>
-      
-      </tr>
-      </table>
-
-      <table align="center">
-        <tr>
-          <td>Search Options:</td>
-          <td>
+          <div class="figure floatleft">
+            <label for="advancedsearch">LTER Sites</label>
+            <select name="siteValues" multiple="multiple" size="17">
+              <%= siteOptions %>
+            </select>
+            <label for="advancedsearch">Taxonomic Criteria</label>
+            <table>
+              <tr>
+                <td>
+                  <label for="advancedsearchleft">Taxon:
+                    <select name="taxonQueryType">
+                      <option value="0" selected="selected">contains</option>
+                      <option value="1">matches exactly</option>
+                      <option value="2">starts with</option>
+                      <option value="3">ends with</option>
+                    </select>
+                  </label>
+                  <input type="text" name="taxon" value='<%=taxon%>' />
+                </td>
+              </tr>
+            </table>
+            <label for="advancedsearch">Search Options</label>
             <input type="radio" name="formAllAny" value="0" checked="checked" />"And" all search criteria&nbsp;
-            <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;
+            <input type="radio" name="formAllAny" value="1" />"Or" all search criteria&nbsp;<br/>
             <input type="checkbox" name="caseSensitive" value="on" />Case sensitive
-          </td>
-        </tr>
-      </table>
-      
-      <br/>
-      <table align="center">
-        <tr>
-          <td>
-            <input type="submit" value="Search" />
-            <input type="reset" value="Reset" />
-          </td>
-        </tr>
-      </table>
+          </div>
+          
+          <div class="figure floatleft">
+            <label for="advancedsearch">Subject</label>
+            <table>
+              <tr>
+                <td>
+                  <select name="subjectField">
+                    <option value="ALL" <%= subjectFieldAll %>>Subject</option>
+                    <option value="TITLE" <%= subjectFieldTitle %>>Title Only</option>
+                    <option value="ABSTRACT" <%= subjectFieldAbstract %>>Abstract Only</option>
+                    <option value="KEYWORDS" <%= subjectFieldKeywords %> selected>Keywords Only</option>
+                  </select>
+                  <select name="subjectQueryType">
+                    <option value="0" selected="selected">contains</option>
+                    <option value="1">matches exactly</option>
+                    <option value="2">starts with</option>
+                    <option value="3">ends with</option>
+                  </select>
+                  <input type="text" name="subjectValue" value='<%= subjectValue %>' />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="subjectAllAny" value="0" checked="checked" />Match All Terms
+                  <input type="radio" name="subjectAllAny" value="1" />Match Any Term
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" name="specific" value="on"  checked="checked" />Add more specific terms
+                  <br/><input type="checkbox" name="related" value="on" />Add related terms
+                  <br/><input type="checkbox" name="relatedSpecific" value="on" />Add related terms and their more specific terms
+                </td>
+              </tr>
+            </table>
+            <label for="advancedsearch">Creators/Organizations</label>
+            <table>
+              <tr>
+                <td><label for="advancedsearchleft">Creator's Last Name:</label>
+                  <select name="creatorSurnameQueryType">
+                    <option value="0" selected="selected">contains</option>
+                    <option value="1">matches exactly</option>
+                    <option value="2">starts with</option>
+                    <option value="3">ends with</option>
+                  </select>
+                  <input type="text" name="creatorSurname" value='<%=creatorSurname%>' />
+                </td>
+              </tr>
+              <tr>
+                <td><label for="advancedsearchleft">Creator's Organization:</label>
+                  <select name="creatorOrganizationQueryType">
+                    <option value="0" selected="selected">contains</option>
+                    <option value="1">matches exactly</option>
+                    <option value="2">starts with</option>
+                    <option value="3">ends with</option>
+                  </select>
+                  <input type="text" name="creatorOrganization" value="" />
+                </td>
+              </tr>
+            </table>   
+            <label for="advancedsearch">Temporal Criteria</label>
+            <table>
+              <tr>
+                <td colspan="2" align="center">
+                  <input type="radio" name="dateField" value="COLLECTION" checked="checked" />Collection Date&nbsp;
+                  <input type="radio" name="dateField" value="PUBLICATION" />Publication Date&nbsp;
+                  <input type="radio" name="dateField" value="ALL" />Either&nbsp;
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="advancedsearchleft">Start Date:<input type="date" name="startDate" value="" placeholder="YYYY-MM-DD" /></label>                        
+                </td>
+                <td>
+                  <label for="advancedsearchleft">End Date:<input type="date" name="endDate" value="" placeholder="YYYY-MM-DD" /></label>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input type="checkbox" name="datesContained" />
+                  Dataset is fully contained within start and end dates
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <label for="advancedsearchleft">Named&nbsp;Timescale:
+                  <select name="namedTimescaleQueryType">
+                    <option value="0" selected="selected">contains</option>
+                    <option value="1">matches exactly</option>
+                    <option value="2">starts with</option>
+                    <option value="3">ends with</option>
+                  </select></label>
+                  <input type="text" name="namedTimescale" value="">
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="figure floatleft">
+            <label for="advancedsearch">Spatial Criteria</label>
+            <script type="text/javascript">var mapPage="advancedSearch";</script>
+            <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=3"></script>
+            <!--<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" 
+                        type="text/javascript"></script>-->
+            <script type="text/javascript" src="./js/dragzoom.js" ></script>
+            <script type="text/javascript" src="./js/map_functions.js" ></script>      
+            <div id="map" style="width: 330px; height: 258px"></div>
+            <figcaption>Zoom in to the region you'd like to search</figcaption>
+            <table>
+              <tr>
+                <td>
+                  <label for="advancedsearchleft">North:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" /></label>
+                  <label for="advancedsearchleft">South:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" /></label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="advancedsearchleft">East:&nbsp;&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" /></label>
+                  <label for="advancedsearchleft">West:&nbsp;&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" /></label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" name="boundaryContained" value="on" />      
+                  Dataset is fully contained within boundaries
+                </td>   
+              </tr>
+              <tr>
+                <td colspan="2"><label for="advancedsearchleft">Geographic Place Name:</label><br/><input type="text" name="locationName" size="40" value=""/></td>
+              </tr>
+            </table>    
+         </div>
+
+         <div class="section">
+            <br/>
+            <p align="center">
+             <input type="submit" value="Search" /> <input type="reset" value="Reset" />
+           </p>
+         </div>
       
     </form>
     
-    </div>
+			</fieldset>
+
     <!-- end of section -->
 
     <div class="section-table">
