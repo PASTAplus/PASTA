@@ -12,7 +12,7 @@ form.back {
 	width: 100%;
 	position: relative;
 	min-height: 100%;
-	margin: 0px auto 10px auto;
+  margin: 0px auto 10px auto;
 }
 
 .head {
@@ -306,3 +306,60 @@ legend {
 	float: right;
 	text-align: right;
 }
+
+label {
+    display: inline-block;
+    width: 140px;
+    font-weight: bold;
+}
+
+label[for="advancedsearch"] {
+    display: block;
+    width: auto;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    background-color: lightgrey;   
+    text-align: center;             
+}
+
+label[for="labelsmall"] {
+    font-size: small
+}
+
+.floatleft {
+    float: left;
+    margin: 3px 10px 3px 0;
+}
+
+.floatright {
+    float: right;
+    margin: 3px 0 3px 10px;
+}
+
+.imgcentered {
+    margin: 10px auto;
+    display: block;
+}
+
+.figure.floatleft {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.figure.floatright {
+    margin-right: 10px;
+    margin-bottom: 20px;
+}
+
+.figcaption {
+    display: block;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+}
+
+div.advancedsearch {
+	  font-size: 90%;
+}
+
+
