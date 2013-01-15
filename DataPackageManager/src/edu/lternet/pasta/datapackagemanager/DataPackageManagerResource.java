@@ -2567,8 +2567,8 @@ public class DataPackageManagerResource extends PastaWebService {
         }
       }
 
-      String dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
-      entryText = "data format: " + dataFormat;
+      MediaType dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
+      entryText = "data format: " + dataFormat.toString();
       
       byte[] byteArray = 
         dataPackageManager.readDataEntity(scope, identifier, revision, entityId, authToken, userId);
@@ -2611,6 +2611,7 @@ public class DataPackageManagerResource extends PastaWebService {
     audit(serviceMethodName, authToken, response, resourceId, entryText);
     response = stampHeader(response);
     return response;
+    
   }
   
    
