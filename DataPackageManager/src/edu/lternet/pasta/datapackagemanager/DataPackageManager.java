@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import javax.xml.transform.TransformerException;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -255,14 +256,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
    * @param identifier  The identifier of the metadata document
    * @param revision    The revision of the metadata document
    * @param entityId    The entityId of the entity
-   * @return            The data entity format, e.g. "text/plain"
+   * @return            The data entity media type, e.g. "text/plain"
    */
-  public String getDataEntityFormat(String scope, 
+  public MediaType getDataEntityFormat(String scope, 
                                     Integer identifier, 
                                     String revision, 
                                     String entityId) 
           throws Exception {
-    String dataFormat = null;
+    MediaType dataFormat = null;
+    String entityFormat = null;
     EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
     EMLDataManager emlDataManager = new EMLDataManager(); 
     
@@ -286,9 +288,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
     Integer revisionInt = new Integer(revision);
     EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revisionInt);
     String packageId = emlPackageIdFormat.format(emlPackageId);
-    dataFormat = emlDataManager.getDataFormat(packageId, entityId);
+    entityFormat = emlDataManager.getDataFormat(packageId, entityId);
+    
+    try {
+    	dataFormat = MediaType.valueOf(entityFormat);
+    } catch (IllegalArgumentException e) {
+    	// Set to OCTET_STREAM if non-standard media type.
+    	dataFormat = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+    }
     
     return dataFormat;
+    
   }
   
 
@@ -1300,6 +1310,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
     }
     
 		return byteArray;
+		
 	}
 
 	
