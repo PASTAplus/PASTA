@@ -39,7 +39,7 @@
 		<div class="content">
 
 			<h2 align="center">Search for Data Packages</h2>
-			<h3 align="center"><a href="./advancedSearch">Advanced Search</a> Results</h3>
+			<h3 align="center"><a href="./advancedSearch.jsp">Advanced Search</a> Results</h3>
 
 			<div class="section-table">
 				<%=searchResult%>
