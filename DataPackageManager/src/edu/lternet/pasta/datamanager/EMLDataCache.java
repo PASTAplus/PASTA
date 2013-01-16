@@ -284,7 +284,7 @@ public class EMLDataCache {
       "  SCOPE varchar(64), " +              // scope
       "  IDENTIFIER int8, " +                // identifier
       "  REVISION int8, " +                  // revision
-      "  ENTITY_ID varchar(64), " +          // entity id
+      "  ENTITY_ID varchar(256), " +          // entity id
       "  ENTITY_NAME varchar(256), " +       // entity name
       "  DATA_FORMAT varchar(64), " +        // data format
       "  DATE_CREATED date, " +              // date created
