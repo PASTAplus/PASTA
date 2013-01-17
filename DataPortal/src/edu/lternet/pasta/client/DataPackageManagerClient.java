@@ -630,6 +630,12 @@ public class DataPackageManagerClient extends PastaClient {
    */
   public byte[] readDataEntity(String scope, Integer identifier,
       String revision, String entityId) throws Exception {
+  	
+  	// Re-encode "%" to its character reference value of %25 to mitigate
+  	// an issue with the HttpGet call that performs the decoding - this is
+  	// a kludge to deal with encoding nonsense.
+  	entityId = entityId.replace("%", "%25");
+  	
     HttpClient httpClient = new DefaultHttpClient();
     HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
     String urlTail = makeUrlTail(scope, identifier.toString(), revision,
