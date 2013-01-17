@@ -1533,10 +1533,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
           throw new UnauthorizedException(message);
         }
         
-        MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl, pastaUser);
         EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
         EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
-        metadataXML = metadataCatalog.readEmlDocument(emlPackageId);
+        DataPackageMetadata dataPackageMetadata = new DataPackageMetadata(emlPackageId);
+        
+        if (dataPackageMetadata != null) {
+          boolean evaluateMode = false;
+          File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
+          metadataXML = FileUtils.readFileToString(levelOneEMLFile);
+        }     
       }
     }
     catch (ClassNotFoundException e) {
