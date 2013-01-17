@@ -34,3 +34,16 @@ CREATE TABLE datapackagemanager.access_matrix (
   CONSTRAINT access_matrix_pk PRIMARY KEY (access_matrix_id),
   CONSTRAINT access_matrix_resource_id_fk FOREIGN KEY (resource_id) REFERENCES datapackagemanager.resource_registry
 );
+
+
+CREATE TABLE datapackagemanager.data_cache_registry (
+  PACKAGE_ID VARCHAR(64),                                   -- package Id
+  SCOPE VARCHAR(64),                                        -- scope
+  IDENTIFIER INT8,                                          -- identifier
+  REVISION INT8,                                            -- revision
+  ENTITY_ID VARCHAR(256),                                   -- entity id
+  ENTITY_NAME VARCHAR(256),                                 -- entity name
+  DATA_FORMAT VARCHAR(64),                                  -- data format
+  DATE_CREATED DATE,                                        -- date created
+  UPDATE_DATE DATE                                          -- update date
+);

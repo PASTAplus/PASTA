@@ -25,7 +25,6 @@
 package edu.lternet.pasta.datamanager;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -99,15 +98,6 @@ public class EMLDataCache {
     this.dbURL = dbURL;
     this.dbUser = dbUser;
     this.dbPassword = dbPassword;
-    
-    /*
-     * Check for existence of Data Cache Registry table. 
-     * Create it if it does not already exist.
-     */
-    if (!isDataCacheRegistryPresent()) {
-      createDataCacheRegistry();
-    }
-    
   }
   
 
@@ -268,55 +258,6 @@ public class EMLDataCache {
   }
   
   	
-  /**
-   * Creates the Data Cache Registry table. This is the table that
-   * is used to keep track of entity information such as
-   * the entity identifier, when the entity was created, and
-   * when it was last updated.
-   */
-  private void createDataCacheRegistry() 
-          throws ClassNotFoundException, SQLException {
-    Connection connection = null;
-    String createString = 
-      "CREATE TABLE " + DATA_CACHE_REGISTRY + " " +
-      "(" +
-      "  PACKAGE_ID varchar(64), " +         // package Id
-      "  SCOPE varchar(64), " +              // scope
-      "  IDENTIFIER int8, " +                // identifier
-      "  REVISION int8, " +                  // revision
-      "  ENTITY_ID varchar(256), " +          // entity id
-      "  ENTITY_NAME varchar(256), " +       // entity name
-      "  DATA_FORMAT varchar(64), " +        // data format
-      "  DATE_CREATED date, " +              // date created
-      "  UPDATE_DATE date" +                 // update date
-      ")";
-
-    Statement stmt = null;
-
-    try {
-      connection = getConnection();
-      stmt = connection.createStatement();             
-      int i = stmt.executeUpdate(createString);
-      Integer anInteger = new Integer(i);
-      logger.debug("createDataCacheRegistry(), createString: " + createString);
-      logger.debug("createDataCacheRegistry(), stmt.executeUpdate() returned: "+
-                  anInteger);
-    } 
-    catch (ClassNotFoundException e) {
-      logger.error("ClassNotFoundException: " + e.getMessage());
-      throw(e);
-    }
-    catch(SQLException e) {
-      logger.error("SQLException: " + e.getMessage());
-      throw(e);
-    }
-    finally {
-      if (stmt != null) stmt.close();
-      returnConnection(connection);
-    }
-  }
-  
-  
 	/**
 	 * Deletes all data entity entries from the Data Cache Registry for the
 	 * specified package id.
@@ -511,60 +452,6 @@ public class EMLDataCache {
 	}
 
 	
-  /**
-   * Boolean to determine whether the Data Cache Registry
-   * table already exists. If it isn't present, it will need to
-   * be created.
-   * 
-   * @return  isPresent, true if the data cache table is present, else false
-   */
-  private boolean isDataCacheRegistryPresent() 
-          throws ClassNotFoundException, SQLException {          
-    boolean isPresent = false;
-    String catalog = null;          // A catalog name (may be null)
-    Connection connection = null;
-    DatabaseMetaData databaseMetaData = null; // For getting db metadata
-    ResultSet rs;
-    String schemaPattern = DATA_CACHE_REGISTRY_SCHEMA; // A schema name pattern
-    String tableNamePattern = "%";  // Matches all table names in the db
-    String[] types = {"TABLE"};     // A list of table types to include
-    
-    try {
-      connection = getConnection();
-      
-      if (connection != null) {
-        databaseMetaData = connection.getMetaData();
-        rs = databaseMetaData.getTables(catalog, schemaPattern, 
-                                    tableNamePattern, types);
-        while (rs.next()) {
-          String TABLE_NAME = rs.getString("TABLE_NAME");
- 
-          if (TABLE_NAME.equalsIgnoreCase(DATA_CACHE_REGISTRY_TABLE)) {
-            isPresent = true;
-          }
-        }
-      
-        if (rs != null) rs.close();
-      }
-      else {
-        SQLException e = new SQLException("Unable to connect to database.");
-        throw(e);
-      }
-    }
-    catch (ClassNotFoundException e) {
-      throw(e);
-    }
-    catch (SQLException e) {
-      throw(e);
-    }
-    finally {
-      returnConnection(connection);
-    }
-    
-    return isPresent;
-  }
-  
-  
   /**
    * Boolean to determine whether a data entity is already registered.
    * 
