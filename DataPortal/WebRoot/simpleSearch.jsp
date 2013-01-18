@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
 <%
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -8,6 +9,8 @@
 
   if (searchResult == null)
     searchResult = "";
+    
+  String optionsString = LTERTerms.getOptionsString(); // for auto-complete
 %>
 
 <!doctype html>
@@ -54,8 +57,12 @@
 								<tr>
 									<td align="left" width="260px"><label for="terms">Search
 											Terms (use * for any):</label></td>
-									<td align="left" width="200px"><input type="text"
-										name="terms" required="required" size="60" /></td>
+									<td align="left" width="200px">
+									  <input type="search" name="terms" required="required" size="60" list="lterterms"/>
+									  <datalist id="lterterms">
+<%=optionsString%>
+									  </datalist>
+								  </td>
 									<td align="center" width="70px"><input type="submit"
 										name="search" value="search" />
 									</td>
