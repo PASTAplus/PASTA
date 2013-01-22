@@ -664,7 +664,7 @@ public class LTERTerms {
    * 
    * @return   a string of option elements
    */
-  public static String getOptionsString() {
+  public static String getDatalistString() {
     String optionsString = null;
     StringBuffer stringBuffer = new StringBuffer("");
     
@@ -675,6 +675,35 @@ public class LTERTerms {
     
     optionsString = stringBuffer.toString();
     return optionsString;
+  }
+
+  
+  /**
+   * Returns a string holding a newline-separated list of
+   * terms for use by the JQUery autocomplete widget.
+   * 
+   *  <option value="CTD">
+   *  <option value="aboveground biomass">
+   *  <option value="aboveground production">
+   *  <option value="abundance">
+   * 
+   * This is used to support auto-complete in the search
+   * input box.
+   * 
+   * @return   a string of comma-separated terms for use
+   */
+  public static String getJQueryString() {
+    String jQueryString = null;
+    StringBuffer stringBuffer = new StringBuffer("");
+    
+    List<String> termsList = Arrays.asList(lterTerms);
+    for (String s : termsList) {
+      stringBuffer.append("\"" + s + "\",");
+    }
+    
+    jQueryString = stringBuffer.toString();
+    jQueryString = jQueryString.substring(0, (jQueryString.length() - 1)); // trim off the trailing comma
+    return jQueryString;
   }
 
 }
