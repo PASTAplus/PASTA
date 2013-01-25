@@ -116,7 +116,7 @@ public class EmlUtility {
    * Methods
    */
   
-  private String emlReferenceExpander(String xslPath) {
+  private String emlReferenceExpander(String xslPath) throws ParseException {
 
     String xml = null;
 
@@ -142,6 +142,7 @@ public class EmlUtility {
     } catch (TransformerException e) {
       logger.error(e.getMessage());
       e.printStackTrace();
+      throw new ParseException("EML Parse Error: " + e.getMessage(), 0);
     }
 
     return xml;
@@ -197,7 +198,8 @@ public class EmlUtility {
    * 
    * @return The HTML document as a String object.
    */
-  public String xmlToHtmlSaxon(String xslPath, HashMap<String, String> parameters) {
+	public String xmlToHtmlSaxon(String xslPath,
+	    HashMap<String, String> parameters) throws ParseException {
 
     String html = null;
     File xsltFile = new File(xslPath);
@@ -234,6 +236,7 @@ public class EmlUtility {
     catch (SaxonApiException e) {
       logger.error(e.getMessage());
       e.printStackTrace();
+      throw new ParseException("EML Parse Error: " + e.getMessage(), 0);
     }
     
     return html;
