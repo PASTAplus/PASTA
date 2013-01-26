@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
 <%
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -8,6 +9,8 @@
 
   if (searchResult == null)
     searchResult = "";
+
+  String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
 %>
 
 <!doctype html>
@@ -24,9 +27,20 @@
 <meta http-equiv="description" content="This is my page">
 
 <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
 
 <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
 
+<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+<script>
+  $(function() {
+    var availableTags = [ <%=jqueryString%> ];
+    
+    $( "#lterterms" ).autocomplete({
+        source: availableTags
+    });
+  });
+</script>  
 </head>
 
 <body>
@@ -52,10 +66,14 @@
 						<table align="left" cellpadding="4em">
 							<tbody>
 								<tr>
-									<td align="left" width="260px"><label for="terms">Search
-											Terms (use * for any):</label></td>
-									<td align="left" width="200px"><input type="text"
-										name="terms" required="required" size="60" /></td>
+									<td align="left" width="260px">
+									  <label for="terms">Search Terms (use * for any):</label>
+									</td>
+									<td align="left" width="200px">
+									  <div class="ui-widget">
+									    <input type="search" name="terms" required="required" size="60" id="lterterms"/>
+									  </div>
+								  </td>
 									<td align="center" width="70px"><input type="submit"
 										name="search" value="search" />
 									</td>

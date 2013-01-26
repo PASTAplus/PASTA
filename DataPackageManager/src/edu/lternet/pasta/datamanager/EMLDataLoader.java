@@ -210,6 +210,7 @@ public class EMLDataLoader implements DataStorageInterface {
    *                     serialization
    */
   public void finishSerialize(String identifier, String errorCode) {
+    logger.warn("EMLDataLoader.finishSerialize()");
     if (fileOutputStream != null) {
       try {
         logger.warn("Output stream finished serializing:\n" +
@@ -297,6 +298,7 @@ public class EMLDataLoader implements DataStorageInterface {
    * @return  the OutputStream to be serialized
    */
   public OutputStream startSerialize(String url) {
+    logger.warn("EMLDataLoader.startSerialize()");
     BufferedOutputStream bufferedOutputStream = null;
     EmlPackageId emlPackageId = getUrlEmlPackageIdMapEntry(url);
     String entityId = getUrlEntityIdMapEntry(url);       
