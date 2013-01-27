@@ -94,24 +94,26 @@
 
 				<form id="simplesearch" name="simplesearch" method="post"
 					action="./simpleSearch">
-					<table align="center" cellpadding="4em">
+					<table id="simpleSearch">
 						<tbody>
 							<tr>
-								<td align="left" width="260px">
+								<td align="left">
 								  <label for="terms">Search Terms (use * for any):</label>
 								</td>
-								<td align="left" width="200px">
+								<td align="left">
 								  <div class="ui-widget">
-									  <input type="search" name="terms" required="required" size="60" id="lterterms"/>
-									</div>
+									  <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;" />
+								  </div>
 								</td>
-								<td align="center" width="70px"><input type="submit"
+								<td align="center"><input type="submit"
 									name="search" value="search" />
 								</td>
-								<td align="center" width="40px"><input type="reset"
+								<td align="center"><input type="reset"
 									name="reset" value="reset" />
 								</td>
-								<td>(<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)</td>
+								<td>
+								    (<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)
+								</td>
 							</tr>
 						</tbody>
 					</table>
