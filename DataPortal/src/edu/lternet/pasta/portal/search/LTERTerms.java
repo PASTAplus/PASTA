@@ -695,8 +695,21 @@ public class LTERTerms {
   public static String getJQueryString() {
     String jQueryString = null;
     StringBuffer stringBuffer = new StringBuffer("");
+    List<String> termsList = null;
     
-    List<String> termsList = Arrays.asList(lterTerms);
+    String[] preferredTerms = ControlledVocabularyClient.webServicePreferredTerms();
+    
+    /*
+     * First try getting the list from the controlled vocabulary web service. If
+     * that fails, use the hard-coded list of preferred terms.
+     */
+    if ((preferredTerms != null) && (preferredTerms.length > 0)) {
+      termsList = Arrays.asList(preferredTerms);
+    }
+    else {
+      termsList = Arrays.asList(lterTerms);
+    }
+    
     for (String s : termsList) {
       stringBuffer.append("\"" + s + "\",");
     }
