@@ -45,6 +45,8 @@ public class ControlledVocabularyClient {
 
   private static final String PREFERRED_TERMS_SERVICE_URL = 
       "http://vocab.lternet.edu/webservice/preferredterms.php";
+  
+  private static String[] PREFERRED_TERMS_ARRAY = null;
 
  
   /**
@@ -224,24 +226,30 @@ public class ControlledVocabularyClient {
     HttpGet httpGet = null;
     HttpClient httpClient = new DefaultHttpClient();
     String[] preferredTerms = null;
-
-    try {
-      httpGet = new HttpGet(PREFERRED_TERMS_SERVICE_URL);
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      if (statusCode == HttpStatus.SC_OK) {
-        HttpEntity httpEntity = httpResponse.getEntity();
-        String entityString = EntityUtils.toString(httpEntity);
-        if (entityString != null) {
-          preferredTerms = entityString.split("\n");
+    
+    if (PREFERRED_TERMS_ARRAY != null) {
+      preferredTerms = PREFERRED_TERMS_ARRAY;
+    }
+    else {
+      try {
+        httpGet = new HttpGet(PREFERRED_TERMS_SERVICE_URL);
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        if (statusCode == HttpStatus.SC_OK) {
+          HttpEntity httpEntity = httpResponse.getEntity();
+          String entityString = EntityUtils.toString(httpEntity);
+          if (entityString != null) {
+            preferredTerms = entityString.split("\n");
+            PREFERRED_TERMS_ARRAY = preferredTerms;
+          }
         }
       }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
+      catch (Exception e) {
+        e.printStackTrace();
+      }
+      finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
 
     return preferredTerms;
