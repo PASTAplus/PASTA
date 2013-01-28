@@ -24,15 +24,28 @@
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
+<%@ page import="edu.lternet.pasta.portal.PastaStatistics" %>
 <%
   HttpSession httpSession = request.getSession();
   httpSession.setAttribute("menuid", "home");
+  
+  String uid = (String) httpSession.getAttribute("uid");
 
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
 
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+  
+  Integer numDataPackages = null;
+  
+  if (uid == null || uid.isEmpty()) {
+    uid = "public";
+  }
+  
+  PastaStatistics pastaStats = new PastaStatistics("public");
+  numDataPackages = pastaStats.getNumDataPackages();
+  
 %>
 
 <!doctype html>
@@ -62,7 +75,52 @@
         source: availableTags
     });
   });
-</script>  
+</script>
+
+<!-- Google Chart for NIS Data Package and Site Growth -->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	// Load the Visualization API and the piechart package.
+	google.load('visualization', '1.0', {
+		'packages' : [ 'corechart' ]
+	});
+
+	// Set a callback to run when the Google Visualization API is loaded.
+	google.setOnLoadCallback(drawChart);
+
+	// Callback that creates and populates a data table,
+	// instantiates the pie chart, passes in the data and
+	// draws it.
+	function drawChart() {
+
+		// Create the data table.
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Week');
+		data.addColumn('number', 'Packages');
+		data.addColumn('number', 'Sites');
+		data.addRows([ 
+		  ['1',     0,  0],
+		  ['2',   168,  4],
+		  ['3',   297,  7],
+		  ['4',   361,  7]
+		]);
+
+		// Set chart options
+		var options = {
+			'title': 'NIS Data Package and Site Growth',
+			'width': 400,
+			'height': 200,
+			'hAxis': {title : 'Week'},
+			'vAxes': {0: {logScale : false}, 1: {logScale : false, maxValue : 27}},
+			'series': {0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}}
+		};
+
+		// Instantiate and draw our chart, passing in some options.
+		var chart = new google.visualization.ColumnChart(document
+				.getElementById('chart_div'));
+		chart.draw(data, options);
+	}
+</script>
 </head>
 
 <body>
@@ -75,49 +133,61 @@
 		<div class="content">
 
 			<div class="section">
-				<p>
-					Data are one of the most valuable products of the Long-Term
-					Ecological Research (LTER) Network program. The LTER Network seeks
-					to inform the broader scientific community by providing open access
-					to well designed and well documented databases via a Network-wide
-					information system. The LTER Network Data Portal contains 
-					ecological data packages contributed by 27 past and present LTER
-					sites. Please review the <a target="_top" 
-					href='http://www.lternet.edu/data/netpolicy.html'> LTER Data 
-				    Policy</a> before downloading any data product.
-				</p>
+				<table id="graph">
+					<tbody>
+						<tr>
+							<td style="vertical-align: top;">Data are one of the most
+								valuable products of the Long-Term Ecological Research (LTER)
+								Network program. The LTER Network seeks to inform the broader
+								scientific community by providing open access to well designed
+								and well documented databases via a Network-wide information
+								system. The LTER Network Data Portal contains ecological data
+								packages contributed by 27 past and present LTER sites. Please
+								review the <a target="_top"
+								href='http://www.lternet.edu/data/netpolicy.html'> LTER Data
+									Policy</a> before downloading any data product.</td>
+							<td align="left">
+							    <div id="chart_div"></div>
+								<p align="center">
+									Total data packages: <em><%=numDataPackages.toString()%></em>
+							    </p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 
 			<div class="section">
-				<p>Search for data packages using one or more terms separated by
-					spaces</p>
+				<p style="padding-left: 10px">Search for data packages using one or more terms separated by spaces</p>
 
 				<form id="simplesearch" name="simplesearch" method="post"
 					action="./simpleSearch">
-					<table align="center" cellpadding="4em">
+					<table id="simpleSearch">
 						<tbody>
 							<tr>
-								<td align="left" width="260px">
+								<td align="left">
 								  <label for="terms">Search Terms (use * for any):</label>
 								</td>
-								<td align="left" width="200px">
+								<td align="left">
 								  <div class="ui-widget">
-									  <input type="search" name="terms" required="required" size="60" id="lterterms"/>
-									</div>
+									  <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;" />
+								  </div>
 								</td>
-								<td align="center" width="70px"><input type="submit"
+								<td align="center"><input type="submit"
 									name="search" value="search" />
 								</td>
-								<td align="center" width="40px"><input type="reset"
+								<td align="center"><input type="reset"
 									name="reset" value="reset" />
 								</td>
-								<td>(<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)</td>
+								<td>
+								    (<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</form>
 			</div>
-
+			
 		</div>
 		<!-- end content -->
 
