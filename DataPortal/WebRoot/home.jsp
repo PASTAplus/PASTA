@@ -24,15 +24,28 @@
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
+<%@ page import="edu.lternet.pasta.portal.PastaStatistics" %>
 <%
   HttpSession httpSession = request.getSession();
   httpSession.setAttribute("menuid", "home");
+  
+  String uid = (String) httpSession.getAttribute("uid");
 
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
 
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+  
+  Integer numDataPackages = null;
+  
+  if (uid == null || uid.isEmpty()) {
+    uid = "public";
+  }
+  
+  PastaStatistics pastaStats = new PastaStatistics("public");
+  numDataPackages = pastaStats.getNumDataPackages();
+  
 %>
 
 <!doctype html>
@@ -86,6 +99,10 @@
 					href='http://www.lternet.edu/data/netpolicy.html'> LTER Data 
 				    Policy</a> before downloading any data product.
 				</p>
+				<p>
+					Hey there data fans, there are now <em><%=numDataPackages.toString()%></em>
+					data packages in the LTER NIS!
+				</p>
 			</div>
 
 			<div class="section">
@@ -94,28 +111,38 @@
 
 				<form id="simplesearch" name="simplesearch" method="post"
 					action="./simpleSearch">
-					<table align="center" cellpadding="4em">
+					<table id="simpleSearch">
 						<tbody>
 							<tr>
-								<td align="left" width="260px">
+								<td align="left">
 								  <label for="terms">Search Terms (use * for any):</label>
 								</td>
-								<td align="left" width="200px">
+								<td align="left">
 								  <div class="ui-widget">
-									  <input type="search" name="terms" required="required" size="60" id="lterterms"/>
-									</div>
+									  <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;" />
+								  </div>
 								</td>
-								<td align="center" width="70px"><input type="submit"
+								<td align="center"><input type="submit"
 									name="search" value="search" />
 								</td>
-								<td align="center" width="40px"><input type="reset"
+								<td align="center"><input type="reset"
 									name="reset" value="reset" />
 								</td>
-								<td>(<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)</td>
+								<td>
+								    (<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</form>
+			</div>
+			
+			<div class="section">
+			 <p>
+			     Hey data fans, there are now
+			     <em><%=numDataPackages.toString()%></em>
+			     data packages in the LTER NIS!
+			 </p>
 			</div>
 
 		</div>
