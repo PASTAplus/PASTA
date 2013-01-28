@@ -136,16 +136,26 @@
 				<table id="graph">
 					<tbody>
 						<tr>
-							<td style="vertical-align: top;">Data are one of the most
+							<td style="vertical-align: top;">
+							    <p>Data are one of the most
 								valuable products of the Long-Term Ecological Research (LTER)
-								Network program. The LTER Network seeks to inform the broader
-								scientific community by providing open access to well designed
-								and well documented databases via a Network-wide information
-								system. The LTER Network Data Portal contains ecological data
-								packages contributed by 27 past and present LTER sites. Please
-								review the <a target="_top"
+								Network. Data derived from publicly funded research in the U.S.
+								LTER Network are made available online with as few restrictions
+								as possible, on a non-discriminatory basis. LTER Network
+								scientists make every effort to release data in a timely fashion
+								and with attention to accurate, well-designed and
+								well-documented data.</p>
+								<p>The LTER Network Data Portal contains
+								ecological data packages contributed by past and present LTER
+								sites. Please review the <a target="_top"
 								href='http://www.lternet.edu/data/netpolicy.html'> LTER Data
-									Policy</a> before downloading any data product.</td>
+									Policy</a> before downloading any data product. Data citation is
+								requested and highly encouraged. Digital object identifier (DOI)
+								citation information is provided in the metadata for each
+								dataset.</p>
+								<p>Please be ethical in your use of these data. Contact
+								the investigator, as a courtesy, prior to use of data in formal
+								publications.</p></td>
 							<td align="left">
 							    <div id="chart_div"></div>
 								<p align="center">
