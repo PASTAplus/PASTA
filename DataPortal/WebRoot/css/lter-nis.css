@@ -82,6 +82,19 @@ table#login-form {
     margin-right: auto;
 }
 
+table#simpleSearch {
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table#graph {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 .warning {
 	clear: both;
 	font-weight: bold;
@@ -309,8 +322,8 @@ legend {
 
 label {
     display: inline-block;
-    width: 140px;
-    font-weight: bold;
+    width: auto;
+    font-weight: normal;
 }
 
 label[for="advancedsearch"] {
@@ -320,7 +333,8 @@ label[for="advancedsearch"] {
     margin-bottom: 0.5em;
     background-color: lightgrey;   
     text-align: center;   
-    font-size: 110%;          
+    font-size: 110%;  
+    font-weight: bold;        
 }
 
 label[for="advancedsearchleft"] {

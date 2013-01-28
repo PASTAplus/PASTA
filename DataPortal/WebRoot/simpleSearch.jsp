@@ -63,27 +63,29 @@
 				<div class="section">
 					<form id="simplesearch" name="simplesearch" method="post"
 						action="./simpleSearch">
-						<table align="left" cellpadding="4em">
-							<tbody>
-								<tr>
-									<td align="left" width="260px">
-									  <label for="terms">Search Terms (use * for any):</label>
-									</td>
-									<td align="left" width="200px">
-									  <div class="ui-widget">
-									    <input type="search" name="terms" required="required" size="60" id="lterterms"/>
-									  </div>
-								  </td>
-									<td align="center" width="70px"><input type="submit"
-										name="search" value="search" />
-									</td>
-									<td align="center" width="40px"><input type="reset"
-										name="reset" value="reset" />
-									</td>
-									<td>(<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)</td>
-								</tr>
-							</tbody>
-						</table>
+	                    <table id="simpleSearch">
+	                        <tbody>
+	                            <tr>
+	                                <td align="left">
+	                                  <label for="terms">Search Terms (use * for any):</label>
+	                                </td>
+	                                <td align="left">
+	                                  <div class="ui-widget">
+	                                      <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;"/>
+	                                  </div>
+	                                </td>
+	                                <td align="center"><input type="submit"
+	                                    name="search" value="search" />
+	                                </td>
+	                                <td align="center"><input type="reset"
+	                                    name="reset" value="reset" />
+	                                </td>
+	                                <td>
+	                                    (<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)
+	                                </td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
 					</form>
 				</div>
 			</fieldset>
