@@ -298,7 +298,7 @@
             <script type="text/javascript" src="./js/dragzoom.js" ></script>
             <script type="text/javascript" src="./js/map_functions.js" ></script>      
             <div id="map" style="width: 330px; height: 258px"></div>
-            <figcaption>Zoom in to the region you'd like to search</figcaption>
+            Zoom in to the region you'd like to search
             <table>
               <tr>
                 <td>
@@ -330,12 +330,16 @@
              <input type="submit" value="Search" /> <input type="reset" value="Reset" />
            </p>
          </div>
+         
+       </div> <!-- end section -->
       
     </form>
     
+    </div> <!-- end section advancedsearch -->
+    
 			</fieldset>
 
-    <!-- end of section -->
+    
 
     <div class="section-table">
         <%=searchResult%>
@@ -350,7 +354,7 @@
 	</div>
 	<!-- end of wrapper -->
 
-  <script type="text/javascript" language="Javascript1.1"> 
+  <script type="text/javascript"> 
 
     <!-- // JavaScript input validation checking code for advanced search form
     var bCancel = false; 
