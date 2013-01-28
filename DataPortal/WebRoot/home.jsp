@@ -24,6 +24,7 @@
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
+<%@ page import="edu.lternet.pasta.portal.PastaStatistics" %>
 <%
   HttpSession httpSession = request.getSession();
   httpSession.setAttribute("menuid", "home");
@@ -33,6 +34,12 @@
       + ":" + request.getServerPort() + path + "/";
 
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+  
+  Integer numDataPackages = null;
+  
+  PastaStatistics pastaStats = new PastaStatistics("public");
+  numDataPackages = pastaStats.getNumDataPackages();
+  
 %>
 
 <!doctype html>
@@ -118,6 +125,14 @@
 						</tbody>
 					</table>
 				</form>
+			</div>
+			
+			<div class="section">
+			 <p>
+			     Hey data fans, there are now
+			     <em><%=numDataPackages.toString()%></em>
+			     data packages in the LTER NIS!
+			 </p>
 			</div>
 
 		</div>
