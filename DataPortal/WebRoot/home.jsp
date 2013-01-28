@@ -28,6 +28,8 @@
 <%
   HttpSession httpSession = request.getSession();
   httpSession.setAttribute("menuid", "home");
+  
+  String uid = (String) httpSession.getAttribute("uid");
 
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -36,6 +38,10 @@
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
   
   Integer numDataPackages = null;
+  
+  if (uid == null || uid.isEmpty()) {
+    uid = "public";
+  }
   
   PastaStatistics pastaStats = new PastaStatistics("public");
   numDataPackages = pastaStats.getNumDataPackages();
@@ -92,6 +98,10 @@
 					sites. Please review the <a target="_top" 
 					href='http://www.lternet.edu/data/netpolicy.html'> LTER Data 
 				    Policy</a> before downloading any data product.
+				</p>
+				<p>
+					Hey there data fans, there are now <em><%=numDataPackages.toString()%></em>
+					data packages in the LTER NIS!
 				</p>
 			</div>
 

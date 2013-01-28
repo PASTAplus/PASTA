@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
  * @author servilla
  * @since Jan 27, 2013
  * 
+ * Provides simple PASTA data package statistics.
+ * 
  */
 public class PastaStatistics {
 
@@ -52,6 +54,13 @@ public class PastaStatistics {
 	 * Constructors
 	 */
 
+	/**
+	 * Constructs a new PastaStatistic object for user "uid".
+	 * 
+	 * @param uid The user identifier.
+	 * @throws PastaAuthenticationException
+	 * @throws PastaConfigurationException
+	 */
 	public PastaStatistics(String uid) throws PastaAuthenticationException,
 	    PastaConfigurationException {
 
@@ -69,28 +78,46 @@ public class PastaStatistics {
 	 * Instance methods
 	 */
 	
+	/**
+	 * Iterates through the list of scopes and identifiers to calculate
+	 * the number of data packages in PASTA.
+	 * 
+	 * @return The number of data packages.
+	 */
 	public Integer getNumDataPackages() {
 
-		Integer numDataPackages = null;
-		String scopes = null;
+		Integer numDataPackages = 0;
+		String scopeList = null;
 		
 		try {
-	    scopes = this.dpmClient.listDataPackageScopes();
+	    scopeList = this.dpmClient.listDataPackageScopes();
     } catch (Exception e) {
 	    logger.error("PastaStatistics: " + e.getMessage());
 	    e.printStackTrace();
     }
 		
-    StrTokenizer tokens = new StrTokenizer(scopes);
-    numDataPackages = tokens.size();
-    
+    StrTokenizer scopes = new StrTokenizer(scopeList);
+
+    while (scopes.hasNext()) {
+    	String scope = scopes.nextToken();
+    	
+    	String idList = null;
+    	
+    	try {
+	      idList = this.dpmClient.listDataPackageIdentifiers(scope);
+      } catch (Exception e) {
+  	    logger.error("PastaStatistics: " + e.getMessage());
+	      e.printStackTrace();
+      }
+    	
+    	StrTokenizer identifiers = new StrTokenizer(idList);
+    	
+    	numDataPackages += identifiers.size();
+    	
+    }
+
 		return numDataPackages;
 
 	}
-	
-	public String getScopes() throws Exception {
-		return this.dpmClient.listDataPackageScopes();
-	}
-
 
 }
