@@ -88,6 +88,13 @@ table#simpleSearch {
 	margin-right: auto;
 }
 
+table#graph {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 .warning {
 	clear: both;
 	font-weight: bold;
