@@ -43,7 +43,10 @@ public class ControlledVocabularyClient {
   private static final String BASE_SERVICE_URL = 
     "http://vocab.lternet.edu/webservice/keywordlist.php/"; 
 
-  
+  private static final String PREFERRED_TERMS_SERVICE_URL = 
+      "http://vocab.lternet.edu/webservice/preferredterms.php";
+
+ 
   /**
    * Case One: Simple Search
    * 
@@ -207,6 +210,41 @@ public class ControlledVocabularyClient {
     }
     
     return searchValues;
+  }
+
+
+  /**
+   * Calls the Controlled Vocabulary web service that returns a newline-separated
+   * list of preferred terms and returns them in a string array.
+   * 
+   * @return  A string array holding the LTER Controlled Vocabulary list of
+   *          preferred terms as returned by the web service.
+   */
+  public static String[] webServicePreferredTerms() {
+    HttpGet httpGet = null;
+    HttpClient httpClient = new DefaultHttpClient();
+    String[] preferredTerms = null;
+
+    try {
+      httpGet = new HttpGet(PREFERRED_TERMS_SERVICE_URL);
+      HttpResponse httpResponse = httpClient.execute(httpGet);
+      int statusCode = httpResponse.getStatusLine().getStatusCode();
+      if (statusCode == HttpStatus.SC_OK) {
+        HttpEntity httpEntity = httpResponse.getEntity();
+        String entityString = EntityUtils.toString(httpEntity);
+        if (entityString != null) {
+          preferredTerms = entityString.split("\n");
+        }
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    return preferredTerms;
   }
 
 }
