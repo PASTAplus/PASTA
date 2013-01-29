@@ -908,7 +908,58 @@ public class DataPackageRegistry {
     return doi;
     
   }
+
+
+  /**
+   * Gets the entityName value for a given data entity resource identifier
+   * 
+   * @param resourceId   the resource identifier
+   * @return  the value of the database table's 'entity_name' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getDataEntityName(String resourceId) 
+          throws ClassNotFoundException, SQLException {
     
+    String entityName = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT entity_name FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        entityName = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return entityName;
+    
+  }
+
+
   /**
    * Gets the principalOwner value for a given resourceId
    * 
