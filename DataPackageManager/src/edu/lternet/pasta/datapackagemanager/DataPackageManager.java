@@ -1315,6 +1315,74 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 
 	
   /**
+   * Returns the entity name for the given entity resource identifier if
+   * it exists; otherwise, throw a ResourceNotFoundException. Authorization
+   * for reading the entity name is based on access rules for the data package 
+   * resource, not on the access rules for the data entity resource.
+   * 
+   * @param dataPackageResourceId     the data package resource identifier,
+   *                                  used for authorization purposes
+   * @param entityResourceId          the entity resource identifier,
+   *                                  used as the key to the entityName value
+   * @param authToken      the authentication token object
+   * @return the data entity name string for this resource, if it exists
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws UnauthorizedException
+   * @throws ResourceNotFoundException
+   * @throws Exception
+   */
+  public String readDataEntityName(String dataPackageResourceId,
+                                   String entityResourceId, 
+                                   AuthToken authToken)
+      throws ClassNotFoundException, SQLException, UnauthorizedException,
+      ResourceNotFoundException, Exception {
+
+    String entityName = null;
+    String user = authToken.getUserId();
+    
+    try {
+      DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+          dbDriver, dbURL, dbUser, dbPassword);
+    
+      /*
+       * Check whether user is authorized to read the data entity.
+       * This is based on the access rules specified for the data package,
+       * not on the access rules specified for reading the data entity.
+       */
+      Authorizer authorizer = new Authorizer(dataPackageRegistry);
+      boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, 
+                                                     Rule.Permission.read);
+      if (!isAuthorized) {
+        String gripe = "User " + user
+            + " does not have permission to read the entity name for this resource: "
+            + entityResourceId;
+        throw new UnauthorizedException(gripe);
+      }
+      
+      entityName = dataPackageRegistry.getDataEntityName(entityResourceId);
+      
+      if (entityName == null) {
+        String gripe = "An entityName value does not exist for this resource: " + 
+                       entityResourceId;
+        throw new ResourceNotFoundException(gripe);
+      }
+      
+    } catch (ClassNotFoundException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    } catch (SQLException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+    }
+
+    return entityName;
+
+  }  
+  
+  
+  /**
    * Reads a data package and returns it as a string representing a 
    * resource map. The specified user must be authorized to read the 
    * data package resource.

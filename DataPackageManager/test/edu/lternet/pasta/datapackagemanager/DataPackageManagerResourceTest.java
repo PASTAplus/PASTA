@@ -82,6 +82,7 @@ public class DataPackageManagerResourceTest {
   private static Integer testUpdateRevision = null;
   private static String testEntityId = null;
   private static String testEntityFirstToken = null;
+  private static String testEntityName = "NoneSuchBugCount";
 
   
   /*
@@ -478,6 +479,30 @@ public class DataPackageManagerResourceTest {
     assertNotNull(dataEntity);
     int entitySize = dataEntity.length;
     assertTrue(entitySize > 880);
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntity(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Entity Name operation
+   */
+  @Test public void testReadDataEntityName() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataEntityName(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().equals(testEntityName));
+    }
 
     // Test for NOT FOUND status with a bogus package id
     response = dataPackageManagerResource.readDataEntity(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
