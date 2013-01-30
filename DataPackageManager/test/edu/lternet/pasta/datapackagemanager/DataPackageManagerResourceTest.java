@@ -501,8 +501,6 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      System.err.printf("entityString: %s\n", entityString);
-      assertTrue(entityString.contains(testScope));
       assertTrue(entityString.trim().equals(testEntityName));
     }
 
