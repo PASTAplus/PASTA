@@ -2630,7 +2630,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *   <tr>
    *     <td align=center>none</td>
    *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/doi/knb-lter-lno/1/3</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/name/knb-lter-lno/1/3/AB39DC03999GDN123</td>
    *   </tr>
    * </table>
    * 
@@ -2648,7 +2648,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <td>If the request to read the data package entity name was successful</td>
    *     <td>The entity name value of the data package entity.</td>
    *     <td><code>text/plain</code></td>
-   *     <td>Daily Average Moored CTD and ADCP Data - FOR01</td>
+   *     <td>Daily Average Moored CTD and ADCP Data</td>
    *   </tr>
    *   <tr>
    *     <td>400 Bad Request</td>
