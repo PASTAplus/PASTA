@@ -27,11 +27,11 @@
 <meta http-equiv="description" content="This is my page">
 
 <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="./css/jquery-ui-1.10.0.css" />
 
 <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
 
-<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+<script src="./js/jquery-ui-1.10.0.js"></script>
 <script>
   $(function() {
     var availableTags = [ <%=jqueryString%> ];
