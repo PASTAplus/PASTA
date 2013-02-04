@@ -27,8 +27,8 @@ package edu.lternet.pasta.datamanager;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.ecoinformatics.datamanager.parser.Entity;
 
@@ -92,14 +92,7 @@ public class EMLEntity {
     this.entityName = entity.getName();
     
     if (entityName != null) { 
-      try {
-        entityId = URLEncoder.encode(entityName, "UTF-8");
-      }
-      catch (UnsupportedEncodingException e) {
-        logger.error("Error while URL-encoding entityName: " + 
-            entityName + "; " + e.getMessage());
-        throw(e);
-      }
+        entityId = DigestUtils.md5Hex(entityName);
     }
 
     this.packageId = entity.getPackageId();
