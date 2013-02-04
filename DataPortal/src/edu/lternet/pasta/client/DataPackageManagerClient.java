@@ -669,6 +669,55 @@ public class DataPackageManagerClient extends PastaClient {
 
 
   /**
+   * Executes the 'readDataEntityName' web service method.
+   * @param scope the scope value, e.g. "knb-lter-lno"
+   * @param identifier the identifier value, e.g. 10
+   * @param revision the revision value, e.g. "1"
+   * @param entityId the entity identifier string, e.g. "NoneSuchBugCount"
+   * @return the data entity name
+   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
+   */
+  public String readDataEntityName(String scope, Integer identifier,
+      String revision, String entityId) throws Exception {
+  	
+  	// Re-encode "%" to its character reference value of %25 to mitigate
+  	// an issue with the HttpGet call that performs the decoding - this is
+  	// a kludge to deal with encoding nonsense.
+  	entityId = entityId.replace("%", "%25");
+  	
+    HttpClient httpClient = new DefaultHttpClient();
+    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+        entityId);
+    String url = BASE_URL + "/name" + urlTail;
+    HttpGet httpGet = new HttpGet(url);
+    String entityString = null;
+
+    // Set header content
+    if (this.token != null) {
+      httpGet.setHeader("Cookie", "auth-token=" + this.token);
+    }
+
+    try {
+      HttpResponse httpResponse = httpClient.execute(httpGet);
+      int statusCode = httpResponse.getStatusLine().getStatusCode();
+      HttpEntity httpEntity = httpResponse.getEntity();
+      entityString = EntityUtils.toString(httpEntity);
+      ContentType contentType = ContentType.getOrDefault(httpEntity);
+      this.contentType = contentType.toString();
+      if (statusCode != HttpStatus.SC_OK) {
+        handleStatusCode(statusCode, entityString);
+      }
+    }
+    finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    return entityString;
+  }
+
+
+  /**
    * Executes the 'readDataPackage' web service method.
    * @param scope the scope value, e.g. "knb-lter-lno"
    * @param identifier the identifier value, e.g. 10
