@@ -22,6 +22,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    This is my JSP page. <br>
+    If your web browser is not automatically redirected immediately, please
+    click <a href="https://portal.lternet.edu/nis">here</a> for the LTER NIS
+    Data Portal.
   </body>
 </html>
