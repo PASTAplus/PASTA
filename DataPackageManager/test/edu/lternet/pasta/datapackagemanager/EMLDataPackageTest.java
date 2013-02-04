@@ -64,7 +64,7 @@ public class EMLDataPackageTest {
   private static String testIdentifierStr = null;
   private static String testRevisionStr = null;
   private static String testEntityId = null;
-  private static String testEntityFirstToken = null;
+  private static String testEntityName = null;
 
   
   /*
@@ -116,9 +116,9 @@ public class EMLDataPackageTest {
       if (testEntityId == null) {
         fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.id'");
       }
-      testEntityFirstToken = options.getOption("datapackagemanager.test.entity.firstToken");
-      if (testEntityFirstToken == null) {
-        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.firstToken'");
+      testEntityName = options.getOption("datapackagemanager.test.entity.name");
+      if (testEntityName == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.name'");
       }
       testPath = options.getOption("datapackagemanager.test.path");
       if (testPath == null) {
