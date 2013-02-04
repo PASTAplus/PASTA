@@ -62,7 +62,7 @@ public class EMLEntityTest {
   private static String testIdentifierStr = null;
   private static String testRevisionStr = null;
   private static String testEntityId = null;
-  private static String testEntityFirstToken = null;
+  private static String testEntityName = null;
 
   
   /*
@@ -114,9 +114,9 @@ public class EMLEntityTest {
       if (testEntityId == null) {
         fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.id'");
       }
-      testEntityFirstToken = options.getOption("datapackagemanager.test.entity.firstToken");
-      if (testEntityFirstToken == null) {
-        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.firstToken'");
+      testEntityName = options.getOption("datapackagemanager.test.entity.name");
+      if (testEntityName == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.name'");
       }
       testPath = options.getOption("datapackagemanager.test.path");
       if (testPath == null) {
@@ -156,7 +156,7 @@ public class EMLEntityTest {
       DataPackage dataPackage = dataPackageManager.parseEml(testEmlFile, evaluateMode);
       EMLDataPackage emlDataPackage = new EMLDataPackage(dataPackage);
       emlEntity = new EMLEntity(emlDataPackage);
-      emlEntity.setEntityName(testEntityId);
+      emlEntity.setEntityName(testEntityName);
     }
     catch (ClassNotFoundException e) {
       fail("ClassNotFoundException while constructing EMLDataPackage object: " + e.getMessage());
