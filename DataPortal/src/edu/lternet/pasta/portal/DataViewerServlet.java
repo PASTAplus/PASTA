@@ -123,7 +123,7 @@ public class DataViewerServlet extends DataPortalServlet {
       uid = "public";
 
     String packageId = request.getParameter("packageid");
-    String entityName = request.getParameter("entityname");
+    String entityId = request.getParameter("entityid");
 
     String scope = null;
     Integer identifier = null;
@@ -135,9 +135,9 @@ public class DataViewerServlet extends DataPortalServlet {
 
     String[] tokens = packageId.split("\\.");
 
-    if (tokens.length == 3 && entityName != null && !(entityName.isEmpty())) {
+    if (tokens.length == 3 && entityId != null && !(entityId.isEmpty())) {
 
-      String fileName = entityName;
+      String fileName = entityId;
       String objectName = null;
       scope = tokens[0];
       identifier = Integer.valueOf(tokens[1]);
@@ -146,11 +146,12 @@ public class DataViewerServlet extends DataPortalServlet {
       try {
 
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+        String entityName = dpmClient.readDataEntityName(scope, identifier, revision, entityId);
         xml = dpmClient.readMetadata(scope, identifier, revision);
         objectName = findObjectName(xml, entityName);
         if (objectName != null) { fileName = objectName; }
         byteArray = dpmClient
-            .readDataEntity(scope, identifier, revision, entityName);
+            .readDataEntity(scope, identifier, revision, entityId);
         if (byteArray != null) { // Download file as binary stream
           response.setHeader("Content-Disposition", "attachment; filename="
               + fileName);

@@ -391,11 +391,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				if (data == null) {
 					data = "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityname=" + entityId + "\" target=\"_blank\">"
+					    + "&entityid=" + entityId + "\" target=\"_blank\">"
 					    + entityName + "</a></li>\n";
 				} else {					
 					data += "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityname=" + entityId + "\" target=\"_blank\">"
+					    + "&entityid=" + entityId + "\" target=\"_blank\">"
 					    + entityName + "</a></li>\n";
 				}
 
