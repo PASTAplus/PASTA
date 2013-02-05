@@ -19,6 +19,7 @@ common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
 /Gatekeeper/WebRoot/WEB-INF/web.xml
 /Gatekeeper/WebRoot/index.jsp
 /DataPackageManager/test/data/NoneSuchBugCount.xml
+/DataPortal/test/data/NoneSuchBugCount.xml
 */build.properties
 */src/META-INF/persistence.xml
 */documents/javadoc
