@@ -225,7 +225,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String dataUri = pastaUriHead + "data/eml";
 
 		String[] uriTokens = null;
-		String entityName = null;
+		String entityId = null;
 		String resource = null;
 
 		String map = null;
@@ -367,9 +367,23 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				uriTokens = resource.split("/");
 
+				entityId = uriTokens[uriTokens.length - 1];
+				
+				String entityName = null;
+				
+				try {
+	        entityName = dpmClient.readDataEntityName(scope, identifier, revision, entityId);
+        } catch (Exception e1) {
+	        logger.error(e1.getMessage());
+	        e1.printStackTrace();
+	        entityName = entityId;
+        }
+
 				// Safe URL encoding of entity name
 				try {
-					entityName = urlCodec.encode(uriTokens[uriTokens.length - 1]);
+					logger.info(entityId);
+					entityId = urlCodec.encode(entityId);
+					logger.info(entityId);
 				} catch (EncoderException e) {
 					logger.error(e.getMessage());
 					e.printStackTrace();
@@ -377,11 +391,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				if (data == null) {
 					data = "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityname=" + entityName + "\" target=\"_blank\">"
+					    + "&entityname=" + entityId + "\" target=\"_blank\">"
 					    + entityName + "</a></li>\n";
 				} else {					
 					data += "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityname=" + entityName + "\" target=\"_blank\">"
+					    + "&entityname=" + entityId + "\" target=\"_blank\">"
 					    + entityName + "</a></li>\n";
 				}
 
