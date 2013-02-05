@@ -351,15 +351,11 @@ public class DataPackageManagerClientTest {
    */
   @Test
   public void testReadDataEntity() {
-    final String scope = "knb-lter-nin";
-    final Integer identifier = new Integer("1");
-    final Integer revision = new Integer("1");
-    final String entityId = "DailyWaterSample-NIN-LTER-1978-1992";
-    final long expectedLength = 924291 ;
+    final long expectedLength = 882;
     
     try {
-      byte[] dataEntity = dpmClient.readDataEntity(scope, identifier,
-          revision.toString(), entityId);
+      byte[] dataEntity = dpmClient.readDataEntity(testScope, testIdentifier,
+          testRevisionStr, testEntityId);
 
       // Check the message body
       assertNotNull(dataEntity);
