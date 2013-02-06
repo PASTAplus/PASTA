@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="knb-lter-nin.99.4" scope="system" system="knb"
+  xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 http://nis.lternet.edu/schemas/eml/eml-2.1.0/eml.xsd">
+  <access authSystem="knb" order="allowFirst">
+    <allow>
+      <principal>uid=NIN,o=LTER,dc=ecoinformatics,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <title>Meteorological data for North Inlet Estuary, South Carolina, from 1982 to 1985, North Inlet LTER</title>
+    <creator>
+      <individualName>
+        <salutation>Dr.</salutation>
+        <givenName>B.</givenName>
+        <surName>Kjerfve</surName>
+      </individualName>
+    </creator>
+    <creator>
+      <individualName>
+        <salutation>Dr.</salutation>
+        <givenName>W.</givenName>
+        <givenName>K.</givenName>
+        <surName>Michener</surName>
+      </individualName>
+    </creator>
+    <metadataProvider>
+      <organizationName>LTER Network Office</organizationName>
+      <address>
+        <deliveryPoint>UNM Biology Department, MSC03-2020</deliveryPoint>
+        <deliveryPoint>1 University of New Mexico</deliveryPoint>
+        <city>Albuquerque</city>
+        <administrativeArea>NM</administrativeArea>
+        <postalCode>87131-0001</postalCode>
+        <country>USA</country>
+      </address>
+      <phone phonetype="voice">505 277 2535</phone>
+      <phone phonetype="fax">505 277 2541</phone>
+      <electronicMailAddress>tech-support@lternet.edu</electronicMailAddress>
+      <onlineUrl>http://www.lternet.edu</onlineUrl>
+    </metadataProvider>
+    <pubDate>2006</pubDate>
+    <language>english</language>
+    <abstract>
+      <para>This data package consists of Meteorological data for North Inlet
+                Estuary, South Carolina, from 1982 to 1985, North Inlet LTER. 
+                The purpose of the meteorological weather station is:
+                To archive weather data for the North Inlet Estuary LTER site;
+                For short and long-term studies at North Inlet, and for comparisons
+                to other LTER sites.</para>
+    </abstract>
+    <keywordSet>
+      <keyword keywordType="theme">weather</keyword>
+      <keyword keywordType="theme">meteorology</keyword>
+      <keyword keywordType="place">North Inlet Estuary</keyword>
+      <keyword keywordType="place">Baruch Institute</keyword>
+      <keyword keywordType="place">Georgetown, South Carolina</keyword>
+    </keywordSet>
+    <intellectualRights>
+      <section>
+        <title>LTER Network Data Access Requirements</title>
+        <para> The access to all LTER data is subject to requirements set forth by this
+                    policy document to enable data providers to track usage, evaluate its impact in
+                    the community, and confirm users' acceptance of the terms of acceptable use.
+                    These requirements are standardized across the LTER Network to provide
+                    contractual exchange of data between Site Data Providers, Network Data
+                    Providers, and Data Users that can be encoded into electronic form and exchanged
+                    between computers. This will allow direct access to data via a common portal
+                    once these requirements have been fulfilled. The following information may be
+                    required directly or by proxy prior to the transference of any data object: <itemizedlist>
+            <listitem>
+              <para> Registration </para>
+            </listitem>
+            <listitem>
+              <itemizedlist>
+                <listitem>
+                  <para> Name </para>
+                </listitem>
+                <listitem>
+                  <para> Affiliation </para>
+                </listitem>
+                <listitem>
+                  <para> Email address </para>
+                </listitem>
+                <listitem>
+                  <para> Full Contact Info </para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+            <listitem>
+              <para> Acceptance of the General Public Use Agreement or Restricted Data
+                                Use Agreement, as applicable </para>
+            </listitem>
+            <listitem>
+              <para> A Statement of Intended Use that is compliant with the above
+                                agreements. Such statements may be made submitted explicitly or made
+                                implicitly via the data access portal interface. </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </section>
+      <section>
+        <title>Conditions of Data Use</title>
+        <para> The re-use of scientific data has the potential to greatly increase
+                    communication, collaboration and synthesis within and among disciplines, and
+                    thus is fostered, supported and encouraged. Permission to use this dataset is
+                    granted to the Data User free of charge subject to the following terms: <itemizedlist>
+            <listitem>
+              <para> Acceptable Use. Use of the dataset will be restricted to
+                                academic, research, educational, government, recreational, or other
+                                not-for-profit professional purposes. The Data User is permitted to
+                                produce and distribute derived works from this dataset provided that
+                                they are released under the same license terms as those accompanying
+                                this Data Set. Any other uses for the Data Set or its derived
+                                products will require explicit permission from the dataset owner.
+                            </para>
+            </listitem>
+            <listitem>
+              <para> Redistribution. The data are provided for use by the Data User.
+                                The metadata and this license must accompany all copies made and be
+                                available to all users of this Data Set. The Data User will not
+                                redistribute the original Data Set beyond this collaboration sphere.
+                            </para>
+            </listitem>
+            <listitem>
+              <para> Citation. It is considered a matter of professional ethics to
+                                acknowledge the work of other scientists. Thus, the Data User will
+                                properly cite the Data Set in any publications or in the metadata of
+                                any derived data products that were produced using the Data Set.
+                                Citation should take the following general form: Creator, Year of
+                                Data Publication, Title of Dataset, Publisher, Dataset identifier.
+                            </para>
+            </listitem>
+            <listitem>
+              <para> Acknowledgement. The Data User should acknowledge any
+                                institutional support or specific funding awards referenced in the
+                                metadata accompanying this dataset in any publications where the
+                                Data Set contributed significantly to its content. Acknowledgements
+                                should identify the supporting party, the party that received the
+                                support, and any identifying information such as grant numbers.
+                            </para>
+            </listitem>
+            <listitem>
+              <para> Notification. The Data User will notify the Data Set Contact when
+                                any derivative work or publication based on or derived from the Data
+                                Set is distributed. The Data User will provide the data contact with
+                                two reprints of any publications resulting from use of the Data Set
+                                and will provide copies, or on-line access to, any derived digital
+                                products. Notification will include an explanation of how the Data
+                                Set was used to produce the derived work. </para>
+            </listitem>
+            <listitem>
+              <para> Collaboration. The Data Set has been released in the spirit of
+                                open scientific collaboration. Data Users are thus strongly
+                                encouraged to consider consultation, collaboration and/or
+                                co-authorship with the Data Set Creator. </para>
+            </listitem>
+          </itemizedlist> By accepting this Data Set, the Data User agrees to abide by the
+                    terms of this agreement. The Data Owner shall have the right to terminate this
+                    agreement immediately by written notice upon the Data User's breach of, or
+                    non-compliance with, any of its terms. The Data User may be held responsible for
+                    any misuse that is caused or encouraged by the Data User's failure to abide by
+                    the terms of this agreement. </para>
+      </section>
+      <section>
+        <title>Disclaimer</title>
+        <para> While substantial efforts are made to ensure the accuracy of data and
+                    documentation contained in this Data Set, complete accuracy of data and metadata
+                    cannot be guaranteed. All data and metadata are made available "as is". The Data
+                    User holds all parties involved in the production or distribution of the Data
+                    Set harmless for damages resulting from its use or interpretation. </para>
+      </section>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>North Inlet encompasses about 2,630 hectares of tidal marshes and 
+                    wetlands near Georgetown, South Carolina, USA. North Inlet-Winyah Bay features high quality, 
+                    ocean-dominated waters and salt marshes in North Inlet, contrasting with the brackish waters 
+                    and marshes of Winyah Bay. The bay estuary is dominated by riverine discharges from a watershed 
+                    impacted by agricultural, municipal and industrial development. Former rice fields and canals 
+                    provide another system for study within the Reserve. The Debidue site is located at the confluence 
+                    of Town Creek and Debidue Creek. The Bread and Butter site is located along the western shoreline 
+                    of Town Creek adjacent to the mouth of Clambank Creek.   
+                    Oyster Landing in Crab Haul creek within the NORTH INLET ESTUARY SYSTEM Georgetown, South Carolina.  
+                    33,20 lat. 79,11 long.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-79.2936</westBoundingCoordinate>
+          <eastBoundingCoordinate>-79.1042</eastBoundingCoordinate>
+          <northBoundingCoordinate>33.357</northBoundingCoordinate>
+          <southBoundingCoordinate>33.2125</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <geographicCoverage>
+        <geographicDescription>Oyster Landing in
+                    Crab Haul Creek 33.21'2" Lat., 79.11'27" Long.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-79.1175</westBoundingCoordinate>
+          <eastBoundingCoordinate>-79.1175</eastBoundingCoordinate>
+          <northBoundingCoordinate>33.2106</northBoundingCoordinate>
+          <southBoundingCoordinate>33.2106</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>1982-06-03</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>1985-12-31</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact>
+      <positionName>Information Manager</positionName>
+      <organizationName>LTER Network Office</organizationName>
+      <address>
+        <deliveryPoint>UNM Biology Department, MSC03-2020</deliveryPoint>
+        <deliveryPoint>1 University of New Mexico</deliveryPoint>
+        <city>Albuquerque</city>
+        <administrativeArea>NM</administrativeArea>
+        <postalCode>87131-0001</postalCode>
+        <country>USA</country>
+      </address>
+      <phone phonetype="voice">505 277 2535</phone>
+      <phone phonetype="fax">505 277 2541</phone>
+      <electronicMailAddress>tech-support@lternet.edu</electronicMailAddress>
+      <onlineUrl>http://www.lternet.edu</onlineUrl>
+    </contact>
+    <publisher>
+      <organizationName>LTER Network Office</organizationName>
+      <address>
+        <deliveryPoint>UNM Biology Department, MSC03-2020</deliveryPoint>
+        <deliveryPoint>1 University of New Mexico</deliveryPoint>
+        <city>Albuquerque</city>
+        <administrativeArea>NM</administrativeArea>
+        <postalCode>87131-0001</postalCode>
+        <country>USA</country>
+      </address>
+      <phone phonetype="voice">505 277 2535</phone>
+      <phone phonetype="fax">505 277 2541</phone>
+      <electronicMailAddress>tech-support@lternet.edu</electronicMailAddress>
+      <onlineUrl>http://www.lternet.edu</onlineUrl>
+    </publisher>
+    <pubPlace>Long Term Ecological Research Network Office</pubPlace>
+    <dataTable id="dailyWaterSample">
+      <entityName>MeteorologicalData-NIN-LTER-1982-1985</entityName>
+      <entityDescription>Meteorological Data for North Inlet Estuary, South Carolina, from 1982 to 1982, North Inlet LTER</entityDescription>
+      <physical>
+        <objectName>LTER.NIN.MET-1985.csv</objectName>
+        <size unit="byte">2134048</size>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <physicalLineDelimiter>\r\n</physicalLineDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url function="download">http://magma.lternet.edu/NIN-Met-Workflow/NIN-datapackages/data/LTER.NIN.MET-1985.csv</url>
+          </online>
+          <access authSystem="knb" order="allowFirst">
+            <allow>
+              <principal>uid=NIN,o=LTER,dc=ecoinformatics,dc=org</principal>
+              <permission>all</permission>
+            </allow>
+            <allow>
+              <principal>public</principal>
+              <permission>read</permission>
+            </allow>
+          </access>
+        </distribution>
+      </physical>
+      <coverage>
+        <geographicCoverage>
+          <geographicDescription>North Inlet encompasses about 2,630 hectares of tidal marshes and 
+                        wetlands near Georgetown, South Carolina, USA. North Inlet-Winyah Bay features high quality, 
+                        ocean-dominated waters and salt marshes in North Inlet, contrasting with the brackish waters 
+                        and marshes of Winyah Bay. The bay estuary is dominated by riverine discharges from a watershed 
+                        impacted by agricultural, municipal and industrial development. Former rice fields and canals 
+                        provide another system for study within the Reserve. The Debidue site is located at the confluence 
+                        of Town Creek and Debidue Creek. The Bread and Butter site is located along the western shoreline 
+                        of Town Creek adjacent to the mouth of Clambank Creek.   
+                        Oyster Landing in Crab Haul creek within the NORTH INLET ESTUARY SYSTEM Georgetown, South Carolina.  
+                        33,20 lat. 79,11 long.</geographicDescription>
+          <boundingCoordinates>
+            <westBoundingCoordinate>-79.2936</westBoundingCoordinate>
+            <eastBoundingCoordinate>-79.1042</eastBoundingCoordinate>
+            <northBoundingCoordinate>33.357</northBoundingCoordinate>
+            <southBoundingCoordinate>33.2125</southBoundingCoordinate>
+          </boundingCoordinates>
+        </geographicCoverage>
+        <geographicCoverage>
+          <geographicDescription>Oyster Landing in
+                        Crab Haul Creek 33.21'2" Lat., 79.11'27" Long.</geographicDescription>
+          <boundingCoordinates>
+            <westBoundingCoordinate>-79.1175</westBoundingCoordinate>
+            <eastBoundingCoordinate>-79.1175</eastBoundingCoordinate>
+            <northBoundingCoordinate>33.2106</northBoundingCoordinate>
+            <southBoundingCoordinate>33.2106</southBoundingCoordinate>
+          </boundingCoordinates>
+        </geographicCoverage>
+        <temporalCoverage>
+          <rangeOfDates>
+            <beginDate>
+              <calendarDate>1982-06-03</calendarDate>
+            </beginDate>
+            <endDate>
+              <calendarDate>1985-12-31</calendarDate>
+            </endDate>
+          </rangeOfDates>
+        </temporalCoverage>
+      </coverage>
+      <methods>
+        <methodStep>
+          <description>
+            <section>
+              <title>Research methods</title>
+              <para>The meteorological system at the Baruch Marine Laboratory was
+                                designed by the Climatronics Corporation of Bohemia, NY. (Job number
+                                7244 on March 3, 1982). The system consisted of a remote meteorological
+                                system with telemetry and an IMP 803 cassette data acquisition system.</para>
+              <para>System Description</para>
+              <para>The system was designed to measure and transmit wind
+                                speed, wind direction, air temperature, barometric pressure, solar
+                                radiation, precipitation, water level, water temperature and
+                                conductivity data. This consisted of the following components:</para>
+              <para>Remote Site </para>
+              <para>1. Wind Speed and Direction sensors with cross arm Climatronics
+                                Wind Mark III </para>
+              <para>2. Naturally Aspirated Temperature Shield w/ YSI 703 -
+                                Dual Element Air Temperature Thermistor </para>
+              <para>3. Solar Radiation sensor with mount Eppley radiometer </para>
+              <para>4. Barometric Pressure sensor YSI transducer </para>
+              <para>5.Precipitation Gage Belfort Instruments tipping bucket gauge </para>
+              <para>6. Water Depth Enviro-Labs Water Level sensor</para>
+              <para>7. Water Temperature YSI 701 - Water Temperature Thermistor</para>
+              <para>8. Conductivity Meter YSI Conductivity Sensor, glass conductivity cell 
+                                and temperature compensator </para>
+              <para>9. Remote Meteorological System mainframe in a NEMA environmental Enclosure (with
+                                mounting hardware), housing the following equipment: signal conditioning
+                                electronics, Modem Transmitter, conductivity meter and line protectors.</para>
+              <para>10. 10 Meter Aluminum Tower with guying kit </para>
+              <para>11. Cables, connectors and a
+                                sensor mounting boom The system was configured as follows: The wind
+                                cross arm was mounted to the 4 foot extension mast located at the top of
+                                the tower. The temperature shield and solar radiation sensor were
+                                mounted on a tower boom near the top of the tower. The precipitation
+                                gage was mounted on a level surface approximately 20 meters from the
+                                tower base. The barometric pressure sensor was mounted inside of the
+                                NEMA enclosure . The water temperature, water level and conductivity
+                                cables were placed in a rigid PVC well in the water. All of the sensor
+                                cables were wired through the signal line protector except the
+                                conductivity cell. The remote meteorological site's NEMA enclosure
+                                housed the signal conditioning electronics, the conductivity meter, an
+                                AC/DC converter and a battery back-up pack. </para>
+              <para>Base Site </para>
+              <para>1. Pre-wired Instrument Cabinet containing a mainframe with a power supply and Modem
+                                Receiver, a multiplexing (MUX) recorder and an IMP-803 Microprocessor
+                                based Cassette Data Acquisition System. </para>
+              <para>2. 2,500 feet of telemetry cable. All sensors were scanned once per second except the following:
+                                Wind Direction - Mean of 120 scans per hour Water Level, Precipitation -
+                                instantaneous values at the time indicated These readings are 24 hours
+                                per day, every day of the year beginning June 3, 1982 except when
+                                individual probes or the entire meteorological station was down. </para>
+            </section>
+          </description>
+        </methodStep>
+        <methodStep>
+          <description>
+            <section>
+              <title>Experimental Design</title>
+              <para>  Monitoring of meteorological paramaters at Oyster
+                                Landing, North Inlet, Georgetown, SC. </para>
+            </section>
+          </description>
+        </methodStep>
+      </methods>
+      <additionalInfo>
+        <section>
+          <para>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <literalLayout>Variables 7,9,10,11,14,15 are means of 3600
+                                        observations per hour. This mean represents conditions for
+                                        the preceding hour.</literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>Variable 8 represents the
+                                        mean of 120 observations per hour.</literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>Variables 12, 13 represent the instantaneous
+                                        values at the time indicated. </literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>When variables 5(hour)=25 and variable
+                                        6(minute)=HI, this record represents the instantaneous daily
+                                        maximum values for variables 7,9,10,11,12,14,15.
+                                    </literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>When variables 5(hour)=25 and variable
+                                        6(minute)=LO, this record represents the instantaneous daily
+                                        minimum values for variables 7,9,10,11,12,14,15.
+                                    </literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>When variables 5(hour)=25 and variable
+                                        6(minutes)=HI, or LO then variable 8 (wind Direction) is not
+                                        recorded. </literalLayout>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <literalLayout>When variables 5(hour)=25 and variable
+                                        6(minutes)=HI, or LO the value indicated for variable
+                                        13(water Level) only represents the maximum or minimum for
+                                        the previous 6 minute interval.</literalLayout>
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </section>
+      </additionalInfo>
+      <attributeList>
+        <attribute id="MeteorologicalData.Date">
+          <attributeName>Date</attributeName>
+          <attributeLabel>Date</attributeLabel>
+          <attributeDefinition>Date when sample collected</attributeDefinition>
+          <storageType typeSystem="http://www.w3.org/2001/XMLSchema-datatypes">date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+            </dateTime>
+          </measurementScale>
+        </attribute>
+        <attribute id="MeteorologicalData.JDay ">
+          <attributeName>Julian Day</attributeName>
+          <attributeLabel>JDay</attributeLabel>
+          <attributeDefinition>Julian day sample was collected</attributeDefinition>
+          <storageType>integer</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>(DD)D</formatString>
+            </dateTime>
+          </measurementScale>
+        </attribute>
+        <attribute id="MeteorologicalData.Time ">
+          <attributeName>Time</attributeName>
+          <attributeLabel>Actual Time</attributeLabel>
+          <attributeDefinition>Actual time when sample was collected</attributeDefinition>
+          <storageType typeSystem="http://www.w3.org/2001/XMLSchema-datatypes">time</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>hh:mm:ss</formatString>
+            </dateTime>
+          </measurementScale>
+        </attribute>
+        <attribute id="MeteorologicalData.Wind_velocity">
+          <attributeName>Wind velocity</attributeName>
+          <attributeLabel>Wind_Velocity </attributeLabel>
+          <attributeDefinition>Wind velocity </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>metersPerSecond</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false"> 0.0 </minimum>
+                  <maximum exclusive="false"> 50.0 </maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Wind_direction">
+          <attributeName> Wind direction</attributeName>
+          <attributeLabel>Wind_Direction </attributeLabel>
+          <attributeDefinition> Wind direction </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>degree</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0 </minimum>
+                  <maximum exclusive="false">540.0</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Air_temperature">
+          <attributeName> Air temperature</attributeName>
+          <attributeLabel>Air_temperature </attributeLabel>
+          <attributeDefinition> Temperature of the Air </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">-20</minimum>
+                  <maximum exclusive="false">50.0</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Water_temperature">
+          <attributeName>Water temperature</attributeName>
+          <attributeLabel>Water_temperature</attributeLabel>
+          <attributeDefinition>temperature of the water </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false"> 0.0 </minimum>
+                  <maximum exclusive="false"> 60.0 </maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Solar_radiation">
+          <attributeName>Solar Radiation</attributeName>
+          <attributeLabel>Solar_radiation </attributeLabel>
+          <attributeDefinition>Solar Radiation </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>Langley</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false"> 0.0 </minimum>
+                  <maximum exclusive="false"> 50.0 </maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Precipitation">
+          <attributeName>Precipitation</attributeName>
+          <attributeLabel>Precipitation </attributeLabel>
+          <attributeDefinition>Precipitation </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>millimeter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.0</minimum>
+                  <maximum exclusive="false">35.0</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Water_level">
+          <attributeName>Water level</attributeName>
+          <attributeLabel>Water_level </attributeLabel>
+          <attributeDefinition> Water level </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>meter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.0</minimum>
+                  <maximum exclusive="false">355.0</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Conductivity">
+          <attributeName>Conductivity</attributeName>
+          <attributeLabel>Conductivity </attributeLabel>
+          <attributeDefinition>Conductivity</attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>miliVoltsPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.0 </minimum>
+                  <maximum exclusive="false"> 95.0 </maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99.9</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute id="MeteorologicalData.Barometric_Pressure">
+          <attributeName>Barometric Pressure</attributeName>
+          <attributeLabel>Barometric_Pressure </attributeLabel>
+          <attributeDefinition> Barometric Pressure </attributeDefinition>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>millibar</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false"> 940 </minimum>
+                  <maximum exclusive="false"> 1050</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>-99</code>
+            <codeExplanation>missing value</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>31391</numberOfRecords>
+    </dataTable>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <stmml:unitList xmlns="http://www.xml-cml.org/schema/stmml"
+        xmlns:sch="http://www.ascc.net/xml/schematron"
+        xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.xml-cml.org/schema/stmml-1.1 http://nis.lternet.edu/schemas/eml/eml-2.1.0/stmml.xsd">
+        <stmml:unit abbreviation="LY" id="Langley" name="Langley" unitType="Solar Radiation">
+          <stmml:description>a unit of measurement of solar radiation</stmml:description>
+        </stmml:unit>
+        <stmml:unit abbreviation="uV/cm" constantToSI="0"
+          id="miliVoltsPerCentimeter" multiplierToSI="0.0001"
+          name="miliVoltsPerCentimeter" parentSI="siemens" unitType="conductivity">
+          <stmml:description>microsiemens per centimeter</stmml:description>
+        </stmml:unit>
+      </stmml:unitList>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
