@@ -65,6 +65,7 @@ public class DataPackageManagerClientTest {
   private static String testUpdateRevisionStr = null;
   private static String testEntityId = null;
   private static String testEntityName = null;
+  private static Integer testEntitySize = null;
 
 
   /*
@@ -125,6 +126,10 @@ public class DataPackageManagerClientTest {
       testEntityName = options.getString("dataportal.test.entity.name");
       if (testEntityName == null) {
         fail("No value found for DataPortal property 'dataportal.test.entity.name'");
+      }
+      testEntitySize = options.getInteger("dataportal.test.entity.size", null);
+      if (testEntitySize == null) {
+        fail("No value found for DataPortal property 'dataportal.test.entity.size'");
       }
       testPath = options.getString("dataportal.test.path");
       if (testPath == null) {
@@ -351,7 +356,7 @@ public class DataPackageManagerClientTest {
    */
   @Test
   public void testReadDataEntity() {
-    final long expectedLength = 882;
+    final long expectedLength = testEntitySize;
     
     try {
       byte[] dataEntity = dpmClient.readDataEntity(testScope, testIdentifier,
