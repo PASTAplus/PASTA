@@ -11,6 +11,14 @@ db.Password=HIDEPASSWORD
 db.MaxConnections=10
 
 # Junit properties
+dataportal.test.emlFileName=NoneSuchBugCount.xml
+dataportal.test.path=test/data
+dataportal.test.scope=knb-lter-xyz
+dataportal.test.identifier=1
+dataportal.test.revision=1
+dataportal.test.revision.update=2
+dataportal.test.entity.id=a9201a0755fc45ae514abb12469c03a0
+dataportal.test.entity.name=NoneSuchBugCount
 tokenmanager.uid=ucarroll
 tokenmanager.token=sz46tDcFxqLby2TtlBARREdqGFSSRFbjSHPvMw0hgXLsG2uGlDWrOzjf/zM7Yd7g4n8pK5qKzohvP9UdYqf/xyx/RBAUU1QYwmUXTA5NnUZ5qHjYCtx3Y+DgwyNsQPoz6dQqR92BWWsWb39BilwfaRoyg8vRbmJ3CFRslvB5WfUqEI2OIhD2h3VyYXq8V7f8X4IZDSHWMWNXYMuxC3eQ+A==
 loginservice.uid=ucarroll
@@ -30,7 +38,7 @@ pasta.port=443
 pasta.uriHead=https://pasta.lternet.edu/package/
 
 # Data Package Management properties
-emlutility.xslpath=/WEB-INF/xsl/eml-2.1.0.xsl
+emlutility.xslpath=/WEB-INF/xsl/eml-2.xsl
 reportutility.xslpath=/WEB-INF/xsl/qualityReportFull.xsl
 emlutility.idref=/WEB-INF/xsl/id-ref.xsl
 harvester.path=/home/pasta/local/harvester

@@ -56,12 +56,15 @@ public class DataPackageManagerClientTest {
   private static String password = null;
   private static String testUser = null;
   private static File testEmlFile = null;
-  private static String testEmlFileName = "test/data/NoneSuchBugCount.xml";
-  private final static String testScope = "knb-lter-lno";
+  private static String testEmlFileName = null;
+  private static String testPath = null;
+  private static String testScope = null;
   private static Integer testIdentifier = null;
-  private static String testRevision = "1";
-  private static String testUpdateRevision = "2";
-  private static String testEntityId = "NoneSuchBugCount";
+  private static String testIdentifierStr = null;
+  private static String testRevisionStr = null;
+  private static String testUpdateRevisionStr = null;
+  private static String testEntityId = null;
+  private static String testEntityName = null;
 
 
   /*
@@ -86,13 +89,9 @@ public class DataPackageManagerClientTest {
   public static void setUpClass() {
     ConfigurationListener.configure();
     Configuration options = ConfigurationListener.getOptions();
-    testEmlFile = new File(testEmlFileName);
 
     if (options == null) {
       fail("Failed to load the DataPortal properties file: 'dataportal.properties'");
-    }
-    else if (testEmlFile == null) {
-      fail("Failed to open test EML file: '" + testEmlFileName + "'");
     }
     else {
       testUser = options.getString("eventservice.uid");
@@ -102,6 +101,43 @@ public class DataPackageManagerClientTest {
       password = options.getString("eventservice.password");
       if (password == null) {
         fail("No value found for property: 'eventservice.password'");
+      }
+      testScope = options.getString("dataportal.test.scope");
+      if (testScope == null) {
+        fail("No value found for DataPortal property 'dataportal.test.scope'");
+      }
+      testIdentifierStr = options.getString("dataportal.test.identifier");
+      if (testIdentifierStr == null) {
+        fail("No value found for DataPortal property 'dataportal.test.identifier'");
+      }
+      testRevisionStr = options.getString("dataportal.test.revision");
+      if (testRevisionStr == null) {
+        fail("No value found for DataPortal property 'dataportal.test.revision'");
+      }
+      testUpdateRevisionStr = options.getString("dataportal.test.revision.update");
+      if (testUpdateRevisionStr == null) {
+        fail("No value found for DataPortal property 'dataportal.test.revision.update'");
+      }
+      testEntityId = options.getString("dataportal.test.entity.id");
+      if (testEntityId == null) {
+        fail("No value found for DataPortal property 'dataportal.test.entity.id'");
+      }
+      testEntityName = options.getString("dataportal.test.entity.name");
+      if (testEntityName == null) {
+        fail("No value found for DataPortal property 'dataportal.test.entity.name'");
+      }
+      testPath = options.getString("dataportal.test.path");
+      if (testPath == null) {
+        fail("No value found for DataPortal property 'dataportal.test.path'");
+      }
+      else {
+        testEmlFileName = options.getString("dataportal.test.emlFileName");
+        if (testEmlFileName == null) {
+          fail("No value found for DataPortal property 'dataportal.test.emlFileName'");
+        }
+        else {
+          testEmlFile = new File(testPath, testEmlFileName);
+        }
       }
     }
 
@@ -124,7 +160,7 @@ public class DataPackageManagerClientTest {
       dpmClient = new DataPackageManagerClient(testUser);
       testIdentifier = DataPackageManagerClient.determineTestIdentifier(dpmClient, testScope);
       String testPackageId = testScope + "." + testIdentifier + "."
-          + testRevision;
+          + testRevisionStr;
       System.err.println("testPackageId: " + testPackageId);
       DataPackageManagerClient.modifyTestEmlFile(testEmlFile, testScope,
           testPackageId);
@@ -184,7 +220,7 @@ public class DataPackageManagerClientTest {
         assertFalse(qualityReport.isEmpty());
         assertTrue(qualityReport.contains("<qr:qualityReport"));
         assertTrue(qualityReport.contains("<entityReport"));
-        assertTrue(qualityReport.contains(testEntityId));
+        assertTrue(qualityReport.contains(testEntityName));
       }
     }
     catch (Exception e) {
@@ -202,7 +238,7 @@ public class DataPackageManagerClientTest {
     try {
       // Test READ for OK status
       String entityString = dpmClient.listDataEntities(testScope,
-          testIdentifier, testRevision);
+          testIdentifier, testRevisionStr);
 
       // Check the message body
       assertFalse(entityString == null);
@@ -255,7 +291,7 @@ public class DataPackageManagerClientTest {
       assertFalse(entityString == null);
       if (entityString != null) {
         assertFalse(entityString.isEmpty());
-        assertTrue(entityString.contains(testRevision));
+        assertTrue(entityString.contains(testRevisionStr));
       }
     }
     catch (Exception e) {
@@ -294,7 +330,7 @@ public class DataPackageManagerClientTest {
   public void testReadDataPackage() {
     try {
       String entityString = dpmClient.readDataPackage(testScope,
-          testIdentifier, testRevision);
+          testIdentifier, testRevisionStr);
 
       // Check the message body
       assertFalse(entityString == null);
@@ -315,15 +351,11 @@ public class DataPackageManagerClientTest {
    */
   @Test
   public void testReadDataEntity() {
-    final String scope = "knb-lter-nin";
-    final Integer identifier = new Integer("1");
-    final Integer revision = new Integer("1");
-    final String entityId = "DailyWaterSample-NIN-LTER-1978-1992";
-    final long expectedLength = 924291 ;
+    final long expectedLength = 882;
     
     try {
-      byte[] dataEntity = dpmClient.readDataEntity(scope, identifier,
-          revision.toString(), entityId);
+      byte[] dataEntity = dpmClient.readDataEntity(testScope, testIdentifier,
+          testRevisionStr, testEntityId);
 
       // Check the message body
       assertNotNull(dataEntity);
@@ -344,7 +376,7 @@ public class DataPackageManagerClientTest {
   public void testReadDataPackageReport() {
     try {
       String entityString = dpmClient.readDataPackageReport(testScope,
-          testIdentifier, testRevision.toString());
+          testIdentifier, testRevisionStr);
 
       // Check the message body
       assertFalse(entityString == null);
@@ -352,7 +384,7 @@ public class DataPackageManagerClientTest {
         assertFalse(entityString.isEmpty());
         assertTrue(entityString.contains("<qr:qualityReport"));
         assertTrue(entityString.contains("<entityReport"));
-        assertTrue(entityString.contains(testEntityId));
+        assertTrue(entityString.contains(testEntityName));
       }
     }
     catch (Exception e) {
@@ -369,7 +401,7 @@ public class DataPackageManagerClientTest {
   public void testReadMetadata() {
     try {
       String entityString = dpmClient.readMetadata(testScope, testIdentifier,
-          testRevision.toString());
+          testRevisionStr);
 
       // Check the message body
       assertFalse(entityString == null);
@@ -416,7 +448,7 @@ public class DataPackageManagerClientTest {
   public void testUpdateDataPackage() {
     try {
       String testPackageId = testScope + "." + testIdentifier + "."
-          + testUpdateRevision;
+          + testUpdateRevisionStr;
       DataPackageManagerClient.modifyTestEmlFile(testEmlFile, testScope,
           testPackageId);
       String entityString = dpmClient.updateDataPackage(testScope,
