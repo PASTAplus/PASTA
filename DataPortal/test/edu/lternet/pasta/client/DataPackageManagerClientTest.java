@@ -375,6 +375,28 @@ public class DataPackageManagerClientTest {
 
 
   /**
+   * Test the status and message body of the Read Data Entity Name
+   */
+  @Test
+  public void testReadDataEntityName() {
+    
+    try {
+      String entityName = dpmClient.readDataEntityName(testScope, testIdentifier,
+          testRevisionStr, testEntityId);
+
+      // Check the message body
+      assertNotNull(entityName);
+      assertEquals(testEntityName, entityName);
+      
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+
+
+  /**
    * Test the status and message body of the Read Data Package Report use case
    */
   @Test
