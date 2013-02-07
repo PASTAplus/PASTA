@@ -25,6 +25,7 @@
 package edu.lternet.pasta.auditmanager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.Calendar;
@@ -63,7 +64,7 @@ public class AuditServiceResourceTest
     private JAXBElement<LogEntry> entry;
     private HttpHeaders headers;
     private Integer oid;
-    private Date d = new Date();
+    private Date testDate = new Date();
 
     @Before
     public void init() {
@@ -163,14 +164,17 @@ public class AuditServiceResourceTest
 
     @Test
     public void testGetReportsByTime() {
-        Calendar c = GregorianCalendar.getInstance();c.setTime(d);
+        int okStatus = Response.Status.OK.getStatusCode();
+        int notFoundStatus = Response.Status.NOT_FOUND.getStatusCode();
+        Calendar c = GregorianCalendar.getInstance();
+        c.setTime(testDate);
         String str = DatatypeConverter.printDateTime(c);
         System.out.println(str);
-        Map<String, String> query = Collections.singletonMap("fromTime", str);
+        Map<String, String> query = Collections.singletonMap("toTime", str);
         UriInfo uriInfo = new DummyUriInfo(query);
         Response r = resource.getReports(headers, uriInfo);
-        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-        System.out.println(r.getEntity());
+        int status = r.getStatus();
+        assertTrue((status == okStatus) || (status == notFoundStatus));
     }
 
 }
