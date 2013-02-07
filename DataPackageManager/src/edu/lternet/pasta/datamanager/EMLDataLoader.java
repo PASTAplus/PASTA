@@ -182,10 +182,16 @@ public class EMLDataLoader implements DataStorageInterface {
     boolean exists = false;
     
     /*
+     * Commenting out the following block of code so that we
+     * always return false and cause the data to be downloaded. 
+     * See Trac #700: Data Manager Library returns stale data entities from bad uploads
+     */
+    
+    /*
      * If this is evaluate mode, always return false because we
      * want the data to be re-evaluated. If this is not evaluate
      * mode, then check to see whether the data entity exists.
-     */
+     *
     if (!this.evaluateMode) {
       EmlPackageId emlPackageId = getUrlEmlPackageIdMapEntry(url);
       String entityId = getUrlEntityIdMapEntry(url);
@@ -195,7 +201,7 @@ public class EMLDataLoader implements DataStorageInterface {
       if (emlFileSystemEntity != null) {
         exists = emlFileSystemEntity.exists();
       }
-    }
+    }*/
         
     return exists;
   }
