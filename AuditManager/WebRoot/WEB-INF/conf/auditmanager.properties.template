@@ -1,6 +1,17 @@
 persistence.unit=AuditManager
 junit.persistence.unit=JUnitTests
 
+## Postgres
+dbAdapter=PostgresAdapter
+dbDriver=org.postgresql.Driver
+dbURL=jdbc:postgresql://localhost/pasta
+dbImplementationClass=org.ecoinformatics.datamanager.database.pooling.PostgresDatabaseConnectionPool
+dbServerName=localhost
+dbName=pasta
+dbUser=pasta
+dbPassword=HIDE_PASSWORD
+dbMaxConnections=10
+
 pasta.service.acr=service.xml
 web.service.version=AuditManager-0.1
 welcome.page=../doc/welcome.html
