@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,9 +50,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBElement;
 
 import org.apache.log4j.Logger;
@@ -627,15 +626,17 @@ public class AuditServiceResource extends PastaWebService
         LogService service = null;
         try {
             Properties properties = ConfigurationListener.getProperties();
-            AuditManager auditManager = new AuditManager(properties);
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
-            AuthToken token =
-                    AuthTokenFactory.makeAuthToken(headers.getCookies());
-
-            LogItemBuilder query = makeQuery(uriInfo);
-            service = getLogService();
-            String logEntity = service.getOidsContent(query, token);
-            return Response.ok(logEntity).build();
+            AuditManager auditManager = new AuditManager(properties);
+            QueryString queryString = new QueryString(uriInfo);
+            queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            List<AuditRecord> auditRecords = auditManager.getAuditRecords(queryParams);
+            if (auditRecords.size() == 0) { 
+              throw new ResourceNotFoundException("No audit records matched the search criteria");
+            }
+            String xmlString = auditRecordsToXML(auditRecords);
+            return Response.ok(xmlString).build();
         }
         catch (ClassNotFoundException e) {
           return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
@@ -661,6 +662,24 @@ public class AuditServiceResource extends PastaWebService
             }
         }
     }
+    
+    
+    private String auditRecordsToXML(List<AuditRecord> auditRecords) {
+      String xmlString = "";
+      StringBuffer stringBuffer = new StringBuffer("<auditReport>\n");
+      
+      if (auditRecords != null) {
+        for (AuditRecord auditRecord : auditRecords) {
+          stringBuffer.append(auditRecord.toXML());
+        }
+      }
+
+      stringBuffer.append("</auditReport>\n");
+      xmlString = stringBuffer.toString();
+      
+      return xmlString;
+    }
+    
 
     /**
      * Returns the content of the log entries requested by OID.
@@ -819,8 +838,8 @@ public class AuditServiceResource extends PastaWebService
         if (serviceMethods != null) query.setServiceMethods(serviceMethods);
         if (strTimes != null) query.setAtTimes(strToDate(strTimes));
         if (resourceIds != null) query.setResourceIds(resourceIds);
-        if (strFromTime != null) query.setFromTime(strToDate(strFromTime, false));
-        if (strToTime != null) query.setToTime(strToDate(strToTime, true));
+        if (strFromTime != null) query.setFromTime(AuditManager.strToDate(strFromTime, false));
+        if (strToTime != null) query.setToTime(AuditManager.strToDate(strToTime, true));
         if (statusCodes != null)
             query.setStatusCodes(listStrToListInt(statusCodes));
 
@@ -839,28 +858,8 @@ public class AuditServiceResource extends PastaWebService
 
         if (tmpTimes == null || tmpTimes.size() == 0) return null;
         List<Date> dateList = new ArrayList<Date>(tmpTimes.size());
-        for (String s : tmpTimes) dateList.add(strToDate(s, false));
+        for (String s : tmpTimes) dateList.add(AuditManager.strToDate(s, false));
         return dateList;
     }
 
-    private Date strToDate(String s, boolean isToTime) {
-      if (s == null || s.isEmpty()) throw new IllegalStateException();
-      
-      /*
-       *  Add a timestamp if it is missing from the date string.
-       *  If isToTime is true, set the time to the last second of the day.
-       */
-      if (s.indexOf('T') == -1) {
-        if (isToTime) {
-          s += "T23:59:59";
-        }
-        else {
-          s += "T00:00:00";
-        }
-      }
-      
-      Date returnDate = DatatypeConverter.parseDateTime(s).getTime();
-      logger.debug("returnDate: " + returnDate.toString());
-      return returnDate;
-  }
 }
