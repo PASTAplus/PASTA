@@ -26,11 +26,13 @@ package edu.lternet.pasta.auditmanager;
 
 import java.io.File;
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -47,11 +49,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBElement;
 
 import org.apache.log4j.Logger;
+
+import com.sun.jersey.api.client.ClientResponse.Status;
 
 import pasta.pasta_lternet_edu.log_entry_0.LogEntry;
 import edu.lternet.pasta.auditmanager.LogItem.LogItemBuilder;
@@ -621,6 +626,8 @@ public class AuditServiceResource extends PastaWebService
 
         LogService service = null;
         try {
+            Properties properties = ConfigurationListener.getProperties();
+            AuditManager auditManager = new AuditManager(properties);
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuthToken token =
                     AuthTokenFactory.makeAuthToken(headers.getCookies());
@@ -629,6 +636,12 @@ public class AuditServiceResource extends PastaWebService
             service = getLogService();
             String logEntity = service.getOidsContent(query, token);
             return Response.ok(logEntity).build();
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
         }
         catch (UnauthorizedException e) {
             return WebExceptionFactory.makeUnauthorized(e).getResponse();

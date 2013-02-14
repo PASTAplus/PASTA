@@ -40,6 +40,8 @@ public class ConfigurationListener extends PastaConfigListener
      */
     public static final String AUDIT_MANAGER_PROPERTIES =
         "auditmanager.properties";
+    
+    private static Properties properties;
 
     /**
      * Used in the properties file to specify the Audit Manager's persistence
@@ -65,17 +67,17 @@ public class ConfigurationListener extends PastaConfigListener
     public void setContextSpecificProperties() {
         super.setPastaServiceAcr();
 
-        Properties p = loadPropertiesFile(AUDIT_MANAGER_PROPERTIES);
+        properties = loadPropertiesFile(AUDIT_MANAGER_PROPERTIES);
 
-        setPersistenceUnit(p);
-        setJUnitPersistenceUnit(p);
+        setPersistenceUnit(properties);
+        setJUnitPersistenceUnit(properties);
         comparePersistenceUnits();
 
-        webServiceVersion = getProperty(p, WEB_SERVICE_VERSION);
-        apiDocument = getFile(p, API_DOCUMENT);
-        tutorialDocument = getFile(p, TUTORIAL_DOCUMENT);
-        welcomePage = getFile(p, WELCOME_PAGE);
-        demoDirectory = getFile(p, "demo.directory");
+        webServiceVersion = getProperty(properties, WEB_SERVICE_VERSION);
+        apiDocument = getFile(properties, API_DOCUMENT);
+        tutorialDocument = getFile(properties, TUTORIAL_DOCUMENT);
+        welcomePage = getFile(properties, WELCOME_PAGE);
+        demoDirectory = getFile(properties, "demo.directory");
     }
 
     /**
@@ -95,7 +97,18 @@ public class ConfigurationListener extends PastaConfigListener
         persistenceUnit = getProperty(p, PERSISTENCE_UNIT);
         checkPersistenceUnit(persistenceUnit);
     }
+    
+    
+    /**
+     * Returns the properties class variable.
+     * 
+     * @return  properties class variable
+     */
+    public static Properties getProperties() {
+      return properties;
+    }
 
+    
     private static void checkPersistenceUnit(String pUnit) {
 
         try {
