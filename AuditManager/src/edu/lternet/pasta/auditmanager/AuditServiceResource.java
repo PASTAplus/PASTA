@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -623,7 +624,6 @@ public class AuditServiceResource extends PastaWebService
     public Response getReports(@Context HttpHeaders headers,
                                @Context UriInfo uriInfo) {
 
-        LogService service = null;
         try {
             Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
@@ -655,11 +655,6 @@ public class AuditServiceResource extends PastaWebService
         }
         catch (IllegalStateException e) {
             return WebExceptionFactory.makeBadRequest(e).getResponse();
-        }
-        finally {
-            if (service != null) {
-                service.close();
-            }
         }
     }
     
@@ -735,16 +730,28 @@ public class AuditServiceResource extends PastaWebService
     @Path(REPORT_PREFIX + "/{oid}")
     public Response getReport(@Context HttpHeaders headers,
                               @PathParam(value = "oid") int oid) {
-
-        LogService service = null;
         try {
+            Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
-            AuthToken token =
-                    AuthTokenFactory.makeAuthToken(headers.getCookies());
-
-            service = getLogService();
-            String logEntry = service.get(new Integer(oid), token);
-            return Response.ok(logEntry).build();
+            AuditManager auditManager = new AuditManager(properties);
+            Integer oidInteger = new Integer(oid);
+            String oidString = oidInteger.toString();
+            List<String> oidList = new ArrayList<String>();
+            oidList.add(oidString);            
+            Map<String, List<String>> queryParams = new HashMap<String, List<String>>();
+            queryParams.put("oid", oidList);
+            List<AuditRecord> auditRecords = auditManager.getAuditRecords(queryParams);
+            if (auditRecords.size() == 0) { 
+              throw new ResourceNotFoundException(String.format("Oid %d does not exist.", oid));
+            }
+            String xmlString = auditRecordsToXML(auditRecords);
+            return Response.ok(xmlString).build();
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
         }
         catch (UnauthorizedException e) {
             return WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -757,11 +764,6 @@ public class AuditServiceResource extends PastaWebService
         }
         catch (IllegalStateException e) {
             return WebExceptionFactory.makeBadRequest(e).getResponse();
-        }
-        finally {
-            if (service != null) {
-                service.close();
-            }
         }
     }
 
