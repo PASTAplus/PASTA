@@ -71,16 +71,7 @@ public class AdvancedSearchPathQuery  {
     addReturnField("dataset/title");
     addReturnField("originator/individualName/surName");
     addReturnField("dataset/creator/individualName/surName");
-    addReturnField("originator/organizationName");
-    addReturnField("dataset/creator/organizationName");
     addReturnField("dataset/pubDate");
-    addReturnField("keyword");
-    addReturnField("entityName");
-    addReturnField("dataset/distribution/online/url");
-    addReturnField("physical/distribution/online/url");
-    addReturnField("dataset/abstract/para");
-    addReturnField("dataset/abstract/section/para");
-    addReturnField("dataset/abstract/para/literalLayout");
   }
   
   

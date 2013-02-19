@@ -199,7 +199,6 @@ public class SimpleSearchServlet extends DataPortalServlet {
         + "  <returnfield>dataset/title</returnfield>\n"
         + "  <returnfield>dataset/creator/individualName/surName</returnfield>\n"
         + "  <returnfield>dataset/pubDate</returnfield>\n"
-        + "  <returnfield>keyword</returnfield>\n"
         + "  <returnfield>originator/individualName/surName</returnfield>\n"
         + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n"
         + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n"
