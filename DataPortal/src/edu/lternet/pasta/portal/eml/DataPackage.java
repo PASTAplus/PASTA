@@ -47,6 +47,7 @@ public class DataPackage {
   
   String packageId = null;
   ArrayList<Entity> entityList = null;
+  ArrayList<String> title = null;
 
   
   /*
@@ -60,6 +61,7 @@ public class DataPackage {
   
   DataPackage() {
     this.entityList = new ArrayList<Entity>();
+    this.title = new ArrayList<String>();
   }
   
   
@@ -80,6 +82,11 @@ public class DataPackage {
   
   public String getPackageId() {
     return packageId;
+  }
+  
+  
+  public ArrayList<String> getTitle() {
+    return title;
   }
 
   

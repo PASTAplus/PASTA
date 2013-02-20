@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
@@ -55,6 +56,7 @@ public class EMLParser {
 
   // constants
   public static final String ENTITY_PATH_PARENT = "//dataset/";
+  public static final String TITLE_PATH = "//dataset/title";
   public static final String OTHER_ENTITY = "otherEntity";
   public static final String TABLE_ENTITY = "dataTable";
   public static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
@@ -102,6 +104,29 @@ public class EMLParser {
   /**
    * Parses an EML document.
    * 
+   * @param   xml          The XML string representation of the EML document
+   * @return  dataPackage  a DataPackage object holding parsed values
+   */
+  public DataPackage parseDocument(String xml) {
+    DataPackage dataPackage = null;
+    
+    if (xml != null) {
+      try {
+        InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+        dataPackage = parseDocument(inputStream);
+      }
+      catch (Exception e) {
+        logger.error("Error parsing EML metacdata: " + e.getMessage());
+      }
+    }
+    
+    return dataPackage;
+  }
+  
+  
+  /**
+   * Parses an EML document.
+   * 
    * @param   inputStream          the input stream to the EML document
    * @return  dataPackage          a DataPackage object holding parsed values
    */
@@ -130,6 +155,13 @@ public class EMLParser {
           this.dataPackage.setPackageId(packageId);
         }
         
+        // Parse the title nodes
+        NodeList titleNodeList = xpathapi.selectNodeList(document, TITLE_PATH);
+        for (int i = 0; i < titleNodeList.getLength(); i++) {
+          String title = titleNodeList.item(i).getTextContent();
+          dataPackage.title.add(title);
+        }
+
         for (int j = 0; j < ENTITY_TYPES.length; j++) {
           String ENTITY_TYPE = ENTITY_TYPES[j];
           String ENTITY_PATH = ENTITY_PATH_PARENT + ENTITY_TYPE;
