@@ -89,7 +89,7 @@
 
 			<p>
 				Have more questions, go to the <a
-					href="https://nis.lternet.edu:8443/x/OwFZ" target="_blank">Frequently
+					href="https://nis.lternet.edu:8443/x/swFZ" target="_blank">Frequently
 					Asked Questions</a> page, enter your question as a comment in either
 				the NIS User's Guide or the NIS Software Developer's Guide, or you
 				can always email <a href="mailto:tech-support@lternet.edu"
