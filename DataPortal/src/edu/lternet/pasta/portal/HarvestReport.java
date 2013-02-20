@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -229,9 +230,11 @@ public class HarvestReport {
     
     if (reportId != null && !reportId.equals("")) {
       File dir = new File(reportPath);
-      String[] fileNames = dir.list( DirectoryFileFilter.INSTANCE );
-      for ( int i = 0; i < fileNames.length; i++ ) {
-        String fileName = fileNames[i];
+      File[] fileArray = dirListByAscendingDate(dir);
+      
+      for (int i = 0; i < fileArray.length; i++) {
+        File aFile = fileArray[i];
+        String fileName = aFile.getName();
         if (fileName != null && !fileName.equals("eml")) {
           packageIds.add(fileName);
         }
@@ -239,6 +242,28 @@ public class HarvestReport {
     }
     
     return packageIds;
+  }
+  
+  
+  /*
+   * Sorts directories by date in ascending order.
+   */
+  private File[] dirListByAscendingDate(File folder) {
+    if (!folder.isDirectory()) {
+      return null;
+    }
+    
+    File files[] = folder.listFiles();
+    
+    Arrays.sort( files, new Comparator<Object>() {
+      public int compare(final Object o1, final Object o2) {
+        return new Long(((File)o1).lastModified()).compareTo
+             (new Long(((File) o2).lastModified()));
+      }
+    }
+    ); 
+    
+    return files;
   }
   
   
