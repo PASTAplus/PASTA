@@ -77,7 +77,7 @@
 
                 <p>What is a DOI and what is its purpose? Find the answer to
                     this question and others in the
-                    <a href="https://nis.lternet.edu:8443/x/swBP" target="_blank">
+                    <a href="https://nis.lternet.edu:8443/x/swFZ" target="_blank">
                     Frequently Asked Questions</a>
                     section of the NIS Community Website.</p>
 					
