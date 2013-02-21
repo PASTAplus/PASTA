@@ -47,7 +47,7 @@ public class DataPackage {
   
   String packageId = null;
   String pubDate = null;
-  ArrayList<Creator> creatorList = null;
+  ArrayList<ResponsibleParty> creatorList = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> titles = null;
 
@@ -62,7 +62,7 @@ public class DataPackage {
    */
   
   DataPackage() {
-    this.creatorList = new ArrayList<Creator>();
+    this.creatorList = new ArrayList<ResponsibleParty>();
     this.entityList = new ArrayList<Entity>();
     this.titles = new ArrayList<String>();
   }
@@ -80,7 +80,7 @@ public class DataPackage {
   
   /* Getters and Setter */
   
-  public ArrayList<Creator> getCreatorList() {
+  public ArrayList<ResponsibleParty> getCreatorList() {
     return creatorList;
   }
 

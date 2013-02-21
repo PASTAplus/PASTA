@@ -37,8 +37,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 
@@ -55,6 +57,7 @@ public class EMLParser {
   private static final Logger logger = Logger.getLogger(EMLParser.class);
 
   // constants
+  public static final String CREATOR_PATH = "//eml/dataset/creator";
   public static final String ENTITY_PATH_PARENT = "//dataset/";
   public static final String PUB_DATE_PATH = "//eml/dataset/pubDate";
   public static final String TITLE_PATH = "//dataset/title";
@@ -163,6 +166,17 @@ public class EMLParser {
           dataPackage.titles.add(title);
         }
 
+        // Parse the creator nodes
+        NodeList creatorNodeList = xpathapi.selectNodeList(document, CREATOR_PATH);
+        if (creatorNodeList != null) {
+          for (int i =0; i < creatorNodeList.getLength(); i++) {
+            Node creatorNode = creatorNodeList.item(i);
+            ResponsibleParty rp = new ResponsibleParty("creator");
+            parseResponsibleParty(creatorNode, rp);
+            dataPackage.creatorList.add(rp);
+          }
+        }
+
         // Parse the pubDate node
         Node pubDateNode = xpathapi.selectSingleNode(document, PUB_DATE_PATH);
         if (pubDateNode != null) {
@@ -237,6 +251,242 @@ public class EMLParser {
     }
 
     return this.dataPackage;
+  }
+  
+  
+  private void parseResponsibleParty(Node node, ResponsibleParty rp) {
+    if (node instanceof Element) {
+      Element element = (Element) node;
+      String elementTagName = element.getTagName();
+      
+      if (elementTagName.equals("contact") ||
+          elementTagName.equals("creator") ||
+          elementTagName.equals("metadataProvider")) {
+        NodeList nodeList = element.getChildNodes();
+        
+        for (int i = 0; i < nodeList.getLength(); i++) {
+          Node rpNode = nodeList.item(i);
+          
+          if (rpNode instanceof Element) {
+            Element rpElement = (Element) rpNode;
+            String rpElementTagName = rpElement.getTagName();
+            String rpElementAttribute = rpElement.getAttribute("phonetype");
+            
+            if (rpElementTagName.equals("individualName")) {
+              NodeList individualNameNodeList = rpElement.getChildNodes();
+              
+              for (int j = 0; j < individualNameNodeList.getLength(); j++) {
+                Node individualNameNode = individualNameNodeList.item(j);
+                
+                if (individualNameNode instanceof Element) {
+                  Element individualNameElement = (Element) individualNameNode;
+                  String individualNameElementTagName = individualNameElement.getTagName();
+                  
+                  if (individualNameElementTagName.equals("salutation")) {
+                    NodeList salutationNodeList = individualNameElement.getChildNodes();
+                    
+                    for (int k = 0; k < salutationNodeList.getLength(); k++) {
+                      Node salutationNode = salutationNodeList.item(k);
+                      
+                      if (salutationNode instanceof Text) {
+                        Text salutationText = (Text) salutationNode;
+                        String salutationNodeValue = salutationText.getNodeValue();
+                        logger.debug("salutationNodeValue: " + salutationNodeValue);
+                        rp.setSalutation(salutationNodeValue);
+                      }
+                    }
+                  }
+                  else if (individualNameElementTagName.equals("givenName")) {
+                    NodeList givenNameNodeList = individualNameElement.getChildNodes();
+                    
+                    for (int l = 0; l < givenNameNodeList.getLength(); l++) {
+                      Node givenNameNode = givenNameNodeList.item(l);
+                      
+                      if (givenNameNode instanceof Text) {
+                        Text givenNameText = (Text) givenNameNode;
+                        String givenNameNodeValue = givenNameText.getNodeValue();
+                        logger.debug("givenNameNodeValue: " + givenNameNodeValue);
+                        rp.addGivenName(givenNameNodeValue);
+                      }
+                    }
+                  }
+                  else if (individualNameElementTagName.equals("surName")) {
+                    NodeList surNameNodeList = individualNameElement.getChildNodes();
+                    
+                    for (int m = 0; m < surNameNodeList.getLength(); m++) {
+                      Node surNameNode = surNameNodeList.item(m);
+                      
+                      if (surNameNode instanceof Text) {
+                        Text surNameText = (Text) surNameNode;
+                        String surNameNodeValue = surNameText.getNodeValue();
+                        logger.debug("surNameNodeValue: " + surNameNodeValue);
+                        rp.setSurName(surNameNodeValue);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            else if (rpElementTagName.equals("organizationName")) {
+              NodeList organizationNameNodeList = rpElement.getChildNodes();
+              
+              for (int n = 0; n < organizationNameNodeList.getLength(); n++) {
+                Node organizationNameNode = organizationNameNodeList.item(n);
+                
+                if (organizationNameNode instanceof Text) {
+                  Text organizationNameText = (Text) organizationNameNode;
+                  String organizationNameNodeValue = organizationNameText.getNodeValue();
+                  logger.debug("organizationNameNodeValue: " + organizationNameNodeValue);
+                  rp.setOrganizationName(organizationNameNodeValue);
+                }
+              }
+            }
+            else if (rpElementTagName.equals("positionName")) {
+              NodeList positionNameNodeList = rpElement.getChildNodes();
+              
+              for (int n = 0; n < positionNameNodeList.getLength(); n++) {
+                Node positionNameNode = positionNameNodeList.item(n);
+                
+                if (positionNameNode instanceof Text) {
+                  Text positionNameText = (Text) positionNameNode;
+                  String positionNameNodeValue = positionNameText.getNodeValue();
+                  logger.debug("positionNameNodeValue: " + positionNameNodeValue);
+                  rp.setPositionName(positionNameNodeValue);
+                }
+              }
+            }
+            else if (rpElementTagName.equals("address")) {
+              NodeList addressNodeList = rpElement.getChildNodes();
+              
+              for (int o = 0; o < addressNodeList.getLength(); o++) {
+                Node addressNode = addressNodeList.item(o);
+                
+                if (addressNode instanceof Element) {
+                  Element addressElement = (Element) addressNode;
+                  String addressElementTagName = addressElement.getTagName();
+                  
+                  if (addressElementTagName.equals("deliveryPoint")) {
+                    NodeList deliveryPointNodeList = addressElement.getChildNodes();
+                    
+                    for (int p = 0; p < deliveryPointNodeList.getLength(); p++) {
+                      Node deliveryPointNode = deliveryPointNodeList.item(p);
+                      
+                      if (deliveryPointNode instanceof Text) {
+                        Text deliveryPointText = (Text) deliveryPointNode;
+                        String deliveryPointNodeValue = deliveryPointText.getNodeValue();
+                        logger.debug("deliveryPointNodeValue: " + deliveryPointNodeValue);
+                        rp.addDeliveryPoint(deliveryPointNodeValue);
+                      }
+                    }
+                  }
+                  else if (addressElementTagName.equals("city")) {
+                    NodeList cityNodeList = addressElement.getChildNodes();
+                    
+                    for (int q = 0; q < cityNodeList.getLength(); q++) {
+                      Node cityNode = cityNodeList.item(q);
+                      
+                      if (cityNode instanceof Text) {
+                        Text cityText = (Text) cityNode;
+                        String cityNodeValue = cityText.getNodeValue();
+                        logger.debug("cityNodeValue: " + cityNodeValue);
+                        rp.setCity(cityNodeValue);
+                      }
+                    }
+                  }
+                  else if (addressElementTagName.equals("administrativeArea")) {
+                    NodeList administrativeAreaNodeList = addressElement.getChildNodes();
+                    
+                    for (int r = 0; r < administrativeAreaNodeList.getLength(); r++) {
+                      Node administrativeAreaNode = administrativeAreaNodeList.item(r);
+                      
+                      if (administrativeAreaNode instanceof Text) {
+                        Text administrativeAreaText = (Text) administrativeAreaNode;
+                        String administrativeAreaNodeValue = administrativeAreaText.getNodeValue();
+                        logger.debug("administrativeAreaNodeValue: " + administrativeAreaNodeValue);
+                        rp.setAdministrativeArea(administrativeAreaNodeValue);
+                      }
+                    }
+                  }
+                  else if (addressElementTagName.equals("postalCode")) {
+                    NodeList postalCodeNodeList = addressElement.getChildNodes();
+                    
+                    for (int r = 0; r < postalCodeNodeList.getLength(); r++) {
+                      Node postalCodeNode = postalCodeNodeList.item(r);
+                      
+                      if (postalCodeNode instanceof Text) {
+                        Text postalCodeText = (Text) postalCodeNode;
+                        String postalCodeNodeValue = postalCodeText.getNodeValue();
+                        logger.debug("postalCodeNodeValue: " + postalCodeNodeValue);
+                        rp.setPostalCode(postalCodeNodeValue);
+                      }
+                    }
+                  }
+                  else if (addressElementTagName.equals("country")) {
+                    NodeList countryNodeList = addressElement.getChildNodes();
+                    
+                    for (int s = 0; s < countryNodeList.getLength(); s++) {
+                      Node countryNode = countryNodeList.item(s);
+                      
+                      if (countryNode instanceof Text) {
+                        Text countryText = (Text) countryNode;
+                        String countryNodeValue = countryText.getNodeValue();
+                        logger.debug("countryNodeValue: " + countryNodeValue);
+                        rp.setCountry(countryNodeValue);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            else if (rpElementTagName.equals("phone") &&
+                     !(rpElementAttribute.equals("facsimile") ||
+                     rpElementAttribute.equals("fax"))) {
+              
+              NodeList phoneNodeList = rpElement.getChildNodes();
+              
+              for (int t = 0; t < phoneNodeList.getLength(); t++) {
+                Node phoneNode = phoneNodeList.item(t);
+                
+                if (phoneNode instanceof Text) {
+                  Text phoneText = (Text) phoneNode;
+                  String phoneNodeValue = phoneText.getNodeValue();
+                  logger.debug("phoneNodeValue: " + phoneNodeValue);
+                  rp.setPhone(phoneNodeValue);
+                }
+              }
+            }
+            else if (rpElementTagName.equals("electronicMailAddress")) {
+              NodeList electronicMailAddressNodeList = rpElement.getChildNodes();
+              
+              for (int u = 0; u < electronicMailAddressNodeList.getLength(); u++) {
+                Node electronicMailAddressNode = electronicMailAddressNodeList.item(u);
+                
+                if (electronicMailAddressNode instanceof Text) {
+                  Text electronicMailAddressText = (Text) electronicMailAddressNode;
+                  String electronicMailAddressNodeValue = electronicMailAddressText.getNodeValue();
+                  logger.debug("electronicMailAddressNodeValue: " + electronicMailAddressNodeValue);
+                  rp.setElectronicMailAddress(electronicMailAddressNodeValue);
+                }
+              }
+            }
+            else if (rpElementTagName.equals("onlineUrl")) {
+              NodeList onlineUrlNodeList = rpElement.getChildNodes();
+              
+              for (int u = 0; u < onlineUrlNodeList.getLength(); u++) {
+                Node onlineUrlNode = onlineUrlNodeList.item(u);
+                
+                if (onlineUrlNode instanceof Text) {
+                  Text onlineUrlText = (Text) onlineUrlNode;
+                  String onlineUrlNodeValue = onlineUrlText.getNodeValue();
+                  logger.debug("onlineUrlNodeValue: " + onlineUrlNodeValue);
+                  rp.setOnlineUrl(onlineUrlNodeValue);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
   
 }

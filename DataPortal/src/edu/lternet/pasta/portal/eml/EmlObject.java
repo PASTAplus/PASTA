@@ -21,16 +21,7 @@
 package edu.lternet.pasta.portal.eml;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-
-import eml.ecoinformatics_org.eml_2_1.Eml;
-import eml.ecoinformatics_org.party_2_1.ResponsibleParty;
-import eml.ecoinformatics_org.party_2_1.Person;
-
-import edu.lternet.pasta.common.EmlUtility;
 
 import org.apache.log4j.Logger;
 
@@ -54,7 +45,6 @@ public class EmlObject {
 	private Logger logger = Logger.getLogger(EmlObject.class);
 
 	private DataPackage dataPackage = null;
-	private Eml eml = null;
 	private Integer personCount = 0;
 	private Integer orgCount = 0;
 
@@ -68,8 +58,6 @@ public class EmlObject {
 	 * @param emlString The EML XML document
 	 */
 	public EmlObject(String emlString) {
-
-		this.eml = EmlUtility.getEml2_1_0(emlString);
 		EMLParser emlParser = new EMLParser();
     this.dataPackage = emlParser.parseDocument(emlString);
 	}
@@ -82,113 +70,16 @@ public class EmlObject {
 	 * Instance methods
 	 */
 
-	/**
-	 * Returns ArrayList of Creators.
-	 * 
-	 * @return Creator array list
-	 */
-	public ArrayList<Creator> getCreators() {
-
-		ArrayList<Creator> creators = new ArrayList<Creator>();
-
-		List<ResponsibleParty> responsibleParties = null;
-		ResponsibleParty responsibleParty = null;
-		List<JAXBElement<?>> names = null;
-		JAXBElement<?> name = null;
-
-		responsibleParties = eml.getDataset().getCreator();
-		Iterator<?> rpItr = responsibleParties.iterator();
-
-		while (rpItr.hasNext()) {
-
-			responsibleParty = (ResponsibleParty) rpItr.next();
-			names = responsibleParty
-			    .getIndividualNameOrOrganizationNameOrPositionName();
-			Iterator<?> nItr = names.iterator();
-
-			String nameType = null;
-			Person person = null;
-			Creator creator =  new Creator();
-
-			while (nItr.hasNext()) {
-				name = (JAXBElement<?>) nItr.next();
-				nameType = name.getName().getLocalPart();
-
-				if (nameType.equals(Creator.PERSON)) {
-					
-					this.personCount++;
-
-					person = (Person) name.getValue();
-
-					try {
-						creator.setSurName(person.getSurName().trim());
-					} catch (Exception e) {
-						logger.error(e);
-						e.printStackTrace();
-					}
-
-					List<String> givenNames = person.getGivenName();
-					Iterator<String> gnItr = givenNames.iterator();
-					StringBuffer givenName = new StringBuffer("");
-
-					while (gnItr.hasNext()) {
-						String namePart = (String) gnItr.next();
-						givenName.append(namePart + " ");
-					}
-
-					try {
-						creator.setGivenName(givenName.toString().trim());
-					} catch (Exception e) {
-						logger.error(e);
-						e.printStackTrace();
-					}
-
-				} else if (nameType.equals(Creator.ORGANIZATION)) {
-					
-					this.orgCount++;
-
-					String organizationName = (String) name.getValue();
-
-					try {
-						creator.setOrganizationName(organizationName.trim());
-					} catch (Exception e) {
-						logger.error(e);
-						e.printStackTrace();
-					}
-
-				} else { // Creator.POSITION
-
-					String positionName = (String) name.getValue();
-
-					try {
-						creator.setPositionName(positionName.trim());
-					} catch (Exception e) {
-						logger.error(e);
-						e.printStackTrace();
-					}
-
-				}
-
-			}
-
-			creators.add(creator);
-
-		}
-
-		return creators;
-
-	}
-	
   /**
    * Returns ArrayList of Creators.
    * 
    * @return Creator array list
    */
-  public ArrayList<Creator> getCreators2() {
+  public ArrayList<ResponsibleParty> getCreators() {
 
-    ArrayList<Creator> creators = this.dataPackage.getCreatorList();
+    ArrayList<ResponsibleParty> creators = this.dataPackage.getCreatorList();
     
-    for (Creator creator : creators) {
+    for (ResponsibleParty creator : creators) {
       if (creator.isPerson()) {
         this.personCount++;
       }
@@ -227,32 +118,25 @@ public class EmlObject {
 	 * @return Title array list
 	 */
 	public ArrayList<Title> getTitles() {
-
 		ArrayList<Title> titles = new ArrayList<Title>();
-
 		List<String> titleList = this.dataPackage.getTitles();
 
-		Iterator tItr = titleList.iterator();
-
-		while (tItr.hasNext()) {
-			
+		for (String titleName : titleList) {
 			Title title = new Title();
 		
 			try {
 				title.setTitleType(Title.MAIN);
-			} catch (Exception e) {
+			} 
+			catch (Exception e) {
 				logger.error(e);
 				e.printStackTrace();
 			}
 
-			String titleName = (String) tItr.next();
 			title.setTitle(titleName.trim());
-
 			titles.add(title);
 		}
 
 		return titles;
-
 	}
 	
 	/**
@@ -272,11 +156,8 @@ public class EmlObject {
 	 * This method is not complete.
 	 */
 	private String getAbstract() {
-		
-		StringBuffer abs = new StringBuffer("");
-				
-		return abs.toString();
-		
+		StringBuffer abs = new StringBuffer("");	
+		return abs.toString();	
 	}
 
 }

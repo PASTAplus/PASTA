@@ -43,8 +43,9 @@ import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.portal.eml.EmlObject;
+import edu.lternet.pasta.portal.eml.ResponsibleParty;
 import edu.lternet.pasta.portal.eml.Title;
-import edu.lternet.pasta.portal.eml.Creator;
+
 
 public class MapBrowseServlet extends DataPortalServlet {
 
@@ -233,7 +234,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String emlString = null;
 		EmlObject emlObject = null;
 		ArrayList<Title> titles = null;
-		ArrayList<Creator> creators = null;
+		ArrayList<ResponsibleParty> creators = null;
 
 		DataPackageManagerClient dpmClient = null;
 		RevisionUtility revUtil = null;
@@ -277,7 +278,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				html += "<h4 align=\"left\">Creators</h4>\n";
 				html += "<ul style=\"list-style: none;\">\n";
 
-				for (Creator creator : creators) {
+				for (ResponsibleParty creator : creators) {
 					html += "<li>";
 					
 					String individualName = creator.getIndividualName();

@@ -20,6 +20,9 @@
 
 package edu.lternet.pasta.portal.eml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -39,9 +42,9 @@ public class Creator {
 	 * Class variables
 	 */
 
-	public static final String PERSON = "individualName";
-	public static final String ORGANIZATION = "organizationName";
-	public static final String POSITION = "positionName";
+	public static final String INDIVIDUAL_NAME = "individualName";
+	public static final String ORGANIZATION_NAME = "organizationName";
+	public static final String POSITION_NAME = "positionName";
 
 	/*
 	 * Instance variables
@@ -53,7 +56,9 @@ public class Creator {
 
 	private String surName = null;
 	private String givenName = null;
+	private List<String> givenNames = null;
 	private String organizationName = null;
+  private List<String> organizationNames = null;
 	private String positionName = null;
 	private String creatorName = null; // One of "surName, givenName", "orgName",
 	                                   // or "positionName".
@@ -63,6 +68,11 @@ public class Creator {
 	/*
 	 * Constructors
 	 */
+	
+	public Creator() {
+	  this.givenNames = new ArrayList<String>();
+	  this.organizationNames = new ArrayList<String>();
+	}
 
 	/*
 	 * Class methods
@@ -72,6 +82,16 @@ public class Creator {
 	 * Instance methods
 	 */
 	
+	public void addGivenName(String givenName) {
+	  givenNames.add(givenName);
+	}
+	
+	
+  public void addOrganization(String organization) {
+    organizationNames.add(organization);
+  }
+  
+  
 	public boolean isOrganization() {
 	  return isOrganization;
 	}
@@ -144,7 +164,13 @@ public class Creator {
 	 * @return Creator given name
 	 */
 	public String getGivenName() {
-		return this.givenName;
+    StringBuffer givenNameBuffer = new StringBuffer("");
+
+    for (String givenName : givenNames) {
+      givenNameBuffer.append(givenName + " ");
+    }
+    
+    return givenNameBuffer.toString().trim();
 	}
 
 	/**
