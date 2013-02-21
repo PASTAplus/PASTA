@@ -57,6 +57,8 @@ public class Creator {
 	private String positionName = null;
 	private String creatorName = null; // One of "surName, givenName", "orgName",
 	                                   // or "positionName".
+	private boolean isOrganization = false;
+	private boolean isPerson = false;
 
 	/*
 	 * Constructors
@@ -69,6 +71,14 @@ public class Creator {
 	/*
 	 * Instance methods
 	 */
+	
+	public boolean isOrganization() {
+	  return isOrganization;
+	}
+
+  public boolean isPerson() {
+    return isPerson;
+  }
 
 	/**
 	 * Sets creator surname.
@@ -171,5 +181,13 @@ public class Creator {
 		return individualName;
 		
 	}
+	
+	public void setIsOrganization(boolean isOrganization) {
+	  this.isOrganization = isOrganization;
+	}
+
+  public void setIsPerson(boolean isPerson) {
+    this.isPerson = isPerson;
+  }
 
 }

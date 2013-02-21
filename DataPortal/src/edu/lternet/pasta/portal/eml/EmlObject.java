@@ -20,20 +20,15 @@
 
 package edu.lternet.pasta.portal.eml;
 
-import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.lang.Class;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 import eml.ecoinformatics_org.eml_2_1.Eml;
 import eml.ecoinformatics_org.party_2_1.ResponsibleParty;
 import eml.ecoinformatics_org.party_2_1.Person;
-import eml.ecoinformatics_org.text_2_1.TextType;
 
 import edu.lternet.pasta.common.EmlUtility;
 
@@ -58,7 +53,7 @@ public class EmlObject {
 
 	private Logger logger = Logger.getLogger(EmlObject.class);
 
-	private String emlString = null;
+	private DataPackage dataPackage = null;
 	private Eml eml = null;
 	private Integer personCount = 0;
 	private Integer orgCount = 0;
@@ -75,7 +70,8 @@ public class EmlObject {
 	public EmlObject(String emlString) {
 
 		this.eml = EmlUtility.getEml2_1_0(emlString);
-
+		EMLParser emlParser = new EMLParser();
+    this.dataPackage = emlParser.parseDocument(emlString);
 	}
 
 	/*
@@ -183,6 +179,28 @@ public class EmlObject {
 
 	}
 	
+  /**
+   * Returns ArrayList of Creators.
+   * 
+   * @return Creator array list
+   */
+  public ArrayList<Creator> getCreators2() {
+
+    ArrayList<Creator> creators = this.dataPackage.getCreatorList();
+    
+    for (Creator creator : creators) {
+      if (creator.isPerson()) {
+        this.personCount++;
+      }
+      else if (creator.isOrganization()) {
+        this.orgCount++;
+      }
+    }
+    
+    return creators;
+  }
+
+  
 	/**
 	 * Returns the number of creators of type PERSON after the call to 
 	 * getCreators().
@@ -212,7 +230,7 @@ public class EmlObject {
 
 		ArrayList<Title> titles = new ArrayList<Title>();
 
-		List<String> titleList = this.eml.getDataset().getTitle();
+		List<String> titleList = this.dataPackage.getTitles();
 
 		Iterator tItr = titleList.iterator();
 
@@ -238,15 +256,13 @@ public class EmlObject {
 	}
 	
 	/**
-	 * Returns the publication date form the EML document.
+	 * Returns the publication date from the EML document.
 	 * 
 	 * @return Publication date
 	 */
 	public String getPubDate() {
 		
-		String pubDate = null;
-		
-		pubDate = this.eml.getDataset().getPubDate();
+		String pubDate = this.dataPackage.getPubDate();
 		
 		return pubDate;
 		
@@ -258,16 +274,7 @@ public class EmlObject {
 	private String getAbstract() {
 		
 		StringBuffer abs = new StringBuffer("");
-		
-		TextType textType = this.eml.getDataset().getAbstract();
-		List<Serializable> list = textType.getContent();
-		
-		if (list != null) {
-			for (Serializable listItem: list) {
-				logger.info(listItem.toString());
-			}
-		}
-		
+				
 		return abs.toString();
 		
 	}

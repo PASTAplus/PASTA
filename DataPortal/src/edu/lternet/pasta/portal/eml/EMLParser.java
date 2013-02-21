@@ -56,6 +56,7 @@ public class EMLParser {
 
   // constants
   public static final String ENTITY_PATH_PARENT = "//dataset/";
+  public static final String PUB_DATE_PATH = "//eml/dataset/pubDate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String OTHER_ENTITY = "otherEntity";
   public static final String TABLE_ENTITY = "dataTable";
@@ -159,7 +160,14 @@ public class EMLParser {
         NodeList titleNodeList = xpathapi.selectNodeList(document, TITLE_PATH);
         for (int i = 0; i < titleNodeList.getLength(); i++) {
           String title = titleNodeList.item(i).getTextContent();
-          dataPackage.title.add(title);
+          dataPackage.titles.add(title);
+        }
+
+        // Parse the pubDate node
+        Node pubDateNode = xpathapi.selectSingleNode(document, PUB_DATE_PATH);
+        if (pubDateNode != null) {
+          String pubDate = pubDateNode.getTextContent();
+          this.dataPackage.setPubDate(pubDate);
         }
 
         for (int j = 0; j < ENTITY_TYPES.length; j++) {

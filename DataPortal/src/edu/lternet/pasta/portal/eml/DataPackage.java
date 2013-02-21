@@ -46,8 +46,10 @@ public class DataPackage {
    */
   
   String packageId = null;
+  String pubDate = null;
+  ArrayList<Creator> creatorList = null;
   ArrayList<Entity> entityList = null;
-  ArrayList<String> title = null;
+  ArrayList<String> titles = null;
 
   
   /*
@@ -60,8 +62,9 @@ public class DataPackage {
    */
   
   DataPackage() {
+    this.creatorList = new ArrayList<Creator>();
     this.entityList = new ArrayList<Entity>();
-    this.title = new ArrayList<String>();
+    this.titles = new ArrayList<String>();
   }
   
   
@@ -75,6 +78,13 @@ public class DataPackage {
    */
   
   
+  /* Getters and Setter */
+  
+  public ArrayList<Creator> getCreatorList() {
+    return creatorList;
+  }
+
+  
   public ArrayList<Entity> getEntityList() {
     return entityList;
   }
@@ -85,13 +95,23 @@ public class DataPackage {
   }
   
   
-  public ArrayList<String> getTitle() {
-    return title;
+  public String getPubDate() {
+    return pubDate;
+  }
+  
+  
+  public ArrayList<String> getTitles() {
+    return titles;
   }
 
   
   public void setPackageId(String packageId) {
     this.packageId = packageId;
+  }
+  
+  
+  public void setPubDate(String pubDate) {
+    this.pubDate = pubDate;
   }
   
 }
