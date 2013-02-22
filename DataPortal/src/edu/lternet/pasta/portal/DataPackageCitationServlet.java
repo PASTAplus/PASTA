@@ -39,9 +39,9 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.portal.eml.EmlObject;
-import edu.lternet.pasta.portal.eml.ResponsibleParty;
-import edu.lternet.pasta.portal.eml.Title;
+import edu.lternet.pasta.common.eml.EmlObject;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
 
 public class DataPackageCitationServlet extends DataPortalServlet {
 

@@ -41,9 +41,9 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.portal.eml.DataPackage;
-import edu.lternet.pasta.portal.eml.EMLParser;
-import edu.lternet.pasta.portal.eml.Entity;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.EMLParser;
+import edu.lternet.pasta.common.eml.Entity;
 
 public class DataViewerServlet extends DataPortalServlet {
 
