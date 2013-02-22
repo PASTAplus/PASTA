@@ -20,10 +20,13 @@
 
 package edu.lternet.pasta.common.eml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import edu.lternet.pasta.common.EmlUtility;
 
 /**
  * @author servilla
@@ -62,6 +65,17 @@ public class EmlObject {
     this.dataPackage = emlParser.parseDocument(emlString);
 	}
 
+	
+  /**
+   * Create the EML 2.1.0 POJO from an EML file.
+   * 
+   * @param emlFile
+   */
+  public EmlObject(File emlFile) {
+    this(EmlUtility.getEmlDoc(emlFile));
+  }
+
+  
 	/*
 	 * Class methods
 	 */
