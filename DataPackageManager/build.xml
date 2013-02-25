@@ -55,6 +55,9 @@
       <fileset dir="${shared.lib.dir}/postgresql">
         <include name="**/*.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/owasp">
+        <include name="esapi-2.0.1.jar"/>
+      </fileset>    
     </copy>
   </target>
 
