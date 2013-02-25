@@ -23,6 +23,7 @@ package edu.lternet.pasta.doi;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
+import edu.lternet.pasta.common.XmlUtility;
 
 /**
  * @author servilla
@@ -96,7 +97,7 @@ public class Creator {
 	public void setSurName(String surName) throws Exception {
 
 		if (this.creatorType.toString().equals(Creator.PERSON)) {
-			this.surName = surName;
+			this.surName = XmlUtility.xmlEncode(surName);
 		} else {
 			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
@@ -114,7 +115,7 @@ public class Creator {
 	public void setGivenName(String givenName) throws Exception {
 
 		if (this.creatorType.toString().equals(Creator.PERSON)) {
-			this.givenName = givenName;
+			this.givenName = XmlUtility.xmlEncode(givenName);
 		} else {
 			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
@@ -132,7 +133,7 @@ public class Creator {
 	public void setOrganizationName(String organizationName) throws Exception {
 
 		if (this.creatorType.toString().equals(Creator.ORGANIZATION)) {
-			this.organizationName = organizationName;
+			this.organizationName = XmlUtility.xmlEncode(organizationName);
 		} else {
 			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
@@ -150,7 +151,7 @@ public class Creator {
 	public void setPositionName(String positionName) throws Exception {
 
 		if (this.creatorType.toString().equals(Creator.POSITION)) {
-			this.positionName = positionName;
+			this.positionName = XmlUtility.xmlEncode(positionName);
 		} else {
 			String gripe = "Operation not supported for this \"creator type\": "
 			    + this.creatorType.toString();
