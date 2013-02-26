@@ -120,4 +120,63 @@ public class PastaStatistics {
 
 	}
 
+	/**
+	 * Iterates through the list of scopes and identifiers of site contributed
+	 * data packages to calculate the total number of site contributed data
+	 * packages in PASTA.
+	 * 
+	 * @return The number of site contributed data packages.
+	 */
+	public Integer getNumDataPackagesSites() {
+
+		Integer numDataPackages = 0;
+		String[] scopeList =
+			{"knb-lter-and",
+			 "knb-lter-arc",
+			 "knb-lter-bes",
+			 "knb-lter-bnz",
+			 "knb-lter-cce",
+			 "knb-lter-cdr",
+			 "knb-lter-cap",
+			 "knb-lter-cwt",
+			 "knb-lter-fce",
+			 "knb-lter-gce",
+			 "knb-lter-hfr",
+			 "knb-lter-hbr",
+			 "knb-lter-jrn",
+			 "knb-lter-kbs",
+			 "knb-lter-knz",
+			 "knb-lter-luq",
+			 "knb-lter-mcm",
+			 "knb-lter-mcr",
+			 "knb-lter-nwt",
+			 "knb-lter-ntl",
+			 "knb-lter-pal",
+			 "knb-lter-pie",
+			 "knb-lter-sbc",
+			 "knb-lter-sev",
+			 "knb-lter-sgs",
+			 "knb-lter-vcr"};
+		
+    for (String scope: scopeList) {
+    	
+    	String idList = null;
+    	
+    	try {
+	      idList = this.dpmClient.listDataPackageIdentifiers(scope);
+      } catch (Exception e) {
+  	    logger.error("PastaStatistics: " + e.getMessage());
+	      e.printStackTrace();
+      }
+    	
+    	StrTokenizer identifiers = new StrTokenizer(idList);
+    	
+    	numDataPackages += identifiers.size();
+    	
+    }
+
+		return numDataPackages;
+
+	}
+	
 }
