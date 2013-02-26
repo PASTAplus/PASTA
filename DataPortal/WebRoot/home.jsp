@@ -38,6 +38,7 @@
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
   
   Integer numDataPackages = null;
+  Integer numDataPackagesSites = null;
   
   if (uid == null || uid.isEmpty()) {
     uid = "public";
@@ -45,6 +46,7 @@
   
   PastaStatistics pastaStats = new PastaStatistics("public");
   numDataPackages = pastaStats.getNumDataPackages();
+  numDataPackagesSites = pastaStats.getNumDataPackagesSites();
   
 %>
 
@@ -111,7 +113,7 @@
 
 		// Set chart options
 		var options = {
-			'title': 'NIS Data Package and Site Growth',
+			'title': 'Site/Data Package Growth',
 			'width': 400,
 			'height': 200,
 			'hAxis': {title : 'Week'},
@@ -163,6 +165,7 @@
 							<td align="left">
 							    <div id="chart_div"></div>
 								<p align="center">
+								    Site contributed data packages: <em><%=numDataPackagesSites.toString()%></em><br/>
 									Total data packages: <em><%=numDataPackages.toString()%></em>
 							    </p>
 							</td>
