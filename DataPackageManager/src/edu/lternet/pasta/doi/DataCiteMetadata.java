@@ -27,6 +27,8 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
 
 /**
  * @author servilla
@@ -145,13 +147,13 @@ public class DataCiteMetadata extends CitationMetadata {
 		// Creators section
 		xml.append("    <creators>\n");
 
-		ArrayList<Creator> creators = super.creators;
+		ArrayList<ResponsibleParty> creators = super.creators;
 
 		if (creators != null) {
-			for (Creator creator : creators) {
+			for (ResponsibleParty creator : creators) {
 				xml.append("        <creator>\n");
 				xml.append("            <creatorName>");
-				xml.append(creator.getCreatorName());
+				xml.append(creator.getIndividualName());
 				xml.append("</creatorName>\n");
 				xml.append("        </creator>\n");
 			}
