@@ -2,6 +2,7 @@ package edu.lternet.pasta.common.eml;
 
 import java.util.ArrayList;
 
+import edu.lternet.pasta.common.XmlUtility;
 
 public class ResponsibleParty {
   
@@ -70,7 +71,7 @@ public class ResponsibleParty {
    * @param   givenName  the givenName string to add
    */
   public void addGivenName(String givenName) {
-    this.givenNames.add(givenName);
+    this.givenNames.add(XmlUtility.xmlEncode(givenName));
   }
   
   
@@ -256,17 +257,17 @@ public class ResponsibleParty {
 
 
   public void setSurName(String surName) {
-    this.surName = surName;
+    this.surName = XmlUtility.xmlEncode(surName);
   }
 
 
   public void setOrganizationName(String organizationName) {
-    this.organizationName = organizationName;
+    this.organizationName = XmlUtility.xmlEncode(organizationName);
   }
 
 
   public void setPositionName(String positionName) {
-    this.positionName = positionName;
+    this.positionName = XmlUtility.xmlEncode(positionName);
   }
 
 
