@@ -27,6 +27,9 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.eml.EmlObject;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 
@@ -179,7 +182,7 @@ public class DOIScanner {
 		String resourceUrl = null;
 		String doiUrl = null;
 		String publicationYear = null;
-		ArrayList<Creator> creators = null;
+		ArrayList<ResponsibleParty> creators = null;
 		ArrayList<Title> titles = null;
 		DigitalObjectIdentifier identifier = null;
 		ResourceType resourceType = null;

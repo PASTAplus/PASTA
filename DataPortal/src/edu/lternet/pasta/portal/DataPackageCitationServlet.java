@@ -39,9 +39,9 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.portal.eml.EmlObject;
-import edu.lternet.pasta.portal.eml.Title;
-import edu.lternet.pasta.portal.eml.Creator;
+import edu.lternet.pasta.common.eml.EmlObject;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
 
 public class DataPackageCitationServlet extends DataPortalServlet {
 
@@ -207,7 +207,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		String emlString = null;
 		EmlObject emlObject = null;
 		ArrayList<Title> titles = null;
-		ArrayList<Creator> creators = null;
+		ArrayList<ResponsibleParty> creators = null;
 
 		String titleText = "";
 		String creatorText = "";
@@ -248,7 +248,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				// Citations should include only person names, if possible
 				if (personCount != 0) {
 
-					for (Creator creator : creators) {
+					for (ResponsibleParty creator : creators) {
 						
 						String individualName = creator.getIndividualName();
 
@@ -265,7 +265,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 				} else if (orgCount != 0) { // otherwise, use organization names
 
-					for (Creator creator : creators) {
+					for (ResponsibleParty creator : creators) {
 
 						String organizationName = creator.getOrganizationName();
 
@@ -293,7 +293,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 				if (orgCount != 0) {
 
-					for (Creator creator : creators) {
+					for (ResponsibleParty creator : creators) {
 
 						String organizationName = creator.getOrganizationName();
 						

@@ -171,7 +171,10 @@ public class DataPackageManagerClientTest {
           testPackageId);
     }
     catch (Exception e) {
-      fail("Error encountered while initializing identifier value prior to running JUnit test.");
+      fail(String.format("%s: %s", 
+            "Error encountered while initializing identifier value prior to running JUnit test.",
+            e.getMessage())
+          );
     }
   }
 

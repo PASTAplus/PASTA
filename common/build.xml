@@ -44,6 +44,9 @@
       <fileset dir="${shared.lib.dir}/apache-logging">
         <include name="log4j-1.2.13.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xalan">
+        <include name="**/xalan.jar"/>
+      </fileset>
       <fileset dir="${shared.lib.dir}/unboundid">
         <include name="unboundid-ldapsdk-se.jar"/>
       </fileset>

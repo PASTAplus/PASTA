@@ -18,7 +18,7 @@
  *
  */
 
-package edu.lternet.pasta.portal.eml;
+package edu.lternet.pasta.common.eml;
 
 import org.apache.log4j.Logger;
 

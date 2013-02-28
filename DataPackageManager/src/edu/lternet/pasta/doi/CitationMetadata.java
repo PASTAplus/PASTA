@@ -24,6 +24,9 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
+
 /**
  * @author servilla
  * @since Nov 5, 2012
@@ -44,7 +47,7 @@ public class CitationMetadata {
 	
 	protected String locationUrl = null;
 	protected String publicationYear = null;
-	protected ArrayList<Creator> creators = null;
+	protected ArrayList<ResponsibleParty> creators = null;
 	protected ArrayList<Title> titles = null;
 	
 	/*
@@ -82,7 +85,7 @@ public class CitationMetadata {
 	 * 
 	 * @param creators
 	 */
-	public void setCreators(ArrayList<Creator> creators) {
+	public void setCreators(ArrayList<ResponsibleParty> creators) {
 		this.creators = creators;
 	}
 	
@@ -118,7 +121,7 @@ public class CitationMetadata {
 	 * 
 	 * @return List of creators.
 	 */
-	public ArrayList<Creator> getCreators() {
+	public ArrayList<ResponsibleParty> getCreators() {
 		return this.creators;
 	}
 	
