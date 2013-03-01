@@ -329,11 +329,13 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
               /* If the entity was downloaded successfully,
                * load entity into a database unless it's an
                * image entity (spatialRaster or spatialVector)
-               * or an otherEntity
+               * or an otherEntity or it uses an externally defined
+               * format
                */
               if (downloadSuccess &&
-                  !emlEntity.getEntity().getIsImageEntity() &&
-                  !emlEntity.getEntity().isOtherEntity()
+                  !entity.getIsImageEntity() &&
+                  !entity.isExternallyDefinedFormat() &&
+                  !entity.isOtherEntity()
                  ) {
 	              loadEntity(emlPackageId, emlEntity);
               }
