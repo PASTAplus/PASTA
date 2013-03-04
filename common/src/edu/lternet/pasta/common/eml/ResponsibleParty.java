@@ -216,6 +216,28 @@ public class ResponsibleParty {
   }
 
 
+  /**
+   * Gets creator name.
+   * 
+   * @return Creator name.
+   */
+  public String getCreatorName() {
+    String creatorName = null;
+
+    if (isPerson()) {
+      creatorName = this.surName + ", " + getGivenName();
+    } 
+    else if (isOrganization()) {
+      creatorName = this.organizationName;
+    } 
+    else {
+      creatorName = this.positionName;
+    }
+
+    return creatorName;
+  }
+
+  
   public String getPhone() {
     return phone;
   }
