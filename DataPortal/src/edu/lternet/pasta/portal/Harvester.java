@@ -42,7 +42,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
@@ -517,6 +516,7 @@ public class Harvester implements Runnable {
           }
           catch (IOException e) {
             urlErrorMessage = "IOException : " + e.getMessage();
+            logger.error(urlErrorMessage); 
           }
           
           /*
