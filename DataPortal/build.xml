@@ -58,9 +58,9 @@
       <fileset dir="${shared.lib.dir}/saxon9">
         <include name="**/saxon9he.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
+      <!-- <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
         <include name="eml-2.1.0.jar"/>
-      </fileset>
+      </fileset> -->
     </copy>
   </target>
 

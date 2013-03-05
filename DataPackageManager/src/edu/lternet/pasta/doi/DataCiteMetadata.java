@@ -151,10 +151,9 @@ public class DataCiteMetadata extends CitationMetadata {
 
 		if (creators != null) {
 			for (ResponsibleParty creator : creators) {
+			  String creatorName = creator.getCreatorName();
 				xml.append("        <creator>\n");
-				xml.append("            <creatorName>");
-				xml.append(creator.getIndividualName());
-				xml.append("</creatorName>\n");
+				xml.append(String.format("            <creatorName>%s</creatorName>\n", creatorName));
 				xml.append("        </creator>\n");
 			}
 		}

@@ -45,7 +45,7 @@ import org.apache.commons.io.FileUtils;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
 import eml.ecoinformatics_org.access_2_1.AccessType;
 import eml.ecoinformatics_org.access_2_1.ObjectFactory;
-import eml.ecoinformatics_org.eml_2_1.Eml;
+//import eml.ecoinformatics_org.eml_2_1.Eml;
 
 /**
  * Used to conveniently read EML documents.
@@ -143,7 +143,7 @@ public final class EmlUtility {
      *
      * @throws IllegalArgumentException
      *             with a {@linkplain JAXBException} as the cause.
-     */
+     *
     public static Eml getEml2_1_0(String emlString) {
 
         try {
@@ -158,7 +158,7 @@ public final class EmlUtility {
             throw new IllegalArgumentException(e);
         }
 
-    }
+    }*/
 
     /**
      * Parses the provided EML 2.1.0 {@code <access>} element string and
