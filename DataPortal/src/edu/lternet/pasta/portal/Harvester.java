@@ -346,6 +346,8 @@ public class Harvester implements Runnable {
           }
           catch (Exception e) {
             serviceMessage = e.getMessage();
+            logger.error(serviceMessage);
+            e.printStackTrace();
             String fileName = isQualityReport(serviceMessage) ? 
                               "qualityReport.xml" : "serviceMessage.txt";
             String serviceMessagePath = packageIdPath + "/" + fileName;
@@ -377,6 +379,7 @@ public class Harvester implements Runnable {
           catch (Exception e) {
             serviceMessage = e.getMessage();
             logger.error(serviceMessage);
+            e.printStackTrace();
             String serviceMessagePath = packageIdPath + "/serviceMessage.txt";
             File serviceMessageFile = new File(serviceMessagePath);
             FileUtils.writeStringToFile(serviceMessageFile, serviceMessage);
