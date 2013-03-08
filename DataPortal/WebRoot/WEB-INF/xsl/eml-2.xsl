@@ -1012,7 +1012,8 @@
                 </xsl:if>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:if test="position() = $entityindex">
+            <xsl:if test="boolean(1)">
+            <!-- <xsl:if test="position() = number($entityindex)"> -->
               <xsl:choose>
                 <!-- <xsl:when test="$displaymodule='attributedetail'"> -->
                 <xsl:when test="boolean(0)">
@@ -1045,7 +1046,8 @@
                 </xsl:if>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:if test="position() = $entityindex">
+            <xsl:if test="boolean(1)">
+            <!-- <xsl:if test="position() = number($entityindex)"> -->
               <xsl:choose>
                 <!-- <xsl:when test="$displaymodule='attributedetail'"> -->
                 <xsl:when test="boolean(0)">
@@ -1078,7 +1080,8 @@
                 </xsl:if>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:if test="position() = $entityindex">
+            <xsl:if test="boolean(1)">
+            <!-- <xsl:if test="position() = number($entityindex)"> -->
               <xsl:choose>
                 <!-- <xsl:when test="$displaymodule='attributedetail'"> -->
                 <xsl:when test="boolean(0)">
@@ -1111,7 +1114,8 @@
                 </xsl:if>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:if test="position() = $entityindex">
+            <xsl:if test="boolean(1)">
+            <!-- <xsl:if test="position() = number($entityindex)"> -->
               <xsl:choose>
                 <!-- <xsl:when test="$displaymodule='attributedetail'"> -->
                 <xsl:when test="boolean(0)">
@@ -1135,7 +1139,7 @@
               </xsl:choose>
             </xsl:if>
           </xsl:if>
-          <xsl:if test="'otherEntityTable' = name()">
+          <xsl:if test="'otherEntity' = name()">
             <xsl:variable name="currentNode" select="."/>
             <xsl:variable name="otherEntityCount">
               <xsl:for-each select="../otherEntity">
@@ -1144,7 +1148,8 @@
                 </xsl:if>
               </xsl:for-each>
             </xsl:variable>
-            <xsl:if test="position() = $entityindex">
+            <xsl:if test="boolean(1)">
+            <!-- <xsl:if test="position() = number($entityindex)"> -->
               <xsl:choose>
                 <!-- <xsl:when test="$displaymodule='attributedetail'"> -->
                 <xsl:when test="boolean(0)">
@@ -7543,11 +7548,8 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntity</xsl:text></xsl:message></xsl:if>
-    <table class="dataset-entity-part">
-      <tr>
-        <td class="dataset-entity-part-header"><h3>Data Resource, Other</h3></td>
-      </tr>
-    </table>
+    <hr></hr>
+    <label><big>Data Resource, Other:</big></label>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -9277,6 +9279,8 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRaster</xsl:text></xsl:message></xsl:if>
+    <hr></hr>
+    <label><big>Spatial Raster:</big></label>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -10176,6 +10180,8 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVector</xsl:text></xsl:message></xsl:if>
+    <hr></hr>
+    <label><big>Spatial Vector:</big></label>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -10408,6 +10414,8 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedure</xsl:text></xsl:message></xsl:if>
+    <hr></hr>
+    <label><big>Stored Procedure:</big></label>
     <table xsl:use-attribute-sets="cellspacing" class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -10762,6 +10770,8 @@
     <xsl:param name="entityindex"/>
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: view</xsl:text></xsl:message></xsl:if>
+    <hr></hr>
+    <label><big>View:</big></label>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
