@@ -2561,7 +2561,10 @@ public class DataPackageManagerResource extends PastaWebService {
       ArrayList<String> resources = dataPackageManager.getDataPackageResources(scope, identifier, revisionInt);
       if (resources != null && resources.size() > 0) {
         for (String resource : resources) {
-          if (resource != null && resource.contains("/package/data/eml")) {
+          if (resource != null && 
+              resource.contains("/package/data/eml") &&
+              resource.contains(entityId)
+             ) {
             resourceId = resource;
           }
         }
