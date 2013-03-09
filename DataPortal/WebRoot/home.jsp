@@ -37,17 +37,35 @@
 
   String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
   
-  Integer numDataPackages = null;
-  Integer numDataPackagesSites = null;
   
   if (uid == null || uid.isEmpty()) {
     uid = "public";
   }
   
+  // Generate PASTA data package statistics and store values in session.
+
+  Integer numDataPackages = null;
+  Integer numDataPackagesSites = null;
+  String count = null;
+
   PastaStatistics pastaStats = new PastaStatistics("public");
-  numDataPackages = pastaStats.getNumDataPackages();
-  numDataPackagesSites = pastaStats.getNumDataPackagesSites();
-  
+
+  count = (String) httpSession.getAttribute("numDataPackages");
+  if (count != null) {
+    numDataPackages = Integer.valueOf(count);
+  } else {
+    numDataPackages = pastaStats.getNumDataPackages();
+    httpSession.setAttribute("numDataPackages", numDataPackages.toString());
+  }
+
+  count = (String) httpSession.getAttribute("numDataPackagesSites");
+  if (count != null) {
+    numDataPackagesSites = Integer.valueOf(count);
+  } else {
+    numDataPackagesSites = pastaStats.getNumDataPackagesSites();
+    httpSession.setAttribute("numDataPackagesSites", numDataPackagesSites.toString());
+  }
+
 %>
 
 <!doctype html>
