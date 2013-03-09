@@ -44,6 +44,7 @@ import com.unboundid.ldap.sdk.LDAPURL;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
+import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchResultReference;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
@@ -243,7 +244,26 @@ public final class KnbLdap extends Ldap {
 
 			// Authentication was achieved
 			if (code.intValue() == ResultCode.SUCCESS_INT_VALUE) {
-				return true;
+				
+              String uid = DN.getRDNString(user);
+              String base = user.replace(uid + ",", "");
+              String userId = uid.split("=")[1];
+              
+              Filter filter = Filter.createEqualityFilter("uid", userId);
+              SearchRequest searchRequest = new SearchRequest(base, SearchScope.SUB, filter, "uid");
+              
+              SearchResult searchResult = connection.search(searchRequest);
+              
+              SearchResultEntry entry = null;
+              entry = searchResult.getSearchEntry(user);
+              
+              // Perform case-sensitive UID test for final authentication
+              if (entry != null && entry.getAttributeValue("uid").equals(userId)) {
+                return true;
+              } else {
+                return false;
+              }
+      	
 			}
 
 			String s = "LDAPConnection.bind() did not throw an exception, "
