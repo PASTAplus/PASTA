@@ -42,7 +42,6 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.log4j.Logger;
-import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -529,7 +528,11 @@ public class HarvestReport {
       if (fileNames != null) {
         for (int i = 0; i < fileNames.length; i++) {
           String fileName = fileNames[i];
-          if (fileName != null && fileName.startsWith(uid)) {
+          if (fileName != null && 
+               (fileName.startsWith(uid + "-evaluate-") || 
+                fileName.startsWith(uid + "-upload-")
+               )
+             ) {
             harvestDirs.add(fileName);
           }
         }
