@@ -37,7 +37,6 @@ import java.util.concurrent.Executors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -81,7 +80,6 @@ public class HarvesterServlet extends DataPortalServlet {
   
   private final String CHECK_BACK_LATER =
       "<p class=\"warning\">This may take a few minutes. Please check the <a href=\"./harvestReport.jsp\">View Harvest Reports</a> page for available reports.</p>";
-  private String reportId = null;
   
   
   /*
@@ -143,6 +141,7 @@ public class HarvesterServlet extends DataPortalServlet {
     File emlFile = null;
     String urlTextArea = null;
     String harvestListURL = null;
+    String reportId = null;
     
     try {
       if (uid == null) {
@@ -237,7 +236,16 @@ public class HarvesterServlet extends DataPortalServlet {
           isEvaluate = true;
         }
         
-        String harvestDirPath = generateHarvestDirPath(uid, isEvaluate);
+        String harvestId = generateHarvestId();
+        
+        if (isEvaluate) {
+          reportId = uid + "-evaluate-" + harvestId;
+        }
+        else {
+          reportId = uid + "-upload-" + harvestId;
+        }
+        
+        String harvestDirPath = harvesterPath + "/" + reportId;
         Harvester harvester = new Harvester(harvestDirPath, uid, isEvaluate);
         
         if (emlTextArea != null) {
@@ -294,8 +302,7 @@ public class HarvesterServlet extends DataPortalServlet {
   
   
   /*
-   * Saves an EML document to the file system for subsequent
-   * processing.
+   * Generates a numeric harvest ID based on the current timestamp.
    */
   private String generateHarvestId() {
     String harvestId = null;
@@ -310,27 +317,6 @@ public class HarvesterServlet extends DataPortalServlet {
     logger.debug("HARVESTID: " + harvestId);
     
     return harvestId;
-  }
-  
-  
-  /*
-   * Generate a directory path for storing a harvest report for
-   * the specified user.
-   */
-  private String generateHarvestDirPath(String uid, boolean isEvaluate) {
-    String harvestDirPath = null;
-    String harvestId = generateHarvestId();
-    
-    if (isEvaluate) {
-      this.reportId = uid + "-evaluate-" + harvestId;
-    }
-    else {
-      this.reportId = uid + "-upload-" + harvestId;
-    }
-    
-    harvestDirPath = harvesterPath + "/" + this.reportId;
-    
-    return harvestDirPath;
   }
   
   
