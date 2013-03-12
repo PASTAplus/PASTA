@@ -323,6 +323,10 @@ public class AuditManager {
         String timestamp = dateToTimestamp(value, true);
         stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
       }
+      else if (key.equalsIgnoreCase("group")) {
+        String orClause = composeORClause("groups", values);
+        stringBuffer.append(orClause);
+      }
       else {
         String orClause = composeORClause(key, values);
         stringBuffer.append(orClause);
