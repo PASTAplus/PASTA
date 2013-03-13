@@ -88,6 +88,7 @@ public final class AuditService
 
         AuditService a = new AuditService();
         a.logAsRunnable(entry, token);
+        
     }
 
     private void logAsRunnable(LogEntry entry, AuthToken token) {
@@ -155,16 +156,13 @@ public final class AuditService
                                          MediaType.TEXT_PLAIN_TYPE);
         b.entity(entry);
 
-        /*
-         * FIXME: when services have their own tokens to authorize against
-         * other services, this won't be necessary.
-         */
-        if (token == null) {
-            Set<String> s = new TreeSet<String>();
-            s.add("authenticated");
-            token = AuthTokenFactory.makeCookieAuthToken("none", AuthSystemDef.KNB, 2000000000, s);
-        }
-        return AuthTokenFactory.addToken(token, b);
+        // Ignore incoming token and create new AuthToken as user PASTA
+				Set<String> s = new TreeSet<String>();
+				s.add("authenticated");
+				token = AuthTokenFactory.makeCookieAuthToken("pasta", AuthSystemDef.KNB,
+				    2000000000, s);
+		
+				return AuthTokenFactory.addToken(token, b);
     }
 
     public static synchronized void joinAll() {
