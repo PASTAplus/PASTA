@@ -61,10 +61,6 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	 * Instance variables
 	 */
 
-	private String pastaUriHead;
-	private String uid = null;
-	private String citationMessage = null;
-
 	/**
 	 * Constructor of the object.
 	 */
@@ -120,10 +116,9 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 		HttpSession httpSession = request.getSession();
 
-		this.uid = (String) httpSession.getAttribute("uid");
+		String uid = (String) httpSession.getAttribute("uid");
 
-		if (this.uid == null || this.uid.isEmpty())
-			this.uid = "public";
+		if (uid == null || uid.isEmpty()) uid = "public";
 
 		String html = null;
 		Integer id = null;
@@ -159,13 +154,12 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 		if (isPackageId) {
 
-			html = this.mapFormatter(scope, id, revision);
+			html = this.mapFormatter(uid, scope, id, revision);
 
 		} else {
 			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
 		}
 
-		httpSession.setAttribute("citationmessage", citationMessage);
 		httpSession.setAttribute("html", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
@@ -179,13 +173,9 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	 *           if an error occurs
 	 */
 	public void init() throws ServletException {
+	
 		PropertiesConfiguration options = ConfigurationListener.getOptions();
-		pastaUriHead = options.getString("pasta.uriHead");
 
-		if ((pastaUriHead == null) || (pastaUriHead.equals(""))) {
-			throw new ServletException(
-			    "No value defined for 'pasta.uriHead' property.");
-		}
 	}
 
 	/**
@@ -200,7 +190,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	 * 
 	 * @return The formatted resource map as HTML
 	 */
-	private String mapFormatter(String scope, Integer identifier, String revision) {
+	private String mapFormatter(String uid, String scope, Integer identifier, String revision) {
 
 		String html = null;
 
@@ -220,7 +210,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 		try {
 
-			dpmClient = new DataPackageManagerClient(this.uid);
+			dpmClient = new DataPackageManagerClient(uid);
 
 			emlString = dpmClient.readMetadata(scope, identifier, revision);
 			emlObject = new EmlObject(emlString);

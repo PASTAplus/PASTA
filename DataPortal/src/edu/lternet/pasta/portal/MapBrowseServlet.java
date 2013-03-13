@@ -56,17 +56,14 @@ public class MapBrowseServlet extends DataPortalServlet {
 	private static final Logger logger = Logger
 	    .getLogger(edu.lternet.pasta.portal.MapBrowseServlet.class);
 	private static final long serialVersionUID = 1L;
-
+	
+	private static String pastaUriHead;
 	private static final String forward = "./dataPackageBrowser.jsp";
 
 	/**
 	 * Instance variables
 	 */
 
-	private Integer count = 0;
-	private String pastaUriHead;
-	private String uid = null;
-	private String browseMessage = null;
 
 	/**
 	 * Constructor of the object.
@@ -123,10 +120,9 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		HttpSession httpSession = request.getSession();
 
-		this.uid = (String) httpSession.getAttribute("uid");
+		String uid = (String) httpSession.getAttribute("uid");
 
-		if (this.uid == null || this.uid.isEmpty())
-			this.uid = "public";
+		if (uid == null || uid.isEmpty()) uid = "public";
 
 		String html = null;
 		Integer id = null;
@@ -166,15 +162,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		if (isPackageId) {
 
-			html = this.mapFormatter(scope, id, revision);
+			html = this.mapFormatter(uid, scope, id, revision);
 
 		} else {
 			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
 		}
 
-		httpSession.setAttribute("browsemessage", browseMessage);
 		httpSession.setAttribute("html", html);
-		httpSession.setAttribute("count", this.count.toString());
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 
@@ -208,7 +202,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	 * 
 	 * @return The formatted resource map as HTML
 	 */
-	private String mapFormatter(String scope, Integer identifier, String revision) {
+	private String mapFormatter(String uid, String scope, Integer identifier, String revision) {
 
 		String html = "";
 
@@ -241,7 +235,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		try {
 
-			dpmClient = new DataPackageManagerClient(this.uid);
+			dpmClient = new DataPackageManagerClient(uid);
 			
 			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier);
 			revUtil = new RevisionUtility(revisionList);
@@ -424,9 +418,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 			}
 				
-
-			this.count++;
-
 		}
 
 		html += "<h4 align=\"left\">Package Identification</h4>\n";
@@ -453,8 +444,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				+ "identifier=" + identifier.toString() + "&"
 				+ "revision=" + revision
 		    + "\">How to cite this data package...</a></p>";
-
-		this.count += 6; // Two for each header
 
 		return html;
 
