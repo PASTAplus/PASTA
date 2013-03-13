@@ -376,9 +376,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				// Safe URL encoding of entity name
 				try {
-					logger.info(entityId);
 					entityId = urlCodec.encode(entityId);
-					logger.info(entityId);
 				} catch (EncoderException e) {
 					logger.error(e.getMessage());
 					e.printStackTrace();
