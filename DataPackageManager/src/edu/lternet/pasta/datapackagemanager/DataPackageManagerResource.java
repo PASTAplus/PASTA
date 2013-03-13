@@ -1859,7 +1859,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <td>200 OK</td>
    *     <td>If the request to read the data package was successful</td>
    *     <td>A resource graph with reference URLs to each of the metadata, data, and quality report resources that comprise the data package.</td>
-   *     <td><code>'application/xml'</code></td>
+   *     <td><code>'text/plain'</code></td>
    *     <td>
    *     https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/3/NoneSuchBugCount<br />
    *     https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/3<br />
@@ -1917,7 +1917,7 @@ public class DataPackageManagerResource extends PastaWebService {
    */
   @GET
   @Path("/eml/{scope}/{identifier}/{revision}")
-  @Produces("application/xml")
+  @Produces("text/plain")
   public Response readDataPackage(
                                   @Context HttpHeaders headers,
                                   @PathParam("scope") String scope,
