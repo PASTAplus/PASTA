@@ -2,7 +2,7 @@
 
 <div class="foot">
 	<p id="foot-copyright">
-		Copyright &copy; 2009-2012 Long Term Ecological Research Network. This
+		Copyright &copy; 2009-2013 Long Term Ecological Research Network. This
 	   	material is based upon work supported by the <a href="http://www.nsf.gov/">
 	   	National Science Foundation</a> under Cooperative Agreements
 	   	<a target="_blank" href="http://www.fastlane.nsf.gov/servlet/showaward?award=0832652">#DEB-0832652</a>
