@@ -205,6 +205,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		String pubDateText = "";
 		String citationId = "";
 		String caveat = "";
+		String citationUrl = "";
 
 		DataPackageManagerClient dpmClient = null;
 
@@ -310,6 +311,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				caveat = "<p>Note: DOIs are generated hourly for all data packages"
 				    + " that are \"publicly\" accessible.</p>";
 			}
+			
+			citationUrl = "<a href=\"" + citationId + "\">" + citationId + "</a>"; 
 
 			String pubDate = emlObject.getPubDate();
 
@@ -335,7 +338,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		}
 
 		html = "<p id=\"cite\">" + creatorText + pubDateText + titleText + orgText + PUBLISHER
-		    + citationId + "</p>" + caveat;
+		    + citationUrl + "</p>" + caveat;
 		
 		return html;
 
