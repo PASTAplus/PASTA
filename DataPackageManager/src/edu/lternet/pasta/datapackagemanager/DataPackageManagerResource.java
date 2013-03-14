@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,6 +84,8 @@ import edu.lternet.pasta.common.WebResponseFactory;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.proxy.AuditService;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -990,6 +994,40 @@ public class DataPackageManagerResource extends PastaWebService {
     return response;
   }
   
+  
+  /*
+   * Matches the specified 'entityName' value with the entity names
+   * found in the EML document string, and returns the corresponding 
+   * objectName value for the matching entity, if an objectName was
+   * specified for the matching entity.
+   * 
+   * Returns null if:
+   *   (1) The EML document fails to parse, or
+   *   (2) No entities match the specified entityName value, or
+   *   (3) The matching entity does not specify an objectName in
+   *       the EML document.
+   */
+  private String findObjectName(String xml, String entityName) {
+    String objectName = null;
+    EMLParser emlParser = new EMLParser();
+    
+    if (xml != null && entityName != null) {
+      try {
+        InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+        DataPackage dataPackage = emlParser.parseDocument(inputStream);
+        
+        if (dataPackage != null) {
+          objectName = dataPackage.findObjectName(entityName);
+        }
+      }
+      catch (Exception e) {
+        logger.error("Error parsing EML metacdata: " + e.getMessage());
+      }
+    }
+    
+    return objectName;
+  }
+
   
   /**
    * 
@@ -2577,7 +2615,26 @@ public class DataPackageManagerResource extends PastaWebService {
         dataPackageManager.readDataEntity(scope, identifier, revision, entityId, authToken, userId);
     
       if (byteArray != null) {
+        String dataPackageResourceId = DataPackageManager.composeResourceId(
+          ResourceType.dataPackage, scope, identifier, Integer.valueOf(revision), null);
+
+        String entityResourceId = DataPackageManager.composeResourceId(
+          ResourceType.data, scope, identifier, Integer.valueOf(revision), entityId);
+
+        String entityName = dataPackageManager.readDataEntityName(
+          dataPackageResourceId, entityResourceId, authToken);
+        
+        String xmlMetadata = dataPackageManager.readMetadata(
+          scope, identifier, revision, authToken.getUserId(), authToken);
+        
+        String objectName = findObjectName(xmlMetadata, entityName);
+
         responseBuilder = Response.ok(byteArray, dataFormat);
+        
+        if (objectName != null) {
+          responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
+        }
+
         response = responseBuilder.build();
       }
       else {

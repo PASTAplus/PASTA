@@ -227,21 +227,9 @@ public class DataViewerServlet extends DataPortalServlet {
       try {
         InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
         DataPackage dataPackage = emlParser.parseDocument(inputStream);
-
+        
         if (dataPackage != null) {
-          ArrayList<Entity> entityList = dataPackage.getEntityList();
-
-          for (Entity entity : entityList) {
-            String anEntityName = entity.getName();
-            String anObjectName = entity.getObjectName();
-
-            if (anEntityName != null && 
-                anObjectName != null && 
-                anEntityName.equals(entityName)
-               ) {
-              objectName = anObjectName;
-            }
-          }
+          objectName = dataPackage.findObjectName(entityName);
         }
       }
       catch (Exception e) {

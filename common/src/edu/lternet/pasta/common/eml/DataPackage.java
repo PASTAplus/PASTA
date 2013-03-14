@@ -77,6 +77,26 @@ public class DataPackage {
    * Instance methods
    */
   
+  /**
+   * Finds the matching object name for a given entity in this data package
+   * based on the entity's name. This is a convenience method.
+   * 
+   * @param entityName    The entity name, e.g. "Data Entity One"
+   * @return the matching object name, or null if no match was found
+   */
+  public String findObjectName(String entityName) {
+    String objectName = null;
+    
+    for (Entity entity : getEntityList()) {
+      String name = entity.getName();
+      if ((name != null) && (name.equals(entityName))) {
+        objectName = entity.getObjectName();
+      }
+    }
+     
+    return objectName;
+  }
+  
   
   /* Getters and Setter */
   

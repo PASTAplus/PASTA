@@ -1590,7 +1590,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
         }
         
         /*
-         * Check whether user is authorized to read the data package report
+         * Check whether user is authorized to read the data package metadata
          */
         Authorizer authorizer = new Authorizer(dataPackageRegistry);
         boolean isAuthorized = authorizer.isAuthorized(authToken, metadataId, Rule.Permission.read);
