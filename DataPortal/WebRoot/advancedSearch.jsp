@@ -292,12 +292,14 @@
 
           <div class="figure floatleft">
             <label for="advancedsearch">Spatial Criteria</label>
-            <script type="text/javascript">var mapPage="advancedSearch";</script>
-            <script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyBp6NVxmktzpZDqazkl1L3xitpGUsbNO24&amp;sensor=true" 
-                    type="text/javascript"></script>
-            <script type="text/javascript" src="./js/dragzoom.js" ></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false"
+                    type="text/javascript">
+            </script>
             <script type="text/javascript" src="./js/map_functions.js" ></script>      
-            <div id="map" style="width: 330px; height: 258px"></div>
+            <script type="text/javascript">
+              google.maps.event.addDomListener(window, 'load', initialize);
+            </script>
+            <div id="map-canvas" style="width: 330px; height: 258px"></div>
             Zoom in to the region you'd like to search
             <table>
               <tr>
