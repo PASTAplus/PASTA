@@ -119,10 +119,8 @@
         if (trim(form.subjectValue.value) == "" &&
             trim(form.creatorSurname.value) == "" &&
             trim(form.creatorOrganization.value) == "" &&
-            trim(form.northBound.value) == "90.0" &&
-            trim(form.eastBound.value) == "180.0" &&
-            trim(form.southBound.value) == "-90.0" &&
-            trim(form.westBound.value) == "-180.0" &&
+            trim(form.eastBound.value) == "180" &&
+            trim(form.westBound.value) == "-180" &&
             trim(form.locationName.value) == "" &&
             trim(form.taxon.value) == "" &&
             howManySelected(form.siteValues) == 0 &&
