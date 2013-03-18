@@ -33,17 +33,19 @@
           <tbody>
             <tr>
               <td class="header">Date/Time</td>
-               <!--  <td class="header">Method</td> -->
+              <td class="header">Method</td>
               <td class="header">Resource</td>
               <td class="header">User</td>
+              <td class="header">Group(s)</td>
             </tr>
             <xsl:for-each select="/auditReport/auditRecord">
               <xsl:sort select="./oid" data-type="number" />
               <tr>
                 <xsl:apply-templates select="./entryTime" />
-                <!--  <xsl:apply-templates select="./serviceMethod" /> -->
+                <xsl:apply-templates select="./serviceMethod" />
                 <xsl:apply-templates select="./resourceId" />
                 <xsl:apply-templates select="./user" />
+                <xsl:apply-templates select="./groups" />
               </tr>
             </xsl:for-each>
           </tbody>
@@ -73,6 +75,12 @@
   </xsl:template>
   
   <xsl:template match="user">
+    <td class="data">
+      <xsl:value-of select="."/>
+    </td>
+  </xsl:template>
+  
+  <xsl:template match="groups">
     <td class="data">
       <xsl:value-of select="."/>
     </td>
