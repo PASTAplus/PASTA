@@ -61,7 +61,7 @@
 
 			<h4>Review PASTA Audit Reports</h4>
 			<ul>
-				<li><a href="./dataPackageAudit.jsp">Data Package Audit Reports</a></li>
+				<li><a href="./dataPackageAudit.jsp">Data Package Access Reports</a></li>
 				<li><a href="./auditReport.jsp">Filtered Audit Reports</a></li>
 			</ul>
 			
