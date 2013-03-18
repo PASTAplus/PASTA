@@ -294,12 +294,19 @@ public class AuditManager {
     for (String value : values) {
       if (!firstValue) { stringBuffer.append(" OR "); }
       String fieldName = getFieldName(key);
-      stringBuffer.append(String.format("%s='%s'", fieldName, value));
+      
+      if (fieldName.equals("resourceid")) {
+      	stringBuffer.append(String.format("%s like '%s'", fieldName, value));
+      } else {
+      	stringBuffer.append(String.format("%s='%s'", fieldName, value));
+      }
+      
       firstValue = false;
     }
     
     stringBuffer.append(" )");
     String orClause = stringBuffer.toString();
+
     return orClause;
   }
   
@@ -361,7 +368,9 @@ public class AuditManager {
         " entrytext, resourceid, statuscode, userid, groups, authsystem " +
         "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
         composeWhereClause(queryParams);
-     
+      
+      logger.warn(selectString);
+      
       Statement stmt = null;
      
       try {

@@ -53,7 +53,7 @@ public final class QueryString {
      * @param uriInfo contains the query string parameters.
      */
     public QueryString(UriInfo uriInfo) {
-        this(uriInfo.getQueryParameters());
+        this(uriInfo.getQueryParameters(true));
     }
 
     /**
