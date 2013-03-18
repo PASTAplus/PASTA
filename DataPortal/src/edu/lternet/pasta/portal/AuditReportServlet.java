@@ -124,21 +124,29 @@ public class AuditReportServlet extends DataPortalServlet {
      * Request and process filter parameters
      */
     
-    String begin = (String) request.getParameter("begin");
-    if (begin != null && !begin.isEmpty()) {
+    String beginTime = "00:00:00";
+    String endTime   = "00:00:00";
+    String time = "";
+    
+    String beginDate = (String) request.getParameter("beginDate");
+    if (beginDate != null && !beginDate.isEmpty()) {
+  		time = (String) request.getParameter("beginTime");
+  		if (time != null && !time.isEmpty()) beginTime = time;
     	if (filter.length() == 0) {
-    		filter.append("fromTime=" + begin);
+    		filter.append("fromTime=" + beginDate + "T" + beginTime);
     	} else {
-    		filter.append("&fromTime=" + begin);
+    		filter.append("&fromTime=" + beginDate + "T" + beginTime);
     	}
     }
     
-    String end = (String) request.getParameter("end");
-    if (end != null && !end.isEmpty()) {
+    String endDate = (String) request.getParameter("endDate");
+    if (endDate != null && !endDate.isEmpty()) {
+  		time = (String) request.getParameter("endTime");
+  		if (time != null && !time.isEmpty()) endTime = time;
     	if (filter.length() == 0) {
-    		filter.append("toTime=" + end);
+    		filter.append("toTime=" + endDate + "T" + endTime);
     	} else {
-    		filter.append("&toTime=" + end);
+    		filter.append("&toTime=" + endDate + "T" + endTime);
     	}
     }
     
