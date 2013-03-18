@@ -33,7 +33,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>NIS Data Portal - Audit Report</title>
+<title>NIS Data Portal - Access Report</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -56,16 +56,14 @@
 
 		<div class="content">
 
-			<h2 align="center">Data Package Audit Report Viewer</h2>
+			<h2 align="center">Data Package Access Report Viewer</h2>
 
 
 			<fieldset>
-				<legend>Data Package Audit Reports</legend>
+				<legend>Data Package Access Report</legend>
 
-				<p>Review a PASTA audit report by entering the Package Id value
-				   (e.g., <em>knb-lter-xyz.1.1</em>) and, optionally, a user
-				   name (e.g., <em>jdoe</em>) and date range, then select
-				   "submit". Dates are formatted as <em>YYYY-MM-DD</em>.</p>
+				<p>Review a PASTA Data Package access report by entering information into one or more
+				of the filters below, then select "submit":</p>
 
 				<form id="dataPackageAudit" name="dataPackageAudit" method="post"
 					action="./dataPackageAudit">
@@ -73,34 +71,54 @@
 					<table>
 						<tbody>
 							<tr>
-								<td align="left">
-								    <label for="packageId">Package Id:</label>
-								</td>
+								<td align="right">PackageId:</td>
 								<td>
-									<input type="text" name="packageId" size="50px"
-									required="required" placeholder="knb-lter-xyz.1.1" autofocus />
+                  <label for="scope">Scope </label>
+									<input type="text" name="scope" size="30px" placeholder="knb-lter-xyz" autofocus />
 								</td>
+                <td>
+                  <label for="identifier">Identifier </label>
+                  <input type="number" name="identifier" size="5px" />
+                </td>
+                <td>
+                  <label for="revision">Revision </label>
+                  <input type="number" name="revision" size="5px" />
+                </td>
 							</tr>
 							<tr>
-								<td align="left">
-								    <label for="userId">User Name:</label>
-								</td>
-								<td>
-								    <input type="text" name="userId" size="50px" />
-								</td>
+							  <td align="right">Resource type:</td>
+							  <td colspan="3">
+							    <label for="package">Package </label>
+							    <input type="checkbox" name="package" value="on" checked="checked" />
+							    <label for="metadata">&nbsp;&nbsp;&nbsp;Metadata </label>
+							    <input type="checkbox" name="metadata" value="on" />
+							    <label for="report]">&nbsp;&nbsp;&nbsp;Report </label>
+							    <input type="checkbox" name="report" value="on" />
+							    <label for="entity">&nbsp;&nbsp;&nbsp;Entity </label>
+							    <input type="checkbox" name="entity" value="on" />
+							  </td>
 							</tr>
 							<tr>
-								<td align="left">Date Range:</td>
-								<td>
+								<td align="right">Who:</td>
+								<td colspan="3">
+								  <label for="userId">User Name </label>
+								  <input type="text" name="userId" size="30px" />
+                  <label for="group">&nbspGroup </label>
+                  <input type="text" name="group" size="30px" />
+                </td>
+							</tr>
+							<tr>
+								<td align="right">Date:</td>
+								<td colspan="3">
 								    <label for="begin">Begin </label>
-								    <input type="text" name="begin" size="15px" placeholder="YYYY-MM-DD" />
-						            <label for="end">End </label>
-								    <input type="text" name="end" size="15px" placeholder="YYYY-MM-DD" />
+								    <input type="date" name="begin" size="15px" placeholder="YYYY-MM-DD" />
+						        <label for="end">&nbsp;End </label>
+								    <input type="date" name="end" size="15px" placeholder="YYYY-MM-DD" />
 								</td>
 							</tr>
 							<tr>
 								<td></td>
-								<td>
+								<td colspan="3">
 								    <input type="submit" name="submit" value="submit" />
 								    <input type="reset" name="reset" value="reset" />
 								</td>
