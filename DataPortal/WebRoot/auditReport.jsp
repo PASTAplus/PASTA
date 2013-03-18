@@ -60,11 +60,11 @@
 
 
 			<fieldset>
-				<legend>Filtered Audit Report</legend>
+				<legend>Audit Report</legend>
 
-				<p>Review a PASTA audit report by selecting the appropriate
-				   filters or see all entries by leaving the defaults, then
-				   select "submit".</p>
+				<p>Review a PASTA audit report by entering information into one or more
+           of the filters below, or see all entries by leaving the defaults, then
+				   select "submit":</p>
 
 				<form id="auditReport" name="auditReport" method="post"
 					action="./auditReport">
@@ -72,16 +72,29 @@
 						<table align="left" cellpadding="4em">
 							<tbody>
 								<tr>
-									<td align="right">Date-Time Range:</td>
+									<td align="right">Begin Date-Time:</td>
 									<td>
-									   <label for="begin">Begin </label>
-									   <input type="text" name="begin" size="25px" placeholder="YYYY-MM-DDTHH:MM:SS" />
+									   <label for="beginDate">Date </label>
+									   <input type="date" name="beginDate" size="25px" placeholder="YYYY-MM-DD" />
 									</td>
 									<td>
-									   <label for="end">End </label>
-									   <input type="text" name="end" size="25px" placeholder="YYYY-MM-DDTHH:MM:SS" />
+									   <label for="beginTime">Time </label>
+									   <input type="text" name="beginTime" size="25px" placeholder="HH:MM:SS" />
 									</td>
+                  <td>Values are Mountain TZ (default 00:00:00)</td>
 								</tr>
+                <tr>
+                  <td align="right">End Date-Time:</td>
+                  <td>
+                     <label for="endDate">Date </label>
+                     <input type="date" name="endDate" size="25px" placeholder="YYYY-MM-DD" />
+                  </td>
+                  <td>
+                     <label for="endTime">Time </label>
+                     <input type="text" name="endTime" size="25px" placeholder="HH:MM:SS" />
+                  </td>
+                  <td>Values are Mountain TZ (default 00:00:00)</td>
+                </tr>
 								<tr>
 									<td align="left">Category Status:</td>
 									<td colspan="2">
