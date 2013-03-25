@@ -200,7 +200,7 @@ public class EmlUtility {
    */
 	public String xmlToHtmlSaxon(String xslPath,
 	    HashMap<String, String> parameters) throws ParseException {
-
+		
     String html = null;
     File xsltFile = new File(xslPath);
     StringReader stringReader = new StringReader(this.eml);
@@ -216,6 +216,7 @@ public class EmlUtility {
       Serializer out = new Serializer();
       out.setOutputProperty(Serializer.Property.METHOD, "html");
       out.setOutputProperty(Serializer.Property.INDENT, "yes");
+      out.setOutputProperty(Serializer.Property.ENCODING, "UTF-8");
       out.setOutputWriter(stringWriter);
       XsltTransformer xsltTransformer = xsltExecutable.load();
       xsltTransformer.setInitialContextNode(xdmNode);
