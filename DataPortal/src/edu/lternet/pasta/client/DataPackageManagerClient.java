@@ -364,7 +364,7 @@ public class DataPackageManagerClient extends PastaClient {
 					logger.info(idleTime);
 					try {
 						String errorText = readDataPackageError(packageScope, packageIdentifier,
-								packageRevision.toString());
+								packageRevision.toString(), entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
@@ -959,11 +959,11 @@ public class DataPackageManagerClient extends PastaClient {
 	}
 
 	public String readDataPackageError(String scope, Integer identifier,
-	    String revision) throws Exception {
+	    String revision, String transaction) throws Exception {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, transaction);
 		String url = BASE_URL + "/error" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -1218,7 +1218,7 @@ public class DataPackageManagerClient extends PastaClient {
 					logger.info(idleTime);
 					try {
 						String errorText = readDataPackageError(packageScope, packageIdentifier,
-								packageRevision.toString());
+								packageRevision.toString(), entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
