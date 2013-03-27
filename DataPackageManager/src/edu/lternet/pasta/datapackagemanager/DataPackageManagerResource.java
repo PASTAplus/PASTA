@@ -25,15 +25,24 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -51,11 +60,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -70,6 +82,7 @@ import edu.ucsb.nceas.utilities.Options;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.LogEntryFactory;
 import edu.lternet.pasta.common.PastaWebService;
@@ -216,6 +229,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
   private static Logger logger =
     Logger.getLogger(DataPackageManagerResource.class);
+  private static final String dirPath = "WebRoot/WEB-INF/conf";
   
   /*
    * Instance fields
@@ -537,76 +551,34 @@ public class DataPackageManagerResource extends PastaWebService {
   @Produces("text/plain")
 	public Response createDataPackage(@Context HttpHeaders headers,
                                     File emlFile) {
-    String resourceMap = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "createDataPackage";
     Rule.Permission permission = Rule.Permission.write;
     AuthToken authToken = null;
-    String entryText = null;
 
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
+		authToken = getAuthToken(headers);
+		String userId = authToken.getUserId();
 
-      // Is user authorized to run the 'createDataPackage' service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      resourceMap = dataPackageManager.createDataPackage(emlFile, userId, authToken);
-
-      if (resourceMap != null) {
-        responseBuilder = Response.ok(resourceMap);
-        response = responseBuilder.build();       
-      } 
-      else {
-        Exception e = new Exception("Data package create operation failed for unknown reason");
-        throw(e);
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-          e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-
-    String resourceId = resourceIdFromResourceMap(resourceMap);
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// Is user authorized to run the 'createDataPackage' service method?
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+		    serviceMethodName, permission, authToken);
+		if (!serviceMethodAuthorized) {
+			throw new UnauthorizedException("User " + userId
+			    + " is not authorized to execute service method " + serviceMethodName);
+		}
+		
+		// Perform createDataPackage in new thread
+		Creator creator = new Creator(emlFile, userId, authToken);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+    executorService.execute(creator);
+    executorService.shutdown();
+		
+		responseBuilder = Response.status(Response.Status.ACCEPTED);
+		response = responseBuilder.build();
     response = stampHeader(response);
     return response;
+    
   }
 
   
@@ -3254,6 +3226,105 @@ public class DataPackageManagerResource extends PastaWebService {
   }
   
   
+  @GET
+  @Path("/error/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readDataPackageError(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String entryText = null;
+    String packageId = scope + "." + identifier + "." + revision;
+    String resourceId = packageId + "/errorlog.txt";
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageError";
+    Rule.Permission permission = Rule.Permission.read;
+    
+		Options options = null;
+		options = ConfigurationListener.getOptions();
+
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
+
+		String metadataDir = options.getOption("datapackagemanager.metadataDir");
+
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+
+    try {
+      
+      if (metadataDir != null && !metadataDir.isEmpty()) {
+      	
+      	File errorFile = new File(metadataDir + "/" + packageId + "/errorlog.txt");
+      	if (!errorFile.exists()) {
+      		Exception e = new Exception("No error was found for data package: " + packageId);
+      		response = WebExceptionFactory.makeNotFound(e).getResponse();
+      	} else {
+      		String errorText = FileUtils.readFileToString(errorFile, "UTF-8");
+          responseBuilder = Response.ok(errorText);
+          response = responseBuilder.build();
+          entryText = errorText;
+      	}
+      	
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+    response = stampHeader(response);
+    return response;
+    
+  }
+  
+  
   /*
    * 
    * <strong>Read Metadata DOI</strong> operation, specifying the scope, identifier, and revision of the metadata DOI to be read in the URI, returning the canonical Digital Object Identifier.
@@ -3782,7 +3853,7 @@ public class DataPackageManagerResource extends PastaWebService {
    * Isolates the resourceId for the data package from a resource map 
    * string and returns it.
    */
-  private String resourceIdFromResourceMap(String resourceMap) {
+  protected static String resourceIdFromResourceMap(String resourceMap) {
     String resourceId = null;
     
     if (resourceMap != null && !resourceMap.isEmpty()) {
@@ -4352,9 +4423,163 @@ public class DataPackageManagerResource extends PastaWebService {
 
           return pairs;
       }
+      
+	/*
+	 * Returns an EmlPackageId object by parsing an EML file.
+	 */
+	private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
+		EmlPackageId emlPackageId = null;
 
-      /*
-       * End of methods originally from the Metadata Factory service.
-       */
+		if (emlFile != null) {
+			FileInputStream fis = new FileInputStream(emlFile);
 
-  }
+			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance()
+			    .newDocumentBuilder();
+			Document document = documentBuilder.parse(fis);
+			emlPackageId = EmlUtility.getEmlPackageId(document);
+		}
+
+		return emlPackageId;
+	}
+
+  /**
+   * Thread framework for executing the createDataPackage in a new thread.
+   * 
+   * @author servilla
+   * @since Mar 26, 2013
+   *
+   */
+	class Creator implements Runnable {
+
+		File emlFile = null;
+		String userId = null;
+		AuthToken authToken = null;
+
+		public Creator(File emlFile, String userId, AuthToken authToken) {
+
+			this.emlFile = emlFile;
+			this.userId = userId;
+			this.authToken = authToken;
+
+		}
+
+		public void run() {
+
+			String map = null;
+			String gripe = null;
+			String packageId = null;
+			EmlPackageId emlPackageId = null;
+			Response response = null;
+			ResponseBuilder responseBuilder = null;
+			String serviceMethodName = "createDataPackage";
+			String resourceId = "";
+
+			try {
+				
+				emlPackageId = emlPackageIdFromEML(emlFile);
+				packageId = emlPackageId.toString();
+
+				DataPackageManager dataPackageManager = new DataPackageManager();
+				map = dataPackageManager.createDataPackage(emlFile, userId, authToken);
+				
+				if (map == null) {
+					gripe = "Data package create operation failed for unknown reason";
+					Exception e = new Exception(gripe);
+					new ErrorLogger(packageId, e);
+					response = WebExceptionFactory.make(
+					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
+				} else {
+					resourceId = DataPackageManagerResource
+					    .resourceIdFromResourceMap(map);
+					responseBuilder = Response.ok(map);
+					response = responseBuilder.build();
+				}
+
+			} catch (IllegalArgumentException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			} catch (UnauthorizedException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			} catch (ResourceNotFoundException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeNotFound(e).getResponse();
+			} catch (ResourceDeletedException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (ResourceExistsException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (UserErrorException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebResponseFactory.makeBadRequest(e);
+			} catch (Exception e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.make(
+				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
+			}
+
+			audit(serviceMethodName, authToken, response, resourceId, gripe);
+			
+		}
+
+	}
+	
+}
+
+/**
+ * 
+ * @author servilla
+ * @since Mar 26, 2013
+ *
+ */
+class ErrorLogger {
+
+	private static Logger logger = Logger.getLogger(ErrorLogger.class);
+	private static final String dirPath = "WebRoot/WEB-INF/conf";
+
+	public ErrorLogger(String packageId, Exception error) {
+
+		Options options = null;
+		options = ConfigurationListener.getOptions();
+
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
+
+		String metadataDir = options.getOption("datapackagemanager.metadataDir");
+
+		if (metadataDir != null && !metadataDir.isEmpty()) {
+
+			File packageDir = new File(metadataDir + "/" + packageId);
+
+			try {
+
+				if (!packageDir.exists()) {
+					FileUtils.forceMkdir(packageDir);
+				}
+
+				File errorFile = new File(metadataDir + "/" + packageId + "/errorlog.txt");
+				FileUtils.writeStringToFile(errorFile, error.getMessage(), "UTF-8");
+				
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+
+		}
+
+		logger.error("ErrorLogger: " + error.getMessage());
+
+	}
+
+}
