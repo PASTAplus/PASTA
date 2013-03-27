@@ -82,9 +82,10 @@ public class DataManagerClient {
 	 * 
 	 * @param dataPackage  the DataPackage object describing the data entities
 	 *                     to be created
+	 * @param transaction  the transaction identifier
    * @return             A list of entityId / entityName pairs
 	 */
-	public String createDataEntities(DataPackage dataPackage) 
+	public String createDataEntities(DataPackage dataPackage, String transaction) 
 	        throws IOException,
 	               MalformedURLException,
 	               Exception {
@@ -92,7 +93,7 @@ public class DataManagerClient {
     StringBuffer stringBuffer = new StringBuffer("");
     
     EMLDataManager emlDataManager = new EMLDataManager();
-    ArrayList<String> entityPairs = emlDataManager.createDataEntities(dataPackage, evaluateMode);
+    ArrayList<String> entityPairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
       
     for (String entityURL : entityPairs) {
       stringBuffer.append(entityURL + "\n");
@@ -158,16 +159,17 @@ public class DataManagerClient {
    * 
    * @param dataPackage  the DataPackage object describing the data entities
    *                     to be created
+   * @param transaction  the transaction identifier
    * @return             A list of entityId / entityName pairs
    */
-  public String evaluateDataEntities(DataPackage dataPackage)
+  public String evaluateDataEntities(DataPackage dataPackage, String transaction)
       throws IOException, Exception {
     
     StringBuffer stringBuffer = new StringBuffer("");
     boolean evaluateMode = true;
     
     EMLDataManager emlDataManager = new EMLDataManager();
-    ArrayList<String> entityURLs = emlDataManager.createDataEntities(dataPackage, evaluateMode);
+    ArrayList<String> entityURLs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
       
     for (String entityURL : entityURLs) {
       stringBuffer.append(entityURL + "\n");

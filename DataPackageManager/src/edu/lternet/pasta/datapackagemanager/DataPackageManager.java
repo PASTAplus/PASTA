@@ -373,9 +373,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 	 * @param emlFile       The EML document to be created in the metadata catalog
 	 * @param user          The user value
 	 * @param authToken     The authorization token
+	 * @param transaction   The transaction identifier
 	 * @return  The resource map generated as a result of creating the data package.
 	 */
-  public String createDataPackage(File emlFile, String user, AuthToken authToken)
+  public String createDataPackage(File emlFile, String user, AuthToken authToken, String transaction)
           throws ClientProtocolException, FileNotFoundException, IOException,  Exception {
     boolean isEvaluate = false;
     String resourceMap = null;
@@ -440,7 +441,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
       boolean isUpdate = false;
       resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
         dataPackageRegistry, packageId, scope, identifier, revision, user, 
-        authToken, isUpdate, isEvaluate);
+        authToken, isUpdate, isEvaluate, transaction);
     }
    
     // Return the resource map
@@ -462,7 +463,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
                                       String user,
                                       AuthToken authToken,
                                       boolean isUpdate,
-                                      boolean isEvaluate
+                                      boolean isEvaluate,
+                                      String transaction
                                       )
             throws ClassNotFoundException, 
                    SQLException, 
@@ -503,10 +505,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
         String entityIdNamePairs = null;
         DataPackage dataPackage = levelZeroDataPackage.getDataPackage();
         if (isEvaluate) {
-          entityIdNamePairs = dataManagerClient.evaluateDataEntities(dataPackage);
+          entityIdNamePairs = dataManagerClient.evaluateDataEntities(dataPackage, transaction);
         }
         else {
-          entityIdNamePairs = dataManagerClient.createDataEntities(dataPackage);
+          entityIdNamePairs = dataManagerClient.createDataEntities(dataPackage, transaction);
         }
       
         if (entityIdNamePairs != null) {
@@ -856,9 +858,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 	 * @param emlFile   file containing the EML document to be evalauted
 	 * @param user      the user name
 	 * @param authToken  the authentication token object
+	 * @param transaction the transaction identifier
 	 * @return an EmlPackageId object
 	 */
-  public String evaluateDataPackage(File emlFile, String user, AuthToken authToken)
+  public String evaluateDataPackage(File emlFile, String user, AuthToken authToken, String transaction)
       throws ClientProtocolException, 
              FileNotFoundException, 
              IOException,
@@ -914,7 +917,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
       boolean isUpdate = false;
       xmlString = createDataPackageAux(emlFile, levelZeroDataPackage, 
           dataPackageRegistry, packageId, scope, identifier, revision, 
-          user, authToken, isUpdate, isEvaluate);
+          user, authToken, isUpdate, isEvaluate, transaction);
      
       //Clean up resources in evaluate mode
       levelZeroDataPackage.deleteDataPackageResources(isEvaluate);
@@ -1740,12 +1743,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
   }
 
 	
-	/**
-	 * 
-	 * @param emlDocument
-	 */
+  /**
+   * Update a data package in PASTA and return a resource map of the created
+   * resources.
+   * 
+   * @param emlFile       The EML document to be created in the metadata catalog
+   * @param scope         The scope value
+   * @param identifier    The identifier value
+   * @param user          The user value
+   * @param authToken     The authorization token
+   * @param transaction   The transaction identifier
+   * @return  The resource map generated as a result of updating the data package.
+   */
   public String updateDataPackage(File emlFile, String scope, Integer identifier,
-                                  String user, AuthToken authToken)
+                                  String user, AuthToken authToken, String transaction)
           throws ClientProtocolException, FileNotFoundException, IOException, 
                  UserErrorException, Exception {
     boolean isEvaluate = false;
@@ -1859,7 +1870,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
       boolean isUpdate = true;
       resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage, 
           dataPackageRegistry, packageId, scope, identifier, revision, user, 
-          authToken, isUpdate, isEvaluate);
+          authToken, isUpdate, isEvaluate, transaction);
     }
 
     // Return the resource map

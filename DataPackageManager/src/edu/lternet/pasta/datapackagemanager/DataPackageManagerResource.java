@@ -872,6 +872,10 @@ public class DataPackageManagerResource extends PastaWebService {
     final String serviceMethodName = "evaluateDataPackage";
     Rule.Permission permission = Rule.Permission.write;
     AuthToken authToken = null;
+
+    Long time = new Date().getTime();
+    String transaction = time.toString();    
+    
     String resourceId = null;
     String entryText = null;
     
@@ -903,7 +907,7 @@ public class DataPackageManagerResource extends PastaWebService {
       }
       
       DataPackageManager dataPackageManager = new DataPackageManager();
-      String xmlString = dataPackageManager.evaluateDataPackage(emlFile, userId, authToken);
+      String xmlString = dataPackageManager.evaluateDataPackage(emlFile, userId, authToken, transaction);
 
       if (xmlString != null) {
         if (produceHTML) {
@@ -4452,7 +4456,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				packageId = emlPackageId.toString();
 
 				DataPackageManager dataPackageManager = new DataPackageManager();
-				map = dataPackageManager.createDataPackage(emlFile, userId, authToken);
+				map = dataPackageManager.createDataPackage(emlFile, userId, authToken, transaction);
 				
 				if (map == null) {
 					gripe = "Data package create operation failed for unknown reason";
@@ -4549,7 +4553,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				packageId = emlPackageId.toString();
 
 				DataPackageManager dataPackageManager = new DataPackageManager();
-				map = dataPackageManager.updateDataPackage(emlFile, scope, identifier, userId, authToken);
+				map = dataPackageManager.updateDataPackage(emlFile, scope, identifier, userId, authToken, transaction);
 				
 				if (map == null) {
 					gripe = "Data package update operation failed for unknown reason";

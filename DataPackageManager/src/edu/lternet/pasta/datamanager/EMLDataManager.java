@@ -250,11 +250,13 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * @param dataPackage  the DataPackage object
 	 * @param evaluateMode boolean to determine whether the create
 	 *                 operation should be run in evaluate mode.
+	 * @param transaction  the transaction identifier
 	 * @return         a list of URLs to access data entities
 	 *                 that were created
 	 */
 	public ArrayList<String> createDataEntities(DataPackage dataPackage,
-	                                            boolean evaluateMode) 
+	                                            boolean evaluateMode,
+	                                            String transaction) 
 	        throws IOException, 
 	               MalformedURLException, 
 	               ResourceExistsException, 
@@ -370,7 +372,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       finally {
         EMLDataPackage emlDataPackage = new EMLDataPackage(dataPackage);
         EMLQualityReport emlQualityReport = new EMLQualityReport(emlPackageId, emlDataPackage);
-        emlQualityReport.storeQualityReport(evaluateMode);
+        emlQualityReport.storeQualityReport(evaluateMode, transaction);
       }
     }
 		else {
