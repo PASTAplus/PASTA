@@ -3274,7 +3274,8 @@ public class DataPackageManagerResource extends PastaWebService {
       	
       	File errorFile = new File(metadataDir + "/" + packageId + "/errorlog.txt");
       	if (!errorFile.exists()) {
-      		Exception e = new Exception("No error was found for data package: " + packageId);
+      		entryText = "No error was found for data package: " + packageId;
+      		Exception e = new Exception(entryText);
       		response = WebExceptionFactory.makeNotFound(e).getResponse();
       	} else {
       		String errorText = FileUtils.readFileToString(errorFile, "UTF-8");
@@ -4130,86 +4131,41 @@ public class DataPackageManagerResource extends PastaWebService {
   @PUT
   @Path("/eml/{scope}/{identifier}")
   @Consumes("application/xml")
-  @Produces("application/xml")
+  @Produces("text/plain")
   public Response updateDataPackage(
                     @Context HttpHeaders headers,
                     @PathParam("scope") String scope,
                     @PathParam("identifier") Integer identifier, 
                     File emlFile) {
+  	
     AuthToken authToken = null;
-    String resourceMap = null;
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "updateDataPackage";
-    String entryText = null;
     Rule.Permission permission = Rule.Permission.write;
 
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
 
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      resourceMap = dataPackageManager.updateDataPackage(emlFile, scope, identifier, userId, authToken);
-
-      if (resourceMap != null) {
-        responseBuilder = Response.ok(resourceMap);
-        response = responseBuilder.build();       
-      }
-      else {
-        Exception e = new Exception("Data package update operation failed for unknown reason");
-        throw(e);
-      }
+		// Is user authorized to run the service method?
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+		    serviceMethodName, permission, authToken);
+		if (!serviceMethodAuthorized) {
+			throw new UnauthorizedException("User " + userId
+			    + " is not authorized to execute service method " + serviceMethodName);
     }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (InvalidPermissionException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-          e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-
-    String resourceId = resourceIdFromResourceMap(resourceMap);
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
+		// Perform updateDataPackage in new thread
+		Updator updator = new Updator(emlFile, scope, identifier, userId, authToken);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		executorService.execute(updator);
+		executorService.shutdown();
+		
+		responseBuilder = Response.status(Response.Status.ACCEPTED);
+		response = responseBuilder.build();
     response = stampHeader(response);
     return response;
+    
   }
   
   
@@ -4531,6 +4487,102 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 	}
+
+  /**
+   * Thread framework for executing the createDataPackage in a new thread.
+   * 
+   * @author servilla
+   * @since Mar 26, 2013
+   *
+   */
+	class Updator implements Runnable {
+
+		File emlFile = null;
+		String scope = null;
+		Integer identifier = null;
+		String userId = null;
+		AuthToken authToken = null;
+
+		public Updator(File emlFile, String scope, Integer identifier,
+		    String userId, AuthToken authToken) {
+
+			this.emlFile = emlFile;
+			this.scope = scope;
+			this.identifier = identifier;
+			this.userId = userId;
+			this.authToken = authToken;
+
+		}
+
+		public void run() {
+
+			String map = null;
+			String gripe = null;
+			String packageId = null;
+			EmlPackageId emlPackageId = null;
+			Response response = null;
+			ResponseBuilder responseBuilder = null;
+			String serviceMethodName = "updateDataPackage";
+			String resourceId = "";
+
+			try {
+				
+				emlPackageId = emlPackageIdFromEML(emlFile);
+				packageId = emlPackageId.toString();
+
+				DataPackageManager dataPackageManager = new DataPackageManager();
+				map = dataPackageManager.updateDataPackage(emlFile, scope, identifier, userId, authToken);
+				
+				if (map == null) {
+					gripe = "Data package update operation failed for unknown reason";
+					Exception e = new Exception(gripe);
+					new ErrorLogger(packageId, e);
+					response = WebExceptionFactory.make(
+					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
+				} else {
+					resourceId = DataPackageManagerResource
+					    .resourceIdFromResourceMap(map);
+					responseBuilder = Response.ok(map);
+					response = responseBuilder.build();
+				}
+
+			} catch (IllegalArgumentException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			} catch (UnauthorizedException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			} catch (ResourceNotFoundException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeNotFound(e).getResponse();
+			} catch (ResourceDeletedException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (ResourceExistsException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (UserErrorException e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebResponseFactory.makeBadRequest(e);
+			} catch (Exception e) {
+				gripe = e.getMessage();
+				new ErrorLogger(packageId, e);
+				response = WebExceptionFactory.make(
+				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
+			}
+
+			audit(serviceMethodName, authToken, response, resourceId, gripe);
+			
+		}
+
+	}
+
 	
 }
 
