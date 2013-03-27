@@ -347,26 +347,30 @@ public class DataPackageManagerClient extends PastaClient {
 			String entityString = EntityUtils.toString(httpEntity);
 
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
+				
 				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
-				String scope = emlPackageId.getScope();
-				Integer identifier = emlPackageId.getIdentifier();
-				Integer revision = emlPackageId.getRevision();
+				String packageScope = emlPackageId.getScope();
+				Integer packageIdentifier = emlPackageId.getIdentifier();
+				Integer packageRevision = emlPackageId.getRevision();
 
-				Integer idleSleep = 2000;
+				Integer idleSleep = 2000;  // 2 seconds
 				Integer idleTime = 0;
-				Integer maxIdleTime = 20000;
+				Integer maxIdleTime = 20000; // 20 seconds
 
+				// Initial sleep period to mitigate potential error-check race condition 
+				Thread.sleep(5000);  // 5 seconds
+				
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
 					try {
-						String errorText = readDataPackageError(scope, identifier,
-						    revision.toString());
+						String errorText = readDataPackageError(packageScope, packageIdentifier,
+								packageRevision.toString());
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
 						try {
-							resourceMap = readDataPackage(scope, identifier,
-							    revision.toString());
+							resourceMap = readDataPackage(packageScope, packageIdentifier,
+									packageRevision.toString());
 							break;
 						} catch (ResourceNotFoundException e1) {
 							logger.error(e1.getMessage());
@@ -1171,6 +1175,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String updateDataPackage(String scope, Integer identifier, File emlFile)
 	    throws Exception {
+		
 		final String contentType = "application/xml";
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
@@ -1194,8 +1199,51 @@ public class DataPackageManagerClient extends PastaClient {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			String entityString = EntityUtils.toString(httpEntity);
-			if (statusCode == HttpStatus.SC_OK) {
-				resourceMap = entityString;
+			
+			if (statusCode == HttpStatus.SC_ACCEPTED) {
+				
+				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
+				String packageScope = emlPackageId.getScope();
+				Integer packageIdentifier = emlPackageId.getIdentifier();
+				Integer packageRevision = emlPackageId.getRevision();
+
+				Integer idleSleep = 2000;  // 2 seconds
+				Integer idleTime = 0;
+				Integer maxIdleTime = 20000; // 20 seconds
+
+				// Initial sleep period to mitigate potential error-check race condition 
+				Thread.sleep(5000);  // 5 seconds
+				
+				while (idleTime <= maxIdleTime) {
+					logger.info(idleTime);
+					try {
+						String errorText = readDataPackageError(packageScope, packageIdentifier,
+								packageRevision.toString());
+						throw new Exception(errorText);
+					} catch (ResourceNotFoundException e) {
+						logger.error(e.getMessage());
+						try {
+							resourceMap = readDataPackage(packageScope, packageIdentifier,
+									packageRevision.toString());
+							break;
+						} catch (ResourceNotFoundException e1) {
+							logger.error(e1.getMessage());
+							Thread.sleep(idleSleep);
+							idleTime += idleSleep;
+						}
+					}
+				}
+
+				if (idleTime > maxIdleTime) {
+					String gripe = "Fiddle sticks!  Updating this data package has "
+					    + "exceeded our patience and we have been forced to terminate "
+					    + "this browser process, but the data package may still be "
+					    + "created in PASTA if an error was not encountered.  Please "
+					    + "check the audit logs or the Data Package Browser at a later "
+					    + "time.";
+					throw new Exception(gripe);
+				}
+
 			} else {
 				handleStatusCode(statusCode, entityString);
 			}
