@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -556,6 +557,9 @@ public class DataPackageManagerResource extends PastaWebService {
     final String serviceMethodName = "createDataPackage";
     Rule.Permission permission = Rule.Permission.write;
     AuthToken authToken = null;
+    
+    Long time = new Date().getTime();
+    String transaction = time.toString();
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
@@ -569,15 +573,17 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 		
 		// Perform createDataPackage in new thread
-		Creator creator = new Creator(emlFile, userId, authToken);
+		Creator creator = new Creator(emlFile, userId, authToken, transaction);
 		ExecutorService executorService = Executors.newCachedThreadPool();
     executorService.execute(creator);
     executorService.shutdown();
 		
 		responseBuilder = Response.status(Response.Status.ACCEPTED);
+		responseBuilder.entity(transaction);
 		response = responseBuilder.build();
     response = stampHeader(response);
-    return response;
+
+		return response;
     
   }
 
@@ -3227,18 +3233,19 @@ public class DataPackageManagerResource extends PastaWebService {
   
   
   @GET
-  @Path("/error/{scope}/{identifier}/{revision}")
+  @Path("/error/{scope}/{identifier}/{revision}/{transaction}")
   @Produces("text/plain")
   public Response readDataPackageError(
                                   @Context HttpHeaders headers,
                                   @PathParam("scope") String scope,
                                   @PathParam("identifier") Integer identifier,
-                                  @PathParam("revision") String revision
+                                  @PathParam("revision") String revision,
+                                  @PathParam("transaction") String transaction
                     ) {
     AuthToken authToken = null;
     String entryText = null;
     String packageId = scope + "." + identifier + "." + revision;
-    String resourceId = packageId + "/errorlog.txt";
+    String resourceId = packageId + "/errorlog." + transaction + ".txt";
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readDataPackageError";
@@ -3272,9 +3279,12 @@ public class DataPackageManagerResource extends PastaWebService {
       
       if (metadataDir != null && !metadataDir.isEmpty()) {
       	
-      	File errorFile = new File(metadataDir + "/" + packageId + "/errorlog.txt");
-      	if (!errorFile.exists()) {
-      		entryText = "No error was found for data package: " + packageId;
+				File errorFile = new File(metadataDir + "/" + packageId + "/errorlog."
+				    + transaction + ".txt");
+
+				if (!errorFile.exists()) {
+					entryText = "No error was found for data package " + packageId
+					    + " for transaction " + transaction;
       		Exception e = new Exception(entryText);
       		response = WebExceptionFactory.makeNotFound(e).getResponse();
       	} else {
@@ -4144,6 +4154,9 @@ public class DataPackageManagerResource extends PastaWebService {
     final String serviceMethodName = "updateDataPackage";
     Rule.Permission permission = Rule.Permission.write;
 
+    Long time = new Date().getTime();
+    String transaction = time.toString();
+    
     authToken = getAuthToken(headers);
     String userId = authToken.getUserId();
 
@@ -4156,12 +4169,13 @@ public class DataPackageManagerResource extends PastaWebService {
     }
     
 		// Perform updateDataPackage in new thread
-		Updator updator = new Updator(emlFile, scope, identifier, userId, authToken);
+		Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		executorService.execute(updator);
 		executorService.shutdown();
 		
 		responseBuilder = Response.status(Response.Status.ACCEPTED);
+		responseBuilder.entity(transaction);
 		response = responseBuilder.build();
     response = stampHeader(response);
     return response;
@@ -4410,12 +4424,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		File emlFile = null;
 		String userId = null;
 		AuthToken authToken = null;
+		String transaction = null;
 
-		public Creator(File emlFile, String userId, AuthToken authToken) {
+		public Creator(File emlFile, String userId, AuthToken authToken, String transaction) {
 
 			this.emlFile = emlFile;
 			this.userId = userId;
 			this.authToken = authToken;
+			this.transaction = transaction;
 
 		}
 
@@ -4441,7 +4457,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				if (map == null) {
 					gripe = "Data package create operation failed for unknown reason";
 					Exception e = new Exception(gripe);
-					new ErrorLogger(packageId, e);
+					new ErrorLogger(packageId, transaction, e);
 					response = WebExceptionFactory.make(
 					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
 				} else {
@@ -4453,31 +4469,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			} catch (IllegalArgumentException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			} catch (UnauthorizedException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			} catch (ResourceNotFoundException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeNotFound(e).getResponse();
 			} catch (ResourceDeletedException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (ResourceExistsException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (UserErrorException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebResponseFactory.makeBadRequest(e);
 			} catch (Exception e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.make(
 				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
 			}
@@ -4502,15 +4518,17 @@ public class DataPackageManagerResource extends PastaWebService {
 		Integer identifier = null;
 		String userId = null;
 		AuthToken authToken = null;
+		String transaction = null;
 
 		public Updator(File emlFile, String scope, Integer identifier,
-		    String userId, AuthToken authToken) {
+		    String userId, AuthToken authToken, String transaction) {
 
 			this.emlFile = emlFile;
 			this.scope = scope;
 			this.identifier = identifier;
 			this.userId = userId;
 			this.authToken = authToken;
+			this.transaction = transaction;
 
 		}
 
@@ -4536,7 +4554,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				if (map == null) {
 					gripe = "Data package update operation failed for unknown reason";
 					Exception e = new Exception(gripe);
-					new ErrorLogger(packageId, e);
+					new ErrorLogger(packageId, transaction, e);
 					response = WebExceptionFactory.make(
 					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
 				} else {
@@ -4548,31 +4566,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			} catch (IllegalArgumentException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			} catch (UnauthorizedException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			} catch (ResourceNotFoundException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeNotFound(e).getResponse();
 			} catch (ResourceDeletedException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (ResourceExistsException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (UserErrorException e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebResponseFactory.makeBadRequest(e);
 			} catch (Exception e) {
 				gripe = e.getMessage();
-				new ErrorLogger(packageId, e);
+				new ErrorLogger(packageId, transaction, e);
 				response = WebExceptionFactory.make(
 				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
 			}
@@ -4597,7 +4615,7 @@ class ErrorLogger {
 	private static Logger logger = Logger.getLogger(ErrorLogger.class);
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 
-	public ErrorLogger(String packageId, Exception error) {
+	public ErrorLogger(String packageId, String transaction, Exception error) {
 
 		Options options = null;
 		options = ConfigurationListener.getOptions();
@@ -4620,7 +4638,8 @@ class ErrorLogger {
 					FileUtils.forceMkdir(packageDir);
 				}
 
-				File errorFile = new File(metadataDir + "/" + packageId + "/errorlog.txt");
+				File errorFile = new File(metadataDir + "/" + packageId + "/errorlog."
+				    + transaction + ".txt");
 				FileUtils.writeStringToFile(errorFile, error.getMessage(), "UTF-8");
 				
 			} catch (IOException e) {
