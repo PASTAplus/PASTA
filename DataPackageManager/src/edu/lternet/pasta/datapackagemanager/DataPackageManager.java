@@ -1660,7 +1660,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 	    boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User " + user
-				    + " does not have permission to read thw DOI for this resource: "
+				    + " does not have permission to read the DOI for this resource: "
 				    + resourceId;
 				throw new UnauthorizedException(gripe);
 			}
