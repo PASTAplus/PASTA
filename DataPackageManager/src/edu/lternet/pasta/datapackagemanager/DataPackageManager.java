@@ -1494,15 +1494,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
    * @param revision     the revision value
    * @param emlPackageId an EmlPackageId object
    * @param user         the user name
-   * @param evaluateMode boolean to determine whether the report
-   *                     operation should be run in evaluate mode.
    * @return  a file object containing the data package quality report XML
    */
 	public File readDataPackageReport(String scope, Integer identifier, String revision,
-	                                  EmlPackageId emlPackageId, AuthToken authToken, String user,
-	                                  boolean evaluateMode)
+	                                  EmlPackageId emlPackageId, AuthToken authToken, String user)
 	        throws ClassNotFoundException, SQLException {
+	  boolean evaluate = false;
     File xmlFile = null;
+    String transaction = null;
     
     try {
       DataPackageRegistry dataPackageRegistry = 
@@ -1540,7 +1539,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
         DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);
      
         if (dataPackageReport != null) {
-          xmlFile = dataPackageReport.getReport(evaluateMode);
+          xmlFile = dataPackageReport.getReport(evaluate, transaction);
         }
       }
     }
@@ -1551,6 +1550,33 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
   }
 
 	
+  /**
+   * Read an evaluate quality report, returning the XML file.
+   * The transaction id for the evaluate operation that generated the report must be specified.
+   * The specified user must be authorized to read the report.
+   * 
+   * @param scope        the scope value
+   * @param identifier   the identifier value
+   * @param revision     the revision value
+   * @param transaction  the transaction identifier, e.g. "1364424858431"
+   * @param emlPackageId an EmlPackageId object
+   * @param user         the user name
+   * @return  a file object containing the data package quality report XML
+   */
+  public File readEvaluateReport(String scope, Integer identifier, String revision, String transaction,
+                                 EmlPackageId emlPackageId, AuthToken authToken, String user) {
+    boolean evaluate = true;
+    File xmlFile = null;
+    
+    DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);    
+    if (dataPackageReport != null) {
+      xmlFile = dataPackageReport.getReport(evaluate, transaction);
+    }
+
+    return xmlFile;
+  }
+
+  
   /**
    * Reads metadata from the Metadata Catalog and returns it as a String.
    * The specified user must be authorized to read the metadata resource.

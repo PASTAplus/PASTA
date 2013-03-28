@@ -175,7 +175,7 @@ public class EMLQualityReport {
 	}
 	
 	
-	private String composeQualityReportFilename(boolean evaluateMode, String transaction) {
+	public String composeQualityReportFilename(boolean evaluateMode, String transaction) {
 	  String filename = null;
 	  
 	  // If evaluate mode, tag the quality report file name with the transaction identifier

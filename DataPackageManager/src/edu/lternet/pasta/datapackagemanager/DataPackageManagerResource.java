@@ -26,15 +26,10 @@ package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -2021,204 +2016,6 @@ public class DataPackageManagerResource extends PastaWebService {
   
   /**
    * 
-   * DEPRECATED as of 11/21/2011
-   *
-   * <strong>Read Data Package Evaluate-Report</strong> operation, specifying the scope, identifier, and revision of a previously evaluated data package in the URI, returning a resource graph with reference URLs to each of the metadata and data entity reports associated with the evaluated data package.
-   * 
-   * <p>If an HTTP Accept header with value 'text/html' is included in the request, 
-   * returns an HTML representation of the report. The default representation is XML.</p>
-   * 
-   * <p>Evaluate-report retrieves a quality report for a data package that was previously evaluated,
-   * that is, for quality reporting purposes only. (See also <em>Evaluate</em> operation above)</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>XML representation: </em>curl -i -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-gce-nis/1/9/INS-GCEM-0011_1_3.TXT</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>HTML representation: </em>curl -i -H "Accept: text/html" -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-gce-nis/1/9/INS-GCEM-0011_1_3.TXT</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the quality report was successful</td>
-   *     <td>The quality report that describes the data entity</td>
-   *     <td><code>application/xml</code> or <code>text/html</code> (See above)</td>
-   *     <td>
-   *   <pre>
-         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-         &lt;qualityReport type="data"&gt;
-         &lt;packageId&gt;knb-lter-gce-nis.1.9&lt;/packageId&gt;
-         &lt;entityId&gt;INS-GCEM-0011_1_3.TXT&lt;/entityId&gt;
-         &lt;entityName&gt;INS-GCEM-0011_1_3.TXT&lt;/entityName&gt;
-         &lt;dateCreated&gt;2011-02-03&lt;/dateCreated&gt;
-         &lt;/qualityReport&gt;
-   *   </pre>
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the quality report for the specified data entity</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no quality reports associated with the specified packageId are found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the metadata document.
-   * @param identifier  The identifier of the metadata document.
-   * @param revision    The revision of the metadata document.
-   * @return            A Response object containing the entity report 
-   *                    XML or HTML if found, else return a 404 Not Found
-   *                    response
-   *
-  @GET
-  @Path("/evaluate/report/eml/{scope}/{identifier}/{revision}")
-  @Produces({"application/xml", "text/html"})
-  public Response readDataPackageEvaluateReport(
-                                    @Context HttpHeaders headers,
-                                    @PathParam("scope") String scope,
-                                    @PathParam("identifier") Integer identifier,
-                                    @PathParam("revision") String revision
-                     ) {
-    boolean evaluateMode = true;  
-    boolean produceHTML = false;
-    
-    /*
-     * Determine whether to produce an HTML representation
-     *
-    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
-    for (MediaType mediaType : mediaTypes) {
-      String mediaTypeStr = mediaType.toString();
-      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
-        produceHTML = true;
-      }
-    }
-    
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    
-    try {
-      AuthToken authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-      EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
-      String packageId = emlPackageIdFormat.format(emlPackageId);
-      File xmlFile = 
-        dataPackageManager.readDataPackageReport(scope, identifier, revision, 
-                                                 emlPackageId, authToken, userId, evaluateMode);
-    
-      if (xmlFile != null && xmlFile.exists()) {
-        if (produceHTML) {
-          Options options = ConfigurationListener.getOptions();
-          String xslPath = null;
-          if (options != null) {
-            xslPath = options.getOption("datapackagemanager.xslPath");
-          }
-          
-          try {
-            String htmlResult = qualityReportXMLtoHTML(xmlFile, xslPath);
-            responseBuilder = Response.ok(htmlResult);
-            if (responseBuilder != null) {       
-              response = responseBuilder.build();       
-            }
-          }
-          catch (IllegalStateException e) {
-            WebApplicationException webApplicationException = 
-              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                       e, e.getMessage());
-            response = webApplicationException.getResponse();
-          }
-        }
-        else {
-          responseBuilder = Response.ok(xmlFile);
-          if (responseBuilder != null) {       
-            response = responseBuilder.build();       
-          }
-        } 
-      }
-      else {
-        ResourceNotFoundException e = new ResourceNotFoundException(
-            "Unable to access data package evaluate report for packageId: " + packageId);
-        WebApplicationException webApplicationException =
-          WebExceptionFactory.makeNotFound(e);
-        response = webApplicationException.getResponse();
-      }
-    }
-    catch (IllegalArgumentException e) {
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (Exception e) {
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                 e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    response = stampHeader(response);
-    return response;
-  }*/
-
-  
-  /**
-   * 
    * <strong>Read Metadata</strong> operation, specifying the scope, identifier, and revision of the metadata document to be read in the URI.
    * 
    * <p>Revision may be specified as "newest" or "oldest" to retrieve the 
@@ -2946,7 +2743,6 @@ public class DataPackageManagerResource extends PastaWebService {
                                     @PathParam("revision") String revision
                      ) {
     AuthToken authToken = null;
-    boolean evaluateMode = false;  
     boolean produceHTML = false;
     final String serviceMethodName = "readDataPackageReport";
     Rule.Permission permission = Rule.Permission.read;
@@ -3001,8 +2797,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
       File xmlFile = 
         dataPackageManager.readDataPackageReport(scope, identifier, revision, 
-                                                 emlPackageId, authToken, userId, 
-                                                 evaluateMode);
+                                                 emlPackageId, authToken, userId);
     
       if (xmlFile != null && xmlFile.exists()) {
         if (produceHTML) {
@@ -3060,11 +2855,225 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    //audit(serviceMethodName, authToken, response, resourceId, entryText);
     response = stampHeader(response);
     return response;
   }
 
+  
+  /**
+   * <strong>Read Evaluate Report</strong> operation, specifying the scope, identifier, revision, and transaction id of the evaluate quality report document to be read in the URI.
+   * 
+   * <p>If an HTTP Accept header with value 'text/html' is included in the request, 
+   * returns an HTML representation of the report. The default representation is XML.</p>
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td></td>
+   *     <td></td>
+   *     <td><em>XML representation: </em>curl -i -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-lno/1/3/1364424858431</td>
+   *   </tr>
+   *   <tr>
+   *     <td></td>
+   *     <td></td>
+   *     <td><em>HTML representation: </em>curl -i -H "Accept: text/html" -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-lno/1/31364424858431</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the quality report was successful</td>
+   *     <td>The quality report document that describes the data package</td>
+   *     <td><code>application/xml</code> or <code>text/html</code> (See above)</td>
+   *     <td>
+   *   <pre>
+         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+         &lt;qualityReport&gt;
+         &lt;packageId&gt;knb-lter-lno.1.3&lt;/packageId&gt;
+         .
+         .
+         .
+         &lt;/qualityReport&gt;
+       </pre>
+   *     </td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the specified data package</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no data package matching the specified scope, identifier, and revision values is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @param transaction The transaction identifier, e.g. "1364424858431"
+   * @return            A Response object containing the evaluate quality report
+   */
+  @GET
+  @Path("/evaluate/report/eml/{scope}/{identifier}/{revision}/{transaction}")
+  @Produces({"application/xml", "text/html"})
+  public Response readEvaluateReport(
+                                    @Context HttpHeaders headers,
+                                    @PathParam("scope") String scope,
+                                    @PathParam("identifier") Integer identifier,
+                                    @PathParam("revision") String revision,
+                                    @PathParam("transaction") String transaction
+                     ) {
+    AuthToken authToken = null;
+    boolean produceHTML = false;
+    final String serviceMethodName = "readEvaluateReport";
+    Rule.Permission permission = Rule.Permission.read;
+    String resourceId = null;
+    String entryText = null;
+    
+    /*
+     * Determine whether to produce an HTML representation
+     */
+    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
+    for (MediaType mediaType : mediaTypes) {
+      String mediaTypeStr = mediaType.toString();
+      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
+        produceHTML = true;
+      }
+    }
+    
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+    
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+    try {
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
+      String packageId = emlPackageIdFormat.format(emlPackageId);
+
+      File xmlFile = 
+        dataPackageManager.readEvaluateReport(scope, identifier, revision, transaction,
+                                              emlPackageId, authToken, userId);
+    
+      if (xmlFile != null && xmlFile.exists()) {
+        if (produceHTML) {
+          Options options = ConfigurationListener.getOptions();
+          String xslPath = null;
+          if (options != null) {
+            xslPath = options.getOption("datapackagemanager.xslPath");
+          }
+          
+          try {
+            String xmlString = FileUtility.fileToString(xmlFile);
+            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
+            responseBuilder = Response.ok(htmlResult);
+            if (responseBuilder != null) {       
+              response = responseBuilder.build();       
+            }
+          }
+          catch (IllegalStateException e) {
+            entryText = e.getMessage();
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                       e, e.getMessage());
+            response = webApplicationException.getResponse();
+          }
+        }
+        else {
+          responseBuilder = Response.ok(xmlFile);
+          if (responseBuilder != null) {       
+            response = responseBuilder.build();       
+          }
+        } 
+      }
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(String.format(
+            "Unable to access data package evaluate report file for packageId: %s; transaction id: %s ",
+            packageId, transaction));
+        WebApplicationException webApplicationException = WebExceptionFactory.makeNotFound(e);
+        entryText = e.getMessage();
+        response = webApplicationException.getResponse();
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    //audit(serviceMethodName, authToken, response, resourceId, entryText);
+    response = stampHeader(response);
+    return response;
+  }
+
+  
   /**
    * 
    * <strong>Read Data Package DOI</strong> operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
