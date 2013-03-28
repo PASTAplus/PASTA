@@ -66,6 +66,7 @@ public class DataPackageManagerResourceTest {
   private static final String dirPath = "WebRoot/WEB-INF/conf";
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   private static Options options = null;
+  private static final int PASTA_SLEEP_TIME = 15000;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
   private static File testEmlFileLevelOne = null;
@@ -87,6 +88,8 @@ public class DataPackageManagerResourceTest {
   /*
    * Instance fields
    */
+  
+  private String transaction = null;
   
   
   /*
@@ -217,24 +220,35 @@ public class DataPackageManagerResourceTest {
    */
   @Test public void testCreateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    String utcString = "1364505531871";
     
     // Test CREATE for OK status
     Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile);
     int statusCode = response.getStatus();
-    assertEquals(200, statusCode);
+    assertEquals(202, statusCode);
     
     // Check the message body
     String entityString = (String) response.getEntity();
+    assertTrue(entityString.length() == utcString.length());   
+    waitForPasta();
+    
+    // Test readDataPackage for OK status
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    // Check the message body
+    entityString = (String) response.getEntity();
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testEntityId));
     }
-    
-    // Test for Conflict state on a second CREATE
+
+    /* Test for Conflict state on a second CREATE
     response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile);
     statusCode = response.getStatus();
-    assertEquals(409, statusCode);
+    assertEquals(409, statusCode); */
   }
   
 
@@ -266,7 +280,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Create Data Package use case when
    * attempting to create a data package containing no entities (should fail)
-   */
+   *
   @Test public void testCreateDataPackageNoEntities() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String testEntityIdNoEntities = "knb-lter-lno.99999.1";
@@ -283,57 +297,37 @@ public class DataPackageManagerResourceTest {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testEntityIdNoEntities));
     }
-  }
+  }*/
   
 
   /**
    * Test the status and message body of the Evaluate Data Package use case
    */
   @Test public void testEvaluateDataPackage() {
+    String utcString = "1364505531871";
     DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     List<MediaType> acceptHeaders = new ArrayList<MediaType>();
     MediaType xmlMediaType = new MediaType("application", "xml");
-    MediaType htmlMediaType = new MediaType("text", "html");
     acceptHeaders.add(xmlMediaType);
     httpHeaders.setAcceptHeaders(acceptHeaders);
     
     // Test Evaluate for OK status
     Response response = dataPackageManagerResource.evaluateDataPackage(httpHeaders, testEmlFile);
-    assertEquals(200, response.getStatus());
+    assertEquals(202, response.getStatus());
     
     // Check the message body
     String entityString = (String) response.getEntity();
-    assertFalse(entityString == null);
-    if (entityString != null) {
-      assertFalse(entityString.isEmpty());
-      assertTrue(entityString.contains("<qr:qualityReport"));
-      assertTrue(entityString.contains("<entityReport"));
-      assertTrue(entityString.contains(testEntityName));
-    } 
-
-    // Get an HTML report. Test REPORT for OK status
-    System.setProperty("javax.xml.transform.TransformerFactory", 
-           "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
-    acceptHeaders.add(htmlMediaType);
-    httpHeaders.setAcceptHeaders(acceptHeaders);
-    response = dataPackageManagerResource.evaluateDataPackage(httpHeaders, testEmlFile);
-    assertEquals(200, response.getStatus());
-    
-    // Check the message body
-    entityString = (String) response.getEntity();
-    assertFalse(entityString == null);
-    if (entityString != null) {
-      assertFalse(entityString.isEmpty());
-      assertTrue(entityString.contains("<table"));
-      assertTrue(entityString.contains(testEntityName));
-    }  
+    assertTrue(entityString.length() == utcString.length());
+    this.transaction = entityString;
+    waitForPasta();
+    testReadEvaluateReport();
   }
   
 
   /**
    * Test the status and message body of the Evaluate Data Package use case when
    * attempting to evaluate a data package containing no entities (should fail)
-   */
+   *
   @Test public void testEvaluateDataPackageNoEntities() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String testEntityIdNoEntities = "knb-lter-lno.99999.1";
@@ -350,7 +344,7 @@ public class DataPackageManagerResourceTest {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testEntityIdNoEntities));
     }
-  }
+  }*/
   
 
   /**
@@ -560,6 +554,58 @@ public class DataPackageManagerResourceTest {
     
 
   /**
+   * Test the status and message body of the Read Data Package Report use case.
+   * This is a private method that gets called by the testEvaluateDataPackage() unit test
+   * because there is an order dependency between the two.
+   */
+  private void testReadEvaluateReport() {
+    DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    List<MediaType> acceptHeaders = new ArrayList<MediaType>();
+    MediaType xmlMediaType = new MediaType("application", "xml");
+    MediaType htmlMediaType = new MediaType("text", "html");
+    acceptHeaders.add(xmlMediaType);
+    httpHeaders.setAcceptHeaders(acceptHeaders);
+    
+    // Get an XML report. Test REPORT for OK status
+    Response response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScope, testIdentifier, testRevision.toString(), this.transaction);
+    assertEquals(200, response.getStatus());
+    
+    // Check the message body
+    File entityFile = (File) response.getEntity();
+    assertTrue(entityFile.exists());
+    String entityString = FileUtility.fileToString(entityFile);
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.contains("<qr:qualityReport"));
+      assertTrue(entityString.contains("<entityReport"));
+      assertTrue(entityString.contains(testEntityName));
+    } 
+
+    // Get an HTML report. Test REPORT for OK status
+    System.setProperty("javax.xml.transform.TransformerFactory", 
+           "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+    acceptHeaders.add(htmlMediaType);
+    httpHeaders.setAcceptHeaders(acceptHeaders);
+    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScope, testIdentifier, testRevision.toString(), this.transaction);
+    assertEquals(200, response.getStatus());
+    
+    // Check the message body
+    entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.contains("<table"));
+      assertTrue(entityString.contains(testEntityName));
+    } 
+    
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), this.transaction);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
    * Test the status and message body of the Read Metadata use case
    */
   @Test public void testReadMetadata() {
@@ -632,22 +678,34 @@ public class DataPackageManagerResourceTest {
    */
   @Test public void testUpdateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    String utcString = "1364505531871";
     
     // Test UPDATE for OK status
     String testPackageId = testScope + "." + testIdentifier + "." + testUpdateRevision;
     modifyTestEmlFile(testEmlFile, testPackageId);
     Response response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScope, testIdentifier, testEmlFile);
     int statusCode = response.getStatus();
-    assertEquals(200, statusCode);
+    assertEquals(202, statusCode);
     
     // Check the message body
     String entityString = (String) response.getEntity();
+    assertTrue(entityString.length() == utcString.length());
+    waitForPasta();
+
+    // Test readDataPackage for OK status
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString());
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    // Check the message body
+    entityString = (String) response.getEntity();
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testEntityId));
     }
-    
+
+    /*
     // Test for Conflict status on a second UPDATE
     response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScope, testIdentifier, testEmlFile);
     statusCode = response.getStatus();
@@ -656,16 +714,17 @@ public class DataPackageManagerResourceTest {
     // Test for Bad Request when the scope value in URI doesn't match scope value in the EML document
     response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScopeBogus, testIdentifier, testEmlFile);
     statusCode = response.getStatus();
-    assertEquals(400, statusCode);
+    assertEquals(400, statusCode); */
   }
 
   
   /**
    * Test the status and message body of the Create Data Package use case when
    * attempting to create a data package containing no entities (should fail)
-   */
+   *
   @Test public void testUpdateDataPackageNoEntities() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    String utcString = "1364505531871";
     String testEntityIdNoEntities = "knb-lter-lno.99999.1";
     String testScopeNoEntities = "knb-lter-lno";
     Integer testIdentifierNoEntities = new Integer(99999);
@@ -683,7 +742,7 @@ public class DataPackageManagerResourceTest {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testEntityIdNoEntities));
     }
-  }
+  }*/
   
 
   /**
@@ -706,6 +765,16 @@ public class DataPackageManagerResourceTest {
     response = dataPackageManagerResource.deleteDataPackage(httpHeaders, testScopeBogus, testIdentifier);
     statusCode = response.getStatus();
     assertEquals(404, statusCode);
+  }
+  
+  
+  private void waitForPasta() {
+    try {
+      Thread.sleep(PASTA_SLEEP_TIME);  // Give PASTA a chance to create the data package
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
   }
   
   

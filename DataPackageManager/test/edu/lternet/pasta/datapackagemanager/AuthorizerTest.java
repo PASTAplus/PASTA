@@ -205,7 +205,14 @@ public class AuthorizerTest {
     // Create the data package to test
     Response response = dataPackageManagerResource.createDataPackage(httpHeadersOwner, testEmlFile);
     int statusCode = response.getStatus();
-    assertEquals("Error creating data package", 200, statusCode);
+    assertEquals("Error creating data package", 202, statusCode);
+    
+    try {
+      Thread.sleep(15000);  // Give PASTA a chance to create the data package
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
     
     try {
     
