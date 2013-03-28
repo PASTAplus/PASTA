@@ -852,14 +852,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 
 	
 	/**
-	 * Evaluate a data package, returning an emlPackageId that can be used
-	 * to fetch the quality report XMl
+	 * Evaluate a data package, returning the XML string representation of the
+	 * quality report.
 	 * 
 	 * @param emlFile   file containing the EML document to be evalauted
 	 * @param user      the user name
 	 * @param authToken  the authentication token object
 	 * @param transaction the transaction identifier
-	 * @return an EmlPackageId object
+	 * @return the quality report XML string
 	 */
   public String evaluateDataPackage(File emlFile, String user, AuthToken authToken, String transaction)
       throws ClientProtocolException, 

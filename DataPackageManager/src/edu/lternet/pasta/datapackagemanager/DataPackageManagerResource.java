@@ -855,123 +855,48 @@ public class DataPackageManagerResource extends PastaWebService {
    *                
    * @return a Response, which if successful, contains a quality report XML document
    */
+
   @POST
   @Path("/evaluate/eml")
   @Consumes("application/xml")
   @Produces({"application/xml", "text/html"})
-  public Response evaluateDataPackage(@Context HttpHeaders headers,
-                                      File emlFile) {
-    boolean produceHTML = false;
+  public Response evaluateDataPackage(@Context HttpHeaders headers, File emlFile) {
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "evaluateDataPackage";
     Rule.Permission permission = Rule.Permission.write;
     AuthToken authToken = null;
-
+    
     Long time = new Date().getTime();
-    String transaction = time.toString();    
-    
-    String resourceId = null;
-    String entryText = null;
-    
-    /*
-     * Determine whether to produce an HTML representation
-     */
-    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
-    
-    if (mediaTypes != null) {
-      for (MediaType mediaType : mediaTypes) {
-        String mediaTypeStr = mediaType.toString();
-        if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
-          produceHTML = true;
-        }
-      }
-    }
-    
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
+    String transaction = time.toString();
 
-      // Is user authorized to run the 'evaluateDataPackage' service method?
-      boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      DataPackageManager dataPackageManager = new DataPackageManager();
-      String xmlString = dataPackageManager.evaluateDataPackage(emlFile, userId, authToken, transaction);
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
 
-      if (xmlString != null) {
-        if (produceHTML) {
-          Options options = ConfigurationListener.getOptions();
-          String xslPath = null;
-          if (options != null) {
-            xslPath = options.getOption("datapackagemanager.xslPath");
-          }
-            
-          try {
-            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
-            responseBuilder = Response.ok(htmlResult);
-            if (responseBuilder != null) {       
-              response = responseBuilder.build();       
-            }
-          }
-          catch (IllegalStateException e) {
-            WebApplicationException webApplicationException = 
-              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                       e, e.getMessage());
-            response = webApplicationException.getResponse();
-          }
-        }
-        else {
-          responseBuilder = Response.ok(xmlString);
-          if (responseBuilder != null) {       
-            response = responseBuilder.build();       
-          }
-        } 
-      }
-      else {
-        Exception e = new Exception(
-            "Data package evaluate operation failed for unknown reason");
-        throw (e);
-      }
+    // Is user authorized to run the 'createDataPackage' service method?
+    boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+        serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException("User " + userId
+          + " is not authorized to execute service method " + serviceMethodName);
     }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
+    // Perform evaluateDataPackage in new thread
+    Evaluator evaluator = new Evaluator(emlFile, userId, authToken, transaction);
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    executorService.execute(evaluator);
+    executorService.shutdown();
+    
+    responseBuilder = Response.status(Response.Status.ACCEPTED);
+    responseBuilder.entity(transaction);
+    response = responseBuilder.build();
     response = stampHeader(response);
+
     return response;
+    
   }
-  
-  
+
+
   /*
    * Matches the specified 'entityName' value with the entity names
    * found in the EML document string, and returns the corresponding 
@@ -2855,7 +2780,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    //audit(serviceMethodName, authToken, response, resourceId, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
     response = stampHeader(response);
     return response;
   }
@@ -2974,7 +2899,7 @@ public class DataPackageManagerResource extends PastaWebService {
     boolean produceHTML = false;
     final String serviceMethodName = "readEvaluateReport";
     Rule.Permission permission = Rule.Permission.read;
-    String resourceId = null;
+    String resourceId = "";
     String entryText = null;
     
     /*
@@ -3068,7 +2993,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    //audit(serviceMethodName, authToken, response, resourceId, entryText);
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
     response = stampHeader(response);
     return response;
   }
@@ -4518,7 +4443,98 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
   /**
-   * Thread framework for executing the createDataPackage in a new thread.
+   * Thread framework for executing the evaluateDataPackage service method in a new thread.
+   * 
+   * @author costa
+   * @since Mar 28, 2013
+   *
+   */
+  class Evaluator implements Runnable {
+
+    File emlFile = null;
+    String userId = null;
+    AuthToken authToken = null;
+    String transaction = null;
+
+    public Evaluator(File emlFile, String userId, AuthToken authToken, String transaction) {
+
+      this.emlFile = emlFile;
+      this.userId = userId;
+      this.authToken = authToken;
+      this.transaction = transaction;
+
+    }
+
+    public void run() {
+
+      String xmlString = null;
+      String gripe = null;
+      String packageId = null;
+      EmlPackageId emlPackageId = null;
+      Response response = null;
+      ResponseBuilder responseBuilder = null;
+      String serviceMethodName = "evaluateDataPackage";
+      String resourceId = "";
+
+      try {
+        
+        emlPackageId = emlPackageIdFromEML(emlFile);
+        packageId = emlPackageId.toString();
+
+        DataPackageManager dataPackageManager = new DataPackageManager();
+        xmlString = dataPackageManager.evaluateDataPackage(emlFile, userId, authToken, transaction);
+        
+        if (xmlString == null) {
+          gripe = "Data package evaluate operation failed for unknown reason";
+          Exception e = new Exception(gripe);
+          new ErrorLogger(packageId, transaction, e);
+          response = WebExceptionFactory.make(
+              Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
+        } else {
+          responseBuilder = Response.ok(xmlString);
+          response = responseBuilder.build();
+        }
+
+      } catch (IllegalArgumentException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.makeBadRequest(e).getResponse();
+      } catch (UnauthorizedException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+      } catch (ResourceNotFoundException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.makeNotFound(e).getResponse();
+      } catch (ResourceDeletedException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.makeConflict(e).getResponse();
+      } catch (ResourceExistsException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.makeConflict(e).getResponse();
+      } catch (UserErrorException e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebResponseFactory.makeBadRequest(e);
+      } catch (Exception e) {
+        gripe = e.getMessage();
+        new ErrorLogger(packageId, transaction, e);
+        response = WebExceptionFactory.make(
+            Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
+      }
+
+      audit(serviceMethodName, authToken, response, resourceId, gripe);
+      
+    }
+        
+  }
+  
+  
+  /**
+   * Thread framework for executing the updateDataPackage in a new thread.
    * 
    * @author servilla
    * @since Mar 26, 2013
