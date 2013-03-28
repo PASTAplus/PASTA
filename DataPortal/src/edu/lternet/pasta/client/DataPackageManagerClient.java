@@ -353,12 +353,10 @@ public class DataPackageManagerClient extends PastaClient {
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
 
-				Integer idleSleep = 2000;  // 2 seconds
 				Integer idleTime = 0;
-				Integer maxIdleTime = 20000; // 20 seconds
 
 				// Initial sleep period to mitigate potential error-check race condition 
-				Thread.sleep(5000);  // 5 seconds
+				Thread.sleep(initialSleepTime);  // 5 seconds
 				
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
@@ -374,8 +372,8 @@ public class DataPackageManagerClient extends PastaClient {
 							break;
 						} catch (ResourceNotFoundException e1) {
 							logger.error(e1.getMessage());
-							Thread.sleep(idleSleep);
-							idleTime += idleSleep;
+							Thread.sleep(idleSleepTime);
+							idleTime += idleSleepTime;
 						}
 					}
 				}
@@ -1207,12 +1205,10 @@ public class DataPackageManagerClient extends PastaClient {
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
 
-				Integer idleSleep = 2000;  // 2 seconds
 				Integer idleTime = 0;
-				Integer maxIdleTime = 20000; // 20 seconds
 
 				// Initial sleep period to mitigate potential error-check race condition 
-				Thread.sleep(5000);  // 5 seconds
+				Thread.sleep(initialSleepTime);  // 5 seconds
 				
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
@@ -1228,8 +1224,8 @@ public class DataPackageManagerClient extends PastaClient {
 							break;
 						} catch (ResourceNotFoundException e1) {
 							logger.error(e1.getMessage());
-							Thread.sleep(idleSleep);
-							idleTime += idleSleep;
+							Thread.sleep(idleSleepTime);
+							idleTime += idleSleepTime;
 						}
 					}
 				}
