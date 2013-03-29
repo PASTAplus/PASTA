@@ -334,6 +334,7 @@ public class DataPackageManagerClient extends PastaClient {
 		if (this.token != null) {
 			httpPost.setHeader("Cookie", "auth-token=" + this.token);
 		}
+		
 		httpPost.setHeader("Content-Type", contentType);
 
 		// Set the request entity
@@ -472,8 +473,49 @@ public class DataPackageManagerClient extends PastaClient {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			String entityString = EntityUtils.toString(httpEntity);
-			if (statusCode == HttpStatus.SC_OK) {
-				qualityReport = entityString;
+						
+			if (statusCode == HttpStatus.SC_ACCEPTED) {
+
+				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
+				String packageScope = emlPackageId.getScope();
+				Integer packageIdentifier = emlPackageId.getIdentifier();
+				Integer packageRevision = emlPackageId.getRevision();
+
+				Integer idleTime = 0;
+
+				// Initial sleep period to mitigate potential error-check race condition
+				Thread.sleep(initialSleepTime); // 5 seconds
+
+				while (idleTime <= maxIdleTime) {
+					logger.info(idleTime);
+					try {
+						String errorText = readDataPackageError(packageScope,
+						    packageIdentifier, packageRevision.toString(), entityString);
+						throw new Exception(errorText);
+					} catch (ResourceNotFoundException e) {
+						logger.error(e.getMessage());
+						try {
+							qualityReport = readEvaluateReport(packageScope, packageIdentifier,
+							    packageRevision.toString(), entityString);
+							break;
+						} catch (ResourceNotFoundException e1) {
+							logger.error(e1.getMessage());
+							Thread.sleep(idleSleepTime);
+							idleTime += idleSleepTime;
+						}
+					}
+				}
+
+				if (idleTime > maxIdleTime) {
+					String gripe = "Fiddle sticks!  Creating this data package has "
+					    + "exceeded our patience and we have been forced to terminate "
+					    + "this browser process, but the data package may still be "
+					    + "created in PASTA if an error was not encountered.  Please "
+					    + "check the audit logs or the Data Package Browser at a later "
+					    + "time.";
+					throw new Exception(gripe);
+				}
+			
 			} else {
 				handleStatusCode(statusCode, entityString);
 			}
@@ -865,6 +907,55 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode != HttpStatus.SC_OK) {
 				handleStatusCode(statusCode, entityString);
 			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
+	 * Executes the 'readEvaluateReport' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @param transaction
+	 * 				  the transaction value
+	 * @return the XML quality report document for the specified data package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readEvaluateReport(String scope, Integer identifier,
+	    String revision, String transaction) throws Exception {
+		String contentType = "application/xml";
+		HttpClient httpClient = new DefaultHttpClient();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, transaction);
+		String url = BASE_URL + "/evaluate/report/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		
+		httpGet.setHeader("Accept", contentType);
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+			
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
