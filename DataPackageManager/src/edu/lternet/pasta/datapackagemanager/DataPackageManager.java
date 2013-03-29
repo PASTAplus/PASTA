@@ -1902,5 +1902,93 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
     // Return the resource map
     return resourceMap;
   }
+  
+	/**
+	 * Writes the data package error message to the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @param error
+	 *          The exception object of the error
+	 */
+	public void writeDataPackageError(String packageId, String transaction,
+	    Exception error) {
+		
+		DataPackageError dpError = null;
+
+		try {
+			 dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		dpError.writeError(packageId, transaction, error);
+
+	}
+  
+	/**
+	 * Reads the data package error message from the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @return The error message
+	 * @throws FileNotFoundException
+	 */
+	public String readDataPackageError(String packageId, String transaction)
+	    throws ResourceNotFoundException {
+
+		String error = null;
+		DataPackageError dpError = null;
+
+		try {
+			dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		try {
+			error = dpError.readError(packageId, transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+		return error;
+
+	}
+
+	/**
+	 * Deletes the data package error message from the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @throws FileNotFoundException
+	 */
+	public void deleteDataPackageError(String packageId, String transaction)
+	    throws ResourceNotFoundException {
+
+		DataPackageError dpError = null;
+		
+		try {
+			dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		try {
+			dpError.deleteError(packageId, transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+	}
 
 }
