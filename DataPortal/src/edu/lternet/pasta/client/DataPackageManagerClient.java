@@ -357,7 +357,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Integer idleTime = 0;
 
 				// Initial sleep period to mitigate potential error-check race condition 
-				Thread.sleep(initialSleepTime);  // 5 seconds
+				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
@@ -484,7 +484,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Integer idleTime = 0;
 
 				// Initial sleep period to mitigate potential error-check race condition
-				Thread.sleep(initialSleepTime); // 5 seconds
+				Thread.sleep(initialSleepTime);
 
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
@@ -943,7 +943,6 @@ public class DataPackageManagerClient extends PastaClient {
 		if (this.token != null) {
 			httpGet.setHeader("Cookie", "auth-token=" + this.token);
 		}
-		
 		httpGet.setHeader("Accept", contentType);
 
 		try {
@@ -1047,12 +1046,27 @@ public class DataPackageManagerClient extends PastaClient {
 
 	}
 
+	/**
+	 * Executes the "readDataPackageError" websevice method.
+	 * 
+	 * @param scope
+	 *          The package scope value
+	 * @param identifier
+	 *          The package identifier value
+	 * @param revision
+	 *          The package revision value
+	 * @param transaction
+	 *          The data package transaction
+	 * @return The error message
+	 * @throws Exception
+	 */
 	public String readDataPackageError(String scope, Integer identifier,
 	    String revision, String transaction) throws Exception {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String urlTail = makeUrlTail(scope, identifier.toString(), revision, transaction);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+		    transaction);
 		String url = BASE_URL + "/error" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -1299,7 +1313,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Integer idleTime = 0;
 
 				// Initial sleep period to mitigate potential error-check race condition 
-				Thread.sleep(initialSleepTime);  // 5 seconds
+				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);

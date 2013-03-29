@@ -120,6 +120,7 @@ public class DataPackageError {
 				e.printStackTrace();
 			}
 		}
+		
 		String filePath = metadataDir + "/" + packageId + "/";
 		String fileName = "errorlog." + transaction + ".txt";
 		File file = new File(filePath + fileName);
