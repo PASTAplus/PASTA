@@ -195,79 +195,88 @@ public class DOIScanner {
 
 			// Build EML document object
 			emlFile = new File(this.getEmlFilePath(resource.getPackageId()));
-			emlObject = new EmlObject(emlFile);
+			
+			if (emlFile.exists()) {
+				emlObject = new EmlObject(emlFile);
 
-			// Set local metadata attributes
-			resourceUrl = resource.getResourceId();
-			doiUrl = this.doiUrlHead + resource.getPackageId();
-			publicationYear = this.getResourceCreateYear(resource.getDateCreated());
-			creators = emlObject.getCreators();
-			titles = emlObject.getTitles();
+				// Set local metadata attributes
+				resourceUrl = resource.getResourceId();
+				doiUrl = this.doiUrlHead + resource.getPackageId();
+				publicationYear = this.getResourceCreateYear(resource.getDateCreated());
+				creators = emlObject.getCreators();
+				titles = emlObject.getTitles();
 
-			// If DOI testing, add salt to resource identifier to create unique DOI
-			// so subsequent tests will not result in EZID create errors.
-			if (this.isDoiTest) {
-				time = new Date();
-				Long salt = time.getTime();
-				identifier = new DigitalObjectIdentifier(resource.getResourceId()
-				+ salt.toString());
-			} else {
-				identifier = new DigitalObjectIdentifier(resource.getResourceId());
-			}
-
-			resourceType = new ResourceType(ResourceType.DATASET);
-			resourceType.setResourceType(resource.getResourceType());
-			alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
-			alternateIdentifier.setAlternateIdentifier(resource.getResourceId());
-
-			// Create and populate the DataCite metadata object
-			DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
-
-			dataCiteMetadata.setLocationUrl(doiUrl);
-			dataCiteMetadata.setPublicationYear(publicationYear);
-			dataCiteMetadata.setCreators(creators);
-			dataCiteMetadata.setTitles(titles);
-			dataCiteMetadata.setDigitalObjectIdentifier(identifier);
-			dataCiteMetadata.setResourceType(resourceType);
-			dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
-
-			// Set and register DOI with DatCite metadata
-			ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
-
-			try {
-				
-				ezidRegistrar.registerDataCiteMetadata();
-				doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-				
-			} catch (EzidException e) {
-				
-				/*
-				 * In the event that a DOI registration succeeded with EZID, but failed
-				 * to be recorded in the resource registry, the following exception
-				 * allows the resource registry to be updated with the DOI string.
-				 */
-
-				if (e.getMessage().equals("identifier already exists")) {
-					logger.warn("Proceeding with resource registry update...");
+				// If DOI testing, add salt to resource identifier to create unique DOI
+				// so subsequent tests will not result in EZID create errors.
+				if (this.isDoiTest) {
+					time = new Date();
+					Long salt = time.getTime();
+					identifier = new DigitalObjectIdentifier(resource.getResourceId()
+					    + salt.toString());
 				} else {
-					logger.error(e.getMessage());
-					e.printStackTrace();
-					doi = null;
+					identifier = new DigitalObjectIdentifier(resource.getResourceId());
 				}
 
-			}
+				resourceType = new ResourceType(ResourceType.DATASET);
+				resourceType.setResourceType(resource.getResourceType());
+				alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
+				alternateIdentifier.setAlternateIdentifier(resource.getResourceId());
 
-			if (doi != null) {
-				// Update Data Package Manager resource registry with DOI
+				// Create and populate the DataCite metadata object
+				DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
+
+				dataCiteMetadata.setLocationUrl(doiUrl);
+				dataCiteMetadata.setPublicationYear(publicationYear);
+				dataCiteMetadata.setCreators(creators);
+				dataCiteMetadata.setTitles(titles);
+				dataCiteMetadata.setDigitalObjectIdentifier(identifier);
+				dataCiteMetadata.setResourceType(resourceType);
+				dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
+
+				// Set and register DOI with DatCite metadata
+				ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
+
 				try {
-					dataPackageRegistry.addResourceDoi(resourceUrl, doi);
-				} catch (SQLException e) {
-					logger.error(e.getMessage());
-					e.printStackTrace();
-					throw new DOIException(e.getMessage());
-				}
-			}
 
+					ezidRegistrar.registerDataCiteMetadata();
+					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+
+				} catch (EzidException e) {
+
+					/*
+					 * In the event that a DOI registration succeeded with EZID, but
+					 * failed to be recorded in the resource registry, the following
+					 * exception allows the resource registry to be updated with the DOI
+					 * string.
+					 */
+
+					if (e.getMessage().equals("identifier already exists")) {
+						logger.warn("Proceeding with resource registry update...");
+					} else {
+						logger.error(e.getMessage());
+						e.printStackTrace();
+						doi = null;
+					}
+
+				}
+
+				if (doi != null) {
+					// Update Data Package Manager resource registry with DOI
+					try {
+						dataPackageRegistry.addResourceDoi(resourceUrl, doi);
+					} catch (SQLException e) {
+						logger.error(e.getMessage());
+						e.printStackTrace();
+						throw new DOIException(e.getMessage());
+					}
+				}
+			
+			} else {
+				String gripe = "doScanToRegister: Level-1-EML.xml file does not exist for "
+				    + resource.getPackageId();
+				logger.error(gripe);
+			}
+			
 		}
 
 	}
