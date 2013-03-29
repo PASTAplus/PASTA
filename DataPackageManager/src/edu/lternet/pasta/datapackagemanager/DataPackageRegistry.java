@@ -1629,7 +1629,7 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, package_id, date_created"
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, date_created"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " resource_type='dataPackage' AND doi IS NULL AND date_deactivated IS NULL;";
 
@@ -1651,10 +1651,14 @@ public class DataPackageRegistry {
 
 				if (this.isPublicAccessible(resourceId)) {
 
+					String packageId = result.getString("scope") + "."
+							+ result.getInt("identifier") + "."
+							+ result.getInt("revision");
+					
 					resource.setResourceId(resourceId);
 					resource.setResourceType(result.getString("resource_type"));
-					resource.setPackageId(result.getString("package_id"));
 					resource.setDateCreate(result.getString("date_created"));
+					resource.setPackageId(packageId);
 
 					resourceList.add(resource);
 
