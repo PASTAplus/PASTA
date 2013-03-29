@@ -346,6 +346,10 @@
                 <principal>authenticated</principal>
                 <permission>read</permission>
             </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
         </access>
     </pasta:service-method>
     
