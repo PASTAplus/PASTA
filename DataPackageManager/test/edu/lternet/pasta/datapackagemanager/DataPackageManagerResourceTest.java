@@ -221,6 +221,7 @@ public class DataPackageManagerResourceTest {
   @Test public void testCreateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String utcString = "1364505531871";
+    String errorSnippet = "Attempting to insert a data package that already exists in PASTA";
     
     // Test CREATE for OK status
     Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile);
@@ -245,10 +246,17 @@ public class DataPackageManagerResourceTest {
       assertTrue(entityString.contains(testEntityId));
     }
 
-    /* Test for Conflict state on a second CREATE
+    /* Test for Conflict state on a second CREATE of the same data package */
     response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile);
     statusCode = response.getStatus();
-    assertEquals(409, statusCode); */
+    assertEquals(202, statusCode);
+
+    // Check the message body
+    entityString = (String) response.getEntity();
+    assertTrue(entityString.length() == utcString.length());
+    this.transaction = entityString;
+    waitForPasta();
+    testReadDataPackageError(testRevision.toString(), errorSnippet);
   }
   
 
@@ -457,6 +465,27 @@ public class DataPackageManagerResourceTest {
     
 
   /**
+   * Test the status and message body of the Read Data Package Error use case.
+   */
+  private void testReadDataPackageError(String revision, String errorSnippet) {
+    DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Get an XML report. Test REPORT for OK status
+    Response response = dataPackageManagerResource.readDataPackageError(httpHeaders, testScope, testIdentifier, revision, this.transaction);
+    assertEquals(200, response.getStatus());
+    
+    // Check the message body
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      System.err.println(entityString);
+      assertTrue(entityString.contains(errorSnippet));
+    } 
+  }
+    
+
+  /**
    * Test the status and message body of the Read Data Entity
    */
   @Test public void testReadDataEntity() {
@@ -554,7 +583,7 @@ public class DataPackageManagerResourceTest {
     
 
   /**
-   * Test the status and message body of the Read Data Package Report use case.
+   * Test the status and message body of the Read Evaluate Report use case.
    * This is a private method that gets called by the testEvaluateDataPackage() unit test
    * because there is an order dependency between the two.
    */
@@ -678,6 +707,7 @@ public class DataPackageManagerResourceTest {
    */
   @Test public void testUpdateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    String conflictError = "but an equal or higher revision";
     String utcString = "1364505531871";
     
     // Test UPDATE for OK status
@@ -705,16 +735,17 @@ public class DataPackageManagerResourceTest {
       assertTrue(entityString.contains(testEntityId));
     }
 
-    /*
-    // Test for Conflict status on a second UPDATE
+    /* Test for Conflict state on a second UPDATE of the same data package */
     response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScope, testIdentifier, testEmlFile);
     statusCode = response.getStatus();
-    assertEquals(409, statusCode);
+    assertEquals(202, statusCode);
 
-    // Test for Bad Request when the scope value in URI doesn't match scope value in the EML document
-    response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScopeBogus, testIdentifier, testEmlFile);
-    statusCode = response.getStatus();
-    assertEquals(400, statusCode); */
+    // Check the message body
+    entityString = (String) response.getEntity();
+    assertTrue(entityString.length() == utcString.length());
+    this.transaction = entityString;
+    waitForPasta();
+    testReadDataPackageError(testUpdateRevision.toString(), conflictError);
   }
 
   
