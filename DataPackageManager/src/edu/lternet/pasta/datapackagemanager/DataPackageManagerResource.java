@@ -482,27 +482,18 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <th><b>Sample Message Body</b></th>
    *   </tr>
    *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the create or evaluate request was successful</td>
-   *     <td>a list of URLs to the data package resources that were created, one URL per line</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>
-   *     https://pasta.lternet.edu/package/data/eml/knb-lter-lno/10108/1/NoneSuchBugCount<br />
-   *     https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/10108/1<br />
-   *     https://pasta.lternet.edu/package/report/eml/knb-lter-lno/10108/1<br />
-   *     https://pasta.lternet.edu/package/eml/knb-lter-lno/10108/1
+   *     <td>202 Accepted</td>
+   *     <td>If the create request was accepted for processing</td>
+   *     <td>A transaction identifier for use in subsequent processing of the request, 
+   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
+   *     how the transaction identifier is used in subsequent service calls.)
    *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the data package contains one or more metadata, metadata/data congruency, or data errors</td>
-   *     <td>A quality report XML document describing the quality errors</td>
-   *     <td><code>application/xml</code></td>
+   *     <td><code>text/plain</code></td>
    *     <td></td>
    *   </tr>
    *   <tr>
    *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to create the data package</td>
+   *     <td>If the requesting user is not authorized to execute this service method</td>
    *     <td>An error message</td>
    *     <td><code>text/plain</code></td>
    *     <td></td>
@@ -516,28 +507,9 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <td><code>text/plain</code></td>
    *     <td></td>
    *   </tr>
-   *   <tr>
-   *     <td>409 Conflict</td>
-   *     <td>If a data package already exists with the same EML packageId,
-   *     or if a data package with the same EML packageId had been deleted previously</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
    * </table>
    * 
-	 * @param emlFile  An EML document file, as specified in the
-	 *                 payload of the request.
+	 * @param emlFile  An EML document file, as specified in the payload of the request.
 	 *                
 	 * @return a Response, which if successful, contains a resource map describing
 	 *         the contents of the data package
@@ -800,32 +772,18 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <th><b>Sample Message Body</b></th>
    *   </tr>
    *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the create or evaluate request was successful</td>
-   *     <td>A quality report XML document</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>
-   *   <pre>
-         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-         &lt;qualityReport&gt;
-         &lt;packageId&gt;knb-lter-lno.1.3&lt;/packageId&gt;
-         .
-         .
-         .
-         &lt;/qualityReport&gt;
-   *   </pre>
+   *     <td>202 Accepted</td>
+   *     <td>If the evaluate request was accepted for processing</td>
+   *     <td>A transaction identifier for use in subsequent processing of the request, 
+   *     e.g. "1364424858431". (See <code>Read Evaluate Report</code> to understand
+   *     how the transaction identifier is used in subsequent service calls.)
    *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request message body contains an error</td>
-   *     <td>An error message</td>
    *     <td><code>text/plain</code></td>
    *     <td></td>
    *   </tr>
    *   <tr>
    *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to evaluate the data package</td>
+   *     <td>If the requesting user is not authorized to execute this service method</td>
    *     <td>An error message</td>
    *     <td><code>text/plain</code></td>
    *     <td></td>
@@ -839,16 +797,6 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <td><code>text/plain</code></td>
    *     <td></td>
    *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
    * </table>
    * 
    * @param emlDocument  The URL to an EML document, as specified in the
@@ -856,7 +804,6 @@ public class DataPackageManagerResource extends PastaWebService {
    *                
    * @return a Response, which if successful, contains a quality report XML document
    */
-
   @POST
   @Path("/evaluate/eml")
   @Consumes("application/xml")
@@ -2793,6 +2740,8 @@ public class DataPackageManagerResource extends PastaWebService {
    * <p>If an HTTP Accept header with value 'text/html' is included in the request, 
    * returns an HTML representation of the report. The default representation is XML.</p>
    * 
+   * <p>See the <code>Evaluate Data Package</code> service method for information about how to obtain the transaction id.</p>
+   * 
    * <h4>Requests:</h4>
    * <table border="1" cellspacing="0" cellpadding="3">
    *   <tr>
@@ -3175,6 +3124,9 @@ public class DataPackageManagerResource extends PastaWebService {
    * <strong>Read Data Package Error</strong> operation, specifying the scope,
    * identifier, revision, and transaction id of the data package error to be
    * read in the URI, returning the error message as plain text.
+   * 
+   * <p>See the <code>Create Data Package</code> and  <code>Update Data Package</code> 
+   * service methods for information about how to obtain the transaction id.</p>
    * 
    * <h4>Requests:</h4>
    * <table border="1" cellspacing="0" cellpadding="3">
@@ -4069,34 +4021,18 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <th><b>Sample Message Body</b></th>
    *   </tr>
    *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the update request was successful</td>
-   *     <td>A newline-separated list of URLs to the data package resources that were created</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>
-   *     https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/2/NoneSuchBugCount<br />
-   *     https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/2<br />
-   *     https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/2<br />
-   *     https://pasta.lternet.edu/package/eml/knb-lter-lno/1/2
+   *     <td>202 Accepted</td>
+   *     <td>If the update request was accepted for processing</td>
+   *     <td>A transaction identifier for use in subsequent processing of the request, 
+   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
+   *     how the transaction identifier is used in subsequent service calls.)
    *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the data package contains one or more metadata, metadata/data congruency, or data errors</td>
-   *     <td>A quality report XML document describing the quality errors</td>
-   *     <td><code>application/xml</code></td>
+   *     <td><code>text/plain</code></td>
    *     <td></td>
    *   </tr>
    *   <tr>
    *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to update the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If the data package matching the specified scope and identifier values is not found</td>
+   *     <td>If the requesting user is not authorized to execute this service method</td>
    *     <td>An error message</td>
    *     <td><code>text/plain</code></td>
    *     <td></td>
@@ -4106,23 +4042,6 @@ public class DataPackageManagerResource extends PastaWebService {
    *     <td>The specified HTTP method is not allowed for the requested resource.
    *     For example, the HTTP method was specified as DELETE but the resource
    *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>409 Conflict</td>
-   *     <td>If a data package with an equal or higher revision value already exists, or if the data package was previously deleted</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
    *     <td>An error message</td>
    *     <td><code>text/plain</code></td>
    *     <td></td>
