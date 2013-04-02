@@ -2261,7 +2261,7 @@ public class DataPackageManagerResource extends PastaWebService {
       }
 
       MediaType dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
-      entryText = "data format: " + dataFormat.toString();
+      entryText = "Data Format: " + dataFormat.toString();
       
       byte[] byteArray = 
         dataPackageManager.readDataEntity(scope, identifier, revision, entityId, authToken, userId);
@@ -2280,6 +2280,9 @@ public class DataPackageManagerResource extends PastaWebService {
           scope, identifier, revision, authToken.getUserId(), authToken);
         
         String objectName = findObjectName(xmlMetadata, entityName);
+        
+        entryText = String.format("%s: %s; %s: %s; %s", 
+                                  "Entity Name", entityName, "Object Name", objectName, entryText);
 
         responseBuilder = Response.ok(byteArray, dataFormat);
         
