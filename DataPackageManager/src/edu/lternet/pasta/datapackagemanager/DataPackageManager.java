@@ -72,7 +72,7 @@ import edu.ucsb.nceas.utilities.Options;
  * The DataPackageManager class is the top-level controller for all the
  * basic services offered by the Data Package Manager web service.
  */
-public class DataPackageManager implements DatabaseConnectionPoolInterface, Runnable {
+public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
   public enum DataPackageManagerAction {
     CREATE, READ, UPDATE, DELETE, SEARCH
@@ -726,23 +726,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
     this.user = user;
     this.authToken = authToken;
 
-    Thread notifierThread = new Thread(this);
-    notifierThread.start();
-  }
-  
-  
-  /**
-   * Runs the EventManagerClient code in a separate thread. 
-   */
-  public void run() {
     EventManagerClient eventManagerClient = new EventManagerClient(eventmanagerHost);
     
     try {
       eventManagerClient.notifyEventManager(this.scope, 
                                             this.identifier, 
-                                            this.revision, 
-                                            this.user, 
-                                            this.authToken);
+                                            this.revision);
     }
     catch (Exception e) {
       logger.warn(

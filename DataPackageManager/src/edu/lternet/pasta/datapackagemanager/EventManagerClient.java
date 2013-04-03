@@ -24,26 +24,23 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
-import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.security.auth.AuthSystemDef;
 import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.security.token.AuthTokenFactory;
+
 
 /**
  * @author dcosta
@@ -53,7 +50,7 @@ import edu.lternet.pasta.common.security.token.AuthToken;
  * The EventManagerClient class interacts with the Event Manager web service as
  * a client to notify it of changes to data packages in PASTA.
  */
-public class EventManagerClient extends PASTAServiceClient {
+public class EventManagerClient extends PASTAServiceClient implements Runnable {
 
   /*
    * Class fields
@@ -67,6 +64,12 @@ public class EventManagerClient extends PASTAServiceClient {
   private Logger logger = Logger.getLogger(EventManagerClient.class);
   private String host = null;
   private String urlHead = null; 
+
+  String scope = null;
+  Integer identifier = null;
+  Integer revision = null;
+  String user = null;
+  AuthToken authToken = null;
 
   
   /*
@@ -93,20 +96,6 @@ public class EventManagerClient extends PASTAServiceClient {
   }
   
   
-  private CookieStore getCookieStore(AuthToken authToken) {
-    CookieStore cookieStore = new BasicCookieStore();    
-    String tokenString = authToken.getTokenString();
-    BasicClientCookie basicClientCookie = 
-      new BasicClientCookie(DataPackageManagerResource.AUTH_TOKEN, tokenString);
-    basicClientCookie.setVersion(0);
-    basicClientCookie.setDomain(".lternet.edu");
-    basicClientCookie.setPath("/");
-    cookieStore.addCookie(basicClientCookie);
-
-    return cookieStore;
-  }
-
-
   /**
    * Notify the Event Manager of a change to a data package.
    * 
@@ -114,27 +103,33 @@ public class EventManagerClient extends PASTAServiceClient {
    * @param identifier  The data package identifier value
    * @param revision    The data package revision value
    * @param user        The user
-   * @param authToken   The authorization token object
+   * 
    */
-  public String notifyEventManager(String scope, 
-                                  Integer identifier,
-                                  Integer revision,
-                                  String user, 
-                                  AuthToken authToken)
-      throws ClientProtocolException, 
-             IOException, 
-             ResourceNotFoundException,
-             Exception {
-    String locationURL = null;
+  public void notifyEventManager(String scope, Integer identifier, Integer revision) {
+    this.scope = scope;
+    this.identifier = identifier;
+    this.revision = revision;
+
+    Set<String> s = new TreeSet<String>();
+    s.add("authenticated");
+    this.authToken = AuthTokenFactory.makeCookieAuthToken("pasta", AuthSystemDef.KNB, 2000000000, s);
+   
+    Thread thread = new Thread(this);
+    thread.start();
+  }
+
+
+  /**
+   * Notify the Event Manager of a change to a data package.
+   * Run in a separate thread.
+   */
+  public void run() {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     String urlTail = makeUrlTail(scope, identifier.toString(), revision.toString(), null);
     String url = urlHead + urlTail;
     HttpPost httpPost = new HttpPost(url);
     BasicHttpContext localcontext = new BasicHttpContext();
-
-    // Add CookieStore holding the auth-token cookie to the execution context
-    CookieStore cookieStore = getCookieStore(authToken);
-    localcontext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+    httpPost.setHeader("Cookie", "auth-token=" + authToken.getTokenString());
     
     try {
       logger.warn("Posting to Event Manager at URL: " + url);
@@ -144,22 +139,17 @@ public class EventManagerClient extends PASTAServiceClient {
       logger.warn("Response Code from Event Manager: " + statusCode);
       HttpEntity httpEntity = httpResponse.getEntity();
       String entityString = EntityUtils.toString(httpEntity);
-      if (statusCode == HttpStatus.SC_OK) {
-        Header[] locationHeaders = httpResponse.getHeaders("Location");
-        if (locationHeaders.length > 0) {
-          Header locationHeader = locationHeaders[0];
-          locationURL = locationHeader.getValue();
-        }
-      }
-      else {
+      if (statusCode != HttpStatus.SC_OK) {
         handleStatusCode(statusCode, entityString);
-       }
+      }
+    }
+    catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
     }
     finally {
       httpClient.getConnectionManager().shutdown();
     }
-
-    return locationURL;
   }
 
 }
