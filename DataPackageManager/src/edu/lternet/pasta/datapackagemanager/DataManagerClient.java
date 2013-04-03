@@ -240,6 +240,49 @@ public class DataManagerClient {
     return byteArray;
 	}
 	
+  /**
+   * Returns a data entity File object.
+   * 
+   * @param resourceLocation The base storage location for the entity resource
+   * @param scope       The scope of the metadata document
+   * @param identifier  The identifier of the metadata document
+   * @param revision    The revision of the metadata document
+   * @param entityId    The entityId of the entity to be read
+   * @return            A File object of the entity data
+   */
+	public File getDataEntityFile(String resourceLocation,
+	                             String scope, 
+	                             Integer identifier, 
+	                             String revision, 
+	                             String entityId) 
+	        throws IOException, 
+	               ResourceNotFoundException,
+	               Exception {
+		File file = null;
+    byte[] byteArray = null;
+    ByteArrayOutputStream byteArrayOutputStream = null;
+    InputStream inputStream = null;	  
+    EMLDataManager emlDataManager = new EMLDataManager(); 
+
+    /*
+     * Handle symbolic revisions such as "newest" and "oldest".
+     */
+    if (revision != null) {
+      if (revision.equals("newest")) {
+        Integer newest = emlDataManager.getNewestRevision(scope, identifier.toString());
+        if (newest != null) { revision = newest.toString(); }
+      }
+      else if (revision.equals("oldest")) {
+        Integer oldest = emlDataManager.getOldestRevision(scope, identifier.toString());
+        if (oldest != null) { revision = oldest.toString(); }
+      }
+    }
+    
+    file = emlDataManager.readDataEntity(resourceLocation, scope, identifier.toString(), revision, entityId);
+
+    return file;
+	}
+
 	/*
 	 * The following group of methods for reading data package reports and
 	 * entity reports is now deprecated. These methods were useful when the Data

@@ -1313,6 +1313,86 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface, Runn
 		
 	}
 
+  /**
+   * Reads a data entity and returns it as a byte array. The specified
+   * user must be authorized to read the data entity resource.
+   * 
+   * @param scope       The scope of the data package.
+   * @param identifier  The identifier of the data package.
+   * @param revision    The revision of the data package.
+   * @param entityId    The entityId of the data package.
+   * @param user        The user name
+   * @return   a File object containing the locally stored entity data
+   */
+	public File getDataEntityFile(String scope, Integer identifier, String revision, 
+	                             String entityId, AuthToken authToken, String user)
+	        throws ClassNotFoundException, 
+	               SQLException, 
+	               ClientProtocolException, 
+	               IOException,
+	               Exception {
+		
+		File file = null;
+		boolean hasDataPackage = false;
+    Integer revisionInt = new Integer(revision);
+    String resourceId = composeResourceId(ResourceType.data, scope, identifier, 
+        revisionInt, entityId);
+		
+		try {
+      DataPackageRegistry dataPackageRegistry = 
+        new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+      hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision);
+      
+      if (!hasDataPackage) {
+        String message = "Attempting to read a data entity that does not exist in PASTA: "
+                         + resourceId;
+        throw new ResourceNotFoundException(message);
+      }
+
+      /*
+       * If we have the data package but it was previously deleted (i.e. de-activated)
+       */
+      boolean isDeactivatedDataPackage = dataPackageRegistry.isDeactivatedDataPackage(scope, identifier);
+      if (isDeactivatedDataPackage) {
+        String message = "Attempting to read a data entity that was previously deleted from PASTA: " +
+                         resourceId;
+        throw new ResourceDeletedException(message);
+      }
+      
+      /*
+       * Now that we know that the data package is in the registry,
+       * check whether the user is authorized to read the data entity. 
+       */
+      Authorizer authorizer = new Authorizer(dataPackageRegistry);
+      boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+      if (!isAuthorized) {
+        String message = 
+          "User " + user + " does not have permission to read this data entity: " +
+          resourceId;
+        throw new UnauthorizedException(message);
+      }
+        
+      DataManagerClient dataManagerClient = new DataManagerClient();
+      String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
+      file = dataManagerClient.getDataEntityFile(resourceLocation, scope, identifier, revision, entityId);
+		}
+    catch (ClassNotFoundException e) {
+      logger.error("Error connecting to Data Package Registry: " + 
+                   e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    }
+    catch (SQLException e) {
+      logger.error("Error connecting to Data Package Registry: " + 
+                   e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    }
+    
+		return file;
+		
+	}
+
 	
   /**
    * Returns the entity name for the given entity resource identifier if
