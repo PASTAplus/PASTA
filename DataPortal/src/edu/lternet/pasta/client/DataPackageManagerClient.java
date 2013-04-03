@@ -29,11 +29,15 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -245,8 +249,8 @@ public class DataPackageManagerClient extends PastaClient {
       String metadata = dpmClient.readMetadata(scope, identifier, revision);
       System.out.println("\nMetadata:\n" + metadata);
       
-      byte[] dataEntity = dpmClient.readDataEntity(scope, identifier, revision, entityId);
-      System.out.println("\nData entity:\n" + dataEntity);
+      //dpmClient.readDataEntity(scope, identifier, revision, entityId, System.out);
+      //System.out.println("\nData entity:\n" + dataEntity);
       
       String dataPackageReport = dpmClient.readDataPackageReport(scope, identifier, revision);
       System.out.println("\nData package report:\n" + dataPackageReport);
@@ -625,11 +629,19 @@ public class DataPackageManagerClient extends PastaClient {
    * @param identifier the identifier value, e.g. 10
    * @param revision the revision value, e.g. "1"
    * @param entityId the entity identifier string, e.g. "NoneSuchBugCount"
-   * @return a byte array containing the data entity
+   * @param servletResponse the servlet response object for returning content
+   * 					to the client browser
    * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
    */
-  public byte[] readDataEntity(String scope, Integer identifier,
-      String revision, String entityId) throws Exception {
+  public void readDataEntity(String scope, Integer identifier,
+      String revision, String entityId, HttpServletResponse servletResponse) throws Exception {
+  	
+  	HttpResponse httpResponse = null;
+  	
+  	if (servletResponse == null) {
+  		String gripe = "Servlet response object is null!";
+  		throw new Exception(gripe);
+  	}
   	
   	// Re-encode "%" to its character reference value of %25 to mitigate
   	// an issue with the HttpGet call that performs the decoding - this is
@@ -642,7 +654,6 @@ public class DataPackageManagerClient extends PastaClient {
         entityId);
     String url = BASE_URL + "/data/eml" + urlTail;
     HttpGet httpGet = new HttpGet(url);
-    byte[] byteArray = null;
 
     // Set header content
     if (this.token != null) {
@@ -650,21 +661,40 @@ public class DataPackageManagerClient extends PastaClient {
     }
 
     try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
+      httpResponse = httpClient.execute(httpGet);
+      
+      getInfo(httpResponse);
+      
       int statusCode = httpResponse.getStatusLine().getStatusCode();
       HttpEntity httpEntity = httpResponse.getEntity();
-      byteArray = EntityUtils.toByteArray(httpEntity);
-      ContentType contentType = ContentType.getOrDefault(httpEntity);
-      this.contentType = contentType.toString();
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, new String(byteArray));
+
+			if (statusCode != HttpStatus.SC_OK) {
+				String gripe = "An error occurred while attempting to read the data enity: "
+				    + entityId;
+				handleStatusCode(statusCode, gripe);
+      } else {
+      	Header header = null;
+      	
+      	header = httpResponse.getFirstHeader("Content-Disposition");
+      	String contentDisposition = header.getValue();
+      	
+      	header = httpResponse.getFirstHeader("Content-Type");
+      	String contentType = header.getValue();
+      	
+      	Integer contentLength = new Long(httpEntity.getContentLength()).intValue();
+      	
+      	servletResponse.setHeader("Content-Disposition", contentDisposition);
+      	servletResponse.setContentType(contentType);
+      	servletResponse.setContentLength(contentLength);
+      	
+      	httpEntity.writeTo(servletResponse.getOutputStream());
       }
+			
     }
     finally {
       httpClient.getConnectionManager().shutdown();
     }
 
-    return byteArray;
   }
 
 
@@ -1124,5 +1154,36 @@ public class DataPackageManagerClient extends PastaClient {
   	return uri;
 
   }
+  
+  private void getInfo(HttpResponse r) {
+    
+    Header[] headers = r.getAllHeaders();
+    
+    for (int i = 0; i < headers.length; i++) {
+    	System.out.println(headers[i].getName() + ": " + headers[i].getValue());
+    }
+    
+    HttpEntity re = r.getEntity();
+    
+    if (re.isChunked()) {
+    	System.out.println("Entity is chunked");
+    } else {
+    	System.out.println("Entity is not chunked");
+    }
+    
+    if (re.isStreaming()) {
+    	System.out.println("Entity is streaming");
+    } else {
+    	System.out.println("Entity is not streaming");
+    }
+    
+    if (re.isRepeatable()) {
+    	System.out.println("Entity is repeatable");
+    } else {
+    	System.out.println("Entity is not repeatable");
+    }
+
+  }
+
   
 }
