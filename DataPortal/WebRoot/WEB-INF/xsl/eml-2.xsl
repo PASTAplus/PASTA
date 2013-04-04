@@ -10086,7 +10086,7 @@
      </xsl:for-each>
      <xsl:for-each select="highWavelength">
         <tr><td class="{$spatialrasterfirstColStyle}">
-             High Wave Length:
+             High Wavelength:
             </td>
             <td class="{$secondColStyle}">
                 <xsl:value-of select="."/>
@@ -10095,7 +10095,7 @@
      </xsl:for-each>
      <xsl:for-each select="lowWaveLength">
         <tr><td class="{$spatialrasterfirstColStyle}">
-             High Wave Length:
+             Low Wavelength:
             </td>
             <td class="{$secondColStyle}">
                 <xsl:value-of select="."/>
@@ -10104,7 +10104,7 @@
      </xsl:for-each>
      <xsl:for-each select="waveLengthUnits">
         <tr><td class="{$spatialrasterfirstColStyle}">
-             Wave Length Units:
+             Wavelength Units:
             </td>
             <td class="{$secondColStyle}">
                 <xsl:value-of select="."/>
