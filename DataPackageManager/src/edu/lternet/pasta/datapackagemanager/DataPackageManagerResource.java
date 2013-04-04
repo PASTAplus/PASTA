@@ -2189,7 +2189,7 @@ public class DataPackageManagerResource extends PastaWebService {
    * @param identifier  The identifier of the data package
    * @param revision    The revision of the data package
    * @param entityId    The identifier of the data entity within the data package
-   * @return a Response object containing the specified data entity,
+   * @return a File object containing the specified data entity,
    *         if found, else returns a 404 Not Found response
    */
   @GET
@@ -2263,10 +2263,10 @@ public class DataPackageManagerResource extends PastaWebService {
       MediaType dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
       entryText = "Data Format: " + dataFormat.toString();
       
-      byte[] byteArray = 
-        dataPackageManager.readDataEntity(scope, identifier, revision, entityId, authToken, userId);
+      File file = 
+        dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId, authToken, userId);
     
-      if (byteArray != null) {
+      if (file != null) {
         String dataPackageResourceId = DataPackageManager.composeResourceId(
           ResourceType.dataPackage, scope, identifier, Integer.valueOf(revision), null);
 
@@ -2284,7 +2284,7 @@ public class DataPackageManagerResource extends PastaWebService {
         entryText = String.format("%s: %s; %s: %s; %s", 
                                   "Entity Name", entityName, "Object Name", objectName, entryText);
 
-        responseBuilder = Response.ok(byteArray, dataFormat);
+        responseBuilder = Response.ok(file, dataFormat);
         
         if (objectName != null) {
           responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
