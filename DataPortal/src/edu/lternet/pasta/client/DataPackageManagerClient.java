@@ -61,811 +61,843 @@ import edu.lternet.pasta.portal.ConfigurationListener;
  * @author dcosta
  * @since April 2, 2012
  * 
- *  The DataPackageManagerClient supports the management of data packages
- *  in the NIS Data Portal. It interacts directly with the 
- *  DataPackageManager PASTA web service.
+ *        The DataPackageManagerClient supports the management of data packages
+ *        in the NIS Data Portal. It interacts directly with the
+ *        DataPackageManager PASTA web service.
  * 
  */
 public class DataPackageManagerClient extends PastaClient {
 
-  /*
-   * Class variables
-   */
+	/*
+	 * Class variables
+	 */
 
-  private static final Logger logger = Logger
-      .getLogger(edu.lternet.pasta.client.DataPackageManagerClient.class);
+	private static final Logger logger = Logger
+	    .getLogger(edu.lternet.pasta.client.DataPackageManagerClient.class);
 
-  static final String pathqueryXML = 
-    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-    "<pathquery version=\"1.0\">\n" +
-    "  <meta_file_id>unspecified</meta_file_id>\n" +
-    "  <querytitle>unspecified</querytitle>\n" +
-    "  <returnfield>dataset/title</returnfield>\n" +
-    "  <returnfield>keyword</returnfield>\n" +
-    "  <returnfield>originator/individualName/surName</returnfield>\n" +
-    "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n" +
-    "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n" +
-    "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n" +
-    "  <querygroup operator=\"UNION\">\n" +
-    "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n" +
-    "      <value>bug</value>\n" +
-    "      <pathexpr>dataset/title</pathexpr>\n" +
-    "    </queryterm>\n" +
-    "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n" +
-    "      <value>Carroll</value>\n" +
-    "      <pathexpr>surName</pathexpr>\n" +
-    "    </queryterm>\n" +
-    "  </querygroup>\n" +
-    "</pathquery>\n";
+	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	    + "<pathquery version=\"1.0\">\n"
+	    + "  <meta_file_id>unspecified</meta_file_id>\n"
+	    + "  <querytitle>unspecified</querytitle>\n"
+	    + "  <returnfield>dataset/title</returnfield>\n"
+	    + "  <returnfield>keyword</returnfield>\n"
+	    + "  <returnfield>originator/individualName/surName</returnfield>\n"
+	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n"
+	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n"
+	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
+	    + "  <querygroup operator=\"UNION\">\n"
+	    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+	    + "      <value>bug</value>\n"
+	    + "      <pathexpr>dataset/title</pathexpr>\n"
+	    + "    </queryterm>\n"
+	    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+	    + "      <value>Carroll</value>\n"
+	    + "      <pathexpr>surName</pathexpr>\n"
+	    + "    </queryterm>\n"
+	    + "  </querygroup>\n" + "</pathquery>\n";
 
+	/*
+	 * Instance variables
+	 */
 
-  /*
-   * Instance variables
-   */
-  
-  private final String BASE_URL;
-  String contentType = null;
-  
-  /*
-   * Constructors
-   */
+	private final String BASE_URL;
+	String contentType = null;
 
-  /**
-   * Creates a new DataPackageManagerClient object and sets the user's 
-   * authentication token if it exists.
-   * 
-   * @param uid
-   *          The user's identifier as a String object.
-   * 
-   * @throws PastaAuthenticationException
-   */
-  public DataPackageManagerClient(String uid) 
-          throws PastaAuthenticationException, PastaConfigurationException {
-    
-    super(uid);
-    String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
-    this.BASE_URL = pastaUrl + "/package";
-  }
+	/*
+	 * Constructors
+	 */
 
-  
-  /*
-   * Class Methods
-   */
-  
-  /**
-   * Determine the test identifier used for testing data package 
-   * operations. Eliminate identifiers that were previously deleted 
-   * or are currently in use.
-   * 
-   * @param  dpmClient  the DataPackageManagerClient object
-   * @param  scope the scope value, e.g. "knb-lter-lno"
-   * @return  an integer value appropriate for use as a test identifier
-   */
-  static Integer determineTestIdentifier(DataPackageManagerClient dpmClient, 
-                                         String scope)
-          throws Exception {
-    Integer identifier = null;
-    
-    /*
-     * Determine the test identifier. Eliminate identifiers that were
-     * previously deleted or are currently in use.
-     */
-    TreeSet<String> deletedSet = new TreeSet<String>();
-    String deletedDataPackages = dpmClient.listDeletedDataPackages();
-    String[] deletedArray = deletedDataPackages.split("\n");
-    for (int i = 0; i < deletedArray.length; i++) {
-      if (deletedArray[i] != null && 
-          !deletedArray[i].equals("") &&
-          deletedArray[i].startsWith(scope)
-          ) {
-        deletedSet.add(deletedArray[i]);
-      }
-    }
+	/**
+	 * Creates a new DataPackageManagerClient object and sets the user's
+	 * authentication token if it exists.
+	 * 
+	 * @param uid
+	 *          The user's identifier as a String object.
+	 * 
+	 * @throws PastaAuthenticationException
+	 */
+	public DataPackageManagerClient(String uid)
+	    throws PastaAuthenticationException, PastaConfigurationException {
 
-    TreeSet<String> identifierSet = new TreeSet<String>();
-    String dataPackageIdentifiers = dpmClient.listDataPackageIdentifiers(scope);
-    String[] identifierArray = dataPackageIdentifiers.split("\n");
-    for (int i = 0; i < identifierArray.length; i++) {
-      if (identifierArray[i] != null && 
-          !identifierArray[i].equals("")
-          ) {
-        identifierSet.add(identifierArray[i]);
-      }
-    }
-    
-    int identifierValue = 1;
-    while (identifier == null) {
-      String identifierString = "" + identifierValue;
-      String scopeDotIdentifier = scope + "." + identifierValue;
-      if (!deletedSet.contains(scopeDotIdentifier) &&
-          !identifierSet.contains(identifierString)
-         ) {
-        identifier = new Integer(identifierValue);
-      }
-      else {
-        identifierValue++;
-      }
-    }
-    
-    return identifier;
-  }
-  
-  
-  /**
-   * main() program. Can be used as a lightweight unit test
-   * to test the methods in this class.
-   * 
-   * @param args  No command arguments are passed to this program.
-   */
-  public static void main(String[] args) {
-    String user = "ucarroll";
-    String scope = "knb-lter-lno";
-    Integer identifier = null;
-    String revision = "1";
-    String entityId = "NoneSuchBugCount";
-    
-    ConfigurationListener.configure();
+		super(uid);
+		String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol,
+		    this.pastaHost, this.pastaPort);
+		this.BASE_URL = pastaUrl + "/package";
+	}
 
-    try {
-      DataPackageManagerClient dpmClient = new DataPackageManagerClient(user);
+	/*
+	 * Class Methods
+	 */
 
-      String dataPackageScopes = dpmClient.listDataPackageScopes();
-      System.out.println("\nData package scopes:\n" + dataPackageScopes);
-         
-      // Create the test data package in PASTA
-      identifier = determineTestIdentifier(dpmClient, scope);
-      String testEMLPath = "test/data/NoneSuchBugCount.xml";
-      File testEMLFile = new File(testEMLPath);
-      String createPackageId = scope + "." + identifier.toString() + "." + revision;
-      modifyTestEmlFile(testEMLFile, scope, createPackageId);
-      String resourceMap = dpmClient.createDataPackage(testEMLFile);
-      System.out.println("\nResource map:\n" + resourceMap);
-   
-      // Update the test data package in PASTA
-      String dataPackageRevisions = dpmClient.listDataPackageRevisions(scope, identifier);
-      System.out.println("\nData package revisions:\n" + dataPackageRevisions); 
-      String[] revisionStrings = dataPackageRevisions.split("\n");
-      int maxRevision = -1;
-      for (int i = 0; i < revisionStrings.length; i++) {
-        String revStr = revisionStrings[i];
-        if (revStr != null && !revStr.equals("")) {
-          Integer revInteger = new Integer(revisionStrings[i]);
-          int rev = revInteger.intValue();
-          maxRevision = Math.max(maxRevision, rev);
-        }
-      }
-      int updateRevision = maxRevision + 1;
-      String updatePackageId = scope + "." + identifier.toString() + "." + updateRevision;     
-      modifyTestEmlFile(testEMLFile, scope, updatePackageId);
-      resourceMap = dpmClient.updateDataPackage(scope, identifier, testEMLFile);
-      System.out.println("\nResource map:\n" + resourceMap);
+	/**
+	 * Determine the test identifier used for testing data package operations.
+	 * Eliminate identifiers that were previously deleted or are currently in use.
+	 * 
+	 * @param dpmClient
+	 *          the DataPackageManagerClient object
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @return an integer value appropriate for use as a test identifier
+	 */
+	static Integer determineTestIdentifier(DataPackageManagerClient dpmClient,
+	    String scope) throws Exception {
+		Integer identifier = null;
 
-      String dataEntities = dpmClient.listDataEntities(scope, identifier, revision);
-      System.out.println("\nData entities:\n" + dataEntities);
-      
-      String dataPackage = dpmClient.readDataPackage(scope, identifier, revision);
-      System.out.println("\nData package:\n" + dataPackage);
+		/*
+		 * Determine the test identifier. Eliminate identifiers that were previously
+		 * deleted or are currently in use.
+		 */
+		TreeSet<String> deletedSet = new TreeSet<String>();
+		String deletedDataPackages = dpmClient.listDeletedDataPackages();
+		String[] deletedArray = deletedDataPackages.split("\n");
+		for (int i = 0; i < deletedArray.length; i++) {
+			if (deletedArray[i] != null && !deletedArray[i].equals("")
+			    && deletedArray[i].startsWith(scope)) {
+				deletedSet.add(deletedArray[i]);
+			}
+		}
 
-      String metadata = dpmClient.readMetadata(scope, identifier, revision);
-      System.out.println("\nMetadata:\n" + metadata);
-      
-      //dpmClient.readDataEntity(scope, identifier, revision, entityId, System.out);
-      //System.out.println("\nData entity:\n" + dataEntity);
-      
-      String dataPackageReport = dpmClient.readDataPackageReport(scope, identifier, revision);
-      System.out.println("\nData package report:\n" + dataPackageReport);
+		TreeSet<String> identifierSet = new TreeSet<String>();
+		String dataPackageIdentifiers = dpmClient.listDataPackageIdentifiers(scope);
+		String[] identifierArray = dataPackageIdentifiers.split("\n");
+		for (int i = 0; i < identifierArray.length; i++) {
+			if (identifierArray[i] != null && !identifierArray[i].equals("")) {
+				identifierSet.add(identifierArray[i]);
+			}
+		}
 
-      String resultSetXML = dpmClient.searchDataPackages(pathqueryXML);
-      System.out.println("\nResult set XML:\n" + resultSetXML);
-      
-      // Delete the test data package from PASTA
-      dpmClient.deleteDataPackage(scope, identifier);
-      System.out.println("\nDeleted data package: " + scope + "." + identifier);
-    }
-    catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    }
-  }
-  
-  
-  /**
-   * Modifies the packageId value in a test EML file. Useful for testing
-   * purposes.
-   * 
-   * @param testEmlFile     The test EML document file
-   * @param scope           The scope value, e.g. "knb-lter-lno"
-   * @param newPackageId    The packageId string to write to the file as the
-   *                        new value of the packageId attribute, e.g.
-   *                        "knb-lter-lno.100.1"
-   */
-  public static void modifyTestEmlFile(File testEmlFile, String scope, String newPackageId) {
-    boolean append = false;
-    String xmlString = FileUtility.fileToString(testEmlFile);
-    Pattern pattern = Pattern.compile(scope + "\\.\\d+\\.\\d+");
-    Matcher matcher = pattern.matcher(xmlString);  
-    // Replace packageId value with new packageId value
-    String modifiedXmlString = matcher.replaceAll(newPackageId);          
-    FileWriter fileWriter;
+		int identifierValue = 1;
+		while (identifier == null) {
+			String identifierString = "" + identifierValue;
+			String scopeDotIdentifier = scope + "." + identifierValue;
+			if (!deletedSet.contains(scopeDotIdentifier)
+			    && !identifierSet.contains(identifierString)) {
+				identifier = new Integer(identifierValue);
+			} else {
+				identifierValue++;
+			}
+		}
 
-    try {
-      fileWriter = new FileWriter(testEmlFile);
-      StringBuffer stringBuffer = new StringBuffer(modifiedXmlString);
-      FileUtils.writeStringToFile(testEmlFile, modifiedXmlString, append);
-    }
-    catch (IOException e) {
-      fail("IOException modifying packageId in test EML file: " + e.getMessage());
-    }
-  }
-  
-  
-  /*
-   * Instance Methods
-   */
-  
-  /*
-   * Documentation for the Data Package Manager web service 
-   * methods and the status codes they return can be found at 
-   * http://package.lternet.edu/package/docs/api
-   */
-  
-  /**
-   * Executes the 'createDataPackage' web service method.
-   * 
-   * @param  emlFile  the Level-0 EML document describing the data package
-   * @return a string representation of the resource map for the
-   *         newly created data package
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String createDataPackage(File emlFile) throws Exception {
-    String contentType = "application/xml";
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    HttpPost httpPost = new HttpPost(BASE_URL + "/eml");
-    String resourceMap = null;
+		return identifier;
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpPost.setHeader("Cookie", "auth-token=" + this.token);
-    }
-    httpPost.setHeader("Content-Type", contentType);
+	/**
+	 * main() program. Can be used as a lightweight unit test to test the methods
+	 * in this class.
+	 * 
+	 * @param args
+	 *          No command arguments are passed to this program.
+	 */
+	public static void main(String[] args) {
+		String user = "ucarroll";
+		String scope = "knb-lter-lno";
+		Integer identifier = null;
+		String revision = "1";
+		String entityId = "NoneSuchBugCount";
 
-    // Set the request entity
-    HttpEntity fileEntity = new FileEntity(emlFile, contentType);
-    httpPost.setEntity(fileEntity);
+		ConfigurationListener.configure();
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpPost);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      String entityString = EntityUtils.toString(httpEntity);
-      if (statusCode == HttpStatus.SC_OK) {
-        resourceMap = entityString;
-      }
-      else {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		try {
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(user);
 
-    return resourceMap;
-  }
+			String dataPackageScopes = dpmClient.listDataPackageScopes();
+			System.out.println("\nData package scopes:\n" + dataPackageScopes);
 
-  
-  /**
-   * Executes the 'deleteDataPackage' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @return an empty string if the data package was successfully deleted
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String deleteDataPackage(String scope, Integer identifier) 
-          throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-    HttpDelete httpDelete = new HttpDelete(BASE_URL + "/eml" + urlTail);
-    String entityString = null;
+			// Create the test data package in PASTA
+			identifier = determineTestIdentifier(dpmClient, scope);
+			String testEMLPath = "test/data/NoneSuchBugCount.xml";
+			File testEMLFile = new File(testEMLPath);
+			String createPackageId = scope + "." + identifier.toString() + "."
+			    + revision;
+			modifyTestEmlFile(testEMLFile, scope, createPackageId);
+			String resourceMap = dpmClient.createDataPackage(testEMLFile);
+			System.out.println("\nResource map:\n" + resourceMap);
 
-    // Set header content
-    if (this.token != null) {
-      httpDelete.setHeader("Cookie", "auth-token=" + this.token);
-    }
+			// Update the test data package in PASTA
+			String dataPackageRevisions = dpmClient.listDataPackageRevisions(scope,
+			    identifier);
+			System.out.println("\nData package revisions:\n" + dataPackageRevisions);
+			String[] revisionStrings = dataPackageRevisions.split("\n");
+			int maxRevision = -1;
+			for (int i = 0; i < revisionStrings.length; i++) {
+				String revStr = revisionStrings[i];
+				if (revStr != null && !revStr.equals("")) {
+					Integer revInteger = new Integer(revisionStrings[i]);
+					int rev = revInteger.intValue();
+					maxRevision = Math.max(maxRevision, rev);
+				}
+			}
+			int updateRevision = maxRevision + 1;
+			String updatePackageId = scope + "." + identifier.toString() + "."
+			    + updateRevision;
+			modifyTestEmlFile(testEMLFile, scope, updatePackageId);
+			resourceMap = dpmClient.updateDataPackage(scope, identifier, testEMLFile);
+			System.out.println("\nResource map:\n" + resourceMap);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpDelete);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+			String dataEntities = dpmClient.listDataEntities(scope, identifier,
+			    revision);
+			System.out.println("\nData entities:\n" + dataEntities);
 
-    return entityString;
-  }
+			String dataPackage = dpmClient.readDataPackage(scope, identifier,
+			    revision);
+			System.out.println("\nData package:\n" + dataPackage);
 
-  
-  /**
-   * Executes the 'evaluateDataPackage' web service method.
-   * @param  emlFile  the Level-0 EML document describing the data package
-   *         to be evaluated
-   * @return a string holding the XML quality report document resulting
-   *         from the evaluation
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String evaluateDataPackage(File emlFile) throws Exception {
-    String contentType = "application/xml";
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
-    String qualityReport = null;
+			String metadata = dpmClient.readMetadata(scope, identifier, revision);
+			System.out.println("\nMetadata:\n" + metadata);
 
-    // Set header content
-    if (this.token != null) {
-      httpPost.setHeader("Cookie", "auth-token=" + this.token);
-    }
-    httpPost.setHeader("Content-Type", contentType);
+			// dpmClient.readDataEntity(scope, identifier, revision, entityId,
+			// System.out);
+			// System.out.println("\nData entity:\n" + dataEntity);
 
-    // Set the request entity
-    HttpEntity fileEntity = new FileEntity(emlFile, contentType);
-    httpPost.setEntity(fileEntity);
+			String dataPackageReport = dpmClient.readDataPackageReport(scope,
+			    identifier, revision);
+			System.out.println("\nData package report:\n" + dataPackageReport);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpPost);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      String entityString = EntityUtils.toString(httpEntity);
-      if (statusCode == HttpStatus.SC_OK) {
-        qualityReport = entityString;
-      }
-      else {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+			String resultSetXML = dpmClient.searchDataPackages(pathqueryXML);
+			System.out.println("\nResult set XML:\n" + resultSetXML);
 
-    return qualityReport;
-  }
+			// Delete the test data package from PASTA
+			dpmClient.deleteDataPackage(scope, identifier);
+			System.out.println("\nDeleted data package: " + scope + "." + identifier);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
+	/**
+	 * Modifies the packageId value in a test EML file. Useful for testing
+	 * purposes.
+	 * 
+	 * @param testEmlFile
+	 *          The test EML document file
+	 * @param scope
+	 *          The scope value, e.g. "knb-lter-lno"
+	 * @param newPackageId
+	 *          The packageId string to write to the file as the new value of the
+	 *          packageId attribute, e.g. "knb-lter-lno.100.1"
+	 */
+	public static void modifyTestEmlFile(File testEmlFile, String scope,
+	    String newPackageId) {
+		boolean append = false;
+		String xmlString = FileUtility.fileToString(testEmlFile);
+		Pattern pattern = Pattern.compile(scope + "\\.\\d+\\.\\d+");
+		Matcher matcher = pattern.matcher(xmlString);
+		// Replace packageId value with new packageId value
+		String modifiedXmlString = matcher.replaceAll(newPackageId);
+		FileWriter fileWriter;
 
-  /**
-   * Executes the 'listDataEntities' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1" or "newest"
-   * @return a newline-separated list of data entity identifiers
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String listDataEntities(String scope, Integer identifier, String revision) 
-          throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-    String url = BASE_URL + "/data/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+		try {
+			fileWriter = new FileWriter(testEmlFile);
+			StringBuffer stringBuffer = new StringBuffer(modifiedXmlString);
+			FileUtils.writeStringToFile(testEmlFile, modifiedXmlString, append);
+		} catch (IOException e) {
+			fail("IOException modifying packageId in test EML file: "
+			    + e.getMessage());
+		}
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+	/*
+	 * Instance Methods
+	 */
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+	/*
+	 * Documentation for the Data Package Manager web service methods and the
+	 * status codes they return can be found at
+	 * http://package.lternet.edu/package/docs/api
+	 */
 
-    return entityString;
-  }
+	/**
+	 * Executes the 'createDataPackage' web service method.
+	 * 
+	 * @param emlFile
+	 *          the Level-0 EML document describing the data package
+	 * @return a string representation of the resource map for the newly created
+	 *         data package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String createDataPackage(File emlFile) throws Exception {
+		String contentType = "application/xml";
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		HttpPost httpPost = new HttpPost(BASE_URL + "/eml");
+		String resourceMap = null;
 
-  
-  /**
-   * Executes the 'listDataPackageIdentifiers' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @return a newline-separated list of identifier values
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String listDataPackageIdentifiers(String scope)
-          throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String url = BASE_URL + "/eml/" + scope;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+		// Set header content
+		if (this.token != null) {
+			httpPost.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		httpPost.setHeader("Content-Type", contentType);
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		// Set the request entity
+		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		httpPost.setEntity(fileEntity);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_NOT_FOUND) {
-        handleStatusCode(statusCode, entityString);
-      }
-      else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-        entityString = "";
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpPost);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+			if (statusCode == HttpStatus.SC_OK) {
+				resourceMap = entityString;
+			} else {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-    return entityString;
-  }
+		return resourceMap;
+	}
 
-  
-  /**
-   * Executes the 'listDataPackageRevisions' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @return a newline-separated list of revision values
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String listDataPackageRevisions(String scope, Integer identifier)
-      throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-    String url = BASE_URL + "/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+	/**
+	 * Executes the 'deleteDataPackage' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @return an empty string if the data package was successfully deleted
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String deleteDataPackage(String scope, Integer identifier)
+	    throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
+		HttpDelete httpDelete = new HttpDelete(BASE_URL + "/eml" + urlTail);
+		String entityString = null;
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		// Set header content
+		if (this.token != null) {
+			httpDelete.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpDelete);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-    return entityString;
-  }
-  
+		return entityString;
+	}
 
-  /**
-   * Executes the 'listDataPackageScopes' web service method.
-   * @return a newline-separated list of scope values
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String listDataPackageScopes() 
-          throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String url = BASE_URL + "/eml";
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+	/**
+	 * Executes the 'evaluateDataPackage' web service method.
+	 * 
+	 * @param emlFile
+	 *          the Level-0 EML document describing the data package to be
+	 *          evaluated
+	 * @return a string holding the XML quality report document resulting from the
+	 *         evaluation
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String evaluateDataPackage(File emlFile) throws Exception {
+		String contentType = "application/xml";
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
+		String qualityReport = null;
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		// Set header content
+		if (this.token != null) {
+			httpPost.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		httpPost.setHeader("Content-Type", contentType);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		// Set the request entity
+		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		httpPost.setEntity(fileEntity);
 
-    return entityString;
-  }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpPost);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+			if (statusCode == HttpStatus.SC_OK) {
+				qualityReport = entityString;
+			} else {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-  
-  /**
-   * Executes the 'listDeletedDataPackages' web service method.
-   * @return a newline-separated list of packageId strings representing
-   *         all the data packages that have been deleted from PASTA
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String listDeletedDataPackages()
-          throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String url = BASE_URL + "/eml/deleted";
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+		return qualityReport;
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+	/**
+	 * Executes the 'listDataEntities' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1" or "newest"
+	 * @return a newline-separated list of data entity identifiers
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDataEntities(String scope, Integer identifier,
+	    String revision) throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/data/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
-    return entityString;
-  }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-  
-  /**
-   * Executes the 'readDataEntity' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1"
-   * @param entityId the entity identifier string, e.g. "NoneSuchBugCount"
-   * @param servletResponse the servlet response object for returning content
-   * 					to the client browser
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public void readDataEntity(String scope, Integer identifier,
-      String revision, String entityId, HttpServletResponse servletResponse) throws Exception {
-  	
-  	HttpResponse httpResponse = null;
-  	
-  	if (servletResponse == null) {
-  		String gripe = "Servlet response object is null!";
-  		throw new Exception(gripe);
-  	}
-  	
-  	// Re-encode "%" to its character reference value of %25 to mitigate
-  	// an issue with the HttpGet call that performs the decoding - this is
-  	// a kludge to deal with encoding nonsense.
-  	entityId = entityId.replace("%", "%25");
-  	
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision,
-        entityId);
-    String url = BASE_URL + "/data/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
+		return entityString;
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+	/**
+	 * Executes the 'listDataPackageIdentifiers' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @return a newline-separated list of identifier values
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDataPackageIdentifiers(String scope) throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/eml/" + scope;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
 
-    try {
-      httpResponse = httpClient.execute(httpGet);
-      
-      getInfo(httpResponse);
-      
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK
+			    && statusCode != HttpStatus.SC_NOT_FOUND) {
+				handleStatusCode(statusCode, entityString);
+			} else if (statusCode == HttpStatus.SC_NOT_FOUND) {
+				entityString = "";
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
+	 * Executes the 'listDataPackageRevisions' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @return a newline-separated list of revision values
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDataPackageRevisions(String scope, Integer identifier)
+	    throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
+		String url = BASE_URL + "/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
+	 * Executes the 'listDataPackageScopes' web service method.
+	 * 
+	 * @return a newline-separated list of scope values
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDataPackageScopes() throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/eml";
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
+	 * Executes the 'listDeletedDataPackages' web service method.
+	 * 
+	 * @return a newline-separated list of packageId strings representing all the
+	 *         data packages that have been deleted from PASTA
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDeletedDataPackages() throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/eml/deleted";
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
+	 * Executes the 'readDataEntity' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @param entityId
+	 *          the entity identifier string, e.g. "NoneSuchBugCount"
+	 * @param servletResponse
+	 *          the servlet response object for returning content to the client
+	 *          browser
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public void readDataEntity(String scope, Integer identifier, String revision,
+	    String entityId, HttpServletResponse servletResponse) throws Exception {
+
+		HttpResponse httpResponse = null;
+
+		if (servletResponse == null) {
+			String gripe = "Servlet response object is null!";
+			throw new Exception(gripe);
+		}
+
+		// Re-encode "%" to its character reference value of %25 to mitigate
+		// an issue with the HttpGet call that performs the decoding - this is
+		// a kludge to deal with encoding nonsense.
+		entityId = entityId.replace("%", "%25");
+
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+		    entityId);
+		String url = BASE_URL + "/data/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			httpResponse = httpClient.execute(httpGet);
+
+			getInfo(httpResponse);
+
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
 
 			if (statusCode != HttpStatus.SC_OK) {
 				String gripe = "An error occurred while attempting to read the data enity: "
 				    + entityId;
 				handleStatusCode(statusCode, gripe);
-      } else {
-      	Header header = null;
-      	
-      	header = httpResponse.getFirstHeader("Content-Disposition");
-      	String contentDisposition = header.getValue();
-      	
-      	header = httpResponse.getFirstHeader("Content-Type");
-      	String contentType = header.getValue();
-      	
-      	Integer contentLength = new Long(httpEntity.getContentLength()).intValue();
-      	
-      	servletResponse.setHeader("Content-Disposition", contentDisposition);
-      	servletResponse.setContentType(contentType);
-      	servletResponse.setContentLength(contentLength);
-      	
-      	httpEntity.writeTo(servletResponse.getOutputStream());
-      }
-			
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+			} else {
+				Header header = null;
 
-  }
+				header = httpResponse.getFirstHeader("Content-Disposition");
+				String contentDisposition = header.getValue();
 
+				header = httpResponse.getFirstHeader("Content-Type");
+				String contentType = header.getValue();
 
-  /**
-   * Executes the 'readDataEntityName' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1"
-   * @param entityId the entity identifier string, e.g. "NoneSuchBugCount"
-   * @return the data entity name
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String readDataEntityName(String scope, Integer identifier,
-      String revision, String entityId) throws Exception {
-  	
-  	// Re-encode "%" to its character reference value of %25 to mitigate
-  	// an issue with the HttpGet call that performs the decoding - this is
-  	// a kludge to deal with encoding nonsense.
-  	entityId = entityId.replace("%", "%25");
-  	
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision,
-        entityId);
-    String url = BASE_URL + "/name" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+				Integer contentLength = new Long(httpEntity.getContentLength())
+				    .intValue();
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+				servletResponse.setHeader("Content-Disposition", contentDisposition);
+				servletResponse.setContentType(contentType);
+				servletResponse.setContentLength(contentLength);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      ContentType contentType = ContentType.getOrDefault(httpEntity);
-      this.contentType = contentType.toString();
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+				httpEntity.writeTo(servletResponse.getOutputStream());
+			}
 
-    return entityString;
-  }
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
+	}
 
-  /**
-   * Executes the 'readDataPackage' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1"
-   * @return the data package resource map
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String readDataPackage(String scope, 
-                                Integer identifier,
-                                String revision) 
-        throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-    String url = BASE_URL + "/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+	/**
+	 * Executes the 'readDataEntityName' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @param entityId
+	 *          the entity identifier string, e.g. "NoneSuchBugCount"
+	 * @return the data entity name
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readDataEntityName(String scope, Integer identifier,
+	    String revision, String entityId) throws Exception {
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		// Re-encode "%" to its character reference value of %25 to mitigate
+		// an issue with the HttpGet call that performs the decoding - this is
+		// a kludge to deal with encoding nonsense.
+		entityId = entityId.replace("%", "%25");
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+		    entityId);
+		String url = BASE_URL + "/name" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
 
-    return entityString;
-  }
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
-  
-  /**
-   * Executes the 'readDataPackageReport' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1"
-   * @return the XML quality report document for the specified data package
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String readDataPackageReport(String scope, Integer identifier,
-      String revision) throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-    String url = BASE_URL + "/report/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			ContentType contentType = ContentType.getOrDefault(httpEntity);
+			this.contentType = contentType.toString();
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		return entityString;
+	}
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity);
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+	/**
+	 * Executes the 'readDataPackage' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @return the data package resource map
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readDataPackage(String scope, Integer identifier,
+	    String revision) throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
 
-    return entityString;
-  }
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-  /**
-   * Executes the 'readMetadata' web service method.
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param revision the revision value, e.g. "1"
-   * @return the Level-1 EML metadata document for the specified data package
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String readMetadata(String scope, Integer identifier, String revision)
-      throws Exception {
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-    String url = BASE_URL + "/metadata/eml" + urlTail;
-    HttpGet httpGet = new HttpGet(url);
-    String entityString = null;
+		return entityString;
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpGet.setHeader("Cookie", "auth-token=" + this.token);
-    }
+	/**
+	 * Executes the 'readDataPackageReport' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @return the XML quality report document for the specified data package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readDataPackageReport(String scope, Integer identifier,
+	    String revision) throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/report/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpGet);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      entityString = EntityUtils.toString(httpEntity, "UTF-8");
-      if (statusCode != HttpStatus.SC_OK) {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
-    return entityString;
-  }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
+		return entityString;
+	}
 
-  /**
+	/**
+	 * Executes the 'readMetadata' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @return the Level-1 EML metadata document for the specified data package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readMetadata(String scope, Integer identifier, String revision)
+	    throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/metadata/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity, "UTF-8");
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	/**
 	 * Returns the DOI for the data package map resource identified by the scope,
 	 * identifier, and revision.
 	 * 
@@ -877,7 +909,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataPackageDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
-		
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
@@ -903,8 +935,8 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 		return entityString;
-		
-	}  
+
+	}
 
 	/**
 	 * Returns the DOI for the metadata resource identified by the scope,
@@ -918,7 +950,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readMetadataDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
-		
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
@@ -944,10 +976,9 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 		return entityString;
-		
+
 	}
-	
-	
+
 	/**
 	 * Returns the DOI for the data package quality report resource identified by
 	 * the scope, identifier, and revision.
@@ -960,7 +991,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataPackageReportDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
-		
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
@@ -986,9 +1017,8 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 		return entityString;
-		
-	}  
 
+	}
 
 	/**
 	 * Returns the DOI for the data entity resource identified by the scope,
@@ -1003,10 +1033,11 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataEntityDoi(String scope, Integer identifier,
 	    String revision, String entityId) throws Exception {
-		
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String urlTail = makeUrlTail(scope, identifier.toString(), revision, entityId);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+		    entityId);
 		String url = BASE_URL + "/data/doi" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -1029,161 +1060,163 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 		return entityString;
-		
-	}  
 
-	
-  /**
-   * Executes the 'searchDataPackages' web service method.
-   * @param pathQuery an XML pathquery string (conforming to Metacat pathquery syntax)
-   * @return an XML resultset document (conforming to Metacat pathquery syntax)
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String searchDataPackages(String pathQuery)
-    throws Exception {
-    String contentType = "application/xml";
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-    HttpPut httpPut = new HttpPut(BASE_URL + "/eml/search");
-    String resultSetXML = null;
+	}
 
-    // Set header content
-    if (this.token != null) {
-      httpPut.setHeader("Cookie", "auth-token=" + this.token);
-    }
-    httpPut.setHeader("Content-Type", contentType);
+	/**
+	 * Executes the 'searchDataPackages' web service method.
+	 * 
+	 * @param pathQuery
+	 *          an XML pathquery string (conforming to Metacat pathquery syntax)
+	 * @return an XML resultset document (conforming to Metacat pathquery syntax)
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String searchDataPackages(String pathQuery) throws Exception {
+		String contentType = "application/xml";
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		HttpPut httpPut = new HttpPut(BASE_URL + "/eml/search");
+		String resultSetXML = null;
 
-    // Set the request entity
-    HttpEntity stringEntity = new StringEntity(pathQuery);
-    httpPut.setEntity(stringEntity);
+		// Set header content
+		if (this.token != null) {
+			httpPut.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		httpPut.setHeader("Content-Type", contentType);
 
-    try {
-      HttpResponse httpResponse = httpClient.execute(httpPut);
-      int statusCode = httpResponse.getStatusLine().getStatusCode();
-      HttpEntity httpEntity = httpResponse.getEntity();
-      String entityString = EntityUtils.toString(httpEntity);
-      if (statusCode == HttpStatus.SC_OK) {
-        resultSetXML = entityString;
-      }
-      else {
-        handleStatusCode(statusCode, entityString);
-      }
-    }
-    finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+		// Set the request entity
+		HttpEntity stringEntity = new StringEntity(pathQuery);
+		httpPut.setEntity(stringEntity);
 
-    return resultSetXML;
-  }
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpPut);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+			if (statusCode == HttpStatus.SC_OK) {
+				resultSetXML = entityString;
+			} else {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-  
-  /**
-   * Executes the 'updateDataPackage' web service method. 
-   * @param scope the scope value, e.g. "knb-lter-lno"
-   * @param identifier the identifier value, e.g. 10
-   * @param  emlFile  the Level-0 EML document describing the data package
-   *            to be updated
-   * @return a string representation of the resource map for the
-   *         updated data package
-   * @see <a target="top" href="http://package.lternet.edu/package/docs/api">Data Package Manager web service API</a>   
-   */
-  public String updateDataPackage(String scope, Integer identifier, File emlFile) 
-          throws Exception {
-      final String contentType = "application/xml";
-      HttpClient httpClient = new DefaultHttpClient();
-      HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-      String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-      final String url = BASE_URL + "/eml" + urlTail;
-      HttpPut httpPut = new HttpPut(url);
-      String resourceMap = null;
+		return resultSetXML;
+	}
 
-      // Set header content
-      if (this.token != null) {
-        httpPut.setHeader("Cookie", "auth-token=" + this.token);
-      }
-      httpPut.setHeader("Content-Type", contentType);
+	/**
+	 * Executes the 'updateDataPackage' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param emlFile
+	 *          the Level-0 EML document describing the data package to be updated
+	 * @return a string representation of the resource map for the updated data
+	 *         package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String updateDataPackage(String scope, Integer identifier, File emlFile)
+	    throws Exception {
+		final String contentType = "application/xml";
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
+		final String url = BASE_URL + "/eml" + urlTail;
+		HttpPut httpPut = new HttpPut(url);
+		String resourceMap = null;
 
-      // Set the request entity
-      HttpEntity fileEntity = new FileEntity(emlFile, contentType);
-      httpPut.setEntity(fileEntity);
+		// Set header content
+		if (this.token != null) {
+			httpPut.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		httpPut.setHeader("Content-Type", contentType);
 
-      try {
-        HttpResponse httpResponse = httpClient.execute(httpPut);
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        HttpEntity httpEntity = httpResponse.getEntity();
-        String entityString = EntityUtils.toString(httpEntity);
-        if (statusCode == HttpStatus.SC_OK) {
-          resourceMap = entityString;
-        }
-        else {
-          handleStatusCode(statusCode, entityString);
-        }
-      }
-      finally {
-        httpClient.getConnectionManager().shutdown();
-      }
+		// Set the request entity
+		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		httpPut.setEntity(fileEntity);
 
-      return resourceMap;
-    }
-  
-  /**
-   * Returns the content type of the last operation that sets it.
-   * 
-   * @return The content type as a String object
-   */
-  public String getContentType() {
-    String contentType = this.contentType;
-    return contentType;
-  }
-  
-  /**
-   * Returns the PASTA data package resource URI.
-   * 
-   * @param scope
-   * @param identifier
-   * @param revision
-   * @return PASTA data package resource URI
-   */
-  public String getPastaPackageUri(String scope, Integer identifier, String revision) {
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpPut);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+			if (statusCode == HttpStatus.SC_OK) {
+				resourceMap = entityString;
+			} else {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
 
-  	String uri = null;
-  	
-  	String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-  	uri = this.pastaUriHead + "eml" + urlTail;
+		return resourceMap;
+	}
 
-  	return uri;
+	/**
+	 * Returns the content type of the last operation that sets it.
+	 * 
+	 * @return The content type as a String object
+	 */
+	public String getContentType() {
+		String contentType = this.contentType;
+		return contentType;
+	}
 
-  }
-  
-  private void getInfo(HttpResponse r) {
-    
-    Header[] headers = r.getAllHeaders();
-    
-    for (int i = 0; i < headers.length; i++) {
-    	System.out.println(headers[i].getName() + ": " + headers[i].getValue());
-    }
-    
-    HttpEntity re = r.getEntity();
-    
-    if (re.isChunked()) {
-    	System.out.println("Entity is chunked");
-    } else {
-    	System.out.println("Entity is not chunked");
-    }
-    
-    if (re.isStreaming()) {
-    	System.out.println("Entity is streaming");
-    } else {
-    	System.out.println("Entity is not streaming");
-    }
-    
-    if (re.isRepeatable()) {
-    	System.out.println("Entity is repeatable");
-    } else {
-    	System.out.println("Entity is not repeatable");
-    }
+	/**
+	 * Returns the PASTA data package resource URI.
+	 * 
+	 * @param scope
+	 * @param identifier
+	 * @param revision
+	 * @return PASTA data package resource URI
+	 */
+	public String getPastaPackageUri(String scope, Integer identifier,
+	    String revision) {
 
-  }
+		String uri = null;
 
-  
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		uri = this.pastaUriHead + "eml" + urlTail;
+
+		return uri;
+
+	}
+
+	private void getInfo(HttpResponse r) {
+
+		Header[] headers = r.getAllHeaders();
+
+		for (int i = 0; i < headers.length; i++) {
+			System.out.println(headers[i].getName() + ": " + headers[i].getValue());
+		}
+
+		HttpEntity re = r.getEntity();
+
+		if (re.isChunked()) {
+			System.out.println("Entity is chunked");
+		} else {
+			System.out.println("Entity is not chunked");
+		}
+
+		if (re.isStreaming()) {
+			System.out.println("Entity is streaming");
+		} else {
+			System.out.println("Entity is not streaming");
+		}
+
+		if (re.isRepeatable()) {
+			System.out.println("Entity is repeatable");
+		} else {
+			System.out.println("Entity is not repeatable");
+		}
+
+	}
+
 }
