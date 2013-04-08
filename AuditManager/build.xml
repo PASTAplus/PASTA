@@ -4,8 +4,8 @@
 
   <property name="webapp.name" value="audit"/>
 
-  <!-- Importing build file for JPA build -->
-  <import file="../ant-util/build-with-jpa.xml"/>
+  <!-- Import standard build file -->
+  <import file="../ant-util/simple.xml"/>
 
   <target name="prepare" depends="prepare-common">
      <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
@@ -16,16 +16,10 @@
       <fileset dir="${shared.lib.dir}/jaxb-pasta-service-0.1">
         <include name="**/*.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/jaxb-log-entry-0.1">
-        <include name="**/*.jar"/>
-      </fileset>
       <fileset dir="${shared.lib.dir}/jersey">
         <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/junit">
-        <include name="**/*.jar"/>
-      </fileset>
-      <fileset dir="${shared.lib.dir}/openjpa">
         <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">

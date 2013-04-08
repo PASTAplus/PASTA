@@ -42,6 +42,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.audit.AuditRecord;
+
 
 /**
 * @author dcosta
@@ -110,6 +112,16 @@ public class AuditManager {
    * Class methods
    */
  
+  /**
+   * Converts a date string to a valid timestamp string by appending a
+   * default time to the date. Useful when querying the audit database
+   * with precise start times and end times.
+   * 
+   * @param s               The date string.
+   * @param isToTime        True if the goal is to compose a "to-time", 
+   *                        else compose a "from-time". 
+   * @return                The timestamp string.
+   */
   public static String dateToTimestamp(String s, boolean isToTime) {
     if (s == null || s.isEmpty()) throw new IllegalStateException();
     
@@ -130,6 +142,14 @@ public class AuditManager {
   }
 
   
+  /**
+   * Constructs a Date object from a date string.
+   * 
+   * @param s               The date string.
+   * @param isToTime        True if the goal is to compose a "to-time", 
+   *                        else compose a "from-time". 
+   * @return                The Date object.
+   */
   public static Date strToDate(String s, boolean isToTime) {
     if (s == null || s.isEmpty()) throw new IllegalStateException();
     
@@ -157,73 +177,254 @@ public class AuditManager {
    */
  
   /**
-   * Adds a new audit log record to the audit table. (TO BE IMPLEMENTED)
+   * Adds a new audit entry to the audit resource registry.
    * 
-   * @param resourceId   The full resource identifier value
-   * @param resourceType The resource type, one of a fixed set of values
-   * @param resourceLocation The resource location, may be null
-   * @param packageId    The packageId value
-   * @param scope        The scope value
-   * @param identifier   The identifier integer value
-   * @param revision     The revision value
-   * @param entityId     The entityId value (may be null if this is not a data entity resource)
-   * @param entityName   The entityName value (may be null if this is not a data entity resource)
-   * @param principalOwner The user (principal) who owns the the resource 
-   * @param mayOverwrite If true, an existing resource with the same resourceId may
-   *                     be overwritten by the new resource by updating its creation date.
-   *                     This would be typically be set true only for evaluation resources
-   *                     such as evaluation reports. If false, an error is generated.
+   * @param oid   
+   * @param service 
+   * @param category 
+   * @param serviceMethod     
+   * @param entryText  
+   * @param resourceId  
+   * @param statusCode   
+   * @param userId 
+   * @param groups 
+   * @param authSystem 
    */
-  public void addAuditLog(String resourceId, 
-                          String resourceLocation,
-                          String packageId, 
-                          String scope, Integer identifier, Integer revision,
-                          String entityId, 
-                          String entityName, 
-                          String principalOwner, 
-                          boolean mayOverwrite)
-         throws ClassNotFoundException, SQLException {
+  public int addAuditEntry (
+     String service, 
+     String category, 
+     String serviceMethod, 
+     String entryText,
+     String resourceId,
+     int statusCode,
+     String userId,
+     String groups,
+     String authSystem
+     )
+          throws ClassNotFoundException, SQLException {
+    int auditId = 0;
     Connection connection = null;
     java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
-   
-    StringBuffer insertSQL = new StringBuffer("INSERT INTO " +  AUDIT_MANAGER_TABLE_QUALIFIED + 
-                                               "(");
-    insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                        "revision, resource_location, entity_id, entity_name, principal_owner, date_created) " + 
-                        "VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+    
+    StringBuffer insertSQL = new StringBuffer("INSERT INTO " + 
+                                              AUDIT_MANAGER_TABLE_QUALIFIED + 
+                                              "(");
+    insertSQL.append("entrytime, service, category, servicemethod, " + 
+                     "entrytext, resourceid, statuscode, userid, groups, authsystem) " + 
+                     "VALUES(?,?,?,?,?,?,?,?,?,?)");
     String insertString = insertSQL.toString();
     logger.debug("insertString: " + insertString);
 
     try {
-      connection = getConnection();
-      PreparedStatement pstmt = connection.prepareStatement(insertString);
-      pstmt.setString(1, resourceId);
-      pstmt.setObject(2, resourceId);
-      pstmt.setString(3, packageId);
-      pstmt.setString(4, scope);
-      pstmt.setInt(5, identifier);
-      pstmt.setInt(6, revision);
-      pstmt.setString(7, resourceLocation);
-      pstmt.setString(8, entityId);
-      pstmt.setString(9, entityName);
-      pstmt.setString(10, principalOwner);
-      pstmt.setTimestamp(11, ts);
-      pstmt.executeUpdate();
-      if (pstmt != null) {
-        pstmt.close();
+        connection = getConnection();
+        PreparedStatement pstmt = connection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
+        pstmt.setTimestamp(1, ts);
+        pstmt.setString(2, service);
+        pstmt.setString(3, category);
+        pstmt.setString(4, serviceMethod);
+        pstmt.setString(5, entryText);
+        pstmt.setString(6, resourceId);
+        pstmt.setInt(7, statusCode);
+        pstmt.setString(8, userId);
+        pstmt.setString(9, groups);
+        pstmt.setString(10, authSystem);
+        pstmt.executeUpdate();
+        ResultSet rs = pstmt.getGeneratedKeys();
+        while (rs.next()) {
+          auditId = rs.getInt(1);
+        }        
+        
+        if (pstmt != null) {
+          pstmt.close();
+        }
       }
-    }
     catch (SQLException e) {
-      logger.error("Error inserting record for resource " + resourceId
-         + " into the resource registry (" + AUDIT_MANAGER_TABLE_QUALIFIED + ")");
-      logger.error("SQLException: " + e.getMessage());
-      throw (e);
-    }
+        logger.error("Error inserting record for resource " + resourceId
+            + " into the resource registry (" + AUDIT_MANAGER_TABLE_QUALIFIED + ")");
+        logger.error("SQLException: " + e.getMessage());
+        throw (e);
+      }
     finally {
-      returnConnection(connection);
+        returnConnection(connection);
     }
+    
+    return auditId;
   }
 
+  
+  private String composeORClause(String key, List<String> values) {
+    StringBuffer stringBuffer = new StringBuffer("( ");
+    boolean firstValue = true;
+    
+    if (values.size() == 0) return "";
+    
+    for (String value : values) {
+      if (!firstValue) { stringBuffer.append(" OR "); }
+      String fieldName = getFieldName(key);
+      
+      if (fieldName.equals("resourceid")) {
+        stringBuffer.append(String.format("%s like '%s'", fieldName, value));
+      } else {
+        stringBuffer.append(String.format("%s='%s'", fieldName, value));
+      }
+      
+      firstValue = false;
+    }
+    
+    stringBuffer.append(" )");
+    String orClause = stringBuffer.toString();
+
+    return orClause;
+  }
+  
+  
+  private String composeWhereClause(Map<String, List<String>> queryParams) {
+    String whereClause = null;
+    
+    StringBuffer stringBuffer = new StringBuffer(" WHERE category IS NOT NULL");
+    
+    for (String key : queryParams.keySet()) {
+      stringBuffer.append(" AND ");
+      List<String> values = queryParams.get(key);
+      
+      if (key.equalsIgnoreCase("fromtime")) {
+        String value = values.get(0);
+        String timestamp = dateToTimestamp(value, false);
+        stringBuffer.append(String.format(" entrytime >= '%s'", timestamp));
+      }
+      else if (key.equalsIgnoreCase("totime")) {
+        String value = values.get(0);
+        String timestamp = dateToTimestamp(value, true);
+        stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
+      }
+      else if (key.equalsIgnoreCase("group")) {
+        String orClause = composeORClause("groups", values);
+        stringBuffer.append(orClause);
+      }
+      else {
+        String orClause = composeORClause(key, values);
+        stringBuffer.append(orClause);
+      }
+    }
+    
+    whereClause = stringBuffer.toString();
+    
+    return whereClause;
+  }
+ 
+  
+  /**
+   * Creates a new audit entry and returns its identifier.
+   * 
+   * @param  auditEntry    the audit entry XML string
+   * @return auditId   the audit entry identifier
+   */
+  public int create(String auditEntry) 
+           throws ClassNotFoundException, SQLException {
+    int auditId = 0;
+    
+    AuditRecord auditRecord = new AuditRecord(auditEntry);
+    
+    String service = auditRecord.getService();
+    String category = auditRecord.getCategory();
+    String serviceMethod = auditRecord.getServiceMethod();
+    String entryText = auditRecord.getEntryText();
+    String resourceId = auditRecord.getResourceId();
+    int statusCode = auditRecord.getResponseStatus();
+    String userId = auditRecord.getUser();
+    String groups = auditRecord.getGroups();
+    String authSystem = auditRecord.getAuthSystem();
+
+    try {
+      auditId = addAuditEntry (service, category, serviceMethod, 
+                     entryText, resourceId, statusCode, userId,
+                     groups, authSystem);
+    }
+    finally {
+
+    }
+    
+    return auditId;
+  }
+ 
+  
+  /**
+   * Gets a list of audit log records from the audit table (named "eventlog")
+   * matching the provided criteria.
+   * 
+   * @param queryParams    a map of query parameters and the values they should be matched to
+   * @return               a list of matching LogItem objects
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws IllegalArgumentException
+   */
+  public List<AuditRecord> getAuditRecords(Map<String, List<String>> queryParams)
+           throws ClassNotFoundException, SQLException, IllegalArgumentException {
+    List<AuditRecord> auditRecords = new ArrayList<AuditRecord>();
+   
+    if (queryParams != null) { 
+      Connection connection = null;
+     
+      String selectString = 
+        "SELECT oid, entrytime, service, category, servicemethod," +
+        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
+        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
+        composeWhereClause(queryParams);
+      
+      logger.debug(selectString);
+      
+      Statement stmt = null;
+     
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(selectString);
+       
+        while (rs.next()) {
+          int oid = rs.getInt(1);
+          java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
+          String service = rs.getString(3);
+          String category = rs.getString(4);
+          String serviceMethod = rs.getString(5);
+          String entryText = rs.getString(6);
+          String resourceId = rs.getString(7);
+          int statusCode = rs.getInt(8);
+          String userId = rs.getString(9);
+          String groups = rs.getString(10);
+          String authSystem = rs.getString(11);
+          AuditRecord auditRecord = new AuditRecord();
+          auditRecord.setOid(oid);
+          java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
+          auditRecord.setEntryTime(entryTime);
+          auditRecord.setService(service);
+          auditRecord.setCategory(category);
+          auditRecord.setServiceMethod(serviceMethod);
+          auditRecord.setEntryText(entryText);
+          auditRecord.setResourceId(resourceId);
+          auditRecord.setResponseStatus(new Integer(statusCode));
+          auditRecord.setUser(userId);
+          auditRecord.setGroups(groups);
+          auditRecord.setAuthSystem(authSystem);
+          auditRecords.add(auditRecord);
+        }
+      }
+      catch(ClassNotFoundException e) {
+        logger.error("ClassNotFoundException: " + e.getMessage());
+        throw(e);
+      }
+      catch(SQLException e) {
+        logger.error("SQLException: " + e.getMessage());
+        throw(e);
+      }
+      finally {
+        if (stmt != null) stmt.close();
+        returnConnection(connection);
+      }
+    }
+   
+    return auditRecords;
+  }
+ 
 
   /**
    * Returns a connection to the database.
@@ -285,144 +486,50 @@ public class AuditManager {
   }
   
   
-  private String composeORClause(String key, List<String> values) {
-    StringBuffer stringBuffer = new StringBuffer("( ");
-    boolean firstValue = true;
-    
-    if (values.size() == 0) return "";
-    
-    for (String value : values) {
-      if (!firstValue) { stringBuffer.append(" OR "); }
-      String fieldName = getFieldName(key);
-      
-      if (fieldName.equals("resourceid")) {
-      	stringBuffer.append(String.format("%s like '%s'", fieldName, value));
-      } else {
-      	stringBuffer.append(String.format("%s='%s'", fieldName, value));
-      }
-      
-      firstValue = false;
-    }
-    
-    stringBuffer.append(" )");
-    String orClause = stringBuffer.toString();
-
-    return orClause;
-  }
-  
-  
-  private String composeWhereClause(Map<String, List<String>> queryParams) {
-    String whereClause = null;
-    
-    StringBuffer stringBuffer = new StringBuffer(" WHERE category IS NOT NULL");
-    
-    for (String key : queryParams.keySet()) {
-      stringBuffer.append(" AND ");
-      List<String> values = queryParams.get(key);
-      
-      if (key.equalsIgnoreCase("fromtime")) {
-        String value = values.get(0);
-        String timestamp = dateToTimestamp(value, false);
-        stringBuffer.append(String.format(" entrytime >= '%s'", timestamp));
-      }
-      else if (key.equalsIgnoreCase("totime")) {
-        String value = values.get(0);
-        String timestamp = dateToTimestamp(value, true);
-        stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
-      }
-      else if (key.equalsIgnoreCase("group")) {
-        String orClause = composeORClause("groups", values);
-        stringBuffer.append(orClause);
-      }
-      else {
-        String orClause = composeORClause(key, values);
-        stringBuffer.append(orClause);
-      }
-    }
-    
-    whereClause = stringBuffer.toString();
-    
-    return whereClause;
-  }
- 
- 
   /**
-   * Gets a list of audit log records from the audit table (named "eventlog")
-   * matching the provided criteria.
+   * Boolean to determine whether the specified audit record is in the
+   * audit database based on a specified audit id value
    * 
-   * @param queryParams    a map of query parameters and the values they should be matched to
-   * @return               a list of matching LogItem objects
-   * @throws ClassNotFoundException
-   * @throws SQLException
-   * @throws IllegalArgumentException
+   * @param auditEntryId   the audit entry identifier
+   * @return  true if the audit record is present, else false
    */
-  public List<AuditRecord> getAuditRecords(Map<String, List<String>> queryParams)
-           throws ClassNotFoundException, SQLException, IllegalArgumentException {
-    List<AuditRecord> auditRecords = new ArrayList<AuditRecord>();
-   
-    if (queryParams != null) { 
-      Connection connection = null;
-     
-      String selectString = 
-        "SELECT oid, entrytime, service, category, servicemethod," +
-        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
-        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
-        composeWhereClause(queryParams);
-      
-      logger.warn(selectString);
-      
-      Statement stmt = null;
-     
-      try {
-        connection = getConnection();
-        stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
-       
-        while (rs.next()) {
-          int oid = rs.getInt(1);
-          java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
-          String service = rs.getString(3);
-          String category = rs.getString(4);
-          String serviceMethod = rs.getString(5);
-          String entryText = rs.getString(6);
-          String resourceId = rs.getString(7);
-          int statusCode = rs.getInt(8);
-          String userId = rs.getString(9);
-          String groups = rs.getString(10);
-          String authSystem = rs.getString(11);
-          AuditRecord auditRecord = new AuditRecord();
-          auditRecord.setOid(oid);
-          java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
-          auditRecord.setEntryTime(entryTime);
-          auditRecord.setService(service);
-          auditRecord.setCategory(category);
-          auditRecord.setServiceMethod(serviceMethod);
-          auditRecord.setEntryText(entryText);
-          auditRecord.setResourceId(resourceId);
-          auditRecord.setStatusCode(new Integer(statusCode));
-          auditRecord.setUserId(userId);
-          auditRecord.setGroups(groups);
-          auditRecord.setAuthSystem(authSystem);
-          auditRecords.add(auditRecord);
-        }
+  public boolean hasAuditEntry(String auditEntryId)
+          throws ClassNotFoundException, SQLException {
+    boolean hasAuditRecord = false;
+    Connection connection = null;
+    String selectString = 
+      "SELECT count(*) FROM " + AUDIT_MANAGER_TABLE_QUALIFIED +
+      "  WHERE oid='" + auditEntryId + "'";
+  
+    Statement stmt = null;
+  
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();             
+      ResultSet rs = stmt.executeQuery(selectString);
+    
+      while (rs.next()) {
+        int count = rs.getInt("count");
+        hasAuditRecord = (count > 0);
       }
-      catch(ClassNotFoundException e) {
-        logger.error("ClassNotFoundException: " + e.getMessage());
-        throw(e);
-      }
-      catch(SQLException e) {
-        logger.error("SQLException: " + e.getMessage());
-        throw(e);
-      }
-      finally {
-        if (stmt != null) stmt.close();
-        returnConnection(connection);
-      }
+
+      if (stmt != null) stmt.close();
     }
-   
-    return auditRecords;
+    catch(ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      throw(e);
+    }
+    catch(SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      throw(e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return hasAuditRecord;
   }
- 
+  
 
   /**
    * Boolean to determine whether the Data Package Registry

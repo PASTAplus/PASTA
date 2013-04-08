@@ -9,23 +9,15 @@
         <param-value>WEB-INF/conf</param-value>
     </context-param>
     <listener>
-        <listener-class>
-            edu.lternet.pasta.auditmanager.ConfigurationListener
-        </listener-class>
+        <listener-class>edu.lternet.pasta.auditmanager.ConfigurationListener</listener-class>
     </listener>
     <servlet>
         <display-name>JAX-RS REST Servlet</display-name>
         <servlet-name>JAX-RS REST Servlet</servlet-name>
-        <servlet-class>
-            com.sun.jersey.spi.container.servlet.ServletContainer
-        </servlet-class>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>
-                com.sun.jersey.spi.container.ContainerResponseFilters
-            </param-name>
-            <param-value>
-                edu.lternet.pasta.auditmanager.AuditServiceResource
-            </param-value>
+            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+            <param-value>edu.lternet.pasta.auditmanager.AuditManagerResource</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

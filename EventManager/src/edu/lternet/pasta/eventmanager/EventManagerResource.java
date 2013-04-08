@@ -35,8 +35,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import edu.lternet.pasta.common.PastaWebService;
-import edu.lternet.pasta.common.WebExceptionFactory;
-import edu.lternet.pasta.common.proxy.AuditService;
 
 /**
  * An abstract class that provides utility methods for the components of the
@@ -159,7 +157,6 @@ public class EventManagerResource extends PastaWebService {
             // also closes all entity managers from this factory
             entityManagerFactory.close();
         } finally {
-            AuditService.joinAll();
             super.finalize();
         }
     }

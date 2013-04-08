@@ -14,6 +14,10 @@
                 <principal>pasta</principal>
                 <permission>write</permission>
             </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
         </access>
     </pasta:service-method>
 
@@ -33,7 +37,7 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="getReports">
+    <pasta:service-method name="getAuditRecord">
         <access
             system="https://pasta.lternet.edu"
             authSystem="https://pasta.lternet.edu/authentication"
@@ -49,7 +53,7 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="getReport">
+    <pasta:service-method name="getAuditRecords">
         <access
             system="https://pasta.lternet.edu"
             authSystem="https://pasta.lternet.edu/authentication"

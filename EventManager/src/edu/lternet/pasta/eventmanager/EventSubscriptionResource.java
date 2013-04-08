@@ -27,6 +27,7 @@ package edu.lternet.pasta.eventmanager;
 import java.io.File;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,12 +47,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import pasta.pasta_lternet_edu.log_entry_0.LogEntry;
+import org.apache.log4j.Logger;
+
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
 import edu.lternet.pasta.common.FileUtility;
-import edu.lternet.pasta.common.LogEntryFactory;
 import edu.lternet.pasta.common.MethodNameUtility;
 import edu.lternet.pasta.common.QueryString;
 import edu.lternet.pasta.common.ResourceDeletedException;
@@ -59,7 +60,8 @@ import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.XmlParsingException;
-import edu.lternet.pasta.common.proxy.AuditService;
+import edu.lternet.pasta.common.audit.AuditManagerClient;
+import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
@@ -153,6 +155,9 @@ public final class EventSubscriptionResource extends EventManagerResource {
     public static final Set<String> VALID_QUERY_KEYS;
 
     private static final String SERVICE_OWNER = "pasta";
+    
+    private static final Logger logger =
+        Logger.getLogger(EventSubscriptionResource.class);
 
     static {
         Set<String> set = new TreeSet<String>();
@@ -194,6 +199,33 @@ public final class EventSubscriptionResource extends EventManagerResource {
     }
 
 
+    /*
+     * Wrapper method for using the audit manager client
+     */
+    private void audit(String serviceMethodName,
+                       AuthToken authToken,
+                       Response response,
+                       String resourceId,
+                       String entryText
+                      ) {
+      String serviceName = getVersionString();
+
+      try {
+        int status = response.getStatus();
+        Date date = new Date();
+        AuditRecord auditRecord = new AuditRecord(date, serviceName, entryText, authToken, status, serviceMethodName, resourceId);
+        String auditHost = ConfigurationListener.getAuditHost();
+        AuditManagerClient auditManagerClient = new AuditManagerClient(auditHost);
+        auditManagerClient.logAudit(auditRecord);
+      }
+      catch (Exception e) {
+        logger.error("Error occurred while auditing Data Package Manager " +
+                     "service call for service method " + 
+                     serviceMethodName + " : " + e.getMessage());
+      }
+    }
+    
+    
     /**
      * Creates a new subscription in the Event Manager's subscription database.
      *
@@ -318,10 +350,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             if (service != null) {
                 service.close();
             }
-            LogEntry entry = LogEntryFactory.make(getVersionString(), method,
-                                                  token, r, resourceId, msg);
-            AuditService.log(entry, token);
-            AuditService.joinAll();
+            audit(method, token, r, resourceId, msg);
         }
     }
 
@@ -491,11 +520,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             if (service != null) {
                 service.close();
             }
-            LogEntry entry =
-                    LogEntryFactory.make(getVersionString(), method, token, r,
-                                         resourceId, msg);
-            AuditService.log(entry, token);
-            AuditService.joinAll();
+            audit(method, token, r, resourceId, msg);
         }
     }
 
@@ -606,6 +631,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
         AuthToken token = null;
         Response r = null;
         String msg = null;
+        String resourceId = null;
 
         try {
             assertAuthorizedToRead(headers, method);
@@ -637,11 +663,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             if (service != null) {
                 service.close();
             }
-            LogEntry entry =
-                    LogEntryFactory.make(getVersionString(), method, token, r,
-                                         null, msg);
-            AuditService.log(entry, token);
-            AuditService.joinAll();
+            audit(method, token, r, resourceId, msg);
         }
     }
 
@@ -753,6 +775,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
         AuthToken token = null;
         String msg = null;
         Response r = null;
+        String resourceId = null;
 
         try {
             assertAuthorizedToWrite(headers, method);
@@ -795,11 +818,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             if (service != null) {
                 service.close();
             }
-            LogEntry entry =
-                    LogEntryFactory.make(getVersionString(), method, token, r,
-                                         subscriptionId, msg);
-            AuditService.log(entry, token);
-            AuditService.joinAll();
+            audit(method, token, r, resourceId, msg);
         }
     }
 

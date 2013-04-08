@@ -76,6 +76,8 @@ public class ConfigurationListener extends PastaConfigListener {
     private static File tutorialDocument;
     private static File welcomePage;
     private static File demoDirectory;
+    
+    private static String auditHost;
 
     @Override
     public void setContextSpecificProperties() {
@@ -95,8 +97,20 @@ public class ConfigurationListener extends PastaConfigListener {
         tutorialDocument = getFile(p, TUTORIAL_DOCUMENT);
         welcomePage = getFile(p, WELCOME_PAGE);
         demoDirectory = getFile(p, "demo.directory");
+        auditHost = getProperty(p, "eventmanager.auditmanager.host");
+    }
+    
+    
+    /**
+     * Returns the audit host property value, e.g. "audit.lternet.edu".
+     * 
+     * @return  the audit host property value
+     */
+    public static String getAuditHost() {
+      return auditHost;
     }
 
+    
     /**
      * Returns the file containing the XML schema for creating EML modification
      * event subscriptions via the web service 'create' call.
