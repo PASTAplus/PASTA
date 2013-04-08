@@ -357,6 +357,7 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Read Data Entity
    */
+  /*
   @Test
   public void testReadDataEntity() {
     final long expectedLength = testEntitySize;
@@ -375,7 +376,7 @@ public class DataPackageManagerClientTest {
       fail(e.getMessage());
     }
   }
-
+  */
 
   /**
    * Test the status and message body of the Read Data Entity Name

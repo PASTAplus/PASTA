@@ -204,7 +204,8 @@ public final class EmlPackageId {
      */
     @Override
     public String toString() {
-        return "scope=" + scope + ",id=" + identifier + ",revision=" + revision;
+        //return "scope=" + scope + ",id=" + identifier + ",revision=" + revision;
+    	return scope + "." + identifier.toString() + "." + revision.toString();
     }
 
     /**

@@ -144,22 +144,9 @@ public class DataViewerServlet extends DataPortalServlet {
       revision = tokens[2];
 
       try {
-
+      	
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        String entityName = dpmClient.readDataEntityName(scope, identifier, revision, entityId);
-        xml = dpmClient.readMetadata(scope, identifier, revision);
-        objectName = findObjectName(xml, entityName);
-        if (objectName != null) { fileName = objectName; }
-        byteArray = dpmClient
-            .readDataEntity(scope, identifier, revision, entityId);
-        if (byteArray != null) { // Download file as binary stream
-          response.setHeader("Content-Disposition", "attachment; filename="
-              + fileName);
-          String contentType = dpmClient.getContentType();
-          response.setContentType(contentType);
-          OutputStream out = response.getOutputStream();
-          out.write(byteArray);
-        }
+        dpmClient.readDataEntity(scope, identifier, revision, entityId, response);
 
       } catch (PastaAuthenticationException e) {
         logger.error("PastaAuthenticationException: " + e.getMessage());

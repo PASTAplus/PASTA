@@ -373,9 +373,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @param emlFile       The EML document to be created in the metadata catalog
 	 * @param user          The user value
 	 * @param authToken     The authorization token
+	 * @param transaction   The transaction identifier
 	 * @return  The resource map generated as a result of creating the data package.
 	 */
-  public String createDataPackage(File emlFile, String user, AuthToken authToken)
+  public String createDataPackage(File emlFile, String user, AuthToken authToken, String transaction)
           throws ClientProtocolException, FileNotFoundException, IOException,  Exception {
     boolean isEvaluate = false;
     String resourceMap = null;
@@ -440,7 +441,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
       boolean isUpdate = false;
       resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
         dataPackageRegistry, packageId, scope, identifier, revision, user, 
-        authToken, isUpdate, isEvaluate);
+        authToken, isUpdate, isEvaluate, transaction);
     }
    
     // Return the resource map
@@ -462,7 +463,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                                       String user,
                                       AuthToken authToken,
                                       boolean isUpdate,
-                                      boolean isEvaluate
+                                      boolean isEvaluate,
+                                      String transaction
                                       )
             throws ClassNotFoundException, 
                    SQLException, 
@@ -503,10 +505,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         String entityIdNamePairs = null;
         DataPackage dataPackage = levelZeroDataPackage.getDataPackage();
         if (isEvaluate) {
-          entityIdNamePairs = dataManagerClient.evaluateDataEntities(dataPackage);
+          entityIdNamePairs = dataManagerClient.evaluateDataEntities(dataPackage, transaction);
         }
         else {
-          entityIdNamePairs = dataManagerClient.createDataEntities(dataPackage);
+          entityIdNamePairs = dataManagerClient.createDataEntities(dataPackage, transaction);
         }
       
         if (entityIdNamePairs != null) {
@@ -839,15 +841,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
-	 * Evaluate a data package, returning an emlPackageId that can be used
-	 * to fetch the quality report XMl
+	 * Evaluate a data package, returning the XML string representation of the
+	 * quality report.
 	 * 
 	 * @param emlFile   file containing the EML document to be evalauted
 	 * @param user      the user name
 	 * @param authToken  the authentication token object
-	 * @return an EmlPackageId object
+	 * @param transaction the transaction identifier
+	 * @return the quality report XML string
 	 */
-  public String evaluateDataPackage(File emlFile, String user, AuthToken authToken)
+  public String evaluateDataPackage(File emlFile, String user, AuthToken authToken, String transaction)
       throws ClientProtocolException, 
              FileNotFoundException, 
              IOException,
@@ -903,7 +906,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
       boolean isUpdate = false;
       xmlString = createDataPackageAux(emlFile, levelZeroDataPackage, 
           dataPackageRegistry, packageId, scope, identifier, revision, 
-          user, authToken, isUpdate, isEvaluate);
+          user, authToken, isUpdate, isEvaluate, transaction);
      
       //Clean up resources in evaluate mode
       levelZeroDataPackage.deleteDataPackageResources(isEvaluate);
@@ -1302,6 +1305,86 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
 	}
 
+  /**
+   * Reads a data entity and returns it as a byte array. The specified
+   * user must be authorized to read the data entity resource.
+   * 
+   * @param scope       The scope of the data package.
+   * @param identifier  The identifier of the data package.
+   * @param revision    The revision of the data package.
+   * @param entityId    The entityId of the data package.
+   * @param user        The user name
+   * @return   a File object containing the locally stored entity data
+   */
+	public File getDataEntityFile(String scope, Integer identifier, String revision, 
+	                             String entityId, AuthToken authToken, String user)
+	        throws ClassNotFoundException, 
+	               SQLException, 
+	               ClientProtocolException, 
+	               IOException,
+	               Exception {
+		
+		File file = null;
+		boolean hasDataPackage = false;
+    Integer revisionInt = new Integer(revision);
+    String resourceId = composeResourceId(ResourceType.data, scope, identifier, 
+        revisionInt, entityId);
+		
+		try {
+      DataPackageRegistry dataPackageRegistry = 
+        new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+      hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision);
+      
+      if (!hasDataPackage) {
+        String message = "Attempting to read a data entity that does not exist in PASTA: "
+                         + resourceId;
+        throw new ResourceNotFoundException(message);
+      }
+
+      /*
+       * If we have the data package but it was previously deleted (i.e. de-activated)
+       */
+      boolean isDeactivatedDataPackage = dataPackageRegistry.isDeactivatedDataPackage(scope, identifier);
+      if (isDeactivatedDataPackage) {
+        String message = "Attempting to read a data entity that was previously deleted from PASTA: " +
+                         resourceId;
+        throw new ResourceDeletedException(message);
+      }
+      
+      /*
+       * Now that we know that the data package is in the registry,
+       * check whether the user is authorized to read the data entity. 
+       */
+      Authorizer authorizer = new Authorizer(dataPackageRegistry);
+      boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+      if (!isAuthorized) {
+        String message = 
+          "User " + user + " does not have permission to read this data entity: " +
+          resourceId;
+        throw new UnauthorizedException(message);
+      }
+        
+      DataManagerClient dataManagerClient = new DataManagerClient();
+      String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
+      file = dataManagerClient.getDataEntityFile(resourceLocation, scope, identifier, revision, entityId);
+		}
+    catch (ClassNotFoundException e) {
+      logger.error("Error connecting to Data Package Registry: " + 
+                   e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    }
+    catch (SQLException e) {
+      logger.error("Error connecting to Data Package Registry: " + 
+                   e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    }
+    
+		return file;
+		
+	}
+
 	
   /**
    * Returns the entity name for the given entity resource identifier if
@@ -1480,15 +1563,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
    * @param revision     the revision value
    * @param emlPackageId an EmlPackageId object
    * @param user         the user name
-   * @param evaluateMode boolean to determine whether the report
-   *                     operation should be run in evaluate mode.
    * @return  a file object containing the data package quality report XML
    */
 	public File readDataPackageReport(String scope, Integer identifier, String revision,
-	                                  EmlPackageId emlPackageId, AuthToken authToken, String user,
-	                                  boolean evaluateMode)
+	                                  EmlPackageId emlPackageId, AuthToken authToken, String user)
 	        throws ClassNotFoundException, SQLException {
+	  boolean evaluate = false;
     File xmlFile = null;
+    String transaction = null;
     
     try {
       DataPackageRegistry dataPackageRegistry = 
@@ -1526,7 +1608,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);
      
         if (dataPackageReport != null) {
-          xmlFile = dataPackageReport.getReport(evaluateMode);
+          xmlFile = dataPackageReport.getReport(evaluate, transaction);
         }
       }
     }
@@ -1537,6 +1619,33 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
   }
 
 	
+  /**
+   * Read an evaluate quality report, returning the XML file.
+   * The transaction id for the evaluate operation that generated the report must be specified.
+   * The specified user must be authorized to read the report.
+   * 
+   * @param scope        the scope value
+   * @param identifier   the identifier value
+   * @param revision     the revision value
+   * @param transaction  the transaction identifier, e.g. "1364424858431"
+   * @param emlPackageId an EmlPackageId object
+   * @param user         the user name
+   * @return  a file object containing the data package quality report XML
+   */
+  public File readEvaluateReport(String scope, Integer identifier, String revision, String transaction,
+                                 EmlPackageId emlPackageId, AuthToken authToken, String user) {
+    boolean evaluate = true;
+    File xmlFile = null;
+    
+    DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);    
+    if (dataPackageReport != null) {
+      xmlFile = dataPackageReport.getReport(evaluate, transaction);
+    }
+
+    return xmlFile;
+  }
+
+  
   /**
    * Reads metadata from the Metadata Catalog and returns it as a String.
    * The specified user must be authorized to read the metadata resource.
@@ -1649,7 +1758,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	    boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User " + user
-				    + " does not have permission to read thw DOI for this resource: "
+				    + " does not have permission to read the DOI for this resource: "
 				    + resourceId;
 				throw new UnauthorizedException(gripe);
 			}
@@ -1729,12 +1838,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
   }
 
 	
-	/**
-	 * 
-	 * @param emlDocument
-	 */
+  /**
+   * Update a data package in PASTA and return a resource map of the created
+   * resources.
+   * 
+   * @param emlFile       The EML document to be created in the metadata catalog
+   * @param scope         The scope value
+   * @param identifier    The identifier value
+   * @param user          The user value
+   * @param authToken     The authorization token
+   * @param transaction   The transaction identifier
+   * @return  The resource map generated as a result of updating the data package.
+   */
   public String updateDataPackage(File emlFile, String scope, Integer identifier,
-                                  String user, AuthToken authToken)
+                                  String user, AuthToken authToken, String transaction)
           throws ClientProtocolException, FileNotFoundException, IOException, 
                  UserErrorException, Exception {
     boolean isEvaluate = false;
@@ -1848,11 +1965,99 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
       boolean isUpdate = true;
       resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage, 
           dataPackageRegistry, packageId, scope, identifier, revision, user, 
-          authToken, isUpdate, isEvaluate);
+          authToken, isUpdate, isEvaluate, transaction);
     }
 
     // Return the resource map
     return resourceMap;
   }
+  
+	/**
+	 * Writes the data package error message to the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @param error
+	 *          The exception object of the error
+	 */
+	public void writeDataPackageError(String packageId, String transaction,
+	    Exception error) {
+		
+		DataPackageError dpError = null;
+
+		try {
+			 dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		dpError.writeError(packageId, transaction, error);
+
+	}
+  
+	/**
+	 * Reads the data package error message from the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @return The error message
+	 * @throws FileNotFoundException
+	 */
+	public String readDataPackageError(String packageId, String transaction)
+	    throws ResourceNotFoundException {
+
+		String error = null;
+		DataPackageError dpError = null;
+
+		try {
+			dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		try {
+			error = dpError.readError(packageId, transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+		return error;
+
+	}
+
+	/**
+	 * Deletes the data package error message from the system.
+	 * 
+	 * @param packageId
+	 *          The data package identifier
+	 * @param transaction
+	 *          The transaction identifier
+	 * @throws FileNotFoundException
+	 */
+	public void deleteDataPackageError(String packageId, String transaction)
+	    throws ResourceNotFoundException {
+
+		DataPackageError dpError = null;
+		
+		try {
+			dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		try {
+			dpError.deleteError(packageId, transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+	}
 
 }

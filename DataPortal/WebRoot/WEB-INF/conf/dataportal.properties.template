@@ -48,3 +48,6 @@ resultsetutility.xslpath=/WEB-INF/xsl/resultset.xsl
 auditreport.xslpath=/WEB-INF/xsl/auditReport.xsl
 datapackageaudit.xslpath=/WEB-INF/xsl/dataPackageAudit.xsl
 system.cwd=/home/pasta/svn/DataPortal/DataPortal
+pastaclient.maxidletime=1800000
+pastaclient.idlesleeptime=30000
+pastaclient.initialsleeptime=15000

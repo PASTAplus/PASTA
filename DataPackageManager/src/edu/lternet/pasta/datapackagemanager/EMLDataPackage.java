@@ -169,7 +169,7 @@ public class EMLDataPackage {
        String dirPath = dataPackageResource.getDirPath();   
        File dirFile = new File(dirPath);  
        if (dirFile != null && dirFile.exists()) { 
-         FileUtils.deleteQuietly(dirFile);
+         //FileUtils.deleteQuietly(dirFile);
        }
        
        // Now cleanup the data entity files  

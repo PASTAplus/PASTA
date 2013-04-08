@@ -65,6 +65,9 @@ public class PastaClient {
   protected String pastaProtocol = null;
   protected int pastaPort;
   protected String pastaUriHead = null;
+  protected Integer maxIdleTime = null;
+  protected Integer idleSleepTime = null;
+  protected Integer initialSleepTime = null;
 
   protected String uid = null;
   protected String token = null;
@@ -88,6 +91,10 @@ public class PastaClient {
     this.pastaProtocol = options.getString("pasta.protocol");
     this.pastaPort = options.getInt("pasta.port");
     this.pastaUriHead = options.getString("pasta.uriHead");
+    
+    this.maxIdleTime = options.getInt("pastaclient.maxidletime");
+    this.idleSleepTime = options.getInt("pastaclient.idlesleeptime");
+    this.initialSleepTime = options.getInt("pastaclient.initialsleeptime");
 
     if (this.uid == null) {
 

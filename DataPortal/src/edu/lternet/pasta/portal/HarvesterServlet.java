@@ -79,7 +79,7 @@ public class HarvesterServlet extends DataPortalServlet {
    */
   
   private final String CHECK_BACK_LATER =
-      "<p class=\"warning\">This may take a few minutes. Please check the <a href=\"./harvestReport.jsp\">View Harvest Reports</a> page for available reports.</p>";
+      "<p class=\"warning\">This may take a few minutes. Please check the <a href=\"./harvestReport.jsp\">View Upload Reports</a> page for available reports.</p>";
   
   
   /*

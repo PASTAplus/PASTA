@@ -28,6 +28,7 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.File;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.datamanager.EMLQualityReport;
 
 
 /**
@@ -48,7 +49,6 @@ public class DataPackageReport {
   */
  
  private EmlPackageId emlPackageId = null;
- private final String FILE_NAME = "quality_report.xml";
  
  
  /*
@@ -83,9 +83,10 @@ public class DataPackageReport {
    boolean success = false;
    
    // We only delete quality reports in non-evaluate mode
-   boolean evaluateMode = false;
+   boolean evaluate = false;
+   String transaction = null;
    
-   File reportFile = getReport(evaluateMode);
+   File reportFile = getReport(evaluate, transaction);
    
    if (reportFile != null) {
      success = reportFile.delete();
@@ -107,21 +108,27 @@ public class DataPackageReport {
   * service method that interacts with the Data Manager service (which
   * could potentially be on another host.)
   * 
-  * @param  evaluateMode   true if this is evaluate mode
+  * @param  evaluate     true if this is an evaluate report
+  * @param  transaction  the transaction identifier, may be null 
+  *                      (should always be non-null when evaluate is true)
   * @return the quality report XML file, or null if it doesn't exist
   */
- public File getReport(boolean evaluateMode) {
+ public File getReport(boolean evaluate, String transaction) {
+   String reportFilename = null;
    File xmlFile = null;
    
    if (this.emlPackageId != null) {
      FileSystemResource reportResource = new FileSystemResource(emlPackageId);
-     reportResource.setEvaluateMode(evaluateMode);
-     String dirPath = reportResource.getDirPath();   
-     String reportFilename = FILE_NAME;
-     File qualityReportFile = new File(dirPath, reportFilename);
+     reportResource.setEvaluateMode(evaluate);
+     String dirPath = reportResource.getDirPath();
+     EMLQualityReport emlQualityReport = new EMLQualityReport(this.emlPackageId);
+     if (emlQualityReport != null) {
+       reportFilename = emlQualityReport.composeQualityReportFilename(evaluate, transaction);
+       File qualityReportFile = new File(dirPath, reportFilename);
      
-     if (qualityReportFile != null && qualityReportFile.exists()) {
-       xmlFile = qualityReportFile;
+       if (qualityReportFile != null && qualityReportFile.exists()) {
+         xmlFile = qualityReportFile;
+       }
      }
    }
      

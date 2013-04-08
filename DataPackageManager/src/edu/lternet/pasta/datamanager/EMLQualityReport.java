@@ -126,9 +126,10 @@ public class EMLQualityReport {
 	 * Stores a quality report on the file system.
 	 * 
 	 * @param   evaluateMode   true if this is evaluate mode
+	 * @param   transaction    the transaction identifier
 	 * @return  true if success storing the report, else false
 	 */
-	public boolean storeQualityReport(boolean evaluateMode) 
+	public boolean storeQualityReport(boolean evaluateMode, String transaction) 
 	        throws IOException {
 	  boolean success = false;
 	  
@@ -139,7 +140,7 @@ public class EMLQualityReport {
 	    String dirPath = emlFileSystemDataPackage.getDirPath();   
 	    File dirFile = new File(dirPath);	 
 	    if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
-	    String qualityReportFilename = QUALITY_REPORT_FILE_NAME;
+      String qualityReportFilename = composeQualityReportFilename(evaluateMode, transaction);
 	    File qualityReportFile = new File(dirPath, qualityReportFilename);
 	    FileWriter fileWriter;
 	    if (emlDataPackage != null) {
@@ -171,6 +172,21 @@ public class EMLQualityReport {
 	  }
       
 	  return success;	  
+	}
+	
+	
+	public String composeQualityReportFilename(boolean evaluateMode, String transaction) {
+	  String filename = null;
+	  
+	  // If evaluate mode, tag the quality report file name with the transaction identifier
+	  if (evaluateMode) {
+	    filename = String.format("quality_report.%s.xml", transaction);
+	  }
+	  else {
+	    filename = QUALITY_REPORT_FILE_NAME;
+	  }
+	  
+	  return filename;
 	}
 
 }
