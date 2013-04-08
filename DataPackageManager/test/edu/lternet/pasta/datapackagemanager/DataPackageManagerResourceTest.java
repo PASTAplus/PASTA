@@ -38,6 +38,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -497,10 +498,10 @@ public class DataPackageManagerResourceTest {
     assertEquals(200, statusCode);
     
     // Check the message body
-    byte[] dataEntity = (byte[]) response.getEntity();
+    File dataEntity = (File) response.getEntity();
     assertNotNull(dataEntity);
-    int entitySize = dataEntity.length;
-    assertTrue(entitySize > 880);
+    long fileSize = FileUtils.sizeOf(dataEntity);
+    assertTrue(fileSize > 880L);
 
     // Test for NOT FOUND status with a bogus package id
     response = dataPackageManagerResource.readDataEntity(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
