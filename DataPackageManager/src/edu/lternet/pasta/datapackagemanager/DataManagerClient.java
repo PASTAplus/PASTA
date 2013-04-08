@@ -260,11 +260,10 @@ public class DataManagerClient {
 	        throws IOException, 
 	               ResourceNotFoundException,
 	               Exception {
+
 		File file = null;
-    byte[] byteArray = null;
-    ByteArrayOutputStream byteArrayOutputStream = null;
-    InputStream inputStream = null;	  
-    EMLDataManager emlDataManager = new EMLDataManager(); 
+
+		EMLDataManager emlDataManager = new EMLDataManager(); 
 
     /*
      * Handle symbolic revisions such as "newest" and "oldest".
