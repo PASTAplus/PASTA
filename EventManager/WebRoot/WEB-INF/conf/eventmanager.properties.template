@@ -15,3 +15,4 @@ tutorial.document=../doc/tutorial.html
 demo.directory=../demo
 
 eml.subscription.schema=eml-subscription.xsd
+eventmanager.auditmanager.host=audit.lternet.edu

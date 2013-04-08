@@ -73,15 +73,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import pasta.pasta_lternet_edu.log_entry_0.LogEntry;
-
 import edu.ucsb.nceas.utilities.Options;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
-import edu.lternet.pasta.common.LogEntryFactory;
 import edu.lternet.pasta.common.PastaWebService;
 import edu.lternet.pasta.common.PercentEncoder;
 import edu.lternet.pasta.common.QueryString;
@@ -94,9 +91,10 @@ import edu.lternet.pasta.common.WebResponseFactory;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
+import edu.lternet.pasta.common.audit.AuditManagerClient;
+import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
-import edu.lternet.pasta.common.proxy.AuditService;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.InvalidPermissionException;
@@ -294,7 +292,7 @@ public class DataPackageManagerResource extends PastaWebService {
    */
   
   /*
-   * Wrapper method for using the audit service
+   * Wrapper method for using the audit manager client
    */
   private void audit(String serviceMethodName,
                      AuthToken authToken,
@@ -302,24 +300,40 @@ public class DataPackageManagerResource extends PastaWebService {
                      String resourceId,
                      String entryText
                     ) {
+    String auditHost = getAuditHost();
     String serviceName = getVersionString();
-    
+
     try {
-      LogEntry logEntry = LogEntryFactory.make(serviceName, serviceMethodName,
-                                              authToken, response, resourceId,
-                                              entryText);
-      AuditService.log(logEntry, authToken);
+      int status = response.getStatus();
+      Date date = new Date();
+      AuditRecord auditRecord = new AuditRecord(date, serviceName, entryText, authToken, status, serviceMethodName, resourceId);
+      AuditManagerClient auditManagerClient = new AuditManagerClient(auditHost);
+      auditManagerClient.logAudit(auditRecord);
     }
     catch (Exception e) {
       logger.error("Error occurred while auditing Data Package Manager " +
                    "service call for service method " + 
                    serviceMethodName + " : " + e.getMessage());
     }
-    finally {
-      AuditService.joinAll();
-    }
   }
   
+  
+  /**
+   * Returns the audit host, e.g. "audit.lternet.edu"
+   * 
+   * @return version, such as {@code DataPackageManager-0.1}.
+   */
+  public String getAuditHost() {
+    String auditHost = null;
+    
+    Options options = ConfigurationListener.getOptions();
+    if (options != null) {
+      auditHost = options.getOption("datapackagemanager.auditmanager.host");
+    }
+    
+    return auditHost;
+  }
+
   
   /**
    * Returns the service version, such as {@code

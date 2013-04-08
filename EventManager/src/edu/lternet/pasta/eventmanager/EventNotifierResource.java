@@ -25,6 +25,7 @@
 package edu.lternet.pasta.eventmanager;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,8 +42,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
-import pasta.pasta_lternet_edu.log_entry_0.LogEntry;
-
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -51,7 +50,6 @@ import com.sun.jersey.spi.resource.Singleton;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
-import edu.lternet.pasta.common.LogEntryFactory;
 import edu.lternet.pasta.common.MethodNameUtility;
 import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
@@ -59,7 +57,8 @@ import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.WebResponseFactory;
-import edu.lternet.pasta.common.proxy.AuditService;
+import edu.lternet.pasta.common.audit.AuditManagerClient;
+import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
@@ -94,7 +93,7 @@ public final class EventNotifierResource extends EventManagerResource {
     public static final int REQUEST_TIMEOUT = 30000;
 
     private static final Logger logger =
-                                Logger.getLogger(ConfigurationListener.class);
+                                Logger.getLogger(EventNotifierResource.class);
 
     private static final String SERVICE_OWNER = "pasta";
 
@@ -148,6 +147,33 @@ public final class EventNotifierResource extends EventManagerResource {
      * Instance methods
      */
 
+    /*
+     * Wrapper method for using the audit manager client
+     */
+    private void audit(String serviceMethodName,
+                       AuthToken authToken,
+                       Response response,
+                       String resourceId,
+                       String entryText
+                      ) {
+      String serviceName = getVersionString();
+
+      try {
+        int status = response.getStatus();
+        Date date = new Date();
+        AuditRecord auditRecord = new AuditRecord(date, serviceName, entryText, authToken, status, serviceMethodName, resourceId);
+        String auditHost = ConfigurationListener.getAuditHost();
+        AuditManagerClient auditManagerClient = new AuditManagerClient(auditHost);
+        auditManagerClient.logAudit(auditRecord);
+      }
+      catch (Exception e) {
+        logger.error("Error occurred while auditing Data Package Manager " +
+                     "service call for service method " + 
+                     serviceMethodName + " : " + e.getMessage());
+      }
+    }
+    
+    
     private AsyncHttpClient makeClient(int connectionTimeout,
                                        int requestTimeout) {
 
@@ -204,7 +230,6 @@ public final class EventNotifierResource extends EventManagerResource {
         EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat(Delimiter.DOT);
         AuthToken authToken = null;
         String method = MethodNameUtility.methodName();
-        LogEntry logEntry = null;
         Response response = null;
         String msg = null, resourceId = null;
 
@@ -229,10 +254,7 @@ public final class EventNotifierResource extends EventManagerResource {
             return response;
 
         } finally {
-            logEntry = LogEntryFactory.make(getVersionString(), method, authToken, response,
-                                         resourceId, msg);
-            AuditService.log(logEntry, authToken);
-            AuditService.joinAll();
+          audit(method, authToken, response, resourceId, msg);
         }
     }
 
@@ -340,9 +362,9 @@ public final class EventNotifierResource extends EventManagerResource {
 
     AuthToken authToken = null;
     String method = MethodNameUtility.methodName();
-    LogEntry logEntry = null;
     Response response = null;
     String entryText = null;
+    String resourceId = null;
 
     try {
       assertAuthorizedToWrite(httpHeaders, method);
@@ -385,10 +407,7 @@ public final class EventNotifierResource extends EventManagerResource {
     }
     finally {
       if (response != null) {
-        logEntry = LogEntryFactory.make(getVersionString(), method, authToken,
-            response, null, entryText);
-        AuditService.log(logEntry, authToken);
-        AuditService.joinAll();
+        audit(method, authToken, response, resourceId, entryText);
       }
     }
     
