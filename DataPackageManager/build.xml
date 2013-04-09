@@ -43,12 +43,6 @@
       <fileset dir="${shared.lib.dir}/junit">
         <include name="**/*.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/jaxb-log-entry-0.1">
-        <include name="log-entry-0.1.jar"/>
-      </fileset>
-      <!-- <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
-        <include name="eml-2.1.0.jar"/>
-      </fileset> -->
        <fileset dir="${shared.lib.dir}/metacat">
         <include name="**/*.jar"/>
       </fileset>
