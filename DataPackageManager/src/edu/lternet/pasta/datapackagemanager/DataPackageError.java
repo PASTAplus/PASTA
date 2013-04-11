@@ -158,9 +158,17 @@ public class DataPackageError {
 		File packageDir = new File(packagePath);
 
 		if (!packageDir.exists()) {
-			String gripe = "The directory " + packageDir + " does not exist in the "
-			    + "metadata directory path " + metadataDir;
-			throw new FileNotFoundException(gripe);
+			
+			packageId = HOMELESS;
+			packagePath = metadataDir + "/" + packageId;
+			packageDir = new File(packagePath);
+
+			if (!packageDir.exists()) {
+				String gripe = "The directory " + packageDir + " does not exist in the "
+				    + "metadata directory path " + metadataDir;
+				throw new FileNotFoundException(gripe);
+			}
+			
 		}
 
 		String filePath = metadataDir + "/" + packageId + "/";
@@ -168,19 +176,9 @@ public class DataPackageError {
 		File file = new File(filePath + fileName);
 
 		if (!file.exists()) {
-			
-			packageId = HOMELESS;
-			
-			filePath = metadataDir + "/" + packageId + "/";
-			fileName = "errorlog." + transaction + ".txt";
-			file = new File(filePath + fileName);
-			
-			if (!file.exists()) {
 					String gripe = "The error file " + fileName + " was not found in the "
 					    + "directory " + filePath;
 					throw new FileNotFoundException(gripe);
-			}
-			
 		}
 
 		try {
@@ -211,9 +209,17 @@ public class DataPackageError {
 		File packageDir = new File(packagePath);
 
 		if (!packageDir.exists()) {
-			String gripe = "The directory " + packageDir + "does not exist in the "
-			    + "metadata directory path " + metadataDir;
-			throw new FileNotFoundException(gripe);
+			
+			packageId = HOMELESS;
+			packagePath = metadataDir + "/" + packageId;
+			packageDir = new File(packagePath);
+
+			if (!packageDir.exists()) {
+				String gripe = "The directory " + packageDir + " does not exist in the "
+				    + "metadata directory path " + metadataDir;
+				throw new FileNotFoundException(gripe);
+			}
+			
 		}
 
 		String filePath = metadataDir + "/" + packageId + "/";
@@ -221,19 +227,9 @@ public class DataPackageError {
 		File file = new File(filePath + fileName);
 
 		if (!file.exists()) {
-			
-			packageId = HOMELESS;
-			
-			filePath = metadataDir + "/" + packageId + "/";
-			fileName = "errorlog." + transaction + ".txt";
-			file = new File(filePath + fileName);
-			
-			if (!file.exists()) {
 					String gripe = "The error file " + fileName + " was not found in the "
 					    + "directory " + filePath;
 					throw new FileNotFoundException(gripe);
-			}
-			
 		}
 
 		try {
