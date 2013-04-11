@@ -109,6 +109,8 @@ public class DataPackageError {
 	 */
 	public void writeError(String packageId, String transaction, Exception error) {
 
+		if (packageId == null) packageId = "homeless";
+		
 		String packagePath = metadataDir + "/" + packageId;
 		File packageDir = new File(packagePath);
 
