@@ -2207,17 +2207,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 	}
-
+	/*
+	 * Generate a ZIP archive of the data package by parsing and retrieving
+	 * components of the data package resource map
+	 */
 	private void createDataPackageZip(String scope, Integer identifier,
 	    Integer revision, String map, AuthToken authToken) throws IOException {
 
-		String user = null;
-		Scanner mapScanner = null;
 		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
 		String zipName = entityDir + "/" + emlPackageId.toString() + "/" + emlPackageId.toString() + ".zip";
 
-		user = authToken.getUserId();
-		mapScanner = new Scanner(map);
+		String user = authToken.getUserId();
+		Scanner mapScanner = new Scanner(map);
 
 		FileOutputStream fOut = null;
 		
@@ -2231,58 +2232,120 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		if (fOut != null) {
 
 			ZipOutputStream zOut = new ZipOutputStream(fOut);
-			
-			try {
-				while (mapScanner.hasNextLine()) {
 
-					FileInputStream fIn = null;
-					String objectName = null;
+			while (mapScanner.hasNextLine()) {
 
-					String line = mapScanner.nextLine();
+				FileInputStream fIn = null;
+				String objectName = null;
+				File file = null;
 
-					if (line.contains(URI_MIDDLE_METADATA)) {
+				String line = mapScanner.nextLine();
 
-						File file = null;
+				if (line.contains(URI_MIDDLE_METADATA)) {
 
-						file = getMetadataFile(scope, identifier, revision.toString(),
-						    user, authToken);
+					try {
+	          file = getMetadataFile(scope, identifier, revision.toString(), user,
+	              authToken);
+          } catch (ClassNotFoundException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (SQLException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (Exception e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          }
 
-						objectName = scope + "." + identifier.toString() + "."
-						    + revision.toString() + ".xml";
+					objectName = emlPackageId.toString() + ".xml";
 
-  					fIn = new FileInputStream(file);
-
-					} else if (line.contains(URI_MIDDLE_REPORT)) {
-
-						File file = readDataPackageReport(scope, identifier,
-						    revision.toString(), emlPackageId, authToken, user);
-
-						objectName = emlPackageId.toString() + ".report.xml";
-						fIn = new FileInputStream(file);
-
-					} else if (line.contains(URI_MIDDLE_DATA)) {
-
-						String[] lineParts = line.split("/");
-						String entityId = lineParts[lineParts.length - 1];
-						String dataPackageResourceId = composeResourceId(
-						    ResourceType.dataPackage, scope, identifier, revision, null);
-						String entityResourceId = composeResourceId(ResourceType.data,
-						    scope, identifier, revision, entityId);
-						String entityName = readDataEntityName(dataPackageResourceId,
-						    entityResourceId, authToken);
-						String xml = readMetadata(scope, identifier, revision.toString(),
-						    user, authToken);
-						File file = getDataEntityFile(scope, identifier,
-						    revision.toString(), entityId, authToken, user);
-
-						objectName = this.findObjectName(xml, entityName);
-						fIn = new FileInputStream(file);
-
+					if (file != null) {
+						try {
+	            fIn = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+	            logger.error(e.getMessage());
+	            e.printStackTrace();
+            }
 					}
 
-					if (objectName != null && fIn != null) {
+				} else if (line.contains(URI_MIDDLE_REPORT)) {
 
-						ZipEntry zipEntry = new ZipEntry(objectName);
+          try {
+	          file = readDataPackageReport(scope, identifier,
+	              revision.toString(), emlPackageId, authToken, user);
+          } catch (ClassNotFoundException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (SQLException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          }
+
+					objectName = emlPackageId.toString() + ".report.xml";
+					
+					if (file != null) {
+						try {
+	            fIn = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+	            logger.error(e.getMessage());
+	            e.printStackTrace();
+            }
+					}
+
+				} else if (line.contains(URI_MIDDLE_DATA)) {
+
+					String[] lineParts = line.split("/");
+					String entityId = lineParts[lineParts.length - 1];
+					String dataPackageResourceId = composeResourceId(
+					    ResourceType.dataPackage, scope, identifier, revision, null);
+					String entityResourceId = composeResourceId(ResourceType.data, scope,
+					    identifier, revision, entityId);
+					
+					String entityName = null;
+					String xml = null;
+					
+          try {
+	          entityName = readDataEntityName(dataPackageResourceId,
+	              entityResourceId, authToken);
+						xml = readMetadata(scope, identifier, revision.toString(),
+						    user, authToken);
+						file = getDataEntityFile(scope, identifier, revision.toString(),
+						    entityId, authToken, user);
+          } catch (UnauthorizedException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (ResourceNotFoundException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (ClassNotFoundException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (SQLException e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          } catch (Exception e) {
+          	logger.error(e.getMessage());
+	          e.printStackTrace();
+          }
+
+					objectName = findObjectName(xml, entityName);
+					
+					if (file != null) {
+						try {
+	            fIn = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+	            logger.error(e.getMessage());
+	            e.printStackTrace();
+            }
+					}
+
+				}
+
+				if (objectName != null && fIn != null) {
+
+					ZipEntry zipEntry = new ZipEntry(objectName);
+					
+					try {
 						zOut.putNextEntry(zipEntry);
 
 						int length;
@@ -2295,19 +2358,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 						zOut.closeEntry();
 						fIn.close();
 
+					} catch (IOException e) {
+						logger.error(e.getMessage());
+						e.printStackTrace();
 					}
 
 				}
-				
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			} finally {
-				zOut.close();
+
 			}
-			
+
+			zOut.close();
+
 		}
 			
 	}
+	
 	
   /*
    * Matches the specified 'entityName' value with the entity names
