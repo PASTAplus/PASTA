@@ -47,6 +47,7 @@ public class DataPackageError {
 	private static Logger logger = Logger.getLogger(DataPackageError.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
+	private static final String HOMELESS = "homeless";
 
 	/*
 	 * Instance variables
@@ -109,6 +110,8 @@ public class DataPackageError {
 	 */
 	public void writeError(String packageId, String transaction, Exception error) {
 
+		if (packageId == null) packageId = HOMELESS;
+		
 		String packagePath = metadataDir + "/" + packageId;
 		File packageDir = new File(packagePath);
 
@@ -155,9 +158,17 @@ public class DataPackageError {
 		File packageDir = new File(packagePath);
 
 		if (!packageDir.exists()) {
-			String gripe = "The directory " + packageDir + " does not exist in the "
-			    + "metadata directory path " + metadataDir;
-			throw new FileNotFoundException(gripe);
+			
+			packageId = HOMELESS;
+			packagePath = metadataDir + "/" + packageId;
+			packageDir = new File(packagePath);
+
+			if (!packageDir.exists()) {
+				String gripe = "The directory " + packageDir + " does not exist in the "
+				    + "metadata directory path " + metadataDir;
+				throw new FileNotFoundException(gripe);
+			}
+			
 		}
 
 		String filePath = metadataDir + "/" + packageId + "/";
@@ -165,9 +176,9 @@ public class DataPackageError {
 		File file = new File(filePath + fileName);
 
 		if (!file.exists()) {
-			String gripe = "The error file " + fileName + " was not found in the "
-			    + "directory " + filePath;
-			throw new FileNotFoundException(gripe);
+					String gripe = "The error file " + fileName + " was not found in the "
+					    + "directory " + filePath;
+					throw new FileNotFoundException(gripe);
 		}
 
 		try {
@@ -198,9 +209,17 @@ public class DataPackageError {
 		File packageDir = new File(packagePath);
 
 		if (!packageDir.exists()) {
-			String gripe = "The directory " + packageDir + "does not exist in the "
-			    + "metadata directory path " + metadataDir;
-			throw new FileNotFoundException(gripe);
+			
+			packageId = HOMELESS;
+			packagePath = metadataDir + "/" + packageId;
+			packageDir = new File(packagePath);
+
+			if (!packageDir.exists()) {
+				String gripe = "The directory " + packageDir + " does not exist in the "
+				    + "metadata directory path " + metadataDir;
+				throw new FileNotFoundException(gripe);
+			}
+			
 		}
 
 		String filePath = metadataDir + "/" + packageId + "/";
@@ -208,9 +227,9 @@ public class DataPackageError {
 		File file = new File(filePath + fileName);
 
 		if (!file.exists()) {
-			String gripe = "The error file " + fileName + "was not found in the "
-			    + "directory" + filePath + ".";
-			throw new FileNotFoundException(gripe);
+					String gripe = "The error file " + fileName + " was not found in the "
+					    + "directory " + filePath;
+					throw new FileNotFoundException(gripe);
 		}
 
 		try {
