@@ -127,6 +127,7 @@ public class DataPackageError {
 
 		try {
 			FileUtils.writeStringToFile(file, error.getMessage(), "UTF-8");
+			logger.error("PackageId::Transaction:Error: " + packageId + "::" + transaction + ":" + error.getMessage());
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
