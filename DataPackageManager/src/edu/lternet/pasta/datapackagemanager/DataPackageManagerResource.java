@@ -4381,11 +4381,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			DataPackageManager dpm = null;
 
 			try {
-				
+
+				dpm = new DataPackageManager();
+
 				emlPackageId = emlPackageIdFromEML(emlFile);
 				packageId = emlPackageId.toString();
 
-				dpm = new DataPackageManager();
 				map = dpm.createDataPackage(emlFile, userId, authToken, transaction);
 				
 				if (map == null) {
@@ -4475,12 +4476,13 @@ public class DataPackageManagerResource extends PastaWebService {
       
       try {
         
+        dpm = new DataPackageManager();
+
         emlPackageId = emlPackageIdFromEML(emlFile);
         packageId = emlPackageId.toString();
 
-        dpm = new DataPackageManager();
         xmlString = dpm.evaluateDataPackage(emlFile, userId, authToken, transaction);
-        
+
         if (xmlString == null) {
           gripe = "Data package evaluate operation failed for unknown reason";
           Exception e = new Exception(gripe);
@@ -4572,10 +4574,11 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			try {
 				
+				dpm = new DataPackageManager();
+
 				emlPackageId = emlPackageIdFromEML(emlFile);
 				packageId = emlPackageId.toString();
 
-				dpm = new DataPackageManager();
 				map = dpm.updateDataPackage(emlFile, scope, identifier, userId, authToken, transaction);
 				
 				if (map == null) {
