@@ -2110,15 +2110,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Writes the data package error message to the system.
 	 * 
-	 * @param packageId
-	 *          The data package identifier
 	 * @param transaction
 	 *          The transaction identifier
 	 * @param error
 	 *          The exception object of the error
 	 */
-	public void writeDataPackageError(String packageId, String transaction,
-	    Exception error) {
+	public void writeDataPackageError(String transaction, Exception error) {
 
 		DataPackageError dpError = null;
 
@@ -2129,21 +2126,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			e.printStackTrace();
 		}
 
-		dpError.writeError(packageId, transaction, error);
+		dpError.writeError(transaction, error);
 
 	}
 
 	/**
 	 * Reads the data package error message from the system.
 	 * 
-	 * @param packageId
-	 *          The data package identifier
 	 * @param transaction
 	 *          The transaction identifier
 	 * @return The error message
 	 * @throws FileNotFoundException
 	 */
-	public String readDataPackageError(String packageId, String transaction)
+	public String readDataPackageError(String transaction)
 	    throws ResourceNotFoundException {
 
 		String error = null;
@@ -2157,7 +2152,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		try {
-			error = dpError.readError(packageId, transaction);
+			error = dpError.readError(transaction);
 		} catch (FileNotFoundException e) {
 			throw new ResourceNotFoundException(e.getMessage());
 		}
@@ -2169,13 +2164,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Deletes the data package error message from the system.
 	 * 
-	 * @param packageId
-	 *          The data package identifier
 	 * @param transaction
 	 *          The transaction identifier
 	 * @throws FileNotFoundException
 	 */
-	public void deleteDataPackageError(String packageId, String transaction)
+	public void deleteDataPackageError(String transaction)
 	    throws ResourceNotFoundException {
 
 		DataPackageError dpError = null;
@@ -2188,7 +2181,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		try {
-			dpError.deleteError(packageId, transaction);
+			dpError.deleteError(transaction);
 		} catch (FileNotFoundException e) {
 			throw new ResourceNotFoundException(e.getMessage());
 		}
