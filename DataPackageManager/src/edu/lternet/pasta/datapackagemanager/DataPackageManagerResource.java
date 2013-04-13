@@ -3259,7 +3259,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		try {
 			DataPackageManager dpm = new DataPackageManager();
-			entryText = dpm.readDataPackageError(packageId, transaction);
+			entryText = dpm.readDataPackageError(transaction);
 			responseBuilder = Response.ok(entryText);
 			response = responseBuilder.build();
 		}
@@ -4327,9 +4327,6 @@ public class DataPackageManagerResource extends PastaWebService {
           return pairs;
       }
       
-	/*
-	 * Returns an EmlPackageId object by parsing an EML file.
-	 */
 	private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
 		EmlPackageId emlPackageId = null;
 
@@ -4372,8 +4369,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			String map = null;
 			String gripe = null;
-			String packageId = null;
-			EmlPackageId emlPackageId = null;
 			Response response = null;
 			ResponseBuilder responseBuilder = null;
 			String serviceMethodName = "createDataPackage";
@@ -4383,16 +4378,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			try {
 
 				dpm = new DataPackageManager();
-
-				emlPackageId = emlPackageIdFromEML(emlFile);
-				packageId = emlPackageId.toString();
-
 				map = dpm.createDataPackage(emlFile, userId, authToken, transaction);
 				
 				if (map == null) {
 					gripe = "Data package create operation failed for unknown reason";
 					Exception e = new Exception(gripe);
-					dpm.writeDataPackageError(packageId, transaction, e);
+					dpm.writeDataPackageError(transaction, e);
 					response = WebExceptionFactory.make(
 					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
 				} else {
@@ -4404,31 +4395,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			} catch (IllegalArgumentException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			} catch (UnauthorizedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			} catch (ResourceNotFoundException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeNotFound(e).getResponse();
 			} catch (ResourceDeletedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (ResourceExistsException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (UserErrorException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebResponseFactory.makeBadRequest(e);
 			} catch (Exception e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.make(
 				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
 			}
@@ -4466,8 +4457,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
       String xmlString = null;
       String gripe = null;
-      String packageId = null;
-      EmlPackageId emlPackageId = null;
       Response response = null;
       ResponseBuilder responseBuilder = null;
       String serviceMethodName = "evaluateDataPackage";
@@ -4477,16 +4466,12 @@ public class DataPackageManagerResource extends PastaWebService {
       try {
         
         dpm = new DataPackageManager();
-
-        emlPackageId = emlPackageIdFromEML(emlFile);
-        packageId = emlPackageId.toString();
-
         xmlString = dpm.evaluateDataPackage(emlFile, userId, authToken, transaction);
 
         if (xmlString == null) {
           gripe = "Data package evaluate operation failed for unknown reason";
           Exception e = new Exception(gripe);
-          dpm.writeDataPackageError(packageId, transaction, e);
+          dpm.writeDataPackageError(transaction, e);
           response = WebExceptionFactory.make(
               Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
         } else {
@@ -4496,31 +4481,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
       } catch (IllegalArgumentException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.makeBadRequest(e).getResponse();
       } catch (UnauthorizedException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.makeUnauthorized(e).getResponse();
       } catch (ResourceNotFoundException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.makeNotFound(e).getResponse();
       } catch (ResourceDeletedException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.makeConflict(e).getResponse();
       } catch (ResourceExistsException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.makeConflict(e).getResponse();
       } catch (UserErrorException e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebResponseFactory.makeBadRequest(e);
       } catch (Exception e) {
         gripe = e.getMessage();
-        dpm.writeDataPackageError(packageId, transaction, e);
+        dpm.writeDataPackageError(transaction, e);
         response = WebExceptionFactory.make(
             Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
       }
@@ -4564,8 +4549,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			String map = null;
 			String gripe = null;
-			String packageId = null;
-			EmlPackageId emlPackageId = null;
 			Response response = null;
 			ResponseBuilder responseBuilder = null;
 			String serviceMethodName = "updateDataPackage";
@@ -4575,16 +4558,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			try {
 				
 				dpm = new DataPackageManager();
-
-				emlPackageId = emlPackageIdFromEML(emlFile);
-				packageId = emlPackageId.toString();
-
 				map = dpm.updateDataPackage(emlFile, scope, identifier, userId, authToken, transaction);
 				
 				if (map == null) {
 					gripe = "Data package update operation failed for unknown reason";
 					Exception e = new Exception(gripe);
-					dpm.writeDataPackageError(packageId, transaction, e);
+					dpm.writeDataPackageError(transaction, e);
 					response = WebExceptionFactory.make(
 					    Response.Status.INTERNAL_SERVER_ERROR, null, gripe).getResponse();
 				} else {
@@ -4596,31 +4575,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			} catch (IllegalArgumentException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			} catch (UnauthorizedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			} catch (ResourceNotFoundException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeNotFound(e).getResponse();
 			} catch (ResourceDeletedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (ResourceExistsException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (UserErrorException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebResponseFactory.makeBadRequest(e);
 			} catch (Exception e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.make(
 				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
 			}
