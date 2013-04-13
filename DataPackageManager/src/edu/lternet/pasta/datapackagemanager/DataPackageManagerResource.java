@@ -571,6 +571,111 @@ public class DataPackageManagerResource extends PastaWebService {
 
   
   /**
+	 * <strong>Create Data Package Archive</strong> operation, specifying the scope,
+   * identifier, revision, and transaction id of the data package archive to be
+   * created in the URI, returning a transaction identifier in the response message
+   * as plain text.
+	 * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -X GET http://package.lternet.edu/package/archive/knb-lter-lno/1/1</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>202 Accepted</td>
+   *     <td>If the create request was accepted for processing</td>
+   *     <td>A transaction identifier for use in subsequent processing of the request, 
+   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
+   *     how the transaction identifier is used in subsequent service calls.)
+   *     </td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to execute this service method</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support POST.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+	 *                
+	 * @return a Response, which if successful, contains a resource map describing
+	 *         the contents of the data package
+	 */
+	@POST
+	@Path("/archive/{scope}/{identifier}/{revision}")
+	@Produces("text/plain")
+  @Consumes("text/plain")
+	public Response createDataPackageArchive(@Context HttpHeaders headers,
+	    @PathParam("scope") String scope,
+	    @PathParam("identifier") Integer identifier,
+	    @PathParam("revision") Integer revision) {
+
+		ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "createDataPackageArchive";
+    Rule.Permission permission = Rule.Permission.write;
+    AuthToken authToken = null;
+    
+    Long time = new Date().getTime();
+    String transaction = time.toString();
+
+		authToken = getAuthToken(headers);
+		String userId = authToken.getUserId();
+
+		// Is user authorized to run the 'createDataPackage' service method?
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+		    serviceMethodName, permission, authToken);
+		if (!serviceMethodAuthorized) {
+			throw new UnauthorizedException("User " + userId
+			    + " is not authorized to execute service method " + serviceMethodName);
+		}
+		
+		// Perform createDataPackage in new thread
+		Archivor archivor= new Archivor(scope, identifier, revision, userId, authToken, transaction);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+    executorService.execute(archivor);
+    executorService.shutdown();
+		
+		responseBuilder = Response.status(Response.Status.ACCEPTED);
+		responseBuilder.entity(transaction);
+		response = responseBuilder.build();
+    response = stampHeader(response);
+
+		return response;
+    
+  }
+
+  
+  /**
    * Decodes the Httpheaders.AUTHORIZATION token
    * (as per MetadataCatalog-0.1, MetadataCatalogResource class).
    *
@@ -2968,6 +3073,179 @@ public class DataPackageManagerResource extends PastaWebService {
   
   /**
    * 
+   * <strong>Read Data Package Archive</strong> operation, specifying the scope,
+   * identifier, revision, and transaction id of the data package archive to be
+   * read in the URI, returning the data package archive as a binary object.
+   * 
+   * <p>See the <code>Create Data Package</code> and  <code>Update Data Package</code> 
+   * service methods for information about how to obtain the transaction id.</p>
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/error/knb-lter-lno/1/3/1364521882823</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the request to read the data package error was successful</td>
+   *     <td>The error message of the data package.</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>Attempting to update a data package to revision '3' but an equal or
+   *         higher revision ('5') already exists in PASTA: knb-lter-nope.1.3.</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the data package</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no error associated with the specified data package is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @param scope       The scope of the data package
+   * @param identifier  The identifier of the data package
+   * @param revision    The revision of the data package
+   * @param transaction The transaction of the data package error
+   * @return a Response object containing a data package error
+   *         if found, else returns a 404 Not Found response
+   */
+  @GET
+  @Path("/archive/{transaction}")
+  public Response readDataPackageArchive(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("transaction") String transaction
+                    ) {
+
+  	AuthToken authToken = null;
+    String entryText = null;
+    String resourceId = "/archive/" + transaction;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageArchive";
+    Rule.Permission permission = Rule.Permission.read;
+    
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+
+		try {
+
+			DataPackageManager dpm = new DataPackageManager();
+			File file = dpm.getDataPackageArchiveFile(transaction);
+
+			if (file != null) {
+				responseBuilder = Response.ok(file, "application/octet-stream");
+				responseBuilder.header("Content-Disposition", "attachment; filename="
+				    + transaction + ".zip");
+				response = responseBuilder.build();
+			} else {
+				String gripe = "Unable to access data package archive " + transaction
+				    + ".zip for transaction: " + transaction;
+				ResourceNotFoundException e = new ResourceNotFoundException(gripe);
+				throw (e);
+			}
+
+		}    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+    response = stampHeader(response);
+    return response;
+    
+  }
+  
+  
+  /**
+   * 
    * <strong>Read Data Package DOI</strong> operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
    * 
    * <h4>Requests:</h4>
@@ -4345,7 +4623,92 @@ public class DataPackageManagerResource extends PastaWebService {
 		return emlPackageId;
 	}
 
+ 
   /**
+   * Thread framework for executing the createDataPackageArchive in a new thread.
+   * 
+   * @author servilla
+   * @since April 12, 2013
+   *
+   */
+	class Archivor implements Runnable {
+
+		String scope = null;
+		Integer identifier = null;
+		Integer revision = null;
+		String userId = null;
+		AuthToken authToken = null;
+		String transaction = null;
+
+		public Archivor(String scope, Integer identifier, Integer revision, String userId, AuthToken authToken, String transaction) {
+
+
+			this.scope = scope;
+			this.identifier = identifier;
+			this.revision = revision;
+			this.userId = userId;
+			this.authToken = authToken;
+			this.transaction = transaction;
+
+		}
+
+		public void run() {
+
+			String archive = "";
+			String gripe = null;
+			String packageId = null;
+			Response response = null;
+			ResponseBuilder responseBuilder = null;
+			String serviceMethodName = "createDataPackageArchive";
+			DataPackageManager dpm = null;
+
+			try {
+
+				dpm = new DataPackageManager();
+
+				archive = dpm.createDataPackageArchive(scope, identifier, revision, userId, authToken, transaction);
+				
+				responseBuilder = Response.ok(archive);
+				response = responseBuilder.build();
+
+			} catch (IllegalArgumentException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			} catch (UnauthorizedException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			} catch (ResourceNotFoundException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.makeNotFound(e).getResponse();
+			} catch (ResourceDeletedException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (ResourceExistsException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (UserErrorException e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebResponseFactory.makeBadRequest(e);
+			} catch (Exception e) {
+				gripe = e.getMessage();
+				dpm.writeDataPackageError(packageId, transaction, e);
+				response = WebExceptionFactory.make(
+				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
+			}
+
+			audit(serviceMethodName, authToken, response, archive, gripe);
+			
+		}
+
+	}
+
+	/**
    * Thread framework for executing the createDataPackage in a new thread.
    * 
    * @author servilla

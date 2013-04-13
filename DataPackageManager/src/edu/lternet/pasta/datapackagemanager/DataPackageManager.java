@@ -452,13 +452,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    authToken, isUpdate, isEvaluate, transaction);
 		}
 		
-		try {
-			createDataPackageZip(scope, identifier, revision, resourceMap, authToken);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
 		// Return the resource map
 		return resourceMap;
 	}
@@ -1494,6 +1487,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	public String readDataPackage(String scope, Integer identifier,
 	    String revisionStr, AuthToken authToken, String user)
 	    throws ClassNotFoundException, SQLException, IllegalArgumentException {
+		
 		boolean hasDataPackage = false;
 		Integer revision = null;
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
@@ -1523,7 +1517,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 			}
 		}
-
+		
 		/*
 		 * Now that we know that the data package is in the registry, check whether
 		 * the user is authorized to read it. If authorized, then get its resource
@@ -2109,13 +2103,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    authToken, isUpdate, isEvaluate, transaction);
 		}
 
-		try {
-			createDataPackageZip(scope, identifier, revision, resourceMap, authToken);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
 		// Return the resource map
 		return resourceMap;
 	}
@@ -2207,172 +2194,110 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 	}
-	/*
-	 * Generate a ZIP archive of the data package by parsing and retrieving
+	
+	
+	/**
+	 * Generate an "archive" of the data package by parsing and retrieving
 	 * components of the data package resource map
+	 * 
+	 * @param scope
+	 *          The scope value of the data package
+	 * @param identifier
+	 *          The identifier value of the data package
+	 * @param revision
+	 *          The revision value of the data package
+	 * @param map
+	 *          The resource map of the data package
+	 * @param authToken
+	 *          The authentication token of the user requesting the archive
+	 * @param transaction
+	 *          The transaction id of the request
+	 * @return The file path to the data package archive
+	 * @throws Exception 
+	 * @throws IOException
 	 */
-	private void createDataPackageZip(String scope, Integer identifier,
-	    Integer revision, String map, AuthToken authToken) throws IOException {
+	public String createDataPackageArchive(String scope, Integer identifier,
+	    Integer revision, String userId, AuthToken authToken, String transaction)
+	    throws Exception {
 
-		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
-		String zipName = entityDir + "/" + emlPackageId.toString() + "/" + emlPackageId.toString() + ".zip";
+		String archiveName = null;
+		DataPackageArchive archive = null;
 
-		String user = authToken.getUserId();
-		Scanner mapScanner = new Scanner(map);
-
-		FileOutputStream fOut = null;
-		
-    try {
-	    fOut = new FileOutputStream(zipName);
-    } catch (FileNotFoundException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
-    
-		if (fOut != null) {
-
-			ZipOutputStream zOut = new ZipOutputStream(fOut);
-
-			while (mapScanner.hasNextLine()) {
-
-				FileInputStream fIn = null;
-				String objectName = null;
-				File file = null;
-
-				String line = mapScanner.nextLine();
-
-				if (line.contains(URI_MIDDLE_METADATA)) {
-
-					try {
-	          file = getMetadataFile(scope, identifier, revision.toString(), user,
-	              authToken);
-          } catch (ClassNotFoundException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (SQLException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (Exception e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          }
-
-					objectName = emlPackageId.toString() + ".xml";
-
-					if (file != null) {
-						try {
-	            fIn = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-	            logger.error(e.getMessage());
-	            e.printStackTrace();
-            }
-					}
-
-				} else if (line.contains(URI_MIDDLE_REPORT)) {
-
-          try {
-	          file = readDataPackageReport(scope, identifier,
-	              revision.toString(), emlPackageId, authToken, user);
-          } catch (ClassNotFoundException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (SQLException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          }
-
-					objectName = emlPackageId.toString() + ".report.xml";
-					
-					if (file != null) {
-						try {
-	            fIn = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-	            logger.error(e.getMessage());
-	            e.printStackTrace();
-            }
-					}
-
-				} else if (line.contains(URI_MIDDLE_DATA)) {
-
-					String[] lineParts = line.split("/");
-					String entityId = lineParts[lineParts.length - 1];
-					String dataPackageResourceId = composeResourceId(
-					    ResourceType.dataPackage, scope, identifier, revision, null);
-					String entityResourceId = composeResourceId(ResourceType.data, scope,
-					    identifier, revision, entityId);
-					
-					String entityName = null;
-					String xml = null;
-					
-          try {
-	          entityName = readDataEntityName(dataPackageResourceId,
-	              entityResourceId, authToken);
-						xml = readMetadata(scope, identifier, revision.toString(),
-						    user, authToken);
-						file = getDataEntityFile(scope, identifier, revision.toString(),
-						    entityId, authToken, user);
-          } catch (UnauthorizedException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (ResourceNotFoundException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (ClassNotFoundException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (SQLException e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          } catch (Exception e) {
-          	logger.error(e.getMessage());
-	          e.printStackTrace();
-          }
-
-					objectName = findObjectName(xml, entityName);
-					
-					if (file != null) {
-						try {
-	            fIn = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-	            logger.error(e.getMessage());
-	            e.printStackTrace();
-            }
-					}
-
-				}
-
-				if (objectName != null && fIn != null) {
-
-					ZipEntry zipEntry = new ZipEntry(objectName);
-					
-					try {
-						zOut.putNextEntry(zipEntry);
-
-						int length;
-						byte[] buffer = new byte[1024];
-
-						while ((length = fIn.read(buffer)) > 0) {
-							zOut.write(buffer, 0, length);
-						}
-
-						zOut.closeEntry();
-						fIn.close();
-
-					} catch (IOException e) {
-						logger.error(e.getMessage());
-						e.printStackTrace();
-					}
-
-				}
-
-			}
-
-			zOut.close();
-
+		try {
+			archive = new DataPackageArchive();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
-			
+
+		if (archive != null) {
+			try {
+				archiveName = archive.createDataPackageArchive(scope, identifier, revision, userId,
+				    authToken, transaction);
+			} catch (Exception e) {
+				throw e;
+			}
+		}
+		
+		return archiveName;
+
+	}	
+	
+	/**
+	 * Returns the File object of the data package archive identified by the
+	 * transaction identifier.
+	 * 
+	 * @param transaction
+	 *          The transaction identifier of the data package archive.
+	 * @return The archive File object
+	 * @throws FileNotFoundException
+	 */
+	public File getDataPackageArchiveFile(String transaction)
+	    throws ResourceNotFoundException {
+
+		File file = null;
+
+		DataPackageArchive archive = null;
+
+		try {
+			archive = new DataPackageArchive();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		try {
+		file = archive.getDataPackageArchiveFile(transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+		return file;
+
 	}
 	
+	/**
+	 * Deletes the data package archive identified by the transaction identifier.
+	 * 
+	 * @param transaction
+	 *          The transaction identifier of the data package archive.
+	 * @throws FileNotFoundException
+	 */
+	public void deleteDataPackageArchive(String transaction)
+	    throws FileNotFoundException {
+
+		DataPackageArchive archive = null;
+
+		try {
+			archive = new DataPackageArchive();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		archive.deleteDataPackageArchive(transaction);
+
+	}
 	
   /*
    * Matches the specified 'entityName' value with the entity names
@@ -2386,7 +2311,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
    *   (3) The matching entity does not specify an objectName in
    *       the EML document.
    */
-  private String findObjectName(String xml, String entityName) {
+  protected String findObjectName(String xml, String entityName) {
     String objectName = null;
     EMLParser emlParser = new EMLParser();
     
