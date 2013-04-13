@@ -176,9 +176,16 @@ public class DataPackageError {
 		File file = new File(filePath + fileName);
 
 		if (!file.exists()) {
+			
+			filePath = metadataDir + "/" + HOMELESS + "/";
+			fileName = "errorlog." + transaction + ".txt";
+			file = new File(filePath + fileName);
+			
+			if (!file.exists()) {
 					String gripe = "The error file " + fileName + " was not found in the "
 					    + "directory " + filePath;
 					throw new FileNotFoundException(gripe);
+			}
 		}
 
 		try {
