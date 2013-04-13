@@ -4653,7 +4653,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			String archive = "";
 			String gripe = null;
-			String packageId = null;
 			Response response = null;
 			ResponseBuilder responseBuilder = null;
 			String serviceMethodName = "createDataPackageArchive";
@@ -4662,7 +4661,6 @@ public class DataPackageManagerResource extends PastaWebService {
 			try {
 
 				dpm = new DataPackageManager();
-
 				archive = dpm.createDataPackageArchive(scope, identifier, revision, userId, authToken, transaction);
 				
 				responseBuilder = Response.ok(archive);
@@ -4670,31 +4668,31 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			} catch (IllegalArgumentException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			} catch (UnauthorizedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			} catch (ResourceNotFoundException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeNotFound(e).getResponse();
 			} catch (ResourceDeletedException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (ResourceExistsException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.makeConflict(e).getResponse();
 			} catch (UserErrorException e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebResponseFactory.makeBadRequest(e);
 			} catch (Exception e) {
 				gripe = e.getMessage();
-				dpm.writeDataPackageError(packageId, transaction, e);
+				dpm.writeDataPackageError(transaction, e);
 				response = WebExceptionFactory.make(
 				    Response.Status.INTERNAL_SERVER_ERROR, null, e.getMessage()).getResponse();
 			}
