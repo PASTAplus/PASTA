@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.ResourceExistsException;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -72,8 +73,7 @@ public class DataPackageError {
 		errorDir = options.getOption("datapackagemanager.errorDir");
 
 		if (errorDir == null || errorDir.isEmpty()) {
-			String gripe = "The Data Package Manager property for the \"error\" "
-			    + "directory was not properly defined.";
+			String gripe = "Error directory property not set!";
 			throw new Exception(gripe);
 		}
 
@@ -107,12 +107,17 @@ public class DataPackageError {
 	 * @param error
 	 *          The exception object of the error
 	 */
-	public void writeError(String transaction, Exception error) {
+	public void writeError(String transaction, Exception error) throws Exception {
 
 		String errorName = transaction + ".txt";
 		String errorPath = errorDir + "/";
 
 		File file = new File(errorPath + errorName);
+
+		if (file.exists()) {
+			String gripe = "The resource " + errorName + "already exists!";
+			throw new ResourceExistsException(gripe);
+		}
 
 		try {
 			FileUtils.writeStringToFile(file, error.getMessage(), "UTF-8");
@@ -146,7 +151,7 @@ public class DataPackageError {
 		File file = new File(errorPath + errorName);
 
 		if (!file.exists()) {
-			String gripe = "The error file " + transaction + ".txt was not found!";
+			String gripe = "The error file " + errorName + " was not found!";
 			throw new FileNotFoundException(gripe);
 		}
 
