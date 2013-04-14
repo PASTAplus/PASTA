@@ -2126,7 +2126,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			e.printStackTrace();
 		}
 
-		dpError.writeError(transaction, error);
+		try {
+	    dpError.writeError(transaction, error);
+    } catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+    }
 
 	}
 
