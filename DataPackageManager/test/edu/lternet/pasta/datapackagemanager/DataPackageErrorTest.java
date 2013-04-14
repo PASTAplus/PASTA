@@ -42,7 +42,7 @@ import edu.ucsb.nceas.utilities.Options;
  * @author servilla
  * @since Apr 13, 2013
  * 
- *        Junit test case for the DataPackageError cleass.
+ *        Junit test case for the DataPackageError class.
  */
 public class DataPackageErrorTest {
 
@@ -120,7 +120,7 @@ public class DataPackageErrorTest {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
-			fail("DataPackageError instantiation.");
+			fail("Failed to instantiate DataPackageError object!");
 		}
 
 	}
@@ -135,6 +135,7 @@ public class DataPackageErrorTest {
 		
 		File file = new File(errorDir + "/" + transaction + ".txt");
 		
+		// Clean up test error message
 		if (file.exists()) {
 			FileUtils.forceDelete(file);
 		}
