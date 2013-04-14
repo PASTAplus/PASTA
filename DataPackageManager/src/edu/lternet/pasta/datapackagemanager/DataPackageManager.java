@@ -1994,7 +1994,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 	    dpError.writeError(transaction, error);
     } catch (Exception e) {
-	    // TODO Auto-generated catch block
+	    logger.error(e.getMessage());
 	    e.printStackTrace();
     }
 
