@@ -23,6 +23,7 @@ package edu.lternet.pasta.datapackagemanager;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Date;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -123,7 +124,8 @@ public class DataPackageArchiveTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-
+		
+		// Create authentication token for testing purposes
 		httpHeadersUser = new DummyCookieHttpHeaders(testUser);
 		authToken = DataPackageManagerResource.getAuthToken(httpHeadersUser);
 
@@ -154,7 +156,7 @@ public class DataPackageArchiveTest {
 
 		dpA = null;
 
-		File file = new File(tmpDir + "/" + transaction + ".zip");
+		File file = new File(tmpDir + "/" + testArchive);
 
 		// Clean up test archive
 		if (file.exists()) {
@@ -171,7 +173,9 @@ public class DataPackageArchiveTest {
 	public void testCreateDataPackageArchive() {
 
 		String archive = null;
+		File file = null;
 
+		// Test for successful creation of test archive
 		try {
 			archive = dpA.createDataPackageArchive(scope, identifier, revision,
 			    testUser, authToken, transaction);
@@ -185,16 +189,93 @@ public class DataPackageArchiveTest {
 		    "Create archive name different than expected test archive name!",
 		    testArchive.equals(archive));
 
-		// Test existence of archive
-		File file = new File(tmpDir + "/" + testArchive);
+		// Test existence of test archive
+		file = new File(tmpDir + "/" + testArchive);
 		assertTrue("Test archive " + testArchive + " does not exist!",
 		    file.exists());
 
-		// Test size of archive
+		// Test size of test archive
 		Long sizeOfArchive = FileUtils.sizeOf(file);
 		assertEquals("Created archive is not the same size as test archive!",
 		    sizeOfTestArchive, sizeOfArchive);
 
+		// TODO Add deflate routine for testing archived objects
+
+	}
+
+	/*
+	 * Test the retrieval of the archive file object.
+	 */
+	@Test
+	public void testGetDataPackageArchive() {
+
+		File file = null;
+
+		// Test for successful creation of test archive
+		try {
+			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
+			    authToken, transaction);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			fail("Failed to create test archive " + testArchive + "!");
+		}
+
+		// Test for getting file object of test archive
+		try {
+			file = dpA.getDataPackageArchiveFile(transaction);
+		} catch (FileNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			fail("Failed during get of data package archive!");
+		}
+
+		if (file != null) {
+
+			// Test existence of test archive
+			assertTrue("Test archive " + testArchive + " does not exist!",
+			    file.exists());
+
+			// Test size of test archive
+			Long sizeOfArchive = FileUtils.sizeOf(file);
+			assertEquals("Created archive is not the same size as test archive!",
+			    sizeOfTestArchive, sizeOfArchive);
+
+		}
+
+	}
+	
+	/*
+	 * Test the deletion of the archive
+	 */
+	@Test
+	public void testDeleteDataPackageArchive() {
+		
+		File file = null;
+
+		// Test for successful creation of test archive
+		try {
+			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
+			    authToken, transaction);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			fail("Failed to create test archive " + testArchive + "!");
+		}
+
+		// Test deleting test archive
+		try {
+	    dpA.deleteDataPackageArchive(transaction);
+    } catch (FileNotFoundException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+	    fail("Failed during delete of data package archive!");
+    }
+		
+		// Test for successful deletion of test archive
+		file = new File(tmpDir + "/" + testArchive);
+		assertFalse("Test archive still exists after attempted delete!", file.exists());
+		
 	}
 
 }
