@@ -120,7 +120,7 @@ public class DataPackageArchive {
 	 *          The authentication token of the user requesting the archive
 	 * @param transaction
 	 *          The transaction id of the request
-	 * @return The file path to the data package archive
+	 * @return The file name of the data package archive
 	 * @throws Exception 
 	 */
 	public String createDataPackageArchive(String scope, Integer identifier,
