@@ -115,7 +115,7 @@ public class DataPackageError {
 		File file = new File(errorPath + errorName);
 
 		if (file.exists()) {
-			String gripe = "The resource " + errorName + "already exists!";
+			String gripe = "The resource " + errorName + " already exists!";
 			throw new ResourceExistsException(gripe);
 		}
 
