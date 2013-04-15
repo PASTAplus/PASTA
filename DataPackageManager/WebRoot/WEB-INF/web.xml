@@ -18,6 +18,11 @@
     <servlet-name>DOI Servlet</servlet-name>
     <servlet-class>edu.lternet.pasta.doi.DOIServlet</servlet-class>
   </servlet>
+  <servlet>
+    <display-name>Archive Cleaner Servlet</display-name>
+    <servlet-name>Archive Cleaner Servlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.datapackagemanager.ArchiveCleanerServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>JAX-RS REST Servlet</servlet-name>
     <url-pattern>/*</url-pattern>
@@ -25,6 +30,10 @@
   <servlet-mapping>
     <servlet-name>DOI Servlet</servlet-name>
     <url-pattern>/doiscan</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Archive Cleaner Servlet</servlet-name>
+    <url-pattern>/doclean</url-pattern>
   </servlet-mapping>
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
