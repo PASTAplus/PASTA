@@ -572,7 +572,7 @@ public class DataPackageManagerResource extends PastaWebService {
   
   /**
 	 * <strong>Create Data Package Archive</strong> operation, specifying the scope,
-   * identifier, revision, and transaction id of the data package archive to be
+   * identifier, and revision of the data package archive to be
    * created in the URI, returning a transaction identifier in the response message
    * as plain text.
 	 * 
@@ -631,7 +631,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *         the contents of the data package
 	 */
 	@POST
-	@Path("/archive/{scope}/{identifier}/{revision}")
+	@Path("/archive/eml/{scope}/{identifier}/{revision}")
 	@Produces("text/plain")
   @Consumes("text/plain")
 	public Response createDataPackageArchive(@Context HttpHeaders headers,
@@ -3073,9 +3073,10 @@ public class DataPackageManagerResource extends PastaWebService {
   
   /**
    * 
-   * <strong>Read Data Package Archive</strong> operation, specifying the scope,
-   * identifier, revision, and transaction id of the data package archive to be
-   * read in the URI, returning the data package archive as a binary object.
+   * <strong>Read Data Package Archive</strong> operation, specifying the
+   * transaction id of the data package archive to be read in the URI,
+   * returning the data package archive as a binary object in the ZIP file
+   * format.
    * 
    * <p>See the <code>Create Data Package</code> and  <code>Update Data Package</code> 
    * service methods for information about how to obtain the transaction id.</p>
@@ -3090,7 +3091,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *   <tr>
    *     <td align=center>none</td>
    *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/error/knb-lter-lno/1/3/1364521882823</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/archive/eml/1364521882823</td>
    *   </tr>
    * </table>
    * 
@@ -3161,7 +3162,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *         if found, else returns a 404 Not Found response
    */
   @GET
-  @Path("/archive/{transaction}")
+  @Path("/archive/eml/{transaction}")
   public Response readDataPackageArchive(
                                   @Context HttpHeaders headers,
                                   @PathParam("transaction") String transaction
@@ -4400,7 +4401,9 @@ public class DataPackageManagerResource extends PastaWebService {
    */
 
   /**
-   * <strong>Add Provenance Metadata</strong> operation. Generates provenance metadata from a metadata document in PASTA and adds it to a provided EML document.
+   * <strong>Add Provenance Metadata</strong> from a metadata document in PASTA
+   * and adds it to the provided EML document found in the request message
+   * body.
    * 
    * <h4>Request entity:</h4>
    *
