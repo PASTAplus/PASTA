@@ -3194,7 +3194,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			DataPackageManager dpm = new DataPackageManager();
 			File file = dpm.getDataPackageArchiveFile(transaction);
 
-			if (file != null) {
+			if (file != null && file.exists()) {
 				responseBuilder = Response.ok(file, "application/octet-stream");
 				responseBuilder.header("Content-Disposition", "attachment; filename="
 				    + transaction + ".zip");
