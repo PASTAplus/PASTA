@@ -31,6 +31,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
@@ -54,7 +55,6 @@ public class DataPackageArchive {
 	/*
 	 * Class variables
 	 */
-
 
 	private static final String SLASH = "/";
 	private static final String URI_MIDDLE_DATA = "data/eml/";
@@ -121,7 +121,7 @@ public class DataPackageArchive {
 	 * @param transaction
 	 *          The transaction id of the request
 	 * @return The file name of the data package archive
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public String createDataPackageArchive(String scope, Integer identifier,
 	    Integer revision, String userId, AuthToken authToken, String transaction)
@@ -130,12 +130,18 @@ public class DataPackageArchive {
 		String zipName = transaction + ".zip";
 		String zipPath = tmpDir + "/";
 
+
 		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
 
 		DataPackageManager dpm = null;
-		
-		File zFile = new File(zipPath + zipName);
-		
+
+		/*
+		 * It is necessary to create a temporary file while building the ZIP archive
+		 * to prevent the client from accessing an incomplete product.
+		 */
+		String tmpName = DigestUtils.md5Hex(transaction);
+		File zFile = new File(zipPath + tmpName);
+
 		if (zFile.exists()) {
 			String gripe = "The resource " + zipName + "already exists!";
 			throw new ResourceExistsException(gripe);
@@ -151,7 +157,7 @@ public class DataPackageArchive {
 
 		FileOutputStream fOut = null;
 
-		try {			
+		try {
 			fOut = new FileOutputStream(zFile);
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage());
@@ -313,6 +319,15 @@ public class DataPackageArchive {
 
 		}
 
+		File tmpFile = new File(zipPath + tmpName);
+		File zipFile = new File(zipPath + zipName);
+
+		// Copy hidden ZIP archive to visible ZIP archive, thus making available
+		if (!tmpFile.renameTo(zipFile)) {
+			String gripe = "Error renaming " + tmpName + " to " + zipName + "!";
+			throw new IOException();
+		}
+
 		return zipName;
 
 	}
@@ -333,7 +348,8 @@ public class DataPackageArchive {
 		File file = new File(archive);
 
 		if (!file.exists()) {
-			String gripe = "The data package archive " + transaction + ".zip does exist!";
+			String gripe = "The data package archive " + transaction
+			    + ".zip does exist!";
 			throw new FileNotFoundException(gripe);
 		}
 
