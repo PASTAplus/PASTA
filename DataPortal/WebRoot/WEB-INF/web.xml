@@ -150,13 +150,18 @@
 		<servlet-name>ProvenanceViewerServlet</servlet-name>
 		<servlet-class>edu.lternet.pasta.portal.ProvenanceViewerServlet</servlet-class>
 	</servlet>
-    <servlet>
-        <description>Data Package Citation Servlet</description>
-        <display-name>DataPackageCitationServlet</display-name>
-        <servlet-name>DataPackageCitationServlet</servlet-name>
-        <servlet-class>edu.lternet.pasta.portal.DataPackageCitationServlet</servlet-class>
-    </servlet>
-
+	<servlet>
+		<description>Data Package Citation Servlet</description>
+		<display-name>DataPackageCitationServlet</display-name>
+		<servlet-name>DataPackageCitationServlet</servlet-name>
+		<servlet-class>edu.lternet.pasta.portal.DataPackageCitationServlet</servlet-class>
+	</servlet>
+  <servlet>
+    <description>Archive Download Servlet</description>
+    <display-name>ArchiveDownloadServlet</display-name>
+    <servlet-name>ArchiveDownloadServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.ArchiveDownloadServlet</servlet-class>
+  </servlet>
 
 	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
@@ -246,14 +251,18 @@
 		<servlet-name>MetadataPreviewerServlet</servlet-name>
 		<url-pattern>/metadataPreviewer</url-pattern>
 	</servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProvenanceViewerServlet</servlet-name>
-        <url-pattern>/provenanceViewer</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DataPackageCitationServlet</servlet-name>
-        <url-pattern>/dataPackageCitation</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ProvenanceViewerServlet</servlet-name>
+		<url-pattern>/provenanceViewer</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DataPackageCitationServlet</servlet-name>
+		<url-pattern>/dataPackageCitation</url-pattern>
+	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ArchiveDownloadServlet</servlet-name>
+    <url-pattern>/archiveDownload</url-pattern>
+  </servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
