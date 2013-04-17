@@ -2385,7 +2385,10 @@ public class DataPackageManagerResource extends PastaWebService {
       File file = 
         dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId, authToken, userId);
     
-      if (file != null) {
+      if (file != null && file.exists()) {
+      	
+      	Long size = FileUtils.sizeOf(file);
+      	
         String dataPackageResourceId = DataPackageManager.composeResourceId(
           ResourceType.dataPackage, scope, identifier, Integer.valueOf(revision), null);
 
@@ -2409,7 +2412,9 @@ public class DataPackageManagerResource extends PastaWebService {
           responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
         }
 
+        responseBuilder.header("Content-Length", size.toString());
         response = responseBuilder.build();
+        
       }
       else {
         ResourceNotFoundException e = new ResourceNotFoundException(
@@ -3195,9 +3200,11 @@ public class DataPackageManagerResource extends PastaWebService {
 			File file = dpm.getDataPackageArchiveFile(transaction);
 
 			if (file != null && file.exists()) {
-				responseBuilder = Response.ok(file, "application/octet-stream");
+				Long size = FileUtils.sizeOf(file);
+				responseBuilder = Response.ok(file, "application/zip");
 				responseBuilder.header("Content-Disposition", "attachment; filename="
 				    + transaction + ".zip");
+				responseBuilder.header("Content-Length", size.toString());
 				response = responseBuilder.build();
 			} else {
 				String gripe = "Unable to access data package archive " + transaction
