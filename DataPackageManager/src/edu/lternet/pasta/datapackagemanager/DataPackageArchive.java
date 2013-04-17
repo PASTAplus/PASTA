@@ -130,6 +130,7 @@ public class DataPackageArchive {
 		String zipName = transaction + ".zip";
 		String zipPath = tmpDir + "/";
 
+		StringBuffer manifest = new StringBuffer();
 
 		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
 
@@ -194,6 +195,7 @@ public class DataPackageArchive {
 					try {
 						file = dpm.getMetadataFile(scope, identifier, revision.toString(),
 						    userId, authToken);
+						objectName = emlPackageId.toString() + ".xml";
 					} catch (ClassNotFoundException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
@@ -205,11 +207,10 @@ public class DataPackageArchive {
 						e.printStackTrace();
 					}
 
-					objectName = emlPackageId.toString() + ".xml";
-
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
+							manifest.append(objectName + "\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
@@ -221,6 +222,7 @@ public class DataPackageArchive {
 					try {
 						file = dpm.readDataPackageReport(scope, identifier,
 						    revision.toString(), emlPackageId, authToken, userId);
+						objectName = emlPackageId.toString() + ".report.xml";
 					} catch (ClassNotFoundException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
@@ -229,11 +231,11 @@ public class DataPackageArchive {
 						e.printStackTrace();
 					}
 
-					objectName = emlPackageId.toString() + ".report.xml";
 
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
+							manifest.append(objectName + "\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
@@ -257,11 +259,13 @@ public class DataPackageArchive {
 						    entityResourceId, authToken);
 						xml = dpm.readMetadata(scope, identifier, revision.toString(),
 						    userId, authToken);
+						objectName = dpm.findObjectName(xml, entityName);
 						file = dpm.getDataEntityFile(scope, identifier,
 						    revision.toString(), entityId, authToken, userId);
 					} catch (UnauthorizedException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
+						manifest.append(objectName + "(access denied)\n");						
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
@@ -276,11 +280,10 @@ public class DataPackageArchive {
 						e.printStackTrace();
 					}
 
-					objectName = dpm.findObjectName(xml, entityName);
-
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
+							manifest.append(objectName + "\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
@@ -314,8 +317,36 @@ public class DataPackageArchive {
 				}
 
 			}
+			
+			// Create ZIP archive manifest
+			File mFile = new File(zipPath + transaction + ".txt");
+			FileUtils.writeStringToFile(mFile, manifest.toString());
+			ZipEntry zipEntry = new ZipEntry("manifest.txt");
+			
+			try {
+				
+				FileInputStream fIn = new FileInputStream(mFile);
+				zOut.putNextEntry(zipEntry);
 
+				int length;
+				byte[] buffer = new byte[1024];
+
+				while ((length = fIn.read(buffer)) > 0) {
+					zOut.write(buffer, 0, length);
+				}
+
+				zOut.closeEntry();
+				fIn.close();
+
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+
+			// Close ZIP archive
 			zOut.close();
+			
+			FileUtils.forceDelete(mFile);
 
 		}
 
