@@ -869,40 +869,12 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, gripe);
 			} else {
 
-				Header header = null;
-
-				// Set content disposition
-				String contentDisposition = null;
-				header = httpResponse.getFirstHeader("Content-Disposition");
+				Header[] headers = httpResponse.getAllHeaders();
 				
-				if (header != null) {
-					contentDisposition = header.getValue();
-				} else {
-					contentDisposition = "attachment; filename=unknown";
-				}
-				
-				servletResponse.setHeader("Content-Disposition", contentDisposition);
-				
-				// Set content type
-				String contentType = null;
-				header = httpResponse.getFirstHeader("Content-Type");
-				if (header != null) {
-					contentType = header.getValue();
-				} else {
-					contentType = "application/octet-stream";
-				}
-				servletResponse.setContentType(contentType);
-				
-				// Set transfer encoding or content length, but not both
-				if (httpEntity.isChunked()) {
-					servletResponse.setHeader("Transfer-Encoding", "chunked");
-				} else {
-					String contentLength = null;
-					header = httpResponse.getFirstHeader("Content-Length");
-					if (header != null) {
-						contentLength = header.getValue();
-						servletResponse.setHeader("Content-Length", contentLength);
-					}					
+				// Copy httpResponse headers to servletResponse headers
+				for (int i = 0; i < headers.length; i++) {
+					Header header = headers[i];
+					servletResponse.setHeader(header.getName(), header.getValue());
 				}
 
 				httpEntity.writeTo(servletResponse.getOutputStream());
@@ -1057,40 +1029,12 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, gripe);
 			} else {
 
-				Header header = null;
-
-				// Set content disposition
-				String contentDisposition = null;
-				header = httpResponse.getFirstHeader("Content-Disposition");
+				Header[] headers = httpResponse.getAllHeaders();
 				
-				if (header != null) {
-					contentDisposition = header.getValue();
-				} else {
-					contentDisposition = "attachment; filename=unknown";
-				}
-				
-				servletResponse.setHeader("Content-Disposition", contentDisposition);
-				
-				// Set content type
-				String contentType = null;
-				header = httpResponse.getFirstHeader("Content-Type");
-				if (header != null) {
-					contentType = header.getValue();
-				} else {
-					contentType = "application/octet-stream";
-				}
-				servletResponse.setContentType(contentType);
-				
-				// Set transfer encoding or content length, but not both
-				if (httpEntity.isChunked()) {
-					servletResponse.setHeader("Transfer-Encoding", "chunked");
-				} else {
-					String contentLength = null;
-					header = httpResponse.getFirstHeader("Content-Length");
-					if (header != null) {
-						contentLength = header.getValue();
-						servletResponse.setHeader("Content-Length", contentLength);
-					}					
+				// Copy httpResponse headers to servletResponse headers
+				for (int i = 0; i < headers.length; i++) {
+					Header header = headers[i];
+					servletResponse.setHeader(header.getName(), header.getValue());
 				}
 
 				httpEntity.writeTo(servletResponse.getOutputStream());
