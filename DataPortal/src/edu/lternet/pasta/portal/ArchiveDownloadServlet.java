@@ -52,7 +52,7 @@ public class ArchiveDownloadServlet extends DataPortalServlet {
    */
 
   private static final Logger logger = Logger
-      .getLogger(edu.lternet.pasta.portal.DataViewerServlet.class);
+      .getLogger(edu.lternet.pasta.portal.ArchiveDownloadServlet.class);
   private static final long serialVersionUID = 1L;
 
   private static final String HTMLHEAD = "<html>\n"
