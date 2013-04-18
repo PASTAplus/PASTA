@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -130,9 +131,12 @@ public class DataPackageArchive {
 		String zipName = transaction + ".zip";
 		String zipPath = tmpDir + "/";
 
+		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
+
 		StringBuffer manifest = new StringBuffer();
 
-		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
+		Date now = new Date();
+		manifest.append("Manifest file for " + zipName + " created on " + now.toString() + "\n");
 
 		DataPackageManager dpm = null;
 
@@ -210,7 +214,8 @@ public class DataPackageArchive {
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
-							manifest.append(objectName + "\n");
+							Long size = FileUtils.sizeOf(file);
+							manifest.append(objectName + " (" + size.toString() +" bytes)\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
@@ -235,7 +240,8 @@ public class DataPackageArchive {
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
-							manifest.append(objectName + "\n");
+							Long size = FileUtils.sizeOf(file);
+							manifest.append(objectName + " (" + size.toString() +" bytes)\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
@@ -265,7 +271,7 @@ public class DataPackageArchive {
 					} catch (UnauthorizedException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
-						manifest.append(objectName + "(access denied)\n");						
+						manifest.append(objectName + " (access denied)\n");						
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
@@ -283,7 +289,8 @@ public class DataPackageArchive {
 					if (file != null) {
 						try {
 							fIn = new FileInputStream(file);
-							manifest.append(objectName + "\n");
+							Long size = FileUtils.sizeOf(file);
+							manifest.append(objectName + " (" + size.toString() +" bytes)\n");
 						} catch (FileNotFoundException e) {
 							logger.error(e.getMessage());
 							e.printStackTrace();
