@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.ResourceExistsException;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -47,13 +48,12 @@ public class DataPackageError {
 	private static Logger logger = Logger.getLogger(DataPackageError.class);
 
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	private static final String HOMELESS = "homeless";
 
 	/*
 	 * Instance variables
 	 */
 
-	String metadataDir = null;
+	String errorDir = null;
 
 	/*
 	 * Constructors
@@ -70,11 +70,10 @@ public class DataPackageError {
 			options = ConfigurationListener.getOptions();
 		}
 
-		metadataDir = options.getOption("datapackagemanager.metadataDir");
+		errorDir = options.getOption("datapackagemanager.errorDir");
 
-		if (metadataDir == null || metadataDir.isEmpty()) {
-			String gripe = "The Data Package Manager property for the \"metadata\" "
-			    + "directory was not properly defined.";
+		if (errorDir == null || errorDir.isEmpty()) {
+			String gripe = "Error directory property not set!";
 			throw new Exception(gripe);
 		}
 
@@ -108,29 +107,22 @@ public class DataPackageError {
 	 * @param error
 	 *          The exception object of the error
 	 */
-	public void writeError(String packageId, String transaction, Exception error) {
+	public void writeError(String transaction, Exception error) throws Exception {
 
-		if (packageId == null) packageId = HOMELESS;
-		
-		String packagePath = metadataDir + "/" + packageId;
-		File packageDir = new File(packagePath);
+		String errorName = transaction + ".txt";
+		String errorPath = errorDir + "/";
 
-		if (!packageDir.exists()) {
-			try {
-				FileUtils.forceMkdir(packageDir);
-			} catch (IOException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-			}
+		File file = new File(errorPath + errorName);
+
+		if (file.exists()) {
+			String gripe = "The resource " + errorName + " already exists!";
+			throw new ResourceExistsException(gripe);
 		}
-		
-		String filePath = metadataDir + "/" + packageId + "/";
-		String fileName = "errorlog." + transaction + ".txt";
-		File file = new File(filePath + fileName);
 
 		try {
 			FileUtils.writeStringToFile(file, error.getMessage(), "UTF-8");
-			logger.error("PackageId::Transaction:Error: " + packageId + "::" + transaction + ":" + error.getMessage());
+			logger.error("Transaction Error: " + transaction + " - "
+			    + error.getMessage());
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -149,36 +141,18 @@ public class DataPackageError {
 	 * @return The error message
 	 * @throws FileNotFoundException
 	 */
-	public String readError(String packageId, String transaction)
-	    throws FileNotFoundException {
+	public String readError(String transaction) throws FileNotFoundException {
 
 		String error = null;
 
-		String packagePath = metadataDir + "/" + packageId;
-		File packageDir = new File(packagePath);
+		String errorPath = errorDir + "/";
+		String errorName = transaction + ".txt";
 
-		if (!packageDir.exists()) {
-			
-			packageId = HOMELESS;
-			packagePath = metadataDir + "/" + packageId;
-			packageDir = new File(packagePath);
-
-			if (!packageDir.exists()) {
-				String gripe = "The directory " + packageDir + " does not exist in the "
-				    + "metadata directory path " + metadataDir;
-				throw new FileNotFoundException(gripe);
-			}
-			
-		}
-
-		String filePath = metadataDir + "/" + packageId + "/";
-		String fileName = "errorlog." + transaction + ".txt";
-		File file = new File(filePath + fileName);
+		File file = new File(errorPath + errorName);
 
 		if (!file.exists()) {
-					String gripe = "The error file " + fileName + " was not found in the "
-					    + "directory " + filePath;
-					throw new FileNotFoundException(gripe);
+			String gripe = "The error file " + errorName + " was not found!";
+			throw new FileNotFoundException(gripe);
 		}
 
 		try {
@@ -193,8 +167,8 @@ public class DataPackageError {
 	}
 
 	/**
-	 * Delete the error file errorlog.[transaction].txt in the "metadata"
-	 * directory for the given package identifier.
+	 * Delete the error file [transaction].txt in the "error" directory for the
+	 * given package identifier.
 	 * 
 	 * @param packageId
 	 *          The data package identifier
@@ -202,34 +176,15 @@ public class DataPackageError {
 	 *          The transaction identifier
 	 * @throws FileNotFoundException
 	 */
-	public void deleteError(String packageId, String transaction)
-	    throws FileNotFoundException {
+	public void deleteError(String transaction) throws FileNotFoundException {
 
-		String packagePath = metadataDir + "/" + packageId;
-		File packageDir = new File(packagePath);
-
-		if (!packageDir.exists()) {
-			
-			packageId = HOMELESS;
-			packagePath = metadataDir + "/" + packageId;
-			packageDir = new File(packagePath);
-
-			if (!packageDir.exists()) {
-				String gripe = "The directory " + packageDir + " does not exist in the "
-				    + "metadata directory path " + metadataDir;
-				throw new FileNotFoundException(gripe);
-			}
-			
-		}
-
-		String filePath = metadataDir + "/" + packageId + "/";
-		String fileName = "errorlog." + transaction + ".txt";
-		File file = new File(filePath + fileName);
+		String errorPath = errorDir + "/";
+		String errorName = transaction + ".txt";
+		File file = new File(errorPath + errorName);
 
 		if (!file.exists()) {
-					String gripe = "The error file " + fileName + " was not found in the "
-					    + "directory " + filePath;
-					throw new FileNotFoundException(gripe);
+			String gripe = "The error file " + errorName + " was not found!";
+			throw new FileNotFoundException(gripe);
 		}
 
 		try {

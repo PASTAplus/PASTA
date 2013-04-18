@@ -403,6 +403,92 @@ public class DataPackageManagerClient extends PastaClient {
 	}
 
 	/**
+	 * Executes the 'createDataPackage' web service method.
+	 * 
+	 * @param emlFile
+	 *          the Level-0 EML document describing the data package
+	 * @return a string representation of the resource map for the newly created
+	 *         data package
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String getDataPackageArchive(String scope, Integer identifier,
+	    String revision, HttpServletResponse servletResponse) throws Exception {
+
+		String contentType = "text/plain";
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		HttpPost httpPost = new HttpPost(BASE_URL + "/archive/eml" + urlTail);
+		String resourceMap = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpPost.setHeader("Cookie", "auth-token=" + this.token);
+		}
+		
+		httpPost.setHeader("Content-Type", contentType);
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpPost);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+
+			if (statusCode == HttpStatus.SC_ACCEPTED) {
+				
+				EmlPackageId emlPackageId = new EmlPackageId(scope, identifier,
+				    Integer.valueOf(revision));
+				String packageScope = emlPackageId.getScope();
+				Integer packageIdentifier = emlPackageId.getIdentifier();
+				Integer packageRevision = emlPackageId.getRevision();
+
+				Integer idleTime = 0;
+
+				// Initial sleep period to mitigate potential error-check race condition 
+				Thread.sleep(initialSleepTime);
+				
+				while (idleTime <= maxIdleTime) {
+					logger.info(idleTime);
+					try {
+						String errorText = readDataPackageError(packageScope, packageIdentifier,
+								packageRevision.toString(), entityString);
+						throw new Exception(errorText);
+					} catch (ResourceNotFoundException e) {
+						logger.error(e.getMessage());
+						try {
+							readDataPackageArchive(entityString, servletResponse);
+							break;
+						} catch (ResourceNotFoundException e1) {
+							logger.error(e1.getMessage());
+							Thread.sleep(idleSleepTime);
+							idleTime += idleSleepTime;
+						}
+					}
+				}
+
+				if (idleTime > maxIdleTime) {
+					String gripe = "Fiddle sticks!  Creating this data package archive has "
+					    + "exceeded our patience and we have been forced to terminate "
+					    + "this browser process, but the data package may still be "
+					    + "created in PASTA if an error was not encountered.  Please "
+					    + "check the audit logs or the Data Package Browser at a later "
+					    + "time.";
+					throw new Exception(gripe);
+				}
+
+			} else {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return resourceMap;
+	}
+
+	/**
 	 * Executes the 'deleteDataPackage' web service method.
 	 * 
 	 * @param scope
@@ -782,22 +868,17 @@ public class DataPackageManagerClient extends PastaClient {
 				    + entityId;
 				handleStatusCode(statusCode, gripe);
 			} else {
-				Header header = null;
 
-				header = httpResponse.getFirstHeader("Content-Disposition");
-				String contentDisposition = header.getValue();
-
-				header = httpResponse.getFirstHeader("Content-Type");
-				String contentType = header.getValue();
-
-				Integer contentLength = new Long(httpEntity.getContentLength())
-				    .intValue();
-
-				servletResponse.setHeader("Content-Disposition", contentDisposition);
-				servletResponse.setContentType(contentType);
-				servletResponse.setContentLength(contentLength);
+				Header[] headers = httpResponse.getAllHeaders();
+				
+				// Copy httpResponse headers to servletResponse headers
+				for (int i = 0; i < headers.length; i++) {
+					Header header = headers[i];
+					servletResponse.setHeader(header.getName(), header.getValue());
+				}
 
 				httpEntity.writeTo(servletResponse.getOutputStream());
+				
 			}
 
 		} finally {
@@ -903,6 +984,70 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 	}
 
+	/**
+	 * Executes the 'readDataPackageArchive' web service method.
+	 * 
+	 * @param transaction
+	 *          the transaction identifier string
+	 * @param servletResponse
+	 *          the servlet response object for returning content to the client
+	 *          browser
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public void readDataPackageArchive(String transaction, HttpServletResponse servletResponse) throws Exception {
+
+		HttpResponse httpResponse = null;
+
+		if (servletResponse == null) {
+			String gripe = "Servlet response object is null!";
+			throw new Exception(gripe);
+		}
+
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/archive/eml/" + transaction;
+		HttpGet httpGet = new HttpGet(url);
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			httpResponse = httpClient.execute(httpGet);
+
+			getInfo(httpResponse);
+
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+
+			if (statusCode != HttpStatus.SC_OK) {
+				String gripe = "An error occurred while attempting to read the data package archive: "
+				    + transaction;
+				handleStatusCode(statusCode, gripe);
+			} else {
+
+				Header[] headers = httpResponse.getAllHeaders();
+				
+				// Copy httpResponse headers to servletResponse headers
+				for (int i = 0; i < headers.length; i++) {
+					Header header = headers[i];
+					servletResponse.setHeader(header.getName(), header.getValue());
+				}
+
+				httpEntity.writeTo(servletResponse.getOutputStream());
+				
+			}
+
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+	}
+
+	
 	/**
 	 * Executes the 'readDataPackageReport' web service method.
 	 * 

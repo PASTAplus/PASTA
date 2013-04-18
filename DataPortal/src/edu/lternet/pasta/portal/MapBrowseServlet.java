@@ -168,6 +168,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
 		}
 
+    httpSession.setAttribute("browsemessage", null);
 		httpSession.setAttribute("html", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
@@ -437,6 +438,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "</ol>\n";
 		html += "</li>\n";
 		html += "</ul>\n";
+		
+		html += "<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">";
+		html += "<input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" />";
+		html += "<input type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />";
+		html += "</form>";
 		
 		html += "<p><br/><a href=\"./dataPackageCitation?scope=" + scope + "&"
 				+ "identifier=" + identifier.toString() + "&"

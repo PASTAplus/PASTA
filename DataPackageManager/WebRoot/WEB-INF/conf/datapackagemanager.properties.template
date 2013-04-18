@@ -66,8 +66,10 @@ welcome.page=/home/pasta/local/apache-tomcat/webapps/package/WEB-INF/doc/welcome
 ## NIS PASTA Data Package Manager properties
 ##
 datapackagemanager.context=package
+datapackagemanager.tmpDir=/home/pasta/local/tmp
 datapackagemanager.metadataDir=/home/pasta/local/metadata
 datapackagemanager.entityDir=/home/pasta/local/data
+datapackagemanager.errorDir=/home/pasta/local/error
 datapackagemanager.auditmanager.host=audit.lternet.edu
 datapackagemanager.eventmanager.host=event.lternet.edu
 datapackagemanager.metadatacatalog.metacatUrl=http://metadata.lternet.edu/metacat/metacat
