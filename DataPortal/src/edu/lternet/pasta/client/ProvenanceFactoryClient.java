@@ -77,7 +77,7 @@ public class ProvenanceFactoryClient extends PastaClient {
 	    throws PastaAuthenticationException, PastaConfigurationException {
 		super(uid);
     String pastaUrl = PastaClient.composePastaUrl(this.pastaProtocol, this.pastaHost, this.pastaPort);
-    this.BASE_URL = pastaUrl + "/package/eml/provenance";
+    this.BASE_URL = pastaUrl + "/package/provenance/eml";
 	}
 	
 	/**
