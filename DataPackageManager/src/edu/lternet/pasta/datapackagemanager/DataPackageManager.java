@@ -94,6 +94,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	private static String resourceDir = null;
 	private static String entityDir = null;
+	private static String reportDir = null;
 	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
 
 	private static final String SLASH = "/";
@@ -645,7 +646,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		/*
 		 * If the data package is valid and this is not evaluate mode, add the
-		 * quaity report resource to the registry.
+		 * quality report resource to the registry.
 		 */
 		if (isDataPackageValid && !isEvaluate) {
 
@@ -1177,6 +1178,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
 			entityDir = options.getOption("datapackagemanager.entityDir");
+			reportDir = options.getOption("datapackagemanager.reportDir");
+			
 
 			String qualityReportingStr = options.getOption("qualityReporting");
 			String qualityReportTemplate = options.getOption("qualityReportTemplate");
@@ -1668,16 +1671,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the user name
 	 * @return a file object containing the data package quality report XML
 	 */
-	public File readEvaluateReport(String scope, Integer identifier,
-	    String revision, String transaction, EmlPackageId emlPackageId,
-	    AuthToken authToken, String user) {
+	public File readEvaluateReport(String transaction) {
 		boolean evaluate = true;
 		File xmlFile = null;
 
-		DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);
-		if (dataPackageReport != null) {
-			xmlFile = dataPackageReport.getReport(evaluate, transaction);
-		}
+		xmlFile = new File(reportDir, String.format("%s.xml", transaction));
 
 		return xmlFile;
 	}
