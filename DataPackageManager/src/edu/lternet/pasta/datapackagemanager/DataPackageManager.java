@@ -1654,30 +1654,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	/**
 	 * Read an evaluate quality report, returning the XML file. The transaction id
-	 * for the evaluate operation that generated the report must be specified. The
-	 * specified user must be authorized to read the report.
+	 * for the evaluate operation that generated the report must be specified.
 	 * 
-	 * @param scope
-	 *          the scope value
-	 * @param identifier
-	 *          the identifier value
-	 * @param revision
-	 *          the revision value
 	 * @param transaction
 	 *          the transaction identifier, e.g. "1364424858431"
-	 * @param emlPackageId
-	 *          an EmlPackageId object
-	 * @param user
-	 *          the user name
 	 * @return a file object containing the data package quality report XML
 	 */
 	public File readEvaluateReport(String transaction) {
-		boolean evaluate = true;
-		File xmlFile = null;
-
-		xmlFile = new File(reportDir, String.format("%s.xml", transaction));
-
-		return xmlFile;
+		
+		DataPackageReport dpr = new DataPackageReport(null);
+		return dpr.getEvaluateReportFile(transaction);
+		
 	}
 
 	/**

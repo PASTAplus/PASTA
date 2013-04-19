@@ -27,8 +27,11 @@ package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
+
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.datamanager.EMLQualityReport;
+import edu.ucsb.nceas.utilities.Options;
 
 
 /**
@@ -43,13 +46,16 @@ public class DataPackageReport {
   * Class fields
   */
  
+	private static Logger logger = Logger.getLogger(DataPackageReport.class);
+	private static final String dirPath = "WebRoot/WEB-INF/conf";
+	private static final String REPORT_DIR_DEFAULT = "/home/pasta/local/report";
 
  /*
   * Instance fields
   */
  
  private EmlPackageId emlPackageId = null;
- 
+ private String reportDir = null;
  
  /*
   * Constructors
@@ -60,8 +66,26 @@ public class DataPackageReport {
   * 
   * @param  emlPackageId, an object that represents the packageId
   */
- public DataPackageReport(EmlPackageId emlPackageId){
+ public DataPackageReport(EmlPackageId emlPackageId) {
    this.emlPackageId = emlPackageId;
+
+		Options options = null;
+		options = ConfigurationListener.getOptions();
+
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
+
+		reportDir = options.getOption("datapackagemanager.reportDir");
+
+		if (reportDir == null || reportDir.isEmpty()) {
+			String gripe = "Report directory property not set! Reverting to "
+			    + "default report directory: " + REPORT_DIR_DEFAULT;
+			logger.warn(gripe);
+		}
+   
  }
 
  
@@ -93,6 +117,18 @@ public class DataPackageReport {
    }
    
    return success;
+ }
+ 
+ /**
+  * Return the evaluate quality report for the given transaction identifier.
+  * 
+  * @param transaction The evaluate quality report transaction identifier.
+  * @return The evaluate quality report File object.
+  */
+ public File getEvaluateReportFile(String transaction) {
+	 File rFile = null;
+	 rFile = new File(reportDir, String.format("%s.xml", transaction));
+	 return rFile;
  }
 
  
