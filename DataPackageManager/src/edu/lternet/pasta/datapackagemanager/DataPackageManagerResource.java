@@ -3012,8 +3012,7 @@ public class DataPackageManagerResource extends PastaWebService {
       String packageId = emlPackageIdFormat.format(emlPackageId);
 
       File xmlFile = 
-        dataPackageManager.readEvaluateReport(scope, identifier, revision, transaction,
-                                              emlPackageId, authToken, userId);
+        dataPackageManager.readEvaluateReport(transaction);
     
       if (xmlFile != null && xmlFile.exists()) {
         if (produceHTML) {
