@@ -66,6 +66,7 @@ welcome.page=/home/pasta/local/apache-tomcat/webapps/package/WEB-INF/doc/welcome
 ## NIS PASTA Data Package Manager properties
 ##
 datapackagemanager.context=package
+datapackagemanager.reportDir=/home/pasta/local/report
 datapackagemanager.tmpDir=/home/pasta/local/tmp
 datapackagemanager.metadataDir=/home/pasta/local/metadata
 datapackagemanager.entityDir=/home/pasta/local/data
