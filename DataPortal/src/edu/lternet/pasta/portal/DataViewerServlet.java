@@ -44,6 +44,7 @@ import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.Entity;
+import edu.lternet.pasta.common.security.access.UnauthorizedException;
 
 public class DataViewerServlet extends DataPortalServlet {
 
@@ -143,35 +144,45 @@ public class DataViewerServlet extends DataPortalServlet {
       identifier = Integer.valueOf(tokens[1]);
       revision = tokens[2];
 
-      try {
-      	
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        dpmClient.readDataEntity(scope, identifier, revision, entityId, response);
+			try {
 
-      } catch (PastaAuthenticationException e) {
-        logger.error("PastaAuthenticationException: " + e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaConfigurationException e) {
-        logger.error("PastaConfigurationException: " + e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (Exception e) {
-        logger.error("Exception: " + e.getMessage());
-        e.printStackTrace();
-        
-        if (e.getMessage().contains("User public does not have permission")) {
-        	html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() +
-        			" -- <a href=\"./login.jsp\">logging into the NIS</a> <em>may</em> let you read this data entity." +
-        			"</p>" + HTMLTAIL;
-        } else {
-            html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-        }
-        
-      }
+				DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+				dpmClient.readDataEntity(scope, identifier, revision, entityId,
+				    response);
+
+			} catch (PastaAuthenticationException e) {
+				logger.error("PastaAuthenticationException: " + e.getMessage());
+				e.printStackTrace();
+				html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
+				    + HTMLTAIL;
+			} catch (PastaConfigurationException e) {
+				logger.error("PastaConfigurationException: " + e.getMessage());
+				e.printStackTrace();
+				html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
+				    + HTMLTAIL;
+			} catch (UnauthorizedException e) {
+				logger.error("UnauthorizedException: " + e.getMessage());
+				e.printStackTrace();
+				
+				if (uid.equals("public")) {
+					html = HTMLHEAD
+					    + "<p class=\"warning\">"
+					    + "User <em>Public</em> does not have access to this data entity"
+					    + " -- <a href=\"./login.jsp\">logging into the NIS</a> <em>may</em> let you read this data entity."
+					    + "</p>" + HTMLTAIL;
+					} else {
+						html = HTMLHEAD
+				    + "<p class=\"warning\">"
+				    + "User <em>" + uid + "</em> does not have access to this data entity!"
+				    + "</p>" + HTMLTAIL;
+					}
+				
+			} catch (Exception e) {
+				logger.error("Exception: " + e.getMessage());
+				e.printStackTrace();
+				html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
+				    + HTMLTAIL;
+			}				    				
 
     } else {
       html = HTMLHEAD
