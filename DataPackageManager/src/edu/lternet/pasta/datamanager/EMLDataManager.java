@@ -71,6 +71,8 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
   private static final String METADATA_DIR_DEFAULT = "/home/pasta/local/metadata";
   private static String entityDir = null;
   private static final String ENTITY_DIR_DEFAULT = "/home/pasta/local/data";
+  private static String reportDir = null;
+  private static final String REPORT_DIR_DEFAULT = "/home/pasta/local/report";
 
   
   /*
@@ -160,6 +162,23 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
     }
     else {
       return METADATA_DIR_DEFAULT;
+    }
+  }
+  
+  
+  /** 
+   * Gets the value of the report directory. Returns
+   * the configured property value if set, else
+   * returns the default value.
+   * 
+   * @return  the path of the metadata directory
+   */
+  public static String getReportDir() {
+    if (reportDir != null) {
+      return reportDir;
+    }
+    else {
+      return REPORT_DIR_DEFAULT;
     }
   }
   
@@ -669,7 +688,8 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       
       // Directory paths for entities and entity reports
       metadataDir = options.getOption("datapackagemanager.metadataDir");      
-      entityDir = options.getOption("datapackagemanager.entityDir");      
+      entityDir = options.getOption("datapackagemanager.entityDir");    
+      reportDir = options.getOption("datapackagemanager.reportDir");
       
       String qualityReportingStr = options.getOption("qualityReporting");
       String qualityReportTemplate = options.getOption("qualityReportTemplate");
