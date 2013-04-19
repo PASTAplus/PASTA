@@ -180,7 +180,7 @@ public class EMLQualityReport {
 	  
 	  // If evaluate mode, tag the quality report file name with the transaction identifier
 	  if (evaluateMode) {
-	    filename = String.format("quality_report.%s.xml", transaction);
+	    filename = String.format("%s.xml", transaction);
 	  }
 	  else {
 	    filename = QUALITY_REPORT_FILE_NAME;
