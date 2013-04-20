@@ -28,6 +28,7 @@ import java.io.File;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.datamanager.EMLDataManager;
 
 /**
 * 
@@ -130,15 +131,17 @@ public class FileSystemResource {
   */
  public String getDirPath() {
    String dirPath = null;
-   StringBuffer stringBuffer = new StringBuffer("");
-   stringBuffer.append(this.baseDir);
-   stringBuffer.append("/");
-   stringBuffer.append(this.packageId);
-   if (this.evaluateMode) {
-     stringBuffer.append("/evaluate");
-   }
-   dirPath = stringBuffer.toString();
    
+   if (this.evaluateMode) {
+     dirPath = EMLDataManager.getReportDir();
+   } else {
+	   StringBuffer stringBuffer = new StringBuffer("");
+	   stringBuffer.append(this.baseDir);
+	   stringBuffer.append("/");
+	   stringBuffer.append(this.packageId);
+	   dirPath = stringBuffer.toString();
+   }
+
    return dirPath;
  }
 

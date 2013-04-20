@@ -130,14 +130,16 @@ public class EMLFileSystemDataPackage extends EMLDataPackage {
    */
   public String getDirPath() {
     String dirPath = null;
-    StringBuffer stringBuffer = new StringBuffer("");
-    stringBuffer.append(this.baseDir);
-    stringBuffer.append("/");
-    stringBuffer.append(this.packageId);
+
     if (this.evaluateMode) {
-      stringBuffer.append("/evaluate");
+      dirPath = EMLDataManager.getReportDir();
+    } else {
+	    StringBuffer stringBuffer = new StringBuffer("");
+	    stringBuffer.append(this.baseDir);
+	    stringBuffer.append("/");
+	    stringBuffer.append(this.packageId);
+	    dirPath = stringBuffer.toString();
     }
-    dirPath = stringBuffer.toString();
     
     return dirPath;
   }

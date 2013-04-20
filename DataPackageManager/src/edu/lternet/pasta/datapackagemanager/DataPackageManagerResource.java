@@ -2539,7 +2539,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *         if found, else returns a 404 Not Found response
    */
   @GET
-  @Path("/name/{scope}/{identifier}/{revision}/{entityId}")
+  @Path("/name/eml/{scope}/{identifier}/{revision}/{entityId}")
   @Produces("text/plain")
   public Response readDataEntityName(
                                   @Context HttpHeaders headers,
@@ -2963,13 +2963,10 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return            A Response object containing the evaluate quality report
    */
   @GET
-  @Path("/evaluate/report/eml/{scope}/{identifier}/{revision}/{transaction}")
+  @Path("/evaluate/report/eml/{transaction}")
   @Produces({"application/xml", "text/html"})
   public Response readEvaluateReport(
                                     @Context HttpHeaders headers,
-                                    @PathParam("scope") String scope,
-                                    @PathParam("identifier") Integer identifier,
-                                    @PathParam("revision") String revision,
                                     @PathParam("transaction") String transaction
                      ) {
     AuthToken authToken = null;
@@ -3008,12 +3005,9 @@ public class DataPackageManagerResource extends PastaWebService {
     
     try {
       DataPackageManager dataPackageManager = new DataPackageManager(); 
-      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
-      String packageId = emlPackageIdFormat.format(emlPackageId);
 
       File xmlFile = 
-        dataPackageManager.readEvaluateReport(scope, identifier, revision, transaction,
-                                              emlPackageId, authToken, userId);
+        dataPackageManager.readEvaluateReport(transaction);
     
       if (xmlFile != null && xmlFile.exists()) {
         if (produceHTML) {
@@ -3048,8 +3042,8 @@ public class DataPackageManagerResource extends PastaWebService {
       }
       else {
         ResourceNotFoundException e = new ResourceNotFoundException(String.format(
-            "Unable to access data package evaluate report file for packageId: %s; transaction id: %s ",
-            packageId, transaction));
+            "Unable to access data package evaluate report file for transaction id: %s ",
+            transaction));
         WebApplicationException webApplicationException = WebExceptionFactory.makeNotFound(e);
         entryText = e.getMessage();
         response = webApplicationException.getResponse();
@@ -3335,7 +3329,7 @@ public class DataPackageManagerResource extends PastaWebService {
    *         if found, else returns a 404 Not Found response
    */
   @GET
-  @Path("/doi/{scope}/{identifier}/{revision}")
+  @Path("/doi/eml/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
   public Response readDataPackageDoi(
                                   @Context HttpHeaders headers,
@@ -3512,19 +3506,15 @@ public class DataPackageManagerResource extends PastaWebService {
    *         if found, else returns a 404 Not Found response
    */
   @GET
-  @Path("/error/{scope}/{identifier}/{revision}/{transaction}")
+  @Path("/error/eml/{transaction}")
   @Produces("text/plain")
   public Response readDataPackageError(
                                   @Context HttpHeaders headers,
-                                  @PathParam("scope") String scope,
-                                  @PathParam("identifier") Integer identifier,
-                                  @PathParam("revision") String revision,
                                   @PathParam("transaction") String transaction
                     ) {
     AuthToken authToken = null;
     String entryText = null;
-    String packageId = scope + "." + identifier + "." + revision;
-    String resourceId = packageId + "/errorlog." + transaction + ".txt";
+    String resourceId = transaction + ".txt";
     ResponseBuilder responseBuilder = null;
     Response response = null;
     final String serviceMethodName = "readDataPackageError";
@@ -4217,7 +4207,7 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return a Response, which if successful, contains a resultset XML document
    */
   @PUT
-  @Path("/eml/search")
+  @Path("/search/eml")
   @Produces("application/xml")
   public Response searchDataPackages(@Context HttpHeaders headers,
                                      String pathQuery) {  
@@ -4502,7 +4492,7 @@ public class DataPackageManagerResource extends PastaWebService {
    * @return an appropriate HTTP response.
    */
     @PUT
-    @Path("/eml/provenance")
+    @Path("/provenance/eml")
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(value={MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public Response appendProvenance(@Context HttpHeaders headers,

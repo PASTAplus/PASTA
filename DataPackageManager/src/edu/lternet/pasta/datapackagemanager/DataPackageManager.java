@@ -94,6 +94,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	private static String resourceDir = null;
 	private static String entityDir = null;
+	private static String reportDir = null;
 	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
 
 	private static final String SLASH = "/";
@@ -645,7 +646,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		/*
 		 * If the data package is valid and this is not evaluate mode, add the
-		 * quaity report resource to the registry.
+		 * quality report resource to the registry.
 		 */
 		if (isDataPackageValid && !isEvaluate) {
 
@@ -1177,6 +1178,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
 			entityDir = options.getOption("datapackagemanager.entityDir");
+			reportDir = options.getOption("datapackagemanager.reportDir");
+			
 
 			String qualityReportingStr = options.getOption("qualityReporting");
 			String qualityReportTemplate = options.getOption("qualityReportTemplate");
@@ -1651,35 +1654,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	/**
 	 * Read an evaluate quality report, returning the XML file. The transaction id
-	 * for the evaluate operation that generated the report must be specified. The
-	 * specified user must be authorized to read the report.
+	 * for the evaluate operation that generated the report must be specified.
 	 * 
-	 * @param scope
-	 *          the scope value
-	 * @param identifier
-	 *          the identifier value
-	 * @param revision
-	 *          the revision value
 	 * @param transaction
 	 *          the transaction identifier, e.g. "1364424858431"
-	 * @param emlPackageId
-	 *          an EmlPackageId object
-	 * @param user
-	 *          the user name
 	 * @return a file object containing the data package quality report XML
 	 */
-	public File readEvaluateReport(String scope, Integer identifier,
-	    String revision, String transaction, EmlPackageId emlPackageId,
-	    AuthToken authToken, String user) {
-		boolean evaluate = true;
-		File xmlFile = null;
-
-		DataPackageReport dataPackageReport = new DataPackageReport(emlPackageId);
-		if (dataPackageReport != null) {
-			xmlFile = dataPackageReport.getReport(evaluate, transaction);
-		}
-
-		return xmlFile;
+	public File readEvaluateReport(String transaction) {
+		
+		DataPackageReport dpr = new DataPackageReport(null);
+		return dpr.getEvaluateReportFile(transaction);
+		
 	}
 
 	/**

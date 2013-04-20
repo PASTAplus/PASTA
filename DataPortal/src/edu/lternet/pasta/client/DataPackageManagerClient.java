@@ -365,8 +365,7 @@ public class DataPackageManagerClient extends PastaClient {
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
 					try {
-						String errorText = readDataPackageError(packageScope, packageIdentifier,
-								packageRevision.toString(), entityString);
+						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
@@ -452,8 +451,7 @@ public class DataPackageManagerClient extends PastaClient {
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
 					try {
-						String errorText = readDataPackageError(packageScope, packageIdentifier,
-								packageRevision.toString(), entityString);
+						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
@@ -578,8 +576,7 @@ public class DataPackageManagerClient extends PastaClient {
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
 					try {
-						String errorText = readDataPackageError(packageScope,
-						    packageIdentifier, packageRevision.toString(), entityString);
+						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
@@ -915,7 +912,7 @@ public class DataPackageManagerClient extends PastaClient {
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
 		    entityId);
-		String url = BASE_URL + "/name" + urlTail;
+		String url = BASE_URL + "/name/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1110,7 +1107,7 @@ public class DataPackageManagerClient extends PastaClient {
 	    String revision, String transaction) throws Exception {
 		String contentType = "application/xml";
 		HttpClient httpClient = new DefaultHttpClient();
-		String urlTail = makeUrlTail(scope, identifier.toString(), revision, transaction);
+		String urlTail = "/" + transaction;
 		String url = BASE_URL + "/evaluate/report/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -1197,7 +1194,7 @@ public class DataPackageManagerClient extends PastaClient {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-		String url = BASE_URL + "/doi" + urlTail;
+		String url = BASE_URL + "/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1236,14 +1233,12 @@ public class DataPackageManagerClient extends PastaClient {
 	 * @return The error message
 	 * @throws Exception
 	 */
-	public String readDataPackageError(String scope, Integer identifier,
-	    String revision, String transaction) throws Exception {
+	public String readDataPackageError(String transaction) throws Exception {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
-		    transaction);
-		String url = BASE_URL + "/error" + urlTail;
+		String urlTail = "/" + transaction;
+		String url = BASE_URL + "/error/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1284,7 +1279,7 @@ public class DataPackageManagerClient extends PastaClient {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-		String url = BASE_URL + "/metadata/doi" + urlTail;
+		String url = BASE_URL + "/metadata/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1325,7 +1320,7 @@ public class DataPackageManagerClient extends PastaClient {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
-		String url = BASE_URL + "/report/doi" + urlTail;
+		String url = BASE_URL + "/report/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1368,7 +1363,7 @@ public class DataPackageManagerClient extends PastaClient {
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
 		    entityId);
-		String url = BASE_URL + "/data/doi" + urlTail;
+		String url = BASE_URL + "/data/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
@@ -1407,7 +1402,7 @@ public class DataPackageManagerClient extends PastaClient {
 		String contentType = "application/xml";
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		HttpPut httpPut = new HttpPut(BASE_URL + "/eml/search");
+		HttpPut httpPut = new HttpPut(BASE_URL + "/search/eml");
 		String resultSetXML = null;
 
 		// Set header content
@@ -1494,8 +1489,7 @@ public class DataPackageManagerClient extends PastaClient {
 				while (idleTime <= maxIdleTime) {
 					logger.info(idleTime);
 					try {
-						String errorText = readDataPackageError(packageScope, packageIdentifier,
-								packageRevision.toString(), entityString);
+						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
