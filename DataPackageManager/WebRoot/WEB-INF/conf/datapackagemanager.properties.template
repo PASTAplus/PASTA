@@ -78,8 +78,8 @@ datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=LTER,dc=ecoinformatics,
 datapackagemanager.pastaUriHead=https://pasta.lternet.edu/package/
 datapackagemanager.test.emlFileName=NoneSuchBugCount.xml
 datapackagemanager.test.path=test/data
-datapackagemanager.test.scope=knb-lter-lno
-datapackagemanager.test.scope.bogus=knb-lter-xyz
+datapackagemanager.test.scope=knb-lter-xyz
+datapackagemanager.test.scope.bogus=knb-lter-zzz
 datapackagemanager.test.identifier=4122
 datapackagemanager.test.revision=1
 datapackagemanager.test.revision.newest=3
