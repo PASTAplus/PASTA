@@ -91,6 +91,7 @@ public class DataPackageManagerResourceTest {
    */
   
   private String transaction = null;
+  private String transactionBogus = "1000000000000";
   
   
   /*
@@ -629,8 +630,8 @@ public class DataPackageManagerResourceTest {
       assertTrue(entityString.contains(testEntityName));
     } 
     
-    // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, this.transaction);
+    // Test for NOT FOUND status with a bogus transaction value
+    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, this.transactionBogus);
     assertEquals(404, response.getStatus());
   }
     
