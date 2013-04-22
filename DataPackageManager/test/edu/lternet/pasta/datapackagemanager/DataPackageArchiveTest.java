@@ -58,7 +58,6 @@ public class DataPackageArchiveTest {
 	private static final String scope = "knb-lter-nin";
 	private static final Integer identifier = 1;
 	private static final Integer revision = 1;
-	private static final Long sizeOfTestArchive = 239843L;
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static String testArchive = null;
 
