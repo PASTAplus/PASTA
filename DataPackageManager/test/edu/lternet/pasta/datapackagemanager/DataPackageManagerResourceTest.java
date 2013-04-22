@@ -472,7 +472,7 @@ public class DataPackageManagerResourceTest {
     DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Get an XML report. Test REPORT for OK status
-    Response response = dataPackageManagerResource.readDataPackageError(httpHeaders, testScope, testIdentifier, revision, this.transaction);
+    Response response = dataPackageManagerResource.readDataPackageError(httpHeaders, this.transaction);
     assertEquals(200, response.getStatus());
     
     // Check the message body
@@ -597,7 +597,7 @@ public class DataPackageManagerResourceTest {
     httpHeaders.setAcceptHeaders(acceptHeaders);
     
     // Get an XML report. Test REPORT for OK status
-    Response response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScope, testIdentifier, testRevision.toString(), this.transaction);
+    Response response = dataPackageManagerResource.readEvaluateReport(httpHeaders, this.transaction);
     assertEquals(200, response.getStatus());
     
     // Check the message body
@@ -617,7 +617,7 @@ public class DataPackageManagerResourceTest {
            "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
     acceptHeaders.add(htmlMediaType);
     httpHeaders.setAcceptHeaders(acceptHeaders);
-    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScope, testIdentifier, testRevision.toString(), this.transaction);
+    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, this.transaction);
     assertEquals(200, response.getStatus());
     
     // Check the message body
@@ -630,7 +630,7 @@ public class DataPackageManagerResourceTest {
     } 
     
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), this.transaction);
+    response = dataPackageManagerResource.readEvaluateReport(httpHeaders, this.transaction);
     assertEquals(404, response.getStatus());
   }
     
