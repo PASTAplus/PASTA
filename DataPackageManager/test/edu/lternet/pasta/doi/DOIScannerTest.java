@@ -20,27 +20,37 @@
 
 package edu.lternet.pasta.doi;
 
+import static org.junit.Assert.*;
+
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
-import org.apache.log4j.Logger;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import org.apache.http.HttpEntity;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Assert;
 
-import edu.lternet.pasta.doi.DOIScanner;
+import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager;
+import edu.lternet.pasta.datapackagemanager.DataPackageManagerResource;
+import edu.lternet.pasta.datapackagemanager.DataPackageManagerResourceTest;
+import edu.lternet.pasta.datapackagemanager.DummyCookieHttpHeaders;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
  * @author servilla
- * @since Nov 9, 2012
+ * @since Apr 22, 2013
  * 
  */
 public class DOIScannerTest {
@@ -49,21 +59,32 @@ public class DOIScannerTest {
 	 * Class variables
 	 */
 
-	private static final Logger logger = Logger.getLogger(DOIScannerTest.class);
+	private static ConfigurationListener configurationListener = null;
+	private static DataPackageManagerResource dataPackageManagerResource;
+	private static DataPackageManager dataPackageManager;
+	private static DOIScanner doiScanner;
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	
-	// The number of test resources that should be available
-	private static final Integer RESOURCES = 16;
-	
-	// The number of test resources with DOIs after performing DOI registration
-	// with DOIScanner.doScanToRegister()
-	private static final Integer DOIS = 7;
-	
-	// The number test resources that have been obsoleted after performing
-	// DOIScanner.doScanToObsolete()
-	private static final Integer DEACTIVATED = 16;
-	
-	private static DOIScanner doiScanner = null;
+	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+	private static Options options = null;
+	private static File testEmlFile = null;
+	private static String testEmlFileName = null;
+	private static String testPath = null;
+	private static String testScope = null;
+	private static String testScopeBogus = null;
+	private static Integer testIdentifier = null;
+	private static String testIdentifierStr = null;
+	private static Integer testRevision = null;
+	private static String testRevisionStr = null;
+	private static String testEntityId = null;
+	private static String testEntityName = null;
+	private static String testMaxIdleTimeStr = null;
+	private static Integer testMaxIdleTime = null;
+	private static String testIdleSleepTimeStr = null;
+	private static Integer testIdleSleepTime = null;
+	private static String testInitialSleepTimeStr = null;
+	private static Integer testInitialSleepTime = null;
+	private static String testPackageId = null;
+
 	private static String dbDriver = null;
 	private static String dbUser = null;
 	private static String dbPassword = null;
@@ -72,6 +93,10 @@ public class DOIScannerTest {
 	/*
 	 * Instance variables
 	 */
+
+	private HttpHeaders httpHeaders = null;
+	private Response response = null;
+	private int statusCode;
 
 	/*
 	 * Constructors
@@ -87,35 +112,112 @@ public class DOIScannerTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
-		ConfigurationListener configurationListener = new ConfigurationListener();
+		configurationListener = new ConfigurationListener();
 		configurationListener.initialize(dirPath);
-		Options options = ConfigurationListener.getOptions();
+		options = ConfigurationListener.getOptions();
 
 		if (options == null) {
-			Assert
-			    .fail("Failed to load the Data Package Manager properties file: 'datapackagemanager.properties'");
+			fail("Failed to load DataPackageManager properties file");
+		} else {
+			dbUser = options.getOption("dbUser");
+			if (dbUser == null) {
+				fail("No value found for DataPackageManager property 'dbUser'");
+			}
+			dbDriver = options.getOption("dbDriver");
+			if (dbDriver == null) {
+				fail("No value found for DataPackageManager property 'dbDriver'");
+			}
+			dbPassword = options.getOption("dbPassword");
+			if (dbPassword == null) {
+				fail("No value found for DataPackageManager property 'dbPassword'");
+			}
+			dbUrl = options.getOption("dbURL");
+			if (dbUrl == null) {
+				fail("No value found for DataPackageManager property 'dbURL'");
+			}
+			testScope = options.getOption("datapackagemanager.test.scope");
+			if (testScope == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.scope'");
+			}
+			testScopeBogus = options.getOption("datapackagemanager.test.scope.bogus");
+			if (testScopeBogus == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.scope.bogus'");
+			}
+			testIdentifierStr = options
+			    .getOption("datapackagemanager.test.identifier");
+			if (testIdentifierStr == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.identifier'");
+			}
+			testRevisionStr = options.getOption("datapackagemanager.test.revision");
+			if (testRevisionStr == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.revision'");
+			}
+			testEntityId = options.getOption("datapackagemanager.test.entity.id");
+			if (testEntityId == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.id'");
+			}
+			testEntityName = options.getOption("datapackagemanager.test.entity.name");
+			if (testEntityName == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.name'");
+			}
+			testPath = options.getOption("datapackagemanager.test.path");
+			if (testPath == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.path'");
+			}
+			testMaxIdleTimeStr = options
+			    .getOption("datapackagemanager.test.maxidletime");
+			if (testMaxIdleTimeStr == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.maxidletime'");
+			}
+			testIdleSleepTimeStr = options
+			    .getOption("datapackagemanager.test.idlesleeptime");
+			if (testIdleSleepTimeStr == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.idlesleeptime'");
+			}
+			testInitialSleepTimeStr = options
+			    .getOption("datapackagemanager.test.initialsleeptime");
+			if (testInitialSleepTimeStr == null) {
+				fail("No value found for DataPackageManager property 'datapackagemanager.test.initialsleeptime'");
+			} else {
+				testEmlFileName = options
+				    .getOption("datapackagemanager.test.emlFileName");
+				if (testEmlFileName == null) {
+					fail("No value found for DataPackageManager property 'datapackagemanager.test.emlFileName'");
+				} else {
+					testEmlFile = new File(testPath, testEmlFileName);
+				}
+			}
+
+			testIdentifier = new Integer(testIdentifierStr);
+			testRevision = new Integer(testRevisionStr);
+			testMaxIdleTime = new Integer(testMaxIdleTimeStr);
+			testIdleSleepTime = new Integer(testIdleSleepTimeStr);
+			testInitialSleepTime = new Integer(testInitialSleepTimeStr);
+
+			dataPackageManagerResource = new DataPackageManagerResource();
+			try {
+				dataPackageManager = new DataPackageManager();
+			} catch (Exception e) {
+				fail("Error encountered while constructing DataPackageManager object prior to running JUnit test.");
+			}
+
+			try {
+				Integer newestRevision = dataPackageManager.getNewestRevision(
+				    testScope, testIdentifier);
+				while (newestRevision != null) {
+					testIdentifier += 1;
+					newestRevision = dataPackageManager.getNewestRevision(testScope,
+					    testIdentifier);
+				}
+				testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+				System.err.println("testPackageId: " + testPackageId);
+				DataPackageManagerResourceTest.modifyTestEmlFile(testEmlFile,
+				    testPackageId);
+			} catch (Exception e) {
+				fail("Error encountered while initializing identifier value prior to running JUnit test.");
+			}
+
 		}
-
-		Assert.assertNotNull("Failed to load 'datapackagemanager.properties'",
-		    options);
-
-		dbDriver = options.getOption("dbDriver");
-		Assert.assertNotNull("Property 'dbDriver' not set", dbDriver);
-
-		dbUser = options.getOption("dbUser");
-		Assert.assertNotNull("Property 'dbUser' not set", dbUser);
-
-		dbPassword = options.getOption("dbPassword");
-		Assert.assertNotNull("Property 'dbPassword' not set", dbPassword);
-
-		dbUrl = options.getOption("dbURL");
-		Assert.assertNotNull("Property 'dbUrl' not set", dbUrl);
-
-		Integer numberResources = getNumberResourcesPresent();
-		if (numberResources != RESOURCES) {
-			Assert.fail("Necessary resources are not present");
-		}
-
 	}
 
 	/**
@@ -136,11 +238,42 @@ public class DOIScannerTest {
 	@Before
 	public void setUp() throws Exception {
 
-		doiScanner = new DOIScanner();
-		doiScanner.setDoiTest(true);
-		
-		setResourceDoiNull();
-		setResourceDateDeactivatedNull();
+		httpHeaders = new DummyCookieHttpHeaders(testUser);
+
+		// Test CREATE for OK status
+		response = dataPackageManagerResource.createDataPackage(httpHeaders,
+		    testEmlFile);
+		statusCode = response.getStatus();
+		assertEquals(202, statusCode);
+
+		String transaction = (String) response.getEntity();
+
+		// Ensure that the test data package has been successfully created
+		if (transaction != null) {
+			Integer timeCounter = testInitialSleepTime;
+			Thread.sleep(testInitialSleepTime);
+			while (timeCounter <= testMaxIdleTime) {
+				try {
+					String error = dataPackageManager.readDataPackageError(transaction);
+					fail(error);
+				} catch (ResourceNotFoundException e) {
+					try {
+						String revisions = dataPackageManager.listDataPackageRevisions(
+						    testScope, testIdentifier);
+						break;
+					} catch (ResourceNotFoundException e1) {
+						timeCounter += testIdleSleepTime;
+						Thread.sleep(testIdleSleepTime);
+					}
+				}
+			}
+			if (timeCounter > testMaxIdleTime) {
+				fail("Time to create data package '" + testPackageId
+				    + "' exceeded max time of " + testMaxIdleTime / 1000 + " seconds!");
+			}
+		} else {
+			fail("Unknown error creating test data package: " + testPackageId);
+		}
 
 	}
 
@@ -152,50 +285,113 @@ public class DOIScannerTest {
 
 	}
 
-/**
- * @throws java.lang.Exception
- */
-@Test
-public void testDoScanToRegister() throws Exception {
-		
-	doiScanner.doScanToRegister();
-	
-	Integer numberDois = getNumberResourcesWithDois();
-	
-	if (numberDois != DOIS) {
-		Assert.fail("The number of resources with DOIs (" + numberDois.toString() +
-				") does not equal the number test resources that should have DOIs (" +
-				DOIS + ")");
-	}
-	
-}
-
-/**
- * @throws java.lang.Exception
- */
-@Test
-public void testDoScanToObsolete() throws Exception {
-	
-	doiScanner.doScanToRegister();
-	
-	setResourceDateDeactivatedNow();
-	doiScanner.doScanToObsolete();
-	
-	Integer numberDeactivated = getNumberResourcesDeactivated();
-	
-	if (numberDeactivated != DEACTIVATED) {
-		Assert.fail("The number of obsoleted resources (" + numberDeactivated +
-				") do not equal the number of test resources expected to be " +
-				"obsoleted (" + DEACTIVATED + ")");
-	}
-	
-}
-
 	/**
-	 * Returns a connection to the database.
-	 * 
-	 * @return conn The database Connection object
+	 * Test the process of generating DOIs for all data packages without DOIs,
+	 * including the single test instance of knb-lter-xyz.*.*.; test deleting the
+	 * test data package and the subsequent obsolescence of the same test data
+	 * package.
 	 */
+	@Test
+	public void testDOIScan() {
+
+		String doi = null;
+		
+		try {
+			doiScanner = new DOIScanner();
+		} catch (ConfigurationException e) {
+			fail(e.getMessage());
+		} catch (ClassNotFoundException e) {
+			fail(e.getMessage());
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		}
+
+		doiScanner.setDoiTest(true);
+
+		// Test DOI registration through scanning the resource registry for active
+		// and public data packages without DOIs
+		try {
+			doiScanner.doScanToRegister();
+		} catch (DOIException e) {
+			fail(e.getMessage());
+		}
+
+		// Test that the test data package did receive a DOI
+		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,
+		    testScope, testIdentifier, testRevisionStr);
+		statusCode = response.getStatus();
+		assertEquals(200, statusCode);
+		doi = (String) response.getEntity();
+		System.err.printf("%s\n", doi);
+
+		// Test DELETE for OK status
+		response = dataPackageManagerResource.deleteDataPackage(httpHeaders,
+		    testScope, testIdentifier);
+		statusCode = response.getStatus();
+		assertEquals(200, statusCode);
+
+		// Test DOI obsolescence through scanning the resource registry for inactive
+		// data packages with DOIs and then removing that DOI
+		try {
+			doiScanner.doScanToObsolete();
+		} catch (DOIException e) {
+			fail(e.getMessage());
+		}
+
+		// Test that the test data package DOI is no longer available
+		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,
+		    testScope, testIdentifier, testRevisionStr);
+		statusCode = response.getStatus();
+		assertEquals(404, statusCode);
+
+		// Test that the test data package DOI no longer exists in the resource
+		// registry
+		doi = null;
+		doi = getDoiValue(testPackageId);
+		assertNull("Expected DOI object to be null!", doi);
+
+	}
+
+	private String getDoiValue(String packageId) {
+
+		String doi = null;
+
+		Connection conn = null;
+		try {
+			conn = getConnection();
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		assertNotNull("Database connection null", conn);
+
+		String queryString = "SELECT doi"
+		    + " FROM datapackagemanager.resource_registry WHERE" + " package_id='"
+		    + packageId + "' AND resource_type='dataPackage';";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			result.next();
+			doi = result.getString("doi");
+
+		} catch (SQLException e) {
+			fail(e.getMessage());
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				fail(e.getMessage());
+			}
+		}
+
+		return doi;
+
+	}
+
 	private static Connection getConnection() throws Exception {
 		Connection conn = null;
 		SQLWarning warn;
@@ -211,222 +407,14 @@ public void testDoScanToObsolete() throws Exception {
 
 		if (warn != null) {
 			while (warn != null) {
-				logger.warn("SQLState: " + warn.getSQLState());
-				logger.warn("Message:  " + warn.getMessage());
-				logger.warn("Vendor: " + warn.getErrorCode());
+				System.err.println("SQLState: " + warn.getSQLState());
+				System.err.println("Message:  " + warn.getMessage());
+				System.err.println("Vendor: " + warn.getErrorCode());
 				warn = warn.getNextWarning();
 			}
 		}
 
 		return conn;
-
-	}
-
-	/**
-	 * Determines if the necessary test resources (16 total) are present in the
-	 * Data Package Manager resource registry:
-	 *  knb-lter-atz.1.1 - 4 resources
-	 *  knb-lter-atz.2.1 - 4 resources
-	 *  knb-lter-atz.2.1 - 4 resources
-	 *  knb-lter-atz.2.1 - 4 resources
-	 * 
-	 * @return Boolean of test resource presence
-	 */
-	private static Integer getNumberResourcesPresent() throws Exception {
-
-		Integer nResources = null;
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "SELECT count(*)"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " package_id LIKE 'knb-lter-atz.%';";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-
-			result.next();
-			nResources = result.getInt(1);
-
-		} finally {
-			conn.close();
-		}
-
-		return nResources;
-
-	}
-	
-	/**
-	 * Sets the test resource attribute 'doi' to NULL in the resource_registry
-	 * table for all test resources.
-	 * 
-	 * @throws Exception
-	 */
-	private static void setResourceDoiNull() throws Exception {
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET doi=NULL WHERE package_id LIKE 'knb-lter-atz.%';";
-
-		Statement stat = null;
-		Integer rowCount = null;
-
-		try {
-			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
-		} finally {
-			conn.close();
-		}
-
-		if (rowCount != 16) {
-			Assert.fail("Did not successfully set resource 'doi' to NULL");
-		}
-
-	}
-	
-	/**
-	 * Sets the test resource attribute 'date_deactivated' to NULL in the
-	 * resource_registry table for all test resources.
-	 * 
-	 * @throws Exception
-	 */
-	private static void setResourceDateDeactivatedNull() throws Exception {
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET date_deactivated=NULL WHERE package_id LIKE 'knb-lter-atz.%';";
-
-		Statement stat = null;
-		Integer rowCount = null;
-
-		try {
-			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
-		} finally {
-			conn.close();
-		}
-
-		if (rowCount != 16) {
-			Assert.fail("Did not successfully set resource 'date_deactivated' to NULL");
-		}
-
-	}
-	
-	/**
-	 * Sets the test resource attributes 'date_deactivated' to the current
-	 * date/time in the resource_registry table for all test resources - 
-	 * effectively deleting the resource.
-	 * 
-	 * @throws Exception
-	 */
-	private static void setResourceDateDeactivatedNow() throws Exception {
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET date_deactivated=now() WHERE package_id LIKE 'knb-lter-atz.%';";
-
-		Statement stat = null;
-		Integer rowCount = null;
-
-		try {
-			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
-		} finally {
-			conn.close();
-		}
-
-		if (rowCount != 16) {
-			Assert.fail("Did not successfully set resource 'date_deactivated' to now()");
-		}
-
-	}
-
-	/**
-	 * Returns the number of test resources that have DOIs.
-	 * 
-	 * @return The number of test resources that have DOIs
-	 * @throws Exception
-	 */
-	private static Integer getNumberResourcesWithDois() throws Exception {
-
-		Integer nResources = null;
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "SELECT count(*)"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " package_id LIKE 'knb-lter-atz.%' AND doi IS NOT NULL;";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-
-			result.next();
-			nResources = result.getInt(1);
-			
-		} finally {
-			conn.close();
-		}
-
-		return nResources;
-
-	}
-
-	/**
-	 * Returns the number of test resources that are deactivated and DO NOT have
-	 * DOIs.
-	 * 
-	 * @return The number of test resources that have DOIs
-	 * @throws Exception
-	 */
-	private static Integer getNumberResourcesDeactivated() throws Exception {
-
-		Integer nResources = null;
-
-		Connection conn = null;
-		conn = getConnection();
-		Assert.assertNotNull("Database connection null", conn);
-
-		String queryString = "SELECT count(*)"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " package_id LIKE 'knb-lter-atz.%' AND date_deactivated IS NOT NULL"
-		    + " AND doi IS NULL;";
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
-
-			result.next();
-			nResources = result.getInt(1);
-			
-		} finally {
-			conn.close();
-		}
-
-		return nResources;
 
 	}
 

@@ -58,7 +58,6 @@ public class DataPackageArchiveTest {
 	private static final String scope = "knb-lter-nin";
 	private static final Integer identifier = 1;
 	private static final Integer revision = 1;
-	private static final Long sizeOfTestArchive = 239584L;
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static String testArchive = null;
 
@@ -194,11 +193,6 @@ public class DataPackageArchiveTest {
 		assertTrue("Test archive " + testArchive + " does not exist!",
 		    file.exists());
 
-		// Test size of test archive
-		Long sizeOfArchive = FileUtils.sizeOf(file);
-		assertEquals("Created archive is not the same size as test archive!",
-		    sizeOfTestArchive, sizeOfArchive);
-
 		// TODO Add deflate routine for testing archived objects
 
 	}
@@ -235,11 +229,6 @@ public class DataPackageArchiveTest {
 			// Test existence of test archive
 			assertTrue("Test archive " + testArchive + " does not exist!",
 			    file.exists());
-
-			// Test size of test archive
-			Long sizeOfArchive = FileUtils.sizeOf(file);
-			assertEquals("Created archive is not the same size as test archive!",
-			    sizeOfTestArchive, sizeOfArchive);
 
 		}
 
