@@ -2126,7 +2126,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @param transaction
 	 *          The transaction identifier
 	 * @return The error message
-	 * @throws FileNotFoundException
+	 * @throws ResourceNotFoundException
 	 */
 	public String readDataPackageError(String transaction)
 	    throws ResourceNotFoundException {
