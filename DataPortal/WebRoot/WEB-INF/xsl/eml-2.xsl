@@ -5955,11 +5955,13 @@
     <xsl:variable name="entity_name">
       <xsl:value-of select="../../../../entityName"/>
     </xsl:variable>
+    <xsl:variable name="tokens" select="tokenize($URL, '/')"></xsl:variable>
+    <xsl:variable name="entity_identifier" select="string($tokens[10])"></xsl:variable>
     <tr>
       <td class="{$firstColStyle}">Data:</td>
       <td class="{$secondColStyle}">
         <a>
-		      <xsl:attribute name="href"><xsl:value-of select="$URL"/></xsl:attribute>
+		      <xsl:attribute name="href">/nis/dataviewer?packageid=<xsl:value-of select="$packageID" />&amp;entityid=<xsl:value-of select="$entity_identifier" /></xsl:attribute>
           <xsl:attribute name="target">_blank</xsl:attribute>
           <xsl:value-of select="."/>
         </a>
