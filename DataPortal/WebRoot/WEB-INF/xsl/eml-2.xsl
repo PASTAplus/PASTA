@@ -5955,13 +5955,15 @@
     <xsl:variable name="entity_name">
       <xsl:value-of select="../../../../entityName"/>
     </xsl:variable>
+    <!-- Parse out entityId from URL and encode for URI safe use as URL HREF value -->
     <xsl:variable name="tokens" select="tokenize($URL, '/')"></xsl:variable>
     <xsl:variable name="entity_identifier" select="string($tokens[10])"></xsl:variable>
+    <xsl:variable name="entity_identifier_encd" select="encode-for-uri($entity_identifier)"></xsl:variable>
     <tr>
       <td class="{$firstColStyle}">Data:</td>
       <td class="{$secondColStyle}">
         <a>
-		      <xsl:attribute name="href">/nis/dataviewer?packageid=<xsl:value-of select="$packageID" />&amp;entityid=<xsl:value-of select="$entity_identifier" /></xsl:attribute>
+		      <xsl:attribute name="href">/nis/dataviewer?packageid=<xsl:value-of select="$packageID" />&amp;entityid=<xsl:value-of select="$entity_identifier_encd" /></xsl:attribute>
           <xsl:attribute name="target">_blank</xsl:attribute>
           <xsl:value-of select="."/>
         </a>
