@@ -982,6 +982,66 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		return oldest;
 	}
+	
+	
+	/**
+	 * Determines whether the user identified by the authentication token is
+	 * authorized to access the given resource identifier with the given
+	 * permission.
+	 * 
+	 * @param authToken
+	 *          The user's authentication token.
+	 * @param resourceId
+	 *          The resource identifier of the requested resource.
+	 * @param permission
+	 *          The requested permission for accessing the resource (e.g., READ).
+	 * @return The boolean result of the request.
+	 * @throws IllegalArgumentException, UnauthorizedException
+	 */
+	public Boolean isAuthorized(AuthToken authToken, String resourceId,
+	    Rule.Permission permission) throws IllegalArgumentException,
+	    UnauthorizedException {
+
+		Boolean isAuthorized = null;
+		DataPackageRegistry dpr = null;
+		String userId = authToken.getUserId();
+
+		if (resourceId == null || resourceId.isEmpty()) {
+			String gripe = "ResourceId parameter is null or is empty!";
+			throw new IllegalArgumentException(gripe);
+		}
+		
+    try {
+	    dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+    } catch (ClassNotFoundException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    } catch (SQLException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
+    
+		Authorizer authorizer = new Authorizer(dpr);
+		try {
+	    isAuthorized = authorizer.isAuthorized(authToken, resourceId, permission);
+	    
+			if (!isAuthorized) {
+				String gripe = "User \"" + userId + "\" is not authorized to "
+				    + permission + " this " + resourceId + " resource!";
+				throw new UnauthorizedException(gripe);
+			}
+	    
+    } catch (ClassNotFoundException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    } catch (SQLException e) {
+	    logger.error(e.getMessage());
+	    e.printStackTrace();
+    }
+		
+		return isAuthorized;
+		
+	}
 
 	/**
 	 * List the data entity resources for the specified data package that are
