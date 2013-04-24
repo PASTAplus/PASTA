@@ -93,6 +93,26 @@
         </access>
     </pasta:service-method>
     
+    <pasta:service-method name="isAuthorized">
+        <access
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
     <pasta:service-method name="listDataEntities">
         <access
             system="https://pasta.lternet.edu"
