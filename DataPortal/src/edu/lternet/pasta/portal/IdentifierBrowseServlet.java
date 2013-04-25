@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.log4j.Logger;
 
@@ -53,6 +54,7 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
   private static final String browseMessage = "Select a data package "
   		+ "<em>scope.identifier</em> value to see the most current "
   		+ "<em>revision</em> of the data package lineage:";
+  private static String pastaUriHead = null;
 
   /**
    * Constructor of the object.
@@ -139,11 +141,26 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
           count++;
         }
         
+      	String filter = "newest";
+      	String newest = null;
+      	Boolean isAuthorized = false;
+      	String resourceId = null;
+      	
         // Output sorted set of scope/identifier values
         for (String identifier: arrayList) {
-          html += "<li><a href=\"./mapbrowse?scope=" + scope
-              + "&identifier=" + identifier + "\">" + scope + ".<em>" + identifier
-              + "</em></a></li>\n";          
+
+					newest = dpmClient.listDataPackageRevisions(scope,
+					    Integer.valueOf(identifier), filter);
+					resourceId = pastaUriHead + "eml/" + scope + "/" + identifier + "/"
+					    + newest;
+					isAuthorized = dpmClient.isAuthorized(resourceId);
+
+					if (isAuthorized) {
+						html += "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
+						    + identifier + "\">" + scope + ".<em>" + identifier
+              + "</em></a></li>\n";                  		
+        	}
+        	
         }
 
         html += "</ol>\n";
@@ -181,6 +198,13 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
    *           if an error occurs
    */
   public void init() throws ServletException {
+		PropertiesConfiguration options = ConfigurationListener.getOptions();
+		pastaUriHead = options.getString("pasta.uriHead");
+
+		if ((pastaUriHead == null) || (pastaUriHead.equals(""))) {
+			throw new ServletException(
+			    "No value defined for 'pasta.uriHead' property.");
+		}
     // Put your code here
   }
 
