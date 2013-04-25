@@ -222,7 +222,7 @@ public class DataPackageManagerClient extends PastaClient {
 
 			// Update the test data package in PASTA
 			String dataPackageRevisions = dpmClient.listDataPackageRevisions(scope,
-			    identifier);
+			    identifier, null);
 			System.out.println("\nData package revisions:\n" + dataPackageRevisions);
 			String[] revisionStrings = dataPackageRevisions.split("\n");
 			int maxRevision = -1;
@@ -749,12 +749,20 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String listDataPackageRevisions(String scope, Integer identifier)
+	public String listDataPackageRevisions(String scope, Integer identifier, String filter)
 	    throws Exception {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-		String url = BASE_URL + "/eml" + urlTail;
+		
+		// Test for "oldest" or "newest" filter
+		if (filter == null) {
+			filter = "";
+		} else {
+			filter = "?filter=" + filter;
+		}
+		
+		String url = BASE_URL + "/eml" + urlTail + filter;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
