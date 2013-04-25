@@ -43,12 +43,14 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
@@ -113,7 +115,7 @@ import edu.lternet.pasta.metadatafactory.MetadataFactory;
  * documents, data entities, and quality reports.
  * 
  * @webservicename Data Package Manager
- * @baseurl https://package.lternet.edu/package
+ * @baseurl https://<pasta-tier>.lternet.edu/package
  *
  * @author dcosta
  * @version 1.0
@@ -997,6 +999,162 @@ public class DataPackageManagerResource extends PastaWebService {
     return objectName;
   }
 
+  
+  /**
+   * 
+   * <strong>Is Authorized</strong> to read operation, determines whether the
+   * user as defined in the authentication token has permission to read the
+   * specified data package resource.
+   * 
+   * <h4>Requests:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Request</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td align=center>none</td>
+   *     <td align=center>none</td>
+   *     <td>curl -i -G http://package.lternet.edu/package/authz?resourceId=https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</td>
+   *   </tr>
+   * </table>
+   * 
+   * <h4>Responses:</h4>
+   * <table border="1" cellspacing="0" cellpadding="3">
+   *   <tr>
+   *     <th><b>Status</b></th>
+   *     <th><b>Reason</b></th>
+   *     <th><b>Message Body</b></th>
+   *     <th><b>MIME type</b></th>
+   *     <th><b>Sample Message Body</b></th>
+   *   </tr>
+   *   <tr>
+   *     <td>200 OK</td>
+   *     <td>If the user is authorized to read the data package resource</td>
+   *     <td>The specific resource</td>
+   *     <td><code>text/plain</code></td>
+   *     <td>https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</td>
+   *   </tr>
+   *   <tr>
+   *     <td>400 Bad Request</td>
+   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>401 Unauthorized</td>
+   *     <td>If the requesting user is not authorized to read the data package</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>404 Not Found</td>
+   *     <td>If no error associated with the specified data package is found</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>405 Method Not Allowed</td>
+   *     <td>The specified HTTP method is not allowed for the requested resource.
+   *     For example, the HTTP method was specified as DELETE but the resource
+   *     can only support GET.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   *   <tr>
+   *     <td>500 Internal Server Error</td>
+   *     <td>The server encountered an unexpected condition which prevented 
+   *     it from fulfilling the request. For example, a SQL error occurred, 
+   *     or an unexpected condition was encountered while processing EML 
+   *     metadata.</td>
+   *     <td>An error message</td>
+   *     <td><code>text/plain</code></td>
+   *     <td></td>
+   *   </tr>
+   * </table>
+   * 
+   * @return a Response object containing a data package resource id
+   *         if permission is allowed, else returns a 401 Unauthorized response
+   */
+	@GET
+	@Path("/authz")
+  @Produces("text/plain")
+	public Response isAuthorized(@Context HttpHeaders headers,
+	    @QueryParam("resourceId") @DefaultValue("") String resourceId) {
+
+		AuthToken authToken = null;
+		String entryText = "/package/authz?resourceId=" + resourceId;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "isAuthorized";
+    Rule.Permission permission = Rule.Permission.read;
+    
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+
+		try {
+
+				DataPackageManager dpm = new DataPackageManager();
+				Boolean isAuthorized = dpm.isAuthorized(authToken, resourceId, permission);
+				
+				if (isAuthorized != null && isAuthorized) {
+	        responseBuilder = Response.ok(resourceId);
+	        response = responseBuilder.build();       
+				}
+		} 
+		catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+    response = stampHeader(response);
+    return response;
+    
+  }
+  
   
   /**
    * 
