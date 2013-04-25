@@ -239,7 +239,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			dpmClient = new DataPackageManagerClient(uid);
 			
-			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier);
+			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier, null);
 			revUtil = new RevisionUtility(revisionList);
 			size = revUtil.getSize();
 			

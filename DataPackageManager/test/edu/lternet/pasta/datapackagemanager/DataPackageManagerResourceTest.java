@@ -406,7 +406,7 @@ public class DataPackageManagerResourceTest {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.listDataPackageRevisions(httpHeaders, testScope, testIdentifier.toString());
+    Response response = dataPackageManagerResource.listDataPackageRevisions(httpHeaders, testScope, testIdentifier.toString(),"");
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     

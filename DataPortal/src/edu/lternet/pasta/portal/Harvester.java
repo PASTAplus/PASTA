@@ -438,7 +438,7 @@ public class Harvester implements Runnable {
     boolean isUpdate = false;
     
     try {
-      String revisionsStr = dpmClient.listDataPackageRevisions(scope, identifier);
+      String revisionsStr = dpmClient.listDataPackageRevisions(scope, identifier, null);
       if (revisionsStr != null) {
         String[] revisionsArray = revisionsStr.split("\n");
         for (int i = 0; i < revisionsArray.length; i++) {

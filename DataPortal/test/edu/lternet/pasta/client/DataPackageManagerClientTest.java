@@ -293,7 +293,7 @@ public class DataPackageManagerClientTest {
   public void testListDataPackageRevisions() {
     try {
       String entityString = dpmClient.listDataPackageRevisions(testScope,
-          testIdentifier);
+          testIdentifier, null);
 
       // Check the message body
       assertFalse(entityString == null);
