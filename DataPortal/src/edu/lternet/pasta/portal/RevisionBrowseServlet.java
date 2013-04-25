@@ -129,7 +129,7 @@ public class RevisionBrowseServlet extends DataPortalServlet {
       try {
 
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        text = dpmClient.listDataPackageRevisions(scope, id);
+        text = dpmClient.listDataPackageRevisions(scope, id, null);
 
         StrTokenizer tokens = new StrTokenizer(text);
 
