@@ -1330,92 +1330,110 @@ public class DataPackageManagerResource extends PastaWebService {
 
   
   /**
-   * 
-   * <strong>List Data Package Revisions</strong> operation, specifying the scope and identifier values to match in the URI. 
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno/1</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the list request was successful</td>
-   *     <td>A newline-separated list of revision values matching the specified scope and identifier values</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>1<br/>2<br/>3</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal scope or identifier value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to access a list of the data package revisions</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package revisions associated with the specified scope and identifier are found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the metadata document.
-   * @param identifier  The identifier of the metadata document.
-   * @return a Response, containing a newline-separated list of revision values
-   */
+	 * 
+	 * <strong>List Data Package Revisions</strong> operation, specifying the
+	 * scope and identifier values to match in the URI.  The request may be
+	 * filtered by applying the modifiers "oldest" or "newest" to the "filter"
+	 * query parameter.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td></td>
+	 * <td></td>
+	 * <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno/1</td>
+	 * </tr>
+	 * <tr>
+	 * <td></td>
+	 * <td></td>
+	 * <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno/1?filter=newest</td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td>200 OK</td>
+	 * <td>If the list request was successful</td>
+	 * <td>A newline-separated list of revision values matching the specified
+	 * scope and identifier values</td>
+	 * <td><code>text/plain</code></td>
+	 * <td>1<br/>
+	 * 2<br/>
+	 * 3</td>
+	 * </tr>
+	 * <tr>
+	 * <td>400 Bad Request</td>
+	 * <td>If the request contains an error, such as an illegal scope or
+	 * identifier value</td>
+	 * <td>An error message</td>
+	 * <td><code>text/plain</code></td>
+	 * <td></td>
+	 * </tr>
+	 * <tr>
+	 * <td>401 Unauthorized</td>
+	 * <td>If the requesting user is not authorized to access a list of the data
+	 * package revisions</td>
+	 * <td>An error message</td>
+	 * <td><code>text/plain</code></td>
+	 * <td></td>
+	 * </tr>
+	 * <tr>
+	 * <td>404 Not Found</td>
+	 * <td>If no data package revisions associated with the specified scope and
+	 * identifier are found</td>
+	 * <td>An error message</td>
+	 * <td><code>text/plain</code></td>
+	 * <td></td>
+	 * </tr>
+	 * <tr>
+	 * <td>405 Method Not Allowed</td>
+	 * <td>The specified HTTP method is not allowed for the requested resource.
+	 * For example, the HTTP method was specified as DELETE but the resource can
+	 * only support GET.</td>
+	 * <td>An error message</td>
+	 * <td><code>text/plain</code></td>
+	 * <td></td>
+	 * </tr>
+	 * <tr>
+	 * <td>500 Internal Server Error</td>
+	 * <td>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request. For example, a SQL error occurred, or an unexpected
+	 * condition was encountered while processing EML metadata.</td>
+	 * <td>An error message</td>
+	 * <td><code>text/plain</code></td>
+	 * <td></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the metadata document.
+	 * @param identifier
+	 *          The identifier of the metadata document.
+	 * @param filter
+	 *          To return either the "oldest" or "newest" revision
+	 * @return a Response, containing a newline-separated list of revision values
+	 */
   @GET
   @Path("/eml/{scope}/{identifier}")
   @Produces("text/plain")
   public Response listDataPackageRevisions(
                                @Context HttpHeaders headers,
                                @PathParam("scope") String scope,
-                               @PathParam("identifier") String identifierStr
+                               @PathParam("identifier") String identifierStr,
+                               @QueryParam("filter") @DefaultValue("") String filter
                     ) {
     Integer identifier = null;
     ResponseBuilder responseBuilder = null;
@@ -1450,10 +1468,20 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-
-      String revisionList = dataPackageManager.listDataPackageRevisions(scope, identifier);
-
+      String revisionList = null;
+      DataPackageManager dataPackageManager = new DataPackageManager();
+      if (filter.isEmpty()) {
+        revisionList = dataPackageManager.listDataPackageRevisions(scope, identifier);      	
+      } else {
+      	if (filter.equals("oldest")) {
+      		revisionList = dataPackageManager.getOldestRevision(scope, identifier).toString();
+      	} else if (filter.equals("newest")) {
+      		revisionList = dataPackageManager.getNewestRevision(scope, identifier).toString();
+      	} else {
+      		revisionList = "";
+      	}
+      }
+      
       if (revisionList != null) {
         responseBuilder = Response.ok(revisionList.trim());
         response = responseBuilder.build();       
