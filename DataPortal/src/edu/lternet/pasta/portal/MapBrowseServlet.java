@@ -404,13 +404,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 				} else {
 					String hover = "If this data entity is not linked, you may not have permission to access it.";
 					if (data == null) {
-						data = "<li>" + entityName + "<a name=\"" + hover
-						    + "\" class=\"tooltip\">"
-						    + "<img src=\"./images/question.png\" /></li>\n";
-					} else {					
-						data += "<li>" + entityName + "<a name=\"" + hover
-						    + "\" class=\"tooltip\">"
-						    + "<img src=\"./images/question.png\" /></li>\n";
+						data = "<li>" + entityName + " [<span name=\"" + hover
+						    + "\" class=\"tooltip\" style=\"color: blue;\">"
+						    + "<em>more info</em>" + "</span>]</li>\n";
+					} else {
+						data += "<li>" + entityName + " [<span name=\"" + hover
+						    + "\" class=\"tooltip\" style=\"color: blue;\">"
+						    + "<em>more info</em>" + "</span>]</li>\n";
 					}
 					
 				}
