@@ -223,6 +223,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String[] uriTokens = null;
 		String entityId = null;
 		String resource = null;
+		Boolean isAuthorized = false;
 
 		String map = null;
 		StrTokenizer tokens = null;
@@ -238,7 +239,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			dpmClient = new DataPackageManagerClient(uid);
 			
-			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier);
+			String revisionList = dpmClient.listDataPackageRevisions(scope, identifier, null);
 			revUtil = new RevisionUtility(revisionList);
 			size = revUtil.getSize();
 			
@@ -361,6 +362,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 			} else if (resource.contains(dataUri)) {
 
+				try {
+	        isAuthorized = dpmClient.isAuthorized(resource);
+        } catch (Exception e2) {
+	        logger.error(e2.getMessage());
+	        isAuthorized = false;  // Fall on side of restriction
+        }
+				
 				uriTokens = resource.split("/");
 
 				entityId = uriTokens[uriTokens.length - 1];
@@ -383,14 +391,28 @@ public class MapBrowseServlet extends DataPortalServlet {
 					e.printStackTrace();
 				}
 
-				if (data == null) {
-					data = "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityid=" + entityId + "\" target=\"_blank\">"
-					    + entityName + "</a></li>\n";
-				} else {					
-					data += "<li><a href=\"./dataviewer?packageid=" + packageId
-					    + "&entityid=" + entityId + "\" target=\"_blank\">"
-					    + entityName + "</a></li>\n";
+				if (isAuthorized) {
+					if (data == null) {
+						data = "<li><a href=\"./dataviewer?packageid=" + packageId
+						    + "&entityid=" + entityId + "\" target=\"_blank\">"
+						    + entityName + "</a></li>\n";
+					} else {					
+						data += "<li><a href=\"./dataviewer?packageid=" + packageId
+						    + "&entityid=" + entityId + "\" target=\"_blank\">"
+						    + entityName + "</a></li>\n";
+					}
+				} else {
+					String hover = "If this data entity is not linked, you may not have permission to access it.";
+					if (data == null) {
+						data = "<li>" + entityName + "<a name=\"" + hover
+						    + "\" class=\"tooltip\">"
+						    + "<img src=\"./images/question.png\" /></li>\n";
+					} else {					
+						data += "<li>" + entityName + "<a name=\"" + hover
+						    + "\" class=\"tooltip\">"
+						    + "<img src=\"./images/question.png\" /></li>\n";
+					}
+					
 				}
 
 			} else {

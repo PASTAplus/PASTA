@@ -222,7 +222,7 @@ public class DataPackageManagerClient extends PastaClient {
 
 			// Update the test data package in PASTA
 			String dataPackageRevisions = dpmClient.listDataPackageRevisions(scope,
-			    identifier);
+			    identifier, null);
 			System.out.println("\nData package revisions:\n" + dataPackageRevisions);
 			String[] revisionStrings = dataPackageRevisions.split("\n");
 			int maxRevision = -1;
@@ -611,6 +611,48 @@ public class DataPackageManagerClient extends PastaClient {
 
 		return qualityReport;
 	}
+	
+	/**
+	 * Determines whether the user has permission to read the resource identified
+	 * by the resourceId.
+	 * 
+	 * @param resourceId
+	 *          The resource identifier of the specific resource.
+	 * @return Boolean whether the user has permission.
+	 * @throws Exception
+	 */
+	public Boolean isAuthorized(String resourceId) throws Exception {
+		
+		Boolean isAuthorized = false;
+		
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/authz?resourceId=" + resourceId;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode == HttpStatus.SC_OK) {
+				isAuthorized = true;
+			} else if (statusCode != HttpStatus.SC_UNAUTHORIZED) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+		
+		return isAuthorized;
+		
+	}
 
 	/**
 	 * Executes the 'listDataEntities' web service method.
@@ -707,12 +749,20 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String listDataPackageRevisions(String scope, Integer identifier)
+	public String listDataPackageRevisions(String scope, Integer identifier, String filter)
 	    throws Exception {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-		String url = BASE_URL + "/eml" + urlTail;
+		
+		// Test for "oldest" or "newest" filter
+		if (filter == null) {
+			filter = "";
+		} else {
+			filter = "?filter=" + filter;
+		}
+		
+		String url = BASE_URL + "/eml" + urlTail + filter;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 
