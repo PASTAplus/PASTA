@@ -625,6 +625,11 @@ public class DataPackageManagerClient extends PastaClient {
 		
 		Boolean isAuthorized = false;
 		
+		// Re-encode "+" to its character reference value of %2B to mitigate
+		// an issue with the HttpGet call that performs the decoding - this is
+		// a kludge to deal with encoding nonsense.
+		resourceId = resourceId.replace("+", "%2B");
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String url = BASE_URL + "/authz?resourceId=" + resourceId;
