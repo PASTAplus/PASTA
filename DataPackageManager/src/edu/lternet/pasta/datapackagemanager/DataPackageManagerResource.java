@@ -1148,7 +1148,7 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
 
     response = stampHeader(response);
     return response;
@@ -1323,7 +1323,8 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
     
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
     response = stampHeader(response);
     return response;
   }
@@ -1515,7 +1516,8 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
 
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
     response = stampHeader(response);
     return response;
   }
@@ -1667,7 +1669,8 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
 
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
     response = stampHeader(response);
     return response;
   }
@@ -1807,7 +1810,8 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
 
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
     response = stampHeader(response);
     return response;
   }
@@ -1945,7 +1949,8 @@ public class DataPackageManagerResource extends PastaWebService {
       response = webApplicationException.getResponse();
     }
 
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
     response = stampHeader(response);
     return response;
   }
