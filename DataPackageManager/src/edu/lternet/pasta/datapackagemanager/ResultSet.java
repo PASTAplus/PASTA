@@ -26,12 +26,14 @@ package edu.lternet.pasta.datapackagemanager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.SQLException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
+import org.ecoinformatics.datamanager.quality.QualityReport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,7 +42,10 @@ import org.w3c.dom.Text;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
+import edu.ucsb.nceas.utilities.Options;
 import edu.ucsb.nceas.utilities.XMLUtilities;
 
 
@@ -63,6 +68,10 @@ public class ResultSet {
    */
 
   private static final String PACKAGEID_PATH = "//resultset/document/packageId";
+  private static String dbDriver = null;
+  private static String dbUser = null;
+  private static String dbPassword = null;
+  private static String dbURL = null;
   
   /*
    * Instance fields
@@ -71,14 +80,22 @@ public class ResultSet {
   private Logger logger = Logger.getLogger(ResultSet.class);
   
   private String resultSetXML = null;
+  private Authorizer authorizer = null;
 
   
   /*
    * Constructors
    */
   
-  ResultSet(String xmlString) {
-    this.resultSetXML = xmlString;
+  ResultSet(String xmlString) throws Exception {
+    
+  	this.resultSetXML = xmlString;
+    
+    loadOptions();
+    DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+		    dbURL, dbUser, dbPassword);
+    authorizer = new Authorizer(dataPackageRegistry);
+    
   }
 
   
@@ -90,6 +107,26 @@ public class ResultSet {
   /*
    * Instance methods
    */
+  
+	/**
+	 * Loads Data Manager options from a configuration file.
+	 */
+	private void loadOptions() throws Exception {
+		try {
+			// Load database connection options
+			Options options = ConfigurationListener.getOptions();
+			dbDriver = options.getOption("dbDriver");
+			dbURL = options.getOption("dbURL");
+			dbUser = options.getOption("dbUser");
+			dbPassword = options.getOption("dbPassword");
+
+		} catch (Exception e) {
+			logger.error("Error in loading options: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+	}
+
   
   private String packageIdToResourceId(String packageId) {
     String resourceId = null;
@@ -155,7 +192,7 @@ public class ResultSet {
    * 
    * @return   the result set XML in PASTA format
    */
-  public String toPastaFormat() {
+  public String toPastaFormat(AuthToken authToken) {
     String pastaFormatXML = this.resultSetXML;
     
     if (pastaFormatXML != null) {
@@ -177,16 +214,26 @@ public class ResultSet {
         packageIdNodeList = xpathapi.selectNodeList(documentElement, PACKAGEID_PATH);
         int nNodes = packageIdNodeList.getLength();
         
-        for (int i = 0; i < nNodes; i++) {
-          Node packageIdNode = packageIdNodeList.item(i);
-          String packageId = packageIdNode.getTextContent();
-          String resourceId = packageIdToResourceId(packageId);
-          Element resourceIdElement = document.createElement("resourceId");
-          Text resourceIdText = document.createTextNode(resourceId);
-          resourceIdElement.appendChild(resourceIdText);
-          Node parentNode = packageIdNode.getParentNode();
-          parentNode.insertBefore(resourceIdElement, packageIdNode); 
-        }
+				for (int i = 0; i < nNodes; i++) {
+					Node packageIdNode = packageIdNodeList.item(i);
+					String packageId = packageIdNode.getTextContent();
+					String resourceId = packageIdToResourceId(packageId);
+					Node parentNode = packageIdNode.getParentNode();
+					
+					// Remove package from result set if not authorized; otherwise add
+					// resourceId
+					if (!authorizer.isAuthorized(authToken, resourceId,
+					    Rule.Permission.read)) {
+						Node documentNode = parentNode.getParentNode();
+						documentNode.removeChild(parentNode);
+					} else {
+						Element resourceIdElement = document.createElement("resourceId");
+						Text resourceIdText = document.createTextNode(resourceId);
+						resourceIdElement.appendChild(resourceIdText);
+						parentNode.insertBefore(resourceIdElement, packageIdNode);
+					}
+					
+				}
 
         pastaFormatXML = XMLUtilities.getDOMTreeAsString(documentElement);
         logger.debug(pastaFormatXML);
