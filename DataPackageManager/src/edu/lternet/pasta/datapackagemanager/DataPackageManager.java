@@ -2004,7 +2004,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		    pastaUser);
 		String metacatXML = metadataCatalog.query(queryString);
 		ResultSet resultSet = new ResultSet(metacatXML);
-		resultsetXML = resultSet.toPastaFormat();
+		resultsetXML = resultSet.toPastaFormat(authToken);
 
 		return resultsetXML;
 	}
