@@ -65,22 +65,16 @@
 					Network Information System (NIS) Data Portal
 				</h3>
 
-				<p>The NIS Data Portal is the cumulative effort of the NIS
-					Development Team to provide a public facing information management and
-					technology interface. The NIS Data Portal is the main path for
-					input and retrieval of the varied data products from the NIS PASTA
-					(Provenance Aware Synthesis Tracking Architecture).</p>
+				<p>The NIS Data Portal is the public facing information management and
+					technology interface to the Provenance Aware Synthesis Tracking
+					Architecture (PASTA). The NIS Data Portal is the main path for
+					uploading and discovery of varied LTER data products that are in
+					PASTA.</p>
 					
 			    <p>Visit the <a href="https://nis.lternet.edu:8443/x/agBP" target="_blank">
 			        NIS Community Website</a> for information about
 			        upcoming updates to the LTER Network Portal.</p>
 
-                <p>What is a DOI and what is its purpose? Find the answer to
-                    this question and others in the
-                    <a href="https://nis.lternet.edu:8443/x/swFZ" target="_blank">
-                    Frequently Asked Questions</a>
-                    section of the NIS Community Website.</p>
-					
 				<h4>For Scientists, Researchers, Students, and the General
 					Public</h4>
 
