@@ -51,8 +51,6 @@
 				        <li><a href="./advancedSearch.jsp">Advanced Search</a></li>	        
 				    </ul>
 				</li>
-        <li><a href="./dataPackageViewer.jsp">View Data Packages</a>
-        </li>
 			</ul>
 
 		</div>
