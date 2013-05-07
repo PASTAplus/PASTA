@@ -141,27 +141,14 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
           count++;
         }
         
-      	String filter = "newest";
-      	String newest = null;
-      	Boolean isAuthorized = false;
-      	String resourceId = null;
-      	
-        // Output sorted set of scope/identifier values
-        for (String identifier: arrayList) {
+				// Output sorted set of scope/identifier values
+				for (String identifier : arrayList) {
 
-					newest = dpmClient.listDataPackageRevisions(scope,
-					    Integer.valueOf(identifier), filter);
-					resourceId = pastaUriHead + "eml/" + scope + "/" + identifier + "/"
-					    + newest;
-					isAuthorized = dpmClient.isAuthorized(resourceId);
+					html += "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
+					    + identifier + "\">" + scope + ".<em>" + identifier
+					    + "</em></a></li>\n";
 
-					if (isAuthorized) {
-						html += "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
-						    + identifier + "\">" + scope + ".<em>" + identifier
-              + "</em></a></li>\n";                  		
-        	}
-        	
-        }
+				}
 
         html += "</ol>\n";
 
