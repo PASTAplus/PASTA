@@ -109,92 +109,102 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.metadatafactory.MetadataFactory;
 
 /**
- * <p>The Data Package Manager Web Service provides a suite of operations 
- * to create, evaluate, read, update, delete, list, and search data package
- * resources in the PASTA system. Data package resources include metadata 
- * documents, data entities, and quality reports.
+ * <p>
+ * The Data Package Manager Web Service provides a suite of operations to
+ * create, evaluate, read, update, delete, list, and search data package
+ * resources in the PASTA system; additional operations provide access to
+ * evaluation reports, provenance metadata, and whether the user has read access
+ * to specific resources. Data package resources include metadata documents,
+ * data entities, and quality reports.</p>
  * 
  * @webservicename Data Package Manager
- * @baseurl https://<pasta-tier>.lternet.edu/package
- *
+ * @baseurl https://pasta.lternet.edu/package
+ * 
  * @author dcosta
  * @version 1.0
  * @created 16-Aug-2011 1:40:03 PM
- *
- * <p>
- * The Provenance Factory generates a provenance-based XML fragment that
- * references metadata content of a parent EML document that is in the PASTA
- * system by using the structure of the <em>methodStep</em> element, which is
- * inserted into a user provided <em>methods</em> element (for multiple
- * references to parent EML documents, multiple <em>methodStep</em> elements
- * are returned, one for each parent EML document). The user provided
- * <em>methods</em> element is not required to be associated with a valid EML
- * document; it acts only as a root element container for the provenance-based
- * <em>methodStep</em> element(s). The service, however, does require that only
- * a single <em>methods</em> element exist in the user provided XML; otherwise,
- * an ambiguity exists when determining a proper xpath location for inserting
- * the provencance-based <em>methodStep</em> XML fragment. The service will
- * accept a valid EML document and correctly insert the provenance-based
- * <em>methodStep</em> XML fragment into the <em>methods</em> element, if it is
- * the only <em>methods</em> element in the EML document. The current service
- * design recognizes that the structure and content of an EML document may vary
- * considerably and may be very complex. To be flexible, the service assumes
- * that a user wanting to insert the provenance-based XML into a complex EML
- * document would do so independent of the Provenance Factory service.
- * </p>
- *
- * <p>
- * The Provenance Factory can be used to append provenance metadata to an EML
- * document that describes a 'derived' or 'synthetic' data set, that is, a data
- * set that was produced from data that exists in the PASTA sytem.
- * </p>
- *
- * <p>
- * Let <em>D<sub>1</sub></em> denote a dataset in PASTA's Data Cache, and let
- * <em>E<sub>1</sub></em> denote an EML document in PASTA's Metadata Catalog
- * that describes <em>D<sub>1</sub></em>. If a new dataset
- * <em>D<sub>2</sub></em> is derived from <em>D<sub>1</sub></em> using method
- * <em>M</em>, a new EML document <em>E<sub>2</sub></em> should also be produced
- * to describe <em>D<sub>2</sub></em>. This can be depicted as:<br>
- *
- * <center><em>M</em> : <em>E<sub>1</sub></em> + <em>D<sub>1</sub></em> &rarr;
- * <em>E<sub>2</sub></em> + <em>D<sub>2</sub></em></center>
- * </p>
- *
- *
- * <p>
- * Ideally, <em>E<sub>2</sub></em> should include a description of the
- * provenance of <em>D<sub>2</sub></em>, that is, it was produced from
- * <em>D<sub>1</sub></em> and <em>E<sub>1</sub></em> by applying method
- * <em>M</em>.
- * </p>
- *
- * <p>
- * The Provenance Factory can be used to append <em>some</em> provenance
- * information to an EML document (<em>E<sub>2</sub></em> from above) in the
- * form of <em>methodStep</em> elements (
- * <code>/eml/dataset/methods/methodStep</code>), whose content references the
- * "parent" EML document(s) (<em>E<sub>1</sub></em> from above). To accomplish
- * this, the user supplies the Provenance Factory with an EML document, to which
- * provenance will be appended, and the packageId(s) of the parent EML
- * document(s) to be referenced. The Provenance Factory requests the specified
- * parent EML documents from PASTA's Metadata Catalog on behalf of the
- * requesting user, and a single methodStep element is appended to the
- * <em>provided</em> EML document (<em>E<sub>2</sub></em>) for each specified
- * parent. The user can also specify particular <em>entityNames</em> (
- * <code>/eml/dataset/dataTable/entityName</code>) in the parent EML document(s)
- * to be included in provenance, which is useful if a parent EML document
- * contains multiple data entities, but only one of which was used to derive the
- * new dataset (<em>D<sub>2</sub></em> from above).
- * </p>
- *
- * <p>
- * The syntax of appended methodStep elements is shown below.
- * </p>
- *
- * <p>
- *
- * <pre>
+ * 
+ *          <p>
+ *          The Provenance Factory generates a provenance-based XML fragment
+ *          that references metadata content of a parent EML document that is in
+ *          the PASTA system by using the structure of the <em>methodStep</em>
+ *          element, which is inserted into a user provided <em>methods</em>
+ *          element (for multiple references to parent EML documents, multiple
+ *          <em>methodStep</em> elements are returned, one for each parent EML
+ *          document). The user provided <em>methods</em> element is not
+ *          required to be associated with a valid EML document; it acts only as
+ *          a root element container for the provenance-based
+ *          <em>methodStep</em> element(s). The service, however, does require
+ *          that only a single <em>methods</em> element exist in the user
+ *          provided XML; otherwise, an ambiguity exists when determining a
+ *          proper xpath location for inserting the provencance-based
+ *          <em>methodStep</em> XML fragment. The service will accept a valid
+ *          EML document and correctly insert the provenance-based
+ *          <em>methodStep</em> XML fragment into the <em>methods</em> element,
+ *          if it is the only <em>methods</em> element in the EML document. The
+ *          current service design recognizes that the structure and content of
+ *          an EML document may vary considerably and may be very complex. To be
+ *          flexible, the service assumes that a user wanting to insert the
+ *          provenance-based XML into a complex EML document would do so
+ *          independent of the Provenance Factory service.
+ *          </p>
+ * 
+ *          <p>
+ *          The Provenance Factory can be used to append provenance metadata to
+ *          an EML document that describes a 'derived' or 'synthetic' data set,
+ *          that is, a data set that was produced from data that exists in the
+ *          PASTA sytem.
+ *          </p>
+ * 
+ *          <p>
+ *          Let <em>D<sub>1</sub></em> denote a dataset in PASTA's Data Cache,
+ *          and let <em>E<sub>1</sub></em> denote an EML document in PASTA's
+ *          Metadata Catalog that describes <em>D<sub>1</sub></em>. If a new
+ *          dataset <em>D<sub>2</sub></em> is derived from
+ *          <em>D<sub>1</sub></em> using method <em>M</em>, a new EML document
+ *          <em>E<sub>2</sub></em> should also be produced to describe
+ *          <em>D<sub>2</sub></em>. This can be depicted as:<br>
+ * 
+ *          <center><em>M</em> : <em>E<sub>1</sub></em> + <em>D<sub>1</sub></em>
+ *          &rarr; <em>E<sub>2</sub></em> + <em>D<sub>2</sub></em></center>
+ *          </p>
+ * 
+ * 
+ *          <p>
+ *          Ideally, <em>E<sub>2</sub></em> should include a description of the
+ *          provenance of <em>D<sub>2</sub></em>, that is, it was produced from
+ *          <em>D<sub>1</sub></em> and <em>E<sub>1</sub></em> by applying method
+ *          <em>M</em>.
+ *          </p>
+ * 
+ *          <p>
+ *          The Provenance Factory can be used to append <em>some</em>
+ *          provenance information to an EML document (<em>E<sub>2</sub></em>
+ *          from above) in the form of <em>methodStep</em> elements (
+ *          <code>/eml/dataset/methods/methodStep</code>), whose content
+ *          references the "parent" EML document(s) (<em>E<sub>1</sub></em> from
+ *          above). To accomplish this, the user supplies the Provenance Factory
+ *          with an EML document, to which provenance will be appended, and the
+ *          packageId(s) of the parent EML document(s) to be referenced. The
+ *          Provenance Factory requests the specified parent EML documents from
+ *          PASTA's Metadata Catalog on behalf of the requesting user, and a
+ *          single methodStep element is appended to the <em>provided</em> EML
+ *          document (<em>E<sub>2</sub></em>) for each specified parent. The
+ *          user can also specify particular <em>entityNames</em> (
+ *          <code>/eml/dataset/dataTable/entityName</code>) in the parent EML
+ *          document(s) to be included in provenance, which is useful if a
+ *          parent EML document contains multiple data entities, but only one of
+ *          which was used to derive the new dataset (<em>D<sub>2</sub></em>
+ *          from above).
+ *          </p>
+ * 
+ *          <p>
+ *          The syntax of appended methodStep elements is shown below.
+ *          </p>
+ * 
+ *          <p>
+ * 
+ *          <pre>
  * &lt;methodStep&gt;
  *    &lt;description&gt;
  *       &lt;para&gt;Specified entityNames from the parent EML document&lt;/para&gt;
@@ -211,8 +221,9 @@ import edu.lternet.pasta.metadatafactory.MetadataFactory;
  *    &lt;/dataSource&gt;
  * &lt;/methodStep&gt;
  * </pre>
- * </p>
- *
+ * 
+ *          </p>
+ * 
  */
 @Path("/")
 public class DataPackageManagerResource extends PastaWebService {
@@ -255,6 +266,7 @@ public class DataPackageManagerResource extends PastaWebService {
    * Class methods
    */
   
+
   /**
    * Gets an AuthToken object from an HttpHeaders object
    * 
@@ -288,12 +300,36 @@ public class DataPackageManagerResource extends PastaWebService {
     return ste[ste.length - 1 - depth].getMethodName();
   }
 
+
   
   /*
-   * Instance methods
+   * Isolates the resourceId for the data package from a resource map 
+   * string and returns it.
+   */
+  protected static String resourceIdFromResourceMap(String resourceMap) {
+    String resourceId = null;
+    
+    if (resourceMap != null && !resourceMap.isEmpty()) {
+      String[] mapEntries = resourceMap.split("\n");
+      if (mapEntries != null && mapEntries.length > 0) {
+        for (String mapEntry : mapEntries) {
+          if (mapEntry.contains("/package/eml/")) {
+            resourceId = mapEntry.trim();
+          }
+        }
+      }
+    }
+    
+    return resourceId;
+  }
+
+  
+  /*
+   * Instance "helper" methods
    */
   
-  /*
+
+	/*
    * Wrapper method for using the audit manager client
    */
   private void audit(String serviceMethodName,
@@ -320,7 +356,70 @@ public class DataPackageManagerResource extends PastaWebService {
   }
   
   
-  /**
+  private List<String> decodeEntityNames(List<String> provided) {
+  
+      List<String> decoded = new LinkedList<String>();
+  
+      for (String p : provided) {
+          String s = PercentEncoder.decode(p);
+          decoded.add(s);
+      }
+  
+      return decoded;
+  }
+
+
+	private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
+  	EmlPackageId emlPackageId = null;
+  
+  	if (emlFile != null) {
+  		FileInputStream fis = new FileInputStream(emlFile);
+  
+  		DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance()
+  		    .newDocumentBuilder();
+  		Document document = documentBuilder.parse(fis);
+  		emlPackageId = EmlUtility.getEmlPackageId(document);
+  	}
+  
+  	return emlPackageId;
+  }
+
+
+	/*
+   * Matches the specified 'entityName' value with the entity names
+   * found in the EML document string, and returns the corresponding 
+   * objectName value for the matching entity, if an objectName was
+   * specified for the matching entity.
+   * 
+   * Returns null if:
+   *   (1) The EML document fails to parse, or
+   *   (2) No entities match the specified entityName value, or
+   *   (3) The matching entity does not specify an objectName in
+   *       the EML document.
+   */
+  private String findObjectName(String xml, String entityName) {
+    String objectName = null;
+    EMLParser emlParser = new EMLParser();
+    
+    if (xml != null && entityName != null) {
+      try {
+        InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+        DataPackage dataPackage = emlParser.parseDocument(inputStream);
+        
+        if (dataPackage != null) {
+          objectName = dataPackage.findObjectName(entityName);
+        }
+      }
+      catch (Exception e) {
+        logger.error("Error parsing EML metacdata: " + e.getMessage());
+      }
+    }
+    
+    return objectName;
+  }
+
+
+	/**
    * Returns the audit host, e.g. "audit.lternet.edu"
    * 
    * @return version, such as {@code DataPackageManager-0.1}.
@@ -367,7 +466,26 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
   
-  /**
+  private Map<EmlPackageId, List<String>> getProvenance(UriInfo uriInfo,
+                                                        AuthToken token) {
+  
+      // packageId::entityName pairs
+      QueryString query = new QueryString(uriInfo);
+  
+      Map<EmlPackageId, List<String>> pairs =
+          new LinkedHashMap<EmlPackageId, List<String>>();
+  
+      for (Entry<String, List<String>> e : query.getParams().entrySet()) {
+          EmlPackageId epi = parsePackageId(e.getKey());
+          List<String> parsed = decodeEntityNames(e.getValue());
+          pairs.put(epi, parsed);
+      }
+  
+      return pairs;
+  }
+
+
+	/**
    * Returns the tutorial document for the Data Manager.
    * 
    * @return the tutorial document for the Data Manager.
@@ -453,7 +571,6 @@ public class DataPackageManagerResource extends PastaWebService {
                   }
                 }
               }
-              
             }
           }
         }
@@ -471,62 +588,196 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
 
+  private EmlPackageId parsePackageId(String packageId) {
+  
+      EmlPackageIdFormat format = new EmlPackageIdFormat(Delimiter.DOT);
+      EmlPackageId epi = null;
+  
+      try {
+          epi = format.parse(packageId);
+      } catch (IllegalArgumentException e) {
+          throw WebExceptionFactory.makeBadRequest(e);
+      }
+  
+      if (!epi.allElementsHaveValues()) {
+          String s = "The specified EML packageId '" + packageId +
+                     "' does not contain a scope, identifier, and " +
+                     "revision.";
+          throw WebExceptionFactory.makeBadRequest(s);
+      }
+  
+      return epi;
+  }
+
+
+	/**
+   * Applies the quality report stylesheet to transform the quality report
+   * representation from XML to HTML for presentation purposes.
+   * 
+   * @param xmlString    the quality report XML string
+   * @param xslPath      path to the quality report stylesheet
+   * 
+   * @return htmlString  the result of the transformation from XML to HTML
+   * @throws IllegalStateException
+   *                     if an error occurs during the transformation process
+   */
+  private String qualityReportXMLtoHTML(String xmlString,
+                                        final String xslPath) 
+          throws IllegalStateException {
+    String htmlString = "";
+    Result result;
+    StringWriter stringWriter = new StringWriter();
+    javax.xml.transform.Transformer transformer;
+    javax.xml.transform.TransformerFactory transformerFactory;
+    Source xmlSource;
+    File xsltFile = new File(xslPath);            
+    Source xsltSource;
+    
+    StringReader stringReader = new StringReader(xmlString);
+    xmlSource = new javax.xml.transform.stream.StreamSource(stringReader);
+    xsltSource = new javax.xml.transform.stream.StreamSource(xsltFile);
+    result = new javax.xml.transform.stream.StreamResult(stringWriter);
+    logger.debug("javax.xml.transform.TransformerFactory :" + 
+                 System.getProperty("javax.xml.transform.TransformerFactory"));
+    transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
+  
+    try {
+      transformer = transformerFactory.newTransformer(xsltSource);      
+      transformer.transform(xmlSource, result);
+      htmlString = stringWriter.toString();
+    }
+    catch (TransformerConfigurationException e) {
+      Throwable x = e;
+      if (e.getException() != null) {
+        x = e.getException();    
+      }
+      x.printStackTrace();
+      throw new IllegalStateException(e);
+    }
+    catch (TransformerException e) {
+      Throwable x = e;
+      if (e.getException() != null) {
+        x = e.getException();    
+      }
+      x.printStackTrace(); 
+      throw new IllegalStateException(e);
+    }
+      
+    return htmlString;
+  }
+
+
+	/*
+   * Stamps a web service response with information about the web
+   * service version name and its corresponding version number.
+   */
+  private Response stampHeader(Response r)
+  {
+    return
+      Response.fromResponse(r).header(versionHeader, versionNumber).build();
+  }
+
+	
   /**
-	 * <strong>Create Data Package</strong> operation, specifying the EML document describing the data package to be created in the message body.
+   * Decodes the Httpheaders.AUTHORIZATION token
+   * (as per MetadataCatalog-0.1, MetadataCatalogResource class).
+   *
+   * @param token
+   * @return String[]
+   *
+  private String[] decoder(String token) throws UnauthorizedException
+  {
+    String [] userCreds = null;
+
+    if (token == null || token.isEmpty())
+      throw new UnauthorizedException("token is empty");
+    if (!token.contains("Basic ") || (token.length() <= "Basic ".length()))
+      throw new UnauthorizedException("Improper Token");
+
+    try {
+      token = token.substring("Basic ".length());
+      userCreds = new String(Base64.decodeBase64(token)).split(":");
+    }
+    catch (Throwable e) {
+      throw new UnauthorizedException(e.getMessage());
+    }
+
+    if (userCreds.length != 2)
+      throw new UnauthorizedException("Improper Token");
+    return userCreds;
+  }*/
+	
+  
+  /*
+   * Instance "web-service" methods
+   */
+  
+  
+	/**
+	 * <strong>Create Data Package</strong> operation, specifying the EML document
+	 * describing the data package to be created in the request message body and
+	 * returning a <em>transaction identifier</em> in the response message body as
+	 * plain text; the <em>transaction identifier</em> may be used in a subsequent
+	 * call to <code>readDataPackageError</code> to determine the operation
+	 * status; see <code>readDataPackage</code> to obtain the data package
+	 * resource map if the operation completed successfully.
 	 * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>the EML document whose data is to be loaded</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>curl -i -X POST -H "Content-Type: application/xml" -d @eml.xml http://package.lternet.edu/package/eml</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>202 Accepted</td>
-   *     <td>If the create request was accepted for processing</td>
-   *     <td>A transaction identifier for use in subsequent processing of the request, 
-   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
-   *     how the transaction identifier is used in subsequent service calls.)
-   *     </td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to execute this service method</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-	 * @param emlFile  An EML document file, as specified in the payload of the request.
-	 *                
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>EML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" 
+	 * -X POST -H "Content-Type: application/xml"
+	 * --data-binary @knb-lter-lno.1.1.xml https://pasta.lternet.edu/package/eml</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Response:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>202 Accepted</td>
+	 * <td align=center>The <em>create data package</em> request was accepted for
+	 * processing</td>
+	 * <td align=center>A <em>transaction identifier</em> for use in subsequent processing of
+	 * the request (see <code>readDataPackageError</code> to understand how the
+	 * transaction identifier may be used to determine if an error occurred during
+	 * the operation)</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method
+	 * </td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param emlFile
+	 *          An EML document file, as specified in the payload of the request.
+	 * 
 	 * @return a Response, which if successful, contains a resource map describing
 	 *         the contents of the data package
 	 */
@@ -573,62 +824,67 @@ public class DataPackageManagerResource extends PastaWebService {
 
   
   /**
-	 * <strong>Create Data Package Archive</strong> operation, specifying the scope,
-   * identifier, and revision of the data package archive to be
-   * created in the URI, returning a transaction identifier in the response message
-   * as plain text.
+	 * <strong>Create Data Package Archive (Zip)</strong> operation, specifying
+	 * the scope, identifier, and revision of the data package to be Zipped in
+	 * the URI, and returning a <em>transaction identifier</em> in the response
+	 * message body as plain text; the <em>transaction identifier</em> may be used
+	 * in a subsequent call to <code>readDataPackageError</code> to determine the
+	 * operation status or to <code>readDataPackageArchive</code> to obtain the
+	 * Zip archive.
 	 * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -X GET http://package.lternet.edu/package/archive/knb-lter-lno/1/1</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>202 Accepted</td>
-   *     <td>If the create request was accepted for processing</td>
-   *     <td>A transaction identifier for use in subsequent processing of the request, 
-   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
-   *     how the transaction identifier is used in subsequent service calls.)
-   *     </td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to execute this service method</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-	 *                
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X POST
+	 * https://pasta.lternet.edu/package/archive/eml/knb-lter-lno/1/1</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Response:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>202 Accepted</td>
+	 * <td align=center>The create request was accepted for processing</td>
+	 * <td align=center>A transaction identifier for use in subsequent processing of the
+	 * request (see <code>readDataPackageError</code> to understand how the
+	 * transaction identifier may be used to determine if an error occurred during
+	 * the operation)</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method
+	 * </td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+
+	 * </tr>
+	 * </table>
+	 * 
 	 * @return a Response, which if successful, contains a resource map describing
 	 *         the contents of the data package
 	 */
@@ -677,254 +933,76 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
   
-  /**
-   * Decodes the Httpheaders.AUTHORIZATION token
-   * (as per MetadataCatalog-0.1, MetadataCatalogResource class).
-   *
-   * @param token
-   * @return String[]
-   *
-  private String[] decoder(String token) throws UnauthorizedException
-  {
-    String [] userCreds = null;
-
-    if (token == null || token.isEmpty())
-      throw new UnauthorizedException("token is empty");
-    if (!token.contains("Basic ") || (token.length() <= "Basic ".length()))
-      throw new UnauthorizedException("Improper Token");
-
-    try {
-      token = token.substring("Basic ".length());
-      userCreds = new String(Base64.decodeBase64(token)).split(":");
-    }
-    catch (Throwable e) {
-      throw new UnauthorizedException(e.getMessage());
-    }
-
-    if (userCreds.length != 2)
-      throw new UnauthorizedException("Improper Token");
-    return userCreds;
-  }*/
-
-
 	/**
+	 * <strong>Evaluate Data Package</strong> operation, specifying the EML
+	 * document describing the data package to be evaluated in the request message
+	 * body, and returning a <em>transaction identifier</em> in the response
+	 * message body as plain text; the <em>transaction identifier</em> may be used
+	 * in a subsequent call to <code>readDataPackageError</code> to determine the
+	 * operation status or to <code>readEvaluateReport</code> to obtain the
+	 * evaluate quality report.
 	 * 
-   * <strong>Delete Data Package</strong> operation, specifying the scope and identifier of the data package to be deleted in the URI.
-   * The data package and its associated quality reports are deleted.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -X DELETE http://package.lternet.edu/package/eml/knb-lter-lno/1</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the delete request was successful</td>
-   *     <td>None</td>
-   *     <td>None</td>
-   *     <td>None</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to delete the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package associated with the specified packageId is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as POST but the resource
-   *     can only support GET or DELETE.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope value of the data package
-   * @param identifier  The identifier value of the data package
-   * @return            a Response object
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>EML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -X POST -H "Content-Type: application/xml"
+	 * --data-binary @eml.xml
+	 * https://pasta.lternet.edu/package/evaluate/eml</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Response:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>202 Accepted</td>
+	 * <td align=center>The evaluate request was accepted for processing</td>
+	 * <td align=center>A transaction identifier for use in subsequent processing of the
+	 * request (see <code>readDataPackageError</code> to understand how the
+	 * transaction identifier may be used to determine if an error occurred during
+	 * the operation)</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method
+	 * </td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param emlDocument
+	 *          The URL to an EML document, as specified in the payload of the
+	 *          request.
+	 * 
+	 * @return a Response, which if successful, contains a quality report XML
+	 *         document
 	 */
-	@DELETE
-	@Path("/eml/{scope}/{identifier}")
-	@Produces("text/plain")
-  public Response deleteDataPackage(@Context HttpHeaders headers,
-                                    @PathParam("scope") String scope,
-                                    @PathParam("identifier") Integer identifier) {
-	  boolean deleted = false;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "deleteDataPackage";
-    Rule.Permission permission = Rule.Permission.write;
-    AuthToken authToken = null;
-    String entryText = null;
-
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the 'deleteDataPackage' service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      entryText = "Deleted " + scope + "." + identifier.toString();
-      
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      deleted = dataPackageManager.deleteDataPackage(scope, identifier, userId, authToken);
-
-      if (deleted) {
-        responseBuilder = Response.ok();
-        response = responseBuilder.build();       
-      } 
-      else {
-        throw new Exception("Data package was not deleted due to an internal server error");
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-          e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-
-    String resourceId = null;
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-    response = stampHeader(response);
-    return response;
-  }
-
-	
-  /**
-   * <strong>Evaluate Data Package</strong> operation, specifying the EML document describing the data package to be evaluated in the message body.
-   * Creates the data package in a scratch area for quality reporting purposes only. 
-   * A quality report XML document is generated and returned in the message body.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>the EML document whose data is to be evaluated</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>curl -i -X POST -H "Content-Type: application/xml" -d @eml.xml http://package.lternet.edu/evaluate/eml</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>202 Accepted</td>
-   *     <td>If the evaluate request was accepted for processing</td>
-   *     <td>A transaction identifier for use in subsequent processing of the request, 
-   *     e.g. "1364424858431". (See <code>Read Evaluate Report</code> to understand
-   *     how the transaction identifier is used in subsequent service calls.)
-   *     </td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to execute this service method</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param emlDocument  The URL to an EML document, as specified in the
-   *                payload of the request.
-   *                
-   * @return a Response, which if successful, contains a quality report XML document
-   */
   @POST
   @Path("/evaluate/eml")
   @Consumes("application/xml")
@@ -938,10 +1016,10 @@ public class DataPackageManagerResource extends PastaWebService {
     
     Long time = new Date().getTime();
     String transaction = time.toString();
-
+  
     authToken = getAuthToken(headers);
     String userId = authToken.getUserId();
-
+  
     // Is user authorized to run the 'createDataPackage' service method?
     boolean serviceMethodAuthorized = isServiceMethodAuthorized(
         serviceMethodName, permission, authToken);
@@ -960,127 +1038,568 @@ public class DataPackageManagerResource extends PastaWebService {
     responseBuilder.entity(transaction);
     response = responseBuilder.build();
     response = stampHeader(response);
-
+  
     return response;
     
   }
 
 
-  /*
-   * Matches the specified 'entityName' value with the entity names
-   * found in the EML document string, and returns the corresponding 
-   * objectName value for the matching entity, if an objectName was
-   * specified for the matching entity.
-   * 
-   * Returns null if:
-   *   (1) The EML document fails to parse, or
-   *   (2) No entities match the specified entityName value, or
-   *   (3) The matching entity does not specify an objectName in
-   *       the EML document.
+	/*
+   * The following methods have been migrated into the Data Package Manager
+   * from the original Metadata Factory service.
    */
-  private String findObjectName(String xml, String entityName) {
-    String objectName = null;
-    EMLParser emlParser = new EMLParser();
-    
-    if (xml != null && entityName != null) {
-      try {
-        InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
-        DataPackage dataPackage = emlParser.parseDocument(inputStream);
-        
-        if (dataPackage != null) {
-          objectName = dataPackage.findObjectName(entityName);
-        }
-      }
-      catch (Exception e) {
-        logger.error("Error parsing EML metacdata: " + e.getMessage());
-      }
-    }
-    
-    return objectName;
-  }
-
   
   /**
+   * <strong>Add Provenance Metadata</strong> from Level-1 metadata in PASTA
+   * to an XML document containing a single <em>methods</em> element in the
+   * request message body.
    * 
-   * <strong>Is Authorized</strong> to read operation, determines whether the
-   * user as defined in the authentication token has permission to read the
-   * specified data package resource.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/authz?resourceId=https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</td>
-   *   </tr>
-   * </table>
-   * 
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>XML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -X PUT -H "Content-Type: application/xml"
+	 * --data-binary @methods.xml
+	 * https://pasta.lternet.edu/package/provenance/eml?knb-lter-lno.1.1</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+   * <p>
+   * The request entity should be an XML document (MIME type
+   * <code>application/xml</code>) that contains an element called <em>methods</em>
+   * (one and only one), located anywhere in the XML tree. A new element
+   * called <em>methodStep</em> will be appended to the <em>methods</em>
+   * element for each parent EML document specified in the query string.
+   * </p>
+   *
+   * <h4>Query parameters:</h4>
+   *
+   * <p>
+   * Query parameters must be the <code>packageId</code> attributes of the
+   * parent EML documents contained in PASTA's Metadata Catalog, with the
+   * syntax <em><code>scope.identifier.revision</code></em>. Multiple
+   * packageIds can be specified by delimiting them with ampersands (
+   * <code>&amp;</code>), e.g.<br>
+   *
+   * <center>
+   * <em>?packageId<sub>1</sub>&amp;packageId<sub>2</sub>&amp;...&amp;packageId<sub>n</sub></em>
+   * .</center>
+   * </p>
+   *
+   * <p>
+   * If a particular <code>entityName</code> in a parent EML document should
+   * be recorded in the provenance metadata, it can be specified in the query
+   * string with the syntax <em>packageId=entityName</em>. If multiple entity
+   * names from a single EML document should be recorded, they must be
+   * specified individually as<br>
+   * <center>
+   *
+   * <em>?packageId<sub>1</sub>=entityName<sub>1</sub>&amp;packageId<sub>1</sub>=entityName<sub>2</sub>&amp;...&amp;packageId<sub>1</sub>=entityName<sub>n</sub></em></center><br>
+   * All query parameter values must be URL encoded.
+   * </p>
+   *
+   *
    * <h4>Responses:</h4>
+   *
    * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the user is authorized to read the data package resource</td>
-   *     <td>The specific resource</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no error associated with the specified data package is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
+   * <tr>
+   * <td align=center><b>Status</b></td>
+   * <td align=center><b>Reason</b></td>
+   * <td align=center><b>Message Body</b></td>
+   * <td align=center><b>MIME type</b></td>
+   * <td align=center><b>Sample Message Body</b></td>
+   * </tr>
    * 
-   * @return a Response object containing a data package resource id
-   *         if permission is allowed, else returns a 401 Unauthorized response
+   * <tr>
+   * <td align=center>200 OK</td>
+   * <td align=center>The request was successful</td>
+   * <td align=center>The modified XML document</td>
+   * <td align=center><code>application/xml</code></td>
+   * <td>
+   * <pre>
+&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;methods&gt;
+  &lt;methodStep&gt;
+    &lt;description&gt;
+      &lt;para&gt;This method step describes provenance-based metadata...
+.
+.
+.
+  &lt;/methodStep&gt;
+&lt;/methods&gt;
+   * </pre>
+   * </td>
+   * </tr>
+   * 
+   * <tr>
+   * <td align=center>400 Bad Request</td>
+   * <td align=center>The request entity or query parameters cannot be properly parsed</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>401 Unauthorized</td>
+   * <td align=center>The requesting user is unauthorized to use the Provenance Factory</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>417 Expectation Failed</td>
+   * <td align=center>The request fails for an incorrect user expectation (e.g., because the
+   * requesting user is not authorized to read an EML document that is specified
+   * in the query parameter)</td>
+   * <td align=center>
+   * An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+
+   * </tr>
+   * </table>
+   *
+   *
+   * @param headers
+   *            the HTTP request headers containing the authorization token.
+   *
+   * @param uriInfo
+   *            contains the query string parameters.
+   *
+   * @param eml
+   *            the EML document to which provenance will be appended.
+   *
+   * @return an appropriate HTTP response.
    */
+    @PUT
+    @Path("/provenance/eml")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(value={MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    public Response appendProvenance(@Context HttpHeaders headers,
+                                     @Context UriInfo uriInfo, String eml) {
+  
+      AuthToken authToken = null;
+      String entryText = null;
+      String resourceId = null;
+      Response response = null;
+      final String serviceMethodName = "appendProvenance";
+      Rule.Permission permission = Rule.Permission.write;
+  
+      try {
+        authToken = AuthTokenFactory.makeAuthToken(headers.getCookies());
+        String userId = authToken.getUserId();
+  
+        // Is user authorized to run the 'appendProvenance' service method?
+        boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+          serviceMethodName, permission, authToken);
+        if (!serviceMethodAuthorized) {
+          throw new UnauthorizedException("User " + userId
+            + " is not authorized to execute service method "
+            + serviceMethodName);
+        }
+  
+        Document doc = XmlUtility.xmlStringToDoc(eml);
+        Map<EmlPackageId, List<String>> provenance = 
+            getProvenance(uriInfo, authToken);
+        MetadataFactory metadataFactory = new MetadataFactory();
+        doc = metadataFactory.make(doc, provenance, authToken);
+        eml = XmlUtility.nodeToXmlString(doc);
+        response = Response.ok(eml, MediaType.APPLICATION_XML).build();
+      }
+      catch (UnauthorizedException e) {
+        entryText = e.getMessage();
+        response = WebResponseFactory.makeUnauthorized(e);
+      }
+      catch (XmlParsingException e) {
+        entryText = e.getMessage();
+        response = WebResponseFactory.makeBadRequest(e);
+      }
+      catch (WebApplicationException e) { // not necessary
+        entryText = e.getMessage();
+        response = e.getResponse();
+      }
+      catch (Exception e) {
+        entryText = e.getMessage();
+        WebApplicationException webApplicationException = 
+          WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+            e, e.getMessage());
+        response = webApplicationException.getResponse();
+      }
+  
+      audit(serviceMethodName, authToken, response, resourceId, entryText);
+      response = stampHeader(response);
+      return response;
+    }
+
+
+	/**
+	 * <strong>Search Data Packages</strong> operation, specifying the Metacat
+	 * <em>path query</em> XML used for querying data packages in the message
+	 * body.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>Metacat "path query" XML used for searching the metadata
+	 * catalog</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -X PUT -H "Content-Type: application/xml"
+	 *     --data-binary @pathQuery.xml https://pasta.lternet.edu/package/search/eml</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The search was successful</td>
+	 * <td align=center>A "resultset" XML document containing the search results</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * <pre>
+&lt;?xml version="1.0"?&gt;
+&lt;resultset&gt;
+.
+.
+.
+&lt;/resultset&gt;
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested
+	 * resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param pathQuery
+	 *          A pathquery XML document, as specified in the payload of the
+	 *          request.
+	 * 
+	 * @return a Response, which if successful, contains a resultset XML document
+	 */
+    @PUT
+    @Path("/search/eml")
+    @Produces("application/xml")
+    public Response searchDataPackages(@Context HttpHeaders headers,
+                                       String pathQuery) {  
+      AuthToken authToken = null;
+      String resourceId = null;
+      String entryText = null;
+      String resultsetXML = null;
+      ResponseBuilder responseBuilder = null;
+      Response response = null;
+      final String serviceMethodName = "searchDataPackages";
+      Rule.Permission permission = Rule.Permission.read;
+  
+      try {
+        authToken = getAuthToken(headers);
+        String userId = authToken.getUserId();
+  
+        // Is user authorized to run the service method?
+        boolean serviceMethodAuthorized = 
+          isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+        if (!serviceMethodAuthorized) {
+          throw new UnauthorizedException(
+              "User " + userId + 
+              " is not authorized to execute service method " + 
+              serviceMethodName);
+        }
+        
+        DataPackageManager dataPackageManager = new DataPackageManager(); 
+        resultsetXML = dataPackageManager.searchDataPackages(pathQuery, userId, authToken);
+  
+        if (resultsetXML != null) {
+          responseBuilder = Response.ok(resultsetXML);
+          response = responseBuilder.build();       
+        } 
+        else {
+          ResourceNotFoundException e = new ResourceNotFoundException(
+                                              "No search results returned");
+          entryText = e.getMessage();
+          WebApplicationException webApplicationException =
+            WebExceptionFactory.makeNotFound(e);
+          response = webApplicationException.getResponse();
+        }
+      }
+      catch (IllegalArgumentException e) {
+        entryText = e.getMessage();
+        response = WebExceptionFactory.makeBadRequest(e).getResponse();
+      }
+      catch (UnauthorizedException e) {
+        entryText = e.getMessage();
+        response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+      }
+      catch (UserErrorException e) {
+        entryText = e.getMessage();
+        response = WebResponseFactory.makeBadRequest(e);
+      }
+      catch (Exception e) {
+        entryText = e.getMessage();
+        WebApplicationException webApplicationException = 
+          WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                   e, e.getMessage());
+        response = webApplicationException.getResponse();
+      }
+  
+      audit(serviceMethodName, authToken, response, resourceId, entryText);
+      response = stampHeader(response);
+      return response;
+    }
+
+
+	/**
+	 * <strong>Update Data Package</strong> operation, specifying the scope and
+	 * identifier of the data package to be updated in the URI, along with the EML
+	 * document describing the data package to be created in the request message
+	 * body, and returning a <em>transaction identifier</em> in the response
+	 * message body as plain text; the <em>transaction identifier</em> may be used
+	 * in a subsequent call to <code>readDataPackageError</code> to determine the
+	 * operation status; see <code>readDataPackage</code> to obtain the data
+	 * package resource map if the operation completed successfully.
+	 * 
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>EML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" 
+	 * -X PUT -H "Content-Type: application/xml"
+	 * --data-binary @knb-lter-lno.1.1.xml
+	 * https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>202 Accepted</td>
+	 * <td align=center>The <em>update data package</em> request was accepted for processing</td>
+	 * <td align=center>A <em>transaction identifier</em> for use in subsequent processing of
+	 * the request (see <code>readDataPackageError</code> to understand how the
+	 * transaction identifier may be used to determine if an error occurred during
+	 * the operation)</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method
+	 * </td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param emlFile
+	 *          The URL to an EML document, as specified in the payload of the
+	 *          request.
+	 * 
+	 * @return a Response, which if successful, contains a resource map describing
+	 *         the contents of the updated data package
+	 */
+  @PUT
+  @Path("/eml/{scope}/{identifier}")
+  @Consumes("application/xml")
+  @Produces("text/plain")
+  public Response updateDataPackage(
+                    @Context HttpHeaders headers,
+                    @PathParam("scope") String scope,
+                    @PathParam("identifier") Integer identifier, 
+                    File emlFile) {
+  	
+    AuthToken authToken = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "updateDataPackage";
+    Rule.Permission permission = Rule.Permission.write;
+  
+    Long time = new Date().getTime();
+    String transaction = time.toString();
+    
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+  
+  	// Is user authorized to run the service method?
+  	boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+  	    serviceMethodName, permission, authToken);
+  	if (!serviceMethodAuthorized) {
+  		throw new UnauthorizedException("User " + userId
+  		    + " is not authorized to execute service method " + serviceMethodName);
+    }
+    
+  	// Perform updateDataPackage in new thread
+  	Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
+  	ExecutorService executorService = Executors.newCachedThreadPool();
+  	executorService.execute(updator);
+  	executorService.shutdown();
+  	
+  	responseBuilder = Response.status(Response.Status.ACCEPTED);
+  	responseBuilder.entity(transaction);
+  	response = responseBuilder.build();
+    response = stampHeader(response);
+    return response;
+    
+  }
+
+
+	/**
+	 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,
+	 * determines whether the user as defined in the authentication token has
+	 * permission to read the specified data package resource.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * http://pasta.lternet.edu/package/authz?resourceId=https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Query parameters:</h4>
+	 * 
+	 * <p>
+	 * The query parameter must be the <code>resourceId</code> of the PASTA
+	 * resource that is being reviewed for authorization:
+	 * 
+	 * <center><em>?resourceId=&lt;resource identifier&gt;</em></center>
+	 * </p>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The user is authorized to read the data package resource</td>
+	 * <td align=center>The specific resource</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>The resource being reviewed is not found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response object containing a data package resource id if
+	 *         permission is allowed, else returns a 401 Unauthorized response
+	 */
 	@GET
 	@Path("/authz")
   @Produces("text/plain")
@@ -1156,90 +1675,100 @@ public class DataPackageManagerResource extends PastaWebService {
   }
   
   
-  /**
-   * 
-   * <strong>List Data Entities</strong> operation, specifying the scope, identifier, and revision values to match in the URI. 
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -G http://package.lternet.edu/package/data/eml/knb-lter-lno/10108/1</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the list request was successful</td>
-   *     <td>A list of data entity identifiers matching the specified scope, identifier, and revisions values</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>FictionalEntityOne<br />FictionalEntityTwo</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to access a list of the data entities</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package entities associated with the specified packageId are found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package. A string
-   *                  that represents a whole number, or, the
-   *                  symbolic values "oldest" or "newest".
-   * @return a Response, containing a newline separated list of
-   *         data entity identifiers
-   */
+	/**
+	 * 
+	 * <strong>List Data Entities</strong> operation, specifying the scope,
+	 * identifier, and revision values to match in the URI.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A list of data entity identifiers matching the specified scope,
+	 * identifier, and revisions values</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * <pre>
+EntityOne
+EntityTwo
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list of the data
+	 * entities</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package entities associated with the specified packageId are
+	 * found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package. A string that represents a whole
+	 *          number, or, the symbolic values "oldest" or "newest".
+	 * @return a Response, containing a newline separated list of data entity
+	 *         identifiers
+	 */
   @GET
   @Path("/data/eml/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
@@ -1330,12 +1859,9 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
   
-  /**
-	 * 
-	 * <strong>List Data Package Revisions</strong> operation, specifying the
-	 * scope and identifier values to match in the URI.  The request may be
-	 * filtered by applying the modifiers "oldest" or "newest" to the "filter"
-	 * query parameter.
+	/**
+	 * <strong>List Data Package Identifiers</strong> operation, specifying the
+	 * scope value to match in the URI.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -1345,14 +1871,9 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <th><b>Sample Request</b></th>
 	 * </tr>
 	 * <tr>
-	 * <td></td>
-	 * <td></td>
-	 * <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno/1</td>
-	 * </tr>
-	 * <tr>
-	 * <td></td>
-	 * <td></td>
-	 * <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno/1?filter=newest</td>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno</code></td>
 	 * </tr>
 	 * </table>
 	 * 
@@ -1366,243 +1887,64 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <th><b>Sample Message Body</b></th>
 	 * </tr>
 	 * <tr>
-	 * <td>200 OK</td>
-	 * <td>If the list request was successful</td>
-	 * <td>A newline-separated list of revision values matching the specified
-	 * scope and identifier values</td>
-	 * <td><code>text/plain</code></td>
-	 * <td>1<br/>
-	 * 2<br/>
-	 * 3</td>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A newline-separated list of data package identifier values matching the
+	 * specified scope value</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * <pre>
+1004
+1005
+1007
+	 * </pre>
+	 * </td>
 	 * </tr>
 	 * <tr>
-	 * <td>400 Bad Request</td>
-	 * <td>If the request contains an error, such as an illegal scope or
-	 * identifier value</td>
-	 * <td>An error message</td>
-	 * <td><code>text/plain</code></td>
-	 * <td></td>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal scope value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * <tr>
-	 * <td>401 Unauthorized</td>
-	 * <td>If the requesting user is not authorized to access a list of the data
-	 * package revisions</td>
-	 * <td>An error message</td>
-	 * <td><code>text/plain</code></td>
-	 * <td></td>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list of the
+	 * identifier values</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * <tr>
-	 * <td>404 Not Found</td>
-	 * <td>If no data package revisions associated with the specified scope and
-	 * identifier are found</td>
-	 * <td>An error message</td>
-	 * <td><code>text/plain</code></td>
-	 * <td></td>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data packages identifiers associated with the specified scope are
+	 * found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * <tr>
-	 * <td>405 Method Not Allowed</td>
-	 * <td>The specified HTTP method is not allowed for the requested resource.
-	 * For example, the HTTP method was specified as DELETE but the resource can
-	 * only support GET.</td>
-	 * <td>An error message</td>
-	 * <td><code>text/plain</code></td>
-	 * <td></td>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * <tr>
-	 * <td>500 Internal Server Error</td>
-	 * <td>The server encountered an unexpected condition which prevented it from
-	 * fulfilling the request. For example, a SQL error occurred, or an unexpected
-	 * condition was encountered while processing EML metadata.</td>
-	 * <td>An error message</td>
-	 * <td><code>text/plain</code></td>
-	 * <td></td>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * </table>
 	 * 
 	 * @param scope
-	 *          The scope of the metadata document.
-	 * @param identifier
-	 *          The identifier of the metadata document.
-	 * @param filter
-	 *          To return either the "oldest" or "newest" revision
-	 * @return a Response, containing a newline-separated list of revision values
+	 *          The scope of the data package.
+	 * @return a Response, containing a newline separated list of identifier
+	 *         values matching the specified scope values
 	 */
-  @GET
-  @Path("/eml/{scope}/{identifier}")
-  @Produces("text/plain")
-  public Response listDataPackageRevisions(
-                               @Context HttpHeaders headers,
-                               @PathParam("scope") String scope,
-                               @PathParam("identifier") String identifierStr,
-                               @QueryParam("filter") @DefaultValue("") String filter
-                    ) {
-    Integer identifier = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "listDataPackageRevisions";
-    Rule.Permission permission = Rule.Permission.read;
-    AuthToken authToken = null;
-    String resourceId = null;
-    String entryText = null;
-
-    try {
-      
-      // Check for a non-integer identifier
-      try {
-        identifier = new Integer(identifierStr);
-      }
-      catch (NumberFormatException e) {
-        String message = "identifier value '"  + identifierStr + "' must be a non-negative integer\n";
-        throw new UserErrorException(message);
-      }
-        
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      String revisionList = null;
-      DataPackageManager dataPackageManager = new DataPackageManager();
-      if (filter.isEmpty()) {
-        revisionList = dataPackageManager.listDataPackageRevisions(scope, identifier);      	
-      } else {
-      	if (filter.equals("oldest")) {
-      		revisionList = dataPackageManager.getOldestRevision(scope, identifier).toString();
-      	} else if (filter.equals("newest")) {
-      		revisionList = dataPackageManager.getNewestRevision(scope, identifier).toString();
-      	} else {
-      		revisionList = "";
-      	}
-      }
-      
-      if (revisionList != null) {
-        responseBuilder = Response.ok(revisionList.trim());
-        response = responseBuilder.build();       
-      }
-      else {
-        String message = "An unknown error occurred";
-        throw new Exception(message);
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-      WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                               e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-
-    // audit(serviceMethodName, authToken, response, resourceId, entryText);
-    
-    response = stampHeader(response);
-    return response;
-  }
-
-
-  /**
-   * 
-   * <strong>List Data Package Identifiers</strong> operation, specifying the scope value to match in the URI. 
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -G http://package.lternet.edu/package/eml/knb-lter-lno</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the list request was successful</td>
-   *     <td>A newline-separated list of data package identifier values matching the specified scope value</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>1004<br/>1005<br/>1007</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal scope value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to access a list of the identifier values</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data packages identifiers associated with the specified scope are found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package.
-   * @return a Response, containing a newline separated list of identifier values
-   *         matching the specified scope values
-   */
   @GET
   @Path("/eml/{scope}")
   @Produces("text/plain")
@@ -1677,76 +2019,281 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
   /**
-   * 
-   * <strong>List Data Package Scopes</strong> operation, returning all scope values extant in the data package registry.
+   * <strong>List Data Package Revisions</strong> operation, specifying the
+   * scope and identifier values to match in the URI.  The request may be
+   * filtered by applying the modifiers "oldest" or "newest" to the "filter"
+   * query parameter.
    * 
    * <h4>Requests:</h4>
    * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -G http://package.lternet.edu/package/eml</td>
-   *   </tr>
+   * <tr>
+   * <th><b>Message Body</b></th>
+   * <th><b>MIME type</b></th>
+   * <th><b>Sample Request</b></th>
+   * </tr>
+   * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+   * <td><code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code></td>
+   * </tr>
+   * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+   * <td><code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1?filter=newest</code></td>
+   * </tr>
    * </table>
+   * 
+	 * <h4>Query parameters:</h4>
+	 * 
+	 * <p>
+	 * If present, the query parameter must be <code>filter</code> and one of
+	 * either "newest" or "oldest":
+	 * 
+	 * <center><em>?filter=newest</em> or <center><em>?filter=oldest</em></center>
+	 * </p>
+	 * 
    * 
    * <h4>Responses:</h4>
    * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the list request was successful</td>
-   *     <td>A list of all scope values extant in the data package registry</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>knb-lter-lno<br/>knb-lter-xyz</td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to access a list of the scope values</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no scope values are extant in the data package registry</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
+   * <tr>
+   * <th><b>Status</b></th>
+   * <th><b>Reason</b></th>
+   * <th><b>Message Body</b></th>
+   * <th><b>MIME type</b></th>
+   * <th><b>Sample Message Body</b></th>
+   * </tr>
+   * <tr>
+   * <td align=center>200 OK</td>
+   * <td align=center>The list request was successful</td>
+   * <td align=center>A newline-separated list of revision values matching the specified
+   * scope and identifier values</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td>
+   * <pre>
+1
+2
+3
+   * </pre>
+   * </td>
+   * </tr>
+   * <tr>
+   * <td align=center>400 Bad Request</td>
+   * <td align=center>The request contains an error, such as an illegal scope or
+   * identifier value</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>401 Unauthorized</td>
+   * <td align=center>The requesting user is not authorized to access a list of the data
+   * package revisions</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>404 Not Found</td>
+   * <td align=center>No data package revisions associated with the specified scope and
+   * identifier are found</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>405 Method Not Allowed</td>
+   * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+   * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
+   * <tr>
+   * <td align=center>500 Internal Server Error</td>
+   * <td align=center>The server encountered an unexpected condition which prevented it from
+   * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+   * <td align=center><code>text/plain</code></td>
+   * <td align=center><code>Error message</code></td>
+   * </tr>
    * </table>
    * 
-   * @return a Response, containing a newline separated list of scope values
+   * @param scope
+   *          The scope of the metadata document.
+   * @param identifier
+   *          The identifier of the metadata document.
+   * @param filter
+   *          To return either the "oldest" or "newest" revision
+   * @return a Response, containing a newline-separated list of revision values
    */
+  @GET
+  @Path("/eml/{scope}/{identifier}")
+  @Produces("text/plain")
+  public Response listDataPackageRevisions(
+                               @Context HttpHeaders headers,
+                               @PathParam("scope") String scope,
+                               @PathParam("identifier") String identifierStr,
+                               @QueryParam("filter") @DefaultValue("") String filter
+                    ) {
+    Integer identifier = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "listDataPackageRevisions";
+    Rule.Permission permission = Rule.Permission.read;
+    AuthToken authToken = null;
+    String resourceId = null;
+    String entryText = null;
+  
+    try {
+      
+      // Check for a non-integer identifier
+      try {
+        identifier = new Integer(identifierStr);
+      }
+      catch (NumberFormatException e) {
+        String message = "identifier value '"  + identifierStr + "' must be a non-negative integer\n";
+        throw new UserErrorException(message);
+      }
+        
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+      String revisionList = null;
+      DataPackageManager dataPackageManager = new DataPackageManager();
+      if (filter.isEmpty()) {
+        revisionList = dataPackageManager.listDataPackageRevisions(scope, identifier);      	
+      } else {
+      	if (filter.equals("oldest")) {
+      		revisionList = dataPackageManager.getOldestRevision(scope, identifier).toString();
+      	} else if (filter.equals("newest")) {
+      		revisionList = dataPackageManager.getNewestRevision(scope, identifier).toString();
+      	} else {
+      		revisionList = "";
+      	}
+      }
+      
+      if (revisionList != null) {
+        responseBuilder = Response.ok(revisionList.trim());
+        response = responseBuilder.build();       
+      }
+      else {
+        String message = "An unknown error occurred";
+        throw new Exception(message);
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+      WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                               e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+  
+    // audit(serviceMethodName, authToken, response, resourceId, entryText);
+    
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>List Data Package Scopes</strong> operation, returning all scope
+	 * values extant in the data package registry.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET https://pasta.lternet.edu/package/eml</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A list of all scope values extant in the data package registry</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * <pre>
+knb-lter-lno
+knb-lter-xyz
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list of the scope
+	 * values</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No scope values are extant in the data package registry</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, containing a newline separated list of scope values
+	 */
   @GET
   @Path("/eml")
   @Produces("text/plain")
@@ -1817,75 +2364,83 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
   
-  /**
-   * 
-   * <strong>List Deleted Data Packages</strong> operation, returning all document identifiers (excluding revision values) that have been deleted from the data package registry.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -G http://package.lternet.edu/package/eml/deleted</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the list request was successful</td>
-   *     <td>A list of all document identifiers deleted from the data package registry</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>knb-lter-lno.1<br/>knb-lter-lno.2<br/>knb-lter-xyz.1</td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to access a list of deleted data packages</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no deleted data packages are found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @return a Response, containing a newline separated list of document identifiers.
-   */
+	/**
+	 * <strong>List Deleted Data Packages</strong> operation, returning all
+	 * document identifiers (excluding revision values) that have been deleted
+	 * from the data package registry.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET https://pasta.lternet.edu/package/eml/deleted</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A list of all document identifiers deleted from the data package
+	 * registry</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * <pre>
+knb-lter-lno.1
+knb-lter-lno.2
+knb-lter-xyz.1
+   * </pre>
+   * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list of deleted
+	 * data packages</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No deleted data packages are found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, containing a newline separated list of document
+	 *         identifiers.
+	 */
   @GET
   @Path("/eml/deleted")
   @Produces("text/plain")
@@ -1957,162 +2512,739 @@ public class DataPackageManagerResource extends PastaWebService {
 
   
   /**
-   * Applies the quality report stylesheet to transform the quality report
-   * representation from XML to HTML for presentation purposes.
-   * 
-   * @param xmlString    the quality report XML string
-   * @param xslPath      path to the quality report stylesheet
-   * 
-   * @return htmlString  the result of the transformation from XML to HTML
-   * @throws IllegalStateException
-   *                     if an error occurs during the transformation process
-   */
-  private String qualityReportXMLtoHTML(String xmlString,
-                                        final String xslPath) 
-          throws IllegalStateException {
-    String htmlString = "";
-    Result result;
-    StringWriter stringWriter = new StringWriter();
-    javax.xml.transform.Transformer transformer;
-    javax.xml.transform.TransformerFactory transformerFactory;
-    Source xmlSource;
-    File xsltFile = new File(xslPath);            
-    Source xsltSource;
+	 * <strong>Read Data Entity</strong> operation, specifying the scope,
+	 * identifier, revision, and entity identifier of the data entity to be read
+	 * in the URI.
+	 * 
+	 * <p>
+	 * Revision may be specified as "newest" or "oldest" to retrieve data from the
+	 * newest or oldest revision, respectively.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/1/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * httpd://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/oldest/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/newest/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data entity was successful</td>
+	 * <td align=center>The data that comprises the data entity</td>
+	 * <td align=center><code>application/octet-stream</code></td>
+	 * <td>
+	 * <pre>
+Site Year Month Day Transect Species_Code Count
+1 2000 8 26 1 G1 0
+1 2000 8 26 2 G1 0
+1 2000 8 26 3 G1 0
+.
+.
+.
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data entity</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>Either the specified data package or the specified data entity is
+	 * not found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param entityId
+	 *          The identifier of the data entity within the data package
+	 * @return a File object containing the specified data entity, if found, else
+	 *         returns a 404 Not Found response
+	 */
+  @GET
+  @Path("/data/eml/{scope}/{identifier}/{revision}/{entityId}")
+  public Response readDataEntity(
+                                 @Context HttpHeaders headers,
+                                 @PathParam("scope") String scope,
+                                 @PathParam("identifier") Integer identifier,
+                                 @PathParam("revision") String revision,
+                                 @PathParam("entityId") String entityId
+                    ) {
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+    final String serviceMethodName = "readDataEntity";
+    Rule.Permission permission = Rule.Permission.read;
+    AuthToken authToken = null;
+    String resourceId = null;
+    String entryText = null;
     
-    StringReader stringReader = new StringReader(xmlString);
-    xmlSource = new javax.xml.transform.stream.StreamSource(stringReader);
-    xsltSource = new javax.xml.transform.stream.StreamSource(xsltFile);
-    result = new javax.xml.transform.stream.StreamResult(stringWriter);
-    logger.debug("javax.xml.transform.TransformerFactory :" + 
-                 System.getProperty("javax.xml.transform.TransformerFactory"));
-    transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
-
     try {
-      transformer = transformerFactory.newTransformer(xsltSource);      
-      transformer.transform(xmlSource, result);
-      htmlString = stringWriter.toString();
-    }
-    catch (TransformerConfigurationException e) {
-      Throwable x = e;
-      if (e.getException() != null) {
-        x = e.getException();    
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
       }
-      x.printStackTrace();
-      throw new IllegalStateException(e);
-    }
-    catch (TransformerException e) {
-      Throwable x = e;
-      if (e.getException() != null) {
-        x = e.getException();    
-      }
-      x.printStackTrace(); 
-      throw new IllegalStateException(e);
-    }
       
-    return htmlString;
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+  
+      /*
+       * Handle symbolic revisions such as "newest" and "oldest".
+       */
+      if (revision != null) {
+        if (revision.equals("newest")) {
+          Integer newest = dataPackageManager.getNewestRevision(scope, identifier);
+          if (newest != null) { revision = newest.toString(); }
+        }
+        else if (revision.equals("oldest")) {
+          Integer oldest = dataPackageManager.getOldestRevision(scope, identifier);
+          if (oldest != null) { revision = oldest.toString(); }
+        }
+      }
+      
+      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
+      String packageId = emlPackageIdFormat.format(emlPackageId);
+  
+      /*
+       * Isolate the resourceId for the data entity so that its value can be
+       * recorded in the audit log
+       */
+      Integer revisionInt = new Integer(revision);
+      ArrayList<String> resources = dataPackageManager.getDataPackageResources(scope, identifier, revisionInt);
+      if (resources != null && resources.size() > 0) {
+        for (String resource : resources) {
+          if (resource != null && 
+              resource.contains("/package/data/eml") &&
+              resource.contains(entityId)
+             ) {
+            resourceId = resource;
+          }
+        }
+      }
+  
+      MediaType dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
+      entryText = "Data Format: " + dataFormat.toString();
+      
+      File file = 
+        dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId, authToken, userId);
+    
+      if (file != null && file.exists()) {
+      	
+      	Long size = FileUtils.sizeOf(file);
+      	
+        String dataPackageResourceId = DataPackageManager.composeResourceId(
+          ResourceType.dataPackage, scope, identifier, Integer.valueOf(revision), null);
+  
+        String entityResourceId = DataPackageManager.composeResourceId(
+          ResourceType.data, scope, identifier, Integer.valueOf(revision), entityId);
+  
+        String entityName = dataPackageManager.readDataEntityName(
+          dataPackageResourceId, entityResourceId, authToken);
+        
+        String xmlMetadata = dataPackageManager.readMetadata(
+          scope, identifier, revision, authToken.getUserId(), authToken);
+        
+        String objectName = findObjectName(xmlMetadata, entityName);
+        
+        entryText = String.format("%s: %s; %s: %s; %s", 
+                                  "Entity Name", entityName, "Object Name", objectName, entryText);
+  
+        responseBuilder = Response.ok(file, dataFormat);
+        
+        if (objectName != null) {
+          responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
+        }
+  
+        responseBuilder.header("Content-Length", size.toString());
+        response = responseBuilder.build();
+        
+      }
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(
+          "Unable to access data entity file for packageId: " + packageId.toString() + 
+                                        "; entityId: " + entityId);
+        throw(e);
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                 e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    response = stampHeader(response);
+    return response;
+    
   }
+
+
+	/**
+	 * 
+	 * <strong>Read Data Entity DOI</strong> operation, specifying the scope,
+	 * identifier, and revision of the data entity DOI to be read in the URI,
+	 * returning the canonical Digital Object Identifier.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/doi/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data entity DOI was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the data entity.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data entity</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No DOI associated with the specified data entity is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param entityId
+	 *          The entity identifier
+	 * @return a Response object containing a data entity DOI if found, else
+	 *         returns a 404 Not Found response
+	 */
   
+  @GET
+  @Path("/data/doi/eml/{scope}/{identifier}/{revision}/{entityId}")
+  @Produces("text/plain")
+  public Response readDataEntityDoi(
+                                 @Context HttpHeaders headers,
+                                 @PathParam("scope") String scope,
+                                 @PathParam("identifier") Integer identifier,
+                                 @PathParam("revision") String revision,
+                                 @PathParam("entityId") String entityId
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    String resourceId = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataEntityDoi";
+    Rule.Permission permission = Rule.Permission.read;
   
-  /**
-   * 
-   * <strong>Read Data Package</strong> operation, specifying the scope, identifier, and revision of the data package to be read in the URI, returning a resource graph with reference URLs to each of the metadata, data, and quality report resources that comprise the data package.
-   * 
-   * <p>Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest 
-   * revision, respectively.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/eml/knb-lter-lno/1/3</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/eml/knb-lter-lno/1/oldest</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/eml/knb-lter-lno/1/newest</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data package was successful</td>
-   *     <td>A resource graph with reference URLs to each of the metadata, data, and quality report resources that comprise the data package.</td>
-   *     <td><code>'text/plain'</code></td>
-   *     <td>
-   *     https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/3/NoneSuchBugCount<br />
-   *     https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/3<br />
-   *     https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/3<br />
-   *     https://pasta.lternet.edu/package/eml/knb-lter-lno/1/3
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package associated with the specified packageId is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return a Response object containing a data package resource graph
-   *         if found, else returns a 404 Not Found response
-   */
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+  		resourceId = DataPackageManager.composeResourceId(
+  		    ResourceType.data, scope, identifier,
+  		    Integer.valueOf(revision), entityId);
+  
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+  
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+        entryText = doi;
+     }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Data Entity Name</strong> operation, specifying the scope,
+	 * identifier, revision, and entity identifier of the data entity whose name
+	 * is to be read in the URI.
+	 * 
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/name/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package entity name was successful</td>
+	 * <td align=center>The entity name value of the data package entity.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>Daily Average Moored CTD and ADCP Data</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package entity
+	 * name</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No entity associated with the specified data package entity identifier
+	 * is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param entityId
+	 *          The identifier of the data entity within the data package
+	 * @return a Response object containing a data entity name if found, else
+	 *         returns a 404 Not Found response
+	 */
+  @GET
+  @Path("/name/eml/{scope}/{identifier}/{revision}/{entityId}")
+  @Produces("text/plain")
+  public Response readDataEntityName(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision,
+                                  @PathParam("entityId") String entityId
+                    ) {
+    AuthToken authToken = null;
+    String dataPackageResourceId = null;
+    String entityName = null;
+    String entryText = null;
+    String entityResourceId = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataEntityName";
+    Rule.Permission permission = Rule.Permission.read;
+  
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+      dataPackageResourceId = DataPackageManager.composeResourceId(
+          ResourceType.dataPackage, scope, identifier,
+          Integer.valueOf(revision), null);
+  
+      entityResourceId = DataPackageManager.composeResourceId(
+          ResourceType.data, scope, identifier,
+          Integer.valueOf(revision), entityId);
+  
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      entityName = dataPackageManager.readDataEntityName(dataPackageResourceId,
+                                                         entityResourceId, authToken);
+      
+      if (entityName != null) {
+        responseBuilder = Response.ok(entityName);
+        response = responseBuilder.build();
+        entryText = entityName;
+      }
+      else {
+        Exception e = new Exception(
+            "Read Data Entity Name operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, entityResourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Data Package</strong> operation, specifying the scope,
+	 * identifier, and revision of the data package to be read in the URI,
+	 * returning a resource graph with reference URLs to each of the metadata,
+	 * data, and quality report resources that comprise the data package.
+	 * 
+	 * <p>
+	 * Revision may be specified as "newest" or "oldest" to retrieve the newest or
+	 * oldest revision, respectively.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1/oldest</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1/newest</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package was successful</td>
+	 * <td align=center>A resource graph with reference URLs to each of the metadata, data, and
+	 * quality report resources that comprise the data package.</td>
+	 * <td align=center><code>'text/plain'</code></td>
+	 * <td>
+	 * <pre>
+https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/1/67e99349d1666e6f4955e9dda42c3cc2
+https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/1
+https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/1
+https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package associated with the specified packageId is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a data package resource graph if
+	 *         found, else returns a 404 Not Found response
+	 */
   @GET
   @Path("/eml/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
@@ -2197,100 +3329,1263 @@ public class DataPackageManagerResource extends PastaWebService {
   }
   
   
-  /**
-   * 
-   * <strong>Read Metadata</strong> operation, specifying the scope, identifier, and revision of the metadata document to be read in the URI.
-   * 
-   * <p>Revision may be specified as "newest" or "oldest" to retrieve the 
-   *    newest or oldest revision, respectively.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/metadata/eml/knb-lter-lno/1/3</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/metadata/eml/knb-lter-lno/1/newest</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/metadata/eml/knb-lter-lno/1/oldest</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the metadata document was successful</td>
-   *     <td>The metadata document</td>
-   *     <td><code>'application/xml'</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package metadata document</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package associated with the specified packageId is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return a Response object containing the XML metadata document in its message body
-   */
+	/**
+	 * <strong>Read Data Package Archive</strong> operation, specifying the
+	 * <em>transaction identifier</em> of the data package archive to be read in
+	 * the URI, returning the data package archive as a binary object in the ZIP
+	 * file format.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/archive/eml/1364521882823</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package archive was successful</td>
+	 * <td align=center>The data package ZIP archive as a binary stream</td>
+	 * <td align=center><code>application/octet-stream</code></td>
+	 * <td align=center>...binary stream...</td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package archive</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No archive associated with the specified <em>transaction identifier</em> is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param transaction
+	 *          The transaction of the data package error
+	 * @return a Response object containing a data package error if found, else
+	 *         returns a 404 Not Found response
+	 */
+  @GET
+  @Path("/archive/eml/{transaction}")
+  public Response readDataPackageArchive(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("transaction") String transaction
+                    ) {
+  
+  	AuthToken authToken = null;
+    String entryText = null;
+    String resourceId = "/archive/" + transaction;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageArchive";
+    Rule.Permission permission = Rule.Permission.read;
+    
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+  
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+  
+  	try {
+  
+  		DataPackageManager dpm = new DataPackageManager();
+  		File file = dpm.getDataPackageArchiveFile(transaction);
+  
+  		if (file != null && file.exists()) {
+  			Long size = FileUtils.sizeOf(file);
+  			responseBuilder = Response.ok(file, "application/zip");
+  			responseBuilder.header("Content-Disposition", "attachment; filename="
+  			    + transaction + ".zip");
+  			responseBuilder.header("Content-Length", size.toString());
+  			response = responseBuilder.build();
+  		} else {
+  			String gripe = "Unable to access data package archive " + transaction
+  			    + ".zip for transaction: " + transaction;
+  			ResourceNotFoundException e = new ResourceNotFoundException(gripe);
+  			throw (e);
+  		}
+  
+  	}    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+    
+  }
+
+
+	/**
+	 * <strong>Read Data Package DOI</strong> operation, specifying the scope,
+	 * identifier, and revision of the data package DOI to be read in the URI,
+	 * returning the canonical Digital Object Identifier.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/doi/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package DOI was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the data package.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No DOI associated with the specified data package is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a data package DOI if found, else
+	 *         returns a 404 Not Found response
+	 */
+  @GET
+  @Path("/doi/eml/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readDataPackageDoi(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    String resourceId = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageDoi";
+    Rule.Permission permission = Rule.Permission.read;
+  
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+  		resourceId = DataPackageManager.composeResourceId(
+  		    ResourceType.dataPackage, scope, identifier,
+  		    Integer.valueOf(revision), null);
+  
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+      
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+        entryText = doi;
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Data Package Report</strong> operation, specifying the scope,
+	 * identifier, and revision of the data package quality report document to be
+	 * read in the URI.
+	 * 
+	 * <p>
+	 * If an HTTP Accept header with value 'text/html' is included in the request,
+	 * returns an HTML representation of the report. The default representation is
+	 * XML.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><em>XML representation: </em><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/3</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><em>HTML representation: </em><code>curl -i -X GET -H "Accept: text/html"
+	 * https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/3</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the quality report was successful</td>
+	 * <td align=center>The quality report document that describes the data package</td>
+	 * <td align=center><code>application/xml</code> or <code>text/html</code></td>
+	 * <td>
+	 * <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;qualityReport&gt;
+  &lt;packageId&gt;knb-lter-lno.1.3&lt;/packageId&gt;
+.
+.
+.
+&lt;/qualityReport&gt;
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the specified data
+	 * package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package matching the specified scope, identifier, and revision
+	 * values is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return A Response object containing the data package quality report
+	 */
+  @GET
+  @Path("/report/eml/{scope}/{identifier}/{revision}")
+  @Produces({"application/xml", "text/html"})
+  public Response readDataPackageReport(
+                                    @Context HttpHeaders headers,
+                                    @PathParam("scope") String scope,
+                                    @PathParam("identifier") Integer identifier,
+                                    @PathParam("revision") String revision
+                     ) {
+    AuthToken authToken = null;
+    boolean produceHTML = false;
+    final String serviceMethodName = "readDataPackageReport";
+    Rule.Permission permission = Rule.Permission.read;
+    String resourceId = null;
+    String entryText = null;
+    
+    /*
+     * Determine whether to produce an HTML representation
+     */
+    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
+    for (MediaType mediaType : mediaTypes) {
+      String mediaTypeStr = mediaType.toString();
+      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
+        produceHTML = true;
+      }
+    }
+    
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+    
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+    try {
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
+      String packageId = emlPackageIdFormat.format(emlPackageId);
+  
+      /*
+       * Isolate the resourceId for the report so that its value can be
+       * recorded in the audit log
+       */
+      Integer revisionInt = new Integer(revision);
+      ArrayList<String> resources = dataPackageManager.getDataPackageResources(scope, identifier, revisionInt);
+      if (resources != null && resources.size() > 0) {
+        for (String resource : resources) {
+          if (resource != null && resource.contains("/package/report/eml")) {
+            resourceId = resource;
+          }
+        }
+      }
+  
+      File xmlFile = 
+        dataPackageManager.readDataPackageReport(scope, identifier, revision, 
+                                                 emlPackageId, authToken, userId);
+    
+      if (xmlFile != null && xmlFile.exists()) {
+        if (produceHTML) {
+          Options options = ConfigurationListener.getOptions();
+          String xslPath = null;
+          if (options != null) {
+            xslPath = options.getOption("datapackagemanager.xslPath");
+          }
+          
+          try {
+            String xmlString = FileUtility.fileToString(xmlFile);
+            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
+            responseBuilder = Response.ok(htmlResult);
+            if (responseBuilder != null) {       
+              response = responseBuilder.build();       
+            }
+          }
+          catch (IllegalStateException e) {
+            entryText = e.getMessage();
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                       e, e.getMessage());
+            response = webApplicationException.getResponse();
+          }
+        }
+        else {
+          responseBuilder = Response.ok(xmlFile);
+          if (responseBuilder != null) {       
+            response = responseBuilder.build();       
+          }
+        } 
+      }
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(
+            "Unable to access data package quality report file for packageId: " + packageId);
+        WebApplicationException webApplicationException =
+          WebExceptionFactory.makeNotFound(e);
+        entryText = e.getMessage();
+        response = webApplicationException.getResponse();
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                 e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Report DOI</strong> operation, specifying the scope,
+	 * identifier, and revision of the report DOI to be read in the URI, returning
+	 * the canonical Digital Object Identifier.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/report/doi/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the report DOI was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the report.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the report</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No DOI associated with the specified report is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a report DOI if found, else returns a
+	 *         404 Not Found response
+	 */
+  @GET
+  @Path("/report/doi/eml/{scope}/{identifier}/{revision}")
+  @Produces("text/plain")
+  public Response readDataPackageReportDoi(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier,
+                                  @PathParam("revision") String revision
+                    ) {
+    AuthToken authToken = null;
+    String doi = null;
+    String entryText = null;
+    String resourceId = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageReportDoi";
+    Rule.Permission permission = Rule.Permission.read;
+  
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+  
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+  		resourceId = DataPackageManager.composeResourceId(
+  		    ResourceType.report, scope, identifier,
+  		    Integer.valueOf(revision), null);
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+  
+      if (doi != null) {
+        responseBuilder = Response.ok(doi);
+        response = responseBuilder.build();
+        entryText = doi;
+      }
+      else {
+        Exception e = new Exception(
+            "Read resource DOI operation failed for unknown reason");
+        throw (e);
+      }
+      
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Data Package Error</strong> operation, specifying the scope,
+	 * identifier, revision, and transaction id of the data package error to be
+	 * read in the URI, returning the error message as plain text.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/error/eml/1364521882823</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package error was successful</td>
+	 * <td align=center>The error message of the data package.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>Attempting to update a data package to revision '1' but an equal or
+	 * higher revision ('1') already exists in PASTA: knb-lter-lno.1.1.</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No error associated with the specified data package is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param transaction
+	 *          The transaction of the data package error
+	 * @return a Response object containing a data package error if found, else
+	 *         returns a 404 Not Found response
+	 */
+  @GET
+  @Path("/error/eml/{transaction}")
+  @Produces("text/plain")
+  public Response readDataPackageError(
+                                  @Context HttpHeaders headers,
+                                  @PathParam("transaction") String transaction
+                    ) {
+    AuthToken authToken = null;
+    String entryText = null;
+    String resourceId = transaction + ".txt";
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "readDataPackageError";
+    Rule.Permission permission = Rule.Permission.read;
+    
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+  
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+  
+  	try {
+  		DataPackageManager dpm = new DataPackageManager();
+  		entryText = dpm.readDataPackageError(transaction);
+  		responseBuilder = Response.ok(entryText);
+  		response = responseBuilder.build();
+  	}
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (ResourceExistsException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = WebExceptionFactory
+          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+  
+    response = stampHeader(response);
+    return response;
+    
+  }
+
+
+	/**
+	 * <strong>Read Evaluate Report</strong> operation, specifying the
+	 * <em>transaction identifier</em> of the evaluate quality report
+	 * document to be read in the URI.
+	 * 
+	 * <p>
+	 * If an HTTP Accept header with value 'text/html' is included in the request,
+	 * returns an HTML representation of the report. The default representation is
+	 * XML.
+	 * </p>
+	 * 
+	 * <p>
+	 * See the <code>Evaluate Data Package</code> service method for information
+	 * about how to obtain the transaction id.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><em>XML representation: </em><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/evaluate/report/eml/1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><em>HTML representation: </em><code>curl -i -H "Accept: text/html" -X GET
+	 * https://pasta.lternet.edu/package/evaluate/report/eml/31364424858431</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the quality report was successful</td>
+	 * <td align=center>The quality report document that describes the data package</td>
+	 * <td align=center><code>application/xml</code> or <code>text/html</code></td>
+	 * <td>
+	 * <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;qualityReport&gt;
+  &lt;packageId&gt;knb-lter-lno.1.1&lt;/packageId&gt;
+.
+.
+.
+&lt;/qualityReport&gt;
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the specified data
+	 * package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package matching the specified scope, identifier, and revision
+	 * values is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param transaction
+	 *          The transaction identifier, e.g. "1364424858431"
+	 * @return A Response object containing the evaluate quality report
+	 */
+  @GET
+  @Path("/evaluate/report/eml/{transaction}")
+  @Produces({"application/xml", "text/html"})
+  public Response readEvaluateReport(
+                                    @Context HttpHeaders headers,
+                                    @PathParam("transaction") String transaction
+                     ) {
+    AuthToken authToken = null;
+    boolean produceHTML = false;
+    final String serviceMethodName = "readEvaluateReport";
+    Rule.Permission permission = Rule.Permission.read;
+    String resourceId = "";
+    String entryText = null;
+    
+    /*
+     * Determine whether to produce an HTML representation
+     */
+    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
+    for (MediaType mediaType : mediaTypes) {
+      String mediaTypeStr = mediaType.toString();
+      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
+        produceHTML = true;
+      }
+    }
+    
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+    
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+    try {
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+  
+      File xmlFile = 
+        dataPackageManager.readEvaluateReport(transaction);
+    
+      if (xmlFile != null && xmlFile.exists()) {
+        if (produceHTML) {
+          Options options = ConfigurationListener.getOptions();
+          String xslPath = null;
+          if (options != null) {
+            xslPath = options.getOption("datapackagemanager.xslPath");
+          }
+          
+          try {
+            String xmlString = FileUtility.fileToString(xmlFile);
+            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
+            responseBuilder = Response.ok(htmlResult);
+            if (responseBuilder != null) {       
+              response = responseBuilder.build();       
+            }
+          }
+          catch (IllegalStateException e) {
+            entryText = e.getMessage();
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                       e, e.getMessage());
+            response = webApplicationException.getResponse();
+          }
+        }
+        else {
+          responseBuilder = Response.ok(xmlFile);
+          if (responseBuilder != null) {       
+            response = responseBuilder.build();       
+          }
+        } 
+      }
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(String.format(
+            "Unable to access data package evaluate report file for transaction id: %s ",
+            transaction));
+        WebApplicationException webApplicationException = WebExceptionFactory.makeNotFound(e);
+        entryText = e.getMessage();
+        response = webApplicationException.getResponse();
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+    
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Read Metadata</strong> operation, specifying the scope, identifier,
+	 * and revision of the EML document to be read in the URI.
+	 * 
+	 * <p>
+	 * Revision may be specified as "newest" or "oldest" to retrieve the newest or
+	 * oldest revision, respectively.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/newest</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/oldest</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the EML document was successful</td>
+	 * <td align=center>EML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;eml:eml packageId="knb-lter-nin.1.1" scope="system"
+  system="https://pasta.lternet.edu"
+  xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0
+  http://nis.lternet.edu/schemas/eml/eml-2.1.0/eml.xsd"&gt;
+.
+.
+.
+&lt;/eml:eml&gt;
+	 * </pre>
+	 *</td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package metadata
+	 * document</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package associated with the specified packageId is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing the XML metadata document in its
+	 *         message body
+	 */
   @GET
   @Path("/metadata/eml/{scope}/{identifier}/{revision}")
   @Produces("application/xml")
@@ -2399,1462 +4694,93 @@ public class DataPackageManagerResource extends PastaWebService {
   }
 
 
-  /**
-   * 
-   * <strong>Read Data Entity</strong> operation, specifying the scope, identifier, revision, and entity identifier of the data entity to be read in the URI.
-   * 
-   * <p>Revision may be specified as "newest" or "oldest" to retrieve data from the newest or oldest 
-   * revision, respectively.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/data/eml/knb-lter-lno/1/3/FictionalEntity</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/data/eml/knb-lter-lno/1/oldest/FictionalEntity</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td>curl -i -G http://package.lternet.edu/package/data/eml/knb-lter-lno/1/newest/FictionalEntity</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data entity was successful</td>
-   *     <td>The data that comprises the data entity</td>
-   *     <td><code>application/octet-stream</code></td>
-   *     <td>
-   *       Site Year Month Day Transect Species_Code Count<br/>
-   *       1 2000 8 26 1 G1 0<br/>
-   *       1 2000 8 26 2 G1 0<br/>
-   *       1 2000 8 26 3 G1 0<br/>
-   *       .<br/>
-   *       .<br/>
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data entity</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If either the specified data package or the specified data entity is not found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param entityId    The identifier of the data entity within the data package
-   * @return a File object containing the specified data entity,
-   *         if found, else returns a 404 Not Found response
-   */
+	/**
+	 * <strong>Read Metadata DOI</strong> operation, specifying the scope,
+	 * identifier, and revision of the metadata DOI to be read in the URI,
+	 * returning the canonical Digital Object Identifier.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/doi/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the metadata DOI was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the metadata</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the metadata</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No DOI associated with the specified metadata is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a metadata DOI if found, else returns
+	 *         a 404 Not Found response
+	 */
   @GET
-  @Path("/data/eml/{scope}/{identifier}/{revision}/{entityId}")
-  public Response readDataEntity(
-                                 @Context HttpHeaders headers,
-                                 @PathParam("scope") String scope,
-                                 @PathParam("identifier") Integer identifier,
-                                 @PathParam("revision") String revision,
-                                 @PathParam("entityId") String entityId
-                    ) {
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-    final String serviceMethodName = "readDataEntity";
-    Rule.Permission permission = Rule.Permission.read;
-    AuthToken authToken = null;
-    String resourceId = null;
-    String entryText = null;
-    
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-
-      /*
-       * Handle symbolic revisions such as "newest" and "oldest".
-       */
-      if (revision != null) {
-        if (revision.equals("newest")) {
-          Integer newest = dataPackageManager.getNewestRevision(scope, identifier);
-          if (newest != null) { revision = newest.toString(); }
-        }
-        else if (revision.equals("oldest")) {
-          Integer oldest = dataPackageManager.getOldestRevision(scope, identifier);
-          if (oldest != null) { revision = oldest.toString(); }
-        }
-      }
-      
-      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
-      String packageId = emlPackageIdFormat.format(emlPackageId);
-
-      /*
-       * Isolate the resourceId for the data entity so that its value can be
-       * recorded in the audit log
-       */
-      Integer revisionInt = new Integer(revision);
-      ArrayList<String> resources = dataPackageManager.getDataPackageResources(scope, identifier, revisionInt);
-      if (resources != null && resources.size() > 0) {
-        for (String resource : resources) {
-          if (resource != null && 
-              resource.contains("/package/data/eml") &&
-              resource.contains(entityId)
-             ) {
-            resourceId = resource;
-          }
-        }
-      }
-
-      MediaType dataFormat = dataPackageManager.getDataEntityFormat(scope, identifier, revision, entityId);
-      entryText = "Data Format: " + dataFormat.toString();
-      
-      File file = 
-        dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId, authToken, userId);
-    
-      if (file != null && file.exists()) {
-      	
-      	Long size = FileUtils.sizeOf(file);
-      	
-        String dataPackageResourceId = DataPackageManager.composeResourceId(
-          ResourceType.dataPackage, scope, identifier, Integer.valueOf(revision), null);
-
-        String entityResourceId = DataPackageManager.composeResourceId(
-          ResourceType.data, scope, identifier, Integer.valueOf(revision), entityId);
-
-        String entityName = dataPackageManager.readDataEntityName(
-          dataPackageResourceId, entityResourceId, authToken);
-        
-        String xmlMetadata = dataPackageManager.readMetadata(
-          scope, identifier, revision, authToken.getUserId(), authToken);
-        
-        String objectName = findObjectName(xmlMetadata, entityName);
-        
-        entryText = String.format("%s: %s; %s: %s; %s", 
-                                  "Entity Name", entityName, "Object Name", objectName, entryText);
-
-        responseBuilder = Response.ok(file, dataFormat);
-        
-        if (objectName != null) {
-          responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
-        }
-
-        responseBuilder.header("Content-Length", size.toString());
-        response = responseBuilder.build();
-        
-      }
-      else {
-        ResourceNotFoundException e = new ResourceNotFoundException(
-          "Unable to access data entity file for packageId: " + packageId.toString() + 
-                                        "; entityId: " + entityId);
-        throw(e);
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                 e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-    response = stampHeader(response);
-    return response;
-    
-  }
-  
-   
-  /**
-   * 
-   * <strong>Read Data Entity Name</strong> operation, specifying the scope, identifier, revision, and entity identifier of the data entity whose name is to be read in the URI.
-   * 
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/name/knb-lter-lno/1/3/AB39DC03999GDN123</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data package entity name was successful</td>
-   *     <td>The entity name value of the data package entity.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>Daily Average Moored CTD and ADCP Data</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package entity name</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no entity associated with the specified data package entity identifier is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param entityId    The identifier of the data entity within the data package
-   * @return a Response object containing a data entity name
-   *         if found, else returns a 404 Not Found response
-   */
-  @GET
-  @Path("/name/eml/{scope}/{identifier}/{revision}/{entityId}")
-  @Produces("text/plain")
-  public Response readDataEntityName(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("scope") String scope,
-                                  @PathParam("identifier") Integer identifier,
-                                  @PathParam("revision") String revision,
-                                  @PathParam("entityId") String entityId
-                    ) {
-    AuthToken authToken = null;
-    String dataPackageResourceId = null;
-    String entityName = null;
-    String entryText = null;
-    String entityResourceId = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataEntityName";
-    Rule.Permission permission = Rule.Permission.read;
-
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      dataPackageResourceId = DataPackageManager.composeResourceId(
-          ResourceType.dataPackage, scope, identifier,
-          Integer.valueOf(revision), null);
-
-      entityResourceId = DataPackageManager.composeResourceId(
-          ResourceType.data, scope, identifier,
-          Integer.valueOf(revision), entityId);
-
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      entityName = dataPackageManager.readDataEntityName(dataPackageResourceId,
-                                                         entityResourceId, authToken);
-      
-      if (entityName != null) {
-        responseBuilder = Response.ok(entityName);
-        response = responseBuilder.build();
-        entryText = entityName;
-      }
-      else {
-        Exception e = new Exception(
-            "Read Data Entity Name operation failed for unknown reason");
-        throw (e);
-      }
-      
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, entityResourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-  }
-  
-  
-  /**
-   * <strong>Read Data Package Report</strong> operation, specifying the scope, identifier, and revision of the data package quality report document to be read in the URI.
-   * 
-   * <p>If an HTTP Accept header with value 'text/html' is included in the request, 
-   * returns an HTML representation of the report. The default representation is XML.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>XML representation: </em>curl -i -G http://package.lternet.edu/package/report/eml/knb-lter-lno/1/3</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>HTML representation: </em>curl -i -H "Accept: text/html" -G http://package.lternet.edu/package/report/eml/knb-lter-lno/1/3</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the quality report was successful</td>
-   *     <td>The quality report document that describes the data package</td>
-   *     <td><code>application/xml</code> or <code>text/html</code> (See above)</td>
-   *     <td>
-   *   <pre>
-         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-         &lt;qualityReport&gt;
-         &lt;packageId&gt;knb-lter-lno.1.3&lt;/packageId&gt;
-         .
-         .
-         .
-         &lt;/qualityReport&gt;
-   *   </pre>
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the specified data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package matching the specified scope, identifier, and revision values is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return            A Response object containing the data package 
-   *                    quality report
-   */
-  @GET
-  @Path("/report/eml/{scope}/{identifier}/{revision}")
-  @Produces({"application/xml", "text/html"})
-  public Response readDataPackageReport(
-                                    @Context HttpHeaders headers,
-                                    @PathParam("scope") String scope,
-                                    @PathParam("identifier") Integer identifier,
-                                    @PathParam("revision") String revision
-                     ) {
-    AuthToken authToken = null;
-    boolean produceHTML = false;
-    final String serviceMethodName = "readDataPackageReport";
-    Rule.Permission permission = Rule.Permission.read;
-    String resourceId = null;
-    String entryText = null;
-    
-    /*
-     * Determine whether to produce an HTML representation
-     */
-    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
-    for (MediaType mediaType : mediaTypes) {
-      String mediaTypeStr = mediaType.toString();
-      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
-        produceHTML = true;
-      }
-    }
-    
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-    
-    // Is user authorized to run the service method?
-    boolean serviceMethodAuthorized = 
-      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-    if (!serviceMethodAuthorized) {
-      throw new UnauthorizedException(
-          "User " + userId + 
-          " is not authorized to execute service method " + 
-          serviceMethodName);
-    }
-    
-    try {
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
-      String packageId = emlPackageIdFormat.format(emlPackageId);
-
-      /*
-       * Isolate the resourceId for the report so that its value can be
-       * recorded in the audit log
-       */
-      Integer revisionInt = new Integer(revision);
-      ArrayList<String> resources = dataPackageManager.getDataPackageResources(scope, identifier, revisionInt);
-      if (resources != null && resources.size() > 0) {
-        for (String resource : resources) {
-          if (resource != null && resource.contains("/package/report/eml")) {
-            resourceId = resource;
-          }
-        }
-      }
-
-      File xmlFile = 
-        dataPackageManager.readDataPackageReport(scope, identifier, revision, 
-                                                 emlPackageId, authToken, userId);
-    
-      if (xmlFile != null && xmlFile.exists()) {
-        if (produceHTML) {
-          Options options = ConfigurationListener.getOptions();
-          String xslPath = null;
-          if (options != null) {
-            xslPath = options.getOption("datapackagemanager.xslPath");
-          }
-          
-          try {
-            String xmlString = FileUtility.fileToString(xmlFile);
-            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
-            responseBuilder = Response.ok(htmlResult);
-            if (responseBuilder != null) {       
-              response = responseBuilder.build();       
-            }
-          }
-          catch (IllegalStateException e) {
-            entryText = e.getMessage();
-            WebApplicationException webApplicationException = 
-              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                       e, e.getMessage());
-            response = webApplicationException.getResponse();
-          }
-        }
-        else {
-          responseBuilder = Response.ok(xmlFile);
-          if (responseBuilder != null) {       
-            response = responseBuilder.build();       
-          }
-        } 
-      }
-      else {
-        ResourceNotFoundException e = new ResourceNotFoundException(
-            "Unable to access data package quality report file for packageId: " + packageId);
-        WebApplicationException webApplicationException =
-          WebExceptionFactory.makeNotFound(e);
-        entryText = e.getMessage();
-        response = webApplicationException.getResponse();
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                 e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-    response = stampHeader(response);
-    return response;
-  }
-
-  
-  /**
-   * <strong>Read Evaluate Report</strong> operation, specifying the scope, identifier, revision, and transaction id of the evaluate quality report document to be read in the URI.
-   * 
-   * <p>If an HTTP Accept header with value 'text/html' is included in the request, 
-   * returns an HTML representation of the report. The default representation is XML.</p>
-   * 
-   * <p>See the <code>Evaluate Data Package</code> service method for information about how to obtain the transaction id.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>XML representation: </em>curl -i -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-lno/1/3/1364424858431</td>
-   *   </tr>
-   *   <tr>
-   *     <td></td>
-   *     <td></td>
-   *     <td><em>HTML representation: </em>curl -i -H "Accept: text/html" -G http://package.lternet.edu/package/evaluate/report/eml/knb-lter-lno/1/31364424858431</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the quality report was successful</td>
-   *     <td>The quality report document that describes the data package</td>
-   *     <td><code>application/xml</code> or <code>text/html</code> (See above)</td>
-   *     <td>
-   *   <pre>
-         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-         &lt;qualityReport&gt;
-         &lt;packageId&gt;knb-lter-lno.1.3&lt;/packageId&gt;
-         .
-         .
-         .
-         &lt;/qualityReport&gt;
-       </pre>
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the specified data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no data package matching the specified scope, identifier, and revision values is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param transaction The transaction identifier, e.g. "1364424858431"
-   * @return            A Response object containing the evaluate quality report
-   */
-  @GET
-  @Path("/evaluate/report/eml/{transaction}")
-  @Produces({"application/xml", "text/html"})
-  public Response readEvaluateReport(
-                                    @Context HttpHeaders headers,
-                                    @PathParam("transaction") String transaction
-                     ) {
-    AuthToken authToken = null;
-    boolean produceHTML = false;
-    final String serviceMethodName = "readEvaluateReport";
-    Rule.Permission permission = Rule.Permission.read;
-    String resourceId = "";
-    String entryText = null;
-    
-    /*
-     * Determine whether to produce an HTML representation
-     */
-    List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
-    for (MediaType mediaType : mediaTypes) {
-      String mediaTypeStr = mediaType.toString();
-      if (mediaTypeStr.equals(MediaType.TEXT_HTML)) {
-        produceHTML = true;
-      }
-    }
-    
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-    
-    // Is user authorized to run the service method?
-    boolean serviceMethodAuthorized = 
-      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-    if (!serviceMethodAuthorized) {
-      throw new UnauthorizedException(
-          "User " + userId + 
-          " is not authorized to execute service method " + 
-          serviceMethodName);
-    }
-    
-    try {
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-
-      File xmlFile = 
-        dataPackageManager.readEvaluateReport(transaction);
-    
-      if (xmlFile != null && xmlFile.exists()) {
-        if (produceHTML) {
-          Options options = ConfigurationListener.getOptions();
-          String xslPath = null;
-          if (options != null) {
-            xslPath = options.getOption("datapackagemanager.xslPath");
-          }
-          
-          try {
-            String xmlString = FileUtility.fileToString(xmlFile);
-            String htmlResult = qualityReportXMLtoHTML(xmlString, xslPath);
-            responseBuilder = Response.ok(htmlResult);
-            if (responseBuilder != null) {       
-              response = responseBuilder.build();       
-            }
-          }
-          catch (IllegalStateException e) {
-            entryText = e.getMessage();
-            WebApplicationException webApplicationException = 
-              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                       e, e.getMessage());
-            response = webApplicationException.getResponse();
-          }
-        }
-        else {
-          responseBuilder = Response.ok(xmlFile);
-          if (responseBuilder != null) {       
-            response = responseBuilder.build();       
-          }
-        } 
-      }
-      else {
-        ResourceNotFoundException e = new ResourceNotFoundException(String.format(
-            "Unable to access data package evaluate report file for transaction id: %s ",
-            transaction));
-        WebApplicationException webApplicationException = WebExceptionFactory.makeNotFound(e);
-        entryText = e.getMessage();
-        response = webApplicationException.getResponse();
-      }
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-    response = stampHeader(response);
-    return response;
-  }
-
-  
-  /**
-   * 
-   * <strong>Read Data Package Archive</strong> operation, specifying the
-   * transaction id of the data package archive to be read in the URI,
-   * returning the data package archive as a binary object in the ZIP file
-   * format.
-   * 
-   * <p>See the <code>Create Data Package</code> and  <code>Update Data Package</code> 
-   * service methods for information about how to obtain the transaction id.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/archive/eml/1364521882823</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data package error was successful</td>
-   *     <td>The error message of the data package.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>Attempting to update a data package to revision '3' but an equal or
-   *         higher revision ('5') already exists in PASTA: knb-lter-nope.1.3.</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no error associated with the specified data package is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param transaction The transaction of the data package error
-   * @return a Response object containing a data package error
-   *         if found, else returns a 404 Not Found response
-   */
-  @GET
-  @Path("/archive/eml/{transaction}")
-  public Response readDataPackageArchive(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("transaction") String transaction
-                    ) {
-
-  	AuthToken authToken = null;
-    String entryText = null;
-    String resourceId = "/archive/" + transaction;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataPackageArchive";
-    Rule.Permission permission = Rule.Permission.read;
-    
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-
-    // Is user authorized to run the service method?
-    boolean serviceMethodAuthorized = 
-      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-    if (!serviceMethodAuthorized) {
-      throw new UnauthorizedException(
-          "User " + userId + 
-          " is not authorized to execute service method " + 
-          serviceMethodName);
-    }
-
-		try {
-
-			DataPackageManager dpm = new DataPackageManager();
-			File file = dpm.getDataPackageArchiveFile(transaction);
-
-			if (file != null && file.exists()) {
-				Long size = FileUtils.sizeOf(file);
-				responseBuilder = Response.ok(file, "application/zip");
-				responseBuilder.header("Content-Disposition", "attachment; filename="
-				    + transaction + ".zip");
-				responseBuilder.header("Content-Length", size.toString());
-				response = responseBuilder.build();
-			} else {
-				String gripe = "Unable to access data package archive " + transaction
-				    + ".zip for transaction: " + transaction;
-				ResourceNotFoundException e = new ResourceNotFoundException(gripe);
-				throw (e);
-			}
-
-		}    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-    
-  }
-  
-  
-  /**
-   * 
-   * <strong>Read Data Package DOI</strong> operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/doi/knb-lter-lno/1/3</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data package DOI was successful</td>
-   *     <td>The canonical Digital Object Identifier of the data package.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no DOI associated with the specified data package is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return a Response object containing a data package DOI
-   *         if found, else returns a 404 Not Found response
-   */
-  @GET
-  @Path("/doi/eml/{scope}/{identifier}/{revision}")
-  @Produces("text/plain")
-  public Response readDataPackageDoi(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("scope") String scope,
-                                  @PathParam("identifier") Integer identifier,
-                                  @PathParam("revision") String revision
-                    ) {
-    AuthToken authToken = null;
-    String doi = null;
-    String entryText = null;
-    String resourceId = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataPackageDoi";
-    Rule.Permission permission = Rule.Permission.read;
-
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-			resourceId = DataPackageManager.composeResourceId(
-			    ResourceType.dataPackage, scope, identifier,
-			    Integer.valueOf(revision), null);
-
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-      
-      if (doi != null) {
-        responseBuilder = Response.ok(doi);
-        response = responseBuilder.build();
-        entryText = doi;
-      }
-      else {
-        Exception e = new Exception(
-            "Read resource DOI operation failed for unknown reason");
-        throw (e);
-      }
-      
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-  }
-  
-  /**
-   * 
-   * <strong>Read Data Package Error</strong> operation, specifying the scope,
-   * identifier, revision, and transaction id of the data package error to be
-   * read in the URI, returning the error message as plain text.
-   * 
-   * <p>See the <code>Create Data Package</code> and  <code>Update Data Package</code> 
-   * service methods for information about how to obtain the transaction id.</p>
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/error/knb-lter-lno/1/3/1364521882823</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data package error was successful</td>
-   *     <td>The error message of the data package.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>Attempting to update a data package to revision '3' but an equal or
-   *         higher revision ('5') already exists in PASTA: knb-lter-nope.1.3.</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data package</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no error associated with the specified data package is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param transaction The transaction of the data package error
-   * @return a Response object containing a data package error
-   *         if found, else returns a 404 Not Found response
-   */
-  @GET
-  @Path("/error/eml/{transaction}")
-  @Produces("text/plain")
-  public Response readDataPackageError(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("transaction") String transaction
-                    ) {
-    AuthToken authToken = null;
-    String entryText = null;
-    String resourceId = transaction + ".txt";
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataPackageError";
-    Rule.Permission permission = Rule.Permission.read;
-    
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-
-    // Is user authorized to run the service method?
-    boolean serviceMethodAuthorized = 
-      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-    if (!serviceMethodAuthorized) {
-      throw new UnauthorizedException(
-          "User " + userId + 
-          " is not authorized to execute service method " + 
-          serviceMethodName);
-    }
-
-		try {
-			DataPackageManager dpm = new DataPackageManager();
-			entryText = dpm.readDataPackageError(transaction);
-			responseBuilder = Response.ok(entryText);
-			response = responseBuilder.build();
-		}
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-    
-  }
-  
-  
-  /*
-   * 
-   * <strong>Read Metadata DOI</strong> operation, specifying the scope, identifier, and revision of the metadata DOI to be read in the URI, returning the canonical Digital Object Identifier.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/metadata/doi/knb-lter-lno/1/3</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the metadata DOI was successful</td>
-   *     <td>The canonical Digital Object Identifier of the metadata.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the metadata</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no DOI associated with the specified metadata is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return a Response object containing a metadata DOI
-   *         if found, else returns a 404 Not Found response
-   */
-  
-  /*
-  @GET
-  @Path("/metadata/doi/{scope}/{identifier}/{revision}")
+  @Path("/metadata/doi/eml/{scope}/{identifier}/{revision}")
   @Produces("text/plain")
   public Response readMetadataDoi(
                                   @Context HttpHeaders headers,
@@ -3870,11 +4796,11 @@ public class DataPackageManagerResource extends PastaWebService {
     Response response = null;
     final String serviceMethodName = "readMetadataDoi";
     Rule.Permission permission = Rule.Permission.read;
-
+  
     try {
       authToken = getAuthToken(headers);
       String userId = authToken.getUserId();
-
+  
       // Is user authorized to run the service method?
       boolean serviceMethodAuthorized = 
         isServiceMethodAuthorized(serviceMethodName, permission, authToken);
@@ -3885,14 +4811,14 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			resourceId = DataPackageManager.composeResourceId(
-			    ResourceType.metadata, scope, identifier,
-			    Integer.valueOf(revision), null);
-
+  		resourceId = DataPackageManager.composeResourceId(
+  		    ResourceType.metadata, scope, identifier,
+  		    Integer.valueOf(revision), null);
+  
       DataPackageManager dataPackageManager = new DataPackageManager(); 
       doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-
-			if (doi != null) {
+  
+  		if (doi != null) {
         responseBuilder = Response.ok(doi);
         response = responseBuilder.build();
         entryText = doi;
@@ -3936,122 +4862,113 @@ public class DataPackageManagerResource extends PastaWebService {
     }
     
     audit(serviceMethodName, authToken, response, resourceId, entryText);
-
+  
     response = stampHeader(response);
     return response;
   }
 
-	*/
 
-  /*
-   * 
-   * <strong>Read Data Entity DOI</strong> operation, specifying the scope, identifier, and revision of the data entity DOI to be read in the URI, returning the canonical Digital Object Identifier.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/data/doi/knb-lter-lno/1/3/enity_name</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the data entity DOI was successful</td>
-   *     <td>The canonical Digital Object Identifier of the data entity.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the data entity</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no DOI associated with the specified data entity is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @param entityId    The entity identifier
-   * @return a Response object containing a data entity DOI
-   *         if found, else returns a 404 Not Found response
-   */
-  
-  /*
-  @GET
-  @Path("/data/doi/{scope}/{identifier}/{revision}/{entityId}")
+	/**
+	 * <strong>Delete Data Package</strong> operation, specifying the scope and
+	 * identifier of the data package to be deleted in the URI. The data package
+	 * and its associated quality reports are deleted.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X DELETE https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The delete request was successful</td>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to delete the data package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package associated with the specified packageId is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope value of the data package
+	 * @param identifier
+	 *          The identifier value of the data package
+	 * @return a Response object
+	 */
+  @DELETE
+  @Path("/eml/{scope}/{identifier}")
   @Produces("text/plain")
-  public Response readDataEntityDoi(
-                                 @Context HttpHeaders headers,
-                                 @PathParam("scope") String scope,
-                                 @PathParam("identifier") Integer identifier,
-                                 @PathParam("revision") String revision,
-                                 @PathParam("entityId") String entityId
-                    ) {
-    AuthToken authToken = null;
-    String doi = null;
-    String entryText = null;
-    String resourceId = null;
+  public Response deleteDataPackage(@Context HttpHeaders headers,
+                                    @PathParam("scope") String scope,
+                                    @PathParam("identifier") Integer identifier) {
+    boolean deleted = false;
     ResponseBuilder responseBuilder = null;
     Response response = null;
-    final String serviceMethodName = "readDataEntityDoi";
-    Rule.Permission permission = Rule.Permission.read;
-
+    final String serviceMethodName = "deleteDataPackage";
+    Rule.Permission permission = Rule.Permission.write;
+    AuthToken authToken = null;
+    String entryText = null;
+  
     try {
       authToken = getAuthToken(headers);
       String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
+  
+      // Is user authorized to run the 'deleteDataPackage' service method?
       boolean serviceMethodAuthorized = 
         isServiceMethodAuthorized(serviceMethodName, permission, authToken);
       if (!serviceMethodAuthorized) {
@@ -4061,384 +4978,17 @@ public class DataPackageManagerResource extends PastaWebService {
             serviceMethodName);
       }
       
-			resourceId = DataPackageManager.composeResourceId(
-			    ResourceType.data, scope, identifier,
-			    Integer.valueOf(revision), entityId);
-
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-
-      if (doi != null) {
-        responseBuilder = Response.ok(doi);
-        response = responseBuilder.build();
-        entryText = doi;
-     }
-      else {
-        Exception e = new Exception(
-            "Read resource DOI operation failed for unknown reason");
-        throw (e);
-      }
-      
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-  }
-	
-	*/
-  
-  /*
-   * 
-   * <strong>Read Report DOI</strong> operation, specifying the scope, identifier, and revision of the report DOI to be read in the URI, returning the canonical Digital Object Identifier.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td align=center>none</td>
-   *     <td align=center>none</td>
-   *     <td>curl -i -G http://package.lternet.edu/package/report/doi/knb-lter-lno/1/3</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the request to read the report DOI was successful</td>
-   *     <td>The canonical Digital Object Identifier of the report.</td>
-   *     <td><code>text/plain</code></td>
-   *     <td>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request contains an error, such as an illegal identifier or revision value</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to read the report</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>404 Not Found</td>
-   *     <td>If no DOI associated with the specified report is found</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support GET.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param scope       The scope of the data package
-   * @param identifier  The identifier of the data package
-   * @param revision    The revision of the data package
-   * @return a Response object containing a report DOI
-   *         if found, else returns a 404 Not Found response
-   */
-  
-  /*
-  @GET
-  @Path("/report/doi/{scope}/{identifier}/{revision}")
-  @Produces("text/plain")
-  public Response readDataPackageReportDoi(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("scope") String scope,
-                                  @PathParam("identifier") Integer identifier,
-                                  @PathParam("revision") String revision
-                    ) {
-    AuthToken authToken = null;
-    String doi = null;
-    String entryText = null;
-    String resourceId = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataPackageReportDoi";
-    Rule.Permission permission = Rule.Permission.read;
-
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-			resourceId = DataPackageManager.composeResourceId(
-			    ResourceType.report, scope, identifier,
-			    Integer.valueOf(revision), null);
+      entryText = "Deleted " + scope + "." + identifier.toString();
       
       DataPackageManager dataPackageManager = new DataPackageManager(); 
-      doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-
-      if (doi != null) {
-        responseBuilder = Response.ok(doi);
-        response = responseBuilder.build();
-        entryText = doi;
-      }
-      else {
-        Exception e = new Exception(
-            "Read resource DOI operation failed for unknown reason");
-        throw (e);
-      }
-      
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-    response = stampHeader(response);
-    return response;
-  }
-
-  */
+      deleted = dataPackageManager.deleteDataPackage(scope, identifier, userId, authToken);
   
-  /*
-   * Isolates the resourceId for the data package from a resource map 
-   * string and returns it.
-   */
-  protected static String resourceIdFromResourceMap(String resourceMap) {
-    String resourceId = null;
-    
-    if (resourceMap != null && !resourceMap.isEmpty()) {
-      String[] mapEntries = resourceMap.split("\n");
-      if (mapEntries != null && mapEntries.length > 0) {
-        for (String mapEntry : mapEntries) {
-          if (mapEntry.contains("/package/eml/")) {
-            resourceId = mapEntry.trim();
-          }
-        }
-      }
-    }
-    
-    return resourceId;
-  }
-
-
-  /**
-   * <strong>Search Data Packages</strong> operation, specifying the pathquery string used for querying data packages in the message body.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>XML "pathquery" string used for searching the metadata catalog</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>curl -i --user uid=LNO,o=LTER,dc=ecoinformatics,dc=org:PASSWORD -X PUT -H "Content-Type: application/xml" -T pathQuery.xml https://package.lternet.edu/package/eml/search</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>200 OK</td>
-   *     <td>If the search was successful</td>
-   *     <td>An XML "resultset" document containing the search results</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>
-   *       <pre>
-&lt;?xml version="1.0"?&gt;
-&lt;resultset&gt;
-.
-.
-.
-&lt;/resultset&gt;
-   *       </pre>
-   *     </td>
-   *   </tr>
-   *   <tr>
-   *     <td>400 Bad Request</td>
-   *     <td>If the request message body contains an error, such as an improperly formatted pathquery string</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to execute the Search Data Packages service method</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>500 Internal Server Error</td>
-   *     <td>The server encountered an unexpected condition which prevented 
-   *     it from fulfilling the request. For example, a SQL error occurred, 
-   *     or an unexpected condition was encountered while processing EML 
-   *     metadata.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param pathQuery  A pathquery XML document, as specified in the
-   *                   payload of the request.
-   *                
-   * @return a Response, which if successful, contains a resultset XML document
-   */
-  @PUT
-  @Path("/search/eml")
-  @Produces("application/xml")
-  public Response searchDataPackages(@Context HttpHeaders headers,
-                                     String pathQuery) {  
-    AuthToken authToken = null;
-    String resourceId = null;
-    String entryText = null;
-    String resultsetXML = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "searchDataPackages";
-    Rule.Permission permission = Rule.Permission.read;
-
-    try {
-      authToken = getAuthToken(headers);
-      String userId = authToken.getUserId();
-
-      // Is user authorized to run the service method?
-      boolean serviceMethodAuthorized = 
-        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-      if (!serviceMethodAuthorized) {
-        throw new UnauthorizedException(
-            "User " + userId + 
-            " is not authorized to execute service method " + 
-            serviceMethodName);
-      }
-      
-      DataPackageManager dataPackageManager = new DataPackageManager(); 
-      resultsetXML = dataPackageManager.searchDataPackages(pathQuery, userId, authToken);
-
-      if (resultsetXML != null) {
-        responseBuilder = Response.ok(resultsetXML);
+      if (deleted) {
+        responseBuilder = Response.ok();
         response = responseBuilder.build();       
       } 
       else {
-        ResourceNotFoundException e = new ResourceNotFoundException(
-                                            "No search results returned");
-        entryText = e.getMessage();
-        WebApplicationException webApplicationException =
-          WebExceptionFactory.makeNotFound(e);
-        response = webApplicationException.getResponse();
+        throw new Exception("Data package was not deleted due to an internal server error");
       }
     }
     catch (IllegalArgumentException e) {
@@ -4448,6 +4998,14 @@ public class DataPackageManagerResource extends PastaWebService {
     catch (UnauthorizedException e) {
       entryText = e.getMessage();
       response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (ResourceNotFoundException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeNotFound(e).getResponse();
+    }
+    catch (ResourceDeletedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeConflict(e).getResponse();
     }
     catch (UserErrorException e) {
       entryText = e.getMessage();
@@ -4457,362 +5015,18 @@ public class DataPackageManagerResource extends PastaWebService {
       entryText = e.getMessage();
       WebApplicationException webApplicationException = 
         WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                 e, e.getMessage());
+          e, e.getMessage());
       response = webApplicationException.getResponse();
     }
-
+  
+    String resourceId = null;
     audit(serviceMethodName, authToken, response, resourceId, entryText);
     response = stampHeader(response);
     return response;
   }
 
-  
-  /*
-   * Stamps a web service response with information about the web
-   * service version name and its corresponding version number.
-   */
-  private Response stampHeader(Response r)
-  {
-    return
-      Response.fromResponse(r).header(versionHeader, versionNumber).build();
-  }
-  
-  
-  /**
-   * <strong>Update Data Package</strong> operation, specifying the scope and identifier of the data package to be updated in the URI, together with the EML document describing the data package in the message body.
-   * 
-   * <h4>Requests:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Request</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>the EML document described the data package to be updated</td>
-   *     <td><code>application/xml</code></td>
-   *     <td>curl -i -X PUT -H "Content-Type: application/xml" -T knb-lter-lno_1_2.xml https://package.lternet.edu/package/eml/knb-lter-lno/1</td>
-   *   </tr>
-   * </table>
-   * 
-   * <h4>Responses:</h4>
-   * <table border="1" cellspacing="0" cellpadding="3">
-   *   <tr>
-   *     <th><b>Status</b></th>
-   *     <th><b>Reason</b></th>
-   *     <th><b>Message Body</b></th>
-   *     <th><b>MIME type</b></th>
-   *     <th><b>Sample Message Body</b></th>
-   *   </tr>
-   *   <tr>
-   *     <td>202 Accepted</td>
-   *     <td>If the update request was accepted for processing</td>
-   *     <td>A transaction identifier for use in subsequent processing of the request, 
-   *     e.g. "1364424858431". (See <code>Read Data Package Error</code> to understand
-   *     how the transaction identifier is used in subsequent service calls.)
-   *     </td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>401 Unauthorized</td>
-   *     <td>If the requesting user is not authorized to execute this service method</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   *   <tr>
-   *     <td>405 Method Not Allowed</td>
-   *     <td>The specified HTTP method is not allowed for the requested resource.
-   *     For example, the HTTP method was specified as DELETE but the resource
-   *     can only support POST.</td>
-   *     <td>An error message</td>
-   *     <td><code>text/plain</code></td>
-   *     <td></td>
-   *   </tr>
-   * </table>
-   * 
-   * @param emlFile  The URL to an EML document, as specified in the
-   *                payload of the request.
-   *                
-   * @return a Response, which if successful, contains a resource map describing
-   *         the contents of the updated data package
-   */
-  @PUT
-  @Path("/eml/{scope}/{identifier}")
-  @Consumes("application/xml")
-  @Produces("text/plain")
-  public Response updateDataPackage(
-                    @Context HttpHeaders headers,
-                    @PathParam("scope") String scope,
-                    @PathParam("identifier") Integer identifier, 
-                    File emlFile) {
-  	
-    AuthToken authToken = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "updateDataPackage";
-    Rule.Permission permission = Rule.Permission.write;
 
-    Long time = new Date().getTime();
-    String transaction = time.toString();
-    
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-
-		// Is user authorized to run the service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-		    serviceMethodName, permission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException("User " + userId
-			    + " is not authorized to execute service method " + serviceMethodName);
-    }
-    
-		// Perform updateDataPackage in new thread
-		Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		executorService.execute(updator);
-		executorService.shutdown();
-		
-		responseBuilder = Response.status(Response.Status.ACCEPTED);
-		responseBuilder.entity(transaction);
-		response = responseBuilder.build();
-    response = stampHeader(response);
-    return response;
-    
-  }
-  
-  
-  /*
-   * The following methods have been migrated into the Data Package Manager
-   * from the original Metadata Factory service.
-   */
-
-  /**
-   * <strong>Add Provenance Metadata</strong> from a metadata document in PASTA
-   * and adds it to the provided EML document found in the request message
-   * body.
-   * 
-   * <h4>Request entity:</h4>
-   *
-   * <p>
-   * The request entity should be an XML document (MIME type
-   * <code>application/xml</code>) that contains an element called <em>methods</em>
-   * (one and only one), located anywhere in the XML tree. A new element
-   * called <em>methodStep</em> will be appended to the <em>methods</em>
-   * element for each parent EML document specified in the query string.
-   * </p>
-   *
-   * <h4>Query parameters:</h4>
-   *
-   * <p>
-   * Query parameters must be the <code>packageId</code> attributes of the
-   * parent EML documents contained in PASTA's Metadata Catalog, with the
-   * syntax <em><code>scope.identifier.revision</code></em>. Multiple
-   * packageIds can be specified by delimiting them with ampersands (
-   * <code>&amp;</code>), e.g.<br>
-   *
-   * <center>
-   * <em>?packageId<sub>1</sub>&amp;packageId<sub>2</sub>&amp;...&amp;packageId<sub>n</sub></em>
-   * .</center>
-   * </p>
-   *
-   *
-   * <p>
-   * If a particular <code>entityName</code> in a parent EML document should
-   * be recorded in the provenance metadata, it can be specified in the query
-   * string with the syntax <em>packageId=entityName</em>. If multiple entity
-   * names from a single EML document should be recorded, they must be
-   * specified individually as<br>
-   * <center>
-   *
-   * <em>?packageId<sub>1</sub>=entityName<sub>1</sub>&amp;packageId<sub>1</sub>=entityName<sub>2</sub>&amp;...&amp;packageId<sub>1</sub>=entityName<sub>n</sub></em>
-   * ,</center><br>
-   * and they must be percent-encoded ("URL encoded").
-   * </p>
-   *
-   *
-   * <h4>Responses:</h4>
-   *
-   * <table border="1" cellspacing="0" cellpadding="3">
-   * <tr>
-   * <td><b>Status</b></td>
-   * <td><b>Reason</b></td>
-   * <td><b>Entity</b></td>
-   * <td><b>MIME type</b></td>
-   * </tr>
-   * <tr>
-   * <td>200 OK</td>
-   * <td>If the request was successful.</td>
-   * <td>The modified EML document.</td>
-   * <td><code>application/xml</code></td>
-   * </tr>
-   * <tr>
-   * <td>400 Bad Request</td>
-   * <td>If the request entity or query parameters cannot be properly parsed.</td>
-   * <td>An error message.</td>
-   * <td><code>text/plain</code></td>
-   * </tr>
-   * <tr>
-   * <td>401 Unauthorized</td>
-   * <td>If the requesting user is unauthorized to use the Provenance Factory.</td>
-   * <td>An error message.</td>
-   * <td><code>text/plain</code></td>
-   * </tr>
-   * <tr>
-   * <td>417 Expectation Failed</td>
-   * <td>If a request made by the Provenance Factory to PASTA's Metadata Catalog
-   * fails, e.g. because the requesting user is not authorized to read an EML
-   * document he/she specified.</td>
-   * <td>
-   * An error message.</td>
-   * <td><code>text/plain</code></td>
-   * </tr>
-   * </table>
-   *
-   *
-   * @param headers
-   *            the HTTP request headers containing the authorization token.
-   *
-   * @param uriInfo
-   *            contains the query string parameters.
-   *
-   * @param eml
-   *            the EML document to which provenance will be appended.
-   *
-   * @return an appropriate HTTP response.
-   */
-    @PUT
-    @Path("/provenance/eml")
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(value={MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
-    public Response appendProvenance(@Context HttpHeaders headers,
-                                     @Context UriInfo uriInfo, String eml) {
-
-      AuthToken authToken = null;
-      String entryText = null;
-      String resourceId = null;
-      Response response = null;
-      final String serviceMethodName = "appendProvenance";
-      Rule.Permission permission = Rule.Permission.write;
-
-      try {
-        authToken = AuthTokenFactory.makeAuthToken(headers.getCookies());
-        String userId = authToken.getUserId();
-
-        // Is user authorized to run the 'appendProvenance' service method?
-        boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-          serviceMethodName, permission, authToken);
-        if (!serviceMethodAuthorized) {
-          throw new UnauthorizedException("User " + userId
-            + " is not authorized to execute service method "
-            + serviceMethodName);
-        }
-
-        Document doc = XmlUtility.xmlStringToDoc(eml);
-        Map<EmlPackageId, List<String>> provenance = 
-            getProvenance(uriInfo, authToken);
-        MetadataFactory metadataFactory = new MetadataFactory();
-        doc = metadataFactory.make(doc, provenance, authToken);
-        eml = XmlUtility.nodeToXmlString(doc);
-        response = Response.ok(eml, MediaType.APPLICATION_XML).build();
-      }
-      catch (UnauthorizedException e) {
-        entryText = e.getMessage();
-        response = WebResponseFactory.makeUnauthorized(e);
-      }
-      catch (XmlParsingException e) {
-        entryText = e.getMessage();
-        response = WebResponseFactory.makeBadRequest(e);
-      }
-      catch (WebApplicationException e) { // not necessary
-        entryText = e.getMessage();
-        response = e.getResponse();
-      }
-      catch (Exception e) {
-        entryText = e.getMessage();
-        WebApplicationException webApplicationException = 
-          WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-            e, e.getMessage());
-        response = webApplicationException.getResponse();
-      }
-
-      audit(serviceMethodName, authToken, response, resourceId, entryText);
-      response = stampHeader(response);
-      return response;
-    }
-
-      
-      private List<String> decodeEntityNames(List<String> provided) {
-
-          List<String> decoded = new LinkedList<String>();
-
-          for (String p : provided) {
-              String s = PercentEncoder.decode(p);
-              decoded.add(s);
-          }
-
-          return decoded;
-      }
-
-      
-      private EmlPackageId parsePackageId(String packageId) {
-
-          EmlPackageIdFormat format = new EmlPackageIdFormat(Delimiter.DOT);
-          EmlPackageId epi = null;
-
-          try {
-              epi = format.parse(packageId);
-          } catch (IllegalArgumentException e) {
-              throw WebExceptionFactory.makeBadRequest(e);
-          }
-
-          if (!epi.allElementsHaveValues()) {
-              String s = "The specified EML packageId '" + packageId +
-                         "' does not contain a scope, identifier, and " +
-                         "revision.";
-              throw WebExceptionFactory.makeBadRequest(s);
-          }
-
-          return epi;
-      }
-
-      
-      private Map<EmlPackageId, List<String>> getProvenance(UriInfo uriInfo,
-                                                            AuthToken token) {
-
-          // packageId::entityName pairs
-          QueryString query = new QueryString(uriInfo);
-
-          Map<EmlPackageId, List<String>> pairs =
-              new LinkedHashMap<EmlPackageId, List<String>>();
-
-          for (Entry<String, List<String>> e : query.getParams().entrySet()) {
-              EmlPackageId epi = parsePackageId(e.getKey());
-              List<String> parsed = decodeEntityNames(e.getValue());
-              pairs.put(epi, parsed);
-          }
-
-          return pairs;
-      }
-      
-	private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
-		EmlPackageId emlPackageId = null;
-
-		if (emlFile != null) {
-			FileInputStream fis = new FileInputStream(emlFile);
-
-			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance()
-			    .newDocumentBuilder();
-			Document document = documentBuilder.parse(fis);
-			emlPackageId = EmlUtility.getEmlPackageId(document);
-		}
-
-		return emlPackageId;
-	}
-
- 
-  /**
+	/**
    * Thread framework for executing the createDataPackageArchive in a new thread.
    * 
    * @author servilla
