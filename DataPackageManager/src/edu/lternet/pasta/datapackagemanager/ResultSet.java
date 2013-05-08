@@ -219,20 +219,10 @@ public class ResultSet {
 					String packageId = packageIdNode.getTextContent();
 					String resourceId = packageIdToResourceId(packageId);
 					Node parentNode = packageIdNode.getParentNode();
-					
-					// Remove package from result set if not authorized; otherwise add
-					// resourceId
-					if (!authorizer.isAuthorized(authToken, resourceId,
-					    Rule.Permission.read)) {
-						Node documentNode = parentNode.getParentNode();
-						documentNode.removeChild(parentNode);
-					} else {
-						Element resourceIdElement = document.createElement("resourceId");
-						Text resourceIdText = document.createTextNode(resourceId);
-						resourceIdElement.appendChild(resourceIdText);
-						parentNode.insertBefore(resourceIdElement, packageIdNode);
-					}
-					
+					Element resourceIdElement = document.createElement("resourceId");
+					Text resourceIdText = document.createTextNode(resourceId);
+					resourceIdElement.appendChild(resourceIdText);
+					parentNode.insertBefore(resourceIdElement, packageIdNode);
 				}
 
         pastaFormatXML = XMLUtilities.getDOMTreeAsString(documentElement);
