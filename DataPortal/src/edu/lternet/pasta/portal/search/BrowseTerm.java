@@ -93,9 +93,13 @@ public class BrowseTerm {
    * Passes through to use the SimpleSearch logic to compose the query string.
    */
   private String composeQueryString() {
+    boolean isSiteQuery = isLTERSite();
     TermsList termsList = new TermsList();
-    String queryString = SimpleSearch.buildPathQueryXml(this.value, termsList);
-    
+    boolean tokenize = false;
+    String searchValue = this.value;
+    if (isSiteQuery) { searchValue = String.format("knb-lter-%s", this.value.toLowerCase()); }   
+    String queryString = SimpleSearch.buildPathQueryXml(searchValue, termsList, tokenize, isSiteQuery);
+
     return queryString;
   }
   
@@ -158,6 +162,16 @@ public class BrowseTerm {
    */
   public String getValue() {
     return value;
+  }
+  
+  
+  private boolean isLTERSite() {
+    boolean isSite = false;
+    
+    LTERSite lterSite = new LTERSite(this.value);
+    isSite = lterSite.isValidSite();
+    
+    return isSite;
   }
   
   

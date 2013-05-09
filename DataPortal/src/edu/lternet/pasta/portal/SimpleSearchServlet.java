@@ -132,11 +132,13 @@ public class SimpleSearchServlet extends DataPortalServlet {
     String query = null;
 
     if (terms != null) {
+      boolean tokenize = true;
+      boolean isSiteTerm = false;
       if (terms.equals("*")) {
-        query = SimpleSearch.buildPathQueryXml("", termsList);
+        query = SimpleSearch.buildPathQueryXml("", termsList, tokenize, isSiteTerm);
         termsList.addTerm("*");
       } else {
-        query = SimpleSearch.buildPathQueryXml(terms, termsList);
+        query = SimpleSearch.buildPathQueryXml(terms, termsList, tokenize, isSiteTerm);
       }
     }
     

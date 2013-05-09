@@ -41,13 +41,28 @@ public class SimpleSearch {
    * 
    * @param terms        The string terms entered by the user (e.g. "climate change")
    * @param termsList    List of terms used in the search, which may include terms other
-   *                     than the ones entered by the user
+   * @param tokenize     If true, splits the terms string into tokens on space, tab, 
+   *                     newline and formfeed, else splits only on newline treating
+   *                     space-separated words as a single term.
+   * @param isSiteQuery  true if we are querying by site name, else false
    * @return  the PathQuery XML string
    */
-  public static String buildPathQueryXml(String terms, TermsList termsList) {
+  public static String buildPathQueryXml(String terms, TermsList termsList, boolean tokenize, boolean isSiteQuery) {
+    StrTokenizer strTokenizer = null;
     final String openQueryTerm = 
       "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n";
     final String closeQueryTerm = "    </queryterm>\n";
+    String[] xpaths;
+    String[] sitePaths = { "@packageId" };
+    String[] nonSitePaths = { "dataset/title", "dataset/abstract", "dataset/keywordSet/keyword" };
+    
+    if (isSiteQuery)  {
+      xpaths = sitePaths;
+    }
+    else {
+      xpaths = nonSitePaths;
+    }
+    
     StringBuffer query = new StringBuffer(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         + "<pathquery version=\"1.0\">\n"
@@ -62,34 +77,30 @@ public class SimpleSearch {
         + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
         + "  <querygroup operator=\"UNION\">\n");
     
-    StrTokenizer tokens = new StrTokenizer(terms);
+    if (tokenize) {
+      strTokenizer = new StrTokenizer(terms);  // splits on space, tab, newline and formfeed
+    }
+    else {
+      strTokenizer = new StrTokenizer(terms, "\n"); // splits only on newline
+    }
     
-    while(tokens.hasNext()) {
-      String token = tokens.nextToken();
-      
-      termsList.addTerm(token);
-      
+    while(strTokenizer.hasNext()) {
+      String token = strTokenizer.nextToken();    
+      termsList.addTerm(token);     
       String value = "      <value>" + token + "</value>\n";
-
-      query.append(openQueryTerm);
-      query.append(value);
-      query.append("      <pathexpr>dataset/title</pathexpr>\n");
-      query.append(closeQueryTerm);
-      query.append(openQueryTerm);
-      query.append(value);
-      query.append("      <pathexpr>dataset/abstract</pathexpr>\n");
-      query.append(closeQueryTerm);
-      query.append(openQueryTerm);
-      query.append(value);
-      query.append("      <pathexpr>dataset/keywordSet/keyword</pathexpr>\n");
-      query.append(closeQueryTerm);
+      
+      for (String xpath : xpaths) {
+        query.append(openQueryTerm);
+        query.append(value);
+        query.append(String.format("      <pathexpr>%s</pathexpr>\n", xpath));
+        query.append(closeQueryTerm);
+      }     
     }
     
     query.append("  </querygroup>\n" + "</pathquery>\n");
 
     String queryStr = query.toString();
     return queryStr;
-
   }
   
 }
