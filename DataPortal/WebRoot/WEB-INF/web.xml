@@ -162,6 +162,13 @@
     <servlet-name>ArchiveDownloadServlet</servlet-name>
     <servlet-class>edu.lternet.pasta.portal.ArchiveDownloadServlet</servlet-class>
   </servlet>
+  <servlet>
+    <description>Browse Servlet</description>
+    <display-name>BrowseServlet</display-name>
+    <servlet-name>BrowseServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.BrowseServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
 
 	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
@@ -262,6 +269,10 @@
   <servlet-mapping>
     <servlet-name>ArchiveDownloadServlet</servlet-name>
     <url-pattern>/archiveDownload</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>BrowseServlet</servlet-name>
+    <url-pattern>/browseServlet</url-pattern>
   </servlet-mapping>
 
 	<welcome-file-list>
