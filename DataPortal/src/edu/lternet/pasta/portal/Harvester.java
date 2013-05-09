@@ -528,6 +528,8 @@ public class Harvester implements Runnable {
           if (emlString != null) {
             File emlFile = saveEmlToFile(harvestEMLPath, emlString, isEvaluate);
             processEMLFile(harvestDirPath, uid, emlFile, isEvaluate);
+            // Sleep to allow DAS database connection recovery
+            Thread.sleep(30000);
           }
           else if (urlErrorMessage != null) {
             writeUrlIoMessage(harvestDirPath, documentURL, urlErrorMessage);
