@@ -38,7 +38,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>Browse Search</title>
+<title>Browse Data Packages</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -79,11 +79,7 @@
 			<h2 align="center">Browse Data Packages</h2>
 
 			<fieldset>
-				<legend>Browse Search</legend>
-
-				<p>Browse by category using the links below. The number of matching data sets 
-           is shown in parentheses. <em>Please note: Only public documents are accessible from this page.</em>
-        </p>
+				<p>Browse by category using the links below. The number of matching data sets is shown in parentheses.&#42;</p>
 
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
@@ -97,6 +93,7 @@
             <input type="hidden" name="browseValue" value="" />
           </form>
 				</div>
+				<p><small>&#42; <em>Please note: (1) Only public documents are accessible from this page; (2) Search results are refreshed nightly.</em></small></p>
 			</fieldset>
 
 			<div class="section-table">
