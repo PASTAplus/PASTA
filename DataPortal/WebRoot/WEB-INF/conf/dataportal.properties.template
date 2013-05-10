@@ -39,6 +39,7 @@ pasta.port=443
 pasta.uriHead=https://pasta.lternet.edu/package/
 
 # Data Package Management properties
+browse.dir=/home/pasta/local/browse
 emlutility.xslpath=/WEB-INF/xsl/eml-2.xsl
 reportutility.xslpath=/WEB-INF/xsl/qualityReportFull.xsl
 emlutility.idref=/WEB-INF/xsl/id-ref.xsl

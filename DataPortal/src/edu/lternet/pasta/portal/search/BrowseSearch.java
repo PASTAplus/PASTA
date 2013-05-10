@@ -49,8 +49,13 @@ public class BrowseSearch {
    * Class fields
    */
   
-  public static final String browseCacheDir = "/home/pasta/local/browse";
-  public static final String browseCachePath = "/home/pasta/local/browse/browseCache.xml";
+  /*
+   * Default value of the browse cache directory is below, but it can be set to a
+   * different value in the dataportal.properties file
+   */
+  public static String browseCacheDir = "/home/pasta/local/browse";     
+  private static final String browseCacheFilename = "browseCache.xml";
+  public static String browseCachePath = browseCacheDir + "/" + browseCacheFilename;
   private static final Logger logger = Logger.getLogger(BrowseSearch.class);
   static final long serialVersionUID = 0;  // Needed for Eclipse warning.
 
@@ -69,6 +74,15 @@ public class BrowseSearch {
   /*
    * Class methods
    */
+  
+  /**
+   * Sets the value of the browse directory and related path value
+   * @param  directoryPath   the browse directory path value to set
+   */
+  public static void setBrowseCacheDir(String directoryPath) {
+    BrowseSearch.browseCacheDir = directoryPath;
+    BrowseSearch.browseCachePath = String.format("%s/%s", directoryPath, browseCacheFilename);
+  }
   
 
   /*
