@@ -186,6 +186,8 @@ public class BrowseServlet extends DataPortalServlet {
     logger.debug("XSLPATH: " + xslpath);
     cwd = options.getString("system.cwd");
     logger.debug("CWD: " + cwd);
+    String browseDirPath = options.getString("browse.dir");
+    BrowseSearch.setBrowseCacheDir(browseDirPath);
 
     File browseCacheFile = new File(BrowseSearch.browseCachePath);
 

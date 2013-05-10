@@ -30,7 +30,10 @@ import java.util.Date;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
+
+import edu.lternet.pasta.portal.ConfigurationListener;
 
 
 /**
@@ -100,8 +103,11 @@ public class BrowseCrawlerServlet extends HttpServlet implements Runnable {
    * @throws         ServletException
    */
   public void init(ServletConfig config) throws ServletException {
-    Integer crawlPeriodInt;
     super.init(config);
+    PropertiesConfiguration options = ConfigurationListener.getOptions();
+    String browseDirPath = options.getString("browse.dir");
+    BrowseSearch.setBrowseCacheDir(browseDirPath);
+    Integer crawlPeriodInt;
     this.servletContext = getServletContext();
 
     crawlPeriodInt = new Integer("24");
