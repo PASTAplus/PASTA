@@ -1,11 +1,13 @@
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%
-  HttpSession httpSession = request.getSession();
-  httpSession.setAttribute("menuid", "discover");
-
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
+
+  String searchResult = (String) request.getAttribute("searchresult");
+
+  if (searchResult == null)
+    searchResult = "";
 %>
 
 <!doctype html>
@@ -13,7 +15,7 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>NIS Data Portal - Discover</title>
+<title>Browse Results</title>
 
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
@@ -36,21 +38,13 @@
 
 		<div class="content">
 
-			<h4>Discover Data Packages</h4>
-			<ul>
-				<li>Browse Data Packages by
-				    <ul>
-                <li><a href="./browse.jsp">Key Word or LTER Site</a></li>
-				        <li><a href="./scopebrowse">Package Identifier</a></li>
-				    </ul>
-				</li>
-				<li>Search for Data Packages using
-				    <ul>
-				        <li><a href="./simpleSearch.jsp">Basic Search</a></li>
-				        <li><a href="./advancedSearch.jsp">Advanced Search</a></li>	        
-				    </ul>
-				</li>
-			</ul>
+			<h2 align="center">Browse Results</h2>
+			<h3 align="center">Back to <a href="./browse.jsp">Browse Data Packages</a></h3>
+
+			<div class="section-table">
+				<%=searchResult%>
+			</div>
+			<!-- end of section-table -->
 
 		</div>
 		<!-- end of content -->

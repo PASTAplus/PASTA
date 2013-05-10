@@ -1,8 +1,7 @@
 /*
- *
- * $Date$
- * $Author$
- * $Revision$
+ * $Date: 2012-06-22 12:23:25 -0700 (Fri, 22 June 2012) $
+ * $Author: dcosta $
+ * $Revision: 2145 $
  *
  * Copyright 2011,2012 the University of New Mexico.
  *
@@ -24,51 +23,66 @@
 
 package edu.lternet.pasta.portal;
 
+import java.io.File;
+
+
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.ResultSetUtility;
-import edu.lternet.pasta.portal.search.SimpleSearch;
+import edu.lternet.pasta.portal.search.BrowseGroup;
+import edu.lternet.pasta.portal.search.BrowseTerm;
+import edu.lternet.pasta.portal.search.BrowseSearch;
 import edu.lternet.pasta.portal.search.TermsList;
 
-public class SimpleSearchServlet extends DataPortalServlet {
+
+public class BrowseServlet extends DataPortalServlet {
 
   /*
    * Class variables
    */
 
-  private static final Logger logger = Logger
-      .getLogger(edu.lternet.pasta.portal.SimpleSearchServlet.class);
+  private static final Logger logger = Logger.getLogger(edu.lternet.pasta.portal.BrowseServlet.class);
   private static final long serialVersionUID = 1L;
 
   private static String cwd = null;
   private static String xslpath = null;
-
-  private static final String forward = "./simpleSearch.jsp";
+  
   
   /*
    * Instance variables
    */
   
 
+  /*
+   * Constructors
+   */
+  
   /**
    * Constructor of the object.
    */
-  public SimpleSearchServlet() {
+  public BrowseServlet() {
     super();
   }
+  
+
+  /*
+   * Class methods
+   */
+
+  
+  /*
+   * Instance methods
+   */
 
   /**
    * Destruction of the servlet. <br>
@@ -78,6 +92,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
     // Put your code here
   }
 
+  
   /**
    * The doGet method of the servlet. <br>
    * 
@@ -99,6 +114,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 
   }
 
+  
   /**
    * The doPost method of the servlet. <br>
    * 
@@ -114,66 +130,49 @@ public class SimpleSearchServlet extends DataPortalServlet {
    *           if an error occurred
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    
+      throws ServletException, IOException {   
+    String forward = "./browseResult.jsp";
     String html = null;
+    TermsList termsList = null;
+    String termsListHTML= "";
     String xml = null;
-    TermsList termsList = new TermsList();
 
     HttpSession httpSession = request.getSession();
     
-    String uid = (String) httpSession.getAttribute("uid");
+    String uid = (String) httpSession.getAttribute("uid");   
+    if (uid == null || uid.isEmpty()) { uid = "public"; }
     
-    if (uid == null || uid.isEmpty())
-      uid = "public";
-
-    String terms = (String) request.getParameter("terms");
-
-    String query = null;
-
-    if (terms != null) {
-      boolean tokenize = true;
-      boolean isSiteTerm = false;
-      if (terms.equals("*")) {
-        query = SimpleSearch.buildPathQueryXml("", termsList, tokenize, isSiteTerm);
-        termsList.addTerm("*");
-      } else {
-        query = SimpleSearch.buildPathQueryXml(terms, termsList, tokenize, isSiteTerm);
-      }
-    }
+    String searchValue = request.getParameter("searchValue");      
+    BrowseTerm browseTerm = new BrowseTerm(searchValue);
+    
+    // Tell the web server that the response is HTML
+    response.setContentType("text/html");
     
     try {
+      xml = browseTerm.readSearchResults();
       
-      DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-      xml = dpmClient.searchDataPackages(query);
-      
-      logger.info("XML: " + xml);
-      
-      ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-      html = "<p> Terms used in this search: " + termsList.toHTML() + "</p>\n";
-      html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-      
-    } catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (PastaConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    }
+      termsList = browseTerm.getTermsList();
+      if (termsList != null) {
+        termsListHTML = termsList.toHTML();
+      }
 
-    request.setAttribute("searchresult", html);
+      ResultSetUtility resultSetUtility = new ResultSetUtility(xml);  
+      html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";     
+      html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+      request.setAttribute("searchresult", html);
+    } 
+    catch (Exception e) {
+      logger.error(e.getMessage());
+      String warningMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+      request.setAttribute("message", warningMessage);
+      forward = "./advancedSearch.jsp";
+    }
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
-
   }
 
+  
   /**
    * Initialization of the servlet. <br>
    * 
@@ -187,8 +186,27 @@ public class SimpleSearchServlet extends DataPortalServlet {
     logger.debug("XSLPATH: " + xslpath);
     cwd = options.getString("system.cwd");
     logger.debug("CWD: " + cwd);
+    String browseDirPath = options.getString("browse.dir");
+    BrowseSearch.setBrowseCacheDir(browseDirPath);
 
+    File browseCacheFile = new File(BrowseSearch.browseCachePath);
+
+    if (browseCacheFile.exists()) {
+      BrowseSearch browseSearch = new BrowseSearch();
+      BrowseGroup browseGroup = browseSearch.readBrowseCache(browseCacheFile);
+      
+      ServletContext servletContext = getServletContext();
+
+      /* Lock the servlet context object to guarantee that only one thread at a
+       * time can be getting or setting the context attribute. 
+       */
+      synchronized(servletContext) {
+        servletContext.setAttribute("browseHTML", browseGroup.toHTML());
+      }
+    }
+    else {
+      logger.error("Missing browseCacheFile at location: " + BrowseSearch.browseCachePath);
+    }
   }
-
-  
+    
 }

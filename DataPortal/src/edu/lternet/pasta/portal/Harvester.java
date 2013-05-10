@@ -650,7 +650,7 @@ public class Harvester implements Runnable {
                             boolean closeWhenFinished) 
           throws IOException {
     if (writer == null) {
-      throw new IOException("IOUtil.writeToWriter(): Writer is NULL!");
+      throw new IOException("writeToWriter(): Writer is null");
     }
 
     char[] bufferChars = new char[buffer.length()];
