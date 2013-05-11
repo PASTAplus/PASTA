@@ -14,9 +14,11 @@
   if (searchResult == null)
     searchResult = "";
     
-  String browseHTML = ""; 
-  ServletContext context = getServletContext();
-  browseHTML = (String) context.getAttribute("browseHTML");
+  String browseHTML = "";
+  
+  HttpSession httpSession = request.getSession();
+  ServletContext servletContext = httpSession.getServletContext();
+  browseHTML = (String) servletContext.getAttribute("browseHTML");
 
   /* File browseCacheFile = new File(BrowseSearch.browseCachePath);
 
