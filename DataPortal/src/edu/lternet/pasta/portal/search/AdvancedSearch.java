@@ -471,19 +471,19 @@ public class AdvancedSearch  {
        */
       if (boundaryContained) {
 
-        emlField = "geographicCoverage/boundingCoordinates/northBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
         searchMode = "less-than-equals";
         qt=new AdvancedSearchQueryTerm(searchMode,caseSensitive,emlField, 
                                        northValue, indent);
         qgSpatial.addQueryTerm(qt);        
 
-        emlField = "geographicCoverage/boundingCoordinates/southBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
         searchMode = "greater-than-equals";
         qt=new AdvancedSearchQueryTerm(searchMode,caseSensitive,emlField, 
                                        southValue, indent);
         qgSpatial.addQueryTerm(qt);        
 
-        emlField = "geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
         searchMode = "less-than-equals";
         
         if (crosses) {
@@ -501,7 +501,7 @@ public class AdvancedSearch  {
           qgSpatial.addQueryTerm(qt);
         }
 
-        emlField = "geographicCoverage/boundingCoordinates/westBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
         searchMode = "greater-than-equals";
         
         if (crosses) {
@@ -527,19 +527,19 @@ public class AdvancedSearch  {
       */
       else {     
 
-        emlField = "geographicCoverage/boundingCoordinates/southBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
         searchMode = "less-than";
         qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
                                          northValue, indent);
         qgSpatial.addQueryTerm(qt);        
 
-        emlField = "geographicCoverage/boundingCoordinates/northBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
         searchMode = "greater-than";
         qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
                                          southValue, indent);
         qgSpatial.addQueryTerm(qt);        
 
-        emlField = "geographicCoverage/boundingCoordinates/westBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
         searchMode = "less-than";
         
         if (crosses) {
@@ -557,7 +557,7 @@ public class AdvancedSearch  {
           qgSpatial.addQueryTerm(qt);   
         }
 
-        emlField = "geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
+        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
         searchMode = "greater-than";
         
         if (crosses) {
