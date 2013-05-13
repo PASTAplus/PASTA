@@ -297,23 +297,36 @@
             <script type="text/javascript">
               google.maps.event.addDomListener(window, 'load', initialize);
             </script>
-            <div id="map-canvas" style="width: 330px; height: 258px"></div>
+            <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px"></div>
+            <div style="margin: 0 auto; width: 330px;">
             Zoom in to the region you'd like to search
-            <table>
+            </div>
+            <table width="100%">
               <tr>
-                <td>
-                  <label for="advancedsearchleft">North:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" /></label>
-                  <label for="advancedsearchleft">South:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" /></label>
+                <td></td>
+                <td align="center">
+                  <label for="advancedsearchleft">N:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" /></label>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td align="left">
+                  <label for="advancedsearchleft">W:&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" /></label>
+                </td>
+                <td></td>
+                <td align="right">
+                  <label for="advancedsearchleft">E:&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" /></label>
                 </td>
               </tr>
               <tr>
-                <td>
-                  <label for="advancedsearchleft">East:&nbsp;&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" /></label>
-                  <label for="advancedsearchleft">West:&nbsp;&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" /></label>
+                <td></td>
+                <td align="center">
+                  <label for="advancedsearchleft">S:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" /></label>
                 </td>
+                <td></td>
               </tr>
               <tr>
-                <td>
+                <td colspan="3">
                   <input type="checkbox" name="boundaryContained" value="on" />      
                   Dataset is fully contained within boundaries
                 </td>   
