@@ -45,6 +45,11 @@ function initialize() {
     document.advancedSearchForm.eastBound.value = northeast.lng();
     document.advancedSearchForm.southBound.value = southwest.lat();
     document.advancedSearchForm.westBound.value = southwest.lng();
+
+    // Set to "1" for initial map load
+    boundsChangedCount++;
+    document.advancedSearchForm.boundsChangedCount.value = boundsChangedCount;
+    
   });
         	
 }
