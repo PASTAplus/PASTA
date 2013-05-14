@@ -126,8 +126,7 @@
         if (trim(form.subjectValue.value) == "" &&
             trim(form.creatorSurname.value) == "" &&
             trim(form.creatorOrganization.value) == "" &&
-            trim(form.eastBound.value) == "180" &&
-            trim(form.westBound.value) == "-180" &&
+            trim(form.boundsChangedCount.value) == "1" &&
             trim(form.locationName.value) == "" &&
             trim(form.taxon.value) == "" &&
             howManySelected(form.siteValues) == 0 &&
