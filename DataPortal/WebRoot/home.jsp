@@ -23,49 +23,53 @@
  -->
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
-<%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
-<%@ page import="edu.lternet.pasta.portal.PastaStatistics" %>
+<%@ page import="edu.lternet.pasta.portal.search.LTERTerms"%>
+<%@ page import="edu.lternet.pasta.portal.PastaStatistics"%>
 <%
-  HttpSession httpSession = request.getSession();
-  httpSession.setAttribute("menuid", "home");
-  
-  String uid = (String) httpSession.getAttribute("uid");
+	HttpSession httpSession = request.getSession();
+	httpSession.setAttribute("menuid", "home");
 
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
+	String uid = (String) httpSession.getAttribute("uid");
 
-  String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
-  
-  
-  if (uid == null || uid.isEmpty()) {
-    uid = "public";
-  }
-  
-  // Generate PASTA data package statistics and store values in session.
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
 
-  Integer numDataPackages = null;
-  Integer numDataPackagesSites = null;
-  String count = null;
+	String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
 
-  PastaStatistics pastaStats = new PastaStatistics("public");
+	if (uid == null || uid.isEmpty()) {
+		uid = "public";
+	}
 
-  count = (String) httpSession.getAttribute("numDataPackages");
-  if (count != null) {
-    numDataPackages = Integer.valueOf(count);
-  } else {
-    numDataPackages = pastaStats.getNumDataPackages();
-    httpSession.setAttribute("numDataPackages", numDataPackages.toString());
-  }
+	// Generate PASTA data package statistics and store values in session.
 
-  count = (String) httpSession.getAttribute("numDataPackagesSites");
-  if (count != null) {
-    numDataPackagesSites = Integer.valueOf(count);
-  } else {
-    numDataPackagesSites = pastaStats.getNumDataPackagesSites();
-    httpSession.setAttribute("numDataPackagesSites", numDataPackagesSites.toString());
-  }
+	Integer numDataPackages = null;
+	Integer numDataPackagesSites = null;
+	String count = null;
 
+	PastaStatistics pastaStats = new PastaStatistics("public");
+
+	count = (String) httpSession.getAttribute("numDataPackages");
+	if (count != null) {
+		numDataPackages = Integer.valueOf(count);
+	} else {
+		numDataPackages = pastaStats.getNumDataPackages();
+		httpSession.setAttribute("numDataPackages",
+				numDataPackages.toString());
+	}
+
+	count = (String) httpSession.getAttribute("numDataPackagesSites");
+	if (count != null) {
+		numDataPackagesSites = Integer.valueOf(count);
+	} else {
+		numDataPackagesSites = pastaStats.getNumDataPackagesSites();
+		httpSession.setAttribute("numDataPackagesSites",
+				numDataPackagesSites.toString());
+	}
+	
+	numDataPackages = 16338;
+	numDataPackagesSites = 924;
 %>
 
 <!doctype html>
@@ -88,13 +92,15 @@
 
 <script src="./js/jquery-ui-1.10.0.js"></script>
 <script>
-  $(function() {
-    var availableTags = [ <%=jqueryString%> ];
-    
-    $( "#lterterms" ).autocomplete({
-        source: availableTags
-    });
-  });
+	$(function() {
+		var availableTags = [
+<%=jqueryString%>
+	];
+
+		$("#lterterms").autocomplete({
+			source : availableTags
+		});
+	});
 </script>
 
 <!-- Google Chart for NIS Data Package and Site Growth -->
@@ -118,36 +124,39 @@
 		data.addColumn('string', 'Week');
 		data.addColumn('number', 'Packages');
 		data.addColumn('number', 'Sites');
-		data.addRows([ 
-		  [ '1',     0,  0],
-		  [ '2',   168,  4],
-		  [ '3',   297,  7],
-		  [ '4',   361,  7],
-		  [ '5',   365,  7],
-		  [ '6',   391,  7],
-		  [ '7',   438,  8],
-		  [ '8',   439,  8],
-		  [ '9',   631, 11],
-		  ['10',   663, 11],
-		  ['11',   678, 11],
-		  ['12',   722, 11],
-		  ['13',   746, 12],
-		  ['14',   758, 12],
-		  ['15',   792, 12],
-		  ['16',   824, 12],
-		  ['17',   857, 12],
-		  ['18',   905, 13],
-		  ['19',   924, 14]
-		]);
+		data.addRows([ [ '1', 0, 0 ], [ '2', 168, 4 ], [ '3', 297, 7 ],
+				[ '4', 361, 7 ], [ '5', 365, 7 ], [ '6', 391, 7 ],
+				[ '7', 438, 8 ], [ '8', 439, 8 ], [ '9', 631, 11 ],
+				[ '10', 663, 11 ], [ '11', 678, 11 ], [ '12', 722, 11 ],
+				[ '13', 746, 12 ], [ '14', 758, 12 ], [ '15', 792, 12 ],
+				[ '16', 824, 12 ], [ '17', 857, 12 ], [ '18', 905, 13 ],
+				[ '19', 924, 14 ] ]);
 
 		// Set chart options
 		var options = {
-			'title': 'Site/Data Package Growth',
-			'width': 400,
-			'height': 200,
-			'hAxis': {title : 'Week'},
-			'vAxes': {0: {logScale : false}, 1: {logScale : false, maxValue : 27}},
-			'series': {0: {targetAxisIndex: 0}, 1: {targetAxisIndex: 1}}
+			'title' : 'Site/Data Package Growth',
+			'width' : 400,
+			'height' : 200,
+			'hAxis' : {
+				title : 'Week'
+			},
+			'vAxes' : {
+				0 : {
+					logScale : false
+				},
+				1 : {
+					logScale : false,
+					maxValue : 27
+				}
+			},
+			'series' : {
+				0 : {
+					targetAxisIndex : 0
+				},
+				1 : {
+					targetAxisIndex : 1
+				}
+			}
 		};
 
 		// Instantiate and draw our chart, passing in some options.
@@ -172,31 +181,49 @@
 					<tbody>
 						<tr>
 							<td style="vertical-align: top;">
-							    <p>Data are one of the most
-								valuable products of the Long-Term Ecological Research (LTER)
-								Network. Data derived from publicly funded research in the U.S.
-								LTER Network are made available online with as few restrictions
-								as possible, on a non-discriminatory basis. LTER Network
-								scientists make every effort to release data in a timely fashion
-								and with attention to accurate, well-designed and
-								well-documented data.</p>
-								<p>The LTER Network Data Portal contains
-								ecological data packages contributed by past and present LTER
-								sites. Please review the <a target="_top"
-								href='http://www.lternet.edu/data/netpolicy.html'> LTER Data
-									Policy</a> before downloading any data product. Data citation is
-								requested and highly encouraged. Digital object identifier (DOI)
-								citation information is provided in the metadata for each
-								dataset.</p>
-								<p>Please be ethical in your use of these data. Contact
-								the investigator, as a courtesy, prior to use of data in formal
-								publications.</p></td>
+								<p>
+									Data are one of the most valuable products of the Long Term
+									Ecological Research (LTER) Network. Data and metadata derived
+									from publicly funded research in the U.S. LTER Network are made
+									available online with as few restrictions as possible, on a
+									non-discriminatory basis. In return, the LTER Network expects
+									data users to <strong>act ethically</strong> by contacting the
+									investigator prior to the use of data for publication.
+								</p>
+
+								<p>
+									The LTER Network Information System Data Portal contains
+									ecological data packages contributed by past and present LTER
+									sites. Please review the <a target="_top"
+										href='http://www.lternet.edu/data/netpolicy.html'> LTER
+										Data Policy</a> before downloading any data product. We request
+									that you cite data sources in your published and unpublished
+									works whenever possible. Digital object identifiers (DOI) are
+									provided for each dataset to facilitate citation.
+								</p>
+
+								<p>
+									Voluntary registration on this site will allow us to notify you
+									of updates to data and metadata of interest and of corrections
+									made to data. In addition, your validated login will gain you
+									access to even more data where contributors have asked for
+									additional information on use. <a href="/nis/register.jsp">Click
+										here</a> to register now.
+								</p>
+
+								<p>LTER Network scientists make every effort to release data in a
+								timely fashion and with attention to accurate, well-designed and
+								well-documented data.  To understand data fully, please read the
+								associated metadata and contact data providers if you have any
+								questions.  The LTER Network is not responsible for misinterpretation
+								of data resulting from failure to consult metadata or data providers.</p>
+								</td>
 							<td align="left">
-							    <div id="chart_div"></div>
+								<div id="chart_div"></div>
 								<p align="center">
-								    Site contributed data packages: <em><%=numDataPackagesSites.toString()%></em><br/>
+									Site contributed data packages: <em><%=numDataPackagesSites.toString()%></em><br />
 									Total data packages: <em><%=numDataPackages.toString()%></em>
-							    </p>
+								</p>
 							</td>
 						</tr>
 					</tbody>
@@ -204,36 +231,37 @@
 			</div>
 
 			<div class="section">
-				<p style="padding-left: 10px">Search for data packages using one or more terms separated by spaces</p>
+				<p style="padding-left: 10px">Search for data packages using one
+					or more terms separated by spaces</p>
 
 				<form id="simplesearch" name="simplesearch" method="post"
 					action="./simpleSearch">
 					<table id="simpleSearch">
 						<tbody>
 							<tr>
-								<td align="left">
-								  <label for="terms">Search Terms (use * for any):</label>
+								<td align="left"><label for="terms">Search Terms
+										(use * for any):</label>
 								</td>
 								<td align="left">
-								  <div class="ui-widget">
-									  <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;" />
-								  </div>
+									<div class="ui-widget">
+										<input type="search" name="terms" required="required"
+											size="50" id="lterterms" style="font-size: 80%;" />
+									</div>
 								</td>
-								<td align="center"><input type="submit"
-									name="search" value="search" />
+								<td align="center"><input type="submit" name="search"
+									value="search" />
 								</td>
-								<td align="center"><input type="reset"
-									name="reset" value="reset" />
+								<td align="center"><input type="reset" name="reset"
+									value="reset" />
 								</td>
-								<td>
-								    (<a target="_top" href="./advancedSearch.jsp">Advanced Search</a>)
-								</td>
+								<td>(<a target="_top" href="./advancedSearch.jsp">Advanced
+										Search</a>)</td>
 							</tr>
 						</tbody>
 					</table>
 				</form>
 			</div>
-			
+
 		</div>
 		<!-- end content -->
 
