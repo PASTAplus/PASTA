@@ -67,9 +67,9 @@
 		httpSession.setAttribute("numDataPackagesSites",
 				numDataPackagesSites.toString());
 	}
-	
-	numDataPackages = 16338;
-	numDataPackagesSites = 924;
+
+ String hover = "New user registration for non-LTER members coming soon!";
+
 %>
 
 <!doctype html>
@@ -222,8 +222,7 @@
 									of updates to data and metadata of interest and of corrections
 									made to data. In addition, your validated login will gain you
 									access to even more data where contributors have asked for
-									additional information on use. <a href="/nis/register.jsp">Click
-										here</a> to register now.
+									additional information on use. <span name="<%=hover%>" class="tooltip" style="color: blue;"><em>Click here</em></span> to register now.
 								</p>
 
 								<p>LTER Network scientists make every effort to release data in a
