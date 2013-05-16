@@ -141,6 +141,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       uid = "public";
     
     String boundaryContained = request.getParameter("boundaryContained");
+    String boundsChangedCount = request.getParameter("boundsChangedCount");
     String caseSensitive = request.getParameter("caseSensitive");
     String dateField = request.getParameter("dateField");
     String startDate = request.getParameter("startDate");
@@ -202,6 +203,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       taxon,
       taxonQueryType,
       isBoundaryContainedChecked,
+      boundsChangedCount,
       northBound,
       southBound,
       eastBound,

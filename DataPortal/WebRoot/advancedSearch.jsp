@@ -112,6 +112,13 @@
   <script type="text/javascript" src="./js/utilities.js"></script>
   <script type="text/javascript" src="./js/validation.js"></script>
   <script type="text/javascript">
+  
+      var boundsChangedCount = 0;
+
+      function boundsChanged() {
+          boundsChangedCount++;
+          document.advancedSearchForm.boundsChangedCount.value = boundsChangedCount;
+      }
 
       function submitRequest(form) {
         var canSearch = true;
@@ -119,8 +126,7 @@
         if (trim(form.subjectValue.value) == "" &&
             trim(form.creatorSurname.value) == "" &&
             trim(form.creatorOrganization.value) == "" &&
-            trim(form.eastBound.value) == "180" &&
-            trim(form.westBound.value) == "-180" &&
+            trim(form.boundsChangedCount.value) == "1" &&
             trim(form.locationName.value) == "" &&
             trim(form.taxon.value) == "" &&
             howManySelected(form.siteValues) == 0 &&
@@ -290,6 +296,7 @@
 
           <div class="figure floatleft">
             <label for="advancedsearch">Spatial Criteria</label>
+            <input type="hidden" name="boundsChangedCount" value="0" />
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false"
                     type="text/javascript">
             </script>
@@ -305,23 +312,23 @@
               <tr>
                 <td></td>
                 <td align="center">
-                  <label for="advancedsearchleft">N:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" /></label>
+                  <label for="advancedsearchleft">N:&nbsp;<input type="text" name="northBound" size="12" maxlength="12" value="90.0" onchange="boundsChanged()" /></label>
                 </td>
                 <td></td>
               </tr>
               <tr>
                 <td align="left">
-                  <label for="advancedsearchleft">W:&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" /></label>
+                  <label for="advancedsearchleft">W:&nbsp;<input type="text" name="westBound" size="12" maxlength="12" value="-180.0" onchange="boundsChanged()" /></label>
                 </td>
                 <td></td>
                 <td align="right">
-                  <label for="advancedsearchleft">E:&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" /></label>
+                  <label for="advancedsearchleft">E:&nbsp;<input type="text" name="eastBound" size="12" maxlength="12" value="180.0" onchange="boundsChanged()" /></label>
                 </td>
               </tr>
               <tr>
                 <td></td>
                 <td align="center">
-                  <label for="advancedsearchleft">S:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" /></label>
+                  <label for="advancedsearchleft">S:&nbsp;<input type="text" name="southBound" size="12" maxlength="12" value="-90.0" onchange="boundsChanged()" /></label>
                 </td>
                 <td></td>
               </tr>

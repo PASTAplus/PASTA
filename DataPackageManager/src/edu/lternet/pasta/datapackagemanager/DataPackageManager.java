@@ -35,6 +35,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
@@ -498,7 +499,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * Create (or evaluate) the data entities in the Data Manager
 				 */
-				String entityIdNamePairs = null;
+				Map<String, String> entityIdNamePairs = null;
 				DataPackage dataPackage = levelZeroDataPackage.getDataPackage();
 				if (isEvaluate) {
 					entityIdNamePairs = dataManagerClient.evaluateDataEntities(
@@ -509,38 +510,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 
 				if (entityIdNamePairs != null) {
-					StringTokenizer lineTokenizer = new StringTokenizer(
-					    entityIdNamePairs, "\n");
-
-					if (lineTokenizer != null) {
-						while (lineTokenizer.hasMoreTokens()) {
-							EMLEntity emlEntity = new EMLEntity(levelZeroDataPackage);
-							String entityNameIdPair = lineTokenizer.nextToken().trim();
-
-							if (!entityNameIdPair.equals("")) {
-								int commaIndex = entityNameIdPair.indexOf(',');
-								if (commaIndex != -1) {
-									String entityId = entityNameIdPair.substring(0, commaIndex);
-									emlEntity.setEntityId(entityId);
-									String entityName = entityNameIdPair
-									    .substring(commaIndex + 1);
-									emlEntity.setEntityName(entityName);
-
-									String entityURI = pastaUriHead + URI_MIDDLE_DATA
-									    + uriDocidPart + SLASH + entityId;
-									emlEntity.setEntityURI(entityURI);
-									entityURIList.add(entityURI);
-									entityURIHashMap.put(entityName, entityURI);
-
-									// Add this emlEntity to the list of entities in the data
-									// package
-									levelZeroDataPackage.addEMLEntity(emlEntity);
-								}
-							}
-						}
-
-						isDataValid = levelZeroDataPackage.isDataValid();
-					}
+          for (String entityId : entityIdNamePairs.keySet()) {
+            EMLEntity emlEntity = new EMLEntity(levelZeroDataPackage);
+            emlEntity.setEntityId(entityId);
+            String entityName = entityIdNamePairs.get(entityId);
+            emlEntity.setEntityName(entityName);
+            String entityURI = pastaUriHead + URI_MIDDLE_DATA + uriDocidPart + SLASH + entityId;
+            emlEntity.setEntityURI(entityURI);
+            entityURIList.add(entityURI);
+            entityURIHashMap.put(entityName, entityURI);
+            // Add this emlEntity to the list of entities in the data package
+            levelZeroDataPackage.addEMLEntity(emlEntity);
+          }
+          
+          isDataValid = levelZeroDataPackage.isDataValid();
 				}
 			}
 		} catch (ResourceExistsException e) {

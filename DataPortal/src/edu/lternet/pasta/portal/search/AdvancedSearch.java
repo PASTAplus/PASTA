@@ -90,6 +90,7 @@ public class AdvancedSearch  {
   private String taxonQueryType;
   
   private boolean isBoundaryContainedChecked;
+  private String boundsChangedCount;
   private String northBound;
   private String southBound;
   private String eastBound;
@@ -141,6 +142,7 @@ public class AdvancedSearch  {
       String taxon,
       String taxonQueryType,   
       boolean isBoundaryContainedChecked,
+      String boundsChangedCount,
       String northBound,
       String southBound,
       String eastBound,
@@ -166,6 +168,7 @@ public class AdvancedSearch  {
     this.taxonQueryType = taxonQueryType;
     
     this.isBoundaryContainedChecked = isBoundaryContainedChecked;
+    this.boundsChangedCount = boundsChangedCount;
     this.northBound = northBound;
     this.southBound = southBound;
     this.eastBound = eastBound;
@@ -437,9 +440,7 @@ public class AdvancedSearch  {
         (!(westValue.equals("")))
        ) {
       
-      if (northValue.equals("90.0") && southValue.equals("-90.0") &&
-          eastValue.equals("180.0") && westValue.equals("-180.0")
-         ) {
+      if (Integer.valueOf(boundsChangedCount) == 1) {
         hasSpatialSearch = false;
         return;
       }

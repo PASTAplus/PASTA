@@ -31,6 +31,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -270,10 +272,9 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * @param evaluateMode boolean to determine whether the create
 	 *                 operation should be run in evaluate mode.
 	 * @param transaction  the transaction identifier
-	 * @return         a list of URLs to access data entities
-	 *                 that were created
+	 * @return         a map of entityIds mapped to their associated entityURLs
 	 */
-	public ArrayList<String> createDataEntities(DataPackage dataPackage,
+	public Map<String, String> createDataEntities(DataPackage dataPackage,
 	                                            boolean evaluateMode,
 	                                            String transaction) 
 	        throws IOException, 
@@ -281,7 +282,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	               ResourceExistsException, 
 	               IllegalStateException, 
 	               Exception {
-		ArrayList<String> entityIdNamePairs = new ArrayList<String>();
+		Map<String, String> entityIdNamePairs = new HashMap<String, String>();
 		emlDataLoader.setEvaluateMode(evaluateMode);
 		
 		if (dataPackage != null) {
@@ -321,7 +322,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
               String entityId = emlEntity.getEntityId();
               String entityName = emlEntity.getEntityName();
               //String entityURL = deriveDataURL(emlPackageId, entityId);
-              entityIdNamePairs.add(entityId + "," + entityName);
+              entityIdNamePairs.put(entityId, entityName);
             
               /*
                * If this is not evaluate mode, and if the user is trying to 

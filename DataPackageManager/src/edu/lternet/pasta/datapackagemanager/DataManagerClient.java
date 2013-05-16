@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ecoinformatics.datamanager.parser.DataPackage;
 
@@ -83,24 +85,17 @@ public class DataManagerClient {
 	 * @param dataPackage  the DataPackage object describing the data entities
 	 *                     to be created
 	 * @param transaction  the transaction identifier
-   * @return             A list of entityId / entityName pairs
+   * @return             A Map of entityId / entityName pairs
 	 */
-	public String createDataEntities(DataPackage dataPackage, String transaction) 
+	public Map<String, String> createDataEntities(DataPackage dataPackage, String transaction) 
 	        throws IOException,
 	               MalformedURLException,
 	               Exception {
-    boolean evaluateMode = false;
-    StringBuffer stringBuffer = new StringBuffer("");
-    
+    boolean evaluateMode = false;    
     EMLDataManager emlDataManager = new EMLDataManager();
-    ArrayList<String> entityPairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
+    Map<String, String> entityPairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
       
-    for (String entityURL : entityPairs) {
-      stringBuffer.append(entityURL + "\n");
-    }
-    
-    String entityPairsList = stringBuffer.toString();
-    return entityPairsList;
+    return entityPairs;
 	}
 
 	
@@ -160,22 +155,14 @@ public class DataManagerClient {
    * @param dataPackage  the DataPackage object describing the data entities
    *                     to be created
    * @param transaction  the transaction identifier
-   * @return             A list of entityId / entityName pairs
+   * @return             A Map of entityId / entityName pairs
    */
-  public String evaluateDataEntities(DataPackage dataPackage, String transaction)
+  public Map<String, String> evaluateDataEntities(DataPackage dataPackage, String transaction)
       throws IOException, Exception {
-    
-    StringBuffer stringBuffer = new StringBuffer("");
     boolean evaluateMode = true;
-    
     EMLDataManager emlDataManager = new EMLDataManager();
-    ArrayList<String> entityURLs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
-      
-    for (String entityURL : entityURLs) {
-      stringBuffer.append(entityURL + "\n");
-    }
-     
-    String entityIdNamePairs = stringBuffer.toString();
+    Map<String, String> entityIdNamePairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
+
     return entityIdNamePairs;
   }
 
