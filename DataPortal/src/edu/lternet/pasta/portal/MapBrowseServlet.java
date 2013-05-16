@@ -346,6 +346,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String metadata = null;
 		String report = null;
 		String data = null;
+		String citationId = null;
 
 		while (tokens.hasNext()) {
 			resource = tokens.nextToken();
@@ -417,6 +418,14 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			} else {
 				
+				try {
+	        citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
+        } catch (Exception e) {
+  				logger.error(e.getMessage());
+  				e.printStackTrace();
+  				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
+        }
+				
 				dataPackage = "<li>" + packageId + "</li>\n";
 				
 				if (predecessor != null) {
@@ -454,23 +463,33 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "<ul>\n";
 		html += metadata;
 		html += report;
-		html += "<li>Data\n";
+		html += "<li>Data*\n";
 		html += "<ol>\n";
 		html += data;
 		html += "</ol>\n";
 		html += "</li>\n";
 		html += "</ul>\n";
 		
+		html += "<div class=\"zip\">";
 		html += "<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">";
 		html += "<input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" />";
 		html += "<input type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />";
 		html += "</form>";
+		html += "</div>";
 		
-		html += "<p><br/><a href=\"./dataPackageCitation?scope=" + scope + "&"
+		html += "<p style=\"padding-left: 1.75em; font-size: 80%;\"><em>*By downloading any data you implicitly acknowledge the "
+				+ "<a href=\"http://www.lternet.edu/data/netpolicy.html\">"
+				+ " LTER	Data Policy</a></em></p>";
+		
+		html += "<h4 align=\"left\">Citation</h4>\n";
+		html += "<ul style=\"list-style: none;\">\n";
+		html += "<li>" + citationId + "</li>";
+		html += "<li><a href=\"./dataPackageCitation?scope=" + scope + "&"
 				+ "identifier=" + identifier.toString() + "&"
 				+ "revision=" + revision
-		    + "\">How to cite this data package...</a></p>";
-
+		    + "\">How to cite this data package...</a></li>";
+		html += "</ul>";
+		
 		return html;
 
 	}
