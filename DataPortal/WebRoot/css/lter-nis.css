@@ -411,6 +411,9 @@ div.advancedsearch {
     z-index: 99;
 }
 
+.zip {
+	padding-left: 1.75em;
+}
 
 /* Support for browse page */
 
