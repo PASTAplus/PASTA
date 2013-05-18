@@ -411,6 +411,10 @@ div.advancedsearch {
     z-index: 99;
 }
 
+li.mapBrowse {
+  padding-bottom: 5.25em;	
+}
+
 .zip {
 	padding-left: 1.75em;
 }

@@ -346,7 +346,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String metadata = null;
 		String report = null;
 		String data = null;
-		String citationId = null;
+		String doiId = null;
+		String pastaId = null;
 
 		while (tokens.hasNext()) {
 			resource = tokens.nextToken();
@@ -419,13 +420,14 @@ public class MapBrowseServlet extends DataPortalServlet {
 			} else {
 				
 				try {
-	        citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
+	        doiId = dpmClient.readDataPackageDoi(scope, identifier, revision);
         } catch (Exception e) {
   				logger.error(e.getMessage());
   				e.printStackTrace();
-  				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
         }
-				
+
+				pastaId = dpmClient.getPastaPackageUri(scope, identifier, revision);
+
 				dataPackage = "<li>" + packageId + "</li>\n";
 				
 				if (predecessor != null) {
@@ -477,19 +479,25 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "</form>";
 		html += "</div>";
 		
-		html += "<p style=\"padding-left: 1.75em; font-size: 80%;\"><em>*By downloading any data you implicitly acknowledge the "
-				+ "<a href=\"http://www.lternet.edu/data/netpolicy.html\">"
-				+ " LTER	Data Policy</a></em></p>";
 		
 		html += "<h4 align=\"left\">Citation</h4>\n";
-		html += "<ul style=\"list-style: none;\">\n";
-		html += "<li>" + citationId + "</li>";
-		html += "<li><a href=\"./dataPackageCitation?scope=" + scope + "&"
+		html += "<ul style=\"list-style: none; padding-bottom: 2.0em;\">\n";
+		html += "<li style=\"padding-bottom: 0.75em;\"><a href=\"./dataPackageCitation?scope=" + scope + "&"
 				+ "identifier=" + identifier.toString() + "&"
 				+ "revision=" + revision
-		    + "\">How to cite this data package...</a></li>";
-		html += "</ul>";
+		    + "\">How to cite this data package...</a></li>\n";
 		
+		if (doiId != null) {
+			html += "<li>Digital Object Identifier - <em>" + doiId + "</em></li>\n";
+		}
+		
+		html += "<li>PASTA Data Package Identifier - <em>" + pastaId + "</em></li>\n";
+		html += "</ul>\n";
+		
+		html += "<p style=\"font-size: 80%;\"><em>*By downloading any data you implicitly acknowledge the "
+				+ "<a href=\"http://www.lternet.edu/data/netpolicy.html\">"
+				+ " LTER	Data Policy</a></em></p>";
+
 		return html;
 
 	}
