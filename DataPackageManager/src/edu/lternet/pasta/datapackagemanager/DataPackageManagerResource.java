@@ -4656,6 +4656,7 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
       
       if (metadataString != null) {
         responseBuilder = Response.ok(metadataString);
+        responseBuilder.header("Content-Length", metadataString.length());
         response = responseBuilder.build();       
       } 
       else {
