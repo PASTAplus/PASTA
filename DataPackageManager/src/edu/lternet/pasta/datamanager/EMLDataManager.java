@@ -514,28 +514,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 
      
   /**
-   * Gets a quality report, returning the XML file.
-   * 
-   * @param emlPackageId     an EmlPackageId object
-   * @param evaluateMode boolean to determine whether the report
-   *                     operation should be run in evaluate mode.
-   * @return  a file object containing the entity report XML
-   */
-  public File getQualityReport(EmlPackageId emlPackageId, 
-                               boolean evaluateMode) {
-    File xmlFile = null;
-    EMLQualityReport emlQualityReport = 
-        new EMLQualityReport(emlPackageId);
-    
-    if (emlQualityReport != null) {
-      xmlFile = emlQualityReport.getQualityReport(evaluateMode);
-    }
-    
-    return xmlFile;
-  }
-
-  
-  /**
    * Gets the newest revision of an entity based on its scope and
    * identifier.
    * 

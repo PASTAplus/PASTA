@@ -98,31 +98,6 @@ public class EMLQualityReport {
    */
 
 	/**
-	 * Gets the quality report from the file system and returns the file.
-	 * 
-	 * @param  evaluateMode   true if this is evaluate mode
-   * @return the quality report XML file, or null if it doesn't exist
-	 */
-	public File getQualityReport(boolean evaluateMode) {
-	  File xmlFile = null;
-	  
-    if (this.emlPackageId != null) {
-      EMLFileSystemDataPackage emlFileSystemDataPackage = new EMLFileSystemDataPackage(emlPackageId);
-      emlFileSystemDataPackage.setEvaluateMode(evaluateMode);
-      String dirPath = emlFileSystemDataPackage.getDirPath();   
-      String qualityReportFilename = QUALITY_REPORT_FILE_NAME;
-      File qualityReportFile = new File(dirPath, qualityReportFilename);
-      
-      if (qualityReportFile != null && qualityReportFile.exists()) {
-        xmlFile = qualityReportFile;
-      }
-    }
-      
-    return xmlFile;
-	}
-	
-	
-	/**
 	 * Stores a quality report on the file system.
 	 * 
 	 * @param   evaluateMode   true if this is evaluate mode
