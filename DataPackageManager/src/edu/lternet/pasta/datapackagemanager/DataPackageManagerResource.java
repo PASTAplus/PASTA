@@ -4655,9 +4655,11 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
       metadataString = dataPackageManager.readMetadata(scope, identifier, revision, userId, authToken);
       
       if (metadataString != null) {
-        responseBuilder = Response.ok(metadataString);
-        responseBuilder.header("Content-Length", metadataString.length());
-        response = responseBuilder.build();       
+    	byte[] byteArray = metadataString.getBytes("UTF-8");
+        responseBuilder = Response.ok();
+        responseBuilder.header("Content-Length", byteArray.length);
+        responseBuilder.entity(metadataString);
+        response = responseBuilder.build();  
       } 
       else {
         ResourceNotFoundException e = new ResourceNotFoundException(
