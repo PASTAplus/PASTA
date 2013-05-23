@@ -1651,6 +1651,66 @@ public class DataPackageRegistry {
     return docidList;
   }
 
+  
+  
+	/**
+	 * Returns an array list of resources that are lacking checksums.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listChecksumlessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND sha1_checksum IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				resourceId = result.getString("resource_id");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setEntityId(entityId);
+				resource.setResourceId(resourceId);
+				resource.setResourceType(result.getString("resource_type"));
+				resource.setPackageId(packageId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
 	/**
 	 * Returns an array list of resources that are both publicly accessible and
 	 * lacking DOIs.
@@ -1718,6 +1778,7 @@ public class DataPackageRegistry {
 
 	}
 
+	
 	/**
 	 * Returns an array list of DOIs that are obsolete.
 	 * 

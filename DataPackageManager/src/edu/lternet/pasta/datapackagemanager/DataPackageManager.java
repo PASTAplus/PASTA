@@ -61,6 +61,7 @@ import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
+import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetacatMetadataCatalog;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -609,7 +610,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				// Store the checksum of the data entity resource
 				File file = getDataEntityFile(scope, identifier,
 						revision.toString(), entityId, authToken, user);
-				storeChecksum(dataPackageRegistry, entityURI, file);
+				storeChecksum(entityURI, file);
 
 				/*
 				 * Get the <access> XML block for this data entity and store the
@@ -632,7 +633,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			// Store the checksum of the metadata resource
 			File file = getMetadataFile(scope, identifier, revision.toString(),
 					user, authToken);
-			storeChecksum(dataPackageRegistry, metadataURI, file);
+			storeChecksum(metadataURI, file);
 			
 			/*
 			 * Store the access control rules for the metadata resource
@@ -654,7 +655,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			// Store the checksum of the report resource
 			File file = readDataPackageReport(scope, identifier,
 					revision.toString(), emlPackageId, authToken, user);
-			storeChecksum(dataPackageRegistry, reportURI, file);
+			storeChecksum(reportURI, file);
 
 			/*
 			 * Store the access control rules for the quality report resource
@@ -1050,7 +1051,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return isAuthorized;
 		
 	}
-
+	
 	
 	/**
 	 * List the data entity resources for the specified data package that are
@@ -2036,11 +2037,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
-	/*
+	/**
 	 * Calculates and stores the SHA-1 checksum of a PASTA resource in the data package registry.
+	 * 
+	 * @param resourceId         The PASTA resource identifier string
+	 * @param file               The file object whose checksum is to be calculated
 	 */
-	private void storeChecksum(DataPackageRegistry dataPackageRegistry, String resourceId, File file) {
+	public void storeChecksum(String resourceId, File file) {
 		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
 			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
 			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
 		}
