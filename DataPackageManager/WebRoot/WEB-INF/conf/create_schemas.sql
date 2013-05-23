@@ -16,6 +16,7 @@ CREATE TABLE datapackagemanager.resource_registry (
   principal_owner VARCHAR(250) NOT NULL,                    -- the principal who owns this resource
   date_created TIMESTAMP NOT NULL,                          -- creation date/time
   date_deactivated TIMESTAMP,                               -- deactivation date/time; NULL indicates still active
+  sha1_checksum CHAR(40),                                   -- SHA-1 checksum of this resource, a 40-character string
   CONSTRAINT resource_registry_pk PRIMARY KEY (resource_id)
 );
 

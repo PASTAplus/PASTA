@@ -39,6 +39,7 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
+import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -60,15 +61,16 @@ import edu.ucsb.nceas.utilities.Options;
 public class DataPackageRegistry {
 
   /*
-   * Class fields
+   * Class variables
    */
   
   private static Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
   private static final String PUBLIC = "public";
- 
+  
+  
   /*
-   * Instance fields
+   * Instance variables
    */
   
   // Name of the database table where data packages are registered
@@ -122,6 +124,45 @@ public class DataPackageRegistry {
    * Class methods
    */
   
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    
+    Options options = null;
+    options = ConfigurationListener.getOptions();
+    
+    String dirPath = "WebRoot/WEB-INF/conf";
+
+    if (options == null) {
+      ConfigurationListener configurationListener = new ConfigurationListener();
+      configurationListener.initialize(dirPath);
+      options = ConfigurationListener.getOptions();
+    }
+
+    DataPackageRegistry dpr = null;
+    String dbDriver = "org.postgresql.Driver";
+    String dbURL = "jdbc:postgresql://localhost:5432/pasta";
+    String dbUser = "pasta";
+    String dbPassword = "p@st@";
+    
+    // String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
+    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+
+    try {
+      dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+      if (dpr.getDoi(resourceId) == null) {
+        logger.info("It's NULL");
+      } else {
+        logger.info("It's not NULL");
+      }
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+    }
+
+  }
+
 
   /*
    * Instance methods
@@ -1610,6 +1651,66 @@ public class DataPackageRegistry {
     return docidList;
   }
 
+  
+  
+	/**
+	 * Returns an array list of resources that are lacking checksums.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listChecksumlessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND sha1_checksum IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				resourceId = result.getString("resource_id");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setEntityId(entityId);
+				resource.setResourceId(resourceId);
+				resource.setResourceType(result.getString("resource_type"));
+				resource.setPackageId(packageId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
 	/**
 	 * Returns an array list of resources that are both publicly accessible and
 	 * lacking DOIs.
@@ -1677,6 +1778,7 @@ public class DataPackageRegistry {
 
 	}
 
+	
 	/**
 	 * Returns an array list of DOIs that are obsolete.
 	 * 
@@ -1746,44 +1848,53 @@ public class DataPackageRegistry {
     }   
   }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		Options options = null;
-		options = ConfigurationListener.getOptions();
-		
-		String dirPath = "WebRoot/WEB-INF/conf";
+  
+  /**
+   * Update the SHA-1 checksum of a resource to the resource registry.
+   * 
+   * @param resourceId
+   *          The resource identifier of the resource to be updated
+   * @param sha1Checksum
+   *          The SHA-1 checksum of the resource
+   * @throws SQLException
+   */
+  public void updateShaChecksum(String resourceId, String sha1Checksum)
+          throws ChecksumException, ClassNotFoundException, SQLException {
+    Connection conn = null;
+    
+    if ((sha1Checksum == null) || (sha1Checksum.length() != 40)) {
+      throw new ChecksumException("SHA-1 checksum must be 40 characters in length");
+    }
+    
+    try {
+      conn = this.getConnection();
+    } 
+    catch (ClassNotFoundException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    }
 
-		if (options == null) {
-			ConfigurationListener configurationListener = new ConfigurationListener();
-			configurationListener.initialize(dirPath);
-			options = ConfigurationListener.getOptions();
-		}
+    String queryString = String.format("UPDATE datapackagemanager.resource_registry "
+        + "SET sha1_checksum='%s' WHERE resource_id='%s'", sha1Checksum, resourceId);
 
-		DataPackageRegistry dpr = null;
-		String dbDriver = "org.postgresql.Driver";
-		String dbURL = "jdbc:postgresql://localhost:5432/pasta";
-		String dbUser = "pasta";
-    String dbPassword = "p@st@";
-		
-		// String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
-    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+    try {
+      Statement statement = conn.createStatement();
+      int rowCount = statement.executeUpdate(queryString);
+      if (rowCount != 1) {
+        String msg = String.format("When updating SHA-1 checksum, expected 1 row updated, instead %d row(s) were updated.", rowCount);
+        throw new ChecksumException(msg);
+      }
+    } 
+    catch (SQLException e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+      throw(e);
+    } 
+    finally {
+      conn.close();
+    }
 
-		try {
-			dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-			if (dpr.getDoi(resourceId) == null) {
-				logger.info("It's NULL");
-			} else {
-				logger.info("It's not NULL");
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-	}
-
+  }
 
 }
