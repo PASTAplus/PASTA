@@ -2770,6 +2770,184 @@ Site Year Month Day Transect Species_Code Count
 
 	/**
 	 * 
+	 * <strong>Read Data Entity Checksum</strong> operation, specifying the scope,
+	 * identifier, and revision of the data entity checksum to be read in the URI,
+	 * returning a 40-character SHA-1 checksum value.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/checksum/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data entity checksum was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the data entity.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>7a39bd7694dc0473a6ae7a7d7520ff2e7a39bd76</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data entity</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No checksum associated with the specified data entity is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param entityId
+	 *          The entity identifier
+	 * @return a Response object containing a data entity checksum if found, else
+	 *         returns a 404 Not Found response
+	 */
+
+@GET
+@Path("/data/checksum/eml/{scope}/{identifier}/{revision}/{entityId}")
+@Produces("text/plain")
+public Response readDataEntityChecksum(
+                               @Context HttpHeaders headers,
+                               @PathParam("scope") String scope,
+                               @PathParam("identifier") Integer identifier,
+                               @PathParam("revision") String revision,
+                               @PathParam("entityId") String entityId
+                  ) {
+  AuthToken authToken = null;
+  String checksum = null;
+  String entryText = null;
+  String resourceId = null;
+  ResponseBuilder responseBuilder = null;
+  Response response = null;
+  final String serviceMethodName = "readDataEntityChecksum";
+  Rule.Permission permission = Rule.Permission.read;
+
+  try {
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+		resourceId = DataPackageManager.composeResourceId(
+		    ResourceType.data, scope, identifier,
+		    Integer.valueOf(revision), entityId);
+
+    DataPackageManager dataPackageManager = new DataPackageManager(); 
+    checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+
+    if (checksum != null) {
+      responseBuilder = Response.ok(checksum);
+      response = responseBuilder.build();
+      entryText = checksum;
+   }
+    else {
+      Exception e = new Exception(
+          "Read resource checksum operation failed for unknown reason");
+      throw (e);
+    }
+    
+  }
+  catch (IllegalArgumentException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeBadRequest(e).getResponse();
+  }
+  catch (UnauthorizedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+  }
+  catch (ResourceNotFoundException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeNotFound(e).getResponse();
+  }
+  catch (ResourceDeletedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (ResourceExistsException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (UserErrorException e) {
+    entryText = e.getMessage();
+    response = WebResponseFactory.makeBadRequest(e);
+  }
+  catch (Exception e) {
+    entryText = e.getMessage();
+    WebApplicationException webApplicationException = WebExceptionFactory
+        .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    response = webApplicationException.getResponse();
+  }
+  
+  audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+  response = stampHeader(response);
+  return response;
+}
+
+
+	/**
+	 * 
 	 * <strong>Read Data Entity DOI</strong> operation, specifying the scope,
 	 * identifier, and revision of the data entity DOI to be read in the URI,
 	 * returning the canonical Digital Object Identifier.
@@ -3912,6 +4090,180 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 
 
 	/**
+	 * <strong>Read Report Checksum</strong> operation, specifying the scope,
+	 * identifier, and revision of the report whose checksum is to be read in the URI, returning
+	 * the 40 characater SHA-1 checksum value.
+	 *
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/report/checksum/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the report checksum was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the report.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>7a39bd76947520ff2edc0473a6ae7a7d7520ff2e</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the report</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No checksum associated with the specified report is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a report checksum if found, else returns a
+	 *         404 Not Found response
+	 */
+@GET
+@Path("/report/checksum/eml/{scope}/{identifier}/{revision}")
+@Produces("text/plain")
+public Response readDataPackageReportChecksum(
+                                @Context HttpHeaders headers,
+                                @PathParam("scope") String scope,
+                                @PathParam("identifier") Integer identifier,
+                                @PathParam("revision") String revision
+                  ) {
+  AuthToken authToken = null;
+  String checksum = null;
+  String entryText = null;
+  String resourceId = null;
+  ResponseBuilder responseBuilder = null;
+  Response response = null;
+  final String serviceMethodName = "readDataPackageReportChecksum";
+  Rule.Permission permission = Rule.Permission.read;
+
+  try {
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+		resourceId = DataPackageManager.composeResourceId(
+		    ResourceType.report, scope, identifier,
+		    Integer.valueOf(revision), null);
+    
+    DataPackageManager dataPackageManager = new DataPackageManager(); 
+    checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+
+    if (checksum != null) {
+      responseBuilder = Response.ok(checksum);
+      response = responseBuilder.build();
+      entryText = checksum;
+    }
+    else {
+      Exception e = new Exception(
+          "Read resource checksum operation failed for unknown reason");
+      throw (e);
+    }
+    
+  }
+  catch (IllegalArgumentException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeBadRequest(e).getResponse();
+  }
+  catch (UnauthorizedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+  }
+  catch (ResourceNotFoundException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeNotFound(e).getResponse();
+  }
+  catch (ResourceDeletedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (ResourceExistsException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (UserErrorException e) {
+    entryText = e.getMessage();
+    response = WebResponseFactory.makeBadRequest(e);
+  }
+  catch (Exception e) {
+    entryText = e.getMessage();
+    WebApplicationException webApplicationException = WebExceptionFactory
+        .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    response = webApplicationException.getResponse();
+  }
+  
+  audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+  response = stampHeader(response);
+  return response;
+}
+
+
+	/**
 	 * <strong>Read Report DOI</strong> operation, specifying the scope,
 	 * identifier, and revision of the report DOI to be read in the URI, returning
 	 * the canonical Digital Object Identifier.
@@ -4695,6 +5047,180 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
     response = stampHeader(response);
     return response;
   }
+
+
+	/**
+	 * <strong>Read Metadata Checksum</strong> operation, specifying the scope,
+	 * identifier, and revision of the metadata object whose checksum value to be 
+	 * read in the URI, returning the 40 character SHA-1 checksum string.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/checksum/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the metadata checksum was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the metadata</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>7a39bd7694dc7520ff2e0473a6ae7a7d7520ff2</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the metadata</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No checksum associated with the specified metadata is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @return a Response object containing a metadata checksum if found, else returns
+	 *         a 404 Not Found response
+	 */
+@GET
+@Path("/metadata/checksum/eml/{scope}/{identifier}/{revision}")
+@Produces("text/plain")
+public Response readMetadataChecksum(
+                                @Context HttpHeaders headers,
+                                @PathParam("scope") String scope,
+                                @PathParam("identifier") Integer identifier,
+                                @PathParam("revision") String revision
+                  ) {
+  AuthToken authToken = null;
+  String checksum = null;
+  String entryText = null;
+  String resourceId = null;
+  ResponseBuilder responseBuilder = null;
+  Response response = null;
+  final String serviceMethodName = "readMetadataChecksum";
+  Rule.Permission permission = Rule.Permission.read;
+
+  try {
+    authToken = getAuthToken(headers);
+    String userId = authToken.getUserId();
+
+    // Is user authorized to run the service method?
+    boolean serviceMethodAuthorized = 
+      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+    if (!serviceMethodAuthorized) {
+      throw new UnauthorizedException(
+          "User " + userId + 
+          " is not authorized to execute service method " + 
+          serviceMethodName);
+    }
+    
+		resourceId = DataPackageManager.composeResourceId(
+		    ResourceType.metadata, scope, identifier,
+		    Integer.valueOf(revision), null);
+
+    DataPackageManager dataPackageManager = new DataPackageManager(); 
+    checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+
+    if (checksum != null) {
+      responseBuilder = Response.ok(checksum);
+      response = responseBuilder.build();
+      entryText = checksum;
+    }
+    else {
+      Exception e = new Exception(
+          "Read resource checksum operation failed for unknown reason");
+      throw (e);
+    }
+    
+  }
+  catch (IllegalArgumentException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeBadRequest(e).getResponse();
+  }
+  catch (UnauthorizedException e) {
+    entryText = e.getMessage();
+  	response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+  }
+  catch (ResourceNotFoundException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeNotFound(e).getResponse();
+  }
+  catch (ResourceDeletedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (ResourceExistsException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (UserErrorException e) {
+    entryText = e.getMessage();
+    response = WebResponseFactory.makeBadRequest(e);
+  }
+  catch (Exception e) {
+    entryText = e.getMessage();
+    WebApplicationException webApplicationException = WebExceptionFactory
+        .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    response = webApplicationException.getResponse();
+  }
+  
+  audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+  response = stampHeader(response);
+  return response;
+}
 
 
 	/**
