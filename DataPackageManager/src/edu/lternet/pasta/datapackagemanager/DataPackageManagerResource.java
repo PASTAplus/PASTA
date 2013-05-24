@@ -2771,8 +2771,8 @@ Site Year Month Day Transect Species_Code Count
 	/**
 	 * 
 	 * <strong>Read Data Entity Checksum</strong> operation, specifying the scope,
-	 * identifier, and revision of the data entity checksum to be read in the URI,
-	 * returning a 40-character SHA-1 checksum value.
+	 * identifier, and revision of the data entity object whose checksum is to be 
+	 * read in the URI, returning a 40-character SHA-1 checksum value.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -4091,8 +4091,8 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 
 	/**
 	 * <strong>Read Report Checksum</strong> operation, specifying the scope,
-	 * identifier, and revision of the report whose checksum is to be read in the URI, returning
-	 * the 40 characater SHA-1 checksum value.
+	 * identifier, and revision of the report object whose checksum is to be 
+	 * read in the URI, returning a 40 character SHA-1 checksum value.
 	 *
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -5051,8 +5051,8 @@ public Response readDataPackageReportChecksum(
 
 	/**
 	 * <strong>Read Metadata Checksum</strong> operation, specifying the scope,
-	 * identifier, and revision of the metadata object whose checksum value to be 
-	 * read in the URI, returning the 40 character SHA-1 checksum string.
+	 * identifier, and revision of the metadata object whose checksum value is
+	 * to be read in the URI, returning a 40 character SHA-1 checksum value.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
