@@ -27,7 +27,6 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -36,10 +35,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.xml.transform.TransformerException;
 import javax.ws.rs.core.MediaType;
@@ -65,6 +60,8 @@ import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
+import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetacatMetadataCatalog;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -134,6 +131,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private String user;
 	private AuthToken authToken;
 
+	
 	/*
 	 * Constructors
 	 */
@@ -143,6 +141,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		dataManager = DataManager.getInstance(this, databaseAdapterName);
 	}
 
+	
 	/*
 	 * Class methods
 	 */
@@ -178,6 +177,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceId;
 	}
 
+	
 	/**
 	 * Gets the value of the resource directory. Returns the configured property
 	 * value if set, else returns the default value.
@@ -192,6 +192,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 	}
 
+	
 	/**
 	 * Utility method to make a DataPackageRegistry object using database
 	 * connection settings.
@@ -205,6 +206,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 	}
 
+	
 	/*
 	 * Instance methods
 	 */
@@ -245,6 +247,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return connection;
 	}
 
+	
 	/**
 	 * Gets the data entity format and returns it as a string.
 	 * 
@@ -303,6 +306,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Returns a list of data package resource identifiers for the specified data
 	 * package. This is a pass-through to the DataPackageRegistry method of the
@@ -330,6 +334,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resources;
 	}
 
+	
 	/**
 	 * Get database adpater name. Implementation of this method is required by the
 	 * DatabaseConnectionPoolInterface.
@@ -340,6 +345,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return databaseAdapterName;
 	}
 
+	
 	/**
 	 * Returns checked out database connection to the pool. Implementation of this
 	 * method is required by the DatabaseConnectionPoolInterface. Note that in
@@ -368,6 +374,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	/* End DatabaseConnectionPoolInterface methods */
 
+	
 	/**
 	 * Create a data package in PASTA and return a resource map of the created
 	 * resources.
@@ -458,17 +465,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceMap;
 	}
 
+	
 	/*
 	 * Implements common logic that is shared by the createDatePackage(),
 	 * evaluateDataPackage(), and updateDataPackage() methods.
 	 */
-	private String createDataPackageAux(File emlFile,
-	    EMLDataPackage levelZeroDataPackage,
-	    DataPackageRegistry dataPackageRegistry, String packageId, String scope,
-	    Integer identifier, Integer revision, String user, AuthToken authToken,
-	    boolean isUpdate, boolean isEvaluate, String transaction)
-	    throws ClassNotFoundException, SQLException, IOException,
-	    ClientProtocolException, TransformerException, Exception {
+	private String createDataPackageAux(File emlFile, EMLDataPackage levelZeroDataPackage,
+				DataPackageRegistry dataPackageRegistry, String packageId, String scope,
+				Integer identifier, Integer revision, String user, AuthToken authToken,
+				boolean isUpdate, boolean isEvaluate, String transaction)
+			throws	ClassNotFoundException, SQLException, IOException,
+					ClientProtocolException, TransformerException, Exception {
 		Authorizer authorizer = new Authorizer(dataPackageRegistry);
 		DataManagerClient dataManagerClient = new DataManagerClient();
 		boolean isDataPackageValid;
@@ -482,10 +489,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		String reportURI = pastaUriHead + URI_MIDDLE_REPORT + uriDocidPart;
 		String qualityReportXML = null;
 		String resourceLocation = null;
-
 		String datasetAccessXML = levelZeroDataPackage.getAccessXML();
 		AccessMatrix datasetAccessMatrix = new AccessMatrix(datasetAccessXML);
-		// ArrayList<Rule> datasetRuleList = datasetAccessMatrix.getRuleList();
+		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
 
 		/*
 		 * Is the metadata for this data package valid?
@@ -555,9 +562,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			try {
 				if (isUpdate) {
-					EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-					EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
-					    identifier.toString(), revision.toString());
 					metacatResult = metadataCatalog.updateEmlDocument(emlPackageId,
 					    emlDocument);
 				} else {
@@ -602,6 +606,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				dataPackageRegistry.addDataPackageResource(entityURI,
 				    ResourceType.data, entityDir, packageId, scope, identifier,
 				    revision, entityId, entityName, user, mayOverwrite);
+				
+				// Store the checksum of the data entity resource
+				File file = getDataEntityFile(scope, identifier,
+						revision.toString(), entityId, authToken, user);
+				storeChecksum(entityURI, file);
 
 				/*
 				 * Get the <access> XML block for this data entity and store the
@@ -620,6 +629,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			dataPackageRegistry.addDataPackageResource(metadataURI,
 			    ResourceType.metadata, resourceLocation, packageId, scope,
 			    identifier, revision, null, null, user, mayOverwrite);
+			
+			// Store the checksum of the metadata resource
+			File file = getMetadataFile(scope, identifier, revision.toString(),
+					user, authToken);
+			storeChecksum(metadataURI, file);
+			
 			/*
 			 * Store the access control rules for the metadata resource
 			 */
@@ -636,6 +651,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			dataPackageRegistry.addDataPackageResource(reportURI,
 			    ResourceType.report, resourceLocation, packageId, scope, identifier,
 			    revision, null, null, user, mayOverwrite);
+
+			// Store the checksum of the report resource
+			File file = readDataPackageReport(scope, identifier,
+					revision.toString(), emlPackageId, authToken, user);
+			storeChecksum(reportURI, file);
 
 			/*
 			 * Store the access control rules for the quality report resource
@@ -689,6 +709,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceMap;
 	}
 
+	
 	/*
 	 * Notifies the event manager of a change to a data package by using an
 	 * EventManagerClient object. Spawns off a thread so that a delayed response
@@ -717,6 +738,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Delete a data package in PASTA based on its scope and identifier values
 	 * 
@@ -816,6 +838,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return deleted;
 	}
 
+	
 	/**
 	 * Evaluate a data package, returning the XML string representation of the
 	 * quality report.
@@ -892,6 +915,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return xmlString;
 	}
 
+	
 	/**
 	 * 
 	 */
@@ -908,6 +932,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return stringBuffer.toString();
 	}
 
+	
 	/**
 	 * Gets the newest revision of a data package based on its scope and
 	 * identifier.
@@ -937,6 +962,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return newest;
 	}
 
+	
 	/**
 	 * Gets the oldest revision of a data package based on its scope and
 	 * identifier.
@@ -1025,7 +1051,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return isAuthorized;
 		
 	}
-
+	
+	
 	/**
 	 * List the data entity resources for the specified data package that are
 	 * readable by the specified user.
@@ -1066,6 +1093,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return entityListString;
 	}
 
+	
 	/**
 	 * List the identifier values for data packages with the specified scope that
 	 * are readable by the specified user.
@@ -1100,6 +1128,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return identifierListString;
 	}
 
+	
 	/**
 	 * List the revision values for data packages with the specified scope and
 	 * identifier that are readable by the specified user.
@@ -1137,6 +1166,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return revisionListString;
 	}
 
+	
 	/**
 	 * List the scope values for all data packages that are readable by the
 	 * specified user.
@@ -1167,6 +1197,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return scopeListString;
 	}
 
+	
 	/**
 	 * List the scope values for all data packages that are readable by the
 	 * specified user.
@@ -1198,6 +1229,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return packageListString;
 	}
 
+	
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 */
@@ -1242,6 +1274,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 	}
 
+	
 	/**
 	 * Parse an EML document using the Data Manager Library method
 	 * DataManager.parseMetadata().
@@ -1275,6 +1308,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return dataPackage;
 	}
 
+	
 	/**
 	 * Reads a data entity and returns it as a byte array. The specified user must
 	 * be authorized to read the data entity resource.
@@ -1360,6 +1394,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Reads a data entity and returns it as a byte array. The specified user must
 	 * be authorized to read the data entity resource.
@@ -1445,7 +1480,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return file;
 
 	}
-
+	
+	
 	/**
 	 * Returns the entity name for the given entity resource identifier if it
 	 * exists; otherwise, throw a ResourceNotFoundException. Authorization for
@@ -1516,6 +1552,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Reads a data package and returns it as a string representing a resource
 	 * map. The specified user must be authorized to read the data package
@@ -1623,6 +1660,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceMap;
 	}
 
+	
 	/**
 	 * Read a data package quality report, returning the XML file. The specified
 	 * user must be authorized to read the report.
@@ -1695,6 +1733,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return xmlFile;
 	}
 
+	
 	/**
 	 * Read an evaluate quality report, returning the XML file. The transaction id
 	 * for the evaluate operation that generated the report must be specified.
@@ -1710,6 +1749,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
 	}
 
+	
 	/**
 	 * Reads metadata from the Metadata Catalog and returns it as a String. The
 	 * specified user must be authorized to read the metadata resource.
@@ -1794,6 +1834,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return metadataXML;
 	}
 
+	
 	/**
 	 * Reads metadata from the Metadata Catalog and returns it as a String. The
 	 * specified user must be authorized to read the metadata resource.
@@ -1878,6 +1919,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return levelOneEMLFile;
 	}
 
+	
 	/**
 	 * Returns the Digital Object Identifier for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
@@ -1935,6 +1977,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Rollback the creation of data entities in the data manager for the
 	 * specified scope and identifier
@@ -1964,6 +2007,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 	}
 
+	
 	/**
 	 * Run a Metadata Catalog query operation. The returned String is a
 	 * PASTA-formatted resultset XML string. The resultset is filtered (by
@@ -1991,7 +2035,28 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		return resultsetXML;
 	}
+	
+	
+	/**
+	 * Calculates and stores the SHA-1 checksum of a PASTA resource in the data package registry.
+	 * 
+	 * @param resourceId         The PASTA resource identifier string
+	 * @param file               The file object whose checksum is to be calculated
+	 */
+	public void storeChecksum(String resourceId, File file) {
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
+			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
+			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
 
+	
 	/**
 	 * Update a data package in PASTA and return a resource map of the created
 	 * resources.
@@ -2135,6 +2200,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceMap;
 	}
 
+	
 	/**
 	 * Writes the data package error message to the system.
 	 * 
@@ -2163,6 +2229,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Reads the data package error message from the system.
 	 * 
@@ -2194,6 +2261,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 
+	
 	/**
 	 * Deletes the data package error message from the system.
 	 * 
@@ -2269,6 +2337,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}	
 	
+	
 	/**
 	 * Returns the File object of the data package archive identified by the
 	 * transaction identifier.
@@ -2302,6 +2371,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 	
+	
 	/**
 	 * Deletes the data package archive identified by the transaction identifier.
 	 * 
@@ -2324,6 +2394,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		archive.deleteDataPackageArchive(transaction);
 
 	}
+	
 	
   /*
    * Matches the specified 'entityName' value with the entity names
@@ -2357,7 +2428,5 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     
     return objectName;
   }
-
-  
 
 }

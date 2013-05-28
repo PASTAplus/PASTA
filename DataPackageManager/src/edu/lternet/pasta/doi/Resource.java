@@ -41,6 +41,10 @@ public class Resource {
 	private String resourceType = null;
 	private String packageId = null;
 	private String dateCreated = null;
+	private String scope = null;
+	private Integer identifier = null;
+	private Integer revision = null;
+	private String entityId = null;
 
 	/*
 	 * Constructors
@@ -126,4 +130,48 @@ public class Resource {
 		return this.dateCreated;
 	}
 	
+	
+	/*
+	 * Additional accessor methods for scope, identifier, revision, and entityId
+	 */
+	
+	public String getScope() {
+		return scope;
+	}
+
+	
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	
+	public Integer getIdentifier() {
+		return identifier;
+	}
+
+	
+	public void setIdentifier(Integer identifier) {
+		this.identifier = identifier;
+	}
+
+	
+	public Integer getRevision() {
+		return revision;
+	}
+
+	
+	public void setRevision(Integer revision) {
+		this.revision = revision;
+	}
+
+	
+	public String getEntityId() {
+		return entityId;
+	}
+
+	
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
+	}
+		
 }
