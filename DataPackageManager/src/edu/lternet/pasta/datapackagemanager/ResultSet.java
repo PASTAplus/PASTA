@@ -222,6 +222,13 @@ public class ResultSet {
 					Element resourceIdElement = document.createElement("resourceId");
 					Text resourceIdText = document.createTextNode(resourceId);
 					resourceIdElement.appendChild(resourceIdText);
+					Element packageIdElement = (Element) packageIdNode;
+					EmlPackageIdFormat epif = new EmlPackageIdFormat();
+					EmlPackageId emlPackageId = epif.parse(packageId);
+					String scope = emlPackageId.getScope();
+					Integer identifier = emlPackageId.getIdentifier();
+					packageIdElement.setAttribute("scope", scope);
+					packageIdElement.setAttribute("identifier", identifier.toString());
 					parentNode.insertBefore(resourceIdElement, packageIdNode);
 				}
 

@@ -43,7 +43,8 @@
             <td class="header" width="65%">Title</td>
           </tr>
           <xsl:for-each select="/resultset/document">
-            <xsl:sort select="./packageId" data-type="text"/>
+            <xsl:sort select="./packageId/@scope" data-type="text"/>
+            <xsl:sort select="./packageId/@identifier" data-type="number"/>
             <xsl:apply-templates select="."/>
           </xsl:for-each>
         </tbody>
