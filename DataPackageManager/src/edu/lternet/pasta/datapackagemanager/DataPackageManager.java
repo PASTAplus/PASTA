@@ -1921,6 +1921,64 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns the SHA-1 checksum for the given resource identifier if
+	 * it exists; otherwise, throw a ResourceNotFoundException.
+	 * 
+	 * @param resourceId
+	 * @param authToken
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readResourceChecksum(String resourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String checksum = null;
+		String user = authToken.getUserId();
+
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			/*
+			 * Check whether user is authorized to read the data package report
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
+			    Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User " + user
+				    + " does not have permission to read the checksum for this resource: "
+				    + resourceId;
+				throw new UnauthorizedException(gripe);
+			}
+
+			checksum = dataPackageRegistry.getResourceShaChecksum(resourceId);
+
+			if (checksum == null) {
+				String gripe = "A checksum does not exist for this resource: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return checksum;
+
+	}
+
+	
+	/**
 	 * Returns the Digital Object Identifier for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 

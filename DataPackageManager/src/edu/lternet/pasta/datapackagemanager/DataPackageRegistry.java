@@ -1050,6 +1050,54 @@ public class DataPackageRegistry {
   
   
   /**
+   * Gets the SHA checksum value for a given resourceId
+   * 
+   * @param   resourceId   the resource identifier
+   * @return  the value of the 'sha1_checksum' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getResourceShaChecksum(String resourceId) 
+          throws ClassNotFoundException, SQLException {
+    String checksum = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT sha1_checksum FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        checksum = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return checksum;
+  }
+  
+  
+  /**
    * Gets the resourceLocation value for a given resourceId
    * 
    * @param resourceId   the resource identifier
