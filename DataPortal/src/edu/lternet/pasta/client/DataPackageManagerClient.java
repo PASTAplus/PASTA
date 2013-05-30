@@ -139,10 +139,12 @@ public class DataPackageManagerClient extends PastaClient {
 	 *          the DataPackageManagerClient object
 	 * @param scope
 	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param initialIdentifier  the starting identifier value; keep incrementing until
+	 *          we find an identifier that hasn't been used
 	 * @return an integer value appropriate for use as a test identifier
 	 */
 	static Integer determineTestIdentifier(DataPackageManagerClient dpmClient,
-	    String scope) throws Exception {
+	    String scope, String initialIdentifier) throws Exception {
 		Integer identifier = null;
 
 		/*
@@ -168,7 +170,7 @@ public class DataPackageManagerClient extends PastaClient {
 			}
 		}
 
-		int identifierValue = 1;
+		int identifierValue = new Integer(initialIdentifier).intValue();
 		while (identifier == null) {
 			String identifierString = "" + identifierValue;
 			String scopeDotIdentifier = scope + "." + identifierValue;
@@ -206,7 +208,7 @@ public class DataPackageManagerClient extends PastaClient {
 			System.out.println("\nData package scopes:\n" + dataPackageScopes);
 
 			// Create the test data package in PASTA
-			identifier = determineTestIdentifier(dpmClient, scope);
+			identifier = determineTestIdentifier(dpmClient, scope, "1000");
 			String testEMLPath = "test/data/NoneSuchBugCount.xml";
 			File testEMLFile = new File(testEMLPath);
 			String createPackageId = scope + "." + identifier.toString() + "."

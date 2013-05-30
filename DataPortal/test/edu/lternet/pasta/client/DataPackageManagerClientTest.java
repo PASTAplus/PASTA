@@ -163,7 +163,7 @@ public class DataPackageManagerClientTest {
      */
     try {
       dpmClient = new DataPackageManagerClient(testUser);
-      testIdentifier = DataPackageManagerClient.determineTestIdentifier(dpmClient, testScope);
+      testIdentifier = DataPackageManagerClient.determineTestIdentifier(dpmClient, testScope, testIdentifierStr);
       String testPackageId = testScope + "." + testIdentifier + "."
           + testRevisionStr;
       System.err.println("testPackageId: " + testPackageId);
