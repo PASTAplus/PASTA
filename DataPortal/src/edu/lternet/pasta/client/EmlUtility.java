@@ -56,6 +56,7 @@ import org.apache.log4j.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 
+import edu.lternet.pasta.common.HTMLUtility;
 import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
@@ -163,7 +164,8 @@ public class EmlUtility {
 
     File styleSheet = new File(xslPath);
 
-    StringReader stringReader = new StringReader(this.eml);
+    String emlScrubbed = HTMLUtility.stripNonValidHTMLCharacters(this.eml);
+    StringReader stringReader = new StringReader(emlScrubbed);
     StringWriter stringWriter = new StringWriter();
     StreamSource styleSource = new StreamSource(styleSheet);
     Result result = new StreamResult(stringWriter);
@@ -203,7 +205,8 @@ public class EmlUtility {
 		
     String html = null;
     File xsltFile = new File(xslPath);
-    StringReader stringReader = new StringReader(this.eml);
+    String emlScrubbed = HTMLUtility.stripNonValidHTMLCharacters(this.eml);
+    StringReader stringReader = new StringReader(emlScrubbed);
     StringWriter stringWriter = new StringWriter();
     StreamSource xsltSource = new StreamSource(xsltFile);
     Source source = new StreamSource(stringReader);

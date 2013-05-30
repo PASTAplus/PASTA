@@ -28,19 +28,26 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
 import eml.ecoinformatics_org.access_2_1.AccessType;
@@ -56,6 +63,66 @@ public final class EmlUtility {
         // preventing instantiation
     }
 
+    /*
+     * Returns an EmlPackageId object by parsing an EML file.
+     */
+    public static EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
+  		EmlPackageId emlPackageId = null;
+
+  		if (emlFile != null) {
+  			String emlString = FileUtils.readFileToString(emlFile);
+  			try {
+  				DocumentBuilder documentBuilder = DocumentBuilderFactory
+  						.newInstance().newDocumentBuilder();
+  				Document document = documentBuilder.parse(IOUtils
+  						.toInputStream(emlString));
+  				emlPackageId = getEmlPackageId(document);
+  			}
+  			/*
+  			 * If a parsing exception is thrown, attempt to parse the packageId
+  			 * using regular expressions. This could be fooled by comments text
+  			 * in the EML document but is still better than nothing at all.
+  			 */
+  			catch (SAXException e) {
+  				StringTokenizer stringTokenizer = new StringTokenizer(emlString, "\n");
+                  String DOUBLE_QUOTE_PATTERN = "packageId=\"([^\"]*)\"";
+                  String SINGLE_QUOTE_PATTERN = "packageId='([^']*)'";
+  				Pattern doubleQuotePattern = Pattern.compile(DOUBLE_QUOTE_PATTERN);
+  				Pattern singleQuotePattern = Pattern.compile(SINGLE_QUOTE_PATTERN);
+  				while (stringTokenizer.hasMoreElements()) {
+  					String token = stringTokenizer.nextToken();
+  					if (token.contains("packageId")) {
+
+  						Matcher doubleQuoteMatcher = doubleQuotePattern
+  								.matcher(token);
+  						if (doubleQuoteMatcher.find()) {
+  							String packageId = doubleQuoteMatcher.group(1);
+  							System.out.println(packageId);
+  							EmlPackageIdFormat formatter = new EmlPackageIdFormat(
+  									Delimiter.DOT);
+  							emlPackageId = formatter.parse(packageId);
+  							break;
+  						}
+
+  						Matcher singleQuoteMatcher = singleQuotePattern
+  								.matcher(token);
+  						if (singleQuoteMatcher.find()) {
+  							String packageId = singleQuoteMatcher.group(1);
+  							EmlPackageIdFormat formatter = new EmlPackageIdFormat(
+  									Delimiter.DOT);
+  							emlPackageId = formatter.parse(packageId);
+  							break;
+  						}
+
+  					}
+  				}
+  			}
+  		}
+
+  		return emlPackageId;
+    }
+    
+    
     /**
      * Returns the packageId of the provided EML document without parsing it
      * (the packageId). If the document does not contain the attribute
