@@ -5,6 +5,7 @@
 .myeclipse
 .DS_Store
 .idea
+/out
 classes
 build
 java-to-xml
