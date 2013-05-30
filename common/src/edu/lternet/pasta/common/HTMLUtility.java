@@ -11,12 +11,14 @@ public class HTMLUtility {
 	   */
 	  public static boolean hasNonValidHTMLCharacter(String in) {
 		  boolean hasInvalid = false;
-	      char current; // Used to reference the current character
+	      char current; // current character
 
 	      if (in == null || ("".equals(in))) return false; // vacancy test
+
 	      for (int i = 0; i < in.length(); i++) {
 	          current = in.charAt(i);
-	          if (current >= 127 && current < 160) {
+
+	          if (isInvalidHTMLCharacter(current)) {
 	              hasInvalid = true;
 	              break;
 	          }
@@ -40,19 +42,38 @@ public class HTMLUtility {
 		}
 		else {
 			StringBuffer out = new StringBuffer();
-			char current; // Used to reference the current character
+			char current; // current character
 
 			if (in == null || ("".equals(in)))
 				return ""; // vacancy test
+			
 			for (int i = 0; i < in.length(); i++) {
 				current = in.charAt(i);
-				if (current < 127 && current >= 160) {
+				if (!isInvalidHTMLCharacter(current)) {
 					out.append(current);
+				}
+				else {
+					Integer anInteger = new Integer(current);
+					out.append(String.format("?%d?", anInteger));
 				}
 			}
 			String outString = out.toString();
 			return outString;
 		}
+	}
+	
+	
+	/*
+	 * Looks at a character to determine whether it's invalid for HTML.
+	 */
+	private static boolean isInvalidHTMLCharacter(char c) {
+		boolean invalid = false;
+		
+		if (c >= 127 && c < 160) {
+			invalid = true;
+        }
+		
+		return invalid;
 	}
 
 }
