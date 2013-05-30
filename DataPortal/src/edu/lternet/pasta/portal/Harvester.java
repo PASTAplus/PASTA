@@ -25,7 +25,6 @@
 package edu.lternet.pasta.portal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,13 +35,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.LoginClient;
@@ -296,7 +291,7 @@ public class Harvester implements Runnable {
        * this harvest.
        */
       try {
-        emlPackageId = emlPackageIdFromEML(emlFile);
+        emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
         EmlPackageIdFormat epif = new EmlPackageIdFormat();
         packageId = epif.format(emlPackageId);
       }
@@ -456,25 +451,6 @@ public class Harvester implements Runnable {
     }
     
     return isUpdate;
-  }
-  
-  
-  /*
-   * Returns an EmlPackageId object by parsing an EML file.
-   */
-  private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
-    EmlPackageId emlPackageId = null;
-
-    if (emlFile != null) {
-      FileInputStream fis = new FileInputStream(emlFile);
-
-      DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance()
-          .newDocumentBuilder();
-      Document document = documentBuilder.parse(fis);
-      emlPackageId = EmlUtility.getEmlPackageId(document);
-    }
-
-    return emlPackageId;
   }
   
   

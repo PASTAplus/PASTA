@@ -27,16 +27,12 @@ package edu.lternet.pasta.client;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -56,7 +52,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlUtility;
@@ -352,7 +347,7 @@ public class DataPackageManagerClient extends PastaClient {
 
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
-				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
+				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -563,7 +558,7 @@ public class DataPackageManagerClient extends PastaClient {
 						
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 
-				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
+				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -1531,7 +1526,7 @@ public class DataPackageManagerClient extends PastaClient {
 			
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
-				EmlPackageId emlPackageId = emlPackageIdFromEML(emlFile);
+				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -1608,24 +1603,6 @@ public class DataPackageManagerClient extends PastaClient {
 
 		return uri;
 
-	}
-
-	/*
-	 * Returns an EmlPackageId object by parsing an EML file.
-	 */
-	private EmlPackageId emlPackageIdFromEML(File emlFile) throws Exception {
-		EmlPackageId emlPackageId = null;
-
-		if (emlFile != null) {
-			FileInputStream fis = new FileInputStream(emlFile);
-
-			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance()
-			    .newDocumentBuilder();
-			Document document = documentBuilder.parse(fis);
-			emlPackageId = EmlUtility.getEmlPackageId(document);
-		}
-
-		return emlPackageId;
 	}
 
 	private void getInfo(HttpResponse r) {
