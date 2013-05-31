@@ -91,35 +91,35 @@ public class TokenManager {
         String uid = "ucarroll";
         
         TokenManager tokenManager = new TokenManager();
-        
-        try {
-			tokenManager.setToken(uid, token);
-		} catch (SQLException e) {
-			logger.error(e);
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			logger.error(e);
-			e.printStackTrace();
-		}
-        
-        try {
-			System.out.println(tokenManager.getToken(uid));
-		} catch (SQLException e) {
-			logger.error(e);
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			logger.error(e);
-			e.printStackTrace();
-		}
+
+      try {
+        tokenManager.setToken(uid, token);
+      } catch (SQLException e) {
+        logger.error(e);
+        e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+        logger.error(e);
+        e.printStackTrace();
+      }
+
+      try {
+        System.out.println(tokenManager.getToken(uid));
+      } catch (SQLException e) {
+        logger.error(e);
+        e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+        logger.error(e);
+        e.printStackTrace();
+      }
 
     }
-    
-    /**
-     * Returns a connection to the database.
-     * 
-     * @return  The database Connection object.
-     */
-    private Connection getConnection() throws ClassNotFoundException {
+
+  /**
+   * Returns a connection to the database.
+   *
+   * @return The database Connection object.
+   */
+  private Connection getConnection() throws ClassNotFoundException {
         
         Connection conn = null;
         
