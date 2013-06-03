@@ -729,7 +729,8 @@ public class DataPackageRegistry {
         "SELECT resource_id FROM " + RESOURCE_REGISTRY +
         "  WHERE scope='" + scope + 
         "' AND identifier='" + identifier + 
-        "' AND revision='" + revision + "'";
+        "' AND revision='" + revision + "'" +
+        "  ORDER BY date_created";
     
       Statement stmt = null;
     
@@ -1473,7 +1474,7 @@ public class DataPackageRegistry {
           "' AND revision='" + revision +
           "' AND entity_id IS NOT NULL" +
           "  AND date_deactivated IS NULL" +
-          "  ORDER BY entity_id";
+          "  ORDER BY date_created";
       
         Statement stmt = null;
       
