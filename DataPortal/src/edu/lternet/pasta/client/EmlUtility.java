@@ -1,10 +1,5 @@
 /*
- *
- * $Date$
- * $Author$
- * $Revision$
- *
- * Copyright 2011,2012 the University of New Mexico.
+ * Copyright 2011-2013 the University of New Mexico.
  *
  * This work was supported by National Science Foundation Cooperative
  * Agreements #DEB-0832652 and #DEB-0936498.
@@ -19,45 +14,26 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
- *
  */
 
 package edu.lternet.pasta.client;
 
+import edu.lternet.pasta.common.HTMLUtility;
+import edu.lternet.pasta.portal.ConfigurationListener;
+import net.sf.saxon.s9api.*;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.HashMap;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import net.sf.saxon.s9api.ItemType;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.s9api.XdmAtomicValue;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XsltCompiler;
-import net.sf.saxon.s9api.XsltExecutable;
-import net.sf.saxon.s9api.XsltTransformer;
-
-import org.apache.log4j.Logger;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-
-import edu.lternet.pasta.common.HTMLUtility;
-import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
  * @author servilla
@@ -100,7 +76,7 @@ public class EmlUtility {
       throw new ParseException("EML is empty", 0);
     }
 
-    this.eml = eml;
+    this.eml = HTMLUtility.stripNonValidHTMLCharacters(eml);
 
     // Properties configuration for local XSLT path and current working
     // directory.
@@ -164,8 +140,7 @@ public class EmlUtility {
 
     File styleSheet = new File(xslPath);
 
-    String emlScrubbed = HTMLUtility.stripNonValidHTMLCharacters(this.eml);
-    StringReader stringReader = new StringReader(emlScrubbed);
+    StringReader stringReader = new StringReader(this.eml);
     StringWriter stringWriter = new StringWriter();
     StreamSource styleSource = new StreamSource(styleSheet);
     Result result = new StreamResult(stringWriter);
@@ -205,8 +180,7 @@ public class EmlUtility {
 		
     String html = null;
     File xsltFile = new File(xslPath);
-    String emlScrubbed = HTMLUtility.stripNonValidHTMLCharacters(this.eml);
-    StringReader stringReader = new StringReader(emlScrubbed);
+    StringReader stringReader = new StringReader(this.eml);
     StringWriter stringWriter = new StringWriter();
     StreamSource xsltSource = new StreamSource(xsltFile);
     Source source = new StreamSource(stringReader);
