@@ -95,6 +95,11 @@ public class HTMLUtility {
       }
     }
 
+    // DEL character
+    else if ((int) c == 127) {
+      invalid = true;
+    }
+
     // C1 control characters
      else if ((int) c >= 128 && (int) c <= 159) {
 			invalid = true;
