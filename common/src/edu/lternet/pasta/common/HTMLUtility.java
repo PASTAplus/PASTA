@@ -86,12 +86,26 @@ public class HTMLUtility {
 	 */
 	private static boolean isInvalidHTMLCharacter(char c) {
 		boolean invalid = false;
-		
-		if ((int) c >= 127 && (int) c < 160) {
+
+    // C0 control characters
+    if ((int) c >= 0 && (int) c <= 31) {
+      // Allowed characters tab (9), linefeed (10), and carriage return (13)
+      if ((int) c != 9 && (int) c != 10 && (int) c != 13 ) {
+        invalid = true;
+      }
+    }
+
+    // C1 control characters
+     else if ((int) c >= 128 && (int) c <= 159) {
 			invalid = true;
     }
-		
-		return invalid;
+
+    // UTF-16 surrogate halves
+    else if ((int) c >= 55296 && (int) c <= 57343) {
+      invalid = true;
+    }
+
+    return invalid;
 	}
 
 
@@ -115,7 +129,7 @@ public class HTMLUtility {
       FileUtils.writeStringToFile(goodOut, good, "UTF-8");
     } catch (IOException e) {
       System.err.println("HTMLUtility: " + e.getMessage());
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }
 
   }
