@@ -30,8 +30,7 @@ import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -282,7 +281,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	               ResourceExistsException, 
 	               IllegalStateException, 
 	               Exception {
-		Map<String, String> entityIdNamePairs = new HashMap<String, String>();
+		Map<String, String> entityIdNamePairs = new LinkedHashMap<String, String>();
 		emlDataLoader.setEvaluateMode(evaluateMode);
 		
 		if (dataPackage != null) {
