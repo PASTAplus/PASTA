@@ -1396,6 +1396,77 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns the entity name for the given entity resource identifier if it
+	 * exists; otherwise, throw a ResourceNotFoundException. Authorization for
+	 * reading the entity name is based on access rules for the data package
+	 * resource, not on the access rules for the data entity resource.
+	 * 
+	 * @param dataPackageResourceId
+	 *          the data package resource identifier, used for authorization
+	 *          purposes
+	 * @param entityResourceId
+	 *          the entity resource identifier, used as the key to the entityName
+	 *          value
+	 * @param authToken
+	 *          the authentication token object
+	 * @return the data entity name string for this resource, if it exists
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readDataEntityName(String dataPackageResourceId,
+	    String entityResourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String entityName = null;
+		String user = authToken.getUserId();
+
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			/*
+			 * Check whether user is authorized to read the data entity. This is based
+			 * on the access rules specified for the data package, not on the access
+			 * rules specified for reading the data entity.
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken,
+			    dataPackageResourceId, Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User "
+				    + user
+				    + " does not have permission to read the entity name for this resource: "
+				    + entityResourceId;
+				throw new UnauthorizedException(gripe);
+			}
+
+			entityName = dataPackageRegistry.getDataEntityName(entityResourceId);
+
+			if (entityName == null) {
+				String gripe = "An entityName value does not exist for this resource: "
+				    + entityResourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return entityName;
+
+	}
+
+	
+	/**
 	 * Reads a data entity and returns it as a byte array. The specified user must
 	 * be authorized to read the data entity resource.
 	 * 
@@ -1481,77 +1552,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 	
-	
-	/**
-	 * Returns the entity name for the given entity resource identifier if it
-	 * exists; otherwise, throw a ResourceNotFoundException. Authorization for
-	 * reading the entity name is based on access rules for the data package
-	 * resource, not on the access rules for the data entity resource.
-	 * 
-	 * @param dataPackageResourceId
-	 *          the data package resource identifier, used for authorization
-	 *          purposes
-	 * @param entityResourceId
-	 *          the entity resource identifier, used as the key to the entityName
-	 *          value
-	 * @param authToken
-	 *          the authentication token object
-	 * @return the data entity name string for this resource, if it exists
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
-	 * @throws UnauthorizedException
-	 * @throws ResourceNotFoundException
-	 * @throws Exception
-	 */
-	public String readDataEntityName(String dataPackageResourceId,
-	    String entityResourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
-
-		String entityName = null;
-		String user = authToken.getUserId();
-
-		try {
-			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
-			    dbDriver, dbURL, dbUser, dbPassword);
-
-			/*
-			 * Check whether user is authorized to read the data entity. This is based
-			 * on the access rules specified for the data package, not on the access
-			 * rules specified for reading the data entity.
-			 */
-			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken,
-			    dataPackageResourceId, Rule.Permission.read);
-			if (!isAuthorized) {
-				String gripe = "User "
-				    + user
-				    + " does not have permission to read the entity name for this resource: "
-				    + entityResourceId;
-				throw new UnauthorizedException(gripe);
-			}
-
-			entityName = dataPackageRegistry.getDataEntityName(entityResourceId);
-
-			if (entityName == null) {
-				String gripe = "An entityName value does not exist for this resource: "
-				    + entityResourceId;
-				throw new ResourceNotFoundException(gripe);
-			}
-
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			throw (e);
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		return entityName;
-
-	}
-
 	
 	/**
 	 * Reads a data package and returns it as a string representing a resource
@@ -1658,6 +1658,38 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		return resourceMap;
+	}
+
+	
+	/**
+	 * Reads the data package error message from the system.
+	 * 
+	 * @param transaction
+	 *          The transaction identifier
+	 * @return The error message
+	 * @throws ResourceNotFoundException
+	 */
+	public String readDataPackageError(String transaction)
+	    throws ResourceNotFoundException {
+
+		String error = null;
+		DataPackageError dpError = null;
+
+		try {
+			dpError = new DataPackageError();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		try {
+			error = dpError.readError(transaction);
+		} catch (FileNotFoundException e) {
+			throw new ResourceNotFoundException(e.getMessage());
+		}
+
+		return error;
+
 	}
 
 	
@@ -1917,6 +1949,72 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		return levelOneEMLFile;
+	}
+
+	
+	/**
+	 * Returns the access control list (ACL) for the given resource identifier if
+	 * it exists; otherwise, throw a ResourceNotFoundException.
+	 * 
+	 * @param resourceId      The resource identifier
+	 * @param authToken       The authorization token object
+	 * @return  an XML string representing the access control list. The string includes
+	 *          an entry for the owner/submitter although that entry does not appear
+	 *          in the access_matrix table (the owner/submitter is stored only in the 
+	 *          resource_registry table).
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readResourceAcl(String resourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String acl = null;
+		String user = authToken.getUserId();
+
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			/*
+			 * Check whether user is authorized to read the data package report
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
+			    Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User " + user
+				    + " does not have permission to read the access control list (ACL) for this resource: "
+				    + resourceId;
+				throw new UnauthorizedException(gripe);
+			}
+			
+			boolean hasResource = dataPackageRegistry.hasResource(resourceId);
+			if (!hasResource) {
+				String gripe = "Resource not found: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+
+			acl = dataPackageRegistry.getResourceAcl(resourceId);
+			if (acl == null) {
+				String gripe = "An access control list (ACL) does not exist for this resource: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return acl;
+
 	}
 
 	
@@ -2284,38 +2382,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	    logger.error(e.getMessage());
 	    e.printStackTrace();
     }
-
-	}
-
-	
-	/**
-	 * Reads the data package error message from the system.
-	 * 
-	 * @param transaction
-	 *          The transaction identifier
-	 * @return The error message
-	 * @throws ResourceNotFoundException
-	 */
-	public String readDataPackageError(String transaction)
-	    throws ResourceNotFoundException {
-
-		String error = null;
-		DataPackageError dpError = null;
-
-		try {
-			dpError = new DataPackageError();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		try {
-			error = dpError.readError(transaction);
-		} catch (FileNotFoundException e) {
-			throw new ResourceNotFoundException(e.getMessage());
-		}
-
-		return error;
 
 	}
 

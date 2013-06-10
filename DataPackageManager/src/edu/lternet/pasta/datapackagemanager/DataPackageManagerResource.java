@@ -1238,281 +1238,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
-	 * <strong>Search Data Packages</strong> operation, specifying the Metacat
-	 * <em>path query</em> XML used for querying data packages in the message
-	 * body.
-	 * 
-	 * <h4>Requests:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Request</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>Metacat "path query" XML used for searching the metadata
-	 * catalog</td>
-	 * <td align=center><code>application/xml</code></td>
-	 * <td><code>curl -i -X PUT -H "Content-Type: application/xml"
-	 *     --data-binary @pathQuery.xml https://pasta.lternet.edu/package/search/eml</code>
-	 * </td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * <h4>Responses:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Status</b></th>
-	 * <th><b>Reason</b></th>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Message Body</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>200 OK</td>
-	 * <td align=center>The search was successful</td>
-	 * <td align=center>A "resultset" XML document containing the search results</td>
-	 * <td align=center><code>application/xml</code></td>
-	 * <td>
-	 * <pre>
-&lt;?xml version="1.0"?&gt;
-&lt;resultset&gt;
-.
-.
-.
-&lt;/resultset&gt;
-	 * </pre>
-	 * </td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>400 Bad Request</td>
-	 * <td align=center>The request message body contains an error, such as an
-	 * improperly formatted path query string</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * 
-	 * </tr>
-	 * <tr>
-	 * <td align=center>401 Unauthorized</td>
-	 * <td align=center>The requesting user is not authorized to execute the
-	 * Search Data Packages service method</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * 
-	 * </tr>
-	 * <tr>
-	 * <td align=center>405 Method Not Allowed</td>
-	 * <td align=center>The specified HTTP method is not allowed for the requested
-	 * resource</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>500 Internal Server Error</td>
-	 * <td align=center>The server encountered an unexpected condition which
-	 * prevented it from fulfilling the request</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * @param pathQuery
-	 *          A pathquery XML document, as specified in the payload of the
-	 *          request.
-	 * 
-	 * @return a Response, which if successful, contains a resultset XML document
-	 */
-    @PUT
-    @Path("/search/eml")
-    @Produces("application/xml")
-    public Response searchDataPackages(@Context HttpHeaders headers,
-                                       String pathQuery) {  
-      AuthToken authToken = null;
-      String resourceId = null;
-      String entryText = null;
-      String resultsetXML = null;
-      ResponseBuilder responseBuilder = null;
-      Response response = null;
-      final String serviceMethodName = "searchDataPackages";
-      Rule.Permission permission = Rule.Permission.read;
-  
-      try {
-        authToken = getAuthToken(headers);
-        String userId = authToken.getUserId();
-  
-        // Is user authorized to run the service method?
-        boolean serviceMethodAuthorized = 
-          isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-        if (!serviceMethodAuthorized) {
-          throw new UnauthorizedException(
-              "User " + userId + 
-              " is not authorized to execute service method " + 
-              serviceMethodName);
-        }
-        
-        DataPackageManager dataPackageManager = new DataPackageManager(); 
-        resultsetXML = dataPackageManager.searchDataPackages(pathQuery, userId, authToken);
-  
-        if (resultsetXML != null) {
-          responseBuilder = Response.ok(resultsetXML);
-          response = responseBuilder.build();       
-        } 
-        else {
-          ResourceNotFoundException e = new ResourceNotFoundException(
-                                              "No search results returned");
-          entryText = e.getMessage();
-          WebApplicationException webApplicationException =
-            WebExceptionFactory.makeNotFound(e);
-          response = webApplicationException.getResponse();
-        }
-      }
-      catch (IllegalArgumentException e) {
-        entryText = e.getMessage();
-        response = WebExceptionFactory.makeBadRequest(e).getResponse();
-      }
-      catch (UnauthorizedException e) {
-        entryText = e.getMessage();
-        response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-      }
-      catch (UserErrorException e) {
-        entryText = e.getMessage();
-        response = WebResponseFactory.makeBadRequest(e);
-      }
-      catch (Exception e) {
-        entryText = e.getMessage();
-        WebApplicationException webApplicationException = 
-          WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-                                   e, e.getMessage());
-        response = webApplicationException.getResponse();
-      }
-  
-      audit(serviceMethodName, authToken, response, resourceId, entryText);
-      response = stampHeader(response);
-      return response;
-    }
-
-
-	/**
-	 * <strong>Update Data Package</strong> operation, specifying the scope and
-	 * identifier of the data package to be updated in the URI, along with the EML
-	 * document describing the data package to be created in the request message
-	 * body, and returning a <em>transaction identifier</em> in the response
-	 * message body as plain text; the <em>transaction identifier</em> may be used
-	 * in a subsequent call to <code>readDataPackageError</code> to determine the
-	 * operation status; see <code>readDataPackage</code> to obtain the data
-	 * package resource map if the operation completed successfully.
-	 * 
-	 * 
-	 * <h4>Requests:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Request</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>EML document</td>
-	 * <td align=center><code>application/xml</code></td>
-	 * <td><code>curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" 
-	 * -X PUT -H "Content-Type: application/xml"
-	 * --data-binary @knb-lter-lno.1.1.xml
-	 * https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code></td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * <h4>Responses:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Status</b></th>
-	 * <th><b>Reason</b></th>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Message Body</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>202 Accepted</td>
-	 * <td align=center>The <em>update data package</em> request was accepted for processing</td>
-	 * <td align=center>A <em>transaction identifier</em> for use in subsequent processing of
-	 * the request (see <code>readDataPackageError</code> to understand how the
-	 * transaction identifier may be used to determine if an error occurred during
-	 * the operation)</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>1364424858431</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>401 Unauthorized</td>
-	 * <td align=center>The requesting user is not authorized to execute this service method
-	 * </td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>405 Method Not Allowed</td>
-	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * @param emlFile
-	 *          The URL to an EML document, as specified in the payload of the
-	 *          request.
-	 * 
-	 * @return a Response, which if successful, contains a resource map describing
-	 *         the contents of the updated data package
-	 */
-  @PUT
-  @Path("/eml/{scope}/{identifier}")
-  @Consumes("application/xml")
-  @Produces("text/plain")
-  public Response updateDataPackage(
-                    @Context HttpHeaders headers,
-                    @PathParam("scope") String scope,
-                    @PathParam("identifier") Integer identifier, 
-                    File emlFile) {
-  	
-    AuthToken authToken = null;
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "updateDataPackage";
-    Rule.Permission permission = Rule.Permission.write;
-  
-    Long time = new Date().getTime();
-    String transaction = time.toString();
-    
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-  
-  	// Is user authorized to run the service method?
-  	boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-  	    serviceMethodName, permission, authToken);
-  	if (!serviceMethodAuthorized) {
-  		throw new UnauthorizedException("User " + userId
-  		    + " is not authorized to execute service method " + serviceMethodName);
-    }
-    
-  	// Perform updateDataPackage in new thread
-  	Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
-  	ExecutorService executorService = Executors.newCachedThreadPool();
-  	executorService.execute(updator);
-  	executorService.shutdown();
-  	
-  	responseBuilder = Response.status(Response.Status.ACCEPTED);
-  	responseBuilder.entity(transaction);
-  	response = responseBuilder.build();
-    response = stampHeader(response);
-    return response;
-    
-  }
-
-
-	/**
 	 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,
 	 * determines whether the user as defined in the authentication token has
 	 * permission to read the specified data package resource.
@@ -2770,6 +2495,199 @@ Site Year Month Day Transect Species_Code Count
 
 	/**
 	 * 
+	 * <strong>Read Data Entity ACL</strong> operation, specifying the scope,
+	 * identifier, and revision of the data entity object whose ACL is to be 
+	 * read in the URI, returning an XML string representing the access control
+	 * list (ACL) for the data entity.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/acl/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data entity ACL was successful</td>
+	 * <td align=center>An XML string representing the access control list (ACL) for the data entity.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>
+	 <access authSystem="https://pasta.lternet.edu/authentication" order="allowFirst" system="https://pasta.lternet.edu">
+       <allow>
+         <principal role="owner">uid=dcosta,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <permission>changePermission</permission>
+       </allow>
+       <allow>
+         <principal>uid=NIN,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <permission>changePermission</permission>
+       </allow>
+       <allow>
+         <principal>public</principal>
+         <permission>read</permission>
+       </allow>
+     </access>
+	 * </code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data entity ACL</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No ACL associated with the specified data entity is found or the data entity itself was not found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param entityId
+	 *          The entity identifier
+	 * @return a Response object containing a data entity access control list XML string if found, else
+	 *         returns a 404 Not Found response
+	 */
+
+	@GET
+	@Path("/data/acl/eml/{scope}/{identifier}/{revision}/{entityId}")
+	@Produces("application/xml")
+	public Response readDataEntityAcl(@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") String revision,
+			@PathParam("entityId") String entityId) {
+		AuthToken authToken = null;
+		String acl = null;
+		String entryText = null;
+		String resourceId = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "readDataEntityAcl";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			resourceId = DataPackageManager.composeResourceId(
+					ResourceType.data, scope, identifier,
+					Integer.valueOf(revision), entityId);
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			acl = dataPackageManager.readResourceAcl(resourceId,
+					authToken);
+
+			if (acl != null) {
+				responseBuilder = Response.ok(acl);
+				response = responseBuilder.build();
+				entryText = acl;
+			}
+			else {
+				Exception e = new Exception(
+						"Read resource checksum operation failed for unknown reason");
+				throw (e);
+			}
+
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (ResourceDeletedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (ResourceExistsException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
+	 * 
 	 * <strong>Read Data Entity Checksum</strong> operation, specifying the scope,
 	 * identifier, and revision of the data entity object whose checksum is to be 
 	 * read in the URI, returning a 40-character SHA-1 checksum value.
@@ -3855,6 +3773,167 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 
 
 	/**
+	 * <strong>Read Data Package Error</strong> operation, specifying the scope,
+	 * identifier, revision, and transaction id of the data package error to be
+	 * read in the URI, returning the error message as plain text.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/error/eml/1364521882823</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package error was successful</td>
+	 * <td align=center>The error message of the data package.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>Attempting to update a data package to revision '1' but an equal or
+	 * higher revision ('1') already exists in PASTA: knb-lter-lno.1.1.</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal identifier or
+	 * revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No error associated with the specified data package is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which prevented it from
+	 * fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *          The scope of the data package
+	 * @param identifier
+	 *          The identifier of the data package
+	 * @param revision
+	 *          The revision of the data package
+	 * @param transaction
+	 *          The transaction of the data package error
+	 * @return a Response object containing a data package error if found, else
+	 *         returns a 404 Not Found response
+	 */
+@GET
+@Path("/error/eml/{transaction}")
+@Produces("text/plain")
+public Response readDataPackageError(
+                                @Context HttpHeaders headers,
+                                @PathParam("transaction") String transaction
+                  ) {
+  AuthToken authToken = null;
+  String entryText = null;
+  String resourceId = transaction + ".txt";
+  ResponseBuilder responseBuilder = null;
+  Response response = null;
+  final String serviceMethodName = "readDataPackageError";
+  Rule.Permission permission = Rule.Permission.read;
+  
+  authToken = getAuthToken(headers);
+  String userId = authToken.getUserId();
+
+  // Is user authorized to run the service method?
+  boolean serviceMethodAuthorized = 
+    isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+  if (!serviceMethodAuthorized) {
+    throw new UnauthorizedException(
+        "User " + userId + 
+        " is not authorized to execute service method " + 
+        serviceMethodName);
+  }
+
+	try {
+		DataPackageManager dpm = new DataPackageManager();
+		entryText = dpm.readDataPackageError(transaction);
+		responseBuilder = Response.ok(entryText);
+		response = responseBuilder.build();
+	}
+  catch (IllegalArgumentException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeBadRequest(e).getResponse();
+  }
+  catch (UnauthorizedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+  }
+  catch (ResourceNotFoundException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeNotFound(e).getResponse();
+  }
+  catch (ResourceDeletedException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (ResourceExistsException e) {
+    entryText = e.getMessage();
+    response = WebExceptionFactory.makeConflict(e).getResponse();
+  }
+  catch (UserErrorException e) {
+    entryText = e.getMessage();
+    response = WebResponseFactory.makeBadRequest(e);
+  }
+  catch (Exception e) {
+    entryText = e.getMessage();
+    WebApplicationException webApplicationException = WebExceptionFactory
+        .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    response = webApplicationException.getResponse();
+  }
+  
+  audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+  response = stampHeader(response);
+  return response;
+  
+}
+
+
+	/**
 	 * <strong>Read Data Package Report</strong> operation, specifying the scope,
 	 * identifier, and revision of the data package quality report document to be
 	 * read in the URI.
@@ -4434,167 +4513,6 @@ public Response readDataPackageReportChecksum(
   
     response = stampHeader(response);
     return response;
-  }
-
-
-	/**
-	 * <strong>Read Data Package Error</strong> operation, specifying the scope,
-	 * identifier, revision, and transaction id of the data package error to be
-	 * read in the URI, returning the error message as plain text.
-	 * 
-	 * <h4>Requests:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Request</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>none</td>
-	 * <td align=center>none</td>
-	 * <td align=center>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/error/eml/1364521882823</code>
-	 * </td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * <h4>Responses:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Status</b></th>
-	 * <th><b>Reason</b></th>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Message Body</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>200 OK</td>
-	 * <td align=center>The request to read the data package error was successful</td>
-	 * <td align=center>The error message of the data package.</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td><code>Attempting to update a data package to revision '1' but an equal or
-	 * higher revision ('1') already exists in PASTA: knb-lter-lno.1.1.</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>400 Bad Request</td>
-	 * <td align=center>The request contains an error, such as an illegal identifier or
-	 * revision value</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>401 Unauthorized</td>
-	 * <td align=center>The requesting user is not authorized to read the data package</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>404 Not Found</td>
-	 * <td align=center>No error associated with the specified data package is found</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>405 Method Not Allowed</td>
-	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>500 Internal Server Error</td>
-	 * <td align=center>The server encountered an unexpected condition which prevented it from
-	 * fulfilling the request</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * @param scope
-	 *          The scope of the data package
-	 * @param identifier
-	 *          The identifier of the data package
-	 * @param revision
-	 *          The revision of the data package
-	 * @param transaction
-	 *          The transaction of the data package error
-	 * @return a Response object containing a data package error if found, else
-	 *         returns a 404 Not Found response
-	 */
-  @GET
-  @Path("/error/eml/{transaction}")
-  @Produces("text/plain")
-  public Response readDataPackageError(
-                                  @Context HttpHeaders headers,
-                                  @PathParam("transaction") String transaction
-                    ) {
-    AuthToken authToken = null;
-    String entryText = null;
-    String resourceId = transaction + ".txt";
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
-    final String serviceMethodName = "readDataPackageError";
-    Rule.Permission permission = Rule.Permission.read;
-    
-    authToken = getAuthToken(headers);
-    String userId = authToken.getUserId();
-  
-    // Is user authorized to run the service method?
-    boolean serviceMethodAuthorized = 
-      isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-    if (!serviceMethodAuthorized) {
-      throw new UnauthorizedException(
-          "User " + userId + 
-          " is not authorized to execute service method " + 
-          serviceMethodName);
-    }
-  
-  	try {
-  		DataPackageManager dpm = new DataPackageManager();
-  		entryText = dpm.readDataPackageError(transaction);
-  		responseBuilder = Response.ok(entryText);
-  		response = responseBuilder.build();
-  	}
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = WebExceptionFactory
-          .make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    
-    audit(serviceMethodName, authToken, response, resourceId, entryText);
-  
-    response = stampHeader(response);
-    return response;
-    
   }
 
 
@@ -5395,6 +5313,281 @@ public Response readMetadataChecksum(
     response = stampHeader(response);
     return response;
   }
+
+
+	/**
+	 * <strong>Search Data Packages</strong> operation, specifying the Metacat
+	 * <em>path query</em> XML used for querying data packages in the message
+	 * body.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>Metacat "path query" XML used for searching the metadata
+	 * catalog</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -X PUT -H "Content-Type: application/xml"
+	 *     --data-binary @pathQuery.xml https://pasta.lternet.edu/package/search/eml</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The search was successful</td>
+	 * <td align=center>A "resultset" XML document containing the search results</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * <pre>
+&lt;?xml version="1.0"?&gt;
+&lt;resultset&gt;
+.
+.
+.
+&lt;/resultset&gt;
+	 * </pre>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested
+	 * resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param pathQuery
+	 *          A pathquery XML document, as specified in the payload of the
+	 *          request.
+	 * 
+	 * @return a Response, which if successful, contains a resultset XML document
+	 */
+  @PUT
+  @Path("/search/eml")
+  @Produces("application/xml")
+  public Response searchDataPackages(@Context HttpHeaders headers,
+                                     String pathQuery) {  
+    AuthToken authToken = null;
+    String resourceId = null;
+    String entryText = null;
+    String resultsetXML = null;
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    final String serviceMethodName = "searchDataPackages";
+    Rule.Permission permission = Rule.Permission.read;
+
+    try {
+      authToken = getAuthToken(headers);
+      String userId = authToken.getUserId();
+
+      // Is user authorized to run the service method?
+      boolean serviceMethodAuthorized = 
+        isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+      if (!serviceMethodAuthorized) {
+        throw new UnauthorizedException(
+            "User " + userId + 
+            " is not authorized to execute service method " + 
+            serviceMethodName);
+      }
+      
+      DataPackageManager dataPackageManager = new DataPackageManager(); 
+      resultsetXML = dataPackageManager.searchDataPackages(pathQuery, userId, authToken);
+
+      if (resultsetXML != null) {
+        responseBuilder = Response.ok(resultsetXML);
+        response = responseBuilder.build();       
+      } 
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(
+                                            "No search results returned");
+        entryText = e.getMessage();
+        WebApplicationException webApplicationException =
+          WebExceptionFactory.makeNotFound(e);
+        response = webApplicationException.getResponse();
+      }
+    }
+    catch (IllegalArgumentException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeBadRequest(e).getResponse();
+    }
+    catch (UnauthorizedException e) {
+      entryText = e.getMessage();
+      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+    }
+    catch (UserErrorException e) {
+      entryText = e.getMessage();
+      response = WebResponseFactory.makeBadRequest(e);
+    }
+    catch (Exception e) {
+      entryText = e.getMessage();
+      WebApplicationException webApplicationException = 
+        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                                 e, e.getMessage());
+      response = webApplicationException.getResponse();
+    }
+
+    audit(serviceMethodName, authToken, response, resourceId, entryText);
+    response = stampHeader(response);
+    return response;
+  }
+
+
+	/**
+	 * <strong>Update Data Package</strong> operation, specifying the scope and
+	 * identifier of the data package to be updated in the URI, along with the EML
+	 * document describing the data package to be created in the request message
+	 * body, and returning a <em>transaction identifier</em> in the response
+	 * message body as plain text; the <em>transaction identifier</em> may be used
+	 * in a subsequent call to <code>readDataPackageError</code> to determine the
+	 * operation status; see <code>readDataPackage</code> to obtain the data
+	 * package resource map if the operation completed successfully.
+	 * 
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>EML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td><code>curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" 
+	 * -X PUT -H "Content-Type: application/xml"
+	 * --data-binary @knb-lter-lno.1.1.xml
+	 * https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>202 Accepted</td>
+	 * <td align=center>The <em>update data package</em> request was accepted for processing</td>
+	 * <td align=center>A <em>transaction identifier</em> for use in subsequent processing of
+	 * the request (see <code>readDataPackageError</code> to understand how the
+	 * transaction identifier may be used to determine if an error occurred during
+	 * the operation)</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>1364424858431</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method
+	 * </td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param emlFile
+	 *          The URL to an EML document, as specified in the payload of the
+	 *          request.
+	 * 
+	 * @return a Response, which if successful, contains a resource map describing
+	 *         the contents of the updated data package
+	 */
+@PUT
+@Path("/eml/{scope}/{identifier}")
+@Consumes("application/xml")
+@Produces("text/plain")
+public Response updateDataPackage(
+                  @Context HttpHeaders headers,
+                  @PathParam("scope") String scope,
+                  @PathParam("identifier") Integer identifier, 
+                  File emlFile) {
+	
+  AuthToken authToken = null;
+  ResponseBuilder responseBuilder = null;
+  Response response = null;
+  final String serviceMethodName = "updateDataPackage";
+  Rule.Permission permission = Rule.Permission.write;
+
+  Long time = new Date().getTime();
+  String transaction = time.toString();
+  
+  authToken = getAuthToken(headers);
+  String userId = authToken.getUserId();
+
+	// Is user authorized to run the service method?
+	boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+	    serviceMethodName, permission, authToken);
+	if (!serviceMethodAuthorized) {
+		throw new UnauthorizedException("User " + userId
+		    + " is not authorized to execute service method " + serviceMethodName);
+  }
+  
+	// Perform updateDataPackage in new thread
+	Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
+	ExecutorService executorService = Executors.newCachedThreadPool();
+	executorService.execute(updator);
+	executorService.shutdown();
+	
+	responseBuilder = Response.status(Response.Status.ACCEPTED);
+	responseBuilder.entity(transaction);
+	response = responseBuilder.build();
+  response = stampHeader(response);
+  return response;
+  
+}
 
 
 	/**
