@@ -1051,6 +1051,124 @@ public class DataPackageRegistry {
   
   
   /**
+   * Composes an access control list (ACL) XML string for a given resourceId
+   * 
+   * @param   resourceId   the resource identifier
+   * @return  An XML string representing the 'access_matrix' table entries
+   *          matching the specified resourceId. An additional 'allow'
+   *          entry is included for the resource's principal owner
+   *          as stored in the 'resource_registry' table.
+   */
+  public String getResourceAcl(String resourceId) 
+          throws ClassNotFoundException, SQLException {
+	boolean isOwner = true;
+	String principalOwner = null;
+    String principal = null;
+    String access_type = null;
+    String access_order = null;
+    String permission = null;
+    boolean allowFirst = true;
+    StringBuffer accessXmlBuffer = new StringBuffer("<access " +
+                                                      "authSystem=\"https://pasta.lternet.edu/authentication\" " +
+    		                                          "order=\"allowFirst\" " +
+                                                      "system=\"https://pasta.lternet.edu\">\n"
+    		                                       );
+
+    /* First compose an 'allow' entry for the resource owner/submitter */
+    Connection connection = null;
+    Statement stmt = null;
+    String selectString = 
+            "SELECT principal_owner FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+    	  principalOwner = rs.getString(1);
+    	  String element = composeAllowOrDenyElement(principalOwner, "allow", "changePermission", isOwner);
+    	  accessXmlBuffer.append(element);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    /* Then compose 'allow' and/or 'deny' entries from the access_matrix table */
+    isOwner = false;
+    selectString = 
+            "SELECT principal, access_type, access_order, permission FROM " + ACCESS_MATRIX +
+            "  WHERE resource_id='" + resourceId + "'";
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+    	  principal = rs.getString(1);
+    	  access_type = rs.getString(2);
+    	  access_order = rs.getString(3);
+    	  permission = rs.getString(4);
+    	  if (access_order.equals("denyFirst")) { allowFirst = false; }
+    	  String element = composeAllowOrDenyElement(principal, access_type, permission, isOwner);
+    	  accessXmlBuffer.append(element);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    accessXmlBuffer.append("</access>");
+    String accessXML = accessXmlBuffer.toString();
+    if (!allowFirst) accessXML.replace("allowFirst", "denyFirst");
+    return accessXML;
+  }
+  
+  
+  /*
+   * Composes an 'allow' or 'deny' XML element.
+   */
+  private String composeAllowOrDenyElement(String principal, String accessType, String permission, boolean isOwner) {
+	  String element = null;
+	  String roleAttribute = isOwner ? " role=\"owner\"" : "";
+	  StringBuffer elementBuffer = new StringBuffer("");
+	  elementBuffer.append(String.format("  <%s>\n", accessType));
+	  elementBuffer.append(String.format("    <principal%s>%s</principal>\n", roleAttribute, principal));
+	  elementBuffer.append(String.format("    <permission>%s</permission>\n", permission));
+	  elementBuffer.append(String.format("  </%s>\n", accessType));
+	  element = elementBuffer.toString();	  
+	  return element;
+  }
+  
+  
+  /**
    * Gets the SHA checksum value for a given resourceId
    * 
    * @param   resourceId   the resource identifier
