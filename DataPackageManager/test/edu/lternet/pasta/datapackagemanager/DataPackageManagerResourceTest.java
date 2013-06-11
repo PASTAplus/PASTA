@@ -662,6 +662,106 @@ public class DataPackageManagerResourceTest {
     
 
   /**
+   * Test the status and message body of the Read Data Entity ACL operation
+   */
+  @Test public void testReadDataEntityAcl() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith("<access"));
+      assertTrue(entityString.trim().endsWith("</access>"));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Package ACL operation
+   */
+  @Test public void testReadDataPackageAcl() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith("<access"));
+      assertTrue(entityString.trim().endsWith("</access>"));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Package Report ACL operation
+   */
+  @Test public void testReadDataPackageReportAcl() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith("<access"));
+      assertTrue(entityString.trim().endsWith("</access>"));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Metadata ACL operation
+   */
+  @Test public void testReadMetadataAcl() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith("<access"));
+      assertTrue(entityString.trim().endsWith("</access>"));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
    * Test the status and message body of the Search Data Packages use case
    */
   @Test public void testSearchDataPackages() {
