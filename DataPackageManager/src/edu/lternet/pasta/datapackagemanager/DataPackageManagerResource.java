@@ -25,7 +25,6 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -57,8 +56,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
@@ -77,7 +74,6 @@ import edu.ucsb.nceas.utilities.Options;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.PastaWebService;
 import edu.lternet.pasta.common.PercentEncoder;
@@ -3424,7 +3420,7 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td><code>curl -i -X GET
-	 * https://pasta.lternet.edu/package/acl/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * https://pasta.lternet.edu/package/acl/eml/knb-lter-lno/1/3</code></td>
 	 * </tr>
 	 * </table>
 	 * 
@@ -4355,7 +4351,7 @@ public Response readDataPackageError(
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td><code>curl -i -X GET
-	 * https://pasta.lternet.edu/package/report/acl/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * https://pasta.lternet.edu/package/report/acl/eml/knb-lter-lno/1/3</code></td>
 	 * </tr>
 	 * </table>
 	 * 
@@ -5342,7 +5338,7 @@ public Response readDataPackageReportChecksum(
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td><code>curl -i -X GET
-	 * https://pasta.lternet.edu/package/metadata/acl/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code></td>
+	 * https://pasta.lternet.edu/package/metadata/acl/eml/knb-lter-lno/1/3</code></td>
 	 * </tr>
 	 * </table>
 	 * 
