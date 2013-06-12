@@ -2476,7 +2476,8 @@ Site Year Month Day Transect Species_Code Count
 	 * <strong>Read Data Entity ACL</strong> operation, specifying the scope,
 	 * identifier, and revision of the data entity object whose Access Control
 	 * List (ACL) is to be read in the URI, returning an XML string representing 
-	 * the ACL for the data entity.
+	 * the ACL for the data entity. Please note: only a very limited set of users 
+	 * are authorized to use this service method.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -2609,8 +2610,7 @@ Site Year Month Day Transect Species_Code Count
 					Integer.valueOf(revision), entityId);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			acl = dataPackageManager.readResourceAcl(resourceId,
-					authToken);
+			acl = dataPackageManager.readResourceAcl(resourceId);
 
 			if (acl != null) {
 				responseBuilder = Response.ok(acl);
@@ -3407,7 +3407,8 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 	 * <strong>Read Data Package ACL</strong> operation, specifying the scope,
 	 * identifier, and revision of the data package whose Access Control
 	 * List (ACL) is to be read in the URI, returning an XML string representing 
-	 * the ACL for the data package.
+	 * the ACL for the data package. Please note: only a very limited set of users 
+	 * are authorized to use this service method.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -3537,8 +3538,7 @@ https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
 					Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			acl = dataPackageManager.readResourceAcl(resourceId,
-					authToken);
+			acl = dataPackageManager.readResourceAcl(resourceId);
 
 			if (acl != null) {
 				responseBuilder = Response.ok(acl);
@@ -4338,7 +4338,8 @@ public Response readDataPackageError(
 	 * <strong>Read Data Package Report ACL</strong> operation, specifying the scope,
 	 * identifier, and revision of the data package report whose access control
 	 * list (ACL) is to be read in the URI, returning an XML string representing 
-	 * the ACL for the data package report resource.
+	 * the ACL for the data package report resource. Please note: only a very limited 
+	 * set of users are authorized to use this service method.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -4468,8 +4469,7 @@ public Response readDataPackageError(
 					Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			acl = dataPackageManager.readResourceAcl(resourceId,
-					authToken);
+			acl = dataPackageManager.readResourceAcl(resourceId);
 
 			if (acl != null) {
 				responseBuilder = Response.ok(acl);
@@ -5325,7 +5325,8 @@ public Response readDataPackageReportChecksum(
 	 * <strong>Read Metadata ACL</strong> operation, specifying the scope,
 	 * identifier, and revision of the data package metadata whose Access Control
 	 * List (ACL) is to be read in the URI, returning an XML string representing 
-	 * the ACL for the data package metadata resource.
+	 * the ACL for the data package metadata resource. Please note: only a very 
+	 * limited set of users are authorized to use this service method.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -5455,8 +5456,7 @@ public Response readDataPackageReportChecksum(
 					Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			acl = dataPackageManager.readResourceAcl(resourceId,
-					authToken);
+			acl = dataPackageManager.readResourceAcl(resourceId);
 
 			if (acl != null) {
 				responseBuilder = Response.ok(acl);

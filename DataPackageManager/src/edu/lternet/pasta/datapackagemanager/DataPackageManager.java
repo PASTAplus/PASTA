@@ -1957,7 +1957,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
 	 * @param resourceId      The resource identifier
-	 * @param authToken       The authorization token object
 	 * @return  an XML string representing the access control list. The string includes
 	 *          an entry for the owner/submitter although that entry does not appear
 	 *          in the access_matrix table (the owner/submitter is stored only in the 
@@ -1968,30 +1967,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readResourceAcl(String resourceId, AuthToken authToken)
+	public String readResourceAcl(String resourceId)
 	    throws ClassNotFoundException, SQLException, UnauthorizedException,
 	    ResourceNotFoundException, Exception {
 
 		String acl = null;
-		String user = authToken.getUserId();
 
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
 
-			/*
-			 * Check whether user is authorized to read the data package report
-			 */
-			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
-			if (!isAuthorized) {
-				String gripe = "User " + user
-				    + " does not have permission to read the access control list (ACL) for this resource: "
-				    + resourceId;
-				throw new UnauthorizedException(gripe);
-			}
-			
 			boolean hasResource = dataPackageRegistry.hasResource(resourceId);
 			if (!hasResource) {
 				String gripe = "Resource not found: " + resourceId;

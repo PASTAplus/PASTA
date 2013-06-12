@@ -66,12 +66,13 @@ public class DataPackageManagerResourceTest {
   private static DataPackageManager dataPackageManager;
   private static final String dirPath = "WebRoot/WEB-INF/conf";
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+  private static final String testUserAcl = "uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org";
   private static Options options = null;
   private static final int PASTA_SLEEP_TIME = 15000;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
-  private static File testEmlFileLevelOne = null;
-  private static File testEmlFileNoEntities = null;
+  //private static File testEmlFileLevelOne = null;
+  //private static File testEmlFileNoEntities = null;
   private static final String testEmlFileNameLevelOne = "Level-1-EML.xml";
   private static final String testEmlFileNameNoEntities = "NoEntities.xml";
   private static String testPath = null;
@@ -173,8 +174,8 @@ public class DataPackageManagerResourceTest {
         }
       }
       
-      testEmlFileLevelOne = new File(testPath, testEmlFileNameLevelOne);   
-      testEmlFileNoEntities = new File(testPath, testEmlFileNameNoEntities);   
+      //testEmlFileLevelOne = new File(testPath, testEmlFileNameLevelOne);   
+      //testEmlFileNoEntities = new File(testPath, testEmlFileNameNoEntities);   
       testIdentifier = new Integer(testIdentifierStr);
       testRevision = new Integer(testRevisionStr);
       testUpdateRevision = testRevision + 1;
@@ -665,7 +666,7 @@ public class DataPackageManagerResourceTest {
    * Test the status and message body of the Read Data Entity ACL operation
    */
   @Test public void testReadDataEntityAcl() {
-    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
     Response response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
@@ -690,7 +691,7 @@ public class DataPackageManagerResourceTest {
    * Test the status and message body of the Read Data Package ACL operation
    */
   @Test public void testReadDataPackageAcl() {
-    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
     Response response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
@@ -715,7 +716,7 @@ public class DataPackageManagerResourceTest {
    * Test the status and message body of the Read Data Package Report ACL operation
    */
   @Test public void testReadDataPackageReportAcl() {
-    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
     Response response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
@@ -740,7 +741,7 @@ public class DataPackageManagerResourceTest {
    * Test the status and message body of the Read Metadata ACL operation
    */
   @Test public void testReadMetadataAcl() {
-    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
     Response response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
