@@ -25,12 +25,12 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
@@ -38,9 +38,11 @@ import org.apache.log4j.Logger;
 import org.ecoinformatics.datamanager.parser.DataPackage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.XMLUtilities;
@@ -413,17 +415,16 @@ public class EMLDataPackage {
 	 * @return a Level-1 EML file
 	 * @throws IOException
 	 * @throws TransformerException
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
 	 */
  public File toLevelOne(File levelZeroEMLFile,
                         HashMap<String, String> entityURIHashMap) 
          throws IOException,
-                TransformerException {
+                TransformerException, SAXException, ParserConfigurationException {
     String levelOneEMLString = null;
     File levelOneEMLFile = null;
-
-    FileReader xmlFileReader = new FileReader(levelZeroEMLFile);
-    Document levelZeroEMLDocument = XMLUtilities
-        .getXMLReaderAsDOMDocument(xmlFileReader);
+    Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
     Node documentElement = levelZeroEMLDocument.getDocumentElement();
     String levelZeroEMLString = XMLUtilities
         .getDOMTreeAsString(documentElement);
