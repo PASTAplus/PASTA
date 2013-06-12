@@ -24,7 +24,10 @@
 
 package edu.lternet.pasta.common;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -50,6 +53,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.owasp.esapi.codecs.XMLEntityCodec;
 
 
@@ -233,6 +238,28 @@ public final class XmlUtility {
 		return encodedXml;
 
 	}
+
+	
+	/**
+	 * Given a File object, builds and returns a Document object.
+	 * 
+	 * @param xmlFile   the File object containing the XML
+	 * @return  the Document object built from the XML file
+	 */
+	public static Document xmlFileToDocument(File xmlFile) 
+			throws SAXException, IOException, ParserConfigurationException {
+		Document document = null;
+
+		if (xmlFile != null) {
+			DocumentBuilder documentBuilder = DocumentBuilderFactory
+					.newInstance().newDocumentBuilder();
+			InputStream fileInputStream = new FileInputStream(xmlFile);
+			document = documentBuilder.parse(fileInputStream);
+		}
+
+		return document;
+	}
+
 
     /**
      * Used for handling all XML parsing errors in {@link XmlUtility}. If
