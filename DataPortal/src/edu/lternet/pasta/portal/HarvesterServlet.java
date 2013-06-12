@@ -252,8 +252,7 @@ public class HarvesterServlet extends DataPortalServlet {
           harvester.processSingleDocument(emlTextArea);
         }
         else if (emlFile != null) {
-          String emlString = FileUtils.readFileToString(emlFile);
-          harvester.processSingleDocument(emlString);
+          harvester.processSingleDocument(emlFile);
         }
         else if (documentURLs != null) {
           harvester.setDocumentURLs(documentURLs);
@@ -401,7 +400,11 @@ public class HarvesterServlet extends DataPortalServlet {
     // Process a file upload
     if (!item.isFormField()) {
       // Get object information
+      String fieldName = item.getFieldName();
       String fileName = item.getName();
+      String contentType = item.getContentType();
+      boolean isInMemory = item.isInMemory();
+      long sizeInBytes = item.getSize();
       String tmpdir = System.getProperty("java.io.tmpdir");
       logger.debug("FILE: " + tmpdir + "/" + fileName);
       eml = new File(tmpdir + "/" + fileName);
