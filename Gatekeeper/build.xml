@@ -13,7 +13,16 @@
     <!-- Copy shared libraries into the local lib directory -->
     <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
       filtering="no">
-      <fileset dir="${shared.lib.dir}/jersey">
+      <fileset dir="${shared.lib.dir}/apache-commons">
+        <include name="**/commons-configuration-1.8.jar"/>
+        <include name="**/commons-logging-1.1.1.jar"/>
+        <include name="**/commons-lang-2.6.jar"/>
+        <include name="**/commons-lang3-3.1.jar"/>
+        <include name="**/commons-io-2.1.jar"/>
+        <include name="**/commons-fileupload-1.2.2.jar"/>
+        <include name="**/commons-codec-1.7.jar"/>
+      </fileset>
+        <fileset dir="${shared.lib.dir}/jersey">
         <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/junit">
