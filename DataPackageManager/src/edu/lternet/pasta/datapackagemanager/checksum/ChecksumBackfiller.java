@@ -128,7 +128,7 @@ public class ChecksumBackfiller {
 		}
 
 		System.err.println(String.format(
-				"Finished processing. Checksums generated for %d resources.",
+				"Finished backfill processing. Checksums generated and stored for %d resource(s).",
 				checksumCount));
 	}
 
