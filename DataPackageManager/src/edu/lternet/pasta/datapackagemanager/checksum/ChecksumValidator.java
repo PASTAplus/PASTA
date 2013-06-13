@@ -132,10 +132,12 @@ public class ChecksumValidator {
 						System.err.println(
 								String.format("Exception while calculating checksum for resource %s: %s", 
 										      resourceId, e.getMessage()));
+						errorCount++;
 					}
 				}
 				else {
 					System.err.println(String.format("Resource type is null for resource %s", resourceId));
+					errorCount++;
 				}
 			}
 		}
