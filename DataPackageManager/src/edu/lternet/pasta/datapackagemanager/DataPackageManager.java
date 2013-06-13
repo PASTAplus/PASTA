@@ -380,16 +380,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * 
 	 * @param resourceId         The PASTA resource identifier string
 	 * @param file               The file object whose checksum is to be calculated
+	 * @return  the calcuated SHA-1 checksum, a 40-character string
 	 */
 	public String calculateChecksum(String resourceId, File file) throws Exception {
 		String checksum = null;
-		try {
-			checksum = DigestUtilsWrapper.getSHA1Checksum(file);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw(e);
-		}
+		checksum = DigestUtilsWrapper.getSHA1Checksum(file);
 		
 		return checksum;
 	}
