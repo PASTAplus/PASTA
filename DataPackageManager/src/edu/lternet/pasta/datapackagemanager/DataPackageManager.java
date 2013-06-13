@@ -376,6 +376,26 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Calculates the SHA-1 checksum of a PASTA resource in the data package registry.
+	 * 
+	 * @param resourceId         The PASTA resource identifier string
+	 * @param file               The file object whose checksum is to be calculated
+	 */
+	public String calculateChecksum(String resourceId, File file) throws Exception {
+		String checksum = null;
+		try {
+			checksum = DigestUtilsWrapper.getSHA1Checksum(file);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw(e);
+		}
+		
+		return checksum;
+	}
+
+	
+	/**
 	 * Create a data package in PASTA and return a resource map of the created
 	 * resources.
 	 * 

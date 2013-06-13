@@ -45,6 +45,7 @@ public class Resource {
 	private Integer identifier = null;
 	private Integer revision = null;
 	private String entityId = null;
+	private String sha1Checksum = null;
 
 	/*
 	 * Constructors
@@ -172,6 +173,15 @@ public class Resource {
 	
 	public void setEntityId(String entityId) {
 		this.entityId = entityId;
+	}
+		
+	public String getSha1Checksum() {
+		return sha1Checksum;
+	}
+
+	
+	public void setSha1Checksum(String checksum) {
+		this.sha1Checksum = checksum;
 	}
 		
 }
