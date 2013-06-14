@@ -29,6 +29,8 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.codec.binary.Base64;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -48,6 +50,8 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.portal.ConfigurationListener;
 import edu.lternet.pasta.token.TokenManager;
+
+
 
 /**
  * @author servilla
@@ -231,7 +235,6 @@ public class LoginClient {
         if (headerName.equals("Set-Cookie")) {
           headerValue = headers[i].getValue();
           token = this.getAuthToken(headerValue);
-          logger.info("TOKEN: " + token);
         }
 
       }
@@ -261,14 +264,15 @@ public class LoginClient {
 
       // Extract token value from the key-value pair.
       if (headerParts[i].startsWith("auth-token=")) {
-        int start = "auth-token=\"".length();
-        int end = headerParts[i].length() - 1;
+        int start = "auth-token=".length();
+        int end = headerParts[i].length();
         authToken = headerParts[i].substring(start, end);
       }
 
     }
 
     return authToken;
+
   }
 
 }

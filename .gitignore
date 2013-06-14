@@ -19,6 +19,7 @@ common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
 */WebRoot/WEB-INF/conf/*.properties
 */WebRoot/WEB-INF/doc/
 /Gatekeeper/WebRoot/WEB-INF/conf/private-key.ser
+/Gatekeeper/WebRoot/WEB-INF/conf/lternet.jks
 /Gatekeeper/WebRoot/WEB-INF/web.xml
 /Gatekeeper/WebRoot/index.jsp
 /DataPackageManager/test/data/NoneSuchBugCount.xml

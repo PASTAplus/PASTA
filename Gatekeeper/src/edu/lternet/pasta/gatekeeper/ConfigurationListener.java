@@ -58,6 +58,14 @@ public class ConfigurationListener implements ServletContextListener
     public static final String LDAP_KEY_STORE = "ldap.keystore";
     public static final String PRIVATE_KEY = "token.privatekey";
     public static final String WEB_SERVICE_VERSION = "web.service.version";
+    public static final String LTER_KEYSTORE = "lter.keystore";
+    public static final String LTER_CERTIFICATE = "lter.certificate";
+    public static final String LTER_KEYSTORE_TYPE = "lter.keystore.type";
+    public static final String LTER_KEYSTORE_ALIAS = "lter.keystore.alias";
+    public static final String LTER_STORE_PASSWD = "lter.store.passwd";
+    public static final String LTER_KEY_PASSWD = "lter.key.passwd";
+    public static final String SIGNATURE_DIR = "signature.dir";
+
 
     private static String tokenName = null;
     private static long tokenTtl = new Long(-1);
@@ -66,6 +74,14 @@ public class ConfigurationListener implements ServletContextListener
     private static File ldapKeyStore = null;
     private static SecretKey privateKey = null;
     private static String webServiceVersion = null;
+    private static File lterKeyStore = null;
+    private static File lterCertificate = null;
+    private static String lterKeyStoreType = null;
+    private static String lterKeyStoreAlias = null;
+    private static String lterStorePasswd = null;
+    private static String lterKeyPasswd = null;
+    private static String signatureDir = null;
+
 
     private static File configDir;
     private static File propertiesFile;
@@ -149,6 +165,69 @@ public class ConfigurationListener implements ServletContextListener
     }
 
     /**
+     * Getter for the lterKeyStore class field.
+     *
+     * @return the lterKeyStore class field.
+     */
+    public static File getLterKeyStore() {
+      return lterKeyStore;
+    }
+
+    /**
+     * Getter for the lterCertificate class field.
+     *
+     * @return the lterCertificate class field.
+     */
+    public static File getLterCertificate() {
+      return lterCertificate;
+    }
+
+    /**
+     * Getter for the lterKeyStoreType class field.
+     *
+     * @return the lterKeyStoreType class field.
+     */
+    public static String getLterKeyStoreType() {
+      return lterKeyStoreType;
+    }
+
+    /**
+     * Getter for the lterKeyStoreAlias class field.
+     *
+     * @return the lterKeyStoreAlias class field.
+     */
+    public static String getLterKeyStoreAlias() {
+      return lterKeyStoreAlias;
+    }
+
+    /**
+     * Getter for the lterStorePasswd class field.
+     *
+     * @return the lterStorePasswd class field.
+     */
+    public static String getLterStorePasswd() {
+      return lterStorePasswd;
+    }
+
+    /**
+     * Getter for the lterKeyPasswd class field.
+     *
+     * @return the lterKeyPasswd class field.
+     */
+    public static String getLterKeyPasswd() {
+      return lterKeyPasswd;
+    }
+
+    /**
+     * Getter for the signatureDir class field.
+     *
+     * @return the signatureDir class field.
+     */
+    public static String getSignatureDir() {
+      return signatureDir;
+    }
+
+  /**
      * This method can be used to execute code when the web application shuts
      * down.
      * 
@@ -209,6 +288,13 @@ public class ConfigurationListener implements ServletContextListener
         setPublicUser(prop);
         setLdapKeyStore(prop);
         setPrivateKey(prop);
+        setLterKeyStore(prop);
+        setLterCertificate(prop);
+        setLterKeyStoreType(prop);
+        setLterKeyStoreAlias(prop);
+        setLterStorePasswd(prop);
+        setLterKeyPasswd(prop);
+        setSignatureDir(prop);
     }
 
     private Properties loadPropertiesFile() {
@@ -292,6 +378,63 @@ public class ConfigurationListener implements ServletContextListener
 
     }
 
+    private void setLterKeyStore(Properties p) {
+
+      String fileName = p.getProperty(LTER_KEYSTORE);
+      if (fileName == null || fileName.isEmpty()) {
+        throw new IllegalArgumentException(LTER_KEYSTORE
+                                               + " not specified properly");
+      }
+
+      lterKeyStore = FileUtility.assertCanRead(new File(configDir, fileName));
+    }
+
+    private void setLterCertificate(Properties p) {
+
+      String fileName = p.getProperty(LTER_CERTIFICATE);
+      if (fileName == null || fileName.isEmpty()) {
+        throw new IllegalArgumentException(LTER_CERTIFICATE
+                                               + " not specified properly");
+      }
+
+      lterCertificate = FileUtility.assertCanRead(new File(configDir, fileName));
+    }
+
+    private void setLterKeyStoreType(Properties p) {
+
+      lterKeyStoreType = p.getProperty(LTER_KEYSTORE_TYPE);
+      if (lterKeyStoreType == null)
+        throw new IllegalArgumentException(lterKeyStoreType + " not specified");
+    }
+
+    private void setLterKeyStoreAlias(Properties p) {
+
+      lterKeyStoreAlias = p.getProperty(LTER_KEYSTORE_ALIAS);
+      if (lterKeyStoreAlias == null)
+        throw new IllegalArgumentException(lterKeyStoreAlias + " not specified");
+    }
+
+    private void setLterStorePasswd(java.util.Properties p) {
+
+      lterStorePasswd = p.getProperty(LTER_KEY_PASSWD);
+      if (lterStorePasswd == null)
+        throw new IllegalArgumentException(lterStorePasswd + " not specified");
+    }
+
+    private void setLterKeyPasswd(java.util.Properties p) {
+  
+      lterKeyPasswd = p.getProperty(LTER_STORE_PASSWD);
+      if (lterKeyPasswd == null)
+        throw new IllegalArgumentException(lterKeyPasswd + " not specified");
+    }
+
+    private void setSignatureDir(java.util.Properties p) {
+  
+      signatureDir = p.getProperty(SIGNATURE_DIR);
+      if (signatureDir == null)
+        throw new IllegalArgumentException(signatureDir + " not specified");
+    }
+ 
     private void setLog4jProperties() {
 
         File properties = new File(getConfigDir(), "log4j.properties");

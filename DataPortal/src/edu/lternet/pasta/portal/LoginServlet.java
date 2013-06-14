@@ -25,6 +25,7 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +37,9 @@ import org.apache.log4j.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import edu.lternet.pasta.client.LoginClient;
+import edu.lternet.pasta.client.Escalator;
 import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.token.TokenManager;
 
 /**
  * The LoginServlet manages user authentication between the NIS Data Portal
@@ -125,7 +128,7 @@ public class LoginServlet extends DataPortalServlet {
 
       new LoginClient(uid, password);
       httpSession.setAttribute("uid", uid);
-      
+
       if (from == null || from.isEmpty()) {
         forward = "./home.jsp";
       } else {
@@ -139,7 +142,39 @@ public class LoginServlet extends DataPortalServlet {
       request.setAttribute("message", message);
     }
 
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+    try {
+        TokenManager tm = new TokenManager();
+        logger.info(tm.getCleartextToken(uid));
+        logger.info(tm.getUserDistinguishedName(uid));
+        logger.info(tm.getTokenAuthenticationSystem(uid));
+        logger.info(tm.getTokenTimeToLive(uid));
+
+        ArrayList<String> groups = tm.getUserGroups(uid);
+
+        for (String group : groups) {
+            logger.info(group);
+        }
+
+        logger.info(tm.getTokenSignature(uid));
+
+        // Let's try to alter the token
+        /*
+        String token = tm.getToken(uid);
+        token = Escalator.addGroup(token, "super");
+        tm.setToken(uid, token);
+
+        logger.info(tm.getCleartextToken(uid));
+        */
+
+    }
+    catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    catch (java.sql.SQLException e) {
+        e.printStackTrace();
+    }
+
+      RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
 
   }

@@ -27,6 +27,7 @@ package edu.lternet.pasta.token;
 import static org.junit.Assert.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -54,7 +55,13 @@ public class TokenManagerTest {
 	
 	private static String uid = null;
 	private static String token = null;
-	private static final String testToken = "sz46tDcFxqLby2TtlBARREdqGFSSRFbjSHPvMw0hgXLsG2uGlDWrOzjf/zM7Yd7g4n8pK5qKzohvP9UdYqf/xyx/RBAUU1QYwmUXTA5NnUZ5qHjYCtx3Y+DgwyNsQPoz6dQqR92BWWsWb39BilwfaRoyg8vRbmJ3CFRslvB5WfUqEI2OIhD2h3VyYXq8V7f8X4IZDSHWMWNXYMuxC3eQ+A==";
+	private static final String testToken = "dWlkPXVjYXJyb2xsLG89TFRFUixkYz1lY29pbmZvcm1hdGljcyxkYz1vcmcqaHR0cHM6Ly9wYXN0YS5sdGVybmV0LmVkdS9hdXRoZW50aWNhdGlvbioxMzcxMTg5Nzk4NDY5KmF1dGhlbnRpY2F0ZWQ=-DoU9U2H16wEO090IbLXenrGZdR48i+gQo3iJFTSLq3WYZ9VrGJ4dcctmI7AhR1o3VWWG01ezu/uNrkz0b/GpIQWlW2S1oh/qlMveMS9bLX0Azzn/U5JOpiBA4FCG4V/6s7JKp2WD1QWquv1KUk4pUMS7JT+xoBvlEMpLhrUIpj7k+u41YuEFhu4lTP4nLrl1yWQkYIzBULYuqx+B0bXeLCYAXJgpljs7QgCQAMaOGE6iBZSsCeVo8fclN9JiTzS6S52fDeTPnbdgl9iK75UQ1DEHJOggo7IT76gipxVnGhS09cC962RneFie4KnIwB8cRSq/oS0zHCmtUmr6vsZe2w==";
+    private static final String testClearTextToken = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org*https://pasta.lternet.edu/authentication*1371189798469*authenticated";
+    private static final String testDn = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+    private static final String testAuthSystem = "https://pasta.lternet.edu/authentication";
+    private static final Long testTimeToLive = 1371189798469L;
+    private static final String testGroup = "authenticated";
+    private static final String testSignature = "DoU9U2H16wEO090IbLXenrGZdR48i+gQo3iJFTSLq3WYZ9VrGJ4dcctmI7AhR1o3VWWG01ezu/uNrkz0b/GpIQWlW2S1oh/qlMveMS9bLX0Azzn/U5JOpiBA4FCG4V/6s7JKp2WD1QWquv1KUk4pUMS7JT+xoBvlEMpLhrUIpj7k+u41YuEFhu4lTP4nLrl1yWQkYIzBULYuqx+B0bXeLCYAXJgpljs7QgCQAMaOGE6iBZSsCeVo8fclN9JiTzS6S52fDeTPnbdgl9iK75UQ1DEHJOggo7IT76gipxVnGhS09cC962RneFie4KnIwB8cRSq/oS0zHCmtUmr6vsZe2w==";
 	
 	/*
 	 * Instance variables
@@ -107,7 +114,15 @@ public class TokenManagerTest {
 	public void setUp() throws Exception {
 		
 		this.tokenManager = new TokenManager();
-		
+
+        try {
+            this.tokenManager.setToken(uid, token);
+        } catch (SQLException e) {
+            fail("SQL exception with call to setToken: " + e);
+        } catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to setToken: " + e);
+        }
+
 	}
 
 	/**
@@ -115,8 +130,16 @@ public class TokenManagerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		
-		this.tokenManager = null;
+
+        try {
+            this.tokenManager.deleteToken(uid);
+        } catch (SQLException e) {
+            fail("SQL exception with call to deleteToken: " + e);
+        } catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to deleteToken: " + e);
+        }
+
+        this.tokenManager = null;
 		
 	}
 
@@ -151,8 +174,130 @@ public class TokenManagerTest {
 		assertTrue(isTokenEqual);
 		
 	}
-	
-	@Test
+
+    @Test
+    public void testGetCleartextToken() {
+
+
+        String clearTextToken = null;
+
+        try {
+            clearTextToken = this.tokenManager.getCleartextToken(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        assertTrue(testClearTextToken.equals(clearTextToken));
+
+    }
+
+    @Test
+    public void testGetUserDistinguishedName() {
+
+
+        String dn = null;
+
+        try {
+            dn = this.tokenManager.getUserDistinguishedName(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        assertTrue(testDn.equals(dn));
+
+    }
+
+    @Test
+    public void testGetTokenAuthenticationSystem() {
+
+
+        String authSystem = null;
+
+        try {
+            authSystem = this.tokenManager.getTokenAuthenticationSystem(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        assertTrue(testAuthSystem.equals(authSystem));
+
+    }
+
+    @Test
+    public void testGetTimeToLive() {
+
+
+        Long ttl = null;
+
+        try {
+            ttl = this.tokenManager.getTokenTimeToLive(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        assertEquals(testTimeToLive, ttl);
+
+    }
+
+    @Test
+    public void testGetUserGroups() {
+
+
+        ArrayList<String> groups = new ArrayList<String>();
+
+        try {
+            groups = this.tokenManager.getUserGroups(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        for(String group: groups) {
+            assertTrue(group.equals(testGroup));
+        }
+
+    }
+
+    @Test
+    public void testGetTokenSignature() {
+
+
+        String signature = null;
+
+        try {
+            signature = this.tokenManager.getTokenSignature(uid);
+        }
+        catch (SQLException e) {
+            fail("SQL exception with call to getToken: " + e);
+        }
+        catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to getToken: " + e);
+        }
+
+        assertTrue(testSignature.equals(signature));
+
+    }
+
+    @Test
 	public void testDeleteToken() {
 		
 		try {
@@ -173,7 +318,17 @@ public class TokenManagerTest {
 			fail("ClassNotFoundException exception with call to deleteToken: " + e);
 		}
 
-		
-	}
+        // Add token back into tokenstore
+        try {
+            this.tokenManager.setToken(uid, token);
+        } catch (SQLException e) {
+            fail("SQL exception with call to setToken: " + e);
+        } catch (ClassNotFoundException e) {
+            fail("ClassNotFoundException exception with call to setToken: " + e);
+        }
+
+
+
+    }
 
 }

@@ -20,9 +20,9 @@
 
 package edu.lternet.pasta.gatekeeper;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
+import java.io.*;
+import java.security.*;
+import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.log4j.Logger;
+
+import org.apache.commons.codec.binary.Base64;
 
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
@@ -127,7 +129,7 @@ public final class GatekeeperFilter implements Filter
         // Output HttpServletRequest diagnostic information
 		    logger.info("Request URL: " + req.getMethod() + " - "
 		    		+ req.getRequestURL().toString());
-        this.dumpHeader(req);
+        //this.dumpHeader(req);
         //this.dumpBody(req);
         
         try {
@@ -151,29 +153,58 @@ public final class GatekeeperFilter implements Filter
             out.println(e.getMessage());
         }
 
-
     }
 
+    /*
+     *  Process incoming authentication token
+     */
     private Cookie doCookie(HttpServletRequest req)
             throws IllegalArgumentException, IllegalStateException, UnauthorizedException {
 
-        AuthToken token = null;
+        String authToken = null;
         String authTokenStr = retrieveAuthTokenString(req.getCookies());
-        /* Check Validity */
-        token = decryptToken(authTokenStr);
-        /* Check TTL */
+
+        if (authTokenStr == null) {
+            String gripe = "Authentication token not found!";
+            throw new IllegalStateException(gripe);
+        } else {
+
+            String[] authTokeStrParts = authTokenStr.split("-");
+            authToken = authTokeStrParts[0];
+            byte[] signature = Base64.decodeBase64(authTokeStrParts[1]);
+
+            if (!isValidSignature(authToken, signature)) {
+                String gripe = "Authentication token is not valid!";
+                throw new IllegalStateException(gripe);
+            }
+
+        }
+
+        AuthToken token = null;
+        token = AuthTokenFactory.makeCookieAuthToken(authToken);
         assertTimeToLive(token);
+
         return makeAuthTokenCookie(token, CookieUse.INTERNAL);
+
     }
 
+    /*
+     *  Process incoming basic-authentication header or "public" user
+     */
     private Cookie doHeader(HttpServletRequest req, HttpServletResponse res) {
 
         AuthToken authToken =
                 makeAuthenticated(req.getHeader(HttpHeaders.AUTHORIZATION));
-        Cookie externalCookie =
-                makeAuthTokenCookie(authToken, CookieUse.EXTERNAL);
-        
-        if (!publicUser) res.addCookie(externalCookie);
+
+        // Only return authToken (in cookie) if real user
+        if (!publicUser) {
+          Cookie externalCookie =
+              makeAuthTokenCookie(authToken, CookieUse.EXTERNAL);
+          res.addCookie(externalCookie);
+        }
+
+
+
         return makeAuthTokenCookie(authToken, CookieUse.INTERNAL);
     }
 
@@ -273,20 +304,21 @@ public final class GatekeeperFilter implements Filter
 
     private Cookie makeAuthTokenCookie(AuthToken attrlist, CookieUse use) {
 
-        String cookieValue = null;
-        switch (use) {
-        case EXTERNAL:
-            cookieValue = SymmetricEncrypter.encrypt(attrlist.getTokenString(),
-                    ConfigurationListener.getPrivateKey());
-            break;
-        case INTERNAL:
-            cookieValue = attrlist.getTokenString();
-            break;
+        String cookieValue = attrlist.getTokenString();
+
+        if (use == CookieUse.EXTERNAL) {
+          // Generate digital signature and add to token string
+          byte[] signature = generateSignature(cookieValue);
+          cookieValue = cookieValue + "-" + Base64.encodeBase64String(signature);
         }
+
+        logger.info("Cookie value: " + cookieValue);
+
         Cookie c = new Cookie(ConfigurationListener.getTokenName(), cookieValue);
         Long expiry = attrlist.getExpirationDate() / 1000L;
         c.setMaxAge(expiry.intValue());
         return c;
+
     }
     
 	/**
@@ -354,6 +386,108 @@ public final class GatekeeperFilter implements Filter
 		}
 
 	}
+
+  /*
+   * Generate MD5withRSA digital signature for tokenString and return base64
+   * encoded signature as a string.
+   */
+  private byte[] generateSignature(String tokenString) {
+
+    byte[] signature = null;
+
+    File ksFile = ConfigurationListener.getLterKeyStore();
+    String ksType = ConfigurationListener.getLterKeyStoreType();
+    String ksAlias = ConfigurationListener.getLterKeyStoreAlias();
+    char[] storePass = ConfigurationListener.getLterStorePasswd().toCharArray();
+    char[] keyPass = ConfigurationListener.getLterKeyPasswd().toCharArray();
+
+    try {
+
+      KeyStore ks = KeyStore.getInstance(ksType);
+      FileInputStream ksFis = new FileInputStream(ksFile);
+      BufferedInputStream ksBufIn = new BufferedInputStream(ksFis);
+
+      ks.load(ksBufIn, storePass);
+      PrivateKey priv = (PrivateKey) ks.getKey(ksAlias, keyPass);
+
+      Signature rsa = Signature.getInstance("MD5withRSA");
+      rsa.initSign(priv);
+
+      rsa.update(tokenString.getBytes());
+      signature = rsa.sign();
+
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      e.printStackTrace();
+    }
+
+    return signature;
+
+  }
+
+  private void writeSignature(String tokenString, byte[] signature) {
+
+    String signatureDir = ConfigurationListener.getSignatureDir();
+    String signatureFile = signatureDir + tokenString;
+
+    FileOutputStream sigFOS = null;
+
+    try {
+      sigFOS = new java.io.FileOutputStream(signatureFile);
+      sigFOS.write(signature);
+      sigFOS.close();
+    }
+    catch (FileNotFoundException e) {
+      logger.error("Gatekeeper.writeSignature: " + e.getMessage());
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      logger.error("Gatekeeper.writeSignature: " + e.getMessage());
+      e.printStackTrace();
+    }
+
+  }
+
+  private Boolean isValidSignature(String tokenString, byte[] signature) {
+
+    Boolean isValid = false;
+
+    File lterCert = ConfigurationListener.getLterCertificate();
+
+    try {
+
+        FileInputStream certFis = new FileInputStream(lterCert);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509Certificate cert =  (X509Certificate) cf.generateCertificate(certFis);
+
+        PublicKey pubKey = cert.getPublicKey();
+
+        Signature sig = Signature.getInstance("MD5withRSA");
+        sig.initVerify(pubKey);
+
+        sig.update(tokenString.getBytes());
+        isValid = sig.verify(signature);
+
+    } catch (FileNotFoundException e) {
+        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
+        e.printStackTrace();
+    } catch (CertificateException e) {
+        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
+        e.printStackTrace();
+    }  catch (NoSuchAlgorithmException e) {
+        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
+        e.printStackTrace();
+    } catch (InvalidKeyException e) {
+        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
+        e.printStackTrace();
+    } catch (SignatureException e) {
+        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return isValid;
+
+  }
 
     public static class PastaRequestWrapper extends HttpServletRequestWrapper
     {
