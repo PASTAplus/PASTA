@@ -50,6 +50,7 @@ public class DigestUtilsWrapper {
 	public static String getSHA1Checksum(File file) throws Exception {
 		InputStream fis = new FileInputStream(file);
 		String shaHex = DigestUtils.shaHex(fis);
+		fis.close();
 		return shaHex;
 	}
 
@@ -63,6 +64,7 @@ public class DigestUtilsWrapper {
 	 */
 	public static String getSHA1Checksum(String filename) throws Exception {
 		InputStream fis = new FileInputStream(filename);
+		fis.close();
 		String shaHex = DigestUtils.shaHex(fis);
 		return shaHex;
 	}
