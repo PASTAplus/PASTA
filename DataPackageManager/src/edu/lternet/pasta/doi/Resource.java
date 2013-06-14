@@ -38,6 +38,7 @@ public class Resource {
 	 */
 
 	private String resourceId = null;
+	private String resourceLocation = null;
 	private String resourceType = null;
 	private String packageId = null;
 	private String dateCreated = null;
@@ -66,6 +67,15 @@ public class Resource {
 	 */
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
+	}
+	
+	/**
+	 * Set resource location.
+	 * 
+	 * @param resourceLocation
+	 */
+	public void setResourceLocation(String resourceLocation) {
+		this.resourceLocation = resourceLocation;
 	}
 	
 	/**
@@ -102,6 +112,15 @@ public class Resource {
 	 */
 	public String getResourceId() {
 		return this.resourceId;
+	}
+	
+	/**
+	 * Get resource type.
+	 * 
+	 * @return Resource type
+	 */
+	public String getResourceLocation() {
+		return this.resourceLocation;
 	}
 	
 	/**

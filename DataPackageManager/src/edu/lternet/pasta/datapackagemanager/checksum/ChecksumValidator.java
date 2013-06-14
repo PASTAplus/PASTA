@@ -87,7 +87,7 @@ public class ChecksumValidator {
 						if (resourceType.equals("data")) {
 							String entityId = resource.getEntityId();
 							DataManagerClient dataManagerClient = new DataManagerClient();
-							String resourceLocation = dpr.getResourceLocation(resourceId);
+							String resourceLocation = resource.getResourceLocation();
 							File file = dataManagerClient.getDataEntityFile(
 								resourceLocation, scope, identifier,
 								revision.toString(), entityId);

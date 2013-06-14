@@ -1838,7 +1838,7 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id, sha1_checksum"
+		String queryString = "SELECT resource_id, resource_type, resource_location, scope, identifier, revision, entity_id, sha1_checksum"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL;";
 
@@ -1851,6 +1851,7 @@ public class DataPackageRegistry {
 				Resource resource = new Resource();
 				String resourceId = result.getString("resource_id");
 				String resourceType = result.getString("resource_type");
+				String resourceLocation = result.getString("resource_location");
 				String scope = result.getString("scope");
 				Integer identifier = new Integer(result.getInt("identifier"));
 				Integer revision = new Integer(result.getInt("revision"));
@@ -1859,6 +1860,7 @@ public class DataPackageRegistry {
 				String sha1Checksum = result.getString("sha1_checksum");
 				resource.setResourceId(resourceId);
 				resource.setResourceType(resourceType);
+				resource.setResourceLocation(resourceLocation);
 				resource.setScope(scope);
 				resource.setIdentifier(identifier);
 				resource.setRevision(revision);
