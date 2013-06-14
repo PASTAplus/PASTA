@@ -540,6 +540,29 @@ public class Harvester implements Runnable {
   }
    
    
+  /**
+   * Inserts or evaluates a single EML document, passed in as an XML file.
+   * 
+   * @param emlFile  the EML XML document file
+   */
+  public void processSingleDocument(File emlFile) 
+          throws Exception {
+    // Directory for storing harvester files for this harvest
+    Harvester.createDirectory(harvestDirPath);
+
+    // Sub-directory for temporary EML files
+    String harvestEMLPath = harvestDirPath + "/eml";
+    Harvester.createDirectory(harvestEMLPath);
+
+    /*
+     * Process the EML file for evaluation or upload
+     */
+    if (emlFile != null) {
+      processEMLFile(harvestDirPath, uid, emlFile, isEvaluate);
+    }
+  }
+   
+   
   /*
    * Write the text of a URL IO error message to file for subsequent use in
    * harvest reports.

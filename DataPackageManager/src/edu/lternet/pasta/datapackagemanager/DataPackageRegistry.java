@@ -1821,7 +1821,68 @@ public class DataPackageRegistry {
   
   
 	/**
-	 * Returns an array list of resources that are lacking checksums.
+	 * Returns an array list of resources that can be assigned a checksum.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listChecksumableResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id, sha1_checksum"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL;";
+
+		Statement statement = null;
+		try {
+			statement = conn.createStatement();
+			ResultSet result = statement.executeQuery(queryString);
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				String sha1Checksum = result.getString("sha1_checksum");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setEntityId(entityId);
+				resource.setPackageId(packageId);
+				resource.setSha1Checksum(sha1Checksum);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
+	 * Returns an array list of resources that are lacking checksums in
+	 * the resource registry.
 	 * 
 	 * @return Array list of resources
 	 * @throws SQLException
@@ -1840,29 +1901,29 @@ public class DataPackageRegistry {
 
 		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
 		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND sha1_checksum IS NULL;";
+		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL AND sha1_checksum IS NULL;";
 
 		Statement stat = null;
 		try {
 			stat = conn.createStatement();
 			ResultSet result = stat.executeQuery(queryString);
-			String resourceId = null;
 
 			while (result.next()) {
 				Resource resource = new Resource();
-				resourceId = result.getString("resource_id");
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
 				String scope = result.getString("scope");
 				Integer identifier = new Integer(result.getInt("identifier"));
 				Integer revision = new Integer(result.getInt("revision"));
 				String packageId = scope + "." + identifier + "." + revision;
 				String entityId = result.getString("entity_id");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
 				resource.setScope(scope);
 				resource.setIdentifier(identifier);
 				resource.setRevision(revision);
-				resource.setEntityId(entityId);
-				resource.setResourceId(resourceId);
-				resource.setResourceType(result.getString("resource_type"));
 				resource.setPackageId(packageId);
+				resource.setEntityId(entityId);
 				resourceList.add(resource);
 			}
 
