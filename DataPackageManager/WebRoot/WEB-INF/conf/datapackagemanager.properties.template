@@ -9,7 +9,7 @@
 ## generation of quality reports.
 ##
 qualityReporting=true
-qualityReportTemplate=/home/pasta/local/apache-tomcat/webapps/package/qualityReportTemplate.xml
+qualityReportTemplate=/home/pasta/local/apache-tomcat/webapps/package/xml/qualityReportTemplate.xml
 emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.xsl
 
 #
