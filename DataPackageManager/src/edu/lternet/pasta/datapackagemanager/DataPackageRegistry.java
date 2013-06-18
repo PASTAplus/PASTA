@@ -67,6 +67,7 @@ public class DataPackageRegistry {
   private static Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
   private static final String PUBLIC = "public";
+  private static final String EML_VERSION = "2.1.0";
   
   
   /*
@@ -1068,11 +1069,15 @@ public class DataPackageRegistry {
     String access_order = null;
     String permission = null;
     boolean allowFirst = true;
-    StringBuffer accessXmlBuffer = new StringBuffer("<access " +
-                                                      "authSystem=\"https://pasta.lternet.edu/authentication\" " +
-    		                                          "order=\"allowFirst\" " +
-                                                      "system=\"https://pasta.lternet.edu\">\n"
-    		                                       );
+      StringBuffer accessXmlBuffer =
+          new StringBuffer("<access:access " +
+                               "xmlns:access=\"eml://ecoinformatics" +
+                               ".org/access-" + EML_VERSION + " " +
+                               "authSystem=\"https://pasta.lternet" +
+                               ".edu/authentication\" " +
+                               "order=\"allowFirst\" " +
+                               "system=\"https://pasta.lternet.edu\">\n"
+          );
 
     /* First compose an 'allow' entry for the resource owner/submitter */
     Connection connection = null;
@@ -1145,7 +1150,7 @@ public class DataPackageRegistry {
       returnConnection(connection);
     }
     
-    accessXmlBuffer.append("</access>");
+    accessXmlBuffer.append("</access:access>");
     String accessXML = accessXmlBuffer.toString();
     if (!allowFirst) accessXML.replace("allowFirst", "denyFirst");
     return accessXML;
@@ -1157,10 +1162,9 @@ public class DataPackageRegistry {
    */
   private String composeAllowOrDenyElement(String principal, String accessType, String permission, boolean isOwner) {
 	  String element = null;
-	  String roleAttribute = isOwner ? " role=\"owner\"" : "";
 	  StringBuffer elementBuffer = new StringBuffer("");
 	  elementBuffer.append(String.format("  <%s>\n", accessType));
-	  elementBuffer.append(String.format("    <principal%s>%s</principal>\n", roleAttribute, principal));
+	  elementBuffer.append(String.format("    <principal>%s</principal>\n", principal));
 	  elementBuffer.append(String.format("    <permission>%s</permission>\n", permission));
 	  elementBuffer.append(String.format("  </%s>\n", accessType));
 	  element = elementBuffer.toString();	  
