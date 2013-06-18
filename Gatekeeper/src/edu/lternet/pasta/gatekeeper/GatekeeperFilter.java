@@ -279,14 +279,15 @@ public final class GatekeeperFilter implements Filter
         AuthTokenWithPassword basicToken =
                 AuthTokenFactory.makeAuthTokenWithPassword(tmpHeader);
         String user = basicToken.getUserId();
+        String password = basicToken.getPassword();
 
         Set<String> groups = new HashSet<String>();
         if (!user.equals(ConfigurationListener.getPublicUser())) {
 
-            if (!knb.authenticate(user, basicToken.getPassword())) {
+            if (!knb.authenticate(user, password)) {
                 String s = "The user '" + user
                         + "' could not be authenticated "
-                        + "using the LTER's or KNB's LDAP server.";
+                        + "using the LTER LDAP server.";
                 throw new UnauthorizedException(s); // Handle this better
             }
             // groups = knb.getGroups(user); // No groups currently stored here
