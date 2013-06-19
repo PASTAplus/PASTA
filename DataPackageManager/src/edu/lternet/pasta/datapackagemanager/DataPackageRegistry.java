@@ -1072,7 +1072,7 @@ public class DataPackageRegistry {
       StringBuffer accessXmlBuffer =
           new StringBuffer("<access:access " +
                                "xmlns:access=\"eml://ecoinformatics" +
-                               ".org/access-" + EML_VERSION + " " +
+                               ".org/access-" + EML_VERSION + "\" " +
                                "authSystem=\"https://pasta.lternet" +
                                ".edu/authentication\" " +
                                "order=\"allowFirst\" " +
