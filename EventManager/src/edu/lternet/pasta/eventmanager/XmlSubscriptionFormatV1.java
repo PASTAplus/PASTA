@@ -56,21 +56,15 @@ import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 public class XmlSubscriptionFormatV1 {
 
     public static final String SUBSCRIPTION = "subscription";
-
     public static final String SUBSCRIPTIONS = "subscriptions";
-
     public static final String TYPE = "type";
-
     public static final String EML = "eml";
-
     public static final String PACKAGE_ID = "packageId";
-
     public static final String URL = "url";
-
     public static final String SUBSCRIPTION_ID = "id";
-
     public static final String CREATOR = "creator";
 
+    
     /**
      * Parses the provided XML string and returns a corresponding subscription
      * builder. The provided XML is validated against a schema that allows
@@ -104,6 +98,7 @@ public class XmlSubscriptionFormatV1 {
         return sb;
     }
 
+    
     private void setPackageId(SubscriptionBuilder sb, NodeList nodes) {
 
         EmlPackageIdFormat formatter = new EmlPackageIdFormat(Delimiter.DOT);
@@ -114,17 +109,20 @@ public class XmlSubscriptionFormatV1 {
         sb.setEmlPackageId(epi);
     }
 
+    
     private void setUrl(SubscriptionBuilder sb, NodeList nodes) {
         String url = getNodeText(nodes, URL);
         sb.setUrl(new SubscribedUrl(url));
     }
 
+    
     private String getNodeText(NodeList nodes, String nodeName) {
         return getNode(nodes, nodeName).getTextContent();
         //String xmlText = getNode(nodes, nodeName).getTextContent();
         //return StringEscapeUtils.unescapeXml(xmlText);
     }
 
+    
     private Node getNode(NodeList nodes, String nodeName) {
 
         for (int i = 0, size = nodes.getLength(); i < size; i ++) {
@@ -142,6 +140,7 @@ public class XmlSubscriptionFormatV1 {
         throw new IllegalStateException(s);
     }
 
+    
     /**
      * Returns an XML representation of the provided subscription. If the
      * subscription ID is {@code null}, because the subscription has not been
@@ -154,6 +153,7 @@ public class XmlSubscriptionFormatV1 {
         return XmlUtility.nodeToXmlString(toDocument(subscription));
     }
 
+    
     /**
      * Parses the provided XML string and returns a corresponding document.
      *
@@ -173,6 +173,7 @@ public class XmlSubscriptionFormatV1 {
         return XmlUtility.xmlStringToDoc(subscriptionXml, schema);
     }
 
+    
     /**
      * Returns a document corresponding to the provided subscription.
      *
@@ -198,11 +199,11 @@ public class XmlSubscriptionFormatV1 {
 
         root.setAttribute(TYPE, EML);
 
-        Long longId = subscription.getSubscriptionId();
+        Integer integerId = subscription.getSubscriptionId();
 
-        if (longId != null) {
+        if (integerId != null) {
             Element id = doc.createElement(SUBSCRIPTION_ID);
-            setText(id, longId.toString());
+            setText(id, integerId.toString());
             root.appendChild(id);
         }
 
@@ -218,11 +219,13 @@ public class XmlSubscriptionFormatV1 {
         return doc;
     }
 
+    
     private void setText(Element e, String text) {
         //e.setTextContent(StringEscapeUtils.escapeXml(text));
         e.setTextContent(text);
     }
 
+    
     /**
      * Returns a document corresponding to the provided collection of
      * subscriptions.
@@ -248,6 +251,7 @@ public class XmlSubscriptionFormatV1 {
         return doc;
     }
 
+    
     /**
      * Returns an XML string corresponding to the provided collection of
      * subscriptions. If a subscription ID is {@code null}, because the
@@ -262,4 +266,5 @@ public class XmlSubscriptionFormatV1 {
     public String format(Collection<EmlSubscription> subscriptions) {
         return XmlUtility.nodeToXmlString(toDocument(subscriptions));
     }
+    
 }

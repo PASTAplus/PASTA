@@ -20,13 +20,8 @@
  */
 package edu.lternet.pasta.eventmanager;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 
 /**
  * This class is used to represent <em>EML modification</em> event
@@ -35,22 +30,17 @@ import edu.lternet.pasta.common.EmlPackageId;
  * {@link SubscriptionService} class.
  *
  * <p>
- * This class utilizes the Java Persistence API (JPA) 2.0. Instances of this
- * class are immutable, except in the following two ways. Subscription IDs are
- * automatically generated when a subscription is first persisted, and
+ * Instances of this class are immutable, except in the following two ways. 
+ * Subscription IDs are automatically generated when a subscription is first persisted, and
  * subscriptions are active upon their creation, but they can be irreversibly
  * inactivated using the method {@link #inactivate()}. The corresponding
  * data table row for a subscription object will not reflect this state change
  * until the object is persisted again.
  * </p>
  */
-@Entity
-@Table(schema="eventmanager", name="emlsubscription") // both are required
 public class EmlSubscription {
 
-    // Indicating that the database will generate a primary key upon insertion
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long subscriptionId;
+    private Integer subscriptionId;
     private boolean active;
     private String creator;
     private String scope;
@@ -64,6 +54,10 @@ public class EmlSubscription {
      * with content.
      */
     protected EmlSubscription() {}
+    
+    /*
+     * Getters
+     */
 
     /**
      * Returns the ID of this subscription. IDs are produced when subscriptions
@@ -72,7 +66,7 @@ public class EmlSubscription {
      * @return the ID of this subscription if it has been persisted; {@code
      *         null} otherwise.
      */
-    public Long getSubscriptionId() {
+    public Integer getSubscriptionId() {
         return subscriptionId;
     }
 
@@ -129,10 +123,20 @@ public class EmlSubscription {
         return revision;
     }
 
+    
     public EmlPackageId getPackageId() {
         return new EmlPackageId(scope, identifier, revision);
     }
 
+    
+    public String getPackageIdStr() {
+        EmlPackageId emlPackageId = getPackageId();
+        EmlPackageIdFormat epf = new EmlPackageIdFormat();
+        String packageId = epf.format(emlPackageId);
+        return packageId;
+    }
+
+    
     /**
      * Returns the subscribed URL.
      *
@@ -142,6 +146,84 @@ public class EmlSubscription {
         return url;
     }
 
+    
+    /*
+     * Setters
+     */
+    
+    /**
+     * Sets the subscriptionId value
+     * @param the id value to set
+     */
+    public void setSubscriptionId(Integer id) {
+        this.subscriptionId = id;
+    }
+
+    
+    /**
+     * Sets the creator of the subscription.
+     * @param creator the user ID of the creator.
+     * @throws IllegalArgumentException if {@code creator} is {@code null}
+     * or empty.
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    
+    /**
+     * Sets the scope
+     * @param the scope of the packageId
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    
+    /**
+     * Sets the identifier
+     * @param the identifier value of the packageId
+     */
+    public void setIdentifier(Integer identifier) {
+        this.identifier = identifier;
+    }
+
+    
+    /**
+     * Sets the revision
+     * @param the revision value of the packageId
+     */
+    public void setRevision(Integer revision) {
+        this.revision = revision;
+    }
+
+    
+    /**
+     * Sets the URL of the subscription.
+     * @param url the URL of the subscription.
+     */
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    
+    /**
+     * Returns an XML representation of this subscription.
+     *
+     * @return an XML string representation of this subscription.
+     */
+    public String toXML() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("  <subscription type=\"eml\">\n"));
+        sb.append(String.format("    <id>%s</id>\n", getSubscriptionId()));
+        sb.append(String.format("    <creator>%s</creator>\n", getCreator()));
+        sb.append(String.format("    <packageId>%s</packageId>\n", getPackageIdStr()));
+        sb.append(String.format("    <url>%s</url>\n", getUrl()));
+        sb.append(String.format("  </subscription>\n"));
+        return sb.toString();
+    }
+
+    
     /**
      * Returns a string representation of this subscription.
      *
@@ -157,6 +239,7 @@ public class EmlSubscription {
         return sb.toString();
     }
 
+    
     /**
      * Returns a new subscription builder with attributes matching this
      * subscription.
@@ -168,6 +251,7 @@ public class EmlSubscription {
         return new SubscriptionBuilder(this);
     }
 
+    
     /**
      * Used to build subscriptions. Subscription builders have three attributes:
      * a subscription's creator, its EML packageId, and its URI.
@@ -334,8 +418,8 @@ public class EmlSubscription {
     }
 
     /**
-     * Used to make database query statements in the Java Persistence Query
-     * Language (JPQL). The state of a provided subscription builder is used to
+     * Used to make database query statements.
+     * The state of a provided subscription builder is used to
      * construct an equivalent query.
      *
      */

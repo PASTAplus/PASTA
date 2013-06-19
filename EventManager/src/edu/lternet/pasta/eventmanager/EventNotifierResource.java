@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -113,8 +112,6 @@ public final class EventNotifierResource extends EventManagerResource {
      * Constructs a new Event Manager resource with the entity manager
      * factory specified by the configuration listener and the default
      * connection and request timeouts.
-     *
-     * @see ConfigurationListener#getPersistenceUnit()
      */
     public EventNotifierResource() {
         super();
@@ -123,17 +120,16 @@ public final class EventNotifierResource extends EventManagerResource {
 
     
     /**
-     * Constructs a new Event Manager resource with the provided entity manager
-     * factory, connection timeout, and request timeout (in milliseconds).
+     * Constructs a new Event Manager resource with the provided
+     * connection timeout and request timeout (in milliseconds).
      *
-     * @param entityManagerFactory provides all entity managers used by this resource.
      * @param connectionTimeout timeout for POST connections.
      * @param requestTimeout timeout for POST requests.
      */
-    public EventNotifierResource(EntityManagerFactory entityManagerFactory,
+    public EventNotifierResource(
                                  int connectionTimeout,
                                  int requestTimeout) {
-        super(entityManagerFactory);
+        super();
         asyncHttpClient = makeClient(connectionTimeout, requestTimeout);
     }
 
@@ -167,7 +163,7 @@ public final class EventNotifierResource extends EventManagerResource {
         auditManagerClient.logAudit(auditRecord);
       }
       catch (Exception e) {
-        logger.error("Error occurred while auditing Data Package Manager " +
+        logger.error("Error occurred while auditing Event Manager " +
                      "service call for service method " + 
                      serviceMethodName + " : " + e.getMessage());
       }
@@ -197,6 +193,7 @@ public final class EventNotifierResource extends EventManagerResource {
         }
     }
 
+    
     /**
      * Used to notify the event manager, via an HTTP POST request, that an EML
      * document in PASTA has been modified. Upon notification, the event manager
@@ -452,8 +449,6 @@ public final class EventNotifierResource extends EventManagerResource {
         subscriptionBuilder.setEmlPackageId(new EmlPackageId(null, null, null));
         emlSubscriptionList.addAll(subscriptionService.getWithPackageIdNulls(subscriptionBuilder));
 
-        subscriptionService.close();
-
         return emlSubscriptionList;
     }
 
@@ -462,9 +457,8 @@ public final class EventNotifierResource extends EventManagerResource {
       EmlSubscription emlSubscription = null;
       
       SubscriptionService subscriptionService = getSubscriptionService();
-      Long id = parseSubscriptionId(subscriptionId);
+      Integer id = parseSubscriptionId(subscriptionId);
       emlSubscription = subscriptionService.get(id, authToken);
-      subscriptionService.close();
 
       return emlSubscription;
     }
@@ -496,7 +490,7 @@ public final class EventNotifierResource extends EventManagerResource {
     
     private void assertAuthorizedToWrite(HttpHeaders headers, String serviceMethod) {
 
-        String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
+        String acr = getServiceAcr(serviceMethod);
 
         JaxRsHttpAccessController controller =
             AccessControllerFactory.getDefaultHttpAccessController();

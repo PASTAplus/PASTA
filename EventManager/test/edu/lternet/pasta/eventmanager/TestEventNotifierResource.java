@@ -29,8 +29,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -62,10 +60,7 @@ public class TestEventNotifierResource {
     public void init() {
         client = new AsyncHttpClient();
         new ConfigurationListener().setContextSpecificProperties();
-        String persistence = ConfigurationListener.getJUnitPersistenceUnit();
-        EntityManagerFactory emf = 
-            Persistence.createEntityManagerFactory(persistence);
-        resource = new EventNotifierResource(emf, 1000, 1000);
+        resource = new EventNotifierResource(1000, 1000);
         scope = "test"; 
         identifier = "1";
         revision = "2";
@@ -139,10 +134,6 @@ public class TestEventNotifierResource {
         } catch (ResourceExistsException e) {
             // ignore
         }
-        
-        ss.close();
-     
-
     }
 
     @Test

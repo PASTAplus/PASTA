@@ -1,6 +1,8 @@
 create schema eventmanager authorization pasta;
+create sequence eventmanager.subscription_id_seq;
 create table eventmanager.emlsubscription (
-   subscriptionId     bigserial  primary key,
+   subscription_id    numeric    default nextval('eventmanager.subscription_id_seq') primary key,
+   date_created       timestamp  not null,
    active             boolean    not null,
    creator            text       not null,
    scope              text,

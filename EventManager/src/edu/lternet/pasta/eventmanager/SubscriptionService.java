@@ -27,9 +27,6 @@ package edu.lternet.pasta.eventmanager;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-
 import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
@@ -41,39 +38,13 @@ import edu.lternet.pasta.eventmanager.EmlSubscription.JpqlFactory;
 import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 /**
- * An event subscription service class. This class performs all persistence
- * operations for the EML modification subscription database using the Java
- * Persistence API (JPA) 2.0.
+ * An event subscription service class. This class performs all database
+ * operations for the EML subscription database
  */
 public final class SubscriptionService {
 
     private static AuthTokenAccessController getAccessController() {
         return AccessControllerFactory.getDefaultAuthTokenAccessController();
-    }
-
-    private final EntityManager entityManager;
-
-    /**
-     * Constructs a new subscription service with the provided entity manager.
-     *
-     * @param em
-     *            the entity manager for which all operations are performed.
-     *
-     * @throws IllegalArgumentException
-     *             if the provided entity manager is {@code null}.
-     */
-    public SubscriptionService(EntityManager em) {
-        if (em == null) {
-            throw new IllegalArgumentException("Null entity manager");
-        }
-        this.entityManager = em;
-    }
-
-    /**
-     * Closes the entity manager of this subscription service.
-     */
-    public void close() {
-        entityManager.close();
     }
 
     /**
@@ -100,7 +71,7 @@ public final class SubscriptionService {
      *             if a subscription already exists in the database with the
      *             provided creator, packageId, and URI.
      */
-    public Long create(EmlSubscription subscription, AuthToken token) {
+    public Integer create(EmlSubscription subscription, AuthToken token) {
 
         if (!subscription.isActive()) {
             String s = "inactive subscription: " + subscription;
@@ -123,11 +94,11 @@ public final class SubscriptionService {
             throw new ResourceExistsException(s);
         }
 
-        entityManager.getTransaction().begin();
+        /*entityManager.getTransaction().begin();
         entityManager.persist(subscription);
-        entityManager.getTransaction().commit();
+        entityManager.getTransaction().commit();*/
         
-        Long subscriptionId = subscription.getSubscriptionId();
+        Integer subscriptionId = subscription.getSubscriptionId();
         return subscriptionId;
     }
 
@@ -139,7 +110,7 @@ public final class SubscriptionService {
      *
      * @throws IllegalArgumentException if the provided ID is {@code null}.
      */
-    public boolean exists(Long subscriptionId) {
+    public boolean exists(Integer subscriptionId) {
 
         try {
             get(subscriptionId);
@@ -179,7 +150,7 @@ public final class SubscriptionService {
      *             control rules.
      *
      */
-    public EmlSubscription get(Long subscriptionId, AuthToken token) {
+    public EmlSubscription get(Integer subscriptionId, AuthToken token) {
 
         EmlSubscription s = get(subscriptionId);
 
@@ -188,14 +159,15 @@ public final class SubscriptionService {
         return s;
     }
 
-    private EmlSubscription get(Long subscriptionId) {
+    private EmlSubscription get(Integer subscriptionId) {
 
         if (subscriptionId == null) {
             throw new IllegalArgumentException("null subscription id");
         }
 
-        EmlSubscription s = entityManager.find(EmlSubscription.class,
-                                               subscriptionId);
+        EmlSubscription s = null;
+        /*EmlSubscription s = entityManager.find(EmlSubscription.class,
+                                               subscriptionId); */
 
         if (s == null) {
             String err = "An event subscription with the specified ID '" +
@@ -274,14 +246,18 @@ public final class SubscriptionService {
         return authorized;
     }
 
+    
     private List<EmlSubscription> getMatches(String jpql) {
-        return makeQuery(jpql).getResultList();
+        //return makeQuery(jpql).getResultList();
+    	return null;
     }
 
-    private TypedQuery<EmlSubscription> makeQuery(String jpql) {
+    
+    /*private TypedQuery<EmlSubscription> makeQuery(String jpql) {
         return entityManager.createQuery(jpql, EmlSubscription.class);
-    }
+    }*/
 
+    
     /**
      * Deletes the subscription with the provided ID, if the user specified in
      * the provided token is authorized to delete it.
@@ -309,7 +285,7 @@ public final class SubscriptionService {
      *             control rules.
      *
      */
-    public void delete(Long subscriptionId, AuthToken token) {
+    public void delete(Integer subscriptionId, AuthToken token) {
 
         EmlSubscription subscription = get(subscriptionId);
 
@@ -317,9 +293,9 @@ public final class SubscriptionService {
 
         subscription.inactivate();
 
-        entityManager.getTransaction().begin();
+        /*entityManager.getTransaction().begin();
         entityManager.merge(subscription);
-        entityManager.getTransaction().commit();
+        entityManager.getTransaction().commit();*/
     }
 
     private void assertReadAuthorized(EmlSubscription s, AuthToken token) {

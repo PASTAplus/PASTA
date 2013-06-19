@@ -35,10 +35,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -53,7 +49,6 @@ import edu.lternet.pasta.eventmanager.EventSubscriptionResource;
 
 public class TestEventSubscriptionResource {
 
-    private EntityManagerFactory emf;
     private HttpHeaders headers;
     private EventSubscriptionResource resource;
     
@@ -62,30 +57,20 @@ public class TestEventSubscriptionResource {
         new ConfigurationListener().setContextSpecificProperties();
         clearDatabase();
         headers = new DummyCookieHttpHeaders("anonymous");
-        resource = new EventSubscriptionResource(emf);
+        resource = new EventSubscriptionResource();
     }
 
     private void clearDatabase() {
 
-        String persistenceUnit =
-                ConfigurationListener.getJUnitPersistenceUnit();
-        emf = Persistence.createEntityManagerFactory(persistenceUnit);
-        
-        EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("DELETE FROM EmlSubscription x");
+        /*Query query = em.createQuery("DELETE FROM EmlSubscription x");
         
         em.getTransaction().begin();
         query.executeUpdate();
         em.getTransaction().commit();
         
-        em.close();
+        em.close();*/
     }
 
-    @After
-    public void cleanUp() {
-        emf.close();
-    }
-    
     @Test
     public void testValidQueryKeys() {
         

@@ -26,14 +26,13 @@ package edu.lternet.pasta.eventmanager;
 
 import java.io.File;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import edu.lternet.pasta.common.FileUtility;
+import edu.lternet.pasta.common.PastaServiceUtility;
 import edu.lternet.pasta.common.PastaWebService;
 
 /**
@@ -46,6 +45,22 @@ import edu.lternet.pasta.common.PastaWebService;
 @Path("")
 public class EventManagerResource extends PastaWebService {
 
+    /**
+     * Returns the access control rule for creating EML modification
+     * subscriptions.
+     *
+     * @param method A String representing the serviceMethod Name that
+     *               initiated the call sequence.
+     * @return the access control rule for creating EML modification
+     *         subscriptions.
+     */
+    protected String getServiceAcr(String method) {
+
+        File acrFileName = ConfigurationListener.getPastaServiceAcr();
+        String pastaService = FileUtility.fileToString(acrFileName);
+        return PastaServiceUtility.getAccessTypeString(method, pastaService);
+    }
+   
     /**
      * Serves the files related to the demo web page.
      * @param fileName the name of the file to be served.
@@ -100,43 +115,13 @@ public class EventManagerResource extends PastaWebService {
         return ConfigurationListener.getWelcomePage();
     }
 
-    private final EntityManagerFactory entityManagerFactory;
-
     /**
      * Constructs an Event Manager resource with the provided entity
      * manager factory.
      *
      * @param emf the entity manager factory used by this resource.
      */
-    public EventManagerResource(EntityManagerFactory emf) {
-        if (emf == null) {
-            throw new IllegalArgumentException("null factory");
-        }
-        this.entityManagerFactory = emf;
-    }
-
-    /**
-     * Constructs an Event Manager resource using the persistence unit
-     * specified by the configuration listener.
-     *
-     * @see ConfigurationListener#getPersistenceUnit()
-     */
     public EventManagerResource() {
-        String persistenceUnit = ConfigurationListener.getPersistenceUnit();
-        entityManagerFactory =
-            Persistence.createEntityManagerFactory(persistenceUnit);
-    }
-
-    /**
-     * Returns an entity manager.
-     * @return an entity manager.
-     */
-    protected EntityManager getEntityManager() {
-
-        EntityManager entityManager =
-            entityManagerFactory.createEntityManager();
-
-        return entityManager;
     }
 
     /**
@@ -144,31 +129,16 @@ public class EventManagerResource extends PastaWebService {
      * @return a subscription service.
      */
     protected SubscriptionService getSubscriptionService() {
-        return new SubscriptionService(getEntityManager());
+        return new SubscriptionService();
     }
 
-    /**
-     * Closes this resource's entity manager factory and all entity managers
-     * created from it.
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            // also closes all entity managers from this factory
-            entityManagerFactory.close();
-        } finally {
-            super.finalize();
-        }
-    }
-
-    protected Long parseSubscriptionId(String s) {
-
+    
+    protected Integer parseSubscriptionId(String s) {
       try {
-          return Long.parseLong(s);
+          return new Integer(s);
       } 
       catch (NumberFormatException e) {
-          String err = "The provided subscription ID '" + s +
-                       "' cannot be parsed as an integer.";
+          String err = String.format("The provided subscription ID '%s' cannot be parsed as an integer.", s);
           throw new IllegalArgumentException(err);
       }
   }
