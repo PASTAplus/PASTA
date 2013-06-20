@@ -67,14 +67,14 @@ public class TestXmlSubscriptionFormatV1 {
         
         String xml = FileUtility.fileToString(goodFile);
         
-        SubscriptionBuilder sb = formatter.parse(xml);
-        EmlPackageId epi = sb.getEmlPackageId();
+        EmlSubscription emlSubscription = formatter.parse(xml);
+        EmlPackageId epi = emlSubscription.getPackageId();
         
-        assertNull(sb.getCreator());
+        assertNull(emlSubscription.getCreator());
         assertEquals("lter-lno", epi.getScope());
         assertEquals(12, epi.getIdentifier().intValue());
         assertEquals(74, epi.getRevision().intValue());
-        assertEquals("http://foo?bar&blah", sb.getUrl().toString());
+        assertEquals("http://foo?bar&blah", emlSubscription.getUrl().toString());
     }
     
     @Test(expected=XmlParsingException.class)

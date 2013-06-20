@@ -78,41 +78,40 @@ public class XmlSubscriptionFormatV1 {
      * @throws XmlParsingException if any parsing error occurs, including the
      * parsing of packageIds and URLs in the provided XML.
      */
-    public SubscriptionBuilder parse(String subscriptionXml) {
-
+    public EmlSubscription parse(String subscriptionXml) {
+    	EmlSubscription emlSubscription = new EmlSubscription();
         Document doc = toDocument(subscriptionXml);
-
         NodeList nodes = doc.getFirstChild().getChildNodes();
-        SubscriptionBuilder sb = new SubscriptionBuilder();
 
         try {
-            setPackageId(sb, nodes);
-            setUrl(sb, nodes);
-        } catch (IllegalArgumentException e) {
+            setPackageId(emlSubscription, nodes);
+            setUrl(emlSubscription, nodes);
+        } 
+        catch (IllegalArgumentException e) {
             String s = "An error was detected while parsing the provided " +
                        "XML (shown below). " + e.getMessage() + "\n\n" +
                        subscriptionXml;
             throw new XmlParsingException(s, e, subscriptionXml);
         }
 
-        return sb;
+        return emlSubscription;
     }
 
     
-    private void setPackageId(SubscriptionBuilder sb, NodeList nodes) {
+    private void setPackageId(EmlSubscription emlSubscription, NodeList nodes) {
 
         EmlPackageIdFormat formatter = new EmlPackageIdFormat(Delimiter.DOT);
 
         String packageId = getNodeText(nodes, PACKAGE_ID);
 
         EmlPackageId epi = formatter.parse(packageId);
-        sb.setEmlPackageId(epi);
+        emlSubscription.setPackageId(epi);
     }
 
     
-    private void setUrl(SubscriptionBuilder sb, NodeList nodes) {
+    private void setUrl(EmlSubscription emlSubscription, NodeList nodes) {
         String url = getNodeText(nodes, URL);
-        sb.setUrl(new SubscribedUrl(url));
+        emlSubscription.setUrl(url);
     }
 
     
@@ -209,7 +208,7 @@ public class XmlSubscriptionFormatV1 {
 
         setText(creator, subscription.getCreator());
         setText(packageId, formatter.format(subscription.getPackageId()));
-        setText(url, subscription.getUrl());
+        setText(url, subscription.getUrl().toString());
 
         doc.appendChild(root);
         root.appendChild(creator);

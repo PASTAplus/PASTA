@@ -31,9 +31,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.PastaServiceUtility;
 import edu.lternet.pasta.common.PastaWebService;
+import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.security.authorization.AccessMatrix;
+import edu.lternet.pasta.common.security.authorization.InvalidPermissionException;
+import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.lternet.pasta.common.security.token.AuthToken;
 
 /**
  * An abstract class that provides utility methods for the components of the
@@ -124,15 +135,74 @@ public class EventManagerResource extends PastaWebService {
     public EventManagerResource() {
     }
 
+
     /**
-     * Returns a subscription service.
-     * @return a subscription service.
+     * Boolean to determine whether the user contained in the AuthToken
+     * is authorized to execute the specified service method.
+     * 
+     * @param serviceMethodName     the name of the service method
+     * @param authToken             the AuthToken containing the user name
+     * @return  true if authorized to run the service method, else false
      */
-    protected SubscriptionService getSubscriptionService() {
-        return new SubscriptionService();
+    protected boolean isServiceMethodAuthorized(String serviceMethodName, 
+                                              Rule.Permission permission, 
+                                              AuthToken authToken) {
+      boolean isAuthorized = false;
+      NodeList nodeList = null;    
+      String serviceDocumentStr = ConfigurationListener.getServiceDocument();
+      Document document = XmlUtility.xmlStringToDoc(serviceDocumentStr);
+      
+      try {
+        if (document != null) {
+          NodeList documentNodeList = document.getChildNodes();
+          Node rootNode = documentNodeList.item(0);
+          nodeList = rootNode.getChildNodes();
+          
+          if (nodeList != null) {
+            int nodeListLength = nodeList.getLength();
+            for (int i = 0; i < nodeListLength; i++) {
+              Node childNode = nodeList.item(i);
+              String nodeName = childNode.getNodeName();
+              String nodeValue = childNode.getNodeValue();
+              if (nodeName.contains("service-method")) {
+                Element serviceElement = (Element) nodeList.item(i);
+                NamedNodeMap serviceAttributesList = serviceElement.getAttributes();
+                
+                for (int j = 0; j < serviceAttributesList.getLength(); j++) {
+                  Node attributeNode = serviceAttributesList.item(j);
+                  nodeName = attributeNode.getNodeName();
+                  nodeValue = attributeNode.getNodeValue();
+                  if (nodeName.equals("name")) {
+                    String name = nodeValue;
+                    if (name.equals(serviceMethodName)) {
+                      NodeList accessNodeList = serviceElement
+                              .getElementsByTagName("access");
+                      Node accessNode = accessNodeList.item(0);
+                      String accessXML = XmlUtility.nodeToXmlString(accessNode);
+                      AccessMatrix accessMatrix = new AccessMatrix(accessXML);
+                      String principalOwner = "pasta";
+                      isAuthorized = accessMatrix.isAuthorized(authToken,
+                        principalOwner, permission);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        else {
+          String message = "No service methods were found in the service.xml file";
+          throw new IllegalStateException(message);
+        }
+      }
+      catch (InvalidPermissionException e) {
+        throw new IllegalStateException(e);
+      }
+
+      return isAuthorized;
     }
 
-    
+
     protected Integer parseSubscriptionId(String s) {
       try {
           return new Integer(s);

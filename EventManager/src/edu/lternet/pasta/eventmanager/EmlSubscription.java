@@ -27,7 +27,7 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
  * This class is used to represent <em>EML modification</em> event
  * subscriptions, which are associations between EML packageIds and URIs created
  * by particular users. Subscriptions can be persisted in a database using the
- * {@link SubscriptionService} class.
+ * {@link SubscriptionRegsitry} class.
  *
  * <p>
  * Instances of this class are immutable, except in the following two ways. 
@@ -39,6 +39,8 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
  * </p>
  */
 public class EmlSubscription {
+	
+	/* Instance variables */
 
     private Integer subscriptionId;
     private boolean active;
@@ -46,7 +48,10 @@ public class EmlSubscription {
     private String scope;
     private Integer identifier;
     private Integer revision;
-    private String url;
+    private SubscribedUrl url;
+    
+    
+    /*Constructors */
 
     /**
      * Constructs an empty subscription. A no-arg constructor is required for
@@ -54,6 +59,10 @@ public class EmlSubscription {
      * with content.
      */
     protected EmlSubscription() {}
+    
+    
+    /* Instance methods */
+    
     
     /*
      * Getters
@@ -70,6 +79,7 @@ public class EmlSubscription {
         return subscriptionId;
     }
 
+    
     /**
      * Indicates if this subscription is still active.
      * @return {@code true} if active; {@code false} if inactive.
@@ -78,6 +88,7 @@ public class EmlSubscription {
         return active;
     }
 
+    
     /**
      * Inactivates this subscription. Subsequent invocations of
      * {@link #isActive()} will return {@code false}. Inactivating more
@@ -87,6 +98,7 @@ public class EmlSubscription {
         active = false;
     }
 
+    
     /**
      * Returns the ID of the user that created this subscription.
      *
@@ -96,6 +108,7 @@ public class EmlSubscription {
         return creator;
     }
 
+    
     /**
      * Returns the scope of the EML packageId.
      *
@@ -125,15 +138,14 @@ public class EmlSubscription {
 
     
     public EmlPackageId getPackageId() {
-        return new EmlPackageId(scope, identifier, revision);
+        return new EmlPackageId(scope, identifier, revision);    
     }
 
     
     public String getPackageIdStr() {
-        EmlPackageId emlPackageId = getPackageId();
         EmlPackageIdFormat epf = new EmlPackageIdFormat();
-        String packageId = epf.format(emlPackageId);
-        return packageId;
+        String packageIdStr = epf.format(getPackageId());
+        return packageIdStr;
     }
 
     
@@ -142,7 +154,7 @@ public class EmlSubscription {
      *
      * @return the subscribed URL.
      */
-    public String getUrl() {
+    public SubscribedUrl getUrl() {
         return url;
     }
 
@@ -190,6 +202,20 @@ public class EmlSubscription {
 
     
     /**
+     * Sets the EML packageId of the subscription.
+     * @param packageId the EML packageId of the subscription.
+     */
+    public void setPackageId(EmlPackageId packageId) {
+        if (packageId == null) {
+            throw new IllegalArgumentException("null packageId");
+        }
+        this.scope = packageId.getScope();
+        this.identifier = packageId.getIdentifier();
+        this.revision = packageId.getRevision();
+    }
+
+    
+    /**
      * Sets the revision
      * @param the revision value of the packageId
      */
@@ -203,7 +229,7 @@ public class EmlSubscription {
      * @param url the URL of the subscription.
      */
     public void setUrl(String url) {
-        this.url = url;
+        this.url = new SubscribedUrl(url);
     }
 
     
@@ -241,18 +267,6 @@ public class EmlSubscription {
 
     
     /**
-     * Returns a new subscription builder with attributes matching this
-     * subscription.
-     *
-     * @return a new subscription builder with attributes matching this
-     * subscription.
-     */
-    public SubscriptionBuilder toBuilder() {
-        return new SubscriptionBuilder(this);
-    }
-
-    
-    /**
      * Used to build subscriptions. Subscription builders have three attributes:
      * a subscription's creator, its EML packageId, and its URI.
      * Upon construction, these attributes are all {@code null},
@@ -279,7 +293,7 @@ public class EmlSubscription {
             packageId = new EmlPackageId(subscription.getScope(),
                                          subscription.getIdentifier(),
                                          subscription.getRevision());
-            url = new SubscribedUrl(subscription.getUrl());
+            //url = new subscription.getUrl();
         }
 
         /**
@@ -328,6 +342,7 @@ public class EmlSubscription {
             return creator;
         }
 
+        
         /**
          * Returns the packageId attribute.
          * @return the packageId attribute.
@@ -336,6 +351,7 @@ public class EmlSubscription {
             return packageId;
         }
 
+        
         /**
          * Returns the URL attribute.
          * @return the URL attribute.
@@ -344,6 +360,7 @@ public class EmlSubscription {
             return url;
         }
 
+        
         /**
          * Sets the creator of the subscription.
          * @param creator the user ID of the creator.
@@ -358,6 +375,7 @@ public class EmlSubscription {
             return this;
         }
 
+        
         /**
          * Sets the EML packageId of the subscription.
          * @param packageId the EML packageId of the subscription.
@@ -411,134 +429,10 @@ public class EmlSubscription {
             s.scope = packageId.getScope();
             s.identifier = packageId.getIdentifier();
             s.revision = packageId.getRevision();
-            s.url = url.toString();
+            s.url = url;
 
             return s;
         }
-    }
-
-    /**
-     * Used to make database query statements.
-     * The state of a provided subscription builder is used to
-     * construct an equivalent query.
-     *
-     */
-    public static final class JpqlFactory {
-
-        /**
-         * Returns a JPQL statement for active subscriptions based on the
-         * current state of the provided subscription builder. If attributes of
-         * the provided builder have not been assigned a value, they will not be
-         * included in the query statement. If the builder has been assigned an
-         * EML packageId, and it contains {@code null} elements, they are
-         * included in the returned statement using the JPQL expression {@code
-         * IS NULL}.
-         *
-         * @return a JPQL statement for querying subscriptions that match the
-         *         current state of this query builder's assigned attributes.
-         */
-        public static String makeWithPackageIdNulls(SubscriptionBuilder sb) {
-
-            StringBuilder jpql = makeBasic(sb);
-            appendPackageIdWithNulls(jpql, sb);
-
-            return jpql.toString();
-        }
-
-        /**
-         * Returns a JPQL statement for active subscriptions based on the
-         * current state of the provided subscription builder. If attributes of
-         * the provided builder have not been assigned a value, they will not be
-         * included in the query statement. If the builder has been assigned an
-         * EML packageId, and it contains {@code null} elements, they are
-         * not included in the returned statement.
-         *
-         * @return a JPQL statement for querying subscriptions that match the
-         *         current state of this query builder's assigned attributes.
-         */
-        public static String makeWithoutPackageIdNulls(SubscriptionBuilder sb) {
-
-            StringBuilder jpql = makeBasic(sb);
-            appendPackageIdWithoutNulls(jpql, sb);
-
-            return jpql.toString();
-        }
-
-        private static StringBuilder makeBasic(SubscriptionBuilder sb) {
-
-            StringBuilder jpql = new StringBuilder();
-
-            jpql.append("SELECT x FROM ");
-            jpql.append(EmlSubscription.class.getSimpleName());
-            jpql.append(" x WHERE x.active = true");
-
-            if (sb.creator != null) {
-                jpql.append(" AND x.creator = '" + sb.creator + "'");
-            }
-
-            if (sb.url != null) {
-                jpql.append(" AND x.url = '" + sb.url + "'");
-            }
-
-            return jpql;
-        }
-
-        private static void appendPackageIdWithNulls(StringBuilder jpql,
-                                                     SubscriptionBuilder sb) {
-
-            if (sb.packageId == null) {
-                return;
-            }
-
-            String scope = sb.packageId.getScope();
-            Integer identifier = sb.packageId.getIdentifier();
-            Integer revision = sb.packageId.getRevision();
-
-            if (scope == null) {
-                jpql.append(" AND x.scope IS NULL");
-            } else {
-                jpql.append(" AND x.scope = '" + scope + "'");
-            }
-
-            if (identifier == null) {
-                jpql.append(" AND x.identifier IS NULL");
-            } else {
-                jpql.append(" AND x.identifier = " + identifier);
-            }
-
-            if (revision == null) {
-                jpql.append(" AND x.revision IS NULL");
-            } else {
-                jpql.append(" AND x.revision = " + revision);
-            }
-
-        }
-
-        private static void appendPackageIdWithoutNulls(StringBuilder jpql,
-                                                       SubscriptionBuilder sb) {
-
-            if (sb.packageId == null) {
-                return;
-            }
-
-            String scope = sb.packageId.getScope();
-            Integer identifier = sb.packageId.getIdentifier();
-            Integer revision = sb.packageId.getRevision();
-
-            if (scope != null) {
-                jpql.append(" AND x.scope = '" + scope + "'");
-            }
-
-            if (identifier != null) {
-                jpql.append(" AND x.identifier = " + identifier);
-            }
-
-            if (revision != null) {
-                jpql.append(" AND x.revision = " + revision);
-            }
-
-        }
-
     }
 
 }

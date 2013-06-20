@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.audit.AuditRecord;
@@ -138,8 +139,7 @@ public class SubscriptionRegistry {
 
 		if (existingSubscriptionId < 0) {
 			StringBuffer insertSQL = new StringBuffer("INSERT INTO " + EML_SUBSCRIPTION + "(");
-			insertSQL
-					.append("active,date_created,creator,scope,identifier,revision,url) "
+			insertSQL.append("active,date_created,creator,scope,identifier,revision,url) "
 							+ "VALUES(?,?,?,?,?,?,?)");
 			String insertString = insertSQL.toString();
 
@@ -149,9 +149,28 @@ public class SubscriptionRegistry {
 				pstmt.setBoolean(1, true);
 				pstmt.setTimestamp(2, ts);
 				pstmt.setString(3, creator);
-				pstmt.setString(4, scope);
-				pstmt.setInt(5, identifier);
-				pstmt.setInt(6, revision);
+
+				if (scope == null) { 
+					pstmt.setNull(4, java.sql.Types.VARCHAR); 
+			    } 
+				else { 
+					pstmt.setString(4, scope); 
+			    }
+
+				if (identifier == null) {
+					pstmt.setNull(5, java.sql.Types.INTEGER);
+				}
+				else {
+					pstmt.setInt(5, identifier);
+				}
+				
+				if (revision == null) {
+					pstmt.setNull(6, java.sql.Types.INTEGER);
+				}
+				else {
+					pstmt.setInt(6, revision);
+				}
+
 				pstmt.setString(7, url);
 				pstmt.executeUpdate();
 		        ResultSet rs = pstmt.getGeneratedKeys();
@@ -274,7 +293,7 @@ public class SubscriptionRegistry {
 	 * 
 	 * @return conn the database Connection object
 	 */
-	public Connection getConnection() throws ClassNotFoundException {
+	private Connection getConnection() throws ClassNotFoundException {
 		Connection conn = null;
 		SQLWarning warn;
 
@@ -312,109 +331,6 @@ public class SubscriptionRegistry {
 	}
  
  
-	/**
-	 * Returns a list of data package resource identifiers for the specified
-	 * data package. 
-	 * 
-	 * @param scope      the scope, e.g. "knb-lter-lno"
-	 * @param identifier the identifier integer value, e.g. 2
-	 * @param revision   the revision value, e.g. 1
-	 */
-	public ArrayList<String> getDataPackageResources(String scope, Integer identifier, Integer revision)
-         throws ClassNotFoundException, SQLException, IllegalArgumentException {
-   ArrayList<String> resources = new ArrayList<String>();
-   
-   if (scope != null && identifier != null && revision != null) {
-     Connection connection = null;
-     String selectString = 
-       "SELECT resource_id FROM " + EML_SUBSCRIPTION +
-       "  WHERE scope='" + scope + 
-       "' AND identifier='" + identifier + 
-       "' AND revision='" + revision + "'" +
-       "  ORDER BY date_created";
-   
-     Statement stmt = null;
-   
-     try {
-       connection = getConnection();
-       stmt = connection.createStatement();             
-       ResultSet rs = stmt.executeQuery(selectString);
-     
-       while (rs.next()) {
-         String resourceId = rs.getString("resource_id");
-           resources.add(resourceId);
-       }
-     }
-     catch(ClassNotFoundException e) {
-       logger.error("ClassNotFoundException: " + e.getMessage());
-       throw(e);
-     }
-     catch(SQLException e) {
-       logger.error("SQLException: " + e.getMessage());
-       throw(e);
-     }
-     finally {
-       if (stmt != null) stmt.close();
-       returnConnection(connection);
-     }
-   }
-   else {
-     String message = "One or more of the scope, identifier, or revision values is null";
-     throw new IllegalArgumentException(message);
-   }
-   
-   return resources;
- }
-	
-	
- /**
-  * Gets the principalOwner value for a given resourceId
-  * 
-  * @param resourceId   the resource identifier
-  * @return  the value of the 'principal_owner' field matching
-  *          the specified resourceId ('resource_id') value
-  */
- public String getPrincipalOwner(String resourceId) 
-         throws ClassNotFoundException, SQLException {
-   String principalOwner = null;
-   
-   Connection connection = null;
-   String selectString = 
-           "SELECT principal_owner FROM " + EML_SUBSCRIPTION +
-           "  WHERE resource_id='" + resourceId + "'";
-   logger.debug("selectString: " + selectString);
-
-   Statement stmt = null;
-
-   try {
-     connection = getConnection();
-     stmt = connection.createStatement();
-     ResultSet rs = stmt.executeQuery(selectString);
-
-     while (rs.next()) {
-       principalOwner = rs.getString(1);
-     }
-
-     if (stmt != null) stmt.close();
-   }
-   catch (ClassNotFoundException e) {
-     logger.error("ClassNotFoundException: " + e.getMessage());
-     e.printStackTrace();
-     throw (e);
-   }
-   catch (SQLException e) {
-     logger.error("SQLException: " + e.getMessage());
-     e.printStackTrace();
-     throw (e);
-   }
-   finally {
-     returnConnection(connection);
-   }
-   
-   return principalOwner;
- }
- 
- 
  /*
   * Boolean to determine whether the specified subscription is in the
   * Subscription Registry based on a specified values
@@ -424,10 +340,13 @@ public class SubscriptionRegistry {
  private int hasSubscription(String creator, String scope, Integer identifier, Integer revision, String url)
          throws ClassNotFoundException, SQLException {
    int subscriptionId = -1;
+   String scopeClause = (scope == null) ? "scope IS NULL" : String.format("scope='%s'", scope);
+   String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("identifier=%d", identifier);
+   String revisionClause = (revision == null) ? "revision IS NULL" : String.format("revision=%d", revision);
    Connection connection = null;
    String selectString = 
-     String.format("SELECT subscription_id FROM %s WHERE creator='%s' AND scope='%s' AND identifier=%d AND revision=%d AND url='%s' AND active=true", 
-    		       EML_SUBSCRIPTION, creator, scope, identifier, revision, url
+     String.format("SELECT subscription_id FROM %s WHERE creator='%s' AND %s AND %s AND %s AND url='%s' AND active=true", 
+    		       EML_SUBSCRIPTION, creator, scopeClause, identifierClause, revisionClause, url
     		      );
  
    Statement stmt = null;
@@ -557,58 +476,82 @@ public class SubscriptionRegistry {
  }
  
  
- /**
-  * Boolean to determine whether the specified subscription is present in the
-  * Subscription Registry but was previously de-activated.
-  * 
-  * @param scope        the scope value, e.g. "knb-lter-lno"
-  * @param identifier   the identifier value, e.g. "1"
-  */
- public boolean isDeactivatedSubsription(String scope, Integer identifier, Integer revision)
-         throws ClassNotFoundException, SQLException {
-   boolean isDeactivated = false;
-   Connection connection = null;
-   String selectString = 
-     "SELECT count(*) FROM " + EML_SUBSCRIPTION +
-     "  WHERE scope='" + scope + "' AND " +
-     "        identifier='" + identifier + "' AND " +
-     "        revision='" + revision + "' AND " +
-     "        active='false'";
- 
-   Statement stmt = null;
- 
-   try {
-     connection = getConnection();
-     stmt = connection.createStatement();             
-     ResultSet rs = stmt.executeQuery(selectString);
-   
-     while (rs.next()) {
-       int count = rs.getInt("count");
-       isDeactivated = (count > 0);
-     }
+	/**
+	 * Retrieves a subscription based on its subscription ID. The user who is reading
+	 * the subscription must be the same as the user who created the subscription.
+	 * 
+	 * @param subscriptionId    the subscription ID value
+	 * @param uid  the user id
+	 * @return the subscription XML string, if successful
+	 */
+	public EmlSubscription getSubscription(Integer subscriptionId, String uid)
+			throws ClassNotFoundException, SQLException, Exception {
+		EmlSubscription emlSubscription = null;
+		String creator = null;
 
-     if (stmt != null) stmt.close();
-   }
-   catch(ClassNotFoundException e) {
-     logger.error("ClassNotFoundException: " + e.getMessage());
-     throw(e);
-   }
-   catch(SQLException e) {
-     logger.error("SQLException: " + e.getMessage());
-     throw(e);
-   }
-   finally {
-     returnConnection(connection);
-   }
-   
-   return isDeactivated;
- }
- 
- 
+		if (!hasSubscription(subscriptionId)) {
+			String msg = String.format("Subscription with ID = %d was not found or may have been deleted.",
+							           subscriptionId);
+			throw new ResourceNotFoundException(msg);
+		}
+
+		Connection conn = getConnection();
+
+		if (conn != null) {
+
+			String selectString = String.format("SELECT date_created, creator, scope, identifier, revision, url FROM %s WHERE subscription_id = %s and active='true'",
+							                    EML_SUBSCRIPTION, subscriptionId);
+			logger.debug(selectString);
+			Statement stmt = null;
+
+			try {
+				stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(selectString);
+
+				while (rs.next()) {
+					//java.sql.Timestamp sqlTimestamp = rs.getTimestamp(1);
+					creator = rs.getString(2);
+					String scope = rs.getString(3);
+					Object identifierObj = rs.getObject(4);
+					Integer identifier = identifierObj == null ? null : (Integer) identifierObj;
+					Object revisionObj = rs.getObject(5);
+					Integer revision = revisionObj == null ? null : (Integer) revisionObj;
+					String url = rs.getString(6);
+					emlSubscription = new EmlSubscription();
+					emlSubscription.setSubscriptionId(subscriptionId);
+					emlSubscription.setCreator(creator);
+					emlSubscription.setScope(scope);
+					emlSubscription.setIdentifier(identifier);
+					emlSubscription.setRevision(revision);
+					emlSubscription.setUrl(url);
+				}
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			}
+			finally {
+				if (stmt != null)
+					stmt.close();
+				returnConnection(conn);
+			}
+		}
+
+	    if (creator == null || !creator.equals(uid)) {
+	    	String msg = String.format("User '%s' is not authorized to read subscription with ID = %d", 
+	    			                   uid, subscriptionId);
+	    	throw new UnauthorizedException(msg);
+	    }
+
+	    return emlSubscription;
+	}
+
+	
 	/**
 	 * Gets a list of EML subscriptions from the 'emlsubscription' table
 	 * matching the provided criteria.
 	 * 
+	 * @param userId the user id
 	 * @param queryParams
 	 *            a map of query parameters and the values they should be
 	 *            matched to
@@ -617,7 +560,7 @@ public class SubscriptionRegistry {
 	 * @throws SQLException
 	 * @throws IllegalArgumentException
 	 */
-	public List<EmlSubscription> getSubscriptions(Map<String, List<String>> queryParams)
+	public List<EmlSubscription> getSubscriptions(String userId, Map<String, List<String>> queryParams)
 			throws ClassNotFoundException, SQLException,
 			IllegalArgumentException {
 		List<EmlSubscription> emlSubscriptions = new ArrayList<EmlSubscription>();
@@ -625,7 +568,7 @@ public class SubscriptionRegistry {
 		if (queryParams != null) {
 			Connection connection = null;
 
-			String whereClause = composeWhereClause(queryParams);
+			String whereClause = composeWhereClause(userId, queryParams);
 			String selectString = String
 					.format("SELECT subscription_id, date_created, creator, scope, identifier, revision, url FROM %s %s",
 							EML_SUBSCRIPTION, whereClause);
@@ -639,11 +582,13 @@ public class SubscriptionRegistry {
 
 				while (rs.next()) {
 					int subscriptionId = rs.getInt(1);
-					java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
+					//java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
 					String creator = rs.getString(3);
 					String scope = rs.getString(4);
-					Integer identifier = rs.getInt(5);
-					Integer revision = rs.getInt(6);
+					Object identifierObj = rs.getObject(5);
+					Integer identifier = identifierObj == null ? null : (Integer) identifierObj;
+					Object revisionObj = rs.getObject(6);
+					Integer revision = revisionObj == null ? null : (Integer) revisionObj;
 					String url = rs.getString(7);
 					EmlSubscription emlSubscription = new EmlSubscription();
                     emlSubscription.setSubscriptionId(subscriptionId);
@@ -677,10 +622,84 @@ public class SubscriptionRegistry {
 	}
 
 
-	private String composeWhereClause(Map<String, List<String>> queryParams) {
+	/**
+	 * Gets a list of EML subscriptions from the 'emlsubscription' table
+	 * matching the specified package id.
+	 * 
+	 * @param queryParams
+	 *            a map of query parameters and the values they should be
+	 *            matched to
+	 * @return a list of matching EmlSubscription objects
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws IllegalArgumentException
+	 */
+	public List<EmlSubscription> getSubscriptions(EmlPackageId emlPackageId)
+			throws ClassNotFoundException, SQLException,
+			IllegalArgumentException {
+		List<EmlSubscription> emlSubscriptions = new ArrayList<EmlSubscription>();
+
+		if (emlPackageId != null) {
+			Connection connection = null;
+
+			String whereClause = composeWhereClause(emlPackageId);
+			String selectString = String
+					.format("SELECT subscription_id, date_created, creator, scope, identifier, revision, url FROM %s %s",
+							EML_SUBSCRIPTION, whereClause);
+			logger.debug(selectString);
+			Statement stmt = null;
+
+			try {
+				connection = getConnection();
+				stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery(selectString);
+
+				while (rs.next()) {
+					int subscriptionId = rs.getInt(1);
+					//java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
+					String creator = rs.getString(3);
+					String scope = rs.getString(4);
+					Object identifierObj = rs.getObject(5);
+					Integer identifier = identifierObj == null ? null : (Integer) identifierObj;
+					Object revisionObj = rs.getObject(6);
+					Integer revision = revisionObj == null ? null : (Integer) revisionObj;
+					String url = rs.getString(7);
+					EmlSubscription emlSubscription = new EmlSubscription();
+                    emlSubscription.setSubscriptionId(subscriptionId);
+					//java.util.Date entryTime = new
+					//java.util.Date(sqlTimestamp.getTime());
+					//emlSubscription.setEntryTime(entryTime);
+					emlSubscription.setCreator(creator);
+					emlSubscription.setScope(scope);
+					emlSubscription.setIdentifier(identifier);
+					emlSubscription.setRevision(revision);
+					emlSubscription.setUrl(url);
+					emlSubscriptions.add(emlSubscription);			 
+				}
+			}
+			catch (ClassNotFoundException e) {
+				logger.error("ClassNotFoundException: " + e.getMessage());
+				throw (e);
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			}
+			finally {
+				if (stmt != null)
+					stmt.close();
+				returnConnection(connection);
+			}
+		}
+
+		return emlSubscriptions;
+	}
+
+
+	private String composeWhereClause(String userId, Map<String, List<String>> queryParams) {
 		String whereClause = null;
 
-		StringBuffer stringBuffer = new StringBuffer(" WHERE active='true'");
+		StringBuffer stringBuffer = new StringBuffer(String.format(" WHERE active='true' AND creator='%s'", userId));
 
 		for (String key : queryParams.keySet()) {
 			stringBuffer.append(" AND ");
@@ -689,6 +708,24 @@ public class SubscriptionRegistry {
 			stringBuffer.append(orClause);
 		}
 
+		whereClause = stringBuffer.toString();
+		return whereClause;
+	}
+
+
+	private String composeWhereClause(EmlPackageId emlPackageId) {
+		String whereClause = null;
+
+		StringBuffer stringBuffer = new StringBuffer(" WHERE active='true'");
+		
+		String scope = emlPackageId.getScope();
+		String scopeClause = (scope == null) ? "scope IS NULL" : String.format("(scope='%s' OR scope IS NULL)", scope);
+		Integer identifier = emlPackageId.getIdentifier();
+		String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("(identifier=%d OR identifier IS NULL)", identifier);
+		Integer revision = emlPackageId.getRevision();
+		String revisionClause = (revision == null) ? "revision IS NULL" : String.format("(revision=%d OR revision IS NULL)", revision);
+		stringBuffer.append(String.format(" AND %s AND %s AND %s", scopeClause, identifierClause, revisionClause));
+		
 		whereClause = stringBuffer.toString();
 		return whereClause;
 	}
@@ -726,60 +763,9 @@ public class SubscriptionRegistry {
 
 
  /**
-  * 
-  * @param scope
-  */
- public ArrayList<String> listSubscriptions(String scope, Integer identifier, Integer revision)
-   throws ClassNotFoundException, SQLException, IllegalArgumentException {
-     ArrayList<String> entityList = new ArrayList<String>();
-     
-     if (scope != null && identifier != null && revision != null) {
-       Connection connection = null;
-       String selectString = 
-         "SELECT subscription_id FROM " + EML_SUBSCRIPTION +
-         "  WHERE scope='" + scope + 
-         "' AND identifier='" + identifier + 
-         "' AND revision='" + revision +
-         "  AND active='true'";
-     
-       Statement stmt = null;
-     
-       try {
-         connection = getConnection();
-         stmt = connection.createStatement();             
-         ResultSet rs = stmt.executeQuery(selectString);
-       
-         while (rs.next()) {
-           String subscription_id = rs.getString("subscription_id");
-           entityList.add(subscription_id);
-         }
-       }
-       catch(ClassNotFoundException e) {
-         logger.error("ClassNotFoundException: " + e.getMessage());
-         throw(e);
-       }
-       catch(SQLException e) {
-         logger.error("SQLException: " + e.getMessage());
-         throw(e);
-       }
-       finally {
-         if (stmt != null) stmt.close();
-         returnConnection(connection);
-       }
-     }
-     else {
-       String message = "One or more of the scope, identifier, or revision values is null";
-       throw new IllegalArgumentException(message);
-     }
-     
-     return entityList;
- }
-
- 
- /**
   * Closes the connection to the database.
   */
- public void returnConnection(Connection conn) {
+ private void returnConnection(Connection conn) {
    try {
      // Close the database connection
      logger.debug("Closing the database connection");

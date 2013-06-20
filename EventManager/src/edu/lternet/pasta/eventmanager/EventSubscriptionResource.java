@@ -49,34 +49,22 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.FileUtility;
-import edu.lternet.pasta.common.MethodNameUtility;
 import edu.lternet.pasta.common.QueryString;
 import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.XmlParsingException;
-import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
-import edu.lternet.pasta.common.security.authorization.AccessMatrix;
-import edu.lternet.pasta.common.security.authorization.InvalidPermissionException;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 
 /**
@@ -241,73 +229,6 @@ public final class EventSubscriptionResource extends EventManagerResource {
     
     
     /**
-     * Boolean to determine whether the user contained in the AuthToken
-     * is authorized to execute the specified service method.
-     * 
-     * @param serviceMethodName     the name of the service method
-     * @param authToken             the AuthToken containing the user name
-     * @return  true if authorized to run the service method, else false
-     */
-    private boolean isServiceMethodAuthorized(String serviceMethodName, 
-                                              Rule.Permission permission, 
-                                              AuthToken authToken) {
-      boolean isAuthorized = false;
-      NodeList nodeList = null;    
-      String serviceDocumentStr = ConfigurationListener.getServiceDocument();
-      Document document = XmlUtility.xmlStringToDoc(serviceDocumentStr);
-      
-      try {
-        if (document != null) {
-          NodeList documentNodeList = document.getChildNodes();
-          Node rootNode = documentNodeList.item(0);
-          nodeList = rootNode.getChildNodes();
-          
-          if (nodeList != null) {
-            int nodeListLength = nodeList.getLength();
-            for (int i = 0; i < nodeListLength; i++) {
-              Node childNode = nodeList.item(i);
-              String nodeName = childNode.getNodeName();
-              String nodeValue = childNode.getNodeValue();
-              if (nodeName.contains("service-method")) {
-                Element serviceElement = (Element) nodeList.item(i);
-                NamedNodeMap serviceAttributesList = serviceElement.getAttributes();
-                
-                for (int j = 0; j < serviceAttributesList.getLength(); j++) {
-                  Node attributeNode = serviceAttributesList.item(j);
-                  nodeName = attributeNode.getNodeName();
-                  nodeValue = attributeNode.getNodeValue();
-                  if (nodeName.equals("name")) {
-                    String name = nodeValue;
-                    if (name.equals(serviceMethodName)) {
-                      NodeList accessNodeList = serviceElement
-                              .getElementsByTagName("access");
-                      Node accessNode = accessNodeList.item(0);
-                      String accessXML = XmlUtility.nodeToXmlString(accessNode);
-                      AccessMatrix accessMatrix = new AccessMatrix(accessXML);
-                      String principalOwner = "pasta";
-                      isAuthorized = accessMatrix.isAuthorized(authToken,
-                        principalOwner, permission);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        else {
-          String message = "No service methods were found in the service.xml file";
-          throw new IllegalStateException(message);
-        }
-      }
-      catch (InvalidPermissionException e) {
-        throw new IllegalStateException(e);
-      }
-
-      return isAuthorized;
-    }
-
-
-    /**
      * Creates a new subscription in the Event Manager's subscription database.
      *
      * <h4>Request entity:</h4>
@@ -405,14 +326,13 @@ public final class EventSubscriptionResource extends EventManagerResource {
     			    + " is not authorized to execute service method " + serviceMethodName);
     		}
 
-            SubscriptionBuilder subscriptionBuilder = xmlSubscriptionFormatV1.parse(requestBody);
-            subscriptionBuilder.setCreator(userId);
-            EmlSubscription emlSubscription = subscriptionBuilder.build();
+    		EmlSubscription emlSubscription  = xmlSubscriptionFormatV1.parse(requestBody);
+    		emlSubscription.setCreator(userId);
             String creator = emlSubscription.getCreator();
             String scope = emlSubscription.getScope();
             Integer identifier = emlSubscription.getIdentifier();
             Integer revision = emlSubscription.getRevision();
-            String url = emlSubscription.getUrl();          
+            String url = emlSubscription.getUrl().toString();          
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
             int subscriptionId = subscriptionRegistry.addSubscription(creator, scope, identifier, revision, url);
             URI uri = URI.create(String.format("%d", subscriptionId));
@@ -562,57 +482,67 @@ public final class EventSubscriptionResource extends EventManagerResource {
     public Response getSubscriptionWithId(@Context HttpHeaders headers,
                       @PathParam("subscriptionId") String subscriptionId) {
 
-        SubscriptionService service = null;
-        String method = MethodNameUtility.methodName();
-        EmlPackageIdFormat format = new EmlPackageIdFormat();
-        AuthToken token = null;
-        String msg = null, resourceId = null;
-        Response r = null;
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.read;
+        Response response = null;
+        final String serviceMethodName = "getMatchingSubscriptions";
 
         try {
-            assertAuthorizedToRead(headers, method);
-            token = AuthTokenFactory.makeAuthToken(headers.getCookies());
+    		authToken = getAuthToken(headers);
+    		String userId = authToken.getUserId();
+
+    		// Is user authorized to run the 'getSubscriptionWithId' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			String errorMsg = String.format("User %s is not authorized to execute service method %s.",
+    					                        userId, serviceMethodName);
+    			throw new UnauthorizedException(errorMsg);
+    		}
 
             Integer id = parseSubscriptionId(subscriptionId);
-            service = getSubscriptionService();
-            EmlSubscription s = service.get(id, token);
-            String xml = xmlSubscriptionFormatV1.format(s);
-            resourceId = format.format(s.getPackageId());
-
-            r = Response.ok(xml, MediaType.APPLICATION_XML).build();
-
-            return r;
-
-        } catch (IllegalArgumentException e) {
-          r = WebExceptionFactory.makeBadRequest(e).getResponse();
-          msg = e.getMessage();
-          return r;
-
-        } catch (UnauthorizedException e) {
-            r = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            EmlSubscription emlSubscription = subscriptionRegistry.getSubscription(id, userId);
+            String xml = emlSubscription.toXML();
+            response = Response.ok(xml, MediaType.APPLICATION_XML).build();
+        } 
+		catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+        catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceNotFoundException e) {
-            r = WebExceptionFactory.makeNotFound(e).getResponse();
+        } 
+        catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceDeletedException e) {
-            r = WebExceptionFactory.makeGone(e).getResponse();
+        } 
+        catch (ResourceDeletedException e) {
+            response = WebExceptionFactory.makeGone(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (WebApplicationException e) {
-            r = e.getResponse();
+        } 
+        catch (WebApplicationException e) {
+            response = e.getResponse();
             msg = e.getMessage();
-            return r;
-
-        } finally {
-            audit(method, token, r, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
     }
 
+    
     /**
      * Returns the subscriptions whose attributes match those specified in
      * the query string. If a query string is omitted, all subscriptions in the
@@ -714,7 +644,6 @@ public final class EventSubscriptionResource extends EventManagerResource {
     @Produces(value={MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public Response getMatchingSubscriptions(@Context HttpHeaders headers,
                                              @Context UriInfo uriInfo) {
-
         AuthToken authToken = null;
         String msg = null;
         Rule.Permission permission = Rule.Permission.read;
@@ -739,7 +668,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
             Map<String, List<String>> queryParams = queryString.getParams();
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
-            List<EmlSubscription> emlSubscriptions = subscriptionRegistry.getSubscriptions(queryParams);
+            List<EmlSubscription> emlSubscriptions = subscriptionRegistry.getSubscriptions(userId, queryParams);
             String xml = toXML(emlSubscriptions);
             response = Response.ok(xml, MediaType.APPLICATION_XML).build();
         } 

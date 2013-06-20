@@ -44,7 +44,6 @@ import org.junit.runners.Parameterized.Parameters;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
 import edu.lternet.pasta.eventmanager.SubscribedUrl;
-import edu.lternet.pasta.eventmanager.EmlSubscription.JpqlFactory;
 import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 @RunWith(Enclosed.class)
@@ -52,7 +51,7 @@ public class TestEmlSubscription {
 
     public static class TestSimply {
         
-        private SubscriptionBuilder sb;
+        private EmlSubscription sb;
         private String creator = "test_creator";
         private String scope = "lno";
         private Integer id = 12;
@@ -62,27 +61,27 @@ public class TestEmlSubscription {
         
         @Before
         public void init() {
-            sb = new SubscriptionBuilder();
+            sb = new EmlSubscription();
             sb.setCreator(creator);
-            sb.setEmlPackageId(packageId);
-            sb.setUrl(url);
+            sb.setPackageId(packageId);
+            sb.setUrl(url.toString());
         }
 
         @Test
         public void testIsActive() {
-            assertTrue(sb.build().isActive());
+            assertTrue(sb.isActive());
         }
         
         @Test
         public void testInactivate() {
-            EmlSubscription s = sb.build();
+            EmlSubscription s = new EmlSubscription();
             s.inactivate();
             assertFalse(s.isActive());
         }
         
         @Test
         public void testGetSubscriptionId() {
-            assertNull(sb.build().getSubscriptionId());
+            assertNull(sb.getSubscriptionId());
         }
         
         // Not testing getSubscriptionId() after persisting to a database.
@@ -90,31 +89,31 @@ public class TestEmlSubscription {
         
         @Test
         public void testSetCreator() {
-            assertEquals(creator, sb.build().getCreator());
+            assertEquals(creator, sb.getCreator());
         }
         
         @Test
         public void testSetEmlPackageIdScope() {
-            assertEquals(scope, sb.getEmlPackageId().getScope());
-            assertEquals(scope, sb.build().getScope());
+            assertEquals(scope, sb.getPackageId().getScope());
+            assertEquals(scope, sb.getScope());
         }
         
         @Test
         public void testSetEmlPakcageIdIdentifier() {
-            assertEquals(id, sb.getEmlPackageId().getIdentifier());
-            assertEquals(id, sb.build().getIdentifier());
+            assertEquals(id, sb.getPackageId().getIdentifier());
+            assertEquals(id, sb.getIdentifier());
         }
         
         @Test
         public void testSetEmlPackageIdRevision() {
-            assertEquals(rev, sb.getEmlPackageId().getRevision());
-            assertEquals(rev, sb.build().getRevision());
+            assertEquals(rev, sb.getPackageId().getRevision());
+            assertEquals(rev, sb.getRevision());
         }
         
         @Test
         public void testSetUri() {
             assertEquals(url, sb.getUrl());
-            assertEquals(url.toString(), sb.build().getUrl());
+            assertEquals(url.toString(), sb.getUrl());
         }
         
         @Test(expected = IllegalArgumentException.class)
@@ -134,49 +133,9 @@ public class TestEmlSubscription {
 
         @Test(expected = IllegalArgumentException.class)
         public void testSetEmlPackgaeIdWithNull() {
-            sb.setEmlPackageId(null);
+            sb.setPackageId(null);
         }
-        
-        @Test
-        public void testClearCreator() {
-            sb.clearCreator();
-            assertNull(sb.getCreator());
-            assertEquals(packageId, sb.getEmlPackageId());
-            assertEquals(url, sb.getUrl());
-        }
-        
-        @Test
-        public void testClearEmlPackageId() {
-            sb.clearEmlPackageId();
-            assertNull(sb.getEmlPackageId());
-            assertEquals(creator, sb.getCreator());
-            assertEquals(url, sb.getUrl());
-        }
-        
-        @Test
-        public void testClearUrl() {
-            sb.clearUrl();
-            assertNull(sb.getUrl());
-            assertEquals(creator, sb.getCreator());
-            assertEquals(packageId, sb.getEmlPackageId());
-        }
-        
-        @Test
-        public void testClearAll() {
-            sb.clearAll();
-            assertNull(sb.getCreator());
-            assertNull(sb.getEmlPackageId());
-            assertNull(sb.getUrl());
-        }
-        
-        @Test
-        public void testToBuilder() {
-            SubscriptionBuilder sb2 = sb.build().toBuilder();
-            assertNotSame(sb, sb2);
-            assertEquals(creator, sb2.getCreator());
-            assertEquals(packageId, sb2.getEmlPackageId());
-            assertEquals(url, sb2.getUrl());
-        }
+                
     }
     
     @RunWith(value=Parameterized.class)
@@ -238,29 +197,5 @@ public class TestEmlSubscription {
             sb.build();
         }
         
-        @Test
-        public void testMakeWithPackageIdNulls() {
-            
-            boolean containsIsNull = 
-                JpqlFactory.makeWithPackageIdNulls(sb).contains("IS NULL");
-            
-            EmlPackageId epi = sb.getEmlPackageId();
-            
-            if (epi == null || epi.allElementsHaveValues()) {
-                assertFalse(containsIsNull);
-            } else {
-                assertTrue(containsIsNull);
-            }
-            
-        }
-        
-        @Test
-        public void testMakeWithoutPackageIdNulls() {
-
-            boolean containsIsNull = 
-                JpqlFactory.makeWithoutPackageIdNulls(sb).contains("IS NULL");
-            
-            assertFalse(containsIsNull);
-        }
     }
 }
