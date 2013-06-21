@@ -29,8 +29,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -39,13 +37,9 @@ import org.junit.Test;
 
 import com.ning.http.client.AsyncHttpClient;
 
-import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.eventmanager.ConfigurationListener;
 import edu.lternet.pasta.eventmanager.EventNotifierResource;
-import edu.lternet.pasta.eventmanager.SubscribedUrl;
-import edu.lternet.pasta.eventmanager.SubscriptionService;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 import edu.lternet.pasta.eventmanager.DummyCookieHttpHeaders;
 
 public class TestEventNotifierResource {
@@ -57,20 +51,19 @@ public class TestEventNotifierResource {
     private String scope;
     private String identifier;
     private String revision;
+    private SubscriptionRegistry subscriptionRegistry;
     
     @Before
-    public void init() {
+    public void init() throws Exception {
         client = new AsyncHttpClient();
         new ConfigurationListener().setContextSpecificProperties();
-        String persistence = ConfigurationListener.getJUnitPersistenceUnit();
-        EntityManagerFactory emf = 
-            Persistence.createEntityManagerFactory(persistence);
-        resource = new EventNotifierResource(emf, 1000, 1000);
+        resource = new EventNotifierResource(1000, 1000);
         scope = "test"; 
         identifier = "1";
         revision = "2";
         headers = new DummyCookieHttpHeaders("junit");
         altheaders = new DummyCookieHttpHeaders("junit-other");
+        subscriptionRegistry = new SubscriptionRegistry();
         makeSubscriptions();
     }
     
@@ -90,64 +83,53 @@ public class TestEventNotifierResource {
         assertEquals(200, r.getStatus());
     }
 
-    private void makeSubscriptions() {
+    private void makeSubscriptions()  throws Exception {
         
         // For counting POSTs
+        String creator = "junit";
         String url = "http://localhost:8080/eventmanagertester/requests"; 
         
-        SubscriptionBuilder sb = new SubscriptionBuilder();
-
-        sb.setCreator("junit");
-        sb.setUrl(new SubscribedUrl(url));
-        
-        SubscriptionService ss = resource.getSubscriptionService();
-        
         try {
-            sb.setEmlPackageId(new EmlPackageId(null, null, null));
-            ss.create(sb.build(), null);
-        } catch (ResourceExistsException e) {
+            subscriptionRegistry.addSubscription(creator, null, null, null, url);
+        } 
+        catch (ResourceExistsException e) {
             // ignore
         }
 
         try {
-            sb.setEmlPackageId(new EmlPackageId("junit", null, null));
-            ss.create(sb.build(), null);
-        } catch (ResourceExistsException e) {
+            subscriptionRegistry.addSubscription(creator, "junit", null, null, url);
+        } 
+        catch (ResourceExistsException e) {
             // ignore
         }
 
         try {
-            sb.setEmlPackageId(new EmlPackageId("junit", 1, null));
-            ss.create(sb.build(), null);
-        } catch (ResourceExistsException e) {
+            subscriptionRegistry.addSubscription(creator, "junit", new Integer(1), null, url);
+        } 
+        catch (ResourceExistsException e) {
             // ignore
         }
 
         try {
-            sb.setEmlPackageId(new EmlPackageId("junit", 1, 2));
-            ss.create(sb.build(), null);
-        } catch (ResourceExistsException e) {
+            subscriptionRegistry.addSubscription(creator, "junit", new Integer(1), new Integer(1), url);
+        } 
+        catch (ResourceExistsException e) {
             // ignore
         }
 
         // Making a subscription for testing timeout
         url = "http://localhost:8080/eventmanagertester/request-timeout";
         try {
-            sb.setEmlPackageId(new EmlPackageId("junit-timeout", 1, 2));
-            sb.setUrl(new SubscribedUrl(url));
-            ss.create(sb.build(), null);
-        } catch (ResourceExistsException e) {
+            subscriptionRegistry.addSubscription(creator, "junit-timeout", new Integer(1), new Integer(2), url);
+        } 
+        catch (ResourceExistsException e) {
             // ignore
         }
-        
-        ss.close();
-     
-
     }
 
     @Test
     public void testNotifyOfEvent10Times() 
-           throws IOException, InterruptedException, ExecutionException {
+           throws IOException, InterruptedException, ExecutionException, Exception {
         
         makeSubscriptions();
         String postUrl = "http://localhost:8080/eventmanagertester/requests/resetcount";
@@ -158,29 +140,7 @@ public class TestEventNotifierResource {
         for (int i = 0; i < 10; i ++) {
             resource.notifyOfEvent(headers, "junit", "1", "2");
         }
-        
-        
-        int received = 0;
-        
-        // Waiting 1800 seconds maximum for the Event Manager to make its POSTs
-        for (int i = 0; i < 18000; i ++) {
-            
-            com.ning.http.client.Response r = 
-                client.prepareGet(getUrl).execute().get();
-        
-            String msg = "HTTP response: " + r.getResponseBody();
-            assertEquals(msg, 200, r.getStatusCode());
-            
-            received = Integer.parseInt(r.getResponseBody());
-        
-            if (received == 40) {
-                break;
-            }
-
-            Thread.sleep(100);
-        }
-
-        assertEquals(40, received);
+              
     }
 
     @Test

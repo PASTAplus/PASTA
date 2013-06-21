@@ -39,7 +39,6 @@ import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
 import edu.lternet.pasta.eventmanager.SubscribedUrl;
 import edu.lternet.pasta.eventmanager.XmlSubscriptionFormatV1;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 public class TestXmlSubscriptionFormatV1 {
     
@@ -67,14 +66,14 @@ public class TestXmlSubscriptionFormatV1 {
         
         String xml = FileUtility.fileToString(goodFile);
         
-        SubscriptionBuilder sb = formatter.parse(xml);
-        EmlPackageId epi = sb.getEmlPackageId();
+        EmlSubscription emlSubscription = formatter.parse(xml);
+        EmlPackageId epi = emlSubscription.getPackageId();
         
-        assertNull(sb.getCreator());
+        assertNull(emlSubscription.getCreator());
         assertEquals("lter-lno", epi.getScope());
         assertEquals(12, epi.getIdentifier().intValue());
         assertEquals(74, epi.getRevision().intValue());
-        assertEquals("http://foo?bar&blah", sb.getUrl().toString());
+        assertEquals("http://foo?bar&blah", emlSubscription.getUrl().toString());
     }
     
     @Test(expected=XmlParsingException.class)
@@ -85,12 +84,12 @@ public class TestXmlSubscriptionFormatV1 {
     
     private EmlSubscription makeSubscription() {
         
-        SubscriptionBuilder sb = new SubscriptionBuilder();
-        sb.setCreator("jwright");
-        sb.setEmlPackageId(new EmlPackageId("lter-lno", 12, 74));
-        sb.setUrl(new SubscribedUrl("http://foo?bar&blah")); // with &
+        EmlSubscription sb = new EmlSubscription();
+        sb.setCreator("junit");
+        sb.setPackageId(new EmlPackageId("lter-lno", 12, 74));
+        sb.setUrl(new SubscribedUrl("http://foo?bar&blah").toString()); // with &
         
-        return sb.build();
+        return sb;
     }
     
     @Test
@@ -98,7 +97,7 @@ public class TestXmlSubscriptionFormatV1 {
         
         String xml = formatter.format(makeSubscription());
 
-        assertTrue(xml.contains("<creator>jwright</creator>"));
+        assertTrue(xml.contains("<creator>junit</creator>"));
         assertTrue(xml.contains("<packageId>lter-lno.12.74</packageId>"));        
         assertTrue(xml.contains("<url>http://foo?bar&amp;blah</url>"));        
         assertFalse(xml.contains("<id>"));
@@ -112,7 +111,7 @@ public class TestXmlSubscriptionFormatV1 {
         String xml = formatter.format(c);
         
         assertTrue(xml.contains("<subscriptions>"));
-        assertTrue(xml.contains("<creator>jwright</creator>"));
+        assertTrue(xml.contains("<creator>junit</creator>"));
         assertTrue(xml.contains("<packageId>lter-lno.12.74</packageId>"));        
         assertTrue(xml.contains("<url>http://foo?bar&amp;blah</url>"));        
         assertFalse(xml.contains("<id>"));
