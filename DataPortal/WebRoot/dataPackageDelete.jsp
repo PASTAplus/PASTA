@@ -62,7 +62,8 @@
 				<legend>Delete</legend>
 
 				<p>Delete a data package using the package scope and identifier
-					(e.g. scope.identifer)</p>
+					(e.g. <code>myscope.100</code>). 
+				<p><em>Please note: Deletion of a data package is permanent and should be given due consideration. Once deleted, no additional data packages can be uploaded with the specified combination of scope and identifier.</em></p>
 
 				<div class="section">
 					<form id="datapackagedelete" name="datapackagedelete" method="post"
