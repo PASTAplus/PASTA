@@ -36,10 +36,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,20 +56,24 @@ public class TestEventSubscriptionResource {
     public void init() {
         new ConfigurationListener().setContextSpecificProperties();
         clearDatabase();
-        headers = new DummyCookieHttpHeaders("anonymous");
+        headers = new DummyCookieHttpHeaders("junit");
         resource = new EventSubscriptionResource();
     }
 
-    private void clearDatabase() {
 
-        /*Query query = em.createQuery("DELETE FROM EmlSubscription x");
-        
-        em.getTransaction().begin();
-        query.executeUpdate();
-        em.getTransaction().commit();
-        
-        em.close();*/
-    }
+	private void clearDatabase() {
+		try {
+			SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+			subscriptionRegistry.deleteTestSubscriptions();
+		}
+		catch (Exception e) {
+			System.err
+					.println(String
+							.format("Failed to clear the database of JUnit subscriptions prior to testing: %s",
+									e.getMessage()));
+		}
+	}
+
 
     @Test
     public void testValidQueryKeys() {
@@ -119,7 +123,10 @@ public class TestEventSubscriptionResource {
     }
     
     private String getSubscriptionId(Response createResponse) {
-        URI uri = (URI) createResponse.getMetadata().get("Location").get(0);
+    	MultivaluedMap<String, Object> mvMap = createResponse.getMetadata();
+    	List<Object> objectList = mvMap.get("Location");
+    	Object firstObject = objectList.get(0);
+        URI uri = (URI) firstObject;
         String[] parts = uri.toString().split("/");
         return parts[parts.length - 1];
     }
@@ -162,7 +169,7 @@ public class TestEventSubscriptionResource {
         
         assertTrue(xml.contains("<subscription type=\"eml\">"));
         assertTrue(xml.contains("<id>" + id + "</id>"));
-        assertTrue(xml.contains("<creator>anonymous</creator>"));
+        assertTrue(xml.contains("<creator>junit</creator>"));
         assertTrue(xml.contains("<packageId>test.1.2</packageId>"));
         assertTrue(xml.contains("<url>http://test</url>"));
         
@@ -180,7 +187,7 @@ public class TestEventSubscriptionResource {
         String xml = (String) r.getEntity();
         
         assertContainsSubscription(xml, id);
-        assertFalse(xml.contains("<subscriptions>"));
+        assertTrue(xml.contains("<subscriptions>"));
     }
 
     @Test
@@ -258,42 +265,21 @@ public class TestEventSubscriptionResource {
         
         String xml = (String) r.getEntity();
         
-        assertTrue(xml.contains("<subscriptions/>"));
+        boolean containsSubscriptions = xml.contains("</subscriptions>");
+        assertTrue(containsSubscriptions);
     }
     
     @Test
     public void testGetMatchingSubscriptionsWithBadKey() {
         
         Map<String, String> query = 
-            Collections.singletonMap("bad", "anonymous");
+            Collections.singletonMap("bad", "junit");
         UriInfo uriInfo = new DummyUriInfo(query);
 
         Response r = resource.getMatchingSubscriptions(headers, uriInfo);
         assertEquals(400, r.getStatus());
     }
     
-    @Test
-    public void testGetMatchingSubscriptionsWithBadPackageId() {
-        
-        Map<String, String> query = 
-            Collections.singletonMap("revision", "2");
-        UriInfo uriInfo = new DummyUriInfo(query);
-
-        Response r = resource.getMatchingSubscriptions(headers, uriInfo);
-        assertEquals(400, r.getStatus());
-    }
-    
-    @Test
-    public void testGetMatchingSubscriptionsWithBadUrl() {
-        
-        Map<String, String> query = 
-            Collections.singletonMap("url", "bad");
-        UriInfo uriInfo = new DummyUriInfo(query);
-
-        Response r = resource.getMatchingSubscriptions(headers, uriInfo);
-        assertEquals(400, r.getStatus());
-    }
-
     @Test
     public void testDeleteSubscription() {
         

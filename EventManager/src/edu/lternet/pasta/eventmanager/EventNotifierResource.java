@@ -26,7 +26,6 @@ package edu.lternet.pasta.eventmanager;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.POST;
@@ -58,13 +57,10 @@ import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.WebResponseFactory;
 import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
-import edu.lternet.pasta.common.security.access.AccessControllerFactory;
-import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 /**
  * A JAX-RS RESTful implementation of the <em>event notification</em> component
@@ -94,9 +90,6 @@ public final class EventNotifierResource extends EventManagerResource {
 
     private static final Logger logger =
                                 Logger.getLogger(EventNotifierResource.class);
-
-    private static final String SERVICE_OWNER = "pasta";
-
     
     /* 
      * Instance variables 
@@ -189,7 +182,8 @@ public final class EventNotifierResource extends EventManagerResource {
     protected void finalize() throws Throwable {
         try {
             asyncHttpClient.close();
-        } finally {
+        } 
+        finally {
             super.finalize();
         }
     }

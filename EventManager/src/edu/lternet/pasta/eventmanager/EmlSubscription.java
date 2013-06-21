@@ -43,7 +43,7 @@ public class EmlSubscription {
 	/* Instance variables */
 
     private Integer subscriptionId;
-    private boolean active;
+    private boolean active = true;
     private String creator;
     private String scope;
     private Integer identifier;
@@ -127,6 +127,7 @@ public class EmlSubscription {
         return identifier;
     }
 
+    
     /**
      * Returns the revision of the EML packageId.
      *
@@ -263,176 +264,6 @@ public class EmlSubscription {
         sb.append(",packageId=" + scope + "." + identifier + "." + revision);
         sb.append(",uri=" + url);
         return sb.toString();
-    }
-
-    
-    /**
-     * Used to build subscriptions. Subscription builders have three attributes:
-     * a subscription's creator, its EML packageId, and its URI.
-     * Upon construction, these attributes are all {@code null},
-     * but they can be assigned values using the methods of this class. An
-     * {@link IllegalArgumentException} is thrown if a {@code null}
-     * argument is provided to any of those methods. To un-assign values to
-     * attributes, use the {@code clear*} methods.
-     */
-    public static final class SubscriptionBuilder {
-
-        private String creator;
-        private EmlPackageId packageId;
-        private SubscribedUrl url;
-
-        /**
-         * Constructs a subscription builder with all attributes {@code null}.
-         */
-        public SubscriptionBuilder() {
-            // do nothing
-        }
-
-        private SubscriptionBuilder(EmlSubscription subscription) {
-            creator = subscription.getCreator();
-            packageId = new EmlPackageId(subscription.getScope(),
-                                         subscription.getIdentifier(),
-                                         subscription.getRevision());
-            //url = new subscription.getUrl();
-        }
-
-        /**
-         * Sets the creator attribute to {@code null}.
-         * @return this subscription builder.
-         */
-        public SubscriptionBuilder clearCreator() {
-            creator = null;
-            return this;
-        }
-
-        /**
-         * Sets the packageId attribute to {@code null}.
-         * @return this subscription builder.
-         */
-        public SubscriptionBuilder clearEmlPackageId() {
-            packageId = null;
-            return this;
-        }
-
-        /**
-         * Sets the URL attribute to {@code null}.
-         * @return this subscription builder.
-         */
-        public SubscriptionBuilder clearUrl() {
-            url = null;
-            return this;
-        }
-
-        /**
-         * Sets all attributes to {@code null}.
-         * @return this subscription builder.
-         */
-        public SubscriptionBuilder clearAll() {
-            clearCreator();
-            clearEmlPackageId();
-            clearUrl();
-            return this;
-        }
-
-        /**
-         * Returns the creator attribute.
-         * @return the creator attribute.
-         */
-        public String getCreator() {
-            return creator;
-        }
-
-        
-        /**
-         * Returns the packageId attribute.
-         * @return the packageId attribute.
-         */
-        public EmlPackageId getEmlPackageId() {
-            return packageId;
-        }
-
-        
-        /**
-         * Returns the URL attribute.
-         * @return the URL attribute.
-         */
-        public SubscribedUrl getUrl() {
-            return url;
-        }
-
-        
-        /**
-         * Sets the creator of the subscription.
-         * @param creator the user ID of the creator.
-         * @throws IllegalArgumentException if {@code creator} is {@code null}
-         * or empty.
-         */
-        public SubscriptionBuilder setCreator(String creator) {
-            if (creator == null || creator.isEmpty()) {
-                throw new IllegalArgumentException("null or empty creator");
-            }
-            this.creator = creator;
-            return this;
-        }
-
-        
-        /**
-         * Sets the EML packageId of the subscription.
-         * @param packageId the EML packageId of the subscription.
-         */
-        public SubscriptionBuilder setEmlPackageId(EmlPackageId packageId) {
-            if (packageId == null) {
-                throw new IllegalArgumentException("null packageId");
-            }
-            this.packageId = packageId;
-            return this;
-        }
-
-        /**
-         * Sets the URL of the subscription.
-         * @param url the URL of the subscription.
-         */
-        public SubscriptionBuilder setUrl(SubscribedUrl url) {
-            if (url == null) {
-                throw new IllegalArgumentException("null url");
-            }
-            this.url = url;
-            return this;
-        }
-
-        /**
-         * Returns a new, active subscription object whose content matches the
-         * current content of this subscription builder.
-         *
-         * @return an active subscription object whose content matches the
-         *         current content of this subscription builder.
-         *
-         * @throws IllegalStateException
-         *             if the creator, packageId, URI, or access control rule
-         *             are {@code null}.
-         */
-        public EmlSubscription build() {
-
-            if (creator == null) {
-                throw new IllegalStateException("Null token");
-            }
-            if (packageId == null) {
-                throw new IllegalStateException("Null packageId");
-            }
-            if (url == null) {
-                throw new IllegalStateException("Null url");
-            }
-
-            EmlSubscription s = new EmlSubscription();
-            s.active = true;
-            s.creator = creator;
-            s.scope = packageId.getScope();
-            s.identifier = packageId.getIdentifier();
-            s.revision = packageId.getRevision();
-            s.url = url;
-
-            return s;
-        }
     }
 
 }

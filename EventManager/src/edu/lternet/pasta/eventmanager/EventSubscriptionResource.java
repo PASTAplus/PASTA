@@ -59,8 +59,6 @@ import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
-import edu.lternet.pasta.common.security.access.AccessControllerFactory;
-import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
@@ -128,7 +126,6 @@ public final class EventSubscriptionResource extends EventManagerResource {
 
 	public static final String AUTH_TOKEN = "auth-token";
     private static final Logger logger = Logger.getLogger(EventSubscriptionResource.class);
-    private static final String SERVICE_OWNER = "pasta";
 
     /**
      * Query parameters for subscriptions
@@ -505,7 +502,10 @@ public final class EventSubscriptionResource extends EventManagerResource {
             Integer id = parseSubscriptionId(subscriptionId);
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
             EmlSubscription emlSubscription = subscriptionRegistry.getSubscription(id, userId);
-            String xml = emlSubscription.toXML();
+            StringBuffer stringBuffer = new StringBuffer("<subscriptions>\n");
+            stringBuffer.append(emlSubscription.toXML());
+            stringBuffer.append("</subscriptions>\n");
+            String xml = stringBuffer.toString();
             response = Response.ok(xml, MediaType.APPLICATION_XML).build();
         } 
 		catch (IllegalArgumentException e) {
@@ -833,23 +833,6 @@ public final class EventSubscriptionResource extends EventManagerResource {
         }
         
         return response;
-    }
-
-    
-    private void assertAuthorizedToRead(HttpHeaders headers, String serviceMethod) {
-
-        String acr = getServiceAcr(serviceMethod);
-        JaxRsHttpAccessController controller =
-            AccessControllerFactory.getDefaultHttpAccessController();
-
-        if (controller.canRead(headers, acr, SERVICE_OWNER)) {
-            return;
-        }
-        String s = "This request is not authorized to notify the event " +
-                   "manager of events. Please check your authorization " + 
-                   "credentials.";
-
-        throw WebExceptionFactory.make(Response.Status.UNAUTHORIZED, null, s);
     }
 
 }

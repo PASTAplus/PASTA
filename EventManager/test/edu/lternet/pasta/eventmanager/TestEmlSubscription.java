@@ -26,7 +26,6 @@ package edu.lternet.pasta.eventmanager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -44,14 +43,13 @@ import org.junit.runners.Parameterized.Parameters;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
 import edu.lternet.pasta.eventmanager.SubscribedUrl;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 @RunWith(Enclosed.class)
 public class TestEmlSubscription {
 
     public static class TestSimply {
         
-        private EmlSubscription sb;
+        private EmlSubscription emlSubscription;
         private String creator = "test_creator";
         private String scope = "lno";
         private Integer id = 12;
@@ -61,15 +59,15 @@ public class TestEmlSubscription {
         
         @Before
         public void init() {
-            sb = new EmlSubscription();
-            sb.setCreator(creator);
-            sb.setPackageId(packageId);
-            sb.setUrl(url.toString());
+            emlSubscription = new EmlSubscription();
+            emlSubscription.setCreator(creator);
+            emlSubscription.setPackageId(packageId);
+            emlSubscription.setUrl(url.toString());
         }
 
         @Test
         public void testIsActive() {
-            assertTrue(sb.isActive());
+            assertTrue(emlSubscription.isActive());
         }
         
         @Test
@@ -81,7 +79,7 @@ public class TestEmlSubscription {
         
         @Test
         public void testGetSubscriptionId() {
-            assertNull(sb.getSubscriptionId());
+            assertNull(emlSubscription.getSubscriptionId());
         }
         
         // Not testing getSubscriptionId() after persisting to a database.
@@ -89,113 +87,33 @@ public class TestEmlSubscription {
         
         @Test
         public void testSetCreator() {
-            assertEquals(creator, sb.getCreator());
+            assertEquals(creator, emlSubscription.getCreator());
         }
         
         @Test
         public void testSetEmlPackageIdScope() {
-            assertEquals(scope, sb.getPackageId().getScope());
-            assertEquals(scope, sb.getScope());
+            assertEquals(scope, emlSubscription.getPackageId().getScope());
+            assertEquals(scope, emlSubscription.getScope());
         }
         
         @Test
         public void testSetEmlPakcageIdIdentifier() {
-            assertEquals(id, sb.getPackageId().getIdentifier());
-            assertEquals(id, sb.getIdentifier());
+            assertEquals(id, emlSubscription.getPackageId().getIdentifier());
+            assertEquals(id, emlSubscription.getIdentifier());
         }
         
         @Test
         public void testSetEmlPackageIdRevision() {
-            assertEquals(rev, sb.getPackageId().getRevision());
-            assertEquals(rev, sb.getRevision());
+            assertEquals(rev, emlSubscription.getPackageId().getRevision());
+            assertEquals(rev, emlSubscription.getRevision());
         }
         
         @Test
         public void testSetUri() {
-            assertEquals(url, sb.getUrl());
-            assertEquals(url.toString(), sb.getUrl());
+            assertEquals(url, emlSubscription.getUrl());
+            assertEquals(url.toString(), emlSubscription.getUrl().toString());
         }
         
-        @Test(expected = IllegalArgumentException.class)
-        public void testSetCreatorWithNull() {
-            sb.setCreator(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void testSetCreatorWithEmptyString() {
-            sb.setCreator("");
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void testSetUriWithNull() {
-            sb.setUrl(null);
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void testSetEmlPackgaeIdWithNull() {
-            sb.setPackageId(null);
-        }
-                
     }
     
-    @RunWith(value=Parameterized.class)
-    public static class TestIncompleteBuildStates {
-
-        // produces a non-exhaustive set of test cases
-        @Parameters
-        public static Collection<?> data() {
-
-            Object[] completeState = { "test_creator", 
-                                       new EmlPackageId(null, null, null), 
-                                       new SubscribedUrl("http://test") };
-
-            Collection<Object[]> data = new LinkedList<Object[]>();
-
-            int size = completeState.length;
-            
-            for (int i = 0; i < size; i ++) {
-
-                Object[] incompleteState = { null, null, null }; 
-                
-                for (int j = i; j < size; j ++) {
-                    
-                    incompleteState[j] = completeState[j];
-
-                    if (!Arrays.deepEquals(incompleteState, completeState)) {
-                        data.add(Arrays.copyOf(incompleteState, size));
-                    }
-                }
-                
-            }
-
-            Object[] incompleteState = { null, null, null }; 
-            data.add(incompleteState);
-
-            return data;
-        }
-
-        
-        private SubscriptionBuilder sb;
-        
-        public TestIncompleteBuildStates(String creator,
-                                         EmlPackageId packageId,
-                                         SubscribedUrl uri) {
-            sb = new SubscriptionBuilder();
-            if (creator != null) {
-                sb.setCreator(creator);
-            }
-            if (packageId != null) {
-                sb.setEmlPackageId(packageId);
-            }
-            if (uri != null) {
-                sb.setUrl(uri);
-            }
-        }
-        
-        @Test(expected=IllegalStateException.class)
-        public void testBuildWithIncompleteState() {
-            sb.build();
-        }
-        
-    }
 }

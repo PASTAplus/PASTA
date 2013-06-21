@@ -32,18 +32,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 
 /**
@@ -200,6 +198,40 @@ public class SubscriptionRegistry {
 		
 
 	/**
+	 * Deletes test subscriptions. Needed for JUnit testing.
+	 */
+	public void deleteTestSubscriptions()
+			throws ClassNotFoundException, SQLException, Exception {
+		Connection conn = getConnection();
+
+		String updateSQL = String.format("DELETE FROM %s where creator = '%s'",
+				                         EML_SUBSCRIPTION, "junit");
+		conn = getConnection();
+
+		if (conn != null) {
+			try {
+				Statement stmt = conn.createStatement();
+				int nRecords = stmt.executeUpdate(updateSQL);
+				stmt.close();
+				logger.info(String.format("Deleted %d JUnit subscriptions", nRecords));
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			}
+			finally {
+				returnConnection(conn);
+			}
+		}
+		else {
+			String message = "deleteTestSubscriptions() failed due to connection error.";
+			Exception e = new Exception(message);
+			throw (e);
+		}
+	}
+
+	
+	/**
 	 * Deletes a subscription based on its subscription ID. The user who is deleting
 	 * the subscription must be the same as the user who created the subscription.
 	 * 
@@ -211,8 +243,13 @@ public class SubscriptionRegistry {
 			throws ClassNotFoundException, SQLException, Exception {
 		Integer deletedId = new Integer("-1");
 		
+		if (wasDeleted(subscriptionId)) {
+			String msg = String.format("Subscription with ID = %d had previously been deleted.", subscriptionId);
+			throw new ResourceDeletedException(msg);
+		}
+
 		if (!hasSubscription(subscriptionId)) {
-			String msg = String.format("Subscription with ID = %d was not found or may already have been deleted.", subscriptionId);
+			String msg = String.format("Subscription with ID = %d was not found..", subscriptionId);
 			throw new ResourceNotFoundException(msg);
 		}
 
@@ -488,6 +525,11 @@ public class SubscriptionRegistry {
 			throws ClassNotFoundException, SQLException, Exception {
 		EmlSubscription emlSubscription = null;
 		String creator = null;
+
+		if (wasDeleted(subscriptionId)) {
+			String msg = String.format("Subscription with ID = %d had previously been deleted.", subscriptionId);
+			throw new ResourceDeletedException(msg);
+		}
 
 		if (!hasSubscription(subscriptionId)) {
 			String msg = String.format("Subscription with ID = %d was not found or may have been deleted.",
@@ -786,4 +828,49 @@ public class SubscriptionRegistry {
  }
 
  
+ /*
+  * Boolean to determine whether the specified subscription is in the
+  * Subscription Registry based on a subscription ID value but has
+  * been deleted (inactivated)
+  * 
+  * @return  true if a subscription matches the id, else false
+  */
+ private boolean wasDeleted(Integer subscriptionId)
+         throws ClassNotFoundException, SQLException {
+   boolean wasDeleted = false;
+   Connection connection = null;
+   String selectString = 
+     String.format("SELECT * FROM %s WHERE subscription_id = %d AND active=false", 
+    		       EML_SUBSCRIPTION, subscriptionId
+    		      );
+ 
+   Statement stmt = null;
+ 
+   try {
+     connection = getConnection();
+     stmt = connection.createStatement();             
+     ResultSet rs = stmt.executeQuery(selectString);
+   
+     while (rs.next()) {
+       wasDeleted = true;
+     }
+
+     if (stmt != null) stmt.close();
+   }
+   catch(ClassNotFoundException e) {
+     logger.error("ClassNotFoundException: " + e.getMessage());
+     throw(e);
+   }
+   catch(SQLException e) {
+     logger.error("SQLException: " + e.getMessage());
+     throw(e);
+   }
+   finally {
+     returnConnection(connection);
+   }
+   
+   return wasDeleted;
+ }
+ 
+
 }

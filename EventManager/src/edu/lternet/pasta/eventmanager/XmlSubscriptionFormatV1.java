@@ -40,7 +40,6 @@ import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 /**
  * Used to parse and format <em>EML modification</em> event subscriptions as

@@ -66,12 +66,12 @@ public class EventManagerResource extends PastaWebService {
      *         subscriptions.
      */
     protected String getServiceAcr(String method) {
-
         File acrFileName = ConfigurationListener.getPastaServiceAcr();
         String pastaService = FileUtility.fileToString(acrFileName);
         return PastaServiceUtility.getAccessTypeString(method, pastaService);
     }
    
+    
     /**
      * Serves the files related to the demo web page.
      * @param fileName the name of the file to be served.
@@ -84,6 +84,7 @@ public class EventManagerResource extends PastaWebService {
         return serveFileFromDirectory(demoDir, fileName);
     }
 
+    
     /**
      * Returns the Event Manager's version, such as {@code
      * eventmanager-0.1}.
@@ -95,6 +96,7 @@ public class EventManagerResource extends PastaWebService {
     public String getVersionString() {
         return ConfigurationListener.getWebServiceVersion();
     }
+    
 
     /**
      * Returns the API documentation for the Event Manager.
@@ -106,6 +108,7 @@ public class EventManagerResource extends PastaWebService {
         return ConfigurationListener.getApiDocument();
     }
 
+    
     /**
      * Returns the tutorial document for the Event Manager.
      *
@@ -116,6 +119,7 @@ public class EventManagerResource extends PastaWebService {
         return ConfigurationListener.getTutorialDocument();
     }
 
+    
     /**
      * Returns the welcome page for the Event Manager.
      *
@@ -126,6 +130,7 @@ public class EventManagerResource extends PastaWebService {
         return ConfigurationListener.getWelcomePage();
     }
 
+    
     /**
      * Constructs an Event Manager resource with the provided entity
      * manager factory.
@@ -212,6 +217,5 @@ public class EventManagerResource extends PastaWebService {
           throw new IllegalArgumentException(err);
       }
   }
-
 
 }
