@@ -4,8 +4,8 @@
 
   <property name="webapp.name" value="eventmanager"/>
 
-  <!-- Importing standard build.xml file -->
-  <import file="../ant-util/build-with-jpa.xml"/>
+  <!-- Import standard build file -->
+  <import file="../ant-util/simple.xml"/>
 
   <!-- Copy shared libraries into the local lib directory -->
   <target name="prepare" depends="prepare-common">
@@ -14,9 +14,12 @@
     <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
       <fileset dir="${shared.lib.dir}/apache-commons">
-        <include name="commons-logging-1.1.1.jar"/>
-        <include name="commons-codec-1.4.jar"/>
-        <!-- <include name="commons-httpclient-3.1.jar"/> -->
+        <include name="**/commons-configuration*.jar"/>
+        <include name="**/commons-logging*.jar"/>
+        <include name="**/commons-lang*.jar"/>
+        <include name="**/commons-io-2.*.jar"/>
+        <include name="**/commons-fileupload-*.jar"/>
+        <include name="**/commons-codec-*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.1.2">
         <include name="**/*.jar"/>
@@ -42,15 +45,8 @@
       <fileset dir="${shared.lib.dir}/junit">
         <include name="junit-4.8.2.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/openjpa">
-        <include name="openjpa-2.0.1.jar"/>
-        <include name="openjpa-all-2.0.1.jar"/>
-      </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
         <include name="postgresql-8.4-702.jdbc4.jar"/>
-      </fileset>
-      <fileset dir="${shared.lib.dir}/jaxb-pasta-service-0.1">
-        <include name="pasta-service-0.1.jar"/>
       </fileset>
     </copy>
 

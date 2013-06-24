@@ -29,10 +29,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -42,6 +42,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -49,11 +50,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.common.EmlPackageIdFormat.Delimiter;
 import edu.lternet.pasta.common.FileUtility;
-import edu.lternet.pasta.common.MethodNameUtility;
 import edu.lternet.pasta.common.QueryString;
 import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
@@ -62,12 +59,11 @@ import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
-import edu.lternet.pasta.common.security.access.AccessControllerFactory;
-import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
+
 
 /**
  * <p>
@@ -75,7 +71,7 @@ import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
  * <b>read</b>, and <b>delete</b> subscriptions to PASTA "events". When an
  * event occurs, subscribers to that event will be automatically notified by
  * the Event Manager. The only event currently handled by the Event Manager
- * is when an EML document in PASTA's Metadata Catalog is created or "updated"
+ * is when an EML document in PASTA is created or "updated"
  * (which can also be considered a form of creation).
  * </p>
  *
@@ -123,42 +119,24 @@ import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
  */
 @Path("subscription")
 public final class EventSubscriptionResource extends EventManagerResource {
+	
+	/*
+	 * Class variables
+	 */
+
+	public static final String AUTH_TOKEN = "auth-token";
+    private static final Logger logger = Logger.getLogger(EventSubscriptionResource.class);
 
     /**
-     * Query parameter for subscription creator's.
+     * Query parameters for subscriptions
      */
     public static final String CREATOR = "creator";
-
-    /**
-     * Query parameter for packageId scopes.
-     */
     public static final String SCOPE = "scope";
-
-    /**
-     * Query parameter for packageId identifiers.
-     */
     public static final String IDENTIFIER = "identifier";
-
-    /**
-     * Query parameter for packageId revisions.
-     */
     public static final String REVISION = "revision";
-
-    /**
-     * Query parameter for URLs.
-     */
     public static final String URL = "url";
-
-    /**
-     * Valid query parameters.
-     */
     public static final Set<String> VALID_QUERY_KEYS;
-
-    private static final String SERVICE_OWNER = "pasta";
-    
-    private static final Logger logger =
-        Logger.getLogger(EventSubscriptionResource.class);
-
+   
     static {
         Set<String> set = new TreeSet<String>();
         set.add(CREATOR);
@@ -168,37 +146,58 @@ public final class EventSubscriptionResource extends EventManagerResource {
         set.add(URL);
         VALID_QUERY_KEYS = Collections.unmodifiableSet(set);
     }
-
-    private final XmlSubscriptionFormatV1 formatter;
-
-    /**
-     * Constructs a new event subscription web service using the provided entity
-     * manager factory.
-     *
-     * @param emf
-     *            the entity manager factory for persisting subscriptions.
+    
+    
+    /*
+     * Instance variables
      */
-    public EventSubscriptionResource(EntityManagerFactory emf) {
-        super(emf);
-        formatter = new XmlSubscriptionFormatV1();
-    }
+
+    private final XmlSubscriptionFormatV1 xmlSubscriptionFormatV1;
+    
+    
+    /*
+     * Constructors
+     */
 
     /**
      * Constructs a new event subscription web service using the entity manager
      * factory specified in {@link ConfigurationListener}.
-     *
-     * @see ConfigurationListener#getPersistenceUnit()
      */
     public EventSubscriptionResource() {
         super();
-        formatter = new XmlSubscriptionFormatV1();
+        xmlSubscriptionFormatV1 = new XmlSubscriptionFormatV1();
     }
-
-    protected void finalize() throws Throwable {
-        super.finalize();
+    
+    
+    /*
+     * Class methods
+     */
+    
+    /**
+     * Gets an AuthToken object from an HttpHeaders object
+     * 
+     * @param headers   the HttpHeaders object
+     * @return an AuthToken token
+     */
+    public static AuthToken getAuthToken(HttpHeaders headers) {
+      Map<String, Cookie> cookiesMap = headers.getCookies();
+      
+      if (!cookiesMap.containsKey(AUTH_TOKEN)) {
+        throw new UnauthorizedException("Missing authentication token: " + AUTH_TOKEN);
+      }
+      
+      String cookieToken = cookiesMap.get(AUTH_TOKEN).getValue();
+      AuthToken authToken = new AttrListAuthTokenV1(cookieToken);
+      
+      return authToken;
     }
-
-
+    
+    
+    /*
+     * Instance methods
+     */
+    
+    
     /*
      * Wrapper method for using the audit manager client
      */
@@ -305,55 +304,64 @@ public final class EventSubscriptionResource extends EventManagerResource {
     @Consumes(MediaType.APPLICATION_XML)
     public Response createSubscription(@Context HttpHeaders headers,
                                                 String requestBody) {
-
-        SubscriptionService service = null;
-        String method = MethodNameUtility.methodName();
-        AuthToken token = null;
-        Response r = null;
-        String msg = null, resourceId = null;
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.write;
+        Response response = null;
+        final String serviceMethodName = "createSubscription";
 
         try {
+    		authToken = getAuthToken(headers);
+    		String userId = authToken.getUserId();
 
-            assertAuthorizedToWrite(headers, method);
-            token = AuthTokenFactory.makeAuthToken(headers.getCookies());
+    		// Is user authorized to run the 'createSubscription' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			throw new UnauthorizedException("User " + userId
+    			    + " is not authorized to execute service method " + serviceMethodName);
+    		}
 
-            EmlSubscription s = formatter.parse(requestBody)
-                                         .setCreator(token.getUserId())
-                                         .build();
-
-            service = getSubscriptionService();
-            service.create(s, token);
-
-            URI uri = URI.create(s.getSubscriptionId().toString());
-
-            r = Response.created(uri).build();
-            resourceId = uri.toString();
-
-            return r;
-
-        } catch (XmlParsingException e) {
-            r = WebExceptionFactory.makeBadRequest(e).getResponse();
+    		EmlSubscription emlSubscription  = xmlSubscriptionFormatV1.parse(requestBody);
+    		emlSubscription.setCreator(userId);
+            String creator = emlSubscription.getCreator();
+            String scope = emlSubscription.getScope();
+            Integer identifier = emlSubscription.getIdentifier();
+            Integer revision = emlSubscription.getRevision();
+            String url = emlSubscription.getUrl().toString();          
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            int subscriptionId = subscriptionRegistry.addSubscription(creator, scope, identifier, revision, url);
+            URI uri = URI.create(String.format("%d", subscriptionId));
+            response = Response.created(uri).build();
+        } 
+        catch (XmlParsingException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (UnauthorizedException e) {
-            r = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } 
+        catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceExistsException e) {
-            r = WebExceptionFactory.makeConflict(e).getResponse();
+        } 
+        catch (ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } finally {
-            if (service != null) {
-                service.close();
-            }
-            audit(method, token, r, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
     }
 
+    
     /**
      * Returns the XML schema for subscription creation request entities.
      *
@@ -386,6 +394,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
         return Response.ok(s, MediaType.APPLICATION_XML).build();
     }
 
+    
     /**
      * Returns the subscription with the specified ID.
      *
@@ -470,60 +479,70 @@ public final class EventSubscriptionResource extends EventManagerResource {
     public Response getSubscriptionWithId(@Context HttpHeaders headers,
                       @PathParam("subscriptionId") String subscriptionId) {
 
-        SubscriptionService service = null;
-        String method = MethodNameUtility.methodName();
-        EmlPackageIdFormat format = new EmlPackageIdFormat();
-        AuthToken token = null;
-        String msg = null, resourceId = null;
-        Response r = null;
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.read;
+        Response response = null;
+        final String serviceMethodName = "getMatchingSubscriptions";
 
         try {
-            assertAuthorizedToRead(headers, method);
-            token = AuthTokenFactory.makeAuthToken(headers.getCookies());
+    		authToken = getAuthToken(headers);
+    		String userId = authToken.getUserId();
 
-            Long id = parseSubscriptionId(subscriptionId);
-            service = getSubscriptionService();
-            EmlSubscription s = service.get(id, token);
-            String xml = formatter.format(s);
-            resourceId = format.format(s.getPackageId());
+    		// Is user authorized to run the 'getSubscriptionWithId' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			String errorMsg = String.format("User %s is not authorized to execute service method %s.",
+    					                        userId, serviceMethodName);
+    			throw new UnauthorizedException(errorMsg);
+    		}
 
-            r = Response.ok(xml, MediaType.APPLICATION_XML).build();
-
-            return r;
-
-        } catch (IllegalArgumentException e) {
-          r = WebExceptionFactory.makeBadRequest(e).getResponse();
-          msg = e.getMessage();
-          return r;
-
-        } catch (UnauthorizedException e) {
-            r = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            Integer id = parseSubscriptionId(subscriptionId);
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            EmlSubscription emlSubscription = subscriptionRegistry.getSubscription(id, userId);
+            StringBuffer stringBuffer = new StringBuffer("<subscriptions>\n");
+            stringBuffer.append(emlSubscription.toXML());
+            stringBuffer.append("</subscriptions>\n");
+            String xml = stringBuffer.toString();
+            response = Response.ok(xml, MediaType.APPLICATION_XML).build();
+        } 
+		catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+        catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceNotFoundException e) {
-            r = WebExceptionFactory.makeNotFound(e).getResponse();
+        } 
+        catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceDeletedException e) {
-            r = WebExceptionFactory.makeGone(e).getResponse();
+        } 
+        catch (ResourceDeletedException e) {
+            response = WebExceptionFactory.makeGone(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (WebApplicationException e) {
-            r = e.getResponse();
+        } 
+        catch (WebApplicationException e) {
+            response = e.getResponse();
             msg = e.getMessage();
-            return r;
-
-        } finally {
-            if (service != null) {
-                service.close();
-            }
-            audit(method, token, r, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
     }
 
+    
     /**
      * Returns the subscriptions whose attributes match those specified in
      * the query string. If a query string is omitted, all subscriptions in the
@@ -625,85 +644,73 @@ public final class EventSubscriptionResource extends EventManagerResource {
     @Produces(value={MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public Response getMatchingSubscriptions(@Context HttpHeaders headers,
                                              @Context UriInfo uriInfo) {
-
-        SubscriptionService service = null;
-        String method = MethodNameUtility.methodName();
-        AuthToken token = null;
-        Response r = null;
+        AuthToken authToken = null;
         String msg = null;
-        String resourceId = null;
+        Rule.Permission permission = Rule.Permission.read;
+        Response response = null;
+        final String serviceMethodName = "getMatchingSubscriptions";
 
         try {
-            assertAuthorizedToRead(headers, method);
-            token = AuthTokenFactory.makeAuthToken(headers.getCookies());
+    		authToken = getAuthToken(headers);
+    		String userId = authToken.getUserId();
 
-            SubscriptionBuilder query = makeQuery(uriInfo);
+    		// Is user authorized to run the 'getMatchingSubscriptions' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			String errorMsg = String.format("User %s is not authorized to execute service method %s.",
+    					                        userId, serviceMethodName);
+    			throw new UnauthorizedException(errorMsg);
+    		}
 
-            service = getSubscriptionService();
-
-            List<EmlSubscription> subscriptions =
-                service.getWithoutPackageIdNulls(query, token);
-
-            String xml = formatter.format(subscriptions);
-
-            r = Response.ok(xml, MediaType.APPLICATION_XML).build();
-            return r;
-
-        } catch (UnauthorizedException e) {
-            r = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            QueryString queryString = new QueryString(uriInfo);
+            queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            List<EmlSubscription> emlSubscriptions = subscriptionRegistry.getSubscriptions(userId, queryParams);
+            String xml = toXML(emlSubscriptions);
+            response = Response.ok(xml, MediaType.APPLICATION_XML).build();
+        } 
+        catch (UnauthorizedException e) {
+        	response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (WebApplicationException e) {
-            r = e.getResponse();
+        } 
+        catch (WebApplicationException e) {
+        	response = e.getResponse();
             msg = e.getMessage();
-            return r;
-
-        } finally {
-            if (service != null) {
-                service.close();
-            }
-            audit(method, token, r, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+        
+        return response;
+    }
+    
+    
+    private String toXML(List<EmlSubscription> subscriptions) {
+    	String xmlString = null;
+    	
+    	StringBuffer stringBuffer = new StringBuffer();
+    	stringBuffer.append("<subscriptions>\n");
+    	
+    	for (EmlSubscription subscription : subscriptions) {
+    		stringBuffer.append(subscription.toXML());
+    	}
+    	
+    	stringBuffer.append("</subscriptions>\n");
+    	xmlString = stringBuffer.toString(); 	
+    	return xmlString;
     }
 
-    private SubscriptionBuilder makeQuery(UriInfo uriInfo) {
-
-        QueryString queryString = new QueryString(uriInfo);
-        queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
-
-        SubscriptionBuilder query = new SubscriptionBuilder();
-
-        String creator = queryString.getOptionalValue(CREATOR);
-
-        if (creator != null) {
-            query.setCreator(creator);
-        }
-
-        String url = queryString.getOptionalValue(URL);
-        if (url != null) {
-            try {
-                query.setUrl(new SubscribedUrl(url));
-            } catch (IllegalArgumentException e) {
-                throw WebExceptionFactory.makeBadRequest(e);
-            }
-        }
-
-        String scope = queryString.getOptionalValue(SCOPE);
-        String identifier = queryString.getOptionalValue(IDENTIFIER);
-        String revision = queryString.getOptionalValue(REVISION);
-
-        try {
-            EmlPackageIdFormat format = new EmlPackageIdFormat(Delimiter.DOT);
-            EmlPackageId epi = format.parse(scope, identifier, revision);
-            query.setEmlPackageId(epi);
-        } catch (IllegalArgumentException e) {
-            throw WebExceptionFactory.makeBadRequest(e);
-        }
-
-        return query;
-    }
-
+    
     /**
      * Deletes the subscription with the specified ID from the subscription
      * database. After "deletion," the subscription might still exist in the
@@ -768,91 +775,64 @@ public final class EventSubscriptionResource extends EventManagerResource {
     @DELETE
     @Path("/eml/{subscriptionId}")
     public Response deleteSubscription(@Context HttpHeaders headers,
-            @PathParam("subscriptionId") String subscriptionId) {
-
-        SubscriptionService service = null;
-        String method = MethodNameUtility.methodName();
-        AuthToken token = null;
+                                       @PathParam("subscriptionId") String subscriptionId) {
+        AuthToken authToken = null;
         String msg = null;
-        Response r = null;
-        String resourceId = null;
+        Rule.Permission permission = Rule.Permission.write;
+        Response response = null;
+        final String serviceMethodName = "deleteSubscription";
 
         try {
-            assertAuthorizedToWrite(headers, method);
-            token = AuthTokenFactory.makeAuthToken(headers.getCookies());
+    		authToken = getAuthToken(headers);
+    		String userId = authToken.getUserId();
 
-            Long id = parseSubscriptionId(subscriptionId);
+    		// Is user authorized to run the 'deleteSubscription' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			throw new UnauthorizedException("User " + userId
+    			    + " is not authorized to execute service method " + serviceMethodName);
+    		}
 
-            service = getSubscriptionService();
-            service.delete(id, token);
-
-            r = Response.ok().build();
-            return r;
-
-        } catch (IllegalArgumentException e) {
-          r = WebExceptionFactory.makeBadRequest(e).getResponse();
+            Integer id = parseSubscriptionId(subscriptionId);
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            Integer deletedSubscriptionId = subscriptionRegistry.deleteSubscription(id, userId);
+            logger.info(String.format("An event subscription with identifier '%d' has been deleted.", deletedSubscriptionId));
+            response = Response.ok().build();
+        } 
+        catch (IllegalArgumentException e) {
+        	response = WebExceptionFactory.makeBadRequest(e).getResponse();
           msg = e.getMessage();
-          return r;
-
-        } catch (UnauthorizedException e) {
-            r = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } 
+        catch (UnauthorizedException e) {
+        	response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceNotFoundException e) {
-            r = WebExceptionFactory.makeNotFound(e).getResponse();
+        } 
+        catch (ResourceNotFoundException e) {
+        	response = WebExceptionFactory.makeNotFound(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (ResourceDeletedException e) {
-            r = WebExceptionFactory.makeGone(e).getResponse();
+        } 
+        catch (ResourceDeletedException e) {
+        	response = WebExceptionFactory.makeGone(e).getResponse();
             msg = e.getMessage();
-            return r;
-
-        } catch (WebApplicationException e) {
-            r = e.getResponse();
+        } 
+        catch (WebApplicationException e) {
+        	response = e.getResponse();
             msg = e.getMessage();
-            return r;
-
-        } finally {
-            if (service != null) {
-                service.close();
-            }
-            audit(method, token, r, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
-    }
-
-    private void assertAuthorizedToRead(HttpHeaders headers, String serviceMethod) {
-
-        String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
-        JaxRsHttpAccessController controller =
-            AccessControllerFactory.getDefaultHttpAccessController();
-
-        if (controller.canRead(headers, acr, SERVICE_OWNER)) {
-            return;
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
         }
-        String s = "This request is not authorized to notify the event " +
-                   "manager of events. Please check your authorization " + 
-                   "credentials.";
-
-        throw WebExceptionFactory.make(Response.Status.UNAUTHORIZED, null, s);
-    }
-
-    private void assertAuthorizedToWrite(HttpHeaders headers, String serviceMethod) {
-
-        String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
-        JaxRsHttpAccessController controller =
-                AccessControllerFactory.getDefaultHttpAccessController();
-
-        if (controller.canWrite(headers, acr, SERVICE_OWNER)) {
-            return;
-        }
-
-        String s = "This request is not authorized to notify the event " +
-                   "manager of events. Please check your authorization " + 
-                   "credentials.";
-
-        throw WebExceptionFactory.make(Response.Status.UNAUTHORIZED, null, s);
+        
+        return response;
     }
 
 }
