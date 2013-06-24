@@ -26,10 +26,8 @@ package edu.lternet.pasta.eventmanager;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -59,12 +57,10 @@ import edu.lternet.pasta.common.WebExceptionFactory;
 import edu.lternet.pasta.common.WebResponseFactory;
 import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
-import edu.lternet.pasta.common.security.access.AccessControllerFactory;
-import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.eventmanager.EmlSubscription.SubscriptionBuilder;
 
 /**
  * A JAX-RS RESTful implementation of the <em>event notification</em> component
@@ -94,9 +90,6 @@ public final class EventNotifierResource extends EventManagerResource {
 
     private static final Logger logger =
                                 Logger.getLogger(EventNotifierResource.class);
-
-    private static final String SERVICE_OWNER = "pasta";
-
     
     /* 
      * Instance variables 
@@ -113,8 +106,6 @@ public final class EventNotifierResource extends EventManagerResource {
      * Constructs a new Event Manager resource with the entity manager
      * factory specified by the configuration listener and the default
      * connection and request timeouts.
-     *
-     * @see ConfigurationListener#getPersistenceUnit()
      */
     public EventNotifierResource() {
         super();
@@ -123,17 +114,16 @@ public final class EventNotifierResource extends EventManagerResource {
 
     
     /**
-     * Constructs a new Event Manager resource with the provided entity manager
-     * factory, connection timeout, and request timeout (in milliseconds).
+     * Constructs a new Event Manager resource with the provided
+     * connection timeout and request timeout (in milliseconds).
      *
-     * @param entityManagerFactory provides all entity managers used by this resource.
      * @param connectionTimeout timeout for POST connections.
      * @param requestTimeout timeout for POST requests.
      */
-    public EventNotifierResource(EntityManagerFactory entityManagerFactory,
+    public EventNotifierResource(
                                  int connectionTimeout,
                                  int requestTimeout) {
-        super(entityManagerFactory);
+        super();
         asyncHttpClient = makeClient(connectionTimeout, requestTimeout);
     }
 
@@ -167,7 +157,7 @@ public final class EventNotifierResource extends EventManagerResource {
         auditManagerClient.logAudit(auditRecord);
       }
       catch (Exception e) {
-        logger.error("Error occurred while auditing Data Package Manager " +
+        logger.error("Error occurred while auditing Event Manager " +
                      "service call for service method " + 
                      serviceMethodName + " : " + e.getMessage());
       }
@@ -192,11 +182,13 @@ public final class EventNotifierResource extends EventManagerResource {
     protected void finalize() throws Throwable {
         try {
             asyncHttpClient.close();
-        } finally {
+        } 
+        finally {
             super.finalize();
         }
     }
 
+    
     /**
      * Used to notify the event manager, via an HTTP POST request, that an EML
      * document in PASTA has been modified. Upon notification, the event manager
@@ -227,35 +219,54 @@ public final class EventNotifierResource extends EventManagerResource {
                                   @PathParam("identifier") String identifier,
                                   @PathParam("revision")   String revision) {
 
-        EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat(Delimiter.DOT);
         AuthToken authToken = null;
-        String method = MethodNameUtility.methodName();
+        EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat(Delimiter.DOT);
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.write;
         Response response = null;
-        String msg = null, resourceId = null;
+        String serviceMethodName = MethodNameUtility.methodName();
 
         try {
-            assertAuthorizedToWrite(httpHeaders, MethodNameUtility.methodName());
             authToken = AuthTokenFactory.makeAuthToken(httpHeaders.getCookies());
+    		String userId = authToken.getUserId();
+
+    		// Is user authorized to run the 'notifyOfEvent' service method?
+    		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+    		    serviceMethodName, permission, authToken);
+    		
+    		if (!serviceMethodAuthorized) {
+    			String errorMsg = String.format("User %s is not authorized to execute service method %s.",
+    					                        userId, serviceMethodName);
+    			throw new UnauthorizedException(errorMsg);
+    		}
+
 
             EmlPackageId emlPackageId = parseEmlPackageId(scope, identifier, revision);
-            List<EmlSubscription> emlSubscriptionList = getSubscriptions(emlPackageId);
+            SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+            List<EmlSubscription> emlSubscriptionList = subscriptionRegistry.getSubscriptions(emlPackageId);
 
             for (EmlSubscription emlSubscription : emlSubscriptionList) {
                 asynchronousNotify(emlPackageIdFormat, emlSubscription, emlPackageId);
             }
 
-            resourceId = emlPackageIdFormat.format(emlPackageId);
             response = Response.ok().build();
-            return response;
-
-        } catch (WebApplicationException e) {
+        } 
+        catch (WebApplicationException e) {
             response = e.getResponse();
             msg = e.getMessage();
-            return response;
-
-        } finally {
-          audit(method, authToken, response, resourceId, msg);
+        } 
+        catch (Exception e) {
+            WebApplicationException webApplicationException = 
+              WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
+                e, e.getMessage());
+            response = webApplicationException.getResponse();
+        	msg = e.getMessage();
         }
+        finally {
+          audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
     }
 
     
@@ -357,62 +368,72 @@ public final class EventNotifierResource extends EventManagerResource {
      */
     @POST
     @Path("eml/{subscriptionId}")
-  public Response executeSubscription(@Context HttpHeaders httpHeaders,
-      @PathParam("subscriptionId") String subscriptionId) {
+	public Response executeSubscription(@Context HttpHeaders httpHeaders,
+			@PathParam("subscriptionId") String subscriptionId) {
+		AuthToken authToken = null;
+		String msg = null;
+		Rule.Permission permission = Rule.Permission.write;
+		Response response = null;
+		String serviceMethodName = MethodNameUtility.methodName();
 
-    AuthToken authToken = null;
-    String method = MethodNameUtility.methodName();
-    Response response = null;
-    String entryText = null;
-    String resourceId = null;
+		try {
+			authToken = AuthTokenFactory.makeAuthToken(httpHeaders.getCookies());
+			String userId = authToken.getUserId();
 
-    try {
-      assertAuthorizedToWrite(httpHeaders, method);
-      authToken = AuthTokenFactory.makeAuthToken(httpHeaders.getCookies());
-      EmlSubscription emlSubscription = getSubscription(subscriptionId,
-          authToken);
-      asynchronousNotify(null, emlSubscription, null);
-      response = Response.ok().build();
-    }
-    catch (IllegalArgumentException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeBadRequest(e).getResponse();
-    }
-    catch (UnauthorizedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-    }
-    catch (ResourceNotFoundException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeNotFound(e).getResponse();
-    }
-    catch (ResourceDeletedException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (ResourceExistsException e) {
-      entryText = e.getMessage();
-      response = WebExceptionFactory.makeConflict(e).getResponse();
-    }
-    catch (UserErrorException e) {
-      entryText = e.getMessage();
-      response = WebResponseFactory.makeBadRequest(e);
-    }
-    catch (Exception e) {
-      entryText = e.getMessage();
-      WebApplicationException webApplicationException = 
-        WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, 
-          e, e.getMessage());
-      response = webApplicationException.getResponse();
-    }
-    finally {
-      if (response != null) {
-        audit(method, authToken, response, resourceId, entryText);
-      }
-    }
-    
-    return response;
-  }
+			// Is user authorized to run the 'executeSubscription' service
+			// method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+
+			if (!serviceMethodAuthorized) {
+				String errorMsg = String.format("User %s is not authorized to execute service method %s.",
+								userId, serviceMethodName);
+				throw new UnauthorizedException(errorMsg);
+			}
+
+			EmlSubscription emlSubscription = getSubscription(subscriptionId, userId);
+			asynchronousNotify(null, emlSubscription, null);
+			response = Response.ok().build();
+		}
+		catch (IllegalArgumentException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (ResourceDeletedException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (ResourceExistsException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			msg = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			msg = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+		finally {
+			if (response != null) {
+				audit(serviceMethodName, authToken, response, null, msg);
+			}
+		}
+
+		return response;
+	}
 
 
     private EmlPackageId parseEmlPackageId(String scope,
@@ -430,41 +451,14 @@ public final class EventNotifierResource extends EventManagerResource {
 
     }
 
-    private List<EmlSubscription> getSubscriptions(EmlPackageId emlPackageId) {
-
-        SubscriptionBuilder subscriptionBuilder = new SubscriptionBuilder();
-        List<EmlSubscription> emlSubscriptionList = new LinkedList<EmlSubscription>();
-
-        SubscriptionService subscriptionService = getSubscriptionService();
-
-        subscriptionBuilder.setEmlPackageId(emlPackageId);
-        emlSubscriptionList.addAll(subscriptionService.getWithPackageIdNulls(subscriptionBuilder));
-
-        String scope = emlPackageId.getScope();
-        Integer identifier = emlPackageId.getIdentifier();
-
-        subscriptionBuilder.setEmlPackageId(new EmlPackageId(scope, identifier, null));
-        emlSubscriptionList.addAll(subscriptionService.getWithPackageIdNulls(subscriptionBuilder));
-
-        subscriptionBuilder.setEmlPackageId(new EmlPackageId(scope, null, null));
-        emlSubscriptionList.addAll(subscriptionService.getWithPackageIdNulls(subscriptionBuilder));
-
-        subscriptionBuilder.setEmlPackageId(new EmlPackageId(null, null, null));
-        emlSubscriptionList.addAll(subscriptionService.getWithPackageIdNulls(subscriptionBuilder));
-
-        subscriptionService.close();
-
-        return emlSubscriptionList;
-    }
-
     
-    private EmlSubscription getSubscription(String subscriptionId, AuthToken authToken) {
+    private EmlSubscription getSubscription(String subscriptionId, String userId) 
+    		throws Exception {
       EmlSubscription emlSubscription = null;
       
-      SubscriptionService subscriptionService = getSubscriptionService();
-      Long id = parseSubscriptionId(subscriptionId);
-      emlSubscription = subscriptionService.get(id, authToken);
-      subscriptionService.close();
+      SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
+      Integer id = parseSubscriptionId(subscriptionId);
+      emlSubscription = subscriptionRegistry.getSubscription(id, userId);
 
       return emlSubscription;
     }
@@ -491,25 +485,6 @@ public final class EventNotifierResource extends EventManagerResource {
         } catch (IOException e) {
             logger.error("Subscriber Notification Error", e);
         }
-    }
-
-    
-    private void assertAuthorizedToWrite(HttpHeaders headers, String serviceMethod) {
-
-        String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
-
-        JaxRsHttpAccessController controller =
-            AccessControllerFactory.getDefaultHttpAccessController();
-
-        if (controller.canWrite(headers, acr, SERVICE_OWNER)) {
-            return;
-        }
-
-        String s = "This request is not authorized to notify the event " +
-                   "manager of events. Please check your authorization " + 
-                   "credentials.";
-
-        throw WebExceptionFactory.make(Response.Status.UNAUTHORIZED, null, s);
     }
 
 }
