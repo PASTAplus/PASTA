@@ -333,6 +333,9 @@ public final class EventSubscriptionResource extends EventManagerResource {
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
             int subscriptionId = subscriptionRegistry.addSubscription(creator, scope, identifier, revision, url);
             URI uri = URI.create(String.format("%d", subscriptionId));
+            emlSubscription.setSubscriptionId(new Integer(subscriptionId));
+            msg = String.format("Created subscription with the following attributes: %s", 
+            		emlSubscription.toString());
             response = Response.created(uri).build();
         } 
         catch (XmlParsingException e) {
@@ -483,7 +486,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
         String msg = null;
         Rule.Permission permission = Rule.Permission.read;
         Response response = null;
-        final String serviceMethodName = "getMatchingSubscriptions";
+        final String serviceMethodName = "getSubscriptionWithId";
 
         try {
     		authToken = getAuthToken(headers);
@@ -505,6 +508,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             StringBuffer stringBuffer = new StringBuffer("<subscriptions>\n");
             stringBuffer.append(emlSubscription.toXML());
             stringBuffer.append("</subscriptions>\n");
+            msg = String.format("Subscription id = '%d'", id);
             String xml = stringBuffer.toString();
             response = Response.ok(xml, MediaType.APPLICATION_XML).build();
         } 
@@ -798,7 +802,7 @@ public final class EventSubscriptionResource extends EventManagerResource {
             Integer id = parseSubscriptionId(subscriptionId);
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
             Integer deletedSubscriptionId = subscriptionRegistry.deleteSubscription(id, userId);
-            logger.info(String.format("An event subscription with identifier '%d' has been deleted.", deletedSubscriptionId));
+            msg = String.format("Deleted subscription with id = '%d'.", deletedSubscriptionId);
             response = Response.ok().build();
         } 
         catch (IllegalArgumentException e) {
