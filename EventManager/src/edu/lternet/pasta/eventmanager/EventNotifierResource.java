@@ -244,10 +244,14 @@ public final class EventNotifierResource extends EventManagerResource {
             EmlPackageId emlPackageId = parseEmlPackageId(scope, identifier, revision);
             SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
             List<EmlSubscription> emlSubscriptionList = subscriptionRegistry.getSubscriptions(emlPackageId);
+            StringBuffer msgBuffer = new StringBuffer(String.format("Event notifications for packageId '%s':\n", emlPackageId.toString()));
 
             for (EmlSubscription emlSubscription : emlSubscriptionList) {
                 asynchronousNotify(emlPackageIdFormat, emlSubscription, emlPackageId);
+                msgBuffer.append(String.format("\n  %s;\n", emlSubscription.toString()));
             }
+            
+            msg = msgBuffer.toString();
 
             response = Response.ok().build();
         } 
@@ -392,6 +396,8 @@ public final class EventNotifierResource extends EventManagerResource {
 			}
 
 			EmlSubscription emlSubscription = getSubscription(subscriptionId, userId);
+			msg = String.format("Executed subscription with the following attributes: %s",
+					            emlSubscription.toString());
 			asynchronousNotify(null, emlSubscription, null);
 			response = Response.ok().build();
 		}
