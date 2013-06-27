@@ -19,7 +19,7 @@
 		<tbody>
 			<tr>
 				<td width="25%">
-					<img src="./images/LTER-logo.jpg" alt="LTER Network Logo" width="54px" height="58px"/>
+					<img src="./images/LTER-logo.jpg" title="LTER Network Logo" width="54px" height="58px"/>
 				</td>
 				<td valign="middle" align="center" width="50%">
 					<p id="head-title">LTER Network Data Portal</p>

@@ -180,7 +180,7 @@
 								Reinvestment Act of 2009 and is administered by the National
 								Science Foundation.</td>
 							<td><img id="arra-img" src="./images/ARRA-Small.gif"
-								alt="US ARRA logo" />
+								title="US ARRA logo" />
 							</td>
 						</tr>
 					</tbody>
