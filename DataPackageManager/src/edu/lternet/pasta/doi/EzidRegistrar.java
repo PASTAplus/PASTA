@@ -157,7 +157,7 @@ public class EzidRegistrar {
 	/**
 	 * Explicitly sets whether to use the EZID stage environment for DOI testing.
 	 * 
-	 * @param doiTest Boolean test flag
+	 * @param isDoiTest Boolean test flag
 	 */
 	public void setDoiTest(Boolean isDoiTest) {
 		
