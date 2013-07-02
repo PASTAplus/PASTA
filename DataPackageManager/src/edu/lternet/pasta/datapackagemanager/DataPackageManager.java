@@ -1266,6 +1266,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			dbUser = options.getOption("dbUser");
 			dbPassword = options.getOption("dbPassword");
 			databaseAdapterName = options.getOption("dbAdapter");
+			
+			// Load scope registry
+			String scopeRegistry = options.getOption("scopeRegistry");
+			DataPackage.setScopeRegistry(scopeRegistry);
 
 			// Load PASTA service options
 			eventmanagerHost = options

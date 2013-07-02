@@ -54,7 +54,7 @@
       <suggestion>Make sure that references refer to the correct elements.</suggestion>
       <reference></reference>
     </qualityCheck>
-    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
+    <qualityCheck qualityType="metadata" system="lter" statusType="error" >
       <identifier>packageIdPattern</identifier>
       <name>packageId pattern matches "scope.identifier.revision"</name>
       <description>Check against LTER requirements for scope.identifier.revision</description>
