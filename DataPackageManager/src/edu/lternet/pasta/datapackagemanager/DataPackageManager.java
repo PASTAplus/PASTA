@@ -113,12 +113,22 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String metacatUrl = null;
 	private static String pastaUriHead = null;
 	private static String pastaUser = null;
+	
+	private static Logger logger = Logger.getLogger(DataPackageManager.class);
+
+	static {
+		try {
+		  loadOptions();
+		}
+		catch (Exception e) {
+			logger.fatal("Error loading options: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
 	/*
 	 * Instance fields
 	 */
-
-	private Logger logger = Logger.getLogger(DataPackageManager.class);
 
 	// An instance of the DataManager class. This object provides the
 	// calling application access to all the public methods exposed by the
@@ -137,7 +147,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 */
 
 	public DataPackageManager() throws Exception {
-		loadOptions();
 		dataManager = DataManager.getInstance(this, databaseAdapterName);
 	}
 
@@ -1248,7 +1257,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 */
-	private void loadOptions() throws Exception {
+	private static void loadOptions() throws Exception {
 		try {
 			// Load database connection options
 			Options options = ConfigurationListener.getOptions();
@@ -1257,6 +1266,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			dbUser = options.getOption("dbUser");
 			dbPassword = options.getOption("dbPassword");
 			databaseAdapterName = options.getOption("dbAdapter");
+			
+			// Load scope registry
+			String scopeRegistry = options.getOption("scopeRegistry");
+			DataPackage.setScopeRegistry(scopeRegistry);
 
 			// Load PASTA service options
 			eventmanagerHost = options

@@ -3483,12 +3483,12 @@
         </td>
       </tr>
     </xsl:for-each>
-    <xsl:if test="method">
+    <xsl:if test="method | methods">
       <tr>
         <td class="{$datatablesubHeaderStyle}" colspan="2"><!-- label removed by mob, 16apr2010 Method Description: --></td>
       </tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr>
         <td colspan="2">
           <xsl:call-template name="method">
@@ -7641,12 +7641,12 @@
         <td colspan="2"><xsl:call-template name="coverage"></xsl:call-template></td>
       </tr>
     </xsl:for-each>
-    <xsl:if test="method">
+    <xsl:if test="method | methods">
       <tr>
         <td class="{$otherentitysubHeaderStyle}" colspan="2">Method Description:</td>
       </tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr>
         <td colspan="2">
           <xsl:call-template name="method">
@@ -9366,12 +9366,12 @@
         </td>
       </tr>
     </xsl:for-each>
-    <xsl:if test="method">
+    <xsl:if test="method | methods">
       <tr>
         <td class="{$spatialrastersubHeaderStyle}" colspan="2">Method Description:</td>
       </tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr>
         <td colspan="2">
           <xsl:call-template name="method">
@@ -10263,12 +10263,12 @@
         </xsl:call-template>
       </td></tr>
     </xsl:for-each>
-    <xsl:if test="method">
+      <xsl:if test="method | methods">
        <tr><td class="{$spatialvectorsubHeaderStyle}" colspan="2">
         Method Description:
       </td></tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr><td colspan="2">
         <xsl:call-template name="method">
           <xsl:with-param name="methodfirstColStyle" select="$spatialvectorfirstColStyle"/>
@@ -10498,12 +10498,12 @@
         <td colspan="2"><xsl:call-template name="coverage"></xsl:call-template></td>
       </tr>
     </xsl:for-each>
-    <xsl:if test="method">
+    <xsl:if test="method | methods">
        <tr>
          <td class="{$storedproceduresubHeaderStyle}" colspan="2">Method Description:</td>
        </tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr>
         <td colspan="2">
           <xsl:call-template name="method">
@@ -10860,12 +10860,12 @@
         <td colspan="2"><xsl:call-template name="coverage"></xsl:call-template></td>
       </tr>
     </xsl:for-each>
-    <xsl:if test="method">
+    <xsl:if test="method | methods">
       <tr>
         <td class="{$viewsubHeaderStyle}" colspan="2">Method Description:</td>
       </tr>
     </xsl:if>
-    <xsl:for-each select="method">
+    <xsl:for-each select="method | methods">
       <tr>
         <td colspan="2">
           <xsl:call-template name="method">

@@ -667,18 +667,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       // Directory paths for entities and entity reports
       metadataDir = options.getOption("datapackagemanager.metadataDir");      
       entityDir = options.getOption("datapackagemanager.entityDir");    
-      reportDir = options.getOption("datapackagemanager.reportDir");
-      
-      String qualityReportingStr = options.getOption("qualityReporting");
-      String qualityReportTemplate = options.getOption("qualityReportTemplate");
-      if (qualityReportingStr != null) {
-        if (qualityReportingStr.equalsIgnoreCase("true")) {
-          QualityReport.setQualityReporting(true, qualityReportTemplate);
-        }
-        else if (qualityReportingStr.equalsIgnoreCase("false")) {
-          QualityReport.setQualityReporting(false, null);
-        }
-      }
+      reportDir = options.getOption("datapackagemanager.reportDir");     
     } 
     catch (Exception e) {
       logger.error("Error in loading options: " + e.getMessage());

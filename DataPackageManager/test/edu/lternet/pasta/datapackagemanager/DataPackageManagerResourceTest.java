@@ -85,6 +85,9 @@ public class DataPackageManagerResourceTest {
   private static Integer testUpdateRevision = null;
   private static String testEntityId = null;
   private static String testEntityName = null;
+  
+  private static final String ACL_START_TEXT = "<access:access";
+  private static final String ACL_END_TEXT = "</access:access>";
 
   
   /*
@@ -677,8 +680,8 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.trim().startsWith("<access"));
-      assertTrue(entityString.trim().endsWith("</access>"));
+      assertTrue(entityString.trim().startsWith(ACL_START_TEXT));
+      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
     }
 
     // Test for NOT FOUND status with a bogus package id
@@ -702,8 +705,8 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.trim().startsWith("<access"));
-      assertTrue(entityString.trim().endsWith("</access>"));
+      assertTrue(entityString.trim().startsWith(ACL_START_TEXT));
+      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
     }
 
     // Test for NOT FOUND status with a bogus package id
@@ -727,8 +730,8 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.trim().startsWith("<access"));
-      assertTrue(entityString.trim().endsWith("</access>"));
+      assertTrue(entityString.trim().startsWith(ACL_START_TEXT));
+      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
     }
 
     // Test for NOT FOUND status with a bogus package id
@@ -752,8 +755,8 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.trim().startsWith("<access"));
-      assertTrue(entityString.trim().endsWith("</access>"));
+      assertTrue(entityString.trim().startsWith(ACL_START_TEXT));
+      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
     }
 
     // Test for NOT FOUND status with a bogus package id
