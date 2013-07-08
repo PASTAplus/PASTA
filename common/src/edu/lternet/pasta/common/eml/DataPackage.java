@@ -78,6 +78,18 @@ public class DataPackage {
    */
   
   /**
+   * Add a new creator to the creator list for this data package.
+   * Filters out duplicates by checking to see whether the responsible
+   * party is already in the list.
+   */
+  public void addCreator(ResponsibleParty responsibleParty) {
+	  if ((responsibleParty != null) && (!hasCreator(responsibleParty))) {
+		  creatorList.add(responsibleParty);
+	  }
+  }
+  
+  
+  /**
    * Finds the matching object name for a given entity in this data package
    * based on the entity's name. This is a convenience method.
    * 
@@ -122,6 +134,28 @@ public class DataPackage {
   
   public ArrayList<String> getTitles() {
     return titles;
+  }
+  
+  
+  private boolean hasCreator(ResponsibleParty responsibleParty) {
+	  boolean hasCreator = false;
+	  String responsiblePartyCreatorName = null;
+	  
+	  if (responsibleParty != null) {
+		  responsiblePartyCreatorName = responsibleParty.getCreatorName();
+	  
+		  if (responsiblePartyCreatorName != null) {
+			  for (ResponsibleParty rp : this.creatorList) {
+				  String rpCreatorName = rp.getCreatorName();
+				  if (responsiblePartyCreatorName.equalsIgnoreCase(rpCreatorName)) {
+					  hasCreator = true;
+					  break;
+				  }
+			  }
+		  }
+	  }
+	  
+	  return hasCreator;
   }
 
   

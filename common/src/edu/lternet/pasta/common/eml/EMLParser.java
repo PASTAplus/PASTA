@@ -173,7 +173,7 @@ public class EMLParser {
             Node creatorNode = creatorNodeList.item(i);
             ResponsibleParty rp = new ResponsibleParty("creator");
             parseResponsibleParty(creatorNode, rp);
-            dataPackage.creatorList.add(rp);
+            dataPackage.addCreator(rp);
           }
         }
 
