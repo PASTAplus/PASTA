@@ -2014,6 +2014,74 @@ public class DataPackageRegistry {
 
 	
 	/**
+	 * Returns an array list of resources that are publicly accessible for
+	 * a particular data package. We expect the list to contain zero or one Resource
+	 * objects for a given package_id.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listDataPackageResources(String packageId) throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, date_created " + 
+		    "FROM datapackagemanager.resource_registry " +
+		    "WHERE resource_type='dataPackage' " +
+		    "  AND package_id='" + packageId + "'" +
+		    "  AND doi IS NULL " +
+		    "  AND date_deactivated IS NULL;";
+
+		Statement stat = null;
+
+		try {
+
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+			String resourceId = null;
+
+			while (result.next()) {
+
+				Resource resource = new Resource();
+
+				// Test here for resource public accessibility before adding to list
+
+				resourceId = result.getString("resource_id");
+
+				if (this.isPublicAccessible(resourceId)) {
+
+					resource.setResourceId(resourceId);
+					resource.setResourceType(result.getString("resource_type"));
+					resource.setDateCreate(result.getString("date_created"));
+					resource.setPackageId(packageId);
+
+					resourceList.add(resource);
+
+				}
+
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
 	 * Returns an array list of DOIs that are obsolete.
 	 * 
 	 * @return Array list of resources

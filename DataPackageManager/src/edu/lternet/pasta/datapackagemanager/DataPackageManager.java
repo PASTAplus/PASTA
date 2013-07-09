@@ -61,6 +61,7 @@ import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
+import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetacatMetadataCatalog;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
@@ -134,6 +135,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	// calling application access to all the public methods exposed by the
 	// Data Manager Library API.
 	private DataManager dataManager;
+	private DOIScanner doiScanner;
 	private String scope;
 	private Integer identifier;
 	private Integer revision;
@@ -148,6 +150,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	public DataPackageManager() throws Exception {
 		dataManager = DataManager.getInstance(this, databaseAdapterName);
+		doiScanner = new DOIScanner();
 	}
 
 	
@@ -719,6 +722,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				authorizer.storeAccessMatrix(dataPackageURI, datasetAccessMatrix,
 				    mayOverwrite);
+								
+				/*
+				 * Register a DOI for the data package
+				 */
+				if (doiScanner != null) {
+					ArrayList<Resource> resourceList = dataPackageRegistry.listDataPackageResources(packageId);
+					if (resourceList != null) {
+						for (Resource resource : resourceList) {
+							doiScanner.processOneResource(resource);
+						}
+					}
+				}
 
 				/*
 				 * Notify the Event Manager about the new resource

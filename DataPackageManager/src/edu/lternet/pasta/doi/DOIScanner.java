@@ -55,7 +55,6 @@ public class DOIScanner {
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String LEVEL1NAME = "Level-1-EML.xml";
 	private static final String TRUE = "true";
-	private static final String FALSE = "false";
 
 	/*
 	 * Instance variables
@@ -65,6 +64,7 @@ public class DOIScanner {
 	private String dbURL = null;
 	private String dbUser = null;
 	private String dbPassword = null;
+	private EzidRegistrar ezidRegistrar = null;
 	private String metadataDir = null;
 	private String doiUrlHead = null;
 	private String doiTest = null;
@@ -102,6 +102,19 @@ public class DOIScanner {
 			this.setDoiTest(false);
 		}
 		
+		try {
+			ezidRegistrar = new EzidRegistrar();
+			if (this.isDoiTest) {
+				ezidRegistrar.setDoiTest(true);
+			} else {
+				ezidRegistrar.setDoiTest(false);
+			}
+		} catch (ConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw(e);
+		}
+
 		dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 
 	}
@@ -142,6 +155,7 @@ public class DOIScanner {
 
 	}
 
+	
 	/**
 	 * Scans the Data Package Manager resource registry for resources that are (1)
 	 * not deactivated (not deleted), (2) publicly accessible and (3) do not have
@@ -154,21 +168,6 @@ public class DOIScanner {
 
 		ArrayList<Resource> resourceList = null;
 
-		EzidRegistrar ezidRegistrar = null;
-
-		try {
-			ezidRegistrar = new EzidRegistrar();
-			if (this.isDoiTest) {
-				ezidRegistrar.setDoiTest(true);
-			} else {
-				ezidRegistrar.setDoiTest(false);
-			}
-		} catch (ConfigurationException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			throw new DOIException(e.getMessage());
-		}
-
 		try {
 			resourceList = dataPackageRegistry.listDoilessResources();
 		} catch (SQLException e) {
@@ -176,6 +175,23 @@ public class DOIScanner {
 			e.printStackTrace();
 			throw new DOIException(e.getMessage());
 		}
+
+		// For all resources without a registered DOI
+		for (Resource resource : resourceList) {
+			processOneResource(resource);
+		}
+
+	}
+
+	
+	/**
+	 * Processes a single resource for DOI registration.
+	 * 
+	 * @param resource        the Resource to be registered
+	 * 
+	 * @throws DOIException
+	 */
+	public void processOneResource(Resource resource) throws DOIException {
 
 		File emlFile = null;
 		EmlObject emlObject = null;
@@ -189,9 +205,6 @@ public class DOIScanner {
 		AlternateIdentifier alternateIdentifier = null;
 		Date time = null;
 		String doi = null;
-
-		// For all resources without a registered DOI
-		for (Resource resource : resourceList) {
 
 			// Build EML document object
 			emlFile = new File(this.getEmlFilePath(resource.getPackageId()));
@@ -276,11 +289,9 @@ public class DOIScanner {
 				    + resource.getPackageId();
 				logger.error(gripe);
 			}
-			
-		}
-
 	}
 
+	
 	/**
 	 * Scans the Data Package Manager resource registry for resources that have
 	 * both (1) a DOI and (2) a deactivated date - indicating that the resource
