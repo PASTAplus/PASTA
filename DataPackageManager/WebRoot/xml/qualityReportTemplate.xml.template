@@ -244,6 +244,17 @@
       <suggestion>Change the fieldDelimiter to a single character or its representation, either decimal, hex or escaped.</suggestion>
       <reference>http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-physical.html#fieldDelimiter</reference>
     </qualityCheck>
+    <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
+      <identifier>attributeNamesUnique</identifier>
+      <name>Attribute names are unique</name>
+      <description>Checks if attributeName values are unique in the table. Not required by EML.</description>
+      <expected>Unique attribute names.</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>A good table does not have duplicate column names.</explanation>
+      <suggestion>Check attribute names; best practice says these should be unique.</suggestion>
+      <reference>EML Best Practices</reference>
+    </qualityCheck>
     <qualityCheck qualityType="data" system="knb" statusType="info" >
       <identifier>displayFirstInsertRow</identifier>
       <name>Display first insert row</name>
