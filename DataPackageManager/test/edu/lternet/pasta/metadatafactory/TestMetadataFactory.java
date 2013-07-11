@@ -158,7 +158,7 @@ public class TestMetadataFactory {
         }
         String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
         System.err.println("testPackageId: " + testPackageId);
-        DataPackageManagerResourceTest.modifyTestEmlFile(testEmlFile, testPackageId);
+        DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);
       }
       catch (Exception e) {
         fail("Error encountered while initializing identifier value prior to running JUnit test.");

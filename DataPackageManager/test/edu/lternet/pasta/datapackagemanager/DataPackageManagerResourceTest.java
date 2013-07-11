@@ -107,9 +107,9 @@ public class DataPackageManagerResourceTest {
    * Class methods
    */
   
-  public static void modifyTestEmlFile(File testEmlFile, String newPackageId) {
+  public static void modifyTestEmlFile(String testScope, File testEmlFile, String newPackageId) {
     String xmlString = FileUtility.fileToString(testEmlFile);
-    Pattern pattern = Pattern.compile("knb-lter-xyz\\.\\d+\\.\\d+");
+    Pattern pattern = Pattern.compile(testScope + "\\.\\d+\\.\\d+");
     Matcher matcher = pattern.matcher(xmlString);  
     // Replace packageId value with new packageId value
     String modifiedXmlString = matcher.replaceAll(newPackageId);          
@@ -199,7 +199,7 @@ public class DataPackageManagerResourceTest {
         }
         String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
         System.err.println("testPackageId: " + testPackageId);
-        modifyTestEmlFile(testEmlFile, testPackageId);
+        modifyTestEmlFile(testScope, testEmlFile, testPackageId);
       }
       catch (Exception e) {
         fail("Error encountered while initializing identifier value prior to running JUnit test.");
@@ -818,7 +818,7 @@ public class DataPackageManagerResourceTest {
     
     // Test UPDATE for OK status
     String testPackageId = testScope + "." + testIdentifier + "." + testUpdateRevision;
-    modifyTestEmlFile(testEmlFile, testPackageId);
+    modifyTestEmlFile(testScope, testEmlFile, testPackageId);
     Response response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScope, testIdentifier, testEmlFile);
     int statusCode = response.getStatus();
     assertEquals(202, statusCode);
