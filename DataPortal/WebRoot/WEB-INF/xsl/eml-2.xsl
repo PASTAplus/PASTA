@@ -728,26 +728,24 @@
     <table  class="onehundred_percent">            
       <tr>
         <td>  
+        <xsl:if test="./methods">
           <h4><xsl:text>These methods, instrumentation and/or protocols apply to all data in this dataset:</xsl:text></h4>
           <table class="subGroup onehundred_percent">  
             <tr>
-              <!-- add in the resource-level temporal coverage info -->
               <td>
-                <xsl:if test="./methods">
-                  <!-- print the type of parent element, and title or description -->
-                  <xsl:for-each select="./methods">
-                    <xsl:call-template name="datasetmethod">
-                      <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
-                      <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
-                    </xsl:call-template>
-                  </xsl:for-each>
-                </xsl:if> 
+                <!-- print the type of parent element, and title or description -->
+                <xsl:for-each select="./methods">
+                  <xsl:call-template name="datasetmethod">
+                    <xsl:with-param name="firstColStyle" select="$firstColStyle"/>
+                    <xsl:with-param name="secondColStyle" select="$secondColStyle"/>
+                  </xsl:call-template>
+                </xsl:for-each>
               </td>
             </tr>
           </table>
-          <!-- Next comes the entity level coverages. attribute-level stuff under its entity name -->
-          <xsl:for-each select="dataTable | spatialRaster | spatialVector | storedProcedure | view |
-              otherEntity">
+        </xsl:if> 
+        <!-- Next comes the entity level coverages. attribute-level stuff under its entity name -->
+        <xsl:for-each select="dataTable | spatialRaster | spatialVector | storedProcedure | view | otherEntity">
              
             <xsl:if test="(./methods) or (*//attribute/methods) or (./method) or (*//attribute/method)">
               <h4>
@@ -758,9 +756,9 @@
                       <xsl:when test="../spatialVector"> spatial vector </xsl:when>
                       <xsl:when test="../storedProcedure"> stored procedure </xsl:when>
                       <xsl:when test="../view"> view </xsl:when>
-                      <xsl:when test="../otherEntity"> data entity </xsl:when>
+                      <xsl:when test="../otherEntity"> non-categorized data resource </xsl:when>
                   </xsl:choose>
-                  <xsl:value-of select="entityName"/>
+                  <em><xsl:value-of select="entityName"/></em>
                 <xsl:text>:</xsl:text>
               </h4>  
               <xsl:if test="(./method) or (./methods)"> <!-- first find an entity-level methods tree -->
@@ -7563,7 +7561,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntity</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Data Resource, Other:</big></label>
+    <label><big>Non-Categorized Data Resource:</big></label>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
