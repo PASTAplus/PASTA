@@ -745,13 +745,23 @@
               </td>
             </tr>
           </table>
-          <!-- next comes the entity level coverages. attribute-level stuff under it's entity name -->
-          <!--  TO DO: this needs to work for all entity types. choose label based on element name -->
-          <xsl:for-each select="dataTable">
+          <!-- Next comes the entity level coverages. attribute-level stuff under its entity name -->
+          <xsl:for-each select="dataTable | spatialRaster | spatialVector | storedProcedure | view |
+              otherEntity">
+             
             <xsl:if test="(./methods) or (*//attribute/methods) or (./method) or (*//attribute/method)">
               <h4>
-                <xsl:text>These methods, instrumentation, and/or protocols apply to Data Table: </xsl:text>
-                <xsl:value-of select="entityName"/> 
+                <xsl:text>These methods, instrumentation, and/or protocols apply to the</xsl:text>
+                  <xsl:choose>
+                      <xsl:when test="../dataTable"> data table </xsl:when>
+                      <xsl:when test="../spatialRaster"> spatial raster </xsl:when>
+                      <xsl:when test="../spatialVector"> spatial vector </xsl:when>
+                      <xsl:when test="../storedProcedure"> stored procedure </xsl:when>
+                      <xsl:when test="../view"> view </xsl:when>
+                      <xsl:when test="../otherEntity"> data entity </xsl:when>
+                  </xsl:choose>
+                  <xsl:value-of select="entityName"/>
+                <xsl:text>:</xsl:text>
               </h4>  
               <xsl:if test="(./method) or (./methods)"> <!-- first find an entity-level methods tree -->
                 <!--  this becomes METHODS in eml 2.1 -->
