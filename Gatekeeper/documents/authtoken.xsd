@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="authtoken">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="authSystem"  minOccurs="1" maxOccurs="unbounded" >
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="identifier" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+                        </xs:sequence>
+                        <xs:attribute name="name" type="xs:string" use="required" />
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="expires" type="xs:int" use="required"/>
+            <xs:attribute name="profileId" type="xs:string" use="required" />
+            <xs:attribute name="commonName" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
