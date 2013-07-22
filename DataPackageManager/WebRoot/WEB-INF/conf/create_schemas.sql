@@ -1,6 +1,5 @@
 CREATE SCHEMA datapackagemanager AUTHORIZATION pasta;
 
-
 CREATE TYPE datapackagemanager.resource_type AS ENUM ('data', 'dataPackage', 'metadata', 'report');
 CREATE TABLE datapackagemanager.resource_registry (
   resource_id VARCHAR(350) NOT NULL,                        -- resource id, the primary key
@@ -47,4 +46,17 @@ CREATE TABLE datapackagemanager.data_cache_registry (
   DATA_FORMAT VARCHAR(64),                                  -- data format
   DATE_CREATED DATE,                                        -- date created
   UPDATE_DATE DATE                                          -- update date
+);
+
+
+CREATE SEQUENCE datapackagemanager.subscription_id_seq;
+CREATE TABLE datapackagemanager.emlsubscription (
+   subscription_id    numeric    default nextval('datapackagemanager.subscription_id_seq') primary key,
+   date_created       timestamp  not null,
+   active             boolean    not null,
+   creator            text       not null,
+   scope              text,
+   identifier         integer,
+   revision           integer,
+   url                text       not null
 );

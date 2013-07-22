@@ -46,6 +46,9 @@
        <fileset dir="${shared.lib.dir}/metacat">
         <include name="**/*.jar"/>
       </fileset>
+    	<fileset dir="${shared.lib.dir}/ning">
+        <include name="async-http-client-1.4.0.jar"/>
+      </fileset>
       <fileset dir="${shared.lib.dir}/owasp">
         <include name="**/esapi-2.0.1.jar"/>
       </fileset>

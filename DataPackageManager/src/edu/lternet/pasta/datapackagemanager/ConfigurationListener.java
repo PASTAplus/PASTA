@@ -59,6 +59,7 @@ public class ConfigurationListener implements ServletContextListener {
     Logger.getLogger(edu.lternet.pasta.datapackagemanager.ConfigurationListener.class);
     
   private static Options options = null;
+  private static String eventSubscriptionDocument = null;
   private static String serviceDocument = null;
   private static String versionNumber = null;
   private static String versionHeader = null;
@@ -117,6 +118,16 @@ public class ConfigurationListener implements ServletContextListener {
   }
   
   
+  /** Getting for the event subscription xsd document, a Document
+   * object created from the eml-subscription.xsd schema file.
+   * 
+   * @return   the serviceDocument XML string
+   */
+  public static String getEventSubscriptionDocument() {
+    return eventSubscriptionDocument;
+  }
+  
+
   /** Getting for the service document, a Document
    * object created from the service.xml file
    * 
@@ -165,6 +176,7 @@ public class ConfigurationListener implements ServletContextListener {
     // Initialize the properties file for Data Manager service
     String propertiesPath = dirPath + "/datapackagemanager.properties";
     String serviceFilePath = dirPath + "/service.xml";
+    String eventSubscriptionFilePath = dirPath + "/eml-subscription.xsd";
     
     try {
       File propertiesFile = new File(propertiesPath);
@@ -174,10 +186,20 @@ public class ConfigurationListener implements ServletContextListener {
       
       File serviceFile = new File(serviceFilePath);
       serviceFile = FileUtility.assertCanRead(serviceFile);
-      this.serviceDocument = FileUtility.fileToString(serviceFile);
-      if (this.serviceDocument == null || this.serviceDocument.equals("")) {
+      serviceDocument = FileUtility.fileToString(serviceFile);
+      if (serviceDocument == null || serviceDocument.equals("")) {
         throw new IllegalStateException("Error loading service.xml file.");
       }
+      
+      File eventSubscriptionFile = new File(eventSubscriptionFilePath);
+      eventSubscriptionFile = FileUtility.assertCanRead(eventSubscriptionFile);
+      eventSubscriptionDocument = FileUtility.fileToString(eventSubscriptionFile);
+      if (eventSubscriptionDocument == null || eventSubscriptionDocument.equals("")) {
+        throw new IllegalStateException("Error loading eml-subscription.xsd file.");
+      }
+      
+      
+      
     } 
     catch (IOException e) {
       String errorMessage = "IOException loading properties file at '" + propertiesPath + "': " + e.getMessage();
