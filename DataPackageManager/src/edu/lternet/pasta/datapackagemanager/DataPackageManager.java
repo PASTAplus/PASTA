@@ -751,8 +751,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	
 	/*
 	 * Notifies the event manager of a change to a data package by using an
-	 * EventManagerClient object. Spawns off a thread so that a delayed response
-	 * from the Event Manager service doesn't slow down our transaction.
+	 * EventManagerClient object.
 	 */
 	private void notifyEventManager(String packageId, String scope,
 	    Integer identifier, Integer revision, String user, AuthToken authToken) {
@@ -763,8 +762,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		this.user = user;
 		this.authToken = authToken;
 
-		EventManagerClient eventManagerClient = new EventManagerClient(
-		    eventmanagerHost);
+		EventManagerClient eventManagerClient = new EventManagerClient();
 
 		try {
 			eventManagerClient.notifyEventManager(this.scope, this.identifier,
