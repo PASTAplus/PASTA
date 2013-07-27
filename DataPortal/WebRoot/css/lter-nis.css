@@ -422,20 +422,16 @@ li.mapBrowse {
 /* Support for browse page */
 
 .searchcat {
-    padding-left: 5px;
     color: #0247A8;
     font-weight: bold;
-    font-size: 110%;  
+    font-size: 100%;  
 }
                     
-td.searchsubcat {
-    padding-left: 15px; 
-}
-
-a.searchsubcat {
+.searchsubcat {
+    font-size: 95%;  
     font-weight: normal;
 }
-                                        
+
 a.searchsubcat:hover {
     color: #669966;
     text-decoration: underline; 

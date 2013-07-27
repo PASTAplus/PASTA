@@ -54,6 +54,7 @@
 <jsp:include page="/WEB-INF/jsp/javascript.jsp" />
 
 <script src="./js/jquery-ui-1.10.0.js"></script>
+<script src="./js/toggle.js" type="text/javascript"></script>
 
     <script language="javascript" type="text/javascript">
     
@@ -89,6 +90,9 @@
 					<form id="browsesearch" name="browsesearch" method="post" action="./browseServlet">
 	          <table id="browseSearch">
 	            <tbody>
+	            <tr>
+	              <th align="left">Categories &amp; Terms</th>
+	            </tr>
                 <%= browseHTML %>
               </tbody>
             </table>
@@ -110,6 +114,22 @@
 
 	</div>
 	<!-- end of wrapper -->
+
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+			jQuery(".toggleButton").click(function() {
+				jQuery(this).next(".collapsible").slideToggle("fast");
+			});
+			jQuery(".collapsible").hide();
+			jQuery("#toggleSummary").next(".collapsible").show();
+		});
+		jQuery("#showAll").click(function() {
+			jQuery(".collapsible").show();
+		});
+		jQuery("#hideAll").click(function() {
+			jQuery(".collapsible").hide();
+		});
+	</script>
 
 </body>
 </html>

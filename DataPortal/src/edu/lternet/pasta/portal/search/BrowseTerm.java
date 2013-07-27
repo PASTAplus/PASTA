@@ -62,6 +62,10 @@ public class BrowseTerm {
   private TermsList termsList;
   private final String value;    // Text value of this browse term, e.g. "percent carbon"
 
+  // The term ID in the LTER Controlled Vocabulary
+  private String termId = null;  
+  private int level = 1;
+
   
   /*
    * Constructors
@@ -88,6 +92,11 @@ public class BrowseTerm {
   /*
    * Instance methods
    */
+  
+  private int calculateIndent() {
+	  return (level + 1) * 4;
+  }
+  
   
   /*
    * Passes through to use the SimpleSearch logic to compose the query string.
@@ -123,23 +132,39 @@ public class BrowseTerm {
     StringBuffer stringBuffer = new StringBuffer("");
     int lastIndex = 0;
     final String findStr = "<document>";
-
-    stringBuffer.append("      <term>\n");
-    stringBuffer.append("        <value>" + value + "</value>\n");
-
-    /* Count the number of matching documents */
-    this.matchCount = 0;
-    while (lastIndex != -1) {
-      lastIndex = searchResults.indexOf(findStr, lastIndex);     
-      if (lastIndex != -1) {
-        lastIndex += findStr.length();
-        this.matchCount++;
-      }
+    int indent = calculateIndent();
+    
+    for (int i = 0; i < indent; i++) {
+    	stringBuffer.append(" ");
     }
+    stringBuffer.append(String.format("<term level='%d' hasMoreDown='0'>\n", 
+    		                          level));
+    for (int i = 0; i < indent + 4; i++) {
+    	stringBuffer.append(" ");
+    }
+    stringBuffer.append("<value>" + value + "</value>\n");
 
-    stringBuffer.append("        <matchCount>" + this.matchCount + "</matchCount>\n");
-    stringBuffer.append("      </term>\n");
-
+    if (searchResults != null) {
+      /* Count the number of matching documents */
+      this.matchCount = 0;
+      while (lastIndex != -1) {
+        lastIndex = searchResults.indexOf(findStr, lastIndex);     
+        if (lastIndex != -1) {
+          lastIndex += findStr.length();
+          this.matchCount++;
+        }
+      }
+      for (int i = 0; i < indent + 4; i++) {
+      	stringBuffer.append(" ");
+      }
+      stringBuffer.append("<matchCount>" + this.matchCount + "</matchCount>\n");
+    }
+    
+    for (int i = 0; i < indent; i++) {
+    	stringBuffer.append(" ");
+    }
+    stringBuffer.append("</term>\n");
+    
     cacheString = stringBuffer.toString();
     return cacheString;
   }
@@ -286,7 +311,9 @@ public class BrowseTerm {
     String searchResults = null;
     
     try {
-      searchResults = FileUtils.readFileToString(browseCacheFile);
+    	if (browseCacheFile.exists()) {
+            searchResults = FileUtils.readFileToString(browseCacheFile);
+    	}
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -296,6 +323,16 @@ public class BrowseTerm {
   }
   
   
+  public void setLevel(int n) {
+	  this.level = n;
+  }
+  
+ 
+  public void setTermId(String id) {
+	  this.termId = id;
+  }
+  
+ 
   /**
    * Writes the search results to file.
    * 

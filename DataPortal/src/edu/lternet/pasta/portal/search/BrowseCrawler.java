@@ -88,18 +88,19 @@ public class BrowseCrawler {
    * Crawls the data catalog, querying each browse term.
    */
   public BrowseGroup crawl() {
-    logger.info("BrowseCrawler: Starting crawl.");
-    File browseCacheFile = new File(BrowseSearch.browseCachePath);
-    browseCache = browseSearch.readBrowseCache(browseCacheFile);
-    ArrayList<BrowseTerm> browseTerms = browseCache.getBrowseTerms();
+    logger.info("Starting crawl.");
+    browseCache = BrowseGroup.generateFromTopTerms();
+    ArrayList<BrowseTerm> browseTerms = new ArrayList<BrowseTerm>();
+    browseCache.getBrowseTerms(browseTerms);
+    logger.info(String.format("Found %d terms in LTER Controlled Vocabulary", browseTerms.size()));
     
     for (BrowseTerm browseTerm : browseTerms) {
-      logger.debug("Crawling term: " + browseTerm.getValue());
+      logger.info("Crawling term: " + browseTerm.getValue());
       browseTerm.crawl();
     }
     
     writeBrowseCache();
-    logger.info("BrowseCrawler: Finished crawl");
+    logger.info(String.format("Finished crawl: %d terms", browseTerms.size()));
     
     return browseCache;
   }
@@ -110,12 +111,8 @@ public class BrowseCrawler {
    */
   private void writeBrowseCache() {
     File browseCacheFile = new File(BrowseSearch.browseCachePath);
-    StringBuffer stringBuffer = new StringBuffer("");
-    
-    stringBuffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    stringBuffer.append("<browseCache>\n");
-    stringBuffer.append(browseCache.toString());
-    stringBuffer.append("</browseCache>\n");
+    StringBuffer stringBuffer = new StringBuffer("");   
+    stringBuffer.append(browseCache.toXML());
     
     try {
       FileUtils.writeStringToFile(browseCacheFile, stringBuffer.toString());

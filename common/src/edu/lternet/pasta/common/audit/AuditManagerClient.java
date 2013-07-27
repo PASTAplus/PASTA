@@ -179,7 +179,7 @@ public class AuditManagerClient implements Runnable {
    httpPost.setHeader("Cookie", "auth-token=" + authToken.getTokenString());
    
    try {
-     logger.warn("Posting to Audit Manager at URL: " + url);
+     logger.debug("Posting to Audit Manager at URL: " + url);
      // Set the request entity
      String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
      String auditEntryXML = xmlHeader + auditRecord.toXML();
@@ -188,7 +188,7 @@ public class AuditManagerClient implements Runnable {
      HttpHost httpHost = new HttpHost(this.host, 8080, "http");
      HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, localcontext);
      int statusCode = httpResponse.getStatusLine().getStatusCode();
-     logger.warn("Response Code from Audit Manager: " + statusCode);
+     logger.debug("Response Code from Audit Manager: " + statusCode);
      HttpEntity httpEntity = httpResponse.getEntity();
      String entityString = EntityUtils.toString(httpEntity);
      if (statusCode != HttpStatus.SC_OK && 

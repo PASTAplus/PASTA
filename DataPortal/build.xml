@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="deploy" name="DataPortal">
   <property file="build.properties"/>
+  <property file="./WebRoot/WEB-INF/conf/dataportal.properties"/>
 
   <property name="webapp.name" value="nis"/>
 
@@ -9,6 +10,15 @@
 
   <!-- Copy shared libraries into the local lib directory -->
   <target name="prepare" depends="prepare-common">
+  	
+     <!-- Make sure the browse directory contains a browse cache file -->
+  	 <copy todir="${browse.dir}" preservelastmodified="true" verbose="true"
+  	       filtering="no" overwrite="false">
+         <fileset dir="${web.dir}/browse">
+             <include name="browseCache.xml"/>
+         </fileset>
+  	 </copy>
+  	
      <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
       <fileset dir="${shared.lib.dir}/apache-commons">

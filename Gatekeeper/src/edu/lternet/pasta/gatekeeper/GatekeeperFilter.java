@@ -127,7 +127,7 @@ public final class GatekeeperFilter implements Filter
         HttpServletResponse res = (HttpServletResponse) response;
 
         // Output HttpServletRequest diagnostic information
-		    logger.info("Request URL: " + req.getMethod() + " - "
+		    logger.debug("Request URL: " + req.getMethod() + " - "
 		    		+ req.getRequestURL().toString());
         //this.dumpHeader(req);
         //this.dumpBody(req);
@@ -313,7 +313,7 @@ public final class GatekeeperFilter implements Filter
           cookieValue = cookieValue + "-" + Base64.encodeBase64String(signature);
         }
 
-        logger.info("Cookie value: " + cookieValue);
+        logger.debug("Cookie value: " + cookieValue);
 
         Cookie c = new Cookie(ConfigurationListener.getTokenName(), cookieValue);
         Long expiry = attrlist.getExpirationDate() / 1000L;
