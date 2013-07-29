@@ -92,7 +92,7 @@ public class BrowseGroup {
    * Class methods
    */
   
-    public static BrowseGroup generateFromTopTerms() {
+    public static BrowseGroup generateKeywordCache() {
 	  BrowseGroup controlledVocabulary = new BrowseGroup("Controlled Vocabulary");
 	  
 	  String topTermsXML = ControlledVocabularyClient.webServiceFetchTopTerms();	  
@@ -208,28 +208,65 @@ public class BrowseGroup {
   }
   
   
+    public static BrowseGroup generateLterSiteCache() {
+  	  BrowseGroup browseLterSiteCache = new BrowseGroup("Controlled Vocabulary");
+	  BrowseGroup topGroup = new BrowseGroup("LTER Sites");
+	  
+	  browseLterSiteCache.addBrowseGroup(topGroup);
+	  
+	  String[] lterSiteTerms = LTERSite.sites;
+	  
+	  for (int i = 0; i < lterSiteTerms.length; i++) {
+		  String term = lterSiteTerms[i];
+		  BrowseTerm browseTerm = new BrowseTerm(term);
+		  browseTerm.setType("ltersite");
+		  topGroup.addBrowseTerm(browseTerm);
+	  }
+	      
+	 
+	  return browseLterSiteCache;
+  }
+    
+    
 	public static void main(String[] args) {
-		BrowseGroup controlledVocabulary = generateFromTopTerms();
+		BrowseGroup controlledVocabulary = generateKeywordCache();
 		String xmlString = controlledVocabulary.toXML();
 		String htmlString = controlledVocabulary.toHTML();
 
-		File browseCacheFile = new File("C:/temp/browseCache.xml");
+		File browseCacheFile = new File("C:/temp/browseKeyword.xml");
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, xmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-		browseCacheFile = new File("C:/temp/browseCache.html");
+		}		
+		browseCacheFile = new File("C:/temp/browseKeyword.html");
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, htmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}		
+		System.out.println("Generation of keyword browse cache completed.");
+
+	    controlledVocabulary = generateLterSiteCache();
+		xmlString = controlledVocabulary.toXML();
+	    htmlString = controlledVocabulary.toHTML();
+		browseCacheFile = new File("C:/temp/browseLterSite.xml");
+		try {
+			FileUtils.writeStringToFile(browseCacheFile, xmlString);
 		}
-		
-		System.out.println("Generation of browse cache completed.");
+		catch (Exception e) {
+			e.printStackTrace();
+		}		
+		browseCacheFile = new File("C:/temp/browseLterSite.html");
+		try {
+			FileUtils.writeStringToFile(browseCacheFile, htmlString);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}		
+		System.out.println("Generation of LTER site browse cache completed.");
 	}
 
 
@@ -555,7 +592,7 @@ public class BrowseGroup {
       stringBuffer.append("<terms>\n");
       ArrayList<BrowseTerm> arrayList = getLocalBrowseTerms();
       for (BrowseTerm browseTerm : arrayList) {
-        browseTermString = browseTerm.generateCacheString();
+        browseTermString = browseTerm.toXML();
         if (!browseTermString.equals("")) {
           stringBuffer.append(browseTermString);
         }

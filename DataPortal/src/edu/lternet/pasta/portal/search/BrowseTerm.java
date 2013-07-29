@@ -65,6 +65,7 @@ public class BrowseTerm {
   // The term ID in the LTER Controlled Vocabulary
   private String termId = null;  
   private int level = 1;
+  private String type = "keyword"; // Other type is "ltersite"
 
   
   /*
@@ -126,7 +127,7 @@ public class BrowseTerm {
    * Generates an XML string for storing this browse term in the browse cache
    * on disk as a <term> element.
    */
-  String generateCacheString() {
+  String toXML() {
     String cacheString = null;
     String searchResults = readSearchResults();
     StringBuffer stringBuffer = new StringBuffer("");
@@ -138,11 +139,16 @@ public class BrowseTerm {
     	stringBuffer.append(" ");
     }
     stringBuffer.append(String.format("<term level='%d' hasMoreDown='0'>\n", 
-    		                          level));
+    		                          this.level));
     for (int i = 0; i < indent + 4; i++) {
     	stringBuffer.append(" ");
     }
     stringBuffer.append("<value>" + value + "</value>\n");
+
+    for (int i = 0; i < indent + 4; i++) {
+      	stringBuffer.append(" ");
+    }
+    stringBuffer.append("<type>" + type + "</type>\n");
 
     if (searchResults != null) {
       /* Count the number of matching documents */
@@ -265,7 +271,8 @@ public class BrowseTerm {
         e.printStackTrace();
       }
       
-      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s\'", encodedValue));
+      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s&amp;type=%s\'", 
+    		                            encodedValue, this.type));
       stringBuffer.append(" class=\"searchsubcat\">");
       stringBuffer.append(value);
       stringBuffer.append(" (" + matchCount + ")");
@@ -330,6 +337,11 @@ public class BrowseTerm {
  
   public void setTermId(String id) {
 	  this.termId = id;
+  }
+  
+ 
+  public void setType(String type) {
+	  this.type = type;
   }
   
  

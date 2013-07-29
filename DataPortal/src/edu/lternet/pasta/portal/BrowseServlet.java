@@ -165,7 +165,7 @@ public class BrowseServlet extends DataPortalServlet {
       logger.error(e.getMessage());
       String warningMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
       request.setAttribute("message", warningMessage);
-      forward = "./advancedSearch.jsp";
+      forward = "./browse.jsp";
     }
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
@@ -180,33 +180,47 @@ public class BrowseServlet extends DataPortalServlet {
    *           if an error occurs
    */
   public void init() throws ServletException {
-
+    ServletContext servletContext = getServletContext();
     PropertiesConfiguration options = ConfigurationListener.getOptions();
     xslpath = options.getString("resultsetutility.xslpath");
-    logger.debug("XSLPATH: " + xslpath);
     cwd = options.getString("system.cwd");
-    logger.debug("CWD: " + cwd);
     String browseDirPath = options.getString("browse.dir");
     BrowseSearch.setBrowseCacheDir(browseDirPath);
+    BrowseSearch browseSearch = null;
+    BrowseGroup browseGroup = null;
 
-    File browseCacheFile = new File(BrowseSearch.browseCachePath);
-
-    if (browseCacheFile.exists()) {
-      BrowseSearch browseSearch = new BrowseSearch();
-      BrowseGroup browseGroup = browseSearch.readBrowseCache(browseCacheFile);
+    File browseKeywordFile = new File(BrowseSearch.browseKeywordPath);
+    if (browseKeywordFile.exists()) {
+      browseSearch = new BrowseSearch();
+      browseGroup = browseSearch.readBrowseCache(browseKeywordFile);
       
-      ServletContext servletContext = getServletContext();
-
       /* Lock the servlet context object to guarantee that only one thread at a
        * time can be getting or setting the context attribute. 
        */
       synchronized(servletContext) {
-        servletContext.setAttribute("browseHTML", browseGroup.toHTML());
+        servletContext.setAttribute("browseKeywordHTML", browseGroup.toHTML());
       }
     }
     else {
-      logger.error("Missing browseCacheFile at location: " + BrowseSearch.browseCachePath);
+      logger.warn("Missing browse keyword file at location: " + BrowseSearch.browseKeywordPath);
+    }
+  
+    
+    File browseLterSiteFile = new File(BrowseSearch.browseLterSitePath);
+    if (browseLterSiteFile.exists()) {
+      browseSearch = new BrowseSearch();
+      browseGroup = browseSearch.readBrowseCache(browseLterSiteFile);
+    
+      /* Lock the servlet context object to guarantee that only one thread at a
+       * time can be getting or setting the context attribute. 
+       */
+      synchronized(servletContext) {
+        servletContext.setAttribute("browseLterSiteHTML", browseGroup.toHTML());
+      }
+    }
+    else {
+      logger.warn("Missing browse LTER site file at location: " + BrowseSearch.browseLterSitePath);
     }
   }
-    
+  
 }

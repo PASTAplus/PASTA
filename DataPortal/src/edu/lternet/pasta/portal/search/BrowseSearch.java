@@ -54,8 +54,10 @@ public class BrowseSearch {
    * different value in the dataportal.properties file
    */
   public static String browseCacheDir = "/home/pasta/local/browse";     
-  private static final String browseCacheFilename = "browseCache.xml";
-  public static String browseCachePath = browseCacheDir + "/" + browseCacheFilename;
+  private static final String browseKeywordFilename = "browseKeyword.xml";
+  public static String browseKeywordPath = browseCacheDir + "/" + browseKeywordFilename;
+  private static final String browseLterSiteFilename = "browseLterSite.xml";
+  public static String browseLterSitePath = browseCacheDir + "/" + browseLterSiteFilename;
   private static final Logger logger = Logger.getLogger(BrowseSearch.class);
   static final long serialVersionUID = 0;  // Needed for Eclipse warning.
 
@@ -81,7 +83,8 @@ public class BrowseSearch {
    */
   public static void setBrowseCacheDir(String directoryPath) {
     BrowseSearch.browseCacheDir = directoryPath;
-    BrowseSearch.browseCachePath = String.format("%s/%s", directoryPath, browseCacheFilename);
+    BrowseSearch.browseKeywordPath = String.format("%s/%s", directoryPath, browseKeywordFilename);
+    BrowseSearch.browseLterSitePath = String.format("%s/%s", directoryPath, browseLterSiteFilename);
   }
   
 
@@ -249,6 +252,11 @@ public class BrowseSearch {
                       textString = text.getData().trim();
                       browseTerm = new BrowseTerm(textString);
                       browseGroup.addBrowseTerm(browseTerm);
+                    }
+                    else if (termElement.getTagName().equals("type")) {
+                        text = (Text) termElement.getFirstChild();
+                        textString = text.getData().trim();
+                        browseTerm.setType(textString);
                     }
                     else if (termElement.getTagName().equals("matchCount")) {
                       text = (Text) termElement.getFirstChild();
