@@ -475,15 +475,13 @@ public class BrowseGroup {
    */
 	public String toHTML() {
 		StringBuffer sb = new StringBuffer("");
-        sb.append("<table id='browseSearch'>\n");
-        sb.append("  <tbody>\n");
+        sb.append("<ul id='browseSearch'>\n");
 		
 		for (BrowseGroup browseGroup : browseGroups) {
 			sb.append(browseGroup.htmlLevel1());
 		}
 		
-		sb.append("  </tbody>\n");
-		sb.append("</table>\n");
+		sb.append("</ul>\n");
 		String htmlString = sb.toString();
 		return htmlString;	
 	}
@@ -495,9 +493,9 @@ public class BrowseGroup {
 		
 		String innerHTML = innerHTML();
 		
-		sb.append("<tr>\n");
-        sb.append(String.format("  <td class='searchcat'><span id='%s' class='toggleButton'>%s +/-</span><div class='collapsible'><table>%s</table></div></td>", toggleId, getValue(), innerHTML));		
-		sb.append("</tr>\n");
+		sb.append("  <li class='searchcat'>\n");
+        sb.append(String.format("<span id='%s' class='toggleButton'>%s +/-</span>\n<div class='collapsible'>\n<table>\n%s</table></div>\n", toggleId, getValue(), innerHTML));		
+		sb.append("  </li>\n");
 		
 		String htmlLevel1 = sb.toString();
 	    return htmlLevel1;
