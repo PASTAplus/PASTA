@@ -188,11 +188,12 @@ public class BrowseServlet extends DataPortalServlet {
     BrowseSearch.setBrowseCacheDir(browseDirPath);
     BrowseSearch browseSearch = null;
     BrowseGroup browseGroup = null;
+    boolean isLterSiteCache = false;
 
     File browseKeywordFile = new File(BrowseSearch.browseKeywordPath);
     if (browseKeywordFile.exists()) {
       browseSearch = new BrowseSearch();
-      browseGroup = browseSearch.readBrowseCache(browseKeywordFile);
+      browseGroup = browseSearch.readBrowseCache(browseKeywordFile, isLterSiteCache);
       
       /* Lock the servlet context object to guarantee that only one thread at a
        * time can be getting or setting the context attribute. 
@@ -206,10 +207,11 @@ public class BrowseServlet extends DataPortalServlet {
     }
   
     
+    isLterSiteCache = true;
     File browseLterSiteFile = new File(BrowseSearch.browseLterSitePath);
     if (browseLterSiteFile.exists()) {
       browseSearch = new BrowseSearch();
-      browseGroup = browseSearch.readBrowseCache(browseLterSiteFile);
+      browseGroup = browseSearch.readBrowseCache(browseLterSiteFile, isLterSiteCache);
     
       /* Lock the servlet context object to guarantee that only one thread at a
        * time can be getting or setting the context attribute. 

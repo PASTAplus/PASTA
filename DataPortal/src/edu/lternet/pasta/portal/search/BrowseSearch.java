@@ -98,7 +98,7 @@ public class BrowseSearch {
    * @param  browseCacheFile     the browse cache File object
    * @return topBrowseGroup, a BrowseGroup object holding the browse cache
    */
-  public BrowseGroup readBrowseCache(File browseCacheFile) {
+  public BrowseGroup readBrowseCache(File browseCacheFile, boolean isLterSiteCache) {
     Document document;
     DocumentBuilder documentBuilder;
     DocumentBuilderFactory documentBuilderFactory =
@@ -110,7 +110,6 @@ public class BrowseSearch {
     Node groupNode;
     NodeList groupNodeList;
     Text text;
-    String textString;
     BrowseGroup topBrowseGroup = null;     // The BrowseGroup that is returned
 
     Element topElement;
@@ -131,6 +130,7 @@ public class BrowseSearch {
             groupNodeList = topElement.getChildNodes();
 
             for (int j = 0; j < groupNodeList.getLength(); j++) {
+              String value = null;
               groupNode = groupNodeList.item(j);
               
               if (groupNode instanceof Element) {
@@ -143,8 +143,8 @@ public class BrowseSearch {
                  */
                 if (groupElement.getTagName().equals("value")) {
                   text = (Text) groupElement.getFirstChild();
-                  textString = text.getData().trim();
-                  topBrowseGroup = new BrowseGroup(textString);                  
+                  value = text.getData().trim();
+                  topBrowseGroup = isLterSiteCache ? new LTERSiteBrowseGroup(value) : new BrowseGroup(value);
                 }
                 /*
                  * If we encounter a group element, parse the group element,
@@ -214,7 +214,12 @@ public class BrowseSearch {
         if (groupElement.getTagName().equals("value")) {
           text = (Text) groupElement.getFirstChild();
           textString = text.getData().trim();
-          browseGroup = new BrowseGroup(textString);
+          if (parentBrowseGroup instanceof LTERSiteBrowseGroup) {
+        	  browseGroup = new LTERSiteBrowseGroup(textString);
+          }
+          else {
+        	  browseGroup = new BrowseGroup(textString);
+          }
           parentBrowseGroup.addBrowseGroup(browseGroup);
         }
         /*
@@ -252,11 +257,6 @@ public class BrowseSearch {
                       textString = text.getData().trim();
                       browseTerm = new BrowseTerm(textString);
                       browseGroup.addBrowseTerm(browseTerm);
-                    }
-                    else if (termElement.getTagName().equals("type")) {
-                        text = (Text) termElement.getFirstChild();
-                        textString = text.getData().trim();
-                        browseTerm.setType(textString);
                     }
                     else if (termElement.getTagName().equals("matchCount")) {
                       text = (Text) termElement.getFirstChild();

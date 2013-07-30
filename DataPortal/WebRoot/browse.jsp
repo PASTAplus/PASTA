@@ -13,9 +13,11 @@
   String type = (String) request.getParameter("type");
   
   String attributeName = "browseKeywordHTML";
+  String subcaption = "Category and Keyword";
   String introText = "category and keyword";
   if ((type != null) && (type.equals("ltersite"))) {
     attributeName = "browseLterSiteHTML";
+    subcaption = "LTER Site";
     introText = "LTER site";
   }
   
@@ -55,6 +57,7 @@
 		<div class="content">
 
 			<h2 align="center">Browse Data Packages</h2>
+			<h3 align="center"><%= subcaption %></h3>
 
 			<fieldset>
 				<p>Browse data packages by <%= introText %> using the links below. The number of matching data sets is shown in parentheses.&#42;</p>
@@ -62,12 +65,7 @@
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
 				<div class="section">
-	          <table id="browseSearch">
-	            <tbody>
-                <%= browseHTML %>
-              </tbody>
-            </table>
-            <input type="hidden" name="browseValue" value="" />
+          <%= browseHTML %>
 				</div>
 				<p><small>&#42; <em>Please note: (1) Only public documents are accessible from this page; (2) Search results are refreshed nightly.</em></small></p>
 			</fieldset>
@@ -86,7 +84,6 @@
 				jQuery(this).next(".collapsible").slideToggle("fast");
 			});
 			jQuery(".collapsible").hide();
-			jQuery("#toggleSummary").next(".collapsible").show();
 		});
 		jQuery("#showAll").click(function() {
 			jQuery(".collapsible").show();

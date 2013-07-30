@@ -65,7 +65,6 @@ public class BrowseTerm {
   // The term ID in the LTER Controlled Vocabulary
   private String termId = null;  
   private int level = 1;
-  private String type = "keyword"; // Other type is "ltersite"
 
   
   /*
@@ -144,11 +143,6 @@ public class BrowseTerm {
     	stringBuffer.append(" ");
     }
     stringBuffer.append("<value>" + value + "</value>\n");
-
-    for (int i = 0; i < indent + 4; i++) {
-      	stringBuffer.append(" ");
-    }
-    stringBuffer.append("<type>" + type + "</type>\n");
 
     if (searchResults != null) {
       /* Count the number of matching documents */
@@ -271,8 +265,8 @@ public class BrowseTerm {
         e.printStackTrace();
       }
       
-      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s&amp;type=%s\'", 
-    		                            encodedValue, this.type));
+      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s'", 
+    		                            encodedValue));
       stringBuffer.append(" class=\"searchsubcat\">");
       stringBuffer.append(value);
       stringBuffer.append(" (" + matchCount + ")");
@@ -337,11 +331,6 @@ public class BrowseTerm {
  
   public void setTermId(String id) {
 	  this.termId = id;
-  }
-  
- 
-  public void setType(String type) {
-	  this.type = type;
   }
   
  

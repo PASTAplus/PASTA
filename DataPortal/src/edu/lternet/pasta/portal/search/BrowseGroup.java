@@ -60,10 +60,10 @@ public class BrowseGroup {
    */
   
   //List of browse groups
-  private ArrayList<BrowseGroup> browseGroups = null;   
+  protected ArrayList<BrowseGroup> browseGroups = null;   
   
   //List of browse terms                                        
-  private ArrayList<BrowseTerm> browseTerms = null;    
+  protected ArrayList<BrowseTerm> browseTerms = null;    
        
   //The name of this browse group, e.g. "Habitat"
   private final String value; 
@@ -71,7 +71,7 @@ public class BrowseGroup {
   // The term ID in the LTER Controlled Vocabulary
   private String termId = null;
   
-  private int level = 0;
+  protected int level = 0;
   
   private String hasMoreDown = null;
                                            
@@ -81,13 +81,23 @@ public class BrowseGroup {
    * Constructors
    */
   
-  public BrowseGroup(String s) {
-    browseGroups = new ArrayList<BrowseGroup>();
-    browseTerms = new ArrayList<BrowseTerm>();
-    value = s;
-  }
+  	/**
+  	 * This constructor is needed for the subclass to compile.
+  	 * Without it the subclass has an error, "Implicit super constructor BrowseGroup() 
+  	 * is undefined for default constructor. Must define an explicit constructor."
+  	 */
+	public BrowseGroup() {
+		this(null);
+	}
 
-  
+
+	public BrowseGroup(String s) {
+		browseGroups = new ArrayList<BrowseGroup>();
+		browseTerms = new ArrayList<BrowseTerm>();
+		value = s;
+	}
+
+
   /*
    * Class methods
    */
@@ -208,51 +218,56 @@ public class BrowseGroup {
   }
   
   
-    public static BrowseGroup generateLterSiteCache() {
-  	  BrowseGroup browseLterSiteCache = new BrowseGroup("Controlled Vocabulary");
-	  BrowseGroup topGroup = new BrowseGroup("LTER Sites");
-	  
-	  browseLterSiteCache.addBrowseGroup(topGroup);
-	  
-	  String[] lterSiteTerms = LTERSite.sites;
-	  
-	  for (int i = 0; i < lterSiteTerms.length; i++) {
-		  String term = lterSiteTerms[i];
-		  BrowseTerm browseTerm = new BrowseTerm(term);
-		  browseTerm.setType("ltersite");
-		  topGroup.addBrowseTerm(browseTerm);
-	  }
-	      
-	 
-	  return browseLterSiteCache;
-  }
+	public static BrowseGroup generateLterSiteCache() {
+		BrowseGroup lterSiteBrowseGroup = new LTERSiteBrowseGroup(
+				"Controlled Vocabulary");
+		BrowseGroup topGroup = new LTERSiteBrowseGroup("LTER Sites");
+
+		lterSiteBrowseGroup.addBrowseGroup(topGroup);
+
+		String[] lterSiteTerms = LTERSite.sites;
+
+		for (int i = 0; i < lterSiteTerms.length; i++) {
+			String term = lterSiteTerms[i];
+			BrowseTerm browseTerm = new BrowseTerm(term);
+			topGroup.addBrowseTerm(browseTerm);
+		}
+
+		return lterSiteBrowseGroup;
+	}
     
     
 	public static void main(String[] args) {
-		BrowseGroup controlledVocabulary = generateKeywordCache();
-		String xmlString = controlledVocabulary.toXML();
-		String htmlString = controlledVocabulary.toHTML();
-
-		File browseCacheFile = new File("C:/temp/browseKeyword.xml");
+		String browseDir = "/home/pasta/local/browse";
+		BrowseGroup controlledVocabulary = null;
+		String xmlString = null;
+		String htmlString = null;
+		File browseCacheFile = null;
+		
+		/*
+		controlledVocabulary = generateKeywordCache();
+		xmlString = controlledVocabulary.toXML();
+		htmlString = controlledVocabulary.toHTML();
+		browseCacheFile = new File("C:/temp/browseKeyword.xml");
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, xmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		browseCacheFile = new File("C:/temp/browseKeyword.html");
+		browseCacheFile = new File(String.format("%s/browseKeyword.xml", browseDir));
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, htmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		System.out.println("Generation of keyword browse cache completed.");
+		System.out.println("Generation of keyword browse cache completed.");*/
 
 	    controlledVocabulary = generateLterSiteCache();
 		xmlString = controlledVocabulary.toXML();
 	    htmlString = controlledVocabulary.toHTML();
-		browseCacheFile = new File("C:/temp/browseLterSite.xml");
+		browseCacheFile = new File(String.format("%s/browseLterSite.xml", browseDir));
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, xmlString);
 		}
@@ -297,7 +312,7 @@ public class BrowseGroup {
   }
   
   
-  private int calculateIndent() {
+  protected int calculateIndent() {
 	  return level * 4;
   }
   
@@ -443,17 +458,17 @@ public class BrowseGroup {
   }
   
   
-  private void setHasMoreDown(String s) {
+  protected void setHasMoreDown(String s) {
 	  this.hasMoreDown = s;
   }
   
  
-  private void setLevel(int n) {
+  protected void setLevel(int n) {
 	  this.level = n;
   }
   
  
-  private void setTermId(String id) {
+  protected void setTermId(String id) {
 	  this.termId = id;
   }
   
@@ -467,18 +482,22 @@ public class BrowseGroup {
 	public String toHTML() {
 		int indent = calculateIndent();
 
-		StringBuffer stringBuffer = new StringBuffer("");
+		StringBuffer sb = new StringBuffer("");
+        sb.append("<table id='browseSearch'>\n");
+        sb.append("  <tbody>\n");
 		
 		for (BrowseGroup browseGroup : browseGroups) {
-			stringBuffer.append(browseGroup.htmlLevel1());
+			sb.append(browseGroup.htmlLevel1());
 		}
 		
-		String htmlString = stringBuffer.toString();
+		sb.append("  </tbody>\n");
+		sb.append("</table>\n");
+		String htmlString = sb.toString();
 		return htmlString;	
 	}
 	
 	
-	private String htmlLevel1() {
+	protected String htmlLevel1() {
 		String toggleId = String.format("toggle_%s", getValue());
 		StringBuffer sb = new StringBuffer("");
 		
@@ -535,7 +554,7 @@ public class BrowseGroup {
 	}
 	
 	
-	private String getTermsList() {
+	protected String getTermsList() {
 		StringBuffer sb = new StringBuffer("");
 		
 		for (BrowseTerm browseTerm : browseTerms) {
@@ -543,6 +562,10 @@ public class BrowseGroup {
 		}
 
 		String htmlString = sb.toString();
+		int len = htmlString.length();
+		if ((htmlString != null) && (htmlString.length() >= 2)) {
+		  htmlString = htmlString.substring(0, len - 2); // trim space and comma
+		}
 		return htmlString;
 	}
 	
