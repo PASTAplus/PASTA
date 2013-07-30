@@ -539,7 +539,11 @@ public class BrowseGroup {
 	private String termsHTMLLevel1() {
 		StringBuffer sb = new StringBuffer("");
 		
-		sb.append(String.format("<tr><td></td><td class='searchsubcat'>%s</td></tr>\n", getTermsList()));
+		String termsList = getTermsList();
+		
+		if ((termsList != null) && (termsList.length() > 0)) {
+		  sb.append(String.format("<tr><td></td><td class='searchsubcat'>%s</td></tr>\n", termsList));
+		}
 
 		String htmlString = sb.toString();
 		return htmlString;
