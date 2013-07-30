@@ -244,25 +244,24 @@ public class BrowseGroup {
 		String htmlString = null;
 		File browseCacheFile = null;
 		
-		/*
 		controlledVocabulary = generateKeywordCache();
 		xmlString = controlledVocabulary.toXML();
 		htmlString = controlledVocabulary.toHTML();
-		browseCacheFile = new File("C:/temp/browseKeyword.xml");
+		browseCacheFile = new File(String.format("%s/browseKeyword.xml", browseDir));
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, xmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		browseCacheFile = new File(String.format("%s/browseKeyword.xml", browseDir));
+		browseCacheFile = new File(String.format("%s/browseKeyword.html", browseDir));
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, htmlString);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		System.out.println("Generation of keyword browse cache completed.");*/
+		System.out.println("Generation of keyword browse cache completed.");
 
 	    controlledVocabulary = generateLterSiteCache();
 		xmlString = controlledVocabulary.toXML();
@@ -274,7 +273,7 @@ public class BrowseGroup {
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		browseCacheFile = new File("C:/temp/browseLterSite.html");
+		browseCacheFile = new File(String.format("%s/browseLterSite.html", browseDir));
 		try {
 			FileUtils.writeStringToFile(browseCacheFile, htmlString);
 		}
@@ -309,11 +308,6 @@ public class BrowseGroup {
   public void addBrowseTerm(BrowseTerm browseTerm) {
     browseTerm.setLevel(this.level + 1);
     browseTerms.add(browseTerm);
-  }
-  
-  
-  protected int calculateIndent() {
-	  return level * 4;
   }
   
   
@@ -480,8 +474,6 @@ public class BrowseGroup {
    * @return     a HTML string holding a <table> element
    */
 	public String toHTML() {
-		int indent = calculateIndent();
-
 		StringBuffer sb = new StringBuffer("");
         sb.append("<table id='browseSearch'>\n");
         sb.append("  <tbody>\n");
@@ -530,9 +522,9 @@ public class BrowseGroup {
 		StringBuffer sb = new StringBuffer("");
 		
 		sb.append("<tr>\n");
-		sb.append("<td class='searchcat' width='30%'>" + 
+		sb.append("<td class='searchcat' width='200'>" + 
 		          String.format("%s</td><td class='searchsubcat'>%s</td>\n", 
-				                getIndentedValue(), getTermsList()));
+				                indentHTML(), getTermsList()));
 		sb.append("</tr>\n");
 		
 		for (BrowseGroup browseGroup : browseGroups) {
@@ -570,13 +562,25 @@ public class BrowseGroup {
 	}
 	
 	
-	private String getIndentedValue() {
-		int indent = calculateIndent();
+	private String indentHTML() {
+		int indent = (level - 1) * 3;
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < indent; i++) {
 			sb.append("&nbsp;");
 		}
 		sb.append(getValue());
+		return sb.toString();
+	}
+ 
+
+	private String indentXML() {
+		int indent = level * 4;
+		StringBuffer sb = new StringBuffer("");
+		
+		for (int i = 0; i < indent; i++) {
+			sb.append(" ");
+		}
+		
 		return sb.toString();
 	}
  
@@ -588,31 +592,21 @@ public class BrowseGroup {
   public String toString() {
     String browseTermString;
     String cacheString;
-    StringBuffer stringBuffer = new StringBuffer("");
+    StringBuffer stringBuffer = new StringBuffer("");    
+    String xmlIndent = indentXML();
     
-    int indent = calculateIndent();
-    
-    for (int i = 0; i < indent; i++) {
-    	stringBuffer.append(" ");
-    }
-    stringBuffer.append(String.format("<group level='%d' hasMoreDown='%s'>\n", 
-    		                          level, getHasMoreDown()));
+    stringBuffer.append(String.format("%s<group level='%d' hasMoreDown='%s'>\n", 
+    		                          xmlIndent, level, getHasMoreDown()));
 
-    for (int i = 0; i < indent + 4; i++) {
-    	stringBuffer.append(" ");
-    }
-    stringBuffer.append("<value>" + value + "</value>\n");
-
+    stringBuffer.append(String.format("%s    <value>" + value + "</value>\n", xmlIndent));
     for (int i = 0; i < browseGroups.size(); i++) {
         BrowseGroup browseGroup = browseGroups.get(i);
         stringBuffer.append(browseGroup.toString());
     }
     
     if (hasTerms()) {
-        for (int i = 0; i < indent + 4; i++) {
-        	stringBuffer.append(" ");
-        }
-      stringBuffer.append("<terms>\n");
+      stringBuffer.append(String.format("%s    <terms>\n", xmlIndent));
+
       ArrayList<BrowseTerm> arrayList = getLocalBrowseTerms();
       for (BrowseTerm browseTerm : arrayList) {
         browseTermString = browseTerm.toXML();
@@ -620,16 +614,10 @@ public class BrowseGroup {
           stringBuffer.append(browseTermString);
         }
       }
-      for (int i = 0; i < indent + 4; i++) {
-      	stringBuffer.append(" ");
-      }
-      stringBuffer.append("</terms>\n");
+      stringBuffer.append(String.format("%s    </terms>\n", xmlIndent));
     }
 
-    for (int i = 0; i < indent; i++) {
-    	stringBuffer.append(" ");
-    }
-    stringBuffer.append("</group>\n");
+    stringBuffer.append(String.format("%s</group>\n", xmlIndent));
     cacheString = stringBuffer.toString();
     return cacheString;
   }

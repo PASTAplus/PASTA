@@ -34,7 +34,6 @@ public class LTERSiteBrowseGroup extends BrowseGroup {
 	   * @return     a HTML string holding a <table> element
 	   */
 		public String toHTML() {
-			int indent = calculateIndent();
 			StringBuffer sb = new StringBuffer("");
 			
 			for (BrowseGroup browseGroup : browseGroups) {
