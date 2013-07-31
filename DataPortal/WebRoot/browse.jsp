@@ -60,14 +60,15 @@
 			<h3 align="center"><%= subcaption %></h3>
 
 			<fieldset>
-				<p>Browse data packages by <%= introText %> using the links below. The number of matching data sets is shown in parentheses.&#42;</p>
+				<p>Browse data packages by <%= introText %> using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
 
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
 				<div class="section">
           <%= browseHTML %>
 				</div>
-				<p><small>&#42; <em>Please note: (1) Only public documents are accessible from this page; (2) Search results are refreshed nightly.</em></small></p>
+				<p><small>&#42; <em>Only public documents are accessible from this page.</em></small><br/>
+				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small></p>
 			</fieldset>
 
 		</div>
