@@ -532,11 +532,10 @@ public class AuditManager {
   
 
   /**
-   * Boolean to determine whether the Data Package Registry
-   * table already exists. If it isn't present, it will need to
-   * be created.
+   * Boolean to determine whether the audit table already exists. 
+   * If it isn't present, it will need to be created.
    * 
-   * @return  isPresent, true if the data cache table is present, else false
+   * @return  isPresent, true if the audit table is present, else false
    */
   private boolean isAuditTablePresent() 
             throws ClassNotFoundException, SQLException {          
