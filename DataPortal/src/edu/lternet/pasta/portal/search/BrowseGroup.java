@@ -494,7 +494,7 @@ public class BrowseGroup {
 		
 		String innerHTML = innerHTML();
 		
-		sb.append(String.format("  <li item-expanded='%s'>%s\n", ITEM_EXPANDED, getValue()));
+		sb.append(String.format("  <li class='searchcat' item-expanded='%s'>%s\n", ITEM_EXPANDED, getValue()));
 		sb.append("    <ul>\n");
         sb.append(String.format("%s\n", innerHTML));		
 		sb.append("    </ul>\n");
