@@ -112,7 +112,10 @@ public class EzidRegistrar {
 			this.setDoiTest(true);
 		}
 
-	}
+        System.setProperty("javax.net.ssl.trustStore", this.keystore);
+        System.setProperty("javax.net.ssl.trustStorePassword", this.keystorePassword);
+
+    }
 
 	/*
 	 * Class methods
@@ -166,10 +169,6 @@ public class EzidRegistrar {
 			this.host = this.ezidStageHost;
 			this.port = this.ezidStagePort;
 			this.protocol = this.ezidStageProtocol;
-
-			System.setProperty("javax.net.ssl.trustStore", this.keystore);
-			System.setProperty("javax.net.ssl.trustStorePassword",
-			    this.keystorePassword);
 
 		} else {
 
