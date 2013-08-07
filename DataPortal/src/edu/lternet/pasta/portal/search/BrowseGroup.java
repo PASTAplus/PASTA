@@ -54,6 +54,7 @@ public class BrowseGroup {
    */
 
 	  private static final Logger logger = Logger.getLogger(BrowseGroup.class);
+	  
   
   /*
    * Instance fields
@@ -75,6 +76,7 @@ public class BrowseGroup {
   
   private String hasMoreDown = null;
                                            
+  protected String ITEM_EXPANDED = "false";
 
 
   /*
@@ -478,7 +480,7 @@ public class BrowseGroup {
         sb.append("<ul id='browseSearch'>\n");
 		
 		for (BrowseGroup browseGroup : browseGroups) {
-			sb.append(browseGroup.htmlLevel1());
+			sb.append(browseGroup.outerHTML());
 		}
 		
 		sb.append("</ul>\n");
@@ -487,14 +489,15 @@ public class BrowseGroup {
 	}
 	
 	
-	protected String htmlLevel1() {
-		String toggleId = String.format("toggle_%s", getValue());
+	protected String outerHTML() {
 		StringBuffer sb = new StringBuffer("");
 		
 		String innerHTML = innerHTML();
 		
-		sb.append("  <li class='searchcat'>\n");
-        sb.append(String.format("<span id='%s' class='toggleButton'>%s +/-</span>\n<div class='collapsible'>\n<table>\n%s</table></div>\n", toggleId, getValue(), innerHTML));		
+		sb.append(String.format("  <li item-expanded='%s'>%s\n", ITEM_EXPANDED, getValue()));
+		sb.append("    <ul>\n");
+        sb.append(String.format("%s\n", innerHTML));		
+		sb.append("    </ul>\n");
 		sb.append("  </li>\n");
 		
 		String htmlLevel1 = sb.toString();
@@ -505,10 +508,10 @@ public class BrowseGroup {
 	private String innerHTML() {
 		StringBuffer sb = new StringBuffer("");
 		
-		sb.append(termsHTMLLevel1());
+		sb.append(termsHTML());
 
 		for (BrowseGroup browseGroup : browseGroups) {
-			sb.append(browseGroup.htmlLevel2());
+			sb.append(browseGroup.outerHTML());
 		}
 	    
 		String innerHTML = sb.toString();
@@ -516,64 +519,30 @@ public class BrowseGroup {
 	}
 	
 	
-	private String htmlLevel2() {
-		StringBuffer sb = new StringBuffer("");
-		
-		sb.append("<tr>\n");
-		sb.append("<td class='searchcat' width='200'>" + 
-		          String.format("%s</td><td class='searchsubcat'>%s</td>\n", 
-				                indentHTML(), getTermsList()));
-		sb.append("</tr>\n");
-		
-		for (BrowseGroup browseGroup : browseGroups) {
-			sb.append(browseGroup.htmlLevel2());
-		}
-
-		String htmlLevel2 = sb.toString();
-		return htmlLevel2;
+	/**
+	 * Create the HTML to display this browse term on the browse page. If this
+	 * browse term matches at least one document, then display it as a link;
+	 * otherwise, just display it as a text value.
+	 * 
+	 * @return htmlString, the HTML string to be displayed on the browse page.
+	 */
+	protected String browseTermHTML(BrowseTerm browseTerm) {
+		return browseTerm.toHTML();
 	}
-	
-	
-	private String termsHTMLLevel1() {
-		StringBuffer sb = new StringBuffer("");
-		
-		String termsList = getTermsList();
-		
-		if ((termsList != null) && (termsList.length() > 0)) {
-		  sb.append(String.format("<tr><td></td><td class='searchsubcat'>%s</td></tr>\n", termsList));
-		}
 
-		String htmlString = sb.toString();
-		return htmlString;
-	}
 	
-	
-	protected String getTermsList() {
+	private String termsHTML() {
 		StringBuffer sb = new StringBuffer("");
-		
+
 		for (BrowseTerm browseTerm : browseTerms) {
-			sb.append(String.format("%s, ", browseTerm.toHTML()));
+			sb.append(String.format("    <li>%s</li>\n",
+					                browseTermHTML(browseTerm)));
 		}
 
 		String htmlString = sb.toString();
-		int len = htmlString.length();
-		if ((htmlString != null) && (htmlString.length() >= 2)) {
-		  htmlString = htmlString.substring(0, len - 2); // trim space and comma
-		}
 		return htmlString;
 	}
-	
-	
-	private String indentHTML() {
-		int indent = (level - 1) * 3;
-		StringBuffer sb = new StringBuffer("");
-		for (int i = 0; i < indent; i++) {
-			sb.append("&nbsp;");
-		}
-		sb.append(getValue());
-		return sb.toString();
-	}
- 
+
 
 	private String indentXML() {
 		int indent = level * 4;

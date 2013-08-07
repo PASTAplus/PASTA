@@ -37,17 +37,30 @@
 <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 <meta http-equiv="description" content="This is my page">
 
-<link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
-<link rel="stylesheet" href="./css/jquery-ui-1.10.0.css" />
+    <link rel="stylesheet"        href="./js/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
-<jsp:include page="/WEB-INF/jsp/javascript.jsp" />
-
-<script src="./js/jquery-ui-1.10.0.js"></script>
-<script src="./js/toggle.js" type="text/javascript"></script>
-
+    <script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxpanel.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxtree.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Create jqxTree
+            $('#jqxTree').jqxTree({ height: '600px'});
+            $('#jqxTree').bind('select', function (event) {
+                var htmlElement = event.args.element;
+                var item = $('#jqxTree').jqxTree('getItem', htmlElement);
+                //alert(item.label);
+            });
+        });
+    </script>
+    
 </head>
 
-<body>
+<body class='default'>
 
 	<div class="wrapper">
 
@@ -65,10 +78,14 @@
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
 				<div class="section">
-          <%= browseHTML %>
+          <div id='jqxTree'>         
+            <%= browseHTML %>           
+				  </div>
 				</div>
-				<p><small>&#42; <em>Only public documents are accessible from this page.</em></small><br/>
-				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small></p>
+				<p>
+				   <small>&#42; <em>Only public documents are accessible from this page.</em></small><br/>
+				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small>
+				</p>
 			</fieldset>
 
 		</div>
@@ -78,21 +95,6 @@
 
 	</div>
 	<!-- end of wrapper -->
-
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery(".toggleButton").click(function() {
-				jQuery(this).next(".collapsible").slideToggle("fast");
-			});
-			jQuery(".collapsible").hide();
-		});
-		jQuery("#showAll").click(function() {
-			jQuery(".collapsible").show();
-		});
-		jQuery("#hideAll").click(function() {
-			jQuery(".collapsible").hide();
-		});
-	</script>
 
 </body>
 </html>
