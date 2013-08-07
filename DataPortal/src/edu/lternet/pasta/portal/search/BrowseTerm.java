@@ -121,6 +121,12 @@ public class BrowseTerm {
     writeSearchResults(searchResults);
   }
   
+  
+  public boolean isLterSiteTerm(String value) {
+	  LTERSite lterSite = new LTERSite(value);
+	  return lterSite.isValidSite();
+  }
+  
 
   /**
    * Generates an XML string for storing this browse term in the browse cache
@@ -254,10 +260,17 @@ public class BrowseTerm {
   public String toHTML () {
     String htmlString;
     StringBuffer stringBuffer = new StringBuffer("");
+    String typeParam = "keyword";
+    String displayValue = value;
+    
+    if (isLTERSite()) {
+        typeParam = "ltersite";
+        LTERSite lterSite = new LTERSite(value);
+        displayValue = lterSite.getSiteName();
+    }
     
     if (matchCount > 0) {
-      String encodedValue = value;
-      
+      String encodedValue = value;     
       try {
         encodedValue = URLEncoder.encode(value, "UTF-8");
       }
@@ -265,15 +278,15 @@ public class BrowseTerm {
         e.printStackTrace();
       }
       
-      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s'", 
-    		                            encodedValue));
+      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s&amp;type=%s'", 
+    		                            encodedValue, typeParam));
       stringBuffer.append(" class=\"searchsubcat\">");
-      stringBuffer.append(value);
+      stringBuffer.append(displayValue);
       stringBuffer.append(" (" + matchCount + ")");
       stringBuffer.append("</a>");
     }
     else {
-      stringBuffer.append(value);
+      stringBuffer.append(String.format("<span class=\"searchsubcat\">%s</span>", displayValue));
     }
 
     htmlString = stringBuffer.toString();
