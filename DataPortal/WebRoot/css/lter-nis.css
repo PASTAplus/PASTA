@@ -422,22 +422,18 @@ li.mapBrowse {
 /* Support for browse page */
 
 .browsegroup {
-    color: #0247A8;
+    color: midnightblue;
     font-weight: bold;
 }
                     
 .browseterm {
-    color: #0247A8;
+    color: blue;
     font-weight: normal;
 }
                     
 .browsetermnolink {
-    color: Gray;
+    color: lightslategray;
     font-weight: normal;
 }
                     
-a.browseterm:hover {
-    color: #669966;
-}
-
 /* End support for browse page */
