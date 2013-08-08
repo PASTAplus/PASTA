@@ -50,8 +50,6 @@ public class BrowseCrawler {
   /*
    * Instance fields
    */
-  private BrowseSearch browseSearch = null;
-  private BrowseGroup browseCache = null;
   
   
   /*
@@ -59,7 +57,6 @@ public class BrowseCrawler {
    */
   
   public BrowseCrawler() {
-    this.browseSearch = new BrowseSearch();
   }
 
   
@@ -76,7 +73,7 @@ public class BrowseCrawler {
   public static void main(String[] args) {
     ConfigurationListener.configure();
     BrowseCrawler browseCrawler = new BrowseCrawler();
-    browseCrawler.crawl();
+    browseCrawler.crawlKeywordTerms();
   }
   
 
@@ -85,21 +82,22 @@ public class BrowseCrawler {
    */
   
   /**
-   * Crawls the data catalog, querying each browse term.
+   * Crawls keyword terms in the LTER Controlled Vocabulary, querying each browse term.
    */
-  public BrowseGroup crawl() {
-    logger.info("BrowseCrawler: Starting crawl.");
-    File browseCacheFile = new File(BrowseSearch.browseCachePath);
-    browseCache = browseSearch.readBrowseCache(browseCacheFile);
-    ArrayList<BrowseTerm> browseTerms = browseCache.getBrowseTerms();
+  public BrowseGroup crawlKeywordTerms() {
+    logger.info("Starting crawl of keywords in LTER Controlled Vocabulary.");
     
+    BrowseGroup browseCache = BrowseGroup.generateKeywordCache();
+    ArrayList<BrowseTerm> browseTerms = new ArrayList<BrowseTerm>();
+    browseCache.getBrowseTerms(browseTerms);
+    logger.info(String.format("Found %d keyword terms", browseTerms.size()));   
     for (BrowseTerm browseTerm : browseTerms) {
-      logger.debug("Crawling term: " + browseTerm.getValue());
+      logger.info("Crawling term: " + browseTerm.getValue());
       browseTerm.crawl();
-    }
-    
-    writeBrowseCache();
-    logger.info("BrowseCrawler: Finished crawl");
+    }    
+    File browseCacheFile = new File(BrowseSearch.browseKeywordPath);
+    writeBrowseCache(browseCacheFile, browseCache);
+    logger.info(String.format("Finished keyword crawl: %d terms", browseTerms.size()));
     
     return browseCache;
   }
@@ -108,14 +106,9 @@ public class BrowseCrawler {
   /**
    * Writes the browse cache from memory to disk.
    */
-  private void writeBrowseCache() {
-    File browseCacheFile = new File(BrowseSearch.browseCachePath);
-    StringBuffer stringBuffer = new StringBuffer("");
-    
-    stringBuffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    stringBuffer.append("<browseCache>\n");
-    stringBuffer.append(browseCache.toString());
-    stringBuffer.append("</browseCache>\n");
+  private void writeBrowseCache(File browseCacheFile, BrowseGroup browseCache) {
+    StringBuffer stringBuffer = new StringBuffer("");   
+    stringBuffer.append(browseCache.toXML());
     
     try {
       FileUtils.writeStringToFile(browseCacheFile, stringBuffer.toString());

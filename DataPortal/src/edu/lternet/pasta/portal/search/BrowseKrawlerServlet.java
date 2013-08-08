@@ -58,22 +58,20 @@ public class BrowseKrawlerServlet extends HttpServlet {
 		this.doPost(request, response);
 	}
 
+	
 	/**
 	 * 
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		HttpSession httpSession = request.getSession();
+		ServletContext servletContext = httpSession.getServletContext();
+		BrowseSearch.setBrowseCacheDir(browseDir);
+		BrowseCrawler browseCrawler = new BrowseCrawler();
+		BrowseGroup browseCache = null;
 		
-    BrowseSearch.setBrowseCacheDir(browseDir);
-    
-    BrowseCrawler browseCrawler;
-    
-    browseCrawler = new BrowseCrawler();
-    BrowseGroup browseCache = browseCrawler.crawl();
-    String html = browseCache.toHTML();
-    HttpSession httpSession = request.getSession();
-    ServletContext servletContext = httpSession.getServletContext();
-    servletContext.setAttribute("browseHTML", html);
-    
+		browseCache = browseCrawler.crawlKeywordTerms();
+		servletContext.setAttribute("browseKeywordHTML", browseCache.toHTML());
 	}
 
 }

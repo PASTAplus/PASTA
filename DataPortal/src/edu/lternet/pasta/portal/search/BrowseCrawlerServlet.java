@@ -124,16 +124,14 @@ public class BrowseCrawlerServlet extends HttpServlet implements Runnable {
    * calling its crawl() method.
    */
   private void initiateNewCrawl() {
-    BrowseCrawler browseCrawler;
-    
-    browseCrawler = new BrowseCrawler();
-    BrowseGroup browseCache = browseCrawler.crawl();
-    
+    BrowseCrawler browseCrawler = new BrowseCrawler();
+    BrowseGroup browseCache = browseCrawler.crawlKeywordTerms();    
+
     /* Lock the servlet context object to guarantee that only one thread at a
      * time can be getting or setting the context attribute. 
      */
     synchronized(servletContext) {
-      servletContext.setAttribute("browseHTML", browseCache.toHTML());
+      servletContext.setAttribute("browseKeywordHTML", browseCache.toHTML());
     }
   }
   

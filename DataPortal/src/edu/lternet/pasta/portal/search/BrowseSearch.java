@@ -54,8 +54,8 @@ public class BrowseSearch {
    * different value in the dataportal.properties file
    */
   public static String browseCacheDir = "/home/pasta/local/browse";     
-  private static final String browseCacheFilename = "browseCache.xml";
-  public static String browseCachePath = browseCacheDir + "/" + browseCacheFilename;
+  private static final String browseKeywordFilename = "browseKeyword.xml";
+  public static String browseKeywordPath = browseCacheDir + "/" + browseKeywordFilename;
   private static final Logger logger = Logger.getLogger(BrowseSearch.class);
   static final long serialVersionUID = 0;  // Needed for Eclipse warning.
 
@@ -81,7 +81,7 @@ public class BrowseSearch {
    */
   public static void setBrowseCacheDir(String directoryPath) {
     BrowseSearch.browseCacheDir = directoryPath;
-    BrowseSearch.browseCachePath = String.format("%s/%s", directoryPath, browseCacheFilename);
+    BrowseSearch.browseKeywordPath = String.format("%s/%s", directoryPath, browseKeywordFilename);
   }
   
 
@@ -107,7 +107,6 @@ public class BrowseSearch {
     Node groupNode;
     NodeList groupNodeList;
     Text text;
-    String textString;
     BrowseGroup topBrowseGroup = null;     // The BrowseGroup that is returned
 
     Element topElement;
@@ -128,6 +127,7 @@ public class BrowseSearch {
             groupNodeList = topElement.getChildNodes();
 
             for (int j = 0; j < groupNodeList.getLength(); j++) {
+              String value = null;
               groupNode = groupNodeList.item(j);
               
               if (groupNode instanceof Element) {
@@ -140,8 +140,8 @@ public class BrowseSearch {
                  */
                 if (groupElement.getTagName().equals("value")) {
                   text = (Text) groupElement.getFirstChild();
-                  textString = text.getData().trim();
-                  topBrowseGroup = new BrowseGroup(textString);                  
+                  value = text.getData().trim();
+                  topBrowseGroup = new BrowseGroup(value);
                 }
                 /*
                  * If we encounter a group element, parse the group element,
@@ -211,7 +211,12 @@ public class BrowseSearch {
         if (groupElement.getTagName().equals("value")) {
           text = (Text) groupElement.getFirstChild();
           textString = text.getData().trim();
-          browseGroup = new BrowseGroup(textString);
+          if (parentBrowseGroup instanceof LTERSiteBrowseGroup) {
+        	  browseGroup = new LTERSiteBrowseGroup(textString);
+          }
+          else {
+        	  browseGroup = new BrowseGroup(textString);
+          }
           parentBrowseGroup.addBrowseGroup(browseGroup);
         }
         /*

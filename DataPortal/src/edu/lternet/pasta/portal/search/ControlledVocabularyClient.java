@@ -41,12 +41,19 @@ public class ControlledVocabularyClient {
 
   // Controlled vocabulary settings
   private static final String BASE_SERVICE_URL = 
-    "http://vocab.lternet.edu/webservice/keywordlist.php/"; 
+      "http://vocab.lternet.edu/webservice/keywordlist.php/"; 
 
+  private static final String FETCH_DOWN_SERVICE_URL = 
+	  "http://vocab.lternet.edu/vocab/vocab/services.php?task=fetchDown&arg=";
+	  
+  private static final String FETCH_TOP_TERMS_SERVICE_URL = 
+      "http://vocab.lternet.edu/vocab/vocab/services.php?task=fetchTopTerms"; 
+  
   private static final String PREFERRED_TERMS_SERVICE_URL = 
       "http://vocab.lternet.edu/webservice/preferredterms.php";
   
   private static String[] PREFERRED_TERMS_ARRAY = null;
+
 
  
   /**
@@ -254,5 +261,98 @@ public class ControlledVocabularyClient {
 
     return preferredTerms;
   }
+
+
+	/**
+	 * Calls the Controlled Vocabulary web service that returns an XML document
+	 * of terms below a specified term. The XML looks like:
+          <vocabularyservices>
+            <result>
+              <term>
+                <term_id>238</term_id>
+                <string>habitats</string>
+                <lang></lang>
+                <relation_type_id>3</relation_type_id>
+                <relation_type>NT</relation_type>
+                <relation_code></relation_code>
+                <relation_label></relation_label>
+                <hasMoreDown>0</hasMoreDown>
+              </term>            
+            .
+            . 
+     * 
+	 * @return An XML document string.
+	 */
+	public static String webServiceFetchDown(String termId) {
+		HttpGet httpGet = null;
+		HttpClient httpClient = new DefaultHttpClient();
+		String xmlString = null;
+
+		try {
+			String serviceURL = FETCH_DOWN_SERVICE_URL + termId;
+			httpGet = new HttpGet(serviceURL);
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if (statusCode == HttpStatus.SC_OK) {
+				HttpEntity httpEntity = httpResponse.getEntity();
+				xmlString = EntityUtils.toString(httpEntity).trim();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return xmlString;
+	}
+
+
+	/**
+	 * Calls the Controlled Vocabulary web service that returns an XML document
+	 * of top terms. The XML looks like:
+          <vocabularyservices>
+            <result>
+              <term>
+                <term_id>799</term_id>
+                <code></code>
+                <lang>en</lang>
+                <string>organizational units</string>
+                </term>
+              <term>
+                <term_id>651</term_id>
+                <code></code>
+                <lang>en</lang>
+                <string>disciplines</string>
+              </term>
+              .
+              . 
+     * 
+	 * @return An XML document string of top terms.
+	 */
+	public static String webServiceFetchTopTerms() {
+		HttpGet httpGet = null;
+		HttpClient httpClient = new DefaultHttpClient();
+		String xmlString = null;
+
+		try {
+			httpGet = new HttpGet(FETCH_TOP_TERMS_SERVICE_URL);
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if (statusCode == HttpStatus.SC_OK) {
+				HttpEntity httpEntity = httpResponse.getEntity();
+				xmlString = EntityUtils.toString(httpEntity).trim();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return xmlString;
+	}
 
 }

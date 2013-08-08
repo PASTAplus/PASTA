@@ -5,34 +5,14 @@
 <%@ page import="edu.lternet.pasta.portal.search.BrowseGroup" %>
 
 <%
+  HttpSession httpSession = request.getSession();
+  ServletContext servletContext = httpSession.getServletContext();
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
-
-  String searchResult = (String) request.getAttribute("searchresult");
-
-  if (searchResult == null)
-    searchResult = "";
-    
-  String browseHTML = "";
   
-  HttpSession httpSession = request.getSession();
-  ServletContext servletContext = httpSession.getServletContext();
-  browseHTML = (String) servletContext.getAttribute("browseHTML");
-
-  /* File browseCacheFile = new File(BrowseSearch.browseCachePath);
-
-  if (browseCacheFile.exists()) {
-      BrowseSearch browseSearch = new BrowseSearch();
-      BrowseGroup browseGroup = browseSearch.readBrowseCache(browseCacheFile);
-      
-      ServletContext servletContext = getServletContext();
-
-      /* Lock the servlet context object to guarantee that only one thread at a
-       * time can be getting or setting the context attribute. 
-       *
-      browseHTML = browseGroup.toHTML();
-   } */
+  String attributeName = "browseKeywordHTML";
+  String browseHTML = (String) servletContext.getAttribute(attributeName);
 %>
 
 <!doctype html>
@@ -48,28 +28,30 @@
 <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 <meta http-equiv="description" content="This is my page">
 
-<link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
-<link rel="stylesheet" href="./css/jquery-ui-1.10.0.css" />
+    <link rel="stylesheet"        href="./js/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
-<jsp:include page="/WEB-INF/jsp/javascript.jsp" />
-
-<script src="./js/jquery-ui-1.10.0.js"></script>
-
-    <script language="javascript" type="text/javascript">
-    
-      function keywordSearch(formObj, searchKeyword) {
-        var searchString = trim(searchKeyword);
-        alert("searchString: " + searchString);
-        formObj.browseValue.value=searchString;
-        formObj.submit();
-        return true;
-      }
-      
+    <script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxcore.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxbuttons.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxpanel.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets/jqxtree.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Create jqxTree
+            $('#jqxTree').jqxTree({ height: '600px'});
+            $('#jqxTree').bind('select', function (event) {
+                var htmlElement = event.args.element;
+                var item = $('#jqxTree').jqxTree('getItem', htmlElement);
+                //alert(item.label);
+            });
+        });
     </script>
-
+    
 </head>
 
-<body>
+<body class='default'>
 
 	<div class="wrapper">
 
@@ -81,27 +63,20 @@
 			<h2 align="center">Browse Data Packages</h2>
 
 			<fieldset>
-				<p>Browse by category using the links below. The number of matching data sets is shown in parentheses.&#42;</p>
+				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
 
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
 				<div class="section">
-					<form id="browsesearch" name="browsesearch" method="post" action="./browseServlet">
-	          <table id="browseSearch">
-	            <tbody>
-                <%= browseHTML %>
-              </tbody>
-            </table>
-            <input type="hidden" name="browseValue" value="" />
-          </form>
+          <div id='jqxTree'>         
+            <%= browseHTML %>           
+				  </div>
 				</div>
-				<p><small>&#42; <em>Please note: (1) Only public documents are accessible from this page; (2) Search results are refreshed nightly.</em></small></p>
+				<p>
+				   <small>&#42; <em>Only public documents are accessible from this page.</em></small><br/>
+				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small>
+				</p>
 			</fieldset>
-
-			<div class="section-table">
-				<%=searchResult%>
-			</div>
-			<!-- end of section-table -->
 
 		</div>
 		<!-- end of content -->

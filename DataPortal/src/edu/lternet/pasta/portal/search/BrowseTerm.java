@@ -62,6 +62,10 @@ public class BrowseTerm {
   private TermsList termsList;
   private final String value;    // Text value of this browse term, e.g. "percent carbon"
 
+  // The term ID in the LTER Controlled Vocabulary
+  private String termId = null;  
+  private int level = 1;
+
   
   /*
    * Constructors
@@ -89,6 +93,11 @@ public class BrowseTerm {
    * Instance methods
    */
   
+  private int calculateIndent() {
+	  return (level + 1) * 4;
+  }
+  
+  
   /*
    * Passes through to use the SimpleSearch logic to compose the query string.
    */
@@ -112,34 +121,56 @@ public class BrowseTerm {
     writeSearchResults(searchResults);
   }
   
+  
+  public boolean isLterSiteTerm(String value) {
+	  LTERSite lterSite = new LTERSite(value);
+	  return lterSite.isValidSite();
+  }
+  
 
   /**
    * Generates an XML string for storing this browse term in the browse cache
    * on disk as a <term> element.
    */
-  String generateCacheString() {
+  String toXML() {
     String cacheString = null;
     String searchResults = readSearchResults();
     StringBuffer stringBuffer = new StringBuffer("");
     int lastIndex = 0;
     final String findStr = "<document>";
-
-    stringBuffer.append("      <term>\n");
-    stringBuffer.append("        <value>" + value + "</value>\n");
-
-    /* Count the number of matching documents */
-    this.matchCount = 0;
-    while (lastIndex != -1) {
-      lastIndex = searchResults.indexOf(findStr, lastIndex);     
-      if (lastIndex != -1) {
-        lastIndex += findStr.length();
-        this.matchCount++;
-      }
+    int indent = calculateIndent();
+    
+    for (int i = 0; i < indent; i++) {
+    	stringBuffer.append(" ");
     }
+    stringBuffer.append(String.format("<term level='%d' hasMoreDown='0'>\n", 
+    		                          this.level));
+    for (int i = 0; i < indent + 4; i++) {
+    	stringBuffer.append(" ");
+    }
+    stringBuffer.append("<value>" + value + "</value>\n");
 
-    stringBuffer.append("        <matchCount>" + this.matchCount + "</matchCount>\n");
-    stringBuffer.append("      </term>\n");
-
+    if (searchResults != null) {
+      /* Count the number of matching documents */
+      this.matchCount = 0;
+      while (lastIndex != -1) {
+        lastIndex = searchResults.indexOf(findStr, lastIndex);     
+        if (lastIndex != -1) {
+          lastIndex += findStr.length();
+          this.matchCount++;
+        }
+      }
+      for (int i = 0; i < indent + 4; i++) {
+      	stringBuffer.append(" ");
+      }
+      stringBuffer.append("<matchCount>" + this.matchCount + "</matchCount>\n");
+    }
+    
+    for (int i = 0; i < indent; i++) {
+    	stringBuffer.append(" ");
+    }
+    stringBuffer.append("</term>\n");
+    
     cacheString = stringBuffer.toString();
     return cacheString;
   }
@@ -229,10 +260,15 @@ public class BrowseTerm {
   public String toHTML () {
     String htmlString;
     StringBuffer stringBuffer = new StringBuffer("");
+    String displayValue = value;
+    
+    if (isLTERSite()) {
+        LTERSite lterSite = new LTERSite(value);
+        displayValue = lterSite.getSiteName();
+    }
     
     if (matchCount > 0) {
-      String encodedValue = value;
-      
+      String encodedValue = value;     
       try {
         encodedValue = URLEncoder.encode(value, "UTF-8");
       }
@@ -240,14 +276,14 @@ public class BrowseTerm {
         e.printStackTrace();
       }
       
-      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s\'", encodedValue));
-      stringBuffer.append(" class=\"searchsubcat\">");
-      stringBuffer.append(value);
+      stringBuffer.append(String.format("<a class='browseterm' href='./browseServlet?searchValue=%s'>", 
+    		                            encodedValue));
+      stringBuffer.append(displayValue);
       stringBuffer.append(" (" + matchCount + ")");
       stringBuffer.append("</a>");
     }
     else {
-      stringBuffer.append(value);
+      stringBuffer.append(String.format("<span class='browsetermnolink'>%s</span>", displayValue));
     }
 
     htmlString = stringBuffer.toString();
@@ -286,7 +322,9 @@ public class BrowseTerm {
     String searchResults = null;
     
     try {
-      searchResults = FileUtils.readFileToString(browseCacheFile);
+    	if (browseCacheFile.exists()) {
+            searchResults = FileUtils.readFileToString(browseCacheFile);
+    	}
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -296,6 +334,16 @@ public class BrowseTerm {
   }
   
   
+  public void setLevel(int n) {
+	  this.level = n;
+  }
+  
+ 
+  public void setTermId(String id) {
+	  this.termId = id;
+  }
+  
+ 
   /**
    * Writes the search results to file.
    * 
