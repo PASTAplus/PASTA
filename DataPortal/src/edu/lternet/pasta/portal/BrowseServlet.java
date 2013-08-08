@@ -188,12 +188,11 @@ public class BrowseServlet extends DataPortalServlet {
     BrowseSearch.setBrowseCacheDir(browseDirPath);
     BrowseSearch browseSearch = null;
     BrowseGroup browseGroup = null;
-    boolean isLterSiteCache = false;
 
     File browseKeywordFile = new File(BrowseSearch.browseKeywordPath);
     if (browseKeywordFile.exists()) {
       browseSearch = new BrowseSearch();
-      browseGroup = browseSearch.readBrowseCache(browseKeywordFile, isLterSiteCache);
+      browseGroup = browseSearch.readBrowseCache(browseKeywordFile);
       
       /* Lock the servlet context object to guarantee that only one thread at a
        * time can be getting or setting the context attribute. 
@@ -204,24 +203,6 @@ public class BrowseServlet extends DataPortalServlet {
     }
     else {
       logger.warn("Missing browse keyword file at location: " + BrowseSearch.browseKeywordPath);
-    }
-  
-    
-    isLterSiteCache = true;
-    File browseLterSiteFile = new File(BrowseSearch.browseLterSitePath);
-    if (browseLterSiteFile.exists()) {
-      browseSearch = new BrowseSearch();
-      browseGroup = browseSearch.readBrowseCache(browseLterSiteFile, isLterSiteCache);
-    
-      /* Lock the servlet context object to guarantee that only one thread at a
-       * time can be getting or setting the context attribute. 
-       */
-      synchronized(servletContext) {
-        servletContext.setAttribute("browseLterSiteHTML", browseGroup.toHTML());
-      }
-    }
-    else {
-      logger.warn("Missing browse LTER site file at location: " + BrowseSearch.browseLterSitePath);
     }
   }
   

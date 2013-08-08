@@ -125,22 +125,13 @@ public class BrowseCrawlerServlet extends HttpServlet implements Runnable {
    */
   private void initiateNewCrawl() {
     BrowseCrawler browseCrawler = new BrowseCrawler();
-    BrowseGroup browseCache = null;
+    BrowseGroup browseCache = browseCrawler.crawlKeywordTerms();    
 
-    browseCache = browseCrawler.crawlKeywordTerms();    
     /* Lock the servlet context object to guarantee that only one thread at a
      * time can be getting or setting the context attribute. 
      */
     synchronized(servletContext) {
       servletContext.setAttribute("browseKeywordHTML", browseCache.toHTML());
-    }
-
-    browseCache = browseCrawler.crawlLterSiteTerms();    
-    /* Lock the servlet context object to guarantee that only one thread at a
-     * time can be getting or setting the context attribute. 
-     */
-    synchronized(servletContext) {
-      servletContext.setAttribute("browseLterSiteHTML", browseCache.toHTML());
     }
   }
   

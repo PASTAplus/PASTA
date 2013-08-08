@@ -107,6 +107,9 @@ public class BrowseGroup {
     public static BrowseGroup generateKeywordCache() {
 	  BrowseGroup controlledVocabulary = new BrowseGroup("Controlled Vocabulary");
 	  
+	  BrowseGroup lterSiteCache = generateLterSiteCache();
+	  controlledVocabulary.addBrowseGroup(lterSiteCache);
+	  
 	  String topTermsXML = ControlledVocabularyClient.webServiceFetchTopTerms();	  
 	    DocumentBuilderFactory documentBuilderFactory =
 	                                           DocumentBuilderFactory.newInstance(); 
@@ -221,11 +224,8 @@ public class BrowseGroup {
   
   
 	public static BrowseGroup generateLterSiteCache() {
-		BrowseGroup lterSiteBrowseGroup = new LTERSiteBrowseGroup(
-				"Controlled Vocabulary");
 		BrowseGroup topGroup = new LTERSiteBrowseGroup("LTER Sites");
-
-		lterSiteBrowseGroup.addBrowseGroup(topGroup);
+		topGroup.setLevel(1);
 
 		String[] lterSiteTerms = LTERSite.sites;
 
@@ -235,7 +235,7 @@ public class BrowseGroup {
 			topGroup.addBrowseTerm(browseTerm);
 		}
 
-		return lterSiteBrowseGroup;
+		return topGroup;
 	}
     
     
@@ -263,26 +263,7 @@ public class BrowseGroup {
 		catch (Exception e) {
 			e.printStackTrace();
 		}		
-		System.out.println("Generation of keyword browse cache completed.");
-
-	    controlledVocabulary = generateLterSiteCache();
-		xmlString = controlledVocabulary.toXML();
-	    htmlString = controlledVocabulary.toHTML();
-		browseCacheFile = new File(String.format("%s/browseLterSite.xml", browseDir));
-		try {
-			FileUtils.writeStringToFile(browseCacheFile, xmlString);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}		
-		browseCacheFile = new File(String.format("%s/browseLterSite.html", browseDir));
-		try {
-			FileUtils.writeStringToFile(browseCacheFile, htmlString);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}		
-		System.out.println("Generation of LTER site browse cache completed.");
+		System.out.println("Generation of keyword browse cache and HTML completed.");
 	}
 
 
@@ -494,7 +475,7 @@ public class BrowseGroup {
 		
 		String innerHTML = innerHTML();
 		
-		sb.append(String.format("  <li class='searchcat' item-expanded='%s'>%s\n", ITEM_EXPANDED, getValue()));
+		sb.append(String.format("  <li class='browsegroup' item-expanded='%s'>%s\n", ITEM_EXPANDED, getValue()));
 		sb.append("    <ul>\n");
         sb.append(String.format("%s\n", innerHTML));		
 		sb.append("    </ul>\n");

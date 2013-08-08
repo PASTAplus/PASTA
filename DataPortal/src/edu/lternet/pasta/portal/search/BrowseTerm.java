@@ -260,11 +260,9 @@ public class BrowseTerm {
   public String toHTML () {
     String htmlString;
     StringBuffer stringBuffer = new StringBuffer("");
-    String typeParam = "keyword";
     String displayValue = value;
     
     if (isLTERSite()) {
-        typeParam = "ltersite";
         LTERSite lterSite = new LTERSite(value);
         displayValue = lterSite.getSiteName();
     }
@@ -278,15 +276,14 @@ public class BrowseTerm {
         e.printStackTrace();
       }
       
-      stringBuffer.append(String.format("<a href=\'./browseServlet?searchValue=%s&amp;type=%s'", 
-    		                            encodedValue, typeParam));
-      stringBuffer.append(" class=\"searchsubcat\">");
+      stringBuffer.append(String.format("<a class='browseterm' href='./browseServlet?searchValue=%s'>", 
+    		                            encodedValue));
       stringBuffer.append(displayValue);
       stringBuffer.append(" (" + matchCount + ")");
       stringBuffer.append("</a>");
     }
     else {
-      stringBuffer.append(String.format("<span class=\"searchsubcat\">%s</span>", displayValue));
+      stringBuffer.append(String.format("<span class='browsetermnolink'>%s</span>", displayValue));
     }
 
     htmlString = stringBuffer.toString();
