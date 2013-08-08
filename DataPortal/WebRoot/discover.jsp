@@ -40,8 +40,7 @@
 			<ul>
 				<li>Browse Data Packages by
 				    <ul>
-                <li><a href="./browse.jsp?type=keyword">Category and Keyword</a></li>
-                <li><a href="./browse.jsp?type=ltersite">LTER Site</a></li>
+                <li><a href="./browse.jsp">Keyword or LTER Site</a></li>
 				        <li><a href="./scopebrowse">Package Identifier</a></li>
 				    </ul>
 				</li>

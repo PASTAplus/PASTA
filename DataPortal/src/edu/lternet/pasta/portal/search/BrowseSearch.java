@@ -56,8 +56,6 @@ public class BrowseSearch {
   public static String browseCacheDir = "/home/pasta/local/browse";     
   private static final String browseKeywordFilename = "browseKeyword.xml";
   public static String browseKeywordPath = browseCacheDir + "/" + browseKeywordFilename;
-  private static final String browseLterSiteFilename = "browseLterSite.xml";
-  public static String browseLterSitePath = browseCacheDir + "/" + browseLterSiteFilename;
   private static final Logger logger = Logger.getLogger(BrowseSearch.class);
   static final long serialVersionUID = 0;  // Needed for Eclipse warning.
 
@@ -84,7 +82,6 @@ public class BrowseSearch {
   public static void setBrowseCacheDir(String directoryPath) {
     BrowseSearch.browseCacheDir = directoryPath;
     BrowseSearch.browseKeywordPath = String.format("%s/%s", directoryPath, browseKeywordFilename);
-    BrowseSearch.browseLterSitePath = String.format("%s/%s", directoryPath, browseLterSiteFilename);
   }
   
 
@@ -98,7 +95,7 @@ public class BrowseSearch {
    * @param  browseCacheFile     the browse cache File object
    * @return topBrowseGroup, a BrowseGroup object holding the browse cache
    */
-  public BrowseGroup readBrowseCache(File browseCacheFile, boolean isLterSiteCache) {
+  public BrowseGroup readBrowseCache(File browseCacheFile) {
     Document document;
     DocumentBuilder documentBuilder;
     DocumentBuilderFactory documentBuilderFactory =
@@ -144,7 +141,7 @@ public class BrowseSearch {
                 if (groupElement.getTagName().equals("value")) {
                   text = (Text) groupElement.getFirstChild();
                   value = text.getData().trim();
-                  topBrowseGroup = isLterSiteCache ? new LTERSiteBrowseGroup(value) : new BrowseGroup(value);
+                  topBrowseGroup = new BrowseGroup(value);
                 }
                 /*
                  * If we encounter a group element, parse the group element,

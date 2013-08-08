@@ -6,7 +6,6 @@ public class LTERSiteBrowseGroup extends BrowseGroup {
 
 	  public LTERSiteBrowseGroup(String s) {
 		super(s);
-		this.ITEM_EXPANDED = "true";
 	}
 
 

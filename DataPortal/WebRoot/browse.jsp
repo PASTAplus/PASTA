@@ -10,17 +10,8 @@
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
-  String type = (String) request.getParameter("type");
   
   String attributeName = "browseKeywordHTML";
-  String subcaption = "Category and Keyword";
-  String introText = "category and keyword";
-  if ((type != null) && (type.equals("ltersite"))) {
-    attributeName = "browseLterSiteHTML";
-    subcaption = "LTER Site";
-    introText = "LTER site";
-  }
-  
   String browseHTML = (String) servletContext.getAttribute(attributeName);
 %>
 
@@ -70,10 +61,9 @@
 		<div class="content">
 
 			<h2 align="center">Browse Data Packages</h2>
-			<h3 align="center"><%= subcaption %></h3>
 
 			<fieldset>
-				<p>Browse data packages by <%= introText %> using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
+				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
 
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         

@@ -104,28 +104,6 @@ public class BrowseCrawler {
 
   
   /**
-   * Crawls each LTER Site, querying each browse term.
-   */
-  public BrowseGroup crawlLterSiteTerms() {
-    logger.info("Starting crawl of LTER Sites.");
-    
-    BrowseGroup browseCache = BrowseGroup.generateLterSiteCache();
-    ArrayList<BrowseTerm> browseTerms = new ArrayList<BrowseTerm>();
-    browseCache.getBrowseTerms(browseTerms);
-    logger.info(String.format("Found %d LTER site terms", browseTerms.size()));   
-    for (BrowseTerm browseTerm : browseTerms) {
-      logger.info("Crawling term: " + browseTerm.getValue());
-      browseTerm.crawl();
-    }    
-    File browseCacheFile = new File(BrowseSearch.browseLterSitePath);
-    writeBrowseCache(browseCacheFile, browseCache);
-    logger.info(String.format("Finished LTER site crawl: %d terms", browseTerms.size()));
-    
-    return browseCache;
-  }
-
-  
-  /**
    * Writes the browse cache from memory to disk.
    */
   private void writeBrowseCache(File browseCacheFile, BrowseGroup browseCache) {
