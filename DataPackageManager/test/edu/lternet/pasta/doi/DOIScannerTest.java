@@ -201,22 +201,26 @@ public class DOIScannerTest {
 				fail("Error encountered while constructing DataPackageManager object prior to running JUnit test.");
 			}
 
-			try {
-				Integer newestRevision = dataPackageManager.getNewestRevision(
-				    testScope, testIdentifier);
-				while (newestRevision != null) {
-					testIdentifier += 1;
-					newestRevision = dataPackageManager.getNewestRevision(testScope,
-					    testIdentifier);
-				}
-				testPackageId = testScope + "." + testIdentifier + "." + testRevision;
-				System.err.println("testPackageId: " + testPackageId);
-				DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile,
-				    testPackageId);
-			} catch (Exception e) {
-				fail("Error encountered while initializing identifier value prior to running JUnit test.");
-			}
+		      Integer newestRevision = null;
 
+		      try {
+		        newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
+		        while (newestRevision != null) {
+		          testIdentifier += 1;
+		          newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
+		        }
+		      }
+		      catch (ResourceNotFoundException e) {
+		    	  newestRevision = null;
+		      }
+		      catch (Exception e) {
+		        fail("Error encountered while initializing identifier value prior to running JUnit test: " +
+		             e.getMessage());       		
+		      }
+
+		      testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+		      System.err.println("testPackageId: " + testPackageId);
+		      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);       
 		}
 	}
 
