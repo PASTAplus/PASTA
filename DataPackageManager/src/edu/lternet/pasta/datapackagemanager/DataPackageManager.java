@@ -983,13 +983,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *           if an error occurs when connection to the data cache
 	 */
 	public Integer getNewestRevision(String scope, Integer identifier)
-	    throws ClassNotFoundException, SQLException {
+	    throws ClassNotFoundException, SQLException, ResourceNotFoundException {
 		Integer newest = null;
 
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
 			newest = dataPackageRegistry.getNewestRevision(scope, identifier);
+			
+			if (newest == null) {
+			  String message = String.format(
+					  "No resources found for scope='%s', identifier='%s'\n\n",
+					  scope, identifier.toString());
+			  throw new ResourceNotFoundException(message);
+			}
+					
 		} catch (SQLException e) {
 			logger
 			    .error("Error connecting to Data Cache Registry: " + e.getMessage());
@@ -1013,13 +1021,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *           if an error occurs when connection to the data cache
 	 */
 	public Integer getOldestRevision(String scope, Integer identifier)
-	    throws ClassNotFoundException, SQLException {
+	    throws ClassNotFoundException, SQLException, ResourceNotFoundException {
 		Integer oldest = null;
 
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
 			oldest = dataPackageRegistry.getOldestRevision(scope, identifier);
+			
+			if (oldest == null) {
+			  String message = String.format(
+					  "No resources found for scope='%s', identifier='%s'\n\n",
+					  scope, identifier.toString());
+			  throw new ResourceNotFoundException(message);
+			}
+					
 		} catch (SQLException e) {
 			logger
 			    .error("Error connecting to Data Cache Registry: " + e.getMessage());
@@ -1153,7 +1169,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		// Throw a ResourceNotFoundException if the list is empty
 		if (identifierList == null || identifierList.size() == 0) {
-			String message = "No resources found for scope = '" + scope + "'\n\n";
+			String message = "No resources found for scope='" + scope + "'\n\n";
 			throw new ResourceNotFoundException(message);
 		}
 
@@ -1190,8 +1206,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		// Throw a ResourceNotFoundException if the list is empty
 		if (revisionList == null || revisionList.size() == 0) {
-			String message = "No resources found for scope = '" + scope
-			    + "'; identifier = '" + identifier + "'\n\n";
+			String message = "No resources found for scope='" + scope
+			    + "', identifier='" + identifier + "'\n\n";
 			throw new ResourceNotFoundException(message);
 		}
 

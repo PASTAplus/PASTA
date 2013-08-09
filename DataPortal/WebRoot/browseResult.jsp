@@ -8,9 +8,6 @@
 
   if (searchResult == null)
     searchResult = "";
-    
-  String type = request.getParameter("type");
-  if (type == null) type = "keyword";
 %>
 
 <!doctype html>
@@ -42,7 +39,7 @@
 		<div class="content">
 
 			<h2 align="center">Browse Results</h2>
-			<h3 align="center">Back to <a href="./browse.jsp?type=<%= type %>">Browse Data Packages</a></h3>
+			<h3 align="center">Back to <a href="./browse.jsp">Browse Data Packages</a></h3>
 
 			<div class="section-table">
 				<%=searchResult%>

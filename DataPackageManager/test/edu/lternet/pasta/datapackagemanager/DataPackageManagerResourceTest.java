@@ -46,6 +46,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.lternet.pasta.common.FileUtility;
+import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.Options;
 
@@ -191,20 +192,26 @@ public class DataPackageManagerResourceTest {
         fail("Error encountered while constructing DataPackageManager object prior to running JUnit test.");
       }
       
+      Integer newestRevision = null;
+
       try {
-        Integer newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
+        newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
         while (newestRevision != null) {
           testIdentifier += 1;
           newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
         }
-        String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
-        System.err.println("testPackageId: " + testPackageId);
-        modifyTestEmlFile(testScope, testEmlFile, testPackageId);
+      }
+      catch (ResourceNotFoundException e) {
+    	  newestRevision = null;
       }
       catch (Exception e) {
-        fail("Error encountered while initializing identifier value prior to running JUnit test.");
+        fail("Error encountered while initializing identifier value prior to running JUnit test: " +
+             e.getMessage());       		
       }
-      
+
+      String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+      System.err.println("testPackageId: " + testPackageId);
+      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);       
     }
   }
   
