@@ -45,6 +45,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
@@ -150,20 +151,26 @@ public class TestMetadataFactory {
         fail("Error encountered while constructing DataPackageManager object prior to running JUnit test.");
       }
       
+      Integer newestRevision = null;
+
       try {
-        Integer newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
+        newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
         while (newestRevision != null) {
           testIdentifier += 1;
           newestRevision = dataPackageManager.getNewestRevision(testScope, testIdentifier);
         }
-        String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
-        System.err.println("testPackageId: " + testPackageId);
-        DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);
+      }
+      catch (ResourceNotFoundException e) {
+    	  newestRevision = null;
       }
       catch (Exception e) {
-        fail("Error encountered while initializing identifier value prior to running JUnit test.");
+        fail("Error encountered while initializing identifier value prior to running JUnit test: " +
+             e.getMessage());       		
       }
-      
+
+      String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+      System.err.println("testPackageId: " + testPackageId);
+      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);  
     }
   }
   

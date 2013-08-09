@@ -1929,7 +1929,7 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-			String revisionList = null;
+			String revisionList = "";
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			if (filter.isEmpty()) {
 				revisionList = dataPackageManager.listDataPackageRevisions(
@@ -1937,16 +1937,19 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 			else {
 				if (filter.equals("oldest")) {
-					revisionList = dataPackageManager.getOldestRevision(scope,
-							identifier).toString();
+					Integer revisionInt = dataPackageManager.getOldestRevision(scope,
+							identifier);
+					if (revisionInt != null) {
+					  revisionList = revisionInt.toString();
+					}
 				}
 				else
 					if (filter.equals("newest")) {
-						revisionList = dataPackageManager.getNewestRevision(
-								scope, identifier).toString();
-					}
-					else {
-						revisionList = "";
+						Integer revisionInt = dataPackageManager.getNewestRevision(scope,
+								identifier);
+						if (revisionInt != null) {
+						  revisionList = revisionInt.toString();
+						}
 					}
 			}
 
