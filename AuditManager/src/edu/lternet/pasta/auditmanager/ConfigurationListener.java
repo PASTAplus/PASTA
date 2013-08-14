@@ -35,7 +35,6 @@ public class ConfigurationListener extends PastaConfigListener {
     // The name of the Event Manager's properties file.
     public static final String AUDIT_MANAGER_PROPERTIES = "auditmanager.properties";
     
-    private static Properties properties;
     private static String webServiceVersion;
     private static File apiDocument;
     private static File tutorialDocument;
@@ -109,10 +108,8 @@ public class ConfigurationListener extends PastaConfigListener {
     
     @Override
     public void setContextSpecificProperties() {
-        super.setPastaServiceAcr();
-        
-        properties = loadPropertiesFile(AUDIT_MANAGER_PROPERTIES);
-        
+        setPastaServiceAcr();       
+        loadPropertiesFile(AUDIT_MANAGER_PROPERTIES);        
         apiDocument = getFile(properties, API_DOCUMENT);
         demoDirectory = getFile(properties, "demo.directory");
         tutorialDocument = getFile(properties, TUTORIAL_DOCUMENT);

@@ -94,6 +94,7 @@ public abstract class PastaConfigListener implements ServletContextListener {
 
     private static File configDir;
     private static File pastaServiceAcr;
+    protected static Properties properties;
 
     /**
      * Returns the {@code conf} directory used by this PASTA web service. If
@@ -143,19 +144,17 @@ public abstract class PastaConfigListener implements ServletContextListener {
      * @throws IllegalStateException
      *             if an {@link IOException} is thrown while reading the file.
      */
-    public static Properties loadPropertiesFile(String propertiesFile) {
-
+    public static void loadPropertiesFile(String propertiesFile) {
         File file = getFile(propertiesFile);
-
-        Properties properties = new Properties();
+        properties = new Properties();
 
         try {
             properties.load(new FileInputStream(file));
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
-        return properties;
+  
     }
 
     /**
@@ -280,7 +279,7 @@ public abstract class PastaConfigListener implements ServletContextListener {
         PropertyConfigurator.configureAndWatch(properties.getAbsolutePath());
     }
 
-    public void setPastaServiceAcr() {
+    public static void setPastaServiceAcr() {
         pastaServiceAcr = new File(getConfigDir(), PASTA_SERVICE_XML);
     }
 

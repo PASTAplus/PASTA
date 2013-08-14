@@ -119,7 +119,7 @@ public class DummyUriInfo implements UriInfo {
 
     @Override
     public MultivaluedMap<String, String> getQueryParameters(boolean arg0) {
-        throw new UnsupportedOperationException();
+        return queryParams;
     }
 
     @Override
