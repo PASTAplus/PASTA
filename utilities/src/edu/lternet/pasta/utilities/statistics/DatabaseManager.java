@@ -18,6 +18,9 @@
 
 package edu.lternet.pasta.utilities.statistics;
 
+import java.sql.*;
+import java.util.ArrayList;
+
 /**
  * User: servilla
  * Date: 8/15/13
@@ -32,16 +35,108 @@ public class DatabaseManager {
 
  /* Constructors */
 
+  public DatabaseManager(String dbUrl, String dbUser, String dbPassword)
+  throws SQLException {
+
+    this.dbUrl = dbUrl;
+    this.dbUser = dbUser;
+    this.dbPassword = dbPassword;
+
+    this.conn = getConnection(dbUrl, dbUser, dbPassword);
+
+  }
+
  /* Instance methods */
+
+  private Connection getConnection(String dbUrl, String dbUser, String dbPassword)
+      throws SQLException {
+
+    Connection conn = null;
+    SQLWarning warn;
+
+    conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+
+    // If a SQLWarning object is available, print its warning(s).
+    // There may be multiple warnings chained.
+    warn = conn.getWarnings();
+
+    if (warn != null) {
+      while (warn != null) {
+        System.err.println("SQLState: " + warn.getSQLState());
+        System.err.println("Message:  " + warn.getMessage());
+        System.err.println("Vendor: " + warn.getErrorCode());
+        warn = warn.getNextWarning();
+      }
+    }
+
+    return conn;
+  }
+
+  public ArrayList<String[]> doQuery(String select) throws SQLException {
+
+    ArrayList<String[]> result = new ArrayList<String[]>();
+
+    Statement stmnt = this.conn.createStatement();
+    ResultSet rs = stmnt.executeQuery(select);
+
+
+
+    ResultSetMetaData rsmd = rs.getMetaData();
+    int colCount = rsmd.getColumnCount();
+    String[] tuple = null;
+
+    // Add header row of column names
+    tuple = new String[colCount];
+    for (int i = 0; i < colCount; i++) {
+      tuple[i] = rsmd.getColumnName(i + 1);
+    }
+    result.add(tuple);
+
+    // Iterate and add each tuple
+    while (rs.next()) {
+      tuple = new String[colCount];
+      for (int i = 0; i < colCount; i++) {
+        tuple[i] = rs.getString(i + 1);
+      }
+      result.add(tuple);
+    }
+
+    return result;
+  }
 
  /* Class methods */
 
   public static void main(String[] args) {
 
+    System.out.println("Made it this far...");
+
+    Connection conn = null;
+
+    String dbUrl = args[0];
+    String dbUser = args[1];
+    String dbPassword = args[2];
+    String sql = "select * from datapackagemanager.resource_registry";
+
+    try {
+      DatabaseManager dbm = new DatabaseManager(dbUrl, dbUser, dbPassword);
+      ArrayList<String[]> result = dbm.doQuery(sql);
+    }
+    catch (SQLException e) {
+      System.err.printf("PASTA Database error - %s\n", e.getMessage());
+      e.printStackTrace();
+    }
+
+
   }
  
  /* Instance variables */
- 
+
+  private String dbUrl = null;
+  private String dbUser = null;
+  private String dbPassword = null;
+
+  private Connection conn = null;
+
  /* Class variables */
 
 }
