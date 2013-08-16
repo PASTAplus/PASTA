@@ -42,7 +42,7 @@ public class DatabaseManager {
     this.dbUser = dbUser;
     this.dbPassword = dbPassword;
 
-    this.conn = getConnection(dbUrl, dbUser, dbPassword);
+    this.conn = getConnection(this.dbUrl, this.dbUser, this.dbPassword);
 
   }
 
@@ -72,14 +72,18 @@ public class DatabaseManager {
     return conn;
   }
 
-  public ArrayList<String[]> doQuery(String select) throws SQLException {
-
-    ArrayList<String[]> result = new ArrayList<String[]>();
+  public ResultSet doQuery(String select) throws SQLException {
 
     Statement stmnt = this.conn.createStatement();
     ResultSet rs = stmnt.executeQuery(select);
 
+    return rs;
+  }
 
+  public ArrayList<String[]> resultSetAsString(ResultSet rs)
+      throws SQLException {
+
+    ArrayList<String[]> result = new ArrayList<String[]>();
 
     ResultSetMetaData rsmd = rs.getMetaData();
     int colCount = rsmd.getColumnCount();
@@ -104,6 +108,7 @@ public class DatabaseManager {
     return result;
   }
 
+
  /* Class methods */
 
   public static void main(String[] args) {
@@ -119,7 +124,17 @@ public class DatabaseManager {
 
     try {
       DatabaseManager dbm = new DatabaseManager(dbUrl, dbUser, dbPassword);
-      ArrayList<String[]> result = dbm.doQuery(sql);
+      ResultSet rs = dbm.doQuery(sql);
+      ArrayList<String[]> result = dbm.resultSetAsString(rs);
+
+      for (String[] tuple: result) {
+        int i = tuple.length;
+        for (int j = 0; j < i; j++) {
+          System.out.printf("%s ", tuple[j]);
+        }
+        System.out.printf("\n");
+      }
+
     }
     catch (SQLException e) {
       System.err.printf("PASTA Database error - %s\n", e.getMessage());
