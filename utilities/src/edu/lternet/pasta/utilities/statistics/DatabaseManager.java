@@ -89,12 +89,11 @@ public class DatabaseManager {
     int colCount = rsmd.getColumnCount();
     String[] tuple = null;
 
-    // Add header row of column names
+    // Skip header row of column names
     tuple = new String[colCount];
     for (int i = 0; i < colCount; i++) {
       tuple[i] = rsmd.getColumnName(i + 1);
     }
-    result.add(tuple);
 
     // Iterate and add each tuple
     while (rs.next()) {
