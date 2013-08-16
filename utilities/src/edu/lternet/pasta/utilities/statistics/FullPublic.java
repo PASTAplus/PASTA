@@ -39,8 +39,12 @@ public class FullPublic {
 
   public FullPublic(String dbUrl, String dbUser, String dbPassword) {
 
+    this.dbUrl = dbUrl;
+    this.dbUser = dbUser;
+    this.dbPassword = dbPassword;
+
     try {
-      this.dbm = new DatabaseManager(dbUrl, dbUser, dbPassword);
+      this.dbm = new DatabaseManager(this.dbUrl, this.dbUser, this.dbPassword);
     }
     catch (SQLException e) {
       e.printStackTrace();
@@ -51,10 +55,36 @@ public class FullPublic {
 
   /* Instance methods */
 
+  public int getFullPublicPackages() {
+
+    int fullPublicPackages = 0;
+
+    ArrayList<String> packageIds = getPackageIds();
+
+    boolean ipr;
+    boolean fail;
+
+    for (String packageId: packageIds) {
+      ArrayList<String> resources = getResources(packageId);
+      fail = false;
+      for (String resource: resources) {
+        ipr = isPublicResource(resource);
+        if(!ipr) {
+          fail = true;
+          break;
+        }
+      }
+      if (!fail) fullPublicPackages++;
+    }
+
+    return fullPublicPackages;
+
+  }
+
   private ArrayList<String> getPackageIds() {
 
-    String sql = "SELECT distinct(package_id) from "
-      + "datapackagemanager.resource_registry";
+    String sql = "SELECT distinct(package_id) FROM "
+      + RESOURCE_REGISTRY;
 
     ArrayList<String[]> result = null;
 
@@ -66,12 +96,63 @@ public class FullPublic {
       e.printStackTrace();
     }
 
-    ArrayList<String> packageIds = null;
+    ArrayList<String> packageIds = new ArrayList<String>();
     for (String[] tuple: result) {
       packageIds.add(tuple[0]);
     }
 
     return packageIds;
+
+  }
+
+  private ArrayList<String> getResources(String packageId) {
+
+    String sql = "SELECT resource_id FROM " + RESOURCE_REGISTRY
+        + " WHERE package_id='" + packageId + "'";
+
+    ArrayList<String[]> result = null;
+
+    try {
+      ResultSet rs = dbm.doQuery(sql);
+      result = dbm.resultSetAsString(rs);
+    }
+    catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    ArrayList<String> resources = new ArrayList<String>();
+    for (String[] tuple: result) {
+      resources.add(tuple[0]);
+    }
+
+    return resources;
+
+  }
+
+  private boolean isPublicResource(String resource) {
+
+    boolean isPublicResource = false;
+
+    String sql = "SELECT access_matrix_id FROM " + ACCESS_MATRIX
+        + " WHERE resource_id='" + resource + "' AND "
+        + " principal='public' AND access_type='allow' AND "
+        + " permission='read'";
+
+    ArrayList<String[]> result = null;
+
+    try {
+      ResultSet rs = dbm.doQuery(sql);
+      result = dbm.resultSetAsString(rs);
+    }
+    catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    for (String[] id: result) {
+      isPublicResource = true;
+    }
+
+    return isPublicResource;
 
   }
 
@@ -86,9 +167,25 @@ public class FullPublic {
     FullPublic fp = new FullPublic(dbUrl, dbUser, dbPassword);
     ArrayList<String> packageIds = fp.getPackageIds();
 
+    int count = 0;
+    boolean ipr;
+
     for (String packageId: packageIds) {
       System.out.printf("%s\n", packageId);
+      count++;
+      ArrayList<String> resources = fp.getResources(packageId);
+      for (String resource: resources) {
+        ipr = fp.isPublicResource(resource);
+        if (ipr) {
+          System.out.printf("\tTRUE: %s\n", resource);
+        } else {
+          System.out.printf("\tFALSE: %s\n", resource);
+        }
+      }
     }
+
+    System.out.printf("Total data packages: %d\n", count);
+    System.out.printf("Public data packages: %d\n", fp.getFullPublicPackages());
 
   }
 
@@ -100,13 +197,9 @@ public class FullPublic {
   private String dbUser = null;
   private String dbPassword = null;
 
-  // Name of the database table where data packages are registered
-  private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
-  private final String ACCESS_MATRIX = "datapackagemanager.ACCESS_MATRIX";
-  private final String DATA_PACKAGE_MANAGER_SCHEMA = "datapackagemanager";
-  private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
-  private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
-
   /* Class variables */
+
+  private static String ACCESS_MATRIX = "datapackagemanager.access_matrix";
+  private static String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
 
 }
