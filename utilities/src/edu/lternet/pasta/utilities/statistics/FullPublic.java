@@ -171,8 +171,9 @@ public class FullPublic {
     boolean ipr;
 
     for (String packageId: packageIds) {
-      System.out.printf("%s\n", packageId);
+      //System.out.printf("%s\n", packageId);
       count++;
+      /*
       ArrayList<String> resources = fp.getResources(packageId);
       for (String resource: resources) {
         ipr = fp.isPublicResource(resource);
@@ -182,6 +183,7 @@ public class FullPublic {
           System.out.printf("\tFALSE: %s\n", resource);
         }
       }
+      */
     }
 
     System.out.printf("Total data packages: %d\n", count);
