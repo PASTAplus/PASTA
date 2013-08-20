@@ -110,7 +110,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String dbUser = null;
 	private static String dbPassword = null;
 	private static String databaseAdapterName = null;
-	private static String eventmanagerHost = null;
 	private static String metacatUrl = null;
 	private static String pastaUriHead = null;
 	private static String pastaUser = null;
@@ -1301,8 +1300,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			DataPackage.setScopeRegistry(scopeRegistry);
 
 			// Load PASTA service options
-			eventmanagerHost = options
-			    .getOption("datapackagemanager.eventmanager.host");
 			resourceDir = options.getOption("datapackagemanager.metadataDir");
 			metacatUrl = options
 			    .getOption("datapackagemanager.metadatacatalog.metacatUrl");
