@@ -96,12 +96,9 @@ datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-1.0
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
 datapackagemanager.doiTest=true
-datapackagemanager.ezidHost=n2t.net
+datapackagemanager.ezidHost=n2t-stage.cdlib.org
 datapackagemanager.ezidPort=443
 datapackagemanager.ezidProtocol=https
-datapackagemanager.ezidStageHost=n2t-stage.cdlib.org
-datapackagemanager.ezidStagePort=443
-datapackagemanager.ezidStageProtocol=https
 datapackagemanager.ezidUser=lternet
 datapackagemanager.ezidPassword=HIDE_PASSWORD
 datapackagemanager.doiUrlHead=https://portal.lternet.edu/nis/mapbrowse?packageid=

@@ -104,11 +104,6 @@ public class DOIScanner {
 		
 		try {
 			ezidRegistrar = new EzidRegistrar();
-			if (this.isDoiTest) {
-				ezidRegistrar.setDoiTest(true);
-			} else {
-				ezidRegistrar.setDoiTest(false);
-			}
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -308,11 +303,6 @@ public class DOIScanner {
 
 		try {
 			ezidRegistrar = new EzidRegistrar();
-			if (this.isDoiTest) {
-				ezidRegistrar.setDoiTest(true);
-			} else {
-				ezidRegistrar.setDoiTest(false);
-			}
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
