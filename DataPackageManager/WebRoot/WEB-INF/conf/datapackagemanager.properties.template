@@ -76,7 +76,6 @@ datapackagemanager.metadataDir=/home/pasta/local/metadata
 datapackagemanager.entityDir=/home/pasta/local/data
 datapackagemanager.errorDir=/home/pasta/local/error
 datapackagemanager.auditmanager.host=audit.lternet.edu
-datapackagemanager.eventmanager.host=event.lternet.edu
 datapackagemanager.metadatacatalog.metacatUrl=http://metadata.lternet.edu/metacat/metacat
 datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=LTER,dc=ecoinformatics,dc=org
 datapackagemanager.pastaUriHead=https://pasta.lternet.edu/package/
