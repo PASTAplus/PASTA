@@ -218,7 +218,13 @@ public class BrowseGroup {
 		catch (Exception e) {
 			logger.error("Exception:\n" + e.getMessage());
 			e.printStackTrace();
-		}      
+		}
+		
+		if (!isBlacklistedTerm(this.value)) {
+			BrowseTerm browseTerm = new BrowseTerm(this.value);
+			browseTerm.setLevel(level + 1);
+			this.addBrowseTerm(browseTerm);
+		}
       
   }
   
@@ -310,24 +316,23 @@ public class BrowseGroup {
 	}
 
 
-	  /**
-	   * Get local browse terms, i.e. at the same level of this browse group.
-	   * 
-	   * @return   A list of all BrowseTerm objects that are descendants of this
-	   *           browse group.
-	   */
-		public  ArrayList<BrowseTerm> getLocalBrowseTerms() {
-			ArrayList<BrowseTerm> arrayList = new ArrayList<BrowseTerm>();
-			for (BrowseTerm browseTerm : browseTerms) {
+	/**
+	 * Get local browse terms, i.e. at the same level of this browse group.
+	 * 
+	 * @return A list of all BrowseTerm objects that are descendants of this
+	 *         browse group.
+	 */
+	public ArrayList<BrowseTerm> getLocalBrowseTerms() {
+		ArrayList<BrowseTerm> arrayList = new ArrayList<BrowseTerm>();
+		for (BrowseTerm browseTerm : browseTerms) {
+			String value = browseTerm.getValue();
+			if (!isBlacklistedTerm(value)) {
 				arrayList.add(browseTerm);
 			}
-			
-			BrowseTerm browseTerm = new BrowseTerm(getValue());
-			browseTerm.setLevel(level + 1);
-			arrayList.add(browseTerm);
-			
-			return arrayList;
 		}
+
+		return arrayList;
+	}
 
 
   /**
@@ -406,6 +411,12 @@ public class BrowseGroup {
    */
   public boolean hasTerms() {
     return (browseTerms.size() > 0);
+  }
+  
+  
+  private boolean isBlacklistedTerm(String value) {
+	  if (value.equals("LTER Sites")) return true;
+	  return false;
   }
 
   
@@ -515,7 +526,8 @@ public class BrowseGroup {
 	private String termsHTML() {
 		StringBuffer sb = new StringBuffer("");
 
-		for (BrowseTerm browseTerm : browseTerms) {
+	    ArrayList<BrowseTerm> localBrowseTerms = getLocalBrowseTerms();
+		for (BrowseTerm browseTerm : localBrowseTerms) {
 			sb.append(String.format("    <li>%s</li>\n",
 					                browseTermHTML(browseTerm)));
 		}
@@ -537,57 +549,57 @@ public class BrowseGroup {
 	}
  
 
-  /**
-   * Converts this browse group to a string. Used in writing out the browse
-   * cache to disk.
-   */
-  public String toString() {
-    String browseTermString;
-    String cacheString;
-    StringBuffer stringBuffer = new StringBuffer("");    
-    String xmlIndent = indentXML();
-    
-    stringBuffer.append(String.format("%s<group level='%d' hasMoreDown='%s'>\n", 
-    		                          xmlIndent, level, getHasMoreDown()));
-
-    stringBuffer.append(String.format("%s    <value>" + value + "</value>\n", xmlIndent));
-    for (int i = 0; i < browseGroups.size(); i++) {
-        BrowseGroup browseGroup = browseGroups.get(i);
-        stringBuffer.append(browseGroup.toString());
-    }
-    
-    if (hasTerms()) {
-      stringBuffer.append(String.format("%s    <terms>\n", xmlIndent));
-
-      ArrayList<BrowseTerm> arrayList = getLocalBrowseTerms();
-      for (BrowseTerm browseTerm : arrayList) {
-        browseTermString = browseTerm.toXML();
-        if (!browseTermString.equals("")) {
-          stringBuffer.append(browseTermString);
-        }
-      }
-      stringBuffer.append(String.format("%s    </terms>\n", xmlIndent));
-    }
-
-    stringBuffer.append(String.format("%s</group>\n", xmlIndent));
-    cacheString = stringBuffer.toString();
-    return cacheString;
-  }
-  
-  
-  /**
-   * Converts this browse group to an XML string. Used in writing out the browse
-   * cache to disk.
-   */
-  public String toXML() {
-	    StringBuffer stringBuffer = new StringBuffer("");
-	    stringBuffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-	    stringBuffer.append("<browseCache>\n");
-	    stringBuffer.append(this.toString());
-	    stringBuffer.append("</browseCache>\n");
-	    String xmlString = stringBuffer.toString();
+	  /**
+	   * Converts this browse group to a string. Used in writing out the browse
+	   * cache to disk.
+	   */
+	  public String toString() {
+	    String browseTermString;
+	    String cacheString;
+	    StringBuffer stringBuffer = new StringBuffer("");    
+	    String xmlIndent = indentXML();
 	    
-	    return xmlString;
-  }
+	    stringBuffer.append(String.format("%s<group level='%d' hasMoreDown='%s'>\n", 
+	    		                          xmlIndent, level, getHasMoreDown()));
 
+	    stringBuffer.append(String.format("%s    <value>" + value + "</value>\n", xmlIndent));
+	    for (int i = 0; i < browseGroups.size(); i++) {
+	        BrowseGroup browseGroup = browseGroups.get(i);
+	        stringBuffer.append(browseGroup.toString());
+	    }
+	    
+	    if (hasTerms()) {
+	      stringBuffer.append(String.format("%s    <terms>\n", xmlIndent));
+
+	      ArrayList<BrowseTerm> arrayList = getLocalBrowseTerms();
+	      for (BrowseTerm browseTerm : arrayList) {
+	        browseTermString = browseTerm.toXML();
+	        if (!browseTermString.equals("")) {
+	          stringBuffer.append(browseTermString);
+	        }
+	      }
+	      stringBuffer.append(String.format("%s    </terms>\n", xmlIndent));
+	    }
+
+	    stringBuffer.append(String.format("%s</group>\n", xmlIndent));
+	    cacheString = stringBuffer.toString();
+	    return cacheString;
+	  }
+	  
+	  
+	  /**
+	   * Converts this browse group to an XML string. Used in writing out the browse
+	   * cache to disk.
+	   */
+	  public String toXML() {
+		    StringBuffer stringBuffer = new StringBuffer("");
+		    stringBuffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		    stringBuffer.append("<browseCache>\n");
+		    stringBuffer.append(this.toString());
+		    stringBuffer.append("</browseCache>\n");
+		    String xmlString = stringBuffer.toString();
+		    
+		    return xmlString;
+	  }
+	  
 }
