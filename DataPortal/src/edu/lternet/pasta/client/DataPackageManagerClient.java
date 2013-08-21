@@ -27,7 +27,6 @@ package edu.lternet.pasta.client;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -197,7 +196,6 @@ public class DataPackageManagerClient extends PastaClient {
 		String scope = "knb-lter-lno";
 		Integer identifier = null;
 		String revision = "1";
-		String entityId = "NoneSuchBugCount";
 
 		ConfigurationListener.configure();
 
@@ -289,11 +287,8 @@ public class DataPackageManagerClient extends PastaClient {
 		Matcher matcher = pattern.matcher(xmlString);
 		// Replace packageId value with new packageId value
 		String modifiedXmlString = matcher.replaceAll(newPackageId);
-		FileWriter fileWriter;
 
 		try {
-			fileWriter = new FileWriter(testEmlFile);
-			StringBuffer stringBuffer = new StringBuffer(modifiedXmlString);
 			FileUtils.writeStringToFile(testEmlFile, modifiedXmlString, append);
 		} catch (IOException e) {
 			fail("IOException modifying packageId in test EML file: "
