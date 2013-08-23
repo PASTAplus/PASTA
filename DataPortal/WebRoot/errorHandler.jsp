@@ -60,12 +60,15 @@
 			<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
 
 			<div class="content">
-        <p class="warning">An error has occurred. Error message:</p>
+        <p>An error has occurred in the LTER Network Data Portal:</p>
         <p class="warning">
 <%
     out.println(exception.toString());
 %>
         </p>
+        <p>For further assistance, please contact:
+<a href="mailto:tech_support@LTERnet.edu?Subject=NIS%20Data%20Portal%20error" target="_top">
+LTER Technical Support</a>. Please copy the error message shown above into your email message, along with any other information that might help us assist you more promptly.
 			</div>
 		  <!-- end content -->
 
