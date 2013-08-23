@@ -729,7 +729,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					ArrayList<Resource> resourceList = dataPackageRegistry.listDataPackageResources(packageId);
 					if (resourceList != null) {
 						for (Resource resource : resourceList) {
-							doiScanner.processOneResource(resource);
+							// DISABLED UNTIL WE CAN FIX BUG IN DOI PROCESSING
+							//doiScanner.processOneResource(resource);
 						}
 					}
 				}
