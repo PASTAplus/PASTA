@@ -129,21 +129,18 @@ public class EventSubscribeServlet extends DataPortalServlet {
             + "</b>' was successfully created.\n";
         type = "info";
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
+      } 
+      catch (Exception e) {
+    	  String errorMessage = e.getMessage();
+    	  if (errorMessage == null) {
+    		  Throwable t = e.getCause();
+    		  if (t != null) {
+    			  errorMessage = t.getMessage();
+    		  }
+    	  }
+          logger.error(errorMessage);
+          e.printStackTrace();
+          throw new ServletException(errorMessage);
       }
       
     }

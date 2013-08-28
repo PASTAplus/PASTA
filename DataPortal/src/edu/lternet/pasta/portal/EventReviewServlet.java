@@ -141,26 +141,18 @@ public class EventReviewServlet extends DataPortalServlet {
         message = subscriptionUtility.xmlToHtml(cwd + xslpath);
         type="info";
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (ParseException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
+      } 
+      catch (Exception e) {
+    	  String errorMessage = e.getMessage();
+    	  if (errorMessage == null) {
+    		  Throwable t = e.getCause();
+    		  if (t != null) {
+    			  errorMessage = t.getMessage();
+    		  }
+    	  }
+          logger.error(errorMessage);
+          e.printStackTrace();
+          throw new ServletException(errorMessage);
       }
 
     }

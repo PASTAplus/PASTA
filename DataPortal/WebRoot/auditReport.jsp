@@ -79,7 +79,7 @@
 									</td>
 									<td>
 									   <label for="beginTime">Time </label>
-									   <input type="text" name="beginTime" size="25px" placeholder="HH:MM:SS" />
+									   <input type="time" name="beginTime" size="25px" placeholder="HH:MM:SS" />
 									</td>
                   <td>Values are Mountain TZ (default 00:00:00)</td>
 								</tr>
@@ -91,7 +91,7 @@
                   </td>
                   <td>
                      <label for="endTime">Time </label>
-                     <input type="text" name="endTime" size="25px" placeholder="HH:MM:SS" />
+                     <input type="time" name="endTime" size="25px" placeholder="HH:MM:SS" />
                   </td>
                   <td>Values are Mountain TZ (default 00:00:00)</td>
                 </tr>

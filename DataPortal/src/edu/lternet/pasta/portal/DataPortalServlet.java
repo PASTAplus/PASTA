@@ -24,7 +24,10 @@
 
 package edu.lternet.pasta.portal;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+
+import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
@@ -65,6 +68,24 @@ public class DataPortalServlet extends HttpServlet {
   /*
    * Instance methods
    */
+  
+  
+  /*
+   * Generalized error handler for Data Portal servlets
+   */
+  protected void handleDataPortalError(Logger logger, Exception e) throws ServletException {
+	  String errorMessage = e.getMessage();
+	  if (errorMessage == null) {
+		  Throwable t = e.getCause();
+		  if (t != null) {
+			  errorMessage = t.getMessage();
+		  }
+	  }
+      logger.error(errorMessage);
+      e.printStackTrace();
+      throw new ServletException(errorMessage);
+  }
+  
   
   /*
    * Composes a data package resource identifier based on the PASTA URI

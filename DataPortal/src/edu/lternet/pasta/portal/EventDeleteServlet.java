@@ -125,21 +125,9 @@ public class EventDeleteServlet extends DataPortalServlet {
             + "</b>' has been deleted.";
         type = "info";
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
       }
 
     }

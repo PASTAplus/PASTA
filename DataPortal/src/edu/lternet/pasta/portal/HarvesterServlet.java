@@ -266,13 +266,17 @@ public class HarvesterServlet extends DataPortalServlet {
       warningMessage = "<p class=\"warning\">" + LOGIN_WARNING + "</p>";
       logger.error(e.getMessage());
     }
-    catch (Exception e) {
-      String eMessage = e.getMessage();
-      warningMessage = "<p class=\"warning\">A problem occurred while processing your request: " + 
-                eMessage + "</p>";
-      logger.error(eMessage);
+    catch (IOException e) {
+        logger.error(e.getMessage());
+        e.printStackTrace();
+        throw(e);
     }
-    finally {
+    catch (Exception e) {
+        logger.error(e.getMessage());
+        e.printStackTrace();
+        throw new ServletException(e.getMessage());
+    }
+
       request.setAttribute("message", warningMessage);
       
       /*
@@ -296,7 +300,7 @@ public class HarvesterServlet extends DataPortalServlet {
         RequestDispatcher requestDispatcher = request.getRequestDispatcher("./harvester.jsp");
         requestDispatcher.forward(request, response);
       }
-    }
+
   }
   
   
