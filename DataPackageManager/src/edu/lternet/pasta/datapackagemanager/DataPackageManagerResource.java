@@ -468,7 +468,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		Map<EmlPackageId, List<String>> pairs = new LinkedHashMap<EmlPackageId, List<String>>();
 
 		for (Entry<String, List<String>> e : query.getParams().entrySet()) {
-			EmlPackageId epi = parsePackageId(e.getKey());
+			String key = e.getKey();
+			EmlPackageId epi = parsePackageId(key);
 			List<String> parsed = decodeEntityNames(e.getValue());
 			pairs.put(epi, parsed);
 		}
@@ -1232,6 +1233,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (XmlParsingException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeNotFound(e);
 		}
 		catch (WebApplicationException e) { // not necessary
 			entryText = e.getMessage();

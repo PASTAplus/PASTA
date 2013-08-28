@@ -31,6 +31,8 @@ import java.util.Map.Entry;
 import org.w3c.dom.Document;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.XmlParsingException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
@@ -81,6 +83,8 @@ public final class MetadataFactory {
 
         for (Entry<EmlPackageId, List<String>> e : provenance.entrySet()) {
             EmlPackageId emlPackageId = e.getKey();
+            EmlPackageIdFormat epif = new EmlPackageIdFormat();
+            String packageId = epif.format(emlPackageId);
             String scope = emlPackageId.getScope();
             Integer identifier = emlPackageId.getIdentifier();
             Integer revision = emlPackageId.getRevision();
@@ -88,6 +92,10 @@ public final class MetadataFactory {
             String user = token.getUserId();
             DataPackageManager dataPackageManager = new DataPackageManager();
             String eml = dataPackageManager.readMetadata(scope, identifier, revisionStr, user, token);
+            if (eml == null) {
+            	throw new ResourceNotFoundException(
+            			String.format("Data package %s could not be accessed.", packageId)); 
+            }
             Document doc = XmlUtility.xmlStringToDoc(eml);
             ParentEml parentEml = new ParentEml(doc);
             msf.append(emlToModify, parentEml, e.getValue());
