@@ -522,12 +522,6 @@ public class AuditManagerResource extends PastaWebService
      *     <td>An error message.</td>
      *     <td><code>text/plain</code></td>
      *   </tr>
-     *   <tr>
-     *     <td>404 Not Found</td>
-     *     <td>If the requested log entry does not exist.</td>
-     *     <td>An error message.</td>
-     *     <td><code>text/plain</code></td>
-     *   </tr>
      * </table>
      *
      * @param headers  the HTTP request headers containing the authorization token.
@@ -546,9 +540,6 @@ public class AuditManagerResource extends PastaWebService
             queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
             Map<String, List<String>> queryParams = queryString.getParams();
             List<AuditRecord> auditRecords = auditManager.getAuditRecords(queryParams);
-            if (auditRecords.size() == 0) { 
-              throw new ResourceNotFoundException("No audit records matched the search criteria");
-            }
             String xmlString = auditRecordsToXML(auditRecords);
             return Response.ok(xmlString).build();
         }
@@ -560,9 +551,6 @@ public class AuditManagerResource extends PastaWebService
         }
         catch (UnauthorizedException e) {
             return WebExceptionFactory.makeUnauthorized(e).getResponse();
-        }
-        catch (ResourceNotFoundException e) {
-            return WebExceptionFactory.makeNotFound(e).getResponse();
         }
         catch (WebApplicationException e) {
             return e.getResponse();
