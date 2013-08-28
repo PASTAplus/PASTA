@@ -108,6 +108,7 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 
+		try {
 		HttpSession httpSession = request.getSession();
 		String uid = (String) httpSession.getAttribute("uid");
 
@@ -132,30 +133,30 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 				e.printStackTrace();
 				message = e.getMessage();
 				type = "warning";
-			} catch (PastaConfigurationException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				message = e.getMessage();
-				type = "warning";
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				message = e.getMessage();
-				type = "warning";
-			}
-
+			} 
 		} else {
 			message = "Package Identifier is null.";
 			type = "warning";
 		}
 		
-
 		request.setAttribute("message", message);
 		request.setAttribute("type", type);
 		request.setAttribute("packageid", packageId);
 
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
+		}
+	    catch (IOException e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        throw(e);
+	    }
+	    catch (Exception e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        throw new ServletException(e.getMessage());
+	    }
+		
 
 	}
 

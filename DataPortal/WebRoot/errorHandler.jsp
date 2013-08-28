@@ -60,7 +60,7 @@
 			<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
 
 			<div class="content">
-        <p>An error has occurred in the LTER Network Data Portal:</p>
+        <h3>An error has occurred in the LTER Network Data Portal:</h3>
         <p class="warning">
 <%
     out.println(exception.toString());

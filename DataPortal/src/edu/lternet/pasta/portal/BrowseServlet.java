@@ -162,10 +162,9 @@ public class BrowseServlet extends DataPortalServlet {
       request.setAttribute("searchresult", html);
     } 
     catch (Exception e) {
-      logger.error(e.getMessage());
-      String warningMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      request.setAttribute("message", warningMessage);
-      forward = "./browse.jsp";
+        logger.error(e.getMessage());
+        e.printStackTrace();
+        throw new ServletException(e.getMessage());
     }
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);

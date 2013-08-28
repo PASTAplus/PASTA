@@ -26,11 +26,6 @@
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
-  String warningMessage = (String) request.getAttribute("message");
-  if (warningMessage == null) {
-    warningMessage = "";
-  }
-
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
@@ -160,7 +155,6 @@
 				<legend>Advanced Search</legend>
 
 		  <div class="section advancedsearch">
-			  <%=warningMessage%>
         <form id="advancedSearchForm" 
               name="advancedSearchForm" 
               method="post"
