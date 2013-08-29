@@ -114,81 +114,37 @@ public class ArchiveDownloadServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     HttpSession httpSession = request.getSession();
-
     String uid = (String) httpSession.getAttribute("uid");
-
-    if (uid == null || uid.isEmpty())
-      uid = "public";
-
+    if (uid == null || uid.isEmpty()) uid = "public";
     String packageId = request.getParameter("packageid");
-
     String scope = null;
     Integer identifier = null;
     String revision = null;
-
-    String html = null;
     String[] tokens = null;
     
     if (packageId != null && !packageId.isEmpty()) {
       tokens = packageId.split("\\.");    	
     }
-
-    if (tokens != null && tokens.length == 3) {
-
-      scope = tokens[0];
-      identifier = Integer.valueOf(tokens[1]);
-      revision = tokens[2];
-
-      try {
-      	
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        dpmClient.getDataPackageArchive(scope, identifier, revision, response);
-
-      } catch (PastaAuthenticationException e) {
-        logger.error("PastaAuthenticationException: " + e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaConfigurationException e) {
-        logger.error("PastaConfigurationException: " + e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (Exception e) {
-        logger.error("Exception: " + e.getMessage());
-        e.printStackTrace();
-        
-        if (e.getMessage().contains("User public does not have permission")) {
-        	html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() +
-        			" -- <a href=\"./login.jsp\">logging into the NIS</a> <em>may</em> let you read this data entity." +
-        			"</p>" + HTMLTAIL;
-        } else {
-            html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-        }
-        
-      }
-
-    } else {
-      html = HTMLHEAD
-          + "<p class=\"warning\">\n"
-          + "Error: packageId \""
-          + packageId
-          + "\" "
-          + "not in the correct form of \"scope\" . \"identifier\" . \"revision\" (e.g., knb-lter-lno.1.1)</p>\n"
-          + HTMLTAIL;
-    }
     
-    if (html != null) {
-      response.setContentType("text/html");
-      PrintWriter out = response.getWriter();
-      out.print(html);
-      out.flush();
-      out.close();
-    }
-
+	try {
+		if (tokens != null && tokens.length == 3) {
+			scope = tokens[0];
+			identifier = Integer.valueOf(tokens[1]);
+			revision = tokens[2];
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+			dpmClient.getDataPackageArchive(scope, identifier, revision, response);
+		}
+		else {
+			String errorMessage = 
+				String.format("packageId '%s' is not in the correct form of 'scope.identifier.revision' (e.g., 'knb-lter-lno.1.1')",
+							  packageId);
+			throw new ServletException(errorMessage);
+		}
+	}
+	catch (Exception e) {
+		handleDataPortalError(logger, e);
+	}   
   }
   
   /**

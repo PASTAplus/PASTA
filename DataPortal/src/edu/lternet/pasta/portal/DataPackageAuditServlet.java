@@ -119,6 +119,7 @@ public class DataPackageAuditServlet extends DataPortalServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
+	AuditManagerClient auditClient = null;
     HttpSession httpSession = request.getSession();
     String xml = null;
     StringBuffer filter = new StringBuffer();
@@ -131,24 +132,9 @@ public class DataPackageAuditServlet extends DataPortalServlet {
       uid = "public";
     }
     
-    AuditManagerClient auditClient = null;
-
     try {
       auditClient = new AuditManagerClient(uid);
       pastaUriHead = auditClient.getPastaUriHead();
-    }
-    catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      message = e.getMessage();
-      type = "warning";
-    }
-    catch (PastaConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      message = e.getMessage();
-      type = "warning";
-    }
     
     /*
      * Request and process filter parameters
@@ -233,31 +219,17 @@ public class DataPackageAuditServlet extends DataPortalServlet {
       type = "warning";
     }
     else if (resourceId == null) {
-			message = "A valid resource type must be selected (i.e., at least one of Package, Metadata, Report, and or Entity)";
+	  message = "A valid resource type must be selected (at least one of Package, Metadata, Report, or Data).";
       type = "warning";
     }
     else if (auditClient != null) {
     	
-      try {
       	String filterStr = filter.toString();
 	      logger.info("Non-encoded: " + filterStr);
         xml = auditClient.reportByFilter(filterStr);
         ReportUtility reportUtility = new ReportUtility(xml);
         message = reportUtility.xmlToHtmlTable(cwd + xslpath);
         type="info"; 
-      } 
-      catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } 
-      catch (ParseException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      }
     }
 
     request.setAttribute("reportMessage", message);
@@ -265,6 +237,10 @@ public class DataPackageAuditServlet extends DataPortalServlet {
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
+    }
+	catch (Exception e) {
+		handleDataPortalError(logger, e);
+	}   
 
   }
 

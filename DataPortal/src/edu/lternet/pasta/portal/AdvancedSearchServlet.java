@@ -225,15 +225,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
       requestDispatcher.forward(request, response);
     } 
-    catch (IOException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      throw(e);
-    }
     catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      throw new ServletException(e.getMessage());
+  	  handleDataPortalError(logger, e);
     }
 
   }

@@ -88,14 +88,14 @@
 							<tr>
 							  <td align="right">Resource type:</td>
 							  <td colspan="3">
-							    <label for="package">Package </label>
 							    <input type="checkbox" name="package" value="on" checked="checked" />
-							    <label for="metadata">&nbsp;&nbsp;&nbsp;Metadata </label>
+							    <label for="package">Package</label>&nbsp;&nbsp;&nbsp;
 							    <input type="checkbox" name="metadata" value="on" />
-							    <label for="report]">&nbsp;&nbsp;&nbsp;Report </label>
+							    <label for="metadata">Metadata</label>&nbsp;&nbsp;&nbsp;
 							    <input type="checkbox" name="report" value="on" />
-							    <label for="entity">&nbsp;&nbsp;&nbsp;Entity </label>
+							    <label for="report]">Report</label>&nbsp;&nbsp;&nbsp;
 							    <input type="checkbox" name="entity" value="on" />
+							    <label for="entity">Data</label>
 							  </td>
 							</tr>
 							<tr>

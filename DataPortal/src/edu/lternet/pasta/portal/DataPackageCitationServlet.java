@@ -130,11 +130,12 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		String revision = request.getParameter("revision");
 		String packageid = request.getParameter("packageid");
 
+		try {
 		if (scope != null && !(scope.isEmpty()) && identifier != null
 		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
 
 			id = Integer.valueOf(identifier);
-			isPackageId = true;
+			//isPackageId = true;
 
 		} else if (packageid != null && !packageid.isEmpty()) {
 
@@ -145,25 +146,27 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				identifier = tokens[1];
 				id = Integer.valueOf(identifier);
 				revision = tokens[2];
-				isPackageId = true;
+				//isPackageId = true;
 			}
 
 		} else {
-			html = "<p class=\"warning\">Error: a well-formed packageId was not found.</p>\n";
+			throw new ServletException("A well-formed packageId was not found.");
 		}
 
 		if (isPackageId) {
-
 			html = this.mapFormatter(uid, scope, id, revision);
-
 		} else {
-			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
+			throw new ServletException("The 'scope', 'identifier', or 'revision' field of the packageId is empty.");
 		}
 
 		httpSession.setAttribute("html", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
-
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+		
 	}
 
 	/**
