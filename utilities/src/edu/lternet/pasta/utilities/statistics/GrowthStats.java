@@ -107,13 +107,13 @@ public class GrowthStats {
 
   private ArrayList<String> dataPackagesForWeek(int year, int week) {
 
-    String startDate = "'" + this.weekStartToDate(year, week) + " " + STARTHOUR + "'";
-    String endDate = "'" + this.weekEndToDate(year, week) + " " + ENDHOUR + "'";
+    String startDate = this.weekStartToDate(year, week);
+    String endDate = this.weekEndToDate(year, week);
 
     String sql = "SELECT distinct scope, identifier FROM "
-        + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
-        + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
-        + "AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
+      + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
+      + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
+      + "AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
 
     ResultSet rs = null;
 
@@ -144,13 +144,13 @@ public class GrowthStats {
 
   private ArrayList<String> sitesForWeek(int year, int week) {
 
-    String startDate = "'" + this.weekStartToDate(year, week) + " " + STARTHOUR + "'";
-    String endDate = "'" + this.weekEndToDate(year, week) + " " + ENDHOUR + "'";
+    String startDate = this.weekStartToDate(year, week);
+    String endDate = this.weekEndToDate(year, week);
 
     String sql = "SELECT distinct scope FROM "
-                     + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
-                     + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
-                     + " AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
+      + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
+      + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
+      + " AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
 
     ResultSet rs = null;
 
@@ -190,7 +190,7 @@ public class GrowthStats {
     String monthStr = Integer.toString(now.get(Calendar.MONTH) + 1);
     String dayStr = Integer.toString(now.get(Calendar.DAY_OF_MONTH));
 
-    String date = yearStr + "-" + monthStr + "-" + dayStr;
+    String date = "'" + yearStr + "-" + monthStr + "-" + dayStr + " 23:59:59'";
     return date;
 
   }
@@ -207,7 +207,7 @@ public class GrowthStats {
     String monthStr = Integer.toString(now.get(Calendar.MONTH) + 1);
     String dayStr = Integer.toString(now.get(Calendar.DAY_OF_MONTH));
 
-    String date = yearStr + "-" + monthStr + "-" + dayStr;
+    String date = "'" + yearStr + "-" + monthStr + "-" + dayStr + " 00:00:00'";
     return date;
 
   }
@@ -219,6 +219,10 @@ public class GrowthStats {
     String dbUrl = args[0];
     String dbUser = args[1];
     String dbPassword = args[2];
+    Integer upToWeek;
+
+    Calendar now = Calendar.getInstance();
+    upToWeek = now.get(Calendar.WEEK_OF_YEAR);
 
     GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword);
 
@@ -230,11 +234,17 @@ public class GrowthStats {
 
     int pkgCount = 0;
     int siteCount = 0;
-    for (int week = 0; week < WEEKSINYEAR; week++) {
+
+    // Generate Google chart data structure
+    for (int week = 0; week < upToWeek - 1; week++) {
       pkgCount += packageStats[week];
       siteCount += siteStats[week];
-      System.out.printf("[%2d, %6d, %2d],%n", week + 1, pkgCount, siteCount);
+      System.out.printf("['%d', %d, %d],%n", week + 1, pkgCount, siteCount);
     }
+    pkgCount += packageStats[upToWeek - 1];
+    siteCount += siteStats[upToWeek - 1];
+    System.out.printf("['%d', %d, %d]%n", upToWeek, pkgCount, siteCount);
+
   }
  
  /* Instance variables */
