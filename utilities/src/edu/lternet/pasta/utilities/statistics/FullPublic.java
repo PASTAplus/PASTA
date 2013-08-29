@@ -167,27 +167,8 @@ public class FullPublic {
     FullPublic fp = new FullPublic(dbUrl, dbUser, dbPassword);
     ArrayList<String> packageIds = fp.getPackageIds();
 
-    int count = 0;
-    boolean ipr;
-
-    for (String packageId: packageIds) {
-      //System.out.printf("%s\n", packageId);
-      count++;
-      /*
-      ArrayList<String> resources = fp.getResources(packageId);
-      for (String resource: resources) {
-        ipr = fp.isPublicResource(resource);
-        if (ipr) {
-          System.out.printf("\tTRUE: %s\n", resource);
-        } else {
-          System.out.printf("\tFALSE: %s\n", resource);
-        }
-      }
-      */
-    }
-
-    System.out.printf("Total data packages: %d\n", count);
-    System.out.printf("Public data packages: %d\n", fp.getFullPublicPackages());
+    System.out.printf("Total data packages: %d%n", packageIds.size());
+    System.out.printf("Public data packages: %d%n", fp.getFullPublicPackages());
 
   }
 
