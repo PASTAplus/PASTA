@@ -18,8 +18,12 @@
 
 package edu.lternet.pasta.utilities.statistics;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: servilla
@@ -52,9 +56,78 @@ public class GrowthStats {
 
  /* Instance methods */
 
-  private String weekStartToDate(int year, int week) {
+  private HashMap<String, Integer> buildPackageHashMap(int year) {
 
-    int dayOfYear = ((week - 1) * DAYSINWEEK) + STARTDAY;
+    HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+    for (Integer week = 1; week <= YEARWEEKS; week++) {
+      for (String pkg: dataPackagesForWeek(year, week)) {
+        if (!map.containsKey(pkg)) {
+          map.put(pkg, week);
+        }
+      }
+    }
+
+    return map;
+
+  }
+
+  private int[] buildPackageStats(HashMap<String, Integer> packageHashMap) {
+
+    int[] packageStats = new int[52];
+
+    // Initialize each cell to 0
+    for (int i = 0; i < YEARWEEKS; i++) {
+      packageStats[i] = 0;
+    }
+
+    for (Map.Entry<String, Integer> entry: packageHashMap.entrySet()) {
+      packageStats[entry.getValue() - 1]++;
+    }
+
+    return packageStats;
+
+  }
+
+  private ArrayList<String> dataPackagesForWeek(int year, int week) {
+
+    String startDate = this.weekStartToDate(year, week);
+    String endDate = this.weekEndToDate(year, week);
+
+    String sql = "SELECT distinct scope, identifier FROM "
+        + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
+        + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%'";
+
+    ResultSet rs = null;
+
+    try {
+      rs = this.dbm.doQuery(sql);
+    }
+    catch (SQLException e) {
+      System.err.printf("%s\n", e.getMessage());
+      e.printStackTrace();
+    }
+
+    ArrayList<String> dataPackages = new ArrayList<String>();
+
+    try {
+      for (String[] pkg: dbm.resultSetAsString(rs)) {
+        dataPackages.add(pkg[0] + "." + pkg[1]);
+      }
+
+    }
+    catch (SQLException e) {
+      System.err.printf("%s\n", e.getMessage());
+      e.printStackTrace();
+    }
+
+    return dataPackages;
+
+  }
+
+  private String weekEndToDate(int year, int week) {
+
+    int dayOfYear = ((week - 1) * DAYSINWEEK) + ENDDAY;
 
     Calendar now = Calendar.getInstance();
     now.set(Calendar.YEAR, year);
@@ -69,9 +142,9 @@ public class GrowthStats {
 
   }
 
-  private String weekEndToDate(int year, int week) {
+  private String weekStartToDate(int year, int week) {
 
-    int dayOfYear = ((week - 1) * DAYSINWEEK) + ENDDAY;
+    int dayOfYear = ((week - 1) * DAYSINWEEK) + STARTDAY;
 
     Calendar now = Calendar.getInstance();
     now.set(Calendar.YEAR, year);
@@ -96,9 +169,15 @@ public class GrowthStats {
 
     GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword);
 
-    System.out.printf("%s\n", gs.weekStartToDate(2013, 53));
-    System.out.printf("%s\n", gs.weekEndToDate(2013, 53));
+    HashMap<String, Integer> map = gs.buildPackageHashMap(2013);
+    int[] packageStats = gs.buildPackageStats(map);
 
+    int count = 0;
+    System.out.printf("WEEK - COUNT - TOTAL%n");
+    for (int i = 0; i < YEARWEEKS; i++) {
+      count += packageStats[i];
+      System.out.printf(" %d,%d,%d%n", i + 1, packageStats[i], count);
+    }
   }
  
  /* Instance variables */
@@ -115,6 +194,7 @@ public class GrowthStats {
   private static int STARTDAY = 1;
   private static int ENDDAY = 7;
   private static int DAYSINWEEK = 7;
+  private static int YEARWEEKS = 52;
 
 
 }
