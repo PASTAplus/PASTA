@@ -149,6 +149,7 @@ public class PastaStatistics {
 			 "knb-lter-luq",
 			 "knb-lter-mcm",
 			 "knb-lter-mcr",
+       "knb-lter-nin",
 			 "knb-lter-nwt",
 			 "knb-lter-ntl",
 			 "knb-lter-pal",
