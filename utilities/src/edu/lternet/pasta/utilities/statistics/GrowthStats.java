@@ -49,6 +49,7 @@ public class GrowthStats {
       this.dbm = new DatabaseManager(this.dbUrl, this.dbUser, this.dbPassword);
     }
     catch (SQLException e) {
+      System.err.printf("%s%n", e.getMessage());
       e.printStackTrace();
     }
 
