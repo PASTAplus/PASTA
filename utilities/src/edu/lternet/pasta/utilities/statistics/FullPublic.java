@@ -111,18 +111,17 @@ public class FullPublic {
         + " WHERE package_id='" + packageId + "'";
 
     ArrayList<String[]> result = null;
+    ArrayList<String> resources = new ArrayList<String>();
 
     try {
       ResultSet rs = dbm.doQuery(sql);
       result = dbm.resultSetAsString(rs);
+      for (String[] tuple: result) {
+        resources.add(tuple[0]);
+      }
     }
     catch (SQLException e) {
       e.printStackTrace();
-    }
-
-    ArrayList<String> resources = new ArrayList<String>();
-    for (String[] tuple: result) {
-      resources.add(tuple[0]);
     }
 
     return resources;
