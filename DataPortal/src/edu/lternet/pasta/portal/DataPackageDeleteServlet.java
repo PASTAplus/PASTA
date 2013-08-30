@@ -40,6 +40,7 @@ import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.PastaEventException;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class DataPackageDeleteServlet extends DataPortalServlet {
 
@@ -90,6 +91,7 @@ public class DataPackageDeleteServlet extends DataPortalServlet {
 
   }
 
+  
   /**
    * The doPost method of the servlet. <br>
    * 
@@ -110,73 +112,60 @@ public class DataPackageDeleteServlet extends DataPortalServlet {
     HttpSession httpSession = request.getSession();
 
     String uid = (String) httpSession.getAttribute("uid");
-
     if (uid == null || uid.isEmpty())
       uid = "public";
 
-    String packageId = request.getParameter("packageid");
-    
+    String packageId = request.getParameter("packageid");    
     String scope = null;
     Integer identifier = null;
-
     String[] tokens = packageId.split("\\.");
-
     String message = null;
     String type = null;
 
+    try {
     if (uid.equals("public")) {
 
       message = LOGIN_WARNING;
       type = "warning";
 
-    } else if (tokens.length == 2) {
+    } 
+    else if (tokens.length == 2) {
       
       scope = tokens[0];
       identifier = Integer.valueOf(tokens[1]);
 
-      try {
-        
         logger.info("PACKAGEID: " + scope + "." + identifier);
         
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
         dpmClient.deleteDataPackage(scope, identifier);
         
-         message = "An data package with scope and identifier '<b>" + packageId
+         message = "Data package with scope and identifier '<b>" + packageId
             + "</b>' has been deleted.";
         type = "info";
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      }
-
-    } else {
-
-      message = "The provided packaged identifier '" + packageId + "' could not be parsed correctly.";
-      type = "warning";
-      
+    } 
+    else if (tokens.length == 3) {
+        message = String.format("The provided packaged identifier '%s' could not be parsed correctly. A revision value should not be included.", 
+        		                packageId);
+        throw new UserErrorException(message);
+    }
+    else {
+        message = String.format("The provided packaged identifier '%s' could not be parsed correctly.",
+        		                packageId);
+        throw new UserErrorException(message);
     }
 
     request.setAttribute("deletemessage", message);
     request.setAttribute("type", type);
+    }
+	catch (Exception e) {
+		handleDataPortalError(logger, e);
+	}
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
-
   }
 
+  
   /**
    * Initialization of the servlet. <br>
    * 

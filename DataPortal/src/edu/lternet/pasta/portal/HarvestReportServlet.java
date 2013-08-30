@@ -113,32 +113,38 @@ public class HarvestReportServlet extends DataPortalServlet  {
    * @throws IOException
    *           if an error occurred
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-   
-    HttpSession httpSession = request.getSession();
-    String uid = (String) httpSession.getAttribute("uid");
-    String warningMessage = null;
-    
-    if (uid == null) {
-      warningMessage = "<p class=\"warning\">" + LOGIN_WARNING + "</p>";
-      request.setAttribute("message", warningMessage);
-    } 
-    else {
-      String reportId = request.getParameter("reportId");
-      if (reportId != null && reportId.length() > 0) {
-        httpSession.setAttribute("harvestReportID", reportId);
-      }    
-    }
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			HttpSession httpSession = request.getSession();
+			String uid = (String) httpSession.getAttribute("uid");
+			String warningMessage = null;
 
-    if (warningMessage == null || warningMessage.length() == 0) {
-      response.sendRedirect("./harvestReport.jsp");
-    }
-    else {
-      RequestDispatcher requestDispatcher = request.getRequestDispatcher("./harvestReport.jsp");
-      requestDispatcher.forward(request, response);
-    }
-  }
+			if (uid == null) {
+				warningMessage = "<p class=\"warning\">" + LOGIN_WARNING
+						+ "</p>";
+				request.setAttribute("message", warningMessage);
+			}
+			else {
+				String reportId = request.getParameter("reportId");
+				if (reportId != null && reportId.length() > 0) {
+					httpSession.setAttribute("harvestReportID", reportId);
+				}
+			}
+
+			if (warningMessage == null || warningMessage.length() == 0) {
+				response.sendRedirect("./harvestReport.jsp");
+			}
+			else {
+				RequestDispatcher requestDispatcher = request
+						.getRequestDispatcher("./harvestReport.jsp");
+				requestDispatcher.forward(request, response);
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+	}
  
   
   /**

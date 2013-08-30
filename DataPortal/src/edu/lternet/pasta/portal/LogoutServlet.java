@@ -105,19 +105,16 @@ public class LogoutServlet extends DataPortalServlet {
 		
 		try {
 			tokenManager.deleteToken(uid);
-		} catch (SQLException e) {
-			logger.error(e);
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			logger.error(e);
-			e.printStackTrace();
-		} finally {
+		}
+	    catch (Exception e) {
+	    	handleDataPortalError(logger, e);
+	    }
+		finally {
 			httpSession.invalidate();
 		}
-
+	
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher("./home.jsp");
 		requestDispatcher.forward(request, response);
-
 	}
 
 	/**

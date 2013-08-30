@@ -222,16 +222,13 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
       html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
+      RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+      requestDispatcher.forward(request, response);
     } 
     catch (Exception e) {
-      logger.error(e.getMessage());
-      String warningMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      request.setAttribute("message", warningMessage);
-      forward = "./advancedSearch.jsp";
+  	  handleDataPortalError(logger, e);
     }
 
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-    requestDispatcher.forward(request, response);
   }
 
   

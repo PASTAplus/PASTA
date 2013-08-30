@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,6 +42,7 @@ import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.ReportUtility;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class ReportViewerServlet extends DataPortalServlet {
   
@@ -106,85 +106,71 @@ public class ReportViewerServlet extends DataPortalServlet {
    * @throws ServletException if an error occurred
    * @throws IOException if an error occurred
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    
-    HttpSession httpSession = request.getSession();
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		HttpSession httpSession = request.getSession();
+		String uid = (String) httpSession.getAttribute("uid");
 
-    String uid = (String) httpSession.getAttribute("uid");
+		if (uid == null || uid.isEmpty())
+			uid = "public";
 
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+		String packageId = request.getParameter("packageid");
+		String encodedPath = request.getParameter("localPath");
+		String scope = null;
+		Integer identifier = null;
+		String revision = null;
+		String xml = null;
+		String html = null;
 
-    String packageId = request.getParameter("packageid");
-    String encodedPath = request.getParameter("localPath");
+		try {
+			String[] tokens = packageId.split("\\.");
 
-    String scope = null;
-    Integer identifier = null;
-    String revision = null;
-    
-    String xml = null;
-    String html = null;
-    
-    String[] tokens = packageId.split("\\.");
-    
-    if (tokens.length == 3) {
-      
-      scope = tokens[0];
-      identifier = Integer.valueOf(tokens[1]);
-      revision = tokens[2];
+			if (tokens.length == 3) {
+				scope = tokens[0];
+				identifier = Integer.valueOf(tokens[1]);
+				revision = tokens[2];
+				/*
+				 * The quality report XML could be read either from a local file
+				 * or from PASTA via the DataPackageManagerClient.
+				 */
+				if (encodedPath != null && encodedPath.length() > 0) {
+					URLCodec urlCodec = new URLCodec();
+					String localPath = urlCodec.decode(encodedPath);
+					File xmlFile = new File(localPath);
+					if (xmlFile != null && xmlFile.exists()) {
+						xml = FileUtils.readFileToString(xmlFile);
+					}
+				}
+				else {
+					DataPackageManagerClient dpmClient = new DataPackageManagerClient(
+							uid);
+					xml = dpmClient.readDataPackageReport(scope, identifier,
+							revision);
+				}
 
-      try {       
-        /*
-         * The quality report XML could be read either from a local file
-         * or from PASTA via the DataPackageManagerClient.
-         */
-        if (encodedPath != null && encodedPath.length() > 0) {
-          URLCodec urlCodec = new URLCodec();
-          String localPath = urlCodec.decode(encodedPath);
-          File xmlFile = new File(localPath);
-          if (xmlFile != null && xmlFile.exists()) {
-            xml = FileUtils.readFileToString(xmlFile);
-          }
-        }
-        else {
-          DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-          xml = dpmClient.readDataPackageReport(scope, identifier, revision);
-        }
+				ReportUtility qrUtility = new ReportUtility(xml);
+				html = HTMLHEAD + "<div class=\"qualityreport\">"
+						+ qrUtility.xmlToHtmlTable(cwd + xslpath) + "</div>"
+						+ HTMLTAIL;
+			}
+			else {
+				String msg = String
+						.format("packageId '%s' is not in the correct form of 'scope.identifier.revision' (e.g., 'knb-lter-lno.1.1')",
+								packageId);
+				throw new UserErrorException(msg);
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
 
-        ReportUtility qrUtility = new ReportUtility(xml);
-        html = HTMLHEAD + "<div class=\"qualityreport\">" + qrUtility.xmlToHtmlTable(cwd + xslpath) + "</div>" + HTMLTAIL;
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.print(html);
+		out.flush();
+		out.close();
+	}
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>" + HTMLTAIL;
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>" +  HTMLTAIL;
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>" +  HTMLTAIL;
-     }
-      
-    } else {
-      html = HTMLHEAD
-          + "<p class=\"warning\">\n"
-          + "Error: packageId \"" + packageId + "\" "   
-          + "is not in the correct form of \"scope\" . \"identifier\" . \"revision\" (e.g., knb-lter-lno.1.1)</p>\n"
-          + HTMLTAIL;
-    }
-
-      
-    response.setContentType("text/html");
-    PrintWriter out = response.getWriter();
-    out.print(html);
-    out.flush();
-    out.close();
-    
-  }
 
   /**
    * Initialization of the servlet. <br>

@@ -25,7 +25,6 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -37,9 +36,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.EventSubscriptionClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.SubscriptionUtility;
 
 public class EventTestServlet extends DataPortalServlet {
@@ -131,28 +127,10 @@ public class EventTestServlet extends DataPortalServlet {
             + "' has been tested by posting to the Target URL:</h3>";
         message += subscriptionUtility.xmlToHtml(cwd + xslpath);
         type = "info";
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (ParseException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      }
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
+      }    
 
     }
 
