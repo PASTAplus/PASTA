@@ -24,7 +24,6 @@
 
 package edu.lternet.pasta.portal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -32,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -40,19 +38,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.EmlUtility;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.client.ReportUtility;
 
-public class MetadataPreviewerServlet extends HttpServlet {
+public class MetadataPreviewerServlet extends DataPortalServlet {
 
   /**
    * Class variables
@@ -65,13 +58,6 @@ public class MetadataPreviewerServlet extends HttpServlet {
   private static String cwd = null;
   private static String xslpath = null;
   
-  private static final String HTMLHEAD = "<html>\n"
-      + "<head><title>Report Viewer</title>\n"
-      + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
-      + "</head><body>\n";
-
-  private static final String HTMLTAIL = "</html>\n";
-
 
   /**
    * Constructor of the object.
@@ -125,7 +111,6 @@ public class MetadataPreviewerServlet extends HttpServlet {
       uid = "public";
 
     String html = null;
-    String type = null;
 
     boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
@@ -159,28 +144,10 @@ public class MetadataPreviewerServlet extends HttpServlet {
           
         }
 
-      } catch (FileUploadException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      }
-
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
+      }    
     }
 
     response.setContentType("text/html");
@@ -188,8 +155,6 @@ public class MetadataPreviewerServlet extends HttpServlet {
     out.print(html);
     out.flush();
     out.close();
-
-    
   }
 
   /**

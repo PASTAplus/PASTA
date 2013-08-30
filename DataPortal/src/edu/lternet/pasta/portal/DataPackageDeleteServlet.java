@@ -139,7 +139,7 @@ public class DataPackageDeleteServlet extends DataPortalServlet {
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
         dpmClient.deleteDataPackage(scope, identifier);
         
-         message = "An data package with scope and identifier '<b>" + packageId
+         message = "Data package with scope and identifier '<b>" + packageId
             + "</b>' has been deleted.";
         type = "info";
     } 

@@ -86,7 +86,7 @@
 					</form>
 				</div>
         <%
-          if (deleteMessage != null && type.equals("class=\"warning\"")) {
+          if (deleteMessage != null) {
             out.println("<div class=\"section\">\n");
             out.println("<table align=\"left\" cellpadding=\"4em\">\n");
             out.println("<tbody>\n");

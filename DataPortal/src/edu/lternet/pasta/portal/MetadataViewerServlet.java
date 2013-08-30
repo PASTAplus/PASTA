@@ -29,9 +29,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -41,8 +39,8 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.EmlUtility;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class MetadataViewerServlet extends DataPortalServlet {
 
@@ -141,6 +139,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
     Integer identifier = null;
     String revision = null;
 
+    try {
     if (packageId != null && !packageId.isEmpty()) {
 
       tokens = packageId.split("\\.");
@@ -150,11 +149,13 @@ public class MetadataViewerServlet extends DataPortalServlet {
         scope = tokens[0];
         identifier = Integer.valueOf(tokens[1]);
         revision = tokens[2];     
-      } else {
-        message = "Error: packageId \"" + packageId + "\" "  + 
-                  "is not in the correct form of \"scope\" . \"identifier\" . " +
-                  "\"revision\" (e.g., knb-lter-lno.1.1)";
-        type = "warning";
+      } 
+      else {
+        message = 
+        	String.format(
+        		"packageId '%s' is not in the correct form of 'scope.identifier.revision' (e.g., 'knb-lter-lno.1.1').",
+        		packageId);
+        throw new UserErrorException(message);
       }
     } else if (url != null && !(url.isEmpty())) {
       tokens = url.split("/");
@@ -169,12 +170,11 @@ public class MetadataViewerServlet extends DataPortalServlet {
 
     } else {
       message = "A packageId or metadata URL was not found.";
-      type = "warning";
+      throw new ResourceNotFoundException(message);
     }
 
     if (isValidPackageId) {
 
-      try {
         String dataPackageDOI = null;
         String xml = null;
         DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
@@ -205,36 +205,13 @@ public class MetadataViewerServlet extends DataPortalServlet {
           message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
           type = "html";
         }
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      }
-
     }
 
-    if (type.equals("warning")) {
+    }
+    catch (Exception e) {
+  	  handleDataPortalError(logger, e);
+    }    
 
-      request.setAttribute("message", message);
-      request.setAttribute("type", type);
-
-      RequestDispatcher requestDispatcher = request
-          .getRequestDispatcher(forward);
-      requestDispatcher.forward(request, response);
-      
-    } else {
       if (type.equals("xml")) {
         response.setContentType("application/xml");
       } else {
@@ -245,10 +222,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
       PrintWriter out = response.getWriter();
       out.print(message);
       out.flush();
-      out.close();
-      
-    }
-
+      out.close();      
   }
 
   /**

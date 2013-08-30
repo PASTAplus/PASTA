@@ -48,7 +48,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
@@ -266,16 +265,9 @@ public class HarvesterServlet extends DataPortalServlet {
       warningMessage = "<p class=\"warning\">" + LOGIN_WARNING + "</p>";
       logger.error(e.getMessage());
     }
-    catch (IOException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        throw(e);
-    }
     catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        throw new ServletException(e.getMessage());
-    }
+  	  handleDataPortalError(logger, e);
+    }    
 
       request.setAttribute("message", warningMessage);
       
@@ -404,11 +396,7 @@ public class HarvesterServlet extends DataPortalServlet {
     // Process a file upload
     if (!item.isFormField()) {
       // Get object information
-      String fieldName = item.getFieldName();
       String fileName = item.getName();
-      String contentType = item.getContentType();
-      boolean isInMemory = item.isInMemory();
-      long sizeInBytes = item.getSize();
       String tmpdir = System.getProperty("java.io.tmpdir");
       logger.debug("FILE: " + tmpdir + "/" + fileName);
       eml = new File(tmpdir + "/" + fileName);

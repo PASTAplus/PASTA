@@ -142,20 +142,10 @@ public class ScopeBrowseServlet extends DataPortalServlet {
       }
 
       html += "</ol>\n";
-
-    } catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (PastaConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    }
+    }       
+    catch (Exception e) {
+  	  handleDataPortalError(logger, e);
+    }    
 
     httpSession.setAttribute("browsemessage", browseMessage);
     httpSession.setAttribute("html", html);

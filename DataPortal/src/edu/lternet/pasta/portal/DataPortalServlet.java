@@ -85,10 +85,10 @@ public class DataPortalServlet extends HttpServlet {
 	  }
 	  
 	  if (className.equals("javax.servlet.ServletException")) {
-	      errorMessage = String.format("%s: %s", this.getClass().getName(), eMessage);
+	      errorMessage = String.format("%s:<br/><br/>%s", this.getClass().getName(), eMessage);
 	  }
 	  else {
-	      errorMessage = String.format("%s: %s", className, eMessage);
+	      errorMessage = String.format("%s:<br/><br/>%s", className, eMessage);
 	  }
       logger.error(errorMessage);
       e.printStackTrace();

@@ -41,6 +41,7 @@ import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.SubscriptionUtility;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class EventReviewServlet extends DataPortalServlet {
 
@@ -101,68 +102,43 @@ public class EventReviewServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     HttpSession httpSession = request.getSession();
     String xml = null;
     String filter = "";
-
     String uid = (String) httpSession.getAttribute("uid");
-
     if (uid == null || uid.isEmpty())
       uid = "public";
-
     String subscriptionId = request.getParameter("subscriptionid");
-
     String message = null;
     String type = null;
 
     if (uid.equals("public")) {
-
       message = LOGIN_WARNING;
       type = "warning";
-
-    } else {
-
+    } 
+    else {
       try {
-
         EventSubscriptionClient eventClient = new EventSubscriptionClient(uid);
-
+        
         if (subscriptionId.isEmpty()) {
-          logger.info("SubscriptionId empty\n");
           xml = eventClient.readByFilter(filter);
         } else {
-          logger.info("SubscriptionId non empty\n");
           xml = eventClient.readBySid(subscriptionId);
         }
-
-        logger.info(xml);
-
+        
         SubscriptionUtility subscriptionUtility = new SubscriptionUtility(xml);
         message = subscriptionUtility.xmlToHtml(cwd + xslpath);
         type="info";
-
       } 
       catch (Exception e) {
-    	  String errorMessage = e.getMessage();
-    	  if (errorMessage == null) {
-    		  Throwable t = e.getCause();
-    		  if (t != null) {
-    			  errorMessage = t.getMessage();
-    		  }
-    	  }
-          logger.error(errorMessage);
-          e.printStackTrace();
-          throw new ServletException(errorMessage);
+    	  handleDataPortalError(logger, e);
       }
-
     }
 
     request.setAttribute("reviewmessage", message);
     request.setAttribute("type", type);
-
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
-
   }
 
   /**

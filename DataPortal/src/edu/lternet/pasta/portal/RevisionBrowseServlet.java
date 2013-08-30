@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class RevisionBrowseServlet extends DataPortalServlet {
 
@@ -104,72 +105,57 @@ public class RevisionBrowseServlet extends DataPortalServlet {
    * @throws IOException
    *           if an error occurred
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		HttpSession httpSession = request.getSession();
+		String uid = (String) httpSession.getAttribute("uid");
+		if (uid == null || uid.isEmpty())
+			uid = "public";
+		String scope = request.getParameter("scope");
+		String identifier = request.getParameter("identifier");
+		Integer id = Integer.valueOf(identifier);
+		String text = null;
+		String html = null;
+		Integer count = 0;
 
-    HttpSession httpSession = request.getSession();
+		try {
 
-    String uid = (String) httpSession.getAttribute("uid");
+			if (scope != null && !(scope.isEmpty()) && identifier != null
+					&& !(identifier.isEmpty())) {
+				DataPackageManagerClient dpmClient = new DataPackageManagerClient(
+						uid);
+				text = dpmClient.listDataPackageRevisions(scope, id, null);
+				StrTokenizer tokens = new StrTokenizer(text);
+				html = "<ol>\n";
 
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+				while (tokens.hasNext()) {
+					String revision = tokens.nextToken();
+					html += "<li><a href=\"./mapbrowse?scope=" + scope
+							+ "&identifier=" + identifier + "&revision="
+							+ revision + "\">" + scope + "." + identifier
+							+ ".<em>" + revision + "</em></a></li>\n";
+					count++;
+				}
 
-    String scope = request.getParameter("scope");
-    String identifier = request.getParameter("identifier");
+				html += "</ol>\n";
+			}
+			else {
+				String msg = "The 'scope', 'identifier', or 'revision' field of the packageId is empty.";
+				throw new UserErrorException(msg);
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
 
-    Integer id = Integer.valueOf(identifier);
+		httpSession.setAttribute("browsemessage", browseMessage);
+		httpSession.setAttribute("html", html);
+		httpSession.setAttribute("count", count.toString());
+		RequestDispatcher requestDispatcher = request
+				.getRequestDispatcher(forward);
+		requestDispatcher.forward(request, response);
+	}
 
-    String text = null;
-    String html = null;
-    Integer count = 0;
-
-    if (scope != null && !(scope.isEmpty()) && identifier != null
-        && !(identifier.isEmpty())) {
-
-      try {
-
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        text = dpmClient.listDataPackageRevisions(scope, id, null);
-
-        StrTokenizer tokens = new StrTokenizer(text);
-
-        html = "<ol>\n";
-
-        while (tokens.hasNext()) {
-          String revision = tokens.nextToken();
-          html += "<li><a href=\"./mapbrowse?scope=" + scope + "&identifier="
-              + identifier + "&revision=" + revision + "\">" + scope + "."
-              + identifier + ".<em>" + revision + "</em></a></li>\n";
-          count++;
-        }
-
-        html += "</ol>\n";
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      }
-
-    } else {
-      html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" field(s) empty</p>\n";
-    }
-
-    httpSession.setAttribute("browsemessage", browseMessage);
-    httpSession.setAttribute("html", html);
-    httpSession.setAttribute("count", count.toString());
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-    requestDispatcher.forward(request, response);
-
-  }
 
   /**
    * Initialization of the servlet. <br>

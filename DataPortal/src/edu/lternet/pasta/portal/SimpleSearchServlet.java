@@ -113,66 +113,51 @@ public class SimpleSearchServlet extends DataPortalServlet {
    * @throws IOException
    *           if an error occurred
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    
-    String html = null;
-    String xml = null;
-    TermsList termsList = new TermsList();
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String html = null;
+		String xml = null;
+		TermsList termsList = new TermsList();
+		HttpSession httpSession = request.getSession();
+		String uid = (String) httpSession.getAttribute("uid");
+		if (uid == null || uid.isEmpty())
+			uid = "public";
+		String terms = (String) request.getParameter("terms");
+		String query = null;
 
-    HttpSession httpSession = request.getSession();
-    
-    String uid = (String) httpSession.getAttribute("uid");
-    
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+		try {
+			if (terms != null) {
+				boolean tokenize = true;
+				boolean isSiteTerm = false;
+				if (terms.equals("*")) {
+					query = SimpleSearch.buildPathQueryXml("", termsList,
+							tokenize, isSiteTerm);
+					termsList.addTerm("*");
+				}
+				else {
+					query = SimpleSearch.buildPathQueryXml(terms, termsList,
+							tokenize, isSiteTerm);
+				}
+			}
 
-    String terms = (String) request.getParameter("terms");
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(
+					uid);
+			xml = dpmClient.searchDataPackages(query);
+			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+			html = "<p> Terms used in this search: " + termsList.toHTML()
+					+ "</p>\n";
+			html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
 
-    String query = null;
+		request.setAttribute("searchresult", html);
+		RequestDispatcher requestDispatcher = request
+				.getRequestDispatcher(forward);
+		requestDispatcher.forward(request, response);
+	}
 
-    if (terms != null) {
-      boolean tokenize = true;
-      boolean isSiteTerm = false;
-      if (terms.equals("*")) {
-        query = SimpleSearch.buildPathQueryXml("", termsList, tokenize, isSiteTerm);
-        termsList.addTerm("*");
-      } else {
-        query = SimpleSearch.buildPathQueryXml(terms, termsList, tokenize, isSiteTerm);
-      }
-    }
-    
-    try {
-      
-      DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-      xml = dpmClient.searchDataPackages(query);
-      
-      logger.info("XML: " + xml);
-      
-      ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-      html = "<p> Terms used in this search: " + termsList.toHTML() + "</p>\n";
-      html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-      
-    } catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (PastaConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    }
-
-    request.setAttribute("searchresult", html);
-
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-    requestDispatcher.forward(request, response);
-
-  }
 
   /**
    * Initialization of the servlet. <br>

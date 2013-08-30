@@ -39,6 +39,7 @@ import edu.lternet.pasta.client.EventSubscriptionClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.PastaEventException;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class EventSubscribeServlet extends DataPortalServlet {
 
@@ -97,60 +98,39 @@ public class EventSubscribeServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     HttpSession httpSession = request.getSession();
-
     String uid = (String) httpSession.getAttribute("uid");
-
     if (uid == null || uid.isEmpty())
       uid = "public";
-
     String packageId = request.getParameter("packageid");
     String targetUrl = request.getParameter("targeturl");
-
     String subscription = "<subscription type=\"eml\"><packageId>" + packageId
         + "</packageId><url>" + targetUrl + "</url></subscription>";
-
     String message = null;
-    String type = null;
+    String type = "info";
 
-    if (uid.equals("public")) {
-      
+    if (uid.equals("public")) {      
       message = LOGIN_WARNING;
       type = "warning";
-      
-    } else {
-      
+    } 
+    else {   
       try {
-
         EventSubscriptionClient eventClient = new EventSubscriptionClient(uid);
-        message = "An Event Subscription with identifier '<b>"
-            + eventClient.create(subscription)
-            + "</b>' was successfully created.\n";
-        type = "info";
-
+        String subscriptionId = eventClient.create(subscription);
+        message = 
+        		String.format(
+        				"An Event Subscription with identifier '<b>%s</b>' was created.\n",
+        				subscriptionId);
       } 
       catch (Exception e) {
-    	  String errorMessage = e.getMessage();
-    	  if (errorMessage == null) {
-    		  Throwable t = e.getCause();
-    		  if (t != null) {
-    			  errorMessage = t.getMessage();
-    		  }
-    	  }
-          logger.error(errorMessage);
-          e.printStackTrace();
-          throw new ServletException(errorMessage);
-      }
-      
+    	  handleDataPortalError(logger, e);
+      }    
     }
 
     request.setAttribute("subscribemessage", message);
     request.setAttribute("type", type);
-
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
-
   }
 
   /**

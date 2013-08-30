@@ -56,6 +56,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
@@ -556,6 +557,7 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				if (emlPackageId != null) {
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -592,6 +594,10 @@ public class DataPackageManagerClient extends PastaClient {
 					    + "check the audit logs or the Data Package Browser at a later "
 					    + "time.";
 					throw new Exception(gripe);
+				}
+				}
+				else {
+					throw new UserErrorException("An EML packageId value could not be parsed from the file. Check that the file contains valid EML.");
 				}
 			
 			} else {

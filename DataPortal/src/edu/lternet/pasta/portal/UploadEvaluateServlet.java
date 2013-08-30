@@ -26,13 +26,11 @@ package edu.lternet.pasta.portal;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,13 +41,13 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.ReportUtility;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class UploadEvaluateServlet extends DataPortalServlet {
 
@@ -164,36 +162,25 @@ public class UploadEvaluateServlet extends DataPortalServlet {
             String xml = dpmClient.evaluateDataPackage(eml);
 
             ReportUtility qrUtility = new ReportUtility(xml);
+            String htmlTable = qrUtility.xmlToHtmlTable(cwd + xslpath);
             
+            if (htmlTable == null) {
+            	String msg = "The uploaded file could not be evaluated.";
+            	throw new UserErrorException(msg);
+            }
+            else {
             html = HTMLHEAD + "<div class=\"qualityreport\">"
-                + qrUtility.xmlToHtmlTable(cwd + xslpath) + "</div>" + HTMLTAIL;
+                + htmlTable + "</div>" + HTMLTAIL;
+            }
 
           }
           
         }
 
-      } catch (FileUploadException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = HTMLHEAD + "<p class=\"warning\">" + e.getMessage() + "</p>"
-            + HTMLTAIL;
-      }
-
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
+      }    
     }
 
     response.setContentType("text/html");
@@ -201,7 +188,6 @@ public class UploadEvaluateServlet extends DataPortalServlet {
     out.print(html);
     out.flush();
     out.close();
-
   }
 
   /**
