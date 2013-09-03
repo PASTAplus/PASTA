@@ -297,7 +297,7 @@
           <div class="figure floatleft">
             <label for="advancedsearch">Spatial Criteria</label>
             <input type="hidden" name="boundsChangedCount" value="0" />
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false"
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&amp;sensor=false"
                     type="text/javascript">
             </script>
             <script type="text/javascript" src="./js/map_functions.js" ></script>      
@@ -376,7 +376,7 @@
 
   <script type="text/javascript"> 
 
-    <!-- // JavaScript input validation checking code for advanced search form
+    <!-- // JavaScript input validation checking code for advanced search form -->
     var bCancel = false; 
 
     function validateAdvancedSearchForm(form) {                                                                   
