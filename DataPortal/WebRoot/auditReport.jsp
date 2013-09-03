@@ -79,7 +79,7 @@
 									</td>
 									<td>
 									   <label for="beginTime">Time </label>
-									   <input type="text" name="beginTime" size="25px" placeholder="HH:MM:SS" />
+									   <input type="time" name="beginTime" size="25px" placeholder="HH:MM:SS" />
 									</td>
                   <td>Values are Mountain TZ (default 00:00:00)</td>
 								</tr>
@@ -91,21 +91,21 @@
                   </td>
                   <td>
                      <label for="endTime">Time </label>
-                     <input type="text" name="endTime" size="25px" placeholder="HH:MM:SS" />
+                     <input type="time" name="endTime" size="25px" placeholder="HH:MM:SS" />
                   </td>
                   <td>Values are Mountain TZ (default 00:00:00)</td>
                 </tr>
 								<tr>
 									<td align="left">Category Status:</td>
 									<td colspan="2">
-									   <label for="debug">Debug</label>
 									   <input type="checkbox" name="debug" value="debug" />
-									   <label for="info">Info</label>
+									   <label for="debug">Debug</label>&nbsp;&nbsp;&nbsp;
 									   <input type="checkbox" name="info" value="info" />
-									   <label for="warn">Warn</label>
+									   <label for="info">Info</label>&nbsp;&nbsp;&nbsp;
 									   <input type="checkbox" name="warn" value="warn" />
-									   <label for="error">Error</label>
+									   <label for="warn">Warn</label>&nbsp;&nbsp;&nbsp;
 									   <input type="checkbox" name="error" value="error" />
+									   <label for="error">Error</label>
 									</td>
 									<td></td>
 								</tr>

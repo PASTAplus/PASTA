@@ -111,6 +111,7 @@ public class AuditReportServlet extends DataPortalServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
+	try {
     HttpSession httpSession = request.getSession();
     String xml = null;
     StringBuffer filter = new StringBuffer();
@@ -228,8 +229,6 @@ public class AuditReportServlet extends DataPortalServlet {
 
     } else {
 
-      try {
-
         logger.info(filter.toString());
         
         AuditManagerClient auditClient = new AuditManagerClient(uid);
@@ -238,29 +237,6 @@ public class AuditReportServlet extends DataPortalServlet {
         ReportUtility reportUtility = new ReportUtility(xml);
         message = reportUtility.xmlToHtmlTable(cwd + xslpath);
         type="info";
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (ParseException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      }
-
     }
 
     request.setAttribute("reportMessage", message);
@@ -268,6 +244,10 @@ public class AuditReportServlet extends DataPortalServlet {
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
+	}
+	catch (Exception e) {
+		handleDataPortalError(logger, e);
+	}   
 
   }
 

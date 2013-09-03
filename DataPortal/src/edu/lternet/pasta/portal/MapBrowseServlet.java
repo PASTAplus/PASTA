@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
@@ -134,45 +135,56 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String revision = request.getParameter("revision");
 		String packageid = request.getParameter("packageid");
 
-		if (scope != null && !(scope.isEmpty()) && identifier != null
-		    && !(identifier.isEmpty())) {
-			
-			if (revision == null || revision.isEmpty()) {
-				revision = "newest";
-			}
+		try {
+			if (scope != null && 
+				!(scope.isEmpty()) && 
+				identifier != null && 
+				!(identifier.isEmpty())
+			   ) {
 
-			id = Integer.valueOf(identifier);
-			isPackageId = true;
+				if (revision == null || revision.isEmpty()) {
+					revision = "newest";
+				}
 
-		} else if (packageid != null && !packageid.isEmpty()) {
-
-			String[] tokens = packageid.split("\\.");
-
-			if (tokens.length == 3) {
-				scope = tokens[0];
-				identifier = tokens[1];
 				id = Integer.valueOf(identifier);
-				revision = tokens[2];
 				isPackageId = true;
 			}
+			else
+				if (packageid != null && 
+				    !packageid.isEmpty()
+				   ) {
 
-		} else {
-			html = "<p class=\"warning\">Error: a well-formed packageId was not found.</p>\n";
+					String[] tokens = packageid.split("\\.");
+
+					if (tokens.length == 3) {
+						scope = tokens[0];
+						identifier = tokens[1];
+						id = Integer.valueOf(identifier);
+						revision = tokens[2];
+						isPackageId = true;
+					}
+				}
+				else {
+					String msg = "A well-formed packageId was not found.";
+					throw new UserErrorException(msg);
+				}
+
+			if (isPackageId) {
+				html = this.mapFormatter(uid, scope, id, revision);
+			}
+			else {
+				String msg = "The 'scope', 'identifier', or 'revision' field of the packageId is empty.";
+				throw new UserErrorException(msg);
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
 		}
 
-		if (isPackageId) {
-
-			html = this.mapFormatter(uid, scope, id, revision);
-
-		} else {
-			html = "<p class=\"warning\"> Error: \"scope\" and or \"identifier\" and or \"revision\" field(s) empty</p>\n";
-		}
-
-    httpSession.setAttribute("browsemessage", null);
+		httpSession.setAttribute("browsemessage", null);
 		httpSession.setAttribute("html", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
-
 	}
 
 	/**

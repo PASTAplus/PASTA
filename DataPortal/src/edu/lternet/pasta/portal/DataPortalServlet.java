@@ -24,7 +24,10 @@
 
 package edu.lternet.pasta.portal;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+
+import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
@@ -65,6 +68,42 @@ public class DataPortalServlet extends HttpServlet {
   /*
    * Instance methods
    */
+  
+  
+  /*
+   * Generalized error handler for Data Portal servlets
+   */
+  protected void handleDataPortalError(Logger logger, Exception e) throws ServletException {
+	  String className = e.getClass().getName();
+	  String errorMessage = null;
+	  String eMessage = e.getMessage();
+	  if (eMessage == null) {
+		  Throwable t = e.getCause();
+		  if (t != null) {
+			  eMessage = t.getMessage();
+		  }
+	  }
+	  
+	  if (className.equals("javax.servlet.ServletException")) {
+	      errorMessage = String.format("%s:<br/><br/>%s", this.getClass().getName(), eMessage);
+	  }
+	  else {
+	      errorMessage = String.format("%s:<br/><br/>%s", className, eMessage);
+	  }
+      logger.error(errorMessage);
+      e.printStackTrace();
+      
+      // If user not logged in, add suggestion for user to log in
+      if (errorMessage.contains("User public does not have permission")) {
+    	  String suggestion = 
+    			  String.format(
+                      " <a href='./login.jsp'>Logging into the LTER Data Portal</a> <em>may</em> let you read this resource.");
+    	  errorMessage = errorMessage + suggestion;
+      }
+    	  
+      throw new ServletException(errorMessage);
+  }
+  
   
   /*
    * Composes a data package resource identifier based on the PASTA URI

@@ -152,21 +152,13 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
 
         html += "</ol>\n";
 
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-      }
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
+      }    
 
-    } else {
+    } 
+    else {
       html = "<p class=\"warning\"> Error: \"scope\" field empty</p>\n";
     }
 

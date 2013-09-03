@@ -41,6 +41,7 @@ import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.SubscriptionUtility;
+import edu.lternet.pasta.common.UserErrorException;
 
 public class EventReviewServlet extends DataPortalServlet {
 
@@ -101,76 +102,43 @@ public class EventReviewServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     HttpSession httpSession = request.getSession();
     String xml = null;
     String filter = "";
-
     String uid = (String) httpSession.getAttribute("uid");
-
     if (uid == null || uid.isEmpty())
       uid = "public";
-
     String subscriptionId = request.getParameter("subscriptionid");
-
     String message = null;
     String type = null;
 
     if (uid.equals("public")) {
-
       message = LOGIN_WARNING;
       type = "warning";
-
-    } else {
-
+    } 
+    else {
       try {
-
         EventSubscriptionClient eventClient = new EventSubscriptionClient(uid);
-
+        
         if (subscriptionId.isEmpty()) {
-          logger.info("SubscriptionId empty\n");
           xml = eventClient.readByFilter(filter);
         } else {
-          logger.info("SubscriptionId non empty\n");
           xml = eventClient.readBySid(subscriptionId);
         }
-
-        logger.info(xml);
-
+        
         SubscriptionUtility subscriptionUtility = new SubscriptionUtility(xml);
         message = subscriptionUtility.xmlToHtml(cwd + xslpath);
         type="info";
-
-      } catch (PastaAuthenticationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaEventException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (ParseException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
-      } catch (PastaConfigurationException e) {
-        logger.error(e.getMessage());
-        e.printStackTrace();
-        message = e.getMessage();
-        type = "warning";
+      } 
+      catch (Exception e) {
+    	  handleDataPortalError(logger, e);
       }
-
     }
 
     request.setAttribute("reviewmessage", message);
     request.setAttribute("type", type);
-
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
-
   }
 
   /**

@@ -27,7 +27,6 @@ package edu.lternet.pasta.client;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -57,6 +56,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
@@ -197,7 +197,6 @@ public class DataPackageManagerClient extends PastaClient {
 		String scope = "knb-lter-lno";
 		Integer identifier = null;
 		String revision = "1";
-		String entityId = "NoneSuchBugCount";
 
 		ConfigurationListener.configure();
 
@@ -289,11 +288,8 @@ public class DataPackageManagerClient extends PastaClient {
 		Matcher matcher = pattern.matcher(xmlString);
 		// Replace packageId value with new packageId value
 		String modifiedXmlString = matcher.replaceAll(newPackageId);
-		FileWriter fileWriter;
 
 		try {
-			fileWriter = new FileWriter(testEmlFile);
-			StringBuffer stringBuffer = new StringBuffer(modifiedXmlString);
 			FileUtils.writeStringToFile(testEmlFile, modifiedXmlString, append);
 		} catch (IOException e) {
 			fail("IOException modifying packageId in test EML file: "
@@ -561,6 +557,7 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				if (emlPackageId != null) {
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -597,6 +594,10 @@ public class DataPackageManagerClient extends PastaClient {
 					    + "check the audit logs or the Data Package Browser at a later "
 					    + "time.";
 					throw new Exception(gripe);
+				}
+				}
+				else {
+					throw new UserErrorException("An EML packageId value could not be parsed from the file. Check that the file contains valid EML.");
 				}
 			
 			} else {

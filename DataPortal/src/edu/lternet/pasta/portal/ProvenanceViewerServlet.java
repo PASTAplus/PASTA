@@ -106,58 +106,38 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	 *           if an error occurred
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
+			throws ServletException, IOException {
+		try {
+			HttpSession httpSession = request.getSession();
+			String uid = (String) httpSession.getAttribute("uid");
+			if (uid == null || uid.isEmpty())
+				uid = "public";
+			String message = null;
+			String type = null;
+			String packageId = request.getParameter("packageid");
 
-		HttpSession httpSession = request.getSession();
-		String uid = (String) httpSession.getAttribute("uid");
-
-		if (uid == null || uid.isEmpty())
-			uid = "public";
-
-		String message = null;
-		String type = null;
-
-		String packageId = request.getParameter("packageid");
-
-		if (packageId != null) {
-
-			try {
-
+			if (packageId != null) {
 				ProvenanceFactoryClient pfc = new ProvenanceFactoryClient(uid);
 				message = pfc.getProvenanceByPid(packageId);
 				message = "<pre>" + this.xmlEncode(message) + "</pre>";
-
-			} catch (PastaAuthenticationException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				message = e.getMessage();
-				type = "warning";
-			} catch (PastaConfigurationException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				message = e.getMessage();
-				type = "warning";
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				message = e.getMessage();
+			}
+			else {
+				message = "Package Identifier is null.";
 				type = "warning";
 			}
 
-		} else {
-			message = "Package Identifier is null.";
-			type = "warning";
+			request.setAttribute("message", message);
+			request.setAttribute("type", type);
+			request.setAttribute("packageid", packageId);
+			RequestDispatcher requestDispatcher = request
+					.getRequestDispatcher(forward);
+			requestDispatcher.forward(request, response);
 		}
-		
-
-		request.setAttribute("message", message);
-		request.setAttribute("type", type);
-		request.setAttribute("packageid", packageId);
-
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-		requestDispatcher.forward(request, response);
-
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
 	}
+
 
 	/**
 	 * Initialization of the servlet. <br>
