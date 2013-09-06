@@ -1,0 +1,3 @@
+# Ant properties for building the DataPortal
+tomcat.home=/home/pasta/local/apache-tomcat
+tomcat.lib=/home/pasta/local/apache-tomcat/lib

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="knb-lter-xyz.1.1" 
+         system="knb" xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://nis.lternet.edu/nis/schemas/eml/eml-2.1.0/eml.xsd">
+    <access authSystem="knb" order="allowFirst" scope="document" system="knb">
+        <allow>
+            <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+            <permission>all</permission>
+        </allow>
+    </access>
+    <dataset>
+        <title>Fictional Bug Count in Nonesuch, Utah</title>
+        <creator>
+            <individualName>
+                <givenName>Utah</givenName>
+                <surName>Carroll</surName>
+            </individualName>
+        </creator>
+        <contact>
+            <individualName>
+                <givenName>Nevada</givenName>
+                <surName>Barr</surName>
+            </individualName>
+        </contact>
+        <methods>
+            <methodStep>
+                <description>A method step for this dataset</description>
+            </methodStep>
+        </methods>
+        <dataTable id="xyz">
+            <entityName>NoneSuchBugCount</entityName>
+            <entityDescription>Bug species richness in the vicinity of Nonesuch, UT</entityDescription>
+            <physical>
+                <objectName>NoneSuchBugCount.txt</objectName>
+                <size unit="bytes">882</size>
+                <characterEncoding>ASCII</characterEncoding>
+                <dataFormat>
+                    <textFormat>
+                        <numHeaderLines>0</numHeaderLines>
+                        <recordDelimiter>\n</recordDelimiter>
+                        <attributeOrientation>column</attributeOrientation>
+                        <simpleDelimited>
+                            <fieldDelimiter>,</fieldDelimiter>
+                        </simpleDelimited>
+                    </textFormat>
+                </dataFormat>
+                <distribution>
+                    <online>
+                        <url function="download">http://svn.lternet.edu/svn/NIS/trunk/DataPackageManager/test/data/NoneSuchBugCount.txt</url>
+                    </online>
+                    <access authSystem="knb" order="allowFirst">
+                        <allow>
+                            <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+                            <permission>write</permission>
+                        </allow>
+                        <deny>
+                            <principal>public</principal>
+                            <permission>read</permission>
+                        </deny>
+                    </access>
+                </distribution>
+            </physical>
+            <methods>
+                <methodStep>
+                    <description>A method step for this data table</description>
+                </methodStep>
+            </methods>
+            <attributeList id="at.1">
+                <attribute id="att.1">
+                    <attributeName>fld</attributeName>
+                    <attributeLabel>Field</attributeLabel>
+                    <attributeDefinition>Field where the data was collected</attributeDefinition>
+                    <storageType>string</storageType>
+                    <measurementScale>
+                        <nominal>
+                            <nonNumericDomain id="nd.1">
+                                <textDomain>
+                                    <definition>Valid names of fields</definition>
+                                </textDomain>
+                            </nonNumericDomain>
+                        </nominal>
+                    </measurementScale>
+                </attribute>
+                <attribute id="att.2">
+                    <attributeName>year</attributeName>
+                    <attributeLabel>year</attributeLabel>
+                    <attributeDefinition>The year the data was collected</attributeDefinition>
+                    <storageType>gYear</storageType>
+                    <measurementScale>
+                        <dateTime>
+                            <formatString>YYYY</formatString>
+                            <dateTimePrecision>1</dateTimePrecision>
+                            <dateTimeDomain id="dd.2">
+                                <bounds>
+                                    <minimum exclusive="false">1998</minimum>
+                                </bounds>
+                            </dateTimeDomain>
+                        </dateTime>
+                    </measurementScale>
+                </attribute>
+                <attribute id="att.3">
+                    <attributeName>sppm2</attributeName>
+                    <attributeLabel>Species Per Square Meter</attributeLabel>
+                    <attributeDefinition>Calculated species per square meter</attributeDefinition>
+                    <storageType>float</storageType>
+                    <measurementScale>
+                        <ratio>
+                            <unit>
+                                <customUnit>speciesPerSquareMeter</customUnit>
+                            </unit>
+                            <precision>0.01</precision>
+                            <numericDomain id="nd.7">
+                                <numberType>real</numberType>
+                                <bounds>
+                                    <minimum exclusive="true">0</minimum>
+                                </bounds>
+                            </numericDomain>
+                        </ratio>
+                    </measurementScale>
+                </attribute>
+            </attributeList>
+            <numberOfRecords>42</numberOfRecords>
+        </dataTable>
+    </dataset>
+    <additionalMetadata>
+        <metadata>
+            <stmml:unitList xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1"
+                xsi:schemaLocation="http://www.xml-cml.org/schema/stmml-1.1 https://nis.lternet.edu/nis/schemas/eml/eml-2.1.0/stmml.xsd">
+                <stmml:unit name="gramsPerSquareMeter" unitType="arealMassDensity"
+                    id="gramsPerSquareMeter" parentSI="kilogramsPerSquareMeter"
+                    multiplierToSI=".001"/>
+                <stmml:unit name="speciesPerSquareMeter" unitType="arealDensity"
+                    id="speciesPerSquareMeter" parentSI="numberPerSquareMeter" multiplierToSI="1"/>
+            </stmml:unitList>
+        </metadata>
+    </additionalMetadata>
+</eml:eml>
