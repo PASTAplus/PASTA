@@ -1,3 +1,33 @@
+<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName()
+	    + ":" + request.getServerPort() + path + "/";
+
+	HttpSession httpSession = request.getSession();
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	if (uid == null || uid.isEmpty()) {
+		request.setAttribute("from", "./auditReport.jsp");
+		String loginWarning = DataPortalServlet.getLoginWarning();
+		request.setAttribute("message", loginWarning);
+		RequestDispatcher requestDispatcher = request
+		    .getRequestDispatcher("./login.jsp");
+		requestDispatcher.forward(request, response);
+	}
+
+	String reportMessage = (String) request.getAttribute("reportMessage");
+	String type = (String) request.getAttribute("type");
+
+	if (type == null) {
+		type = "";
+	} else {
+		type = "class=\"" + type + "\"";
+	}
+%>
+
 <!DOCTYPE html>
 <html>
 
@@ -79,7 +109,7 @@
 								<p>Review a PASTA audit report by entering information
 								 into one or more of the filters below, or see all entries
 								  by leaving the defaults, then select "submit":</p>
-								<form id="dataPackageAudit" action="./dataPackageAudit" method="post" name="dataPackageAudit">
+								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
 									<div class="section">
 										<table>
 											<tr>
@@ -87,11 +117,11 @@
 											</tr>
 											<tr>
 												<td><label for="userId">Date</label>
-												<input name="begin" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												<input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 												<label style="margin-top:-16px;">&nbsp;</label>
 												</td>
 												<td><label for="group">Time</label>
-												<input name="end" placeholder="HH:MM:SS" size="15px" type="time" />
+												<input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
 												<label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
@@ -102,11 +132,11 @@
 											</tr>
 											<tr>
 												<td><label for="userId">Date</label>
-												<input name="begin" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												<input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 												<label style="margin-top:-16px;">&nbsp;</label>
 												</td>
 												<td><label for="group">Time</label>
-												<input name="end" placeholder="HH:MM:SS" size="15px" type="time" />
+												<input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
 												<label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
@@ -125,28 +155,28 @@
 													<label for="choices">
 													<ul class="checklist">
 														<li>
-														<input name="jqdemo" type="checkbox" value="value1" />
+														<input name="debug" type="checkbox" value="debug" />
 														<p>Debug</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value2" />
+														<input name="info" type="checkbox" value="info" />
 														<p>Info</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value3" />
+														<input name="warn" type="checkbox" value="warn" />
 														<p>Warn</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value4" />
+														<input name="error" type="checkbox" value="error" />
 														<p>Error</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
@@ -164,7 +194,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="begin" placeholder=" " size="15px" type="text" />
+												<input name="code" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -174,7 +204,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="begin" placeholder=" " size="15px" type="text" />
+												<input name="userId" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -184,7 +214,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="begin" placeholder=" " size="15px" type="text" />
+												<input name="group" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -199,7 +229,28 @@
 										</table>
 									</div>
 									<!-- section -->
+					<%
+						if (reportMessage != null && type.equals("class=\"warning\"")) {
+							out.println("<div class=\"section\">\n");
+							out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+							out.println("<tbody>\n");
+							out.println("<tr>\n");
+							out.println("<td " + type + ">\n");
+							out.println(reportMessage + "\n");
+							out.println("</td>\n");
+							out.println("</tr>\n");
+							out.println("</tbody>\n");
+							out.println("</table>\n");
+						}
+					%>
+
 								</form>
+			<%
+				if (reportMessage != null && type.equals("class=\"info\"")) {
+					out.println(reportMessage);
+				}
+			%>
+
 								</fieldset>
 								<!-- /Content -->
 							</div>

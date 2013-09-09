@@ -1,3 +1,33 @@
+<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+  String path = request.getContextPath();
+  String basePath = request.getScheme() + "://" + request.getServerName()
+      + ":" + request.getServerPort() + path + "/";
+
+  HttpSession httpSession = request.getSession();
+
+  String uid = (String) httpSession.getAttribute("uid");
+
+  if (uid == null || uid.isEmpty()) {
+    request.setAttribute("from", "./dataPackageDelete.jsp");
+    String loginWarning = DataPortalServlet.getLoginWarning();
+    request.setAttribute("message", loginWarning);
+    RequestDispatcher requestDispatcher = request
+        .getRequestDispatcher("./login.jsp");
+    requestDispatcher.forward(request, response);
+  }
+
+  String deleteMessage = (String) request.getAttribute("deletemessage");
+  String type = (String) request.getAttribute("type");
+
+  if (type == null) {
+    type = "";
+  } else {
+    type = "class=\"" + type + "\"";
+  }
+%>
+
 <!DOCTYPE html>
 <html>
 
@@ -78,6 +108,20 @@
 										</table>
 									</form>
 								</div>
+        <%
+          if (deleteMessage != null) {
+            out.println("<div class=\"section\">\n");
+            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<tbody>\n");
+            out.println("<tr>\n");
+            out.println("<td " + type + ">\n");
+            out.println(deleteMessage + "\n");
+            out.println("</td>\n");
+            out.println("</tr>\n");
+            out.println("</tbody>\n");
+            out.println("</table>\n");
+          }
+        %>
 								</fieldset>
 								<!-- /Content -->
 							</div>

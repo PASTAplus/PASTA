@@ -1,3 +1,33 @@
+<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+  String path = request.getContextPath();
+  String basePath = request.getScheme() + "://" + request.getServerName()
+      + ":" + request.getServerPort() + path + "/";
+      
+  HttpSession httpSession = request.getSession();
+  
+    String uid = (String) httpSession.getAttribute("uid");
+
+  if (uid == null || uid.isEmpty()) {
+    request.setAttribute("from", "./provenanceViewer.jsp");
+    String loginWarning = DataPortalServlet.getLoginWarning();
+    request.setAttribute("message", loginWarning);
+    RequestDispatcher requestDispatcher = request
+        .getRequestDispatcher("./login.jsp");
+    requestDispatcher.forward(request, response);
+  }
+  
+  String message = (String) request.getAttribute("message");
+  String type = (String) request.getAttribute("type");
+  String packageid = (String) request.getAttribute("packageid");
+
+  if (type == null) {
+    type = "";
+  }
+          
+%>
+
 <!DOCTYPE html>
 <html>
 
@@ -72,6 +102,26 @@
 									</form>
 								</div>
 								</fieldset>
+			<%
+				if (message != null && !type.equals("warning")) {
+				    out.println("<fieldset>\n");
+				    out.println("<legend>" + packageid + "</legend>\n");
+					out.println("<div class=\"section\">\n");
+					out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+					out.println("<tbody>\n");
+					out.println("<tr>\n");
+					out.println("<td " + type + ">\n");
+					out.println(message + "\n");
+					out.println("</td>\n");
+					out.println("</tr>\n");
+					out.println("</tbody>\n");
+					out.println("</table>\n");
+					out.println("</div>\n");
+					out.println("</fieldset>\n");
+				}
+			%>
+
+
 								<!-- /Content --></div>
 						</div>
 					</div>

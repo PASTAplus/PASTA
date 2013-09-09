@@ -6,13 +6,16 @@
 	String uid = (String) httpSession.getAttribute("uid");
 	String identity = null;
 	String uname = null;
+	String welcomeBack = null;
 	
 	if ((uid == null) || (uid.equals(""))) {
 		identity = "<a href='./login.jsp'>Login</a>";
-		uname = " ";
+		uname = "";
+		welcomeBack = "";
 	} else {
     identity = "<a id=\"login\" href=\"./logout\">Log Out</a>";
 		uname = uid;
+		welcomeBack = "Welcome Back";
 	}
 
   final String currentClass = " class='current-menu-item current_page_item'";
@@ -141,8 +144,8 @@
 <div class="row-fluid page_title">
 	<div class="container">
 		<div class="span8">
-			<h2 class="title_size">Welcome Back</h2>
-			<h2 class="title_desc loggedin">Mark Servilla</h2>
+			<h2 class="title_size"><%= welcomeBack %></h2>
+			<h2 class="title_desc loggedin"><%= uname %></h2>
 		</div>
 		<div class="span4">
 			<div class="pull-right">
