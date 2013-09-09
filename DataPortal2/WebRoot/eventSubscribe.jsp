@@ -1,3 +1,37 @@
+<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+  String path = request.getContextPath();
+  String basePath = request.getScheme() + "://" + request.getServerName()
+      + ":" + request.getServerPort() + path + "/";
+
+  HttpSession httpSession = request.getSession();
+
+  String uid = (String) httpSession.getAttribute("uid");
+
+  if (uid == null || uid.isEmpty()) {
+    request.setAttribute("from", "./eventSubscribe.jsp");
+    String loginWarning = DataPortalServlet.getLoginWarning();
+    request.setAttribute("message", loginWarning);
+    RequestDispatcher requestDispatcher = request
+        .getRequestDispatcher("./login.jsp");
+    requestDispatcher.forward(request, response);
+  }
+
+  String subscribeMessage = (String) request
+      .getAttribute("subscribemessage");
+  String deleteMessage = (String) request.getAttribute("deletemessage");
+  String reviewMessage = (String) request.getAttribute("reviewmessage");
+  String testMessage = (String) request.getAttribute("testmessage");
+  String type = (String) request.getAttribute("type");
+
+  if (type == null) {
+    type = "";
+  } else {
+    type = "class=\"" + type + "\"";
+  }
+%>
+
 <!DOCTYPE html>
 <html>
 
@@ -82,6 +116,20 @@
 										</table>
 									</form>
 								</div>
+				<%
+				  if (subscribeMessage != null) {
+				    out.println("<div class=\"section\">\n");
+				    out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+				    out.println("<tbody>\n");
+				    out.println("<tr>\n");
+				    out.println("<td " + type + ">\n");
+				    out.println(subscribeMessage + "\n");
+				    out.println("</td>\n");
+				    out.println("</tr>\n");
+				    out.println("</tbody>\n");
+				    out.println("</table>\n");
+				  }
+				%>
 								</fieldset>
 								<fieldset>
 								<legend>Review</legend>
@@ -110,6 +158,20 @@
 										</table>
 									</form>
 								</div>
+        <%
+          if (reviewMessage != null) {
+            out.println("<div class=\"section-table\">\n");
+            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<tbody>\n");
+            out.println("<tr>\n");
+            out.println("<td " + type + ">\n");
+            out.println(reviewMessage + "\n");
+            out.println("</td>\n");
+            out.println("</tr>\n");
+            out.println("</tbody>\n");
+            out.println("</table>\n");
+          }
+        %>
 								</fieldset> <fieldset>
 								<legend>Test</legend>
 								<p>Test a subscription using the subscription identifier.</p>
@@ -134,6 +196,20 @@
 										</table>
 									</form>
 								</div>
+        <%
+          if (testMessage != null) {
+            out.println("<div class=\"section-table\">\n");
+            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<tbody>\n");
+            out.println("<tr>\n");
+            out.println("<td " + type + ">\n");
+            out.println(testMessage + "\n");
+            out.println("</td>\n");
+            out.println("</tr>\n");
+            out.println("</tbody>\n");
+            out.println("</table>\n");
+          }
+        %>
 								</fieldset> <fieldset>
 								<legend>Delete</legend>
 								<p>Delete a subscription using the subscription 
@@ -160,6 +236,20 @@
 										</table>
 									</form>
 								</div>
+        <%
+          if (deleteMessage != null) {
+            out.println("<div class=\"section\">\n");
+            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<tbody>\n");
+            out.println("<tr>\n");
+            out.println("<td " + type + ">\n");
+            out.println(deleteMessage + "\n");
+            out.println("</td>\n");
+            out.println("</tr>\n");
+            out.println("</tbody>\n");
+            out.println("</table>\n");
+          }
+        %>
 								</fieldset>
 								<!-- /Content --></div>
 						</div>

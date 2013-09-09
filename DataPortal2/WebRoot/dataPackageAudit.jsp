@@ -1,3 +1,33 @@
+<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName()
+	    + ":" + request.getServerPort() + path + "/";
+
+	HttpSession httpSession = request.getSession();
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	if (uid == null || uid.isEmpty()) {
+		request.setAttribute("from", "./dataPackageAudit.jsp");
+		String loginWarning = DataPortalServlet.getLoginWarning();
+		request.setAttribute("message", loginWarning);
+		RequestDispatcher requestDispatcher = request
+		    .getRequestDispatcher("./login.jsp");
+		requestDispatcher.forward(request, response);
+	}
+
+	String reportMessage = (String) request.getAttribute("reportMessage");
+	String type = (String) request.getAttribute("type");
+
+	if (type == null) {
+		type = "";
+	} else {
+		type = "class=\"" + type + "\"";
+	}
+%>
+
 <!DOCTYPE html>
 <html>
 
@@ -117,28 +147,28 @@
 													<label for="choices">
 													<ul class="checklist">
 														<li>
-														<input name="jqdemo" type="checkbox" value="value1" />
+														<input name="package" type="checkbox" value="value1" />
 														<p>Package</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value2" />
+														<input name="metadata" type="checkbox" value="value2" />
 														<p>Metadata</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value3" />
+														<input name="report" type="checkbox" value="value3" />
 														<p>Report</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="jqdemo" type="checkbox" value="value4" />
+														<input name="entity" type="checkbox" value="value4" />
 														<p>Entity</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
@@ -192,8 +222,28 @@
 										</table>
 									</div>
 									<!-- section -->
+					<%
+						if (reportMessage != null && type.equals("class=\"warning\"")) {
+							out.println("<div class=\"section\">\n");
+							out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+							out.println("<tbody>\n");
+							out.println("<tr>\n");
+							out.println("<td " + type + ">\n");
+							out.println(reportMessage + "\n");
+							out.println("</td>\n");
+							out.println("</tr>\n");
+							out.println("</tbody>\n");
+							out.println("</table>\n");
+						}
+					%>
 								</form>
 								</fieldset>
+			<%
+				if (reportMessage != null && type.equals("class=\"info\"")) {
+					out.println(reportMessage);
+				}
+			%>
+
 								<!-- /Content -->
 							</div>
 						</div>
