@@ -119,7 +119,7 @@
 											</tr>
 											<tr>
 												<td><label for="scope">Scope</label>
-												<input autofocus="" name="scope" placeholder="knb-lter-xyz" size="30px" type="text" />
+												<input autofocus name="scope" placeholder="knb-lter-xyz" size="30px" type="text" />
 												</td>
 												<td><label for="identifier">Identifier</label>
 												<input name="identifier" size="5px" type="number" />
@@ -161,15 +161,15 @@
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="report" type="checkbox" value="value3" />
-														<p>Report</p>
+														<input name="entity" type="checkbox" value="value4" />
+														<p>Data</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
 														Cancel</a> </li>
 														<li>
-														<input name="entity" type="checkbox" value="value4" />
-														<p>Entity</p>
+														<input name="report" type="checkbox" value="value3" />
+														<p>Report</p>
 														<a class="checkbox-select" href="#">
 														Select</a>
 														<a class="checkbox-deselect" href="#">
