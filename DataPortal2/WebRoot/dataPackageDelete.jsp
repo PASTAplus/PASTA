@@ -36,7 +36,7 @@
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
 <!-- Google Fonts CSS -->
-<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
 <!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
 <link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css">
