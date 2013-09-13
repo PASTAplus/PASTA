@@ -50,11 +50,11 @@
                   <td align="left" width="200px"><input type="file"
                     name="emlfile" accept="application/xml" size="60" 
                     required="required" /></td>
-                  <td align="center" width="70px"><input type="submit"
-                    name="upload" value="upload" />
+                  <td align="center" width="70px">
+                    <input type="submit" name="upload" value="Upload" />
                   </td>
-                  <td align="center" width="40px"><input type="reset"
-                    name="reset" value="reset" />
+                  <td align="center" width="40px">
+                    <input type="reset" name="reset" value="Clear" />
                   </td>
                 </tr>
               </tbody>

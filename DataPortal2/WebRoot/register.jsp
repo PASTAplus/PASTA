@@ -134,7 +134,7 @@
 				</p>
 				<p>
 					<input type="submit" name="submit" value="Submit" /> <input
-						type="reset" name="reset" value="Reset" />
+						type="reset" name="reset" value="Clear" />
 				</p>
 	
 			</div>

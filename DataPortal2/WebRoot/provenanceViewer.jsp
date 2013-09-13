@@ -71,7 +71,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Provenance Metadata Viewer</h2>
+								<h2>Provenance Viewer</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -94,8 +94,8 @@
 											</tr>
 											<tr>
 												<td>
-												<input class="btn btn-info btn-default" name="view" type="submit" value="view" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="view" type="submit" value="View" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>

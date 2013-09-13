@@ -2,13 +2,9 @@
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
-  /* 
-   * Check to see whether a default 'site' setting was specified (e.g. 'ARC').
-   */
-  String siteParam = request.getParameter("site");
   final String indent = "              ";
   boolean includeNIN = true;      // include North Inlet in the options list
-  String siteOptions = LTERSite.composeHTMLOptions(indent, includeNIN, siteParam);
+  String siteOptions = LTERSite.composeHTMLOptions(indent, includeNIN, null);
 %>
 
 <!DOCTYPE html>
@@ -17,8 +13,7 @@
 <head>
 <title>LTER :: Network Data Portal</title>
 
-<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
-
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" > -->
 <!-- Google Fonts CSS -->
 <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -183,11 +178,6 @@
 														<td valign="top">
 														  <h3 class="separator_border labelBolder span4" for="advancedsearch">LTER Sites</h3>
 														</td>
-														<td valign="top"></td>
-														<td valign="top">
-														  <h3 class="separator_border labelBolder span4" for="advancedsearch">Taxonomic Criteria</h3>
-														</td>
-														<td valign="top"></td>
 													</tr>
 													<tr>
 														<td class="spacersmh"></td>
@@ -198,10 +188,6 @@
                                 <%= siteOptions %>
                               </select>
                             </td>
-														<td class="spacerwd" valign="top"></td>
-														<td valign="top">
-														</td>
-														<td class="spacerwd" valign="top"></td>
 													</tr>
 												</table>
 											  <div class="row-fluid text_bar_pattern themeple_sc">
@@ -211,8 +197,8 @@
 										      <table>
 											      <tr>
 												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												      </td>
 											      </tr>
 										      </table>
@@ -282,18 +268,18 @@
 															  <td>
 															    <ul class="checklistLG">
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="specific" type="checkbox" value="value1">
 																      <p>More Specific Terms</p>
 																      <a class="checkboxLG-select" href="#">Select</a>
 																      <a class="checkboxLG-deselect" href="#">Cancel</a> </li>
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="related" type="checkbox" value="value1">
 																      <p>Related Terms</p>
 																      <a class="checkboxLG-select" href="#">Select</a>
 																      <a class="checkboxLG-deselect" href="#">Cancel</a>
 																    </li>
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="relatedSpecific" type="checkbox" value="value1">
 																      <p>Related / More Specific Terms</p>
 																      <a class="checkboxLG-select" href="#">Select</a>
 																      <a class="checkboxLG-deselect" href="#">Cancel</a>
@@ -348,8 +334,8 @@
 										      <table>
 											      <tr>
 												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												      </td>
 											      </tr>
 										      </table>
@@ -371,15 +357,16 @@
 													  </script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);
             							  </script>
-													  <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px">
+													  <div style="margin: 0 auto;">
+														Zoom in to the region you&#39;d like to search:
+														</div>
+													  <div id="map-canvas" style="margin: 0 auto; width: 100%; height: 200px">
 													  </div>
-													  <div style="margin: 0 auto; width: 330px;">
-														Zoom in to the region you&#39;d like to search </div>
-													  <table width="100%">
+													  <table>
 														  <tr>
 															  <td></td>
 															  <td align="center">
-															    <label for="advancedsearchleft">N:
+															    <label>N:
 															      <input maxlength="12" name="northBound" onchange="boundsChanged()" 
 															            size="12" type="text" value="90.0" />
 															    </label>
@@ -388,14 +375,14 @@
 														  </tr>
 														  <tr>
 															  <td align="left">
-															    <label for="advancedsearchleft">W:
+															    <label>W:
 															      <input maxlength="12" name="westBound" onchange="boundsChanged()" 
 															             size="12" type="text" value="-180.0" />
 															    </label>
 															  </td>
 															  <td></td>
 															  <td align="right">
-															    <label for="advancedsearchleft">E:
+															    <label>E:
 															      <input maxlength="12" name="eastBound" onchange="boundsChanged()" 
 															             size="12" type="text" value="180.0" />
 															    </label>
@@ -404,18 +391,20 @@
 														  <tr>
 															  <td></td>
 															  <td align="center">
-															    <label for="advancedsearchleft">S:
+															    <label>S:
 															      <input maxlength="12" name="southBound" onchange="boundsChanged()" 
 															             size="12" type="text" value="-90.0" />
 															    </label>
 															  </td>
 															  <td></td>
 														  </tr>
+														</table>
+														<table>
 														  <tr>
 															  <td colspan="3">
 															    <ul class="checklistLG">
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="boundaryContained" type="checkbox" value="value1">
 																      <p>Dataset is Contained within Boundaries</p>
 																      <a class="checkboxLG-select" href="#">Select</a>
 																      <a class="checkboxLG-deselect" href="#">Cancel</a>
@@ -445,8 +434,8 @@
 										      <table>
 											      <tr>
 												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												      </td>
 											      </tr>
 										      </table>
@@ -459,9 +448,6 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
-														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
 														  <tr>
 															  <td colspan="12">
 															    <h3 class="separator_border labelBold span1" for="advancedsearch">Temporal Criteria</h3>
@@ -493,22 +479,20 @@
 													  <table>
 														  <tr>
 															  <td>
-															    <label for="userId">Start Date</label>
-															    <input name="begin" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <label for="userId">Start Date:</label>
+															    <input name="startDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 															  </td>
 															  <td></td>
 															  <td>
-															    <label for="group">End Date</label>
-															    <input name="end" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <label for="group">End Date:</label>
+															    <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 															  </td>
-														  </tr>
-													  </table>
-													  <table>
-														  <tr>
-															  <td colspan="2">
+															  <td></td>
+															  <td></td>
+															  <td>
 															    <ul class="checklistLG">
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="datesContained" type="checkbox" value="value1">
 																      <p>Dataset is Contained within Start / End Dates</p>
 																      <a class="checkboxLG-select" href="#">Select</a>
 																      <a class="checkboxLG-deselect" href="#">Cancel</a>
@@ -521,7 +505,7 @@
 														  </tr>
 														  <tr>
 															  <td>
-															    <label for="advancedsearchleft">Named Time-scale:</label>
+															    <label>Named Time-scale:</label>
 															  </td>
 														  </tr>
 														  <tr>
@@ -535,39 +519,42 @@
 															  </td>
 															  <td></td>
 															  <td>
-															    <input name="namedTimescale" style="width: 190px" type="text" value="">
+															    <input name="namedTimescale" type="text" value="">
 															  </td>
 														  </tr>
 													  </table>
-														  <table>
-														    <tr>
-															    <td class="spacersmh"></td>
-														    </tr>
-														    <tr>
-															    <td colspan="12">
-															      <h3 class="separator_border labelBold span1" for="advancedsearch">Taxonomic Criteria</h3>
-															    </td>
-														    </tr>
-														    <tr>
-															    <td class="spacersmh"></td>
-														    </tr>
-															  <tr>
-																  <td>
-																    <h3>Taxon: </h3>
-																    <select name="taxonQueryType">
-																      <option selected="selected" value="0">contains</option>
-																      <option value="1">matches exactly</option>
-																      <option value="2">starts with</option>
-																      <option value="3">ends with</option>
-																    </select> </td>
-																  <td></td>
-															  </tr>
-															  <tr>
-																  <td>
-																    <input name="taxon" style="width: 190px" type="text" value="" />
-																  </td>
-															  </tr>
-														  </table>
+														<table>
+														  <tr>
+														   <td class="spacersmh"></td>
+														  </tr>
+														  <tr>
+														   <td colspan="12">
+														     <h3 class="separator_border labelBold span1">Taxonomic Criteria</h3>
+														   </td>
+														  </tr>
+														  <tr>
+														   <td class="spacersmh"></td>
+														  </tr>
+														  <tr>
+														    <td>
+														      <label>Taxon:</label>
+														    </td>
+														  </tr>
+															<tr>
+															  <td>
+																  <select name="taxonQueryType">
+																    <option selected="selected" value="0">contains</option>
+																    <option value="1">matches exactly</option>
+																    <option value="2">starts with</option>
+																    <option value="3">ends with</option>
+																  </select> 
+																</td>
+																<td></td>
+															  <td>
+															    <input name="taxon" type="text" value="" />
+															  </td>
+															</tr>
+														</table>
 												  </div>
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <div class="span12">
@@ -577,8 +564,8 @@
 										      <table>
 											      <tr>
 												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												      </td>
 											      </tr>
 										      </table>
@@ -608,7 +595,7 @@
 														    <td>
 															    <ul class="checklist">
 																    <li>
-																      <input name="jqdemo" type="checkbox" value="value1">
+																      <input name="caseSensitive" type="checkbox" value="value1">
 																      <p>Case Sensitive?</p>
 																      <a class="checkbox-select" href="#">Select</a>
 																      <a class="checkbox-deselect" href="#">Cancel</a>
@@ -635,8 +622,8 @@
 										      <table>
 											      <tr>
 												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
 												      </td>
 											      </tr>
 										      </table>

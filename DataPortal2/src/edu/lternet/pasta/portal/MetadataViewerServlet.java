@@ -52,7 +52,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.MetadataViewerServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static final String forward = "./message.jsp";
+  private static final String forward = "./metadataViewer.jsp";
 
   private static String cwd = null;
   private static String xslpath = null;
@@ -109,15 +109,11 @@ public class MetadataViewerServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     HttpSession httpSession = request.getSession();
     String uid = (String) httpSession.getAttribute("uid");
-
-    if (uid == null || uid.isEmpty())
-      uid = "public";
-
+    if (uid == null || uid.isEmpty()) uid = "public";
     String message = null;
-    String type = null;
+    String metadataStr = null;
 
     /*
      * The packageId may be set by either a post parameter or by a query
@@ -132,9 +128,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
     }
 
     boolean isValidPackageId = false;
-
     String[] tokens = null;
-
     String scope = null;
     Integer identifier = null;
     String revision = null;
@@ -181,9 +175,15 @@ public class MetadataViewerServlet extends DataPortalServlet {
         xml = dpmClient.readMetadata(scope, identifier, revision);
 
         if (contentType.equals("application/xml")) {
-          message = xml;
-          type = "xml";
-        } else {
+          metadataStr = xml;
+          response.setContentType("application/xml");
+          response.setCharacterEncoding("UTF-8");
+          PrintWriter out = response.getWriter();
+          out.print(message);
+          out.flush();
+          out.close();      
+        } 
+        else {
           EmlUtility emlUtility = new EmlUtility(xml);
           HashMap<String, String> parameterMap = new HashMap<String, String>();
           String pastUriHead = dpmClient.getPastaUriHead();
@@ -202,27 +202,20 @@ public class MetadataViewerServlet extends DataPortalServlet {
           catch (Exception e) {
             // No DOI was read. Just continue on.
           }
-          message = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
-          type = "html";
+          metadataStr = emlUtility.xmlToHtmlSaxon(cwd + xslpath, parameterMap);
+          
+          request.setAttribute("metadataHtml", metadataStr);
+          request.setAttribute("packageId", packageId);
+          RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+          requestDispatcher.forward(request, response);
         }
-    }
+      }
 
     }
     catch (Exception e) {
   	  handleDataPortalError(logger, e);
-    }    
-
-      if (type.equals("xml")) {
-        response.setContentType("application/xml");
-      } else {
-        response.setContentType("text/html");
-      }
-      
-      response.setCharacterEncoding("UTF-8");
-      PrintWriter out = response.getWriter();
-      out.print(message);
-      out.flush();
-      out.close();      
+    }
+    
   }
 
   /**

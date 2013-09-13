@@ -41,7 +41,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Package Evaluate</h2>
+								<h2>Evaluate Data Package</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -61,8 +61,8 @@
 											</tr>
 											<tr>
 												<td align="left">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="evaluate" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>

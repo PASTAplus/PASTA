@@ -101,8 +101,8 @@
 											</tr>
 											<tr>
 												<td>
-												<input class="btn btn-info btn-default" name="delete" type="submit" value="delete" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="delete" type="submit" value="Delete" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>
