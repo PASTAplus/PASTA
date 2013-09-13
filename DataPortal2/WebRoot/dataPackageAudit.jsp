@@ -99,7 +99,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Package Access Report Viewer</h2>
+								<h2>Data Package Access Reports</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -215,8 +215,8 @@
 											<tr>
 												<td></td>
 												<td colspan="3">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="submit" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>

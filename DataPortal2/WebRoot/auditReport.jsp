@@ -99,7 +99,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Audit Report</h2>
+								<h2>Audit Reports</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -108,7 +108,7 @@
 								<!-- Content --><fieldset>
 								<p>Review a PASTA audit report by entering information
 								 into one or more of the filters below, or see all entries
-								  by leaving the defaults, then select "submit":</p>
+								  by leaving the defaults, then select "Submit".</p>
 								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
 									<div class="section">
 										<table>
@@ -222,8 +222,8 @@
 											<tr>
 												<td></td>
 												<td>
-												<input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="submit" />
-												<input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
+												<input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>

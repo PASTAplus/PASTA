@@ -54,12 +54,11 @@
 							<div class="span12">
 								<!-- Content -->
 								<p>Data packages may be evaluated without uploading 
-								them to the NIS by selecting &quot;evaluate&quot;. Once you 
+								them to the NIS by selecting &quot;Evaluate&quot;. Once you 
 								are satisfied that data packages are ready to be 
 								uploaded to the NIS, you may do so by selecting 
-								&quot;upload&quot;. Several alternatives for supplying the 
-								EML metadata for your data packages are available 
-								below.</p>
+								&quot;Upload&quot;. Several alternatives for supplying the 
+								EML metadata for your data packages are available below.</p>
 								<fieldset>
 								<legend>EML Metadata File</legend>
 								<p>Select an Ecological Metadata Language (EML) file to evaluate or upload.</p>
@@ -75,9 +74,9 @@
 											</tr>
 											<tr>
 												<td align="left">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="evaluate" />
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="upload" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>
@@ -88,8 +87,8 @@
 								<fieldset>
 								<legend>EML Document URLs</legend>
 								<p>Enter a list of EML document URLs into the text 
-								area below, one per line, and then select &quot;evaluate&quot; 
-								or &quot;upload&quot;.</p>
+								area below, one per line, and then select &quot;Evaluate&quot; 
+								or &quot;Upload&quot;.</p>
 								<div class="section">
 									<form id="urlList" action="./harvester" method="post" name="urlList">
 										<table align="left" cellpadding="4em">
@@ -100,9 +99,9 @@
 											</tr>
 											<tr>
 												<td align="left">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="evaluate" />
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="upload" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+												<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
+												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>
@@ -124,8 +123,8 @@
 												<legend>Copy EML Metadata Text</legend>
 												<p>Copy the XML for a single EML 
 												metadata document into the text 
-												area below and then select &quot;evaluate&quot; 
-												or &quot;upload&quot;.</p>
+												area below and then select &quot;Evaluate&quot; 
+												or &quot;Upload&quot;.</p>
 												<div class="section">
 													<form id="emlText" action="./harvester" method="post" name="emlText">
 														<table align="left" cellpadding="4em">
@@ -135,9 +134,9 @@
 															</tr>
 															<tr>
 																<td align="left">
-																<input class="btn btn-info btn-default" name="submit" type="submit" value="evaluate" />
-																<input class="btn btn-info btn-default" name="submit" type="submit" value="upload" />
-																<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" /></td>
+																<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+																<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
+																<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" /></td>
 															</tr>
 														</table>
 														<input id="metadataSource" name="metadataSource" type="hidden" value="emlText" />
@@ -147,8 +146,8 @@
 												<fieldset>
 												<legend>Metacat Harvest List URL</legend>
 												<p>Enter the URL of a Metacat Harvest 
-												List and then select &quot;evaluate&quot; 
-												or &quot;upload&quot;. All <code>documentURL</code> 
+												List and then select &quot;Evaluate&quot; 
+												or &quot;Upload&quot;. All <code>documentURL</code> 
 												elements in the harvest list will 
 												be processed. </p>
 												<div class="section">
@@ -164,9 +163,9 @@
 															</tr>
 															<tr>
 																<td align="left">
-																<input class="btn btn-info btn-default" name="submit" type="submit" value="evaluate" />
-																<input class="btn btn-info btn-default" name="submit" type="submit" value="upload" />
-																<input class="btn btn-info btn-default" name="reset" type="reset" value="reset" />
+																<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+																<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
+																<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 																</td>
 															</tr>
 														</table>

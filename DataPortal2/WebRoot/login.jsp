@@ -93,8 +93,8 @@
 								<tr>
 									<td></td>
 									<td>
-									   <input type="submit" name="login" value="login" />
-									   <input type="reset" name="reset" value="reset" />
+										<input class="btn btn-info btn-default" name="login" type="submit" value="Login" />
+										<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 									</td>
 								</tr>
 							</tbody>

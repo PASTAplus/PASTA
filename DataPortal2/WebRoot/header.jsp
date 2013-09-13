@@ -111,7 +111,7 @@
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
 					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
 					Manage Event Subscriptions:</p>
-					<li><a href="eventSubscribe.jsp">Subscribe/Review/Test/Delete</a></li>
+					<li><a href="eventSubscribe.jsp">Event Subscriptions</a></li>
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
 					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
 					PASTA Provenance Metadata:</p>
@@ -119,8 +119,8 @@
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
 					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
 					Review PASTA Audit Reports:</p>
+					<li><a href="auditReport.jsp">Audit Reports</a></li>
 					<li><a href="dataPackageAudit.jsp">Data Package Access Reports</a></li>
-					<li><a href="auditReport.jsp">Filtered Audit Reports</a></li>
 				</ul>
 				</li>
 				<li<%= aboutClass %>><a href="about.jsp">About</a></li>
