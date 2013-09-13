@@ -135,7 +135,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		    && !(identifier.isEmpty()) && revision != null && !(revision.isEmpty())) {
 
 			id = Integer.valueOf(identifier);
-			//isPackageId = true;
+			isPackageId = true;
 
 		} else if (packageid != null && !packageid.isEmpty()) {
 
@@ -146,7 +146,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				identifier = tokens[1];
 				id = Integer.valueOf(identifier);
 				revision = tokens[2];
-				//isPackageId = true;
+				isPackageId = true;
 			}
 
 		} else {
