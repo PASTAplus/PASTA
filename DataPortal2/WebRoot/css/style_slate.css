@@ -2765,3 +2765,20 @@ a.browseterm hover {
 }
 
 /* End support for browse page */
+
+
+/* Support for data package citation page */
+
+#cite {
+	margin-left: 20px;
+	padding: 5px;
+	padding-left: 10px;
+	font-weight: normal;
+	font-style: italic;
+	width: 90%;
+	background: #e6e6e6;
+    border:0;
+	
+}
+
+/* End support for data package citation page */
