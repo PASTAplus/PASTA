@@ -85,7 +85,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	public enum ResourceType {
-		data, dataPackage, metadata, report
+		archive, data, dataPackage, metadata, report
 	}
 
 	/*
@@ -98,6 +98,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
 
 	private static final String SLASH = "/";
+	private static final String URI_MIDDLE_ARCHIVE = "archive/eml/";
 	private static final String URI_MIDDLE_DATA = "data/eml/";
 	private static final String URI_MIDDLE_DATA_PACKAGE = "eml/";
 	private static final String URI_MIDDLE_METADATA = "metadata/eml/";
@@ -171,6 +172,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		switch (resourceType) {
+		case archive:
+			resourceId = pastaUriHead + URI_MIDDLE_ARCHIVE + uriDocidPart;
+			break;
 		case data:
 			resourceId = pastaUriHead + URI_MIDDLE_DATA + uriDocidPart + SLASH
 			    + entityId;

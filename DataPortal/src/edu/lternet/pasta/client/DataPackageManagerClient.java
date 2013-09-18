@@ -449,7 +449,7 @@ public class DataPackageManagerClient extends PastaClient {
 					} catch (ResourceNotFoundException e) {
 						logger.error(e.getMessage());
 						try {
-							readDataPackageArchive(entityString, servletResponse);
+							readDataPackageArchive(scope, identifier, revision, entityString, servletResponse);
 							break;
 						} catch (ResourceNotFoundException e1) {
 							logger.error(e1.getMessage());
@@ -1037,6 +1037,12 @@ public class DataPackageManagerClient extends PastaClient {
 	/**
 	 * Executes the 'readDataPackageArchive' web service method.
 	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
 	 * @param transaction
 	 *          the transaction identifier string
 	 * @param servletResponse
@@ -1046,7 +1052,10 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public void readDataPackageArchive(String transaction, HttpServletResponse servletResponse) throws Exception {
+	public void readDataPackageArchive(String scope, Integer identifier,
+		                               String revision, String transaction, 
+		                               HttpServletResponse servletResponse) 
+		                            		   throws Exception {
 
 		HttpResponse httpResponse = null;
 
@@ -1057,7 +1066,8 @@ public class DataPackageManagerClient extends PastaClient {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String url = BASE_URL + "/archive/eml/" + transaction;
+		String url = String.format("%s/archive/eml/%s/%d/%s/%s",  
+				                    BASE_URL, scope, identifier, revision, transaction);
 		HttpGet httpGet = new HttpGet(url);
 
 		// Set header content
