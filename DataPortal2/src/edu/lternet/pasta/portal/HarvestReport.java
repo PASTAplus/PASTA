@@ -91,13 +91,15 @@ public class HarvestReport {
     StringBuffer htmlStringBuffer = new StringBuffer("");
   
     ArrayList<String> harvestDirs = getHarvestDirs(uid, removeNewest);  
-    htmlStringBuffer.append("<ul>\n");
     
     for (String harvestDir : harvestDirs) {
-      htmlStringBuffer.append(harvestReportLink(harvestDir));
+      String harvestReportLink = harvestReportLink(harvestDir);
+      htmlStringBuffer.append(
+      		String.format(
+      				"<option value='%s'>%s</option>", 
+      				harvestDir, 
+      				harvestReportLink));
     }
-    
-    htmlStringBuffer.append("</ul>\n");
     
     return htmlStringBuffer.toString();
   }

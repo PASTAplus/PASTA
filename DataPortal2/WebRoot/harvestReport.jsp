@@ -44,6 +44,10 @@
   boolean removeNewestReport = true;
   String olderReports = harvestReport.composeHarvestReports(uid,
       removeNewestReport);
+
+  removeNewestReport = false;
+  String harvestReportList = harvestReport.composeHarvestReports(uid,
+      removeNewestReport);
 %>
 
 <!DOCTYPE html>
@@ -95,7 +99,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>View Upload Reports</h2>
+								<h2>View Evaluate/Upload Results</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -105,19 +109,26 @@
 								
 			<%=warningMessage%>
 
-			<table width="100%">
+			<table>
 				<tbody>
+				
 					<tr>
-						<td valign="top" width="30%"><b>Most recent report:</b>
-							<ul>
-								<%=newestReportLink%>
-							</ul> <b>Older reports:</b> <%=olderReports%></td>
-						<td valign="top" width="70%">
+						<td valign="top">
+						  <b>Select the Evaluate or Upload results to view:</b><br/>			
+							<select name="harvestReports" size="1">
+								<%= harvestReportList %>
+							</select>
+						</td>
+					</tr>
+
+					<tr>				
+						<td valign="top">
 							<div class="section-table">
 								<%=harvestReportHTML%>
 							</div>
 						</td>
 					</tr>
+					
 				</tbody>
 			</table>
 			
