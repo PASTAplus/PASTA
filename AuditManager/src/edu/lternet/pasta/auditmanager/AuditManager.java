@@ -140,6 +140,15 @@ public class AuditManager {
     
     return s;
   }
+  
+  
+  public static void main(String[] args) 
+         throws ClassNotFoundException, SQLException {
+	  ConfigurationListener.loadPropertiesFile("auditmanager.properties");
+	  Properties properties = ConfigurationListener.getProperties();
+	  AuditManager auditManager = new AuditManager(properties);
+	  auditManager.fixArchiveRecords();
+  }
 
   
   /**
@@ -423,6 +432,76 @@ public class AuditManager {
     }
    
     return auditRecords;
+  }
+ 
+
+  /**
+   * 
+   */
+  public void fixArchiveRecords()
+           throws ClassNotFoundException, SQLException, IllegalArgumentException {   
+      Connection connection = null;  
+      String selectString = 
+    		  String.format(
+                     "SELECT oid, servicemethod, resourceid from %s " +
+    		         "WHERE servicemethod='readDataPackage' OR " +
+                     "      servicemethod='createDataPackageArchive' OR " +
+    		         "      servicemethod='readDataPackageArchive' " +
+                     "ORDER BY oid",
+                     AUDIT_MANAGER_TABLE_QUALIFIED);
+      
+      Statement stmt = null;
+     
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(selectString);
+        String dataPackageResourceId = "";
+        int dataPackageOid = 0;
+       
+        while (rs.next()) {
+          int oid = rs.getInt(1);
+          String serviceMethod = rs.getString(2);
+          String resourceId = rs.getString(3);
+          
+          if (serviceMethod.equals("readDataPackage")) {
+        	  dataPackageOid = oid;
+        	  dataPackageResourceId = resourceId;
+          }
+          else if (serviceMethod.endsWith("Archive")) {
+        	  if (!resourceId.startsWith("https:")) {
+        	    String archiveResourceId = dataPackageResourceId.replace("/package/", "/package/archive/");
+        	    System.out.println(String.format("Data package oid: %d; Archive record oid: %d", dataPackageOid, oid));
+        	    System.out.println(String.format("Replacing %s with %s", resourceId, archiveResourceId));
+                String updateString = 
+            		  String.format("UPDATE %s SET resourceid='%s' WHERE oid=%d",
+                                    AUDIT_MANAGER_TABLE_QUALIFIED, archiveResourceId, oid);
+                System.out.println(updateString);
+                
+                Connection updateConnection = getConnection();
+                Statement updateStmt = updateConnection.createStatement();
+                int nRecords = updateStmt.executeUpdate(updateString);
+                if (nRecords != 1) throw new SQLException(String.format("%d records updated; expected 1.", nRecords));               
+                if (updateStmt != null) updateStmt.close();
+                returnConnection(updateConnection);
+                
+        	  }
+          }
+        }
+      }
+      catch(ClassNotFoundException e) {
+        logger.error("ClassNotFoundException: " + e.getMessage());
+        throw(e);
+      }
+      catch(SQLException e) {
+        logger.error("SQLException: " + e.getMessage());
+        throw(e);
+      }
+      finally {
+        if (stmt != null) stmt.close();
+        returnConnection(connection);
+      }
+      
   }
  
 
