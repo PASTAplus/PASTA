@@ -27,27 +27,20 @@
   String newestReportID = harvestReport.newestHarvestReport(uid);
   String harvestReportHTML = null;
   String harvestReportID = (String) session.getAttribute("harvestReportID");
+  
   if (harvestReportID != null && harvestReportID.length() > 0) {
     harvestReportHTML = harvestReport.harvestReportHTML(harvestReportID);
-  } else if (newestReportID != null && newestReportID.length() > 0) {
+  } 
+  else if (newestReportID != null && newestReportID.length() > 0) {
     harvestReportHTML = harvestReport.harvestReportHTML(newestReportID);
+    harvestReportID = newestReportID;
   }
+  
   if (harvestReportHTML == null) {
     harvestReportHTML = "";
   }
 
-  String newestReportLink = harvestReport.newestHarvestReportLink(uid);
-  if (newestReportLink == null) {
-    newestReportLink = "";
-  }
-
-  boolean removeNewestReport = true;
-  String olderReports = harvestReport.composeHarvestReports(uid,
-      removeNewestReport);
-
-  removeNewestReport = false;
-  String harvestReportList = harvestReport.composeHarvestReports(uid,
-      removeNewestReport);
+  String harvestReportList = harvestReport.composeHarvestReports(uid, harvestReportID);
 %>
 
 <!DOCTYPE html>
@@ -109,18 +102,25 @@
 								
 			<%=warningMessage%>
 
+			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport">
 			<table>
-				<tbody>
-				
+				<tbody>		
 					<tr>
 						<td valign="top">
-						  <b>Select the Evaluate or Upload results to view:</b><br/>			
-							<select name="harvestReports" size="1">
+						  <label>Select the Evaluate or Upload results to view:</label>
+							<select name="reportId" size="1">
 								<%= harvestReportList %>
-							</select>
+							</select>					
 						</td>
 					</tr>
-
+			  <tr>
+					<td>
+			  		<input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="View Results" />
+			  		<br/><br/>
+					</td>
+				</tr>
+			</table>
+			<table>
 					<tr>				
 						<td valign="top">
 							<div class="section-table">
@@ -128,10 +128,9 @@
 							</div>
 						</td>
 					</tr>
-					
 				</tbody>
 			</table>
-			
+      </form>			
 								<!-- /Content -->
 							</div>
 						</div>

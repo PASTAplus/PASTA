@@ -83,22 +83,18 @@ public class HarvestReport {
    * of reports is generated based on the user id.
    * 
    * @param uid  the user id, e.g. "ucarroll"
-   * @param removeNewest  if true, the newest harvest report is
-   *            removed from the list
    * @return  the HTML string, a "<ul>" element
    */
-  public String composeHarvestReports(String uid, boolean removeNewest) {
-    StringBuffer htmlStringBuffer = new StringBuffer("");
-  
-    ArrayList<String> harvestDirs = getHarvestDirs(uid, removeNewest);  
+  public String composeHarvestReports(String uid, String reportId) {
+    StringBuffer htmlStringBuffer = new StringBuffer(""); 
+    ArrayList<String> harvestDirs = getHarvestDirs(uid);  
     
     for (String harvestDir : harvestDirs) {
-      String harvestReportLink = harvestReportLink(harvestDir);
-      htmlStringBuffer.append(
-      		String.format(
-      				"<option value='%s'>%s</option>", 
-      				harvestDir, 
-      				harvestReportLink));
+      String selected = (harvestDir.equals(reportId)) ? " selected='selected'" : "";
+      String formattedReportId = reportIdFormatter(harvestDir);
+      htmlStringBuffer.append(String.format("<option value='%s'%s>%s</option>",
+      				                        harvestDir, selected, formattedReportId)
+      				         );
     }
     
     return htmlStringBuffer.toString();
@@ -114,30 +110,27 @@ public class HarvestReport {
    */
   public String harvestReportHTML(String reportId) {
     String reportPath = HarvestReportServlet.getHarvesterPath() + "/" + reportId;
+    String formattedReportId = reportIdFormatter(reportId);
     boolean isEvaluate = (reportId != null && reportId.contains("-evaluate-"));
     String verb = isEvaluate ? "evaluated" : "uploaded";
+    String noun = isEvaluate ? "Evaluate" : "Upload";
     StringBuffer stringBuffer = new StringBuffer("");
     
     stringBuffer.append("<fieldset>\n");
-    stringBuffer.append("<legend>Report Identifier: " + reportId + "</legend>\n");
+    stringBuffer.append(String.format("<legend>%s Results: %s</legend>\n", noun, formattedReportId));
     
     stringBuffer.append("<table width=\"100%\">\n");
-    stringBuffer.append("<tbody>\n");
-    
+    stringBuffer.append("<tbody>\n");    
     stringBuffer.append("<tr>\n");
-    stringBuffer.append("<td class=\"header\" colspan=\"9\">Summary Table</td>\n");
-    stringBuffer.append("</tr>\n");
-    
-    stringBuffer.append("<tr>\n");
-    stringBuffer.append("<td class=\"header\">PackageId</td>\n");
-    stringBuffer.append("<td class=\"header\">Was<br/>" + verb + "</td>\n");
-    stringBuffer.append("<td class=\"header\">Quality<br/>Report</td>\n");
-    stringBuffer.append("<td class=\"header\">Total<br/>Quality<br/>Checks</td>\n");
-    stringBuffer.append("<td class=\"header\">Valid</td>");
-    stringBuffer.append("<td class=\"header\">Info</td>");
-    stringBuffer.append("<td class=\"header\">Warn</td>");
-    stringBuffer.append("<td class=\"header\">Error</td>");
-    stringBuffer.append("<td class=\"header\" width=\"50%\">System Message</td>");
+    stringBuffer.append("<th>PackageId</td>\n");
+    stringBuffer.append("<th>Was<br/>" + verb + "</td>\n");
+    stringBuffer.append("<th>Quality<br/>Report</td>\n");
+    stringBuffer.append("<th>Total<br/>Quality<br/>Checks</td>\n");
+    stringBuffer.append("<th>Valid</td>");
+    stringBuffer.append("<th>Info</td>");
+    stringBuffer.append("<th>Warn</td>");
+    stringBuffer.append("<th>Error</td>");
+    stringBuffer.append("<th width=\"50%\">System Message</td>");
     stringBuffer.append("</tr>");
     
     String urlMessagesPath = reportPath + "/urlMessages.txt";
@@ -466,52 +459,14 @@ public class HarvestReport {
    * @return  a report identifier value for the newest report
    */
   public String newestHarvestReport(String uid) {
-    boolean removeNewest = false;
     String newestReport = null;
     
     if (uid != null && uid.length() > 0) {
-      ArrayList<String> harvestDirs = getHarvestDirs(uid, removeNewest);
+      ArrayList<String> harvestDirs = getHarvestDirs(uid);
       newestReport = getNewestReport(harvestDirs);    
     }
     
     return newestReport;
-  }
-  
-  
-  /**
-   * Returns a link (i.e. an <a> tag) to the newest harvest report
-   * that has been generated for the specified user.
-   * 
-   * @param uid    the user id, e.g. "ucarroll"
-   * @return  an HTML link to the newest harvest report
-   */
-  public String newestHarvestReportLink(String uid) {
-    String newestHarvestReport = newestHarvestReport(uid);    
-    String newestReportHTML = harvestReportLink(newestHarvestReport);
-    
-    return newestReportHTML;
-  }
-  
-  
-  /*
-   * Generates an HTML link tag to the harvest report for
-   * the specified reportId value.
-   */
-  private String harvestReportLink(String reportId) {
-    if (reportId != null && reportId.length() > 0){
-    StringBuffer stringBuffer = new StringBuffer("<li>");
-    String url = "./harvestReport?reportId=" + reportId;
-    String reportLink = "<a href=\"" + url + "\">" + this.reportIdFormatter(reportId) + "</a>";
-    stringBuffer.append(reportLink);
-    stringBuffer.append("</li>");
-    String reportHTML = stringBuffer.toString();
-    this.reportIdFormatter(reportId);
-    
-    return reportHTML;
-    }
-    else {
-      return "";
-    }
   }
   
   
@@ -520,7 +475,7 @@ public class HarvestReport {
    * user id. If removeNewest is true, omits the newest harvest directory
    * name from the list.
    */
-  private ArrayList<String> getHarvestDirs(String uid, boolean removeNewest) {
+  private ArrayList<String> getHarvestDirs(String uid) {
     ArrayList<String> harvestDirs = new ArrayList<String>();
     
     if (uid != null && !uid.equals("")) {
@@ -539,11 +494,6 @@ public class HarvestReport {
           }
         }
       }
-    }
-    
-    if (removeNewest && harvestDirs.size() > 0) {
-      String newest = getNewestReport(harvestDirs);
-      harvestDirs.remove(newest);
     }
     
     Comparator<String> reportComparator = new Comparator<String>() {
