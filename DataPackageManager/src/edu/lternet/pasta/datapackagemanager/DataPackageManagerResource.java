@@ -3803,13 +3803,17 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *         returns a 404 Not Found response
 	 */
 	@GET
-	@Path("/archive/eml/{transaction}")
+	@Path("/archive/eml/{scope}/{identifier}/{revision}/{transaction}")
 	public Response readDataPackageArchive(@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") Integer revision,			
 			@PathParam("transaction") String transaction) {
 
 		AuthToken authToken = null;
 		String entryText = null;
-		String resourceId = "/archive/" + transaction;
+		String resourceId = DataPackageManager.composeResourceId(
+				ResourceType.archive, scope, identifier, revision, null);
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
 		final String serviceMethodName = "readDataPackageArchive";
@@ -7354,6 +7358,9 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			String archive = "";
 			String gripe = null;
+			String resourceId = 
+					DataPackageManager.composeResourceId(
+							ResourceType.archive, scope, identifier, revision, null);
 			Response response = null;
 			ResponseBuilder responseBuilder = null;
 			String serviceMethodName = "createDataPackageArchive";
@@ -7408,7 +7415,7 @@ public class DataPackageManagerResource extends PastaWebService {
 						e.getMessage()).getResponse();
 			}
 
-			audit(serviceMethodName, authToken, response, archive, gripe);
+			audit(serviceMethodName, authToken, response, resourceId, gripe);
 
 		}
 
