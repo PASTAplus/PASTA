@@ -196,7 +196,7 @@ public class HarvesterServlet extends DataPortalServlet {
                   if (fieldName != null && 
                       fieldName.equals("submit") &&
                       itemString != null &&
-                      itemString.equals("evaluate")
+                      itemString.equalsIgnoreCase("evaluate")
                      ) {
                     isEvaluate = true;                   
                   }
@@ -231,7 +231,7 @@ public class HarvesterServlet extends DataPortalServlet {
          * value of the submit button in each of the harvester forms.
          */
         String mode = request.getParameter("submit");
-        if (mode != null && mode.equals("evaluate")) {
+        if (mode != null && mode.equalsIgnoreCase("evaluate")) {
           isEvaluate = true;
         }
         

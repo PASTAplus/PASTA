@@ -129,18 +129,6 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: /</xsl:text></xsl:message></xsl:if>
     <!-- HTML5 DOCTYPE declaration -->
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html>&#x0A;</xsl:text>
-    <html>
-      <head>
-        <link rel="stylesheet" type="text/css" href="./css/w3_recommended.css" />
-        <link rel="stylesheet" type="text/css" href="./css/sbclter.css" />
-        <link rel="stylesheet" type="text/css" href="./css/lter-nis.css"></link> <xsl:text>&#x0A;</xsl:text> 
-        <script src="./js/jquery-1.7.1.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
-        <script src="./js/toggle.js" type="text/javascript"></script> <xsl:text>&#x0A;</xsl:text>
-        <title><xsl:value-of select="$docid"/></title>
-      </head>
-      <body>
-        <!-- coverage pages have a map -->
-        <xsl:attribute name="onload">initialize_map()</xsl:attribute>
         <!-- begin the content area -->
         <xsl:element name="div">
           <xsl:apply-templates select="*[local-name()='eml']"/>              
@@ -150,23 +138,8 @@
           <xsl:apply-templates select="error"/>
         </div>
         <!-- end the content area -->
-        <xsl:text>&#x0A;</xsl:text> <script type="text/javascript">
-        jQuery(document).ready(function() {
-          jQuery(".toggleButton").click(function() {
-            jQuery(this).next(".collapsible").slideToggle("fast");
-          });
-          jQuery(".collapsible").hide();
-          jQuery("#toggleSummary").next(".collapsible").show();
-        });    
-        jQuery("#showAll").click(function() {
-          jQuery(".collapsible").show();
-        });
-        jQuery("#hideAll").click(function() {
-          jQuery(".collapsible").hide();
-        });
-        </script>  <xsl:text>&#x0A;</xsl:text>
-      </body>
-    </html>
+        <xsl:text>&#x0A;</xsl:text> 
+        <xsl:text>&#x0A;</xsl:text>
   </xsl:template>
   
   <xsl:template match="error">
@@ -1843,11 +1816,11 @@
   <xsl:template name="datasettitle">
     <xsl:param name="packageID" ></xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasettitle</xsl:text></xsl:message></xsl:if>
-    <h3>
+    <h2>
       <xsl:for-each select="./title">
         <xsl:value-of select="."/>
       </xsl:for-each>
-    </h3>
+    </h2>
   </xsl:template>
   
   <xsl:template name="datasetmixed">

@@ -72,12 +72,15 @@
 							views of the National Science Foundation. Please
 							<a href="http://www.LTERnet.edu/contact" target="_blank">
 							contact us</a> with questions, comments, or for technical 
-							assistance regarding this web site or the LTER Network.
-							<br><br><span class="pull-left" style="color: #333">
+							assistance regarding this web site or the LTER Network.<br/><br/>
+							<!-- 
+							<span class="pull-left" style="color: #333">
 							Powered By
 							<a href="http://www.lcraigwilson.com" target="_blank">
 							lcraigwilson.com</a> <span style="color: #fff">Design 
-							by Craig Wilson</span><br><br></span></div>
+							by Craig Wilson</span><br><br></span>
+							-->
+						</div>
 					</div>
 				</div>
 			</div>

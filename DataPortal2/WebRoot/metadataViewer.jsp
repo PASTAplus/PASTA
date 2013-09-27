@@ -55,22 +55,17 @@
 <jsp:include page="header.jsp" />
 
 <div class="row-fluid ">
-	<div>
 		<div class="container">
 			<div class="row-fluid distance_1">
 				<div class="box_shadow box_layout">
 					<div class="row-fluid">
-						<div class="span12">
-							<div class="recent_title">
-								<h2>Metadata</h2>
-							</div>
-							<span class="row-fluid separator_border"></span>
-						</div>
 						<div class="row-fluid">
 							<div class="span12">
+							
 								<!-- Content -->
                   <%= metadataHtml %>																
 							  <!-- /Content -->
+							  
 						  </div>
 					</div>
 				</div>
@@ -82,7 +77,21 @@
 		
 </div>
 
-	<script src="charts/assets/effects.js"></script>
+        <script type="text/javascript">
+        jQuery(document).ready(function() {
+          jQuery(".toggleButton").click(function() {
+            jQuery(this).next(".collapsible").slideToggle("fast");
+          });
+          jQuery(".collapsible").hide();
+          jQuery("#toggleSummary").next(".collapsible").show();
+        });    
+        jQuery("#showAll").click(function() {
+          jQuery(".collapsible").show();
+        });
+        jQuery("#hideAll").click(function() {
+          jQuery(".collapsible").hide();
+        });
+        </script>  
 
 </body>
 

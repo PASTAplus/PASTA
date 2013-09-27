@@ -106,7 +106,7 @@
 					Manage Data Packages:</p>
 					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Package</a></li>
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
-					<li><a href="harvestReport.jsp">View Upload Reports</a></li>
+					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
 					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
 					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
