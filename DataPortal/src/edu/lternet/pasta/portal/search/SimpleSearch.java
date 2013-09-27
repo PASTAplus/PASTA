@@ -72,9 +72,8 @@ public class SimpleSearch {
         + "  <returnfield>dataset/creator/individualName/surName</returnfield>\n"
         + "  <returnfield>dataset/pubDate</returnfield>\n"
         + "  <returnfield>originator/individualName/surName</returnfield>\n"
-        + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n"
-        + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n"
         + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
+        + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
         + "  <querygroup operator=\"UNION\">\n");
     
     if (tokenize) {
