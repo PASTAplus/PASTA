@@ -18,6 +18,7 @@
         <include name="**/commons-io-2.*.jar"/>
         <include name="**/commons-fileupload-*.jar"/>
         <include name="**/commons-codec-*.jar"/>
+        <include name="**/commons-net-*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.1.2">
         <include name="**/*.jar"/>
