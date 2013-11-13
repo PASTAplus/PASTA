@@ -8,6 +8,7 @@
 ## web services, we will generally always want to set it to 'true' to support the
 ## generation of quality reports.
 ##
+anonymousFtpPasswd=pasta@LTERnet.edu
 qualityReporting=true
 qualityReportTemplate=/home/pasta/local/apache-tomcat/webapps/package/xml/qualityReportTemplate.xml
 emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.xsl
