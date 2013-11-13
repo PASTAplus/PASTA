@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.ecoinformatics.datamanager.DataManager;
 import org.ecoinformatics.datamanager.database.ConnectionNotAvailableException;
 import org.ecoinformatics.datamanager.database.DatabaseConnectionPoolInterface;
+import org.ecoinformatics.datamanager.download.DownloadHandler;
 import org.ecoinformatics.datamanager.parser.DataPackage;
 import org.ecoinformatics.datamanager.quality.QualityReport;
 
@@ -1322,7 +1323,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			entityDir = options.getOption("datapackagemanager.entityDir");
 			reportDir = options.getOption("datapackagemanager.reportDir");
 			
-
+			// Data Manager Library (DML) options
+			String anonymousFtpPasswd = options.getOption("anonymousFtpPasswd");
+			if (anonymousFtpPasswd != null) {
+				DownloadHandler.setAnonymousFtpPasswd(anonymousFtpPasswd);
+			}
 			String qualityReportingStr = options.getOption("qualityReporting");
 			String qualityReportTemplate = options.getOption("qualityReportTemplate");
 			String emlDereferencerXSLT = options.getOption("emlDereferencerXSLT");
