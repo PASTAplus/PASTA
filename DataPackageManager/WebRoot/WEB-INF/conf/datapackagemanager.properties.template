@@ -101,9 +101,3 @@ datapackagemanager.ezidProtocol=https
 datapackagemanager.ezidUser=lternet
 datapackagemanager.ezidPassword=HIDE_PASSWORD
 datapackagemanager.doiUrlHead=https://portal.lternet.edu/nis/mapbrowse?packageid=
-
-##
-## For testing with EZID stage environment
-##
-datapackagemanager.keystore=/home/pasta/local/apache-tomcat/webapps/package/WEB-INF/conf/ezidstage.jks
-datapackagemanager.keystorePassword=HIDE_PASSWORD
