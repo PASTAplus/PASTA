@@ -99,9 +99,6 @@ public class EzidRegistrar {
 
 		this.loadOptions(options);
 
-        System.setProperty("javax.net.ssl.trustStore", this.keystore);
-        System.setProperty("javax.net.ssl.trustStorePassword", this.keystorePassword);
-
     }
 
 	/*
@@ -125,10 +122,6 @@ public class EzidRegistrar {
 			this.host = options.getOption("datapackagemanager.ezidHost");
 			this.port = options.getOption("datapackagemanager.ezidPort");
 			this.protocol = options.getOption("datapackagemanager.ezidProtocol");
-
-			this.keystore = options.getOption("datapackagemanager.keystore");
-			this.keystorePassword = options
-			    .getOption("datapackagemanager.keystorePassword");
 			this.ezidUser = options.getOption("datapackagemanager.ezidUser");
 			this.ezidPassword = options.getOption("datapackagemanager.ezidPassword");
 
