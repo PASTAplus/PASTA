@@ -53,7 +53,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
   private static String cwd = null;
   private static String xslpath = null;
 
-  private static final String forward = "./simpleSearch.jsp";
+  private static final String forward = "./searchResult.jsp";
   
   /*
    * Instance variables
