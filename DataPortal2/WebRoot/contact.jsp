@@ -57,7 +57,7 @@
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13823">
 									Mark Servilla</a>, NIS Lead Scientist</li>
 									<li>
-									<a href="http://search.lternet.edu/directory_view.php?personid=13757">
+									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13757">
 									Duane Costa</a>, NIS Analyst/Programmer III</li>
 								</ul>
 								<h3 align="left">Websites</h3>

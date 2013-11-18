@@ -105,7 +105,8 @@
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
-								<!-- Content --><fieldset>
+								<!-- Content -->
+								<fieldset>
 								<p>Review a PASTA audit report by entering information
 								 into one or more of the filters below, or see all entries
 								  by leaving the defaults, then select "Submit".</p>
@@ -113,16 +114,20 @@
 									<div class="section">
 										<table>
 											<tr>
-												<td><label class="labelBold">Begin Date-Time:</label></td>
+												<td>
+												  <label class="labelBold">Begin Date-Time:</label>
+												</td>
 											</tr>
 											<tr>
-												<td><label for="userId">Date</label>
-												<input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												<label style="margin-top:-16px;">&nbsp;</label>
+												<td>
+												  <label for="userId">Date</label>
+												  <input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <label style="margin-top:-16px;">&nbsp;</label>
 												</td>
-												<td><label for="group">Time</label>
-												<input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												<label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
+												<td>
+												  <label for="group">Time</label>
+												  <input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
+												  <label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
 										</table>
@@ -131,90 +136,97 @@
 												<td><label class="labelBold">End Date-Time:</label></td>
 											</tr>
 											<tr>
-												<td><label for="userId">Date</label>
-												<input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												<label style="margin-top:-16px;">&nbsp;</label>
+												<td>
+												  <label for="userId">Date</label>
+												  <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <label style="margin-top:-16px;">&nbsp;</label>
 												</td>
-												<td><label for="group">Time</label>
-												<input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												<label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
+												<td>
+												  <label for="group">Time</label>
+												  <input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
+												  <label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
 										</table>
 										<table>
 											<tr>
-												<td><label class="labelBold">Category Status:</label></td>
+												<td>
+												  <label class="labelBold">Category Status:</label>
+												</td>
 											</tr>
 											<tr>
 												<td class="spacersm"></td>
 											</tr>
 											<tr>
 												<td>
-												<form>
-													<fieldset>
-													<label for="choices">
-													<ul class="checklist">
-														<li>
-														<input name="debug" type="checkbox" value="debug" />
-														<p>Debug</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="info" type="checkbox" value="info" />
-														<p>Info</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="warn" type="checkbox" value="warn" />
-														<p>Warn</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="error" type="checkbox" value="error" />
-														<p>Error</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-													</ul>
-													</label></fieldset>
-												</form>
+												  <form>
+													  <fieldset>
+													    <label for="choices">
+													      <ul class="checklist">
+														      <li>
+														        <input name="debug" type="checkbox" value="debug" />
+														        <p>Debug</p>
+														        <a class="checkbox-select" href="#">Select</a>
+														        <a class="checkbox-deselect" href="#">Cancel</a>
+														      </li>
+														      <li>
+														        <input name="info" type="checkbox" value="info" />
+														        <p>Info</p>
+														        <a class="checkbox-select" href="#">Select</a>
+														        <a class="checkbox-deselect" href="#">Cancel</a>
+														      </li>
+														      <li>
+														        <input name="warn" type="checkbox" value="warn" />
+														        <p>Warn</p>
+														        <a class="checkbox-select" href="#">Select</a>
+														        <a class="checkbox-deselect" href="#">Cancel</a>
+														      </li>
+														      <li>
+														        <input name="error" type="checkbox" value="error" />
+														        <p>Error</p>
+														        <a class="checkbox-select" href="#">Select</a>
+														        <a class="checkbox-deselect" href="#">Cancel</a>
+														      </li>
+													      </ul>
+													    </label>
+													  </fieldset>
+												  </form>
 												</td>
 											</tr>
 										</table>
 										<table>
 											<tr>
-												<td><label style="margin-top:20px" class="labelBold">HTTP Code:</label></td>
+												<td>
+												  <label style="margin-top:20px" class="labelBold">HTTP Code:</label>
+												</td>
 											</tr>
 											<tr>
 												<td>
-												<input name="code" placeholder=" " size="15px" type="text" />
+												  <input name="code" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
 										<table>
 											<tr>
-												<td><label class="labelBold">User Name:</label></td>
+												<td>
+												  <label class="labelBold">User Name:</label>
+												</td>
 											</tr>
 											<tr>
 												<td>
-												<input name="userId" placeholder=" " size="15px" type="text" />
+												  <input name="userId" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
 										<table>
 											<tr>
-												<td><label class="labelBold">Group:</label></td>
+												<td>
+												  <label class="labelBold">Group:</label>
+												</td>
 											</tr>
 											<tr>
 												<td>
-												<input name="group" placeholder=" " size="15px" type="text" />
+												  <input name="group" placeholder=" " size="15px" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -222,8 +234,8 @@
 											<tr>
 												<td></td>
 												<td>
-												<input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
-												<input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
+												  <input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
+												  <input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>
@@ -245,11 +257,11 @@
 					%>
 
 								</form>
-			<%
-				if (reportMessage != null && type.equals("class=\"info\"")) {
-					out.println(reportMessage);
-				}
-			%>
+			    <%
+				    if (reportMessage != null && type.equals("class=\"info\"")) {
+					    out.println(reportMessage);
+				    }
+			    %>
 
 								</fieldset>
 								<!-- /Content -->
