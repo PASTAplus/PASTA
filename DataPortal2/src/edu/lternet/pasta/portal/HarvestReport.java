@@ -326,7 +326,7 @@ public class HarvestReport {
       String scope = emlPackageId.getScope();
       Integer identifier = emlPackageId.getIdentifier();
       Integer revision = emlPackageId.getRevision();
-      link = "<a href=\"./mapbrowse?scope=" + scope +
+      link = "<a class=\"searchsubcat\" href=\"./mapbrowse?scope=" + scope +
              "&identifier=" + identifier.toString() +
              "&revision=" + revision.toString() +
              "\">" + packageId + "</a>";
@@ -348,7 +348,7 @@ public class HarvestReport {
 
     try {
       if (packageId != null && packageId.length() > 0) {
-        link = "<a href=\"./reportviewer?packageid=" + packageId;
+        link = "<a class=\"searchsubcat\" href=\"./reportviewer?packageid=" + packageId;
         
         if (localPath != null) {
           String encodedPath = urlCodec.encode(localPath);

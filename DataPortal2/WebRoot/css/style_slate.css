@@ -50,7 +50,6 @@ article .blog_quote p {
 label, input, button, select, textarea {
 	font-size: 12px;
 }
-
 .menu li a {
 	font-size: 14px;
 	color: #444444;
@@ -505,11 +504,6 @@ select.select-menu {
 	max-width: none;
 	width: 100%;
 }
-
-
-
-
-
 .footers {
 	position: relative;
 	bottom: 0;
@@ -2604,15 +2598,7 @@ a.checkbox-deselect {
 	color:#000;
 	font-weight:600;
 }
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
+
 .checklistLG {
 	list-style: none;
 	margin: 0;
@@ -2675,15 +2661,7 @@ a.checkboxLG-deselect {
 	color:#000;
 	font-weight:600;
 }
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
-/**  **/
+
 article, aside, figure, footer, header, nav, section {
     display:                    block;
     margin:                     0;
@@ -2745,7 +2723,7 @@ ul, ol {
 
 /*** Added by D. Costa ***/
 
-/* Support for browse page */
+/* Browse page */
 
 .browsegroup {
     font-weight: bold;
@@ -2764,10 +2742,10 @@ a.browseterm hover {
 	text-decoration: underline;
 }
 
-/* End support for browse page */
+/* End browse page */
 
 
-/* Support for data package citation page */
+/* Data package citation page */
 
 #cite {
 	margin-left: 20px;
@@ -2781,4 +2759,4 @@ a.browseterm hover {
 	
 }
 
-/* End support for data package citation page */
+/* End data package citation page */

@@ -360,7 +360,7 @@
 													  <div style="margin: 0 auto;">
 														Zoom in to the region you&#39;d like to search:
 														</div>
-													  <div id="map-canvas" style="margin: 0 auto; width: 100%; height: 200px">
+													  <div id="map-canvas" style="margin: 0 auto; width: 350px; height: 200px">
 													  </div>
 													  <table>
 														  <tr>
