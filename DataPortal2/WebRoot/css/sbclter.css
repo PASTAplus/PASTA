@@ -215,12 +215,12 @@ th.rowheader {
 }
 
 .rowodd {
-    border-bottom:              1px;
-    border-top:                 1px;
-    background-color:           lightgrey;
-    padding:                    0.25em;
-    margin:                     0;
-} 
+	  border-bottom:              white solid 2px;
+	  border-top:                 white solid 2px;
+	  background-color:           #b2cce0;
+	  padding:                    0.25em;
+	  margin:                     0;
+}
 
 .roweven {
     padding:                    0.25em;
