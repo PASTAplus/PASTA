@@ -1,4 +1,4 @@
-﻿/*!
+/*!
  * Bootstrap v2.1.1
  *
  * Copyright 2012 Twitter, Inc
@@ -75,7 +75,7 @@ img {
   -ms-interpolation-mode: bicubic;
 }
 
-#map_canvas img {
+#map-canvas img {
   max-width: none;
 }
 
@@ -964,7 +964,7 @@ select{padding-left:10px;}
 input,
 textarea,
 .uneditable-input {
-  width: 206px;
+  /* width: 206px; */
 }
 
 textarea {
