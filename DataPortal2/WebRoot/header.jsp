@@ -77,15 +77,7 @@
 			<img alt="" src="images/non_st_logo.png" title="LTER : Network"> </a></div>
 			<div class="span9 menu">
 			<ul id="menu-nav" class="menu">
-				<li<%= homeClass %>><a href="home.jsp">Home</a>
-				<ul class="sub-menu">
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
-					Beta:</p>
-					<li><a href="home.jsp">Welcome to LTER</a> </li>
-					<li><a href="tigerTeam.jsp">Tiger Team Message</a> </li>
-				</ul>
-				</li>
+				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
 				<li<%= discoverClass %>><a href="#">Discover</a>
 				<ul class="sub-menu">
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">

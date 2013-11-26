@@ -180,7 +180,7 @@
 										  <div id="tab3" class="tab-pane active">
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
-													  <h3 class="separator_border labelBolder span12">Spatial Criteria</h3>
+													  <!-- <h3 class="separator_border labelBolder span12">Spatial Criteria</h3> -->
 													  <input name="boundsChangedCount" type="hidden" value="0" />
 													  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&amp;sensor=false" 
 													          type="text/javascript">
@@ -262,7 +262,8 @@
 														  </tr>
 														  <tr>
 															  <td>
-															    <h3 class="separator_border labelBold span1" for="advancedsearch">Geographic Place Name</h3>
+															    <!-- <h3 class="separator_border labelBold span1" for="advancedsearch">Geographic Place Name</h3> -->
+															    <label>Geographic Place Name:</label>
 															  </td>
 														  </tr>
 														  <tr>
@@ -298,6 +299,7 @@
 																  
 										  <div id="tab1" class="tab-pane  ">
 												<table>
+												  <!--
 													<tr>
 														<td valign="top">
 														  <h3 class="separator_border labelBolder span4" for="advancedsearch">LTER Sites</h3>
@@ -306,9 +308,10 @@
 													<tr>
 														<td class="spacersmh"></td>
 													</tr>
+													-->
 													<tr>
 														<td valign="top">
-                              <select name="siteValues" multiple="multiple" size="28">
+                              <select name="siteValues" multiple="multiple" size="10">
                                 <%= siteOptions %>
                               </select>
                             </td>
@@ -335,6 +338,7 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
+													    <!-- 
 														  <tr>
 															  <td colspan="6">
 															    <h3 class="separator_border labelBolder span1">Subject</h3>
@@ -343,13 +347,14 @@
 														  <tr>
 															  <td class="spacersm2"></td>
 														  </tr>
+														  -->
 														  <tr>
 															  <td>
 															    <select name="subjectField">
 															      <option value="ALL">Subject</option>
-															      <option value="TITLE">Title Only</option>
-															      <option value="ABSTRACT">Abstract Only</option>
-															      <option value="KEYWORDS">Keywords Only</option>
+															      <option value="TITLE">Title only</option>
+															      <option value="ABSTRACT">Abstract only</option>
+															      <option value="KEYWORDS">Keywords only</option>
 															    </select>
 															  </td>
 															  <td class="spacerwd"></td>
@@ -435,6 +440,7 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
+													    <!--
 														  <tr>
 															  <td>
 															    <h3 class="separator_border labelBold span1">Creator / Organization</h3>
@@ -443,6 +449,7 @@
 														  <tr>
 															  <td class="spacersmh"></td>
 														  </tr>
+														  -->
 														  <tr>
 															  <td>
 															    <label>Creator&#39;s Last Name:</label>
@@ -491,6 +498,7 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
+													    <!-- 
 														  <tr>
 															  <td colspan="12">
 															    <h3 class="separator_border labelBold span1">Temporal Criteria</h3>
@@ -499,6 +507,7 @@
 														  <tr>
 															  <td class="spacersmh"></td>
 														  </tr>
+														  -->
 														  <tr>
 															  <td>
 															    <input checked="checked" name="dateField" type="radio" value="COLLECTION" /> 
@@ -589,6 +598,7 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 														<table>
+														  <!--
 														  <tr>
 														   <td colspan="12">
 														     <h3 class="separator_border labelBold span1">Taxonomic Criteria</h3>
@@ -597,6 +607,7 @@
 														  <tr>
 														   <td class="spacersmh"></td>
 														  </tr>
+														  -->
 														  <tr>
 														    <td>
 														      <label>Taxon:</label>
@@ -641,6 +652,7 @@
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <!-- Search Options Table -->												
 												    <table style="float:left">
+													    <!--
 													    <tr>
 														    <td colspan="5" valign="top">
 														      <h3 class="separator_border labelBolder span3" for="advancedsearch">Search Options</h3>
@@ -653,6 +665,7 @@
 														    <td class="spacer"></td>
 														    <td class="spacer"></td>
 													    </tr>
+													    -->
 													    <tr>
 														    <td>
 															    <ul class="checklist">
