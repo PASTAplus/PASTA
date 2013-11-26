@@ -108,7 +108,7 @@
 								<!-- Content --><fieldset>
 								<p>Review a PASTA Data Package access report by 
 								entering information into one or more of the filters 
-								below, then select &quot;submit&quot;:</p>
+								below, then select &quot;Submit&quot;:</p>
 								<form id="dataPackageAudit" action="./dataPackageAudit" method="post" name="dataPackageAudit">
 									<div class="section">
 										<table>
