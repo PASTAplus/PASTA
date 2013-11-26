@@ -41,7 +41,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Evaluate Data Package</h2>
+								<h2>Evaluate Data Packages</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>

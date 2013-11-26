@@ -59,8 +59,8 @@
 					</span>
 					<div class="row-fluid">
 						<div class="span12 ">
-							Copyright 2009-2013 Long Term Ecological Research 
-							Network. This material is based upon work supported 
+							Copyright 2009-2013 <a href="http://www.lternet.edu">Long Term Ecological Research
+							Network</a>. This material is based upon work supported 
 							by the <a href="http://www.nsf.gov/">National Science 
 							Foundation</a> under Cooperative Agreements
 							<a href="http://www.fastlane.nsf.gov/servlet/showaward?award=0832652" target="_blank">
