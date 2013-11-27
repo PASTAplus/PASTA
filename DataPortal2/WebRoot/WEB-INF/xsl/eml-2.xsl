@@ -5940,16 +5940,33 @@
     <xsl:variable name="tokens" select="tokenize($URL, '/')"></xsl:variable>
     <xsl:variable name="entity_identifier" select="string($tokens[10])"></xsl:variable>
     <xsl:variable name="entity_identifier_encd" select="encode-for-uri($entity_identifier)"></xsl:variable>
-    <tr>
-      <td class="{$firstColStyle}">Data:</td>
-      <td class="{$secondColStyle}">
-        <a>
-		      <xsl:attribute name="href">/nis/dataviewer?packageid=<xsl:value-of select="$packageID" />&amp;entityid=<xsl:value-of select="$entity_identifier_encd" /></xsl:attribute>
-          <xsl:attribute name="target">_blank</xsl:attribute>
-          <xsl:value-of select="."/>
-        </a>
-      </td>
-    </tr> 
+    <xsl:choose>
+      <!-- Assume a PASTA data entity if ancestor path stems from "physical" -->
+      <xsl:when test="ancestor::physical/distribution/online/url">
+        <tr>
+          <td class="{$firstColStyle}">Data:</td>
+          <td class="{$secondColStyle}">
+            <a>
+              <xsl:attribute name="href">/nis/dataviewer?packageid=<xsl:value-of select="$packageID" />&amp;entityid=<xsl:value-of select="$entity_identifier_encd" /></xsl:attribute>
+              <xsl:attribute name="target">_blank</xsl:attribute>
+              <xsl:value-of select="."/>
+            </a>
+          </td>
+        </tr>         
+      </xsl:when>
+      <xsl:otherwise>
+        <tr>
+          <td class="{$firstColStyle}">Url:</td>
+          <td class="{$secondColStyle}">
+            <a>
+              <xsl:attribute name="href"><xsl:value-of select="$URL" /></xsl:attribute>
+              <xsl:attribute name="target">_blank</xsl:attribute>
+              <xsl:value-of select="."/>
+            </a>
+          </td>
+        </tr>         
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:if test="ancestor::otherEntity[physical/dataFormat/externallyDefinedFormat/formatName='KML']">
       <tr>
         <td>View KML content with Google Maps:</td>
