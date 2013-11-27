@@ -195,54 +195,49 @@
 														</div>
 														
 														<table>														
-														<tr>										
-														<td>
-                            <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px"></div>
-													  </td>
-													  <td>
-													  <table>
-														  <tr>
-															  <td></td>
-															  <td align="center">
-															    <label>N:
-															      <input maxlength="12" name="northBound" onchange="boundsChanged()" 
-															            size="12" type="text" value="90.0" />
-															    </label>
-															  </td>
-															  <td></td>
-														  </tr>
-														  <tr>
-															  <td align="left">
-															    <label>W:
-															      <input maxlength="12" name="westBound" onchange="boundsChanged()" 
-															             size="12" type="text" value="-180.0" />
-															    </label>
-															  </td>
-															  <td>
-															  </td>
-															  <td align="right">
-															    <label>E:
-															      <input maxlength="12" name="eastBound" onchange="boundsChanged()" 
-															             size="12" type="text" value="180.0" />
-															    </label>
-															  </td>
-														  </tr>
-														  <tr>
-															  <td></td>
-															  <td align="center">
-															    <label>S:
-															      <input maxlength="12" name="southBound" onchange="boundsChanged()" 
-															             size="12" type="text" value="-90.0" />
-															    </label>
-															  </td>
-															  <td></td>
-														  </tr>
-														</table>
-														</td>														</tr>
-														</table>
-														
-														<table align="center">
-														<tr>
+													  	<tr>										
+														    <td>
+                                  <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px"></div>
+													      </td>
+													      <td>
+													        <table>
+														        <tr>
+															        <td></td>
+															        <td>
+															          <label>North:
+															            <input maxlength="12" name="northBound" onchange="boundsChanged()" 
+															                  size="12" type="text" value="90.0" />
+															          </label>
+															        </td>
+															        <td></td>
+		  												      </tr>
+			  											      <tr>
+				  											      <td>
+					  										        <label>West:
+						  									          <input maxlength="12" name="westBound" onchange="boundsChanged()" 
+							  								                 size="12" type="text" value="-180.0" />
+								  							        </label>
+									  						      </td>
+										  					      <td></td>
+											  				      <td>
+												  			        <label>East:
+													  		          <input maxlength="12" name="eastBound" onchange="boundsChanged()" 
+														  	                 size="12" type="text" value="180.0" />
+															          </label>
+															        </td>
+						  								      </tr>
+							  							      <tr>
+								  							      <td></td>
+									  						      <td>
+										  					        <label>South:
+											  				          <input maxlength="12" name="southBound" onchange="boundsChanged()" 
+												  			                 size="12" type="text" value="-90.0" />
+													  		        </label>
+														  	      </td>
+															        <td></td>
+	  													      </tr>
+		  												    </table>
+			  											  </td>														
 														    <td>
 															    <ul class="checklistLG">
 																    <li>
@@ -253,9 +248,9 @@
 																    </li>
 															    </ul>
 													      </td>								
-													  </tr>
-													  </table>
-													  
+				  										</tr>
+														</table>
+														
 														<table>
 														  <tr>
 															  <td class="spacersmh"></td>
