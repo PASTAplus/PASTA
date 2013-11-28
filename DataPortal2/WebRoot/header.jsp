@@ -73,8 +73,10 @@
 <div class="container">
 	<div class="row-fluid header_container">
 		<div class="span3">
-			<a href="#">
-			<img alt="" src="images/non_st_logo.png" title="LTER : Network"> </a></div>
+			<a href="home.jsp">
+			  <img alt="" src="images/non_st_logo.png" title="LTER : Network">
+			</a>
+	 </div>
 			<div class="span9 menu">
 			<ul id="menu-nav" class="menu">
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
@@ -143,7 +145,7 @@
 			<div class="pull-right">
 				<div id="search-3" class="widget title_widget widget_search">
 				  <form id="searchform" action="./simpleSearch" class="form-inline" method="post" >
-				    <label style="margin-left: 80px; background-color:transparent">Search Terms (use * for any)</label>
+				    <label style="margin-left: 80px; background-color:transparent">Search Term</label>
 
 						<input type="search" name="terms" id="lterterms" class="span11 search-query" size="25" required="required">
 
