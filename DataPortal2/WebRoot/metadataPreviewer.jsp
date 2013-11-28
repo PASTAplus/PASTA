@@ -26,7 +26,6 @@
 	<div class="wrapper">
 
 		<jsp:include page="/WEB-INF/jsp/head.jsp" />
-		<jsp:include page="/WEB-INF/jsp/menuTopLevel.jsp" />
 
 		<div class="content">
 

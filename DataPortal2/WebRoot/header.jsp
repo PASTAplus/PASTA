@@ -77,15 +77,7 @@
 			<img alt="" src="images/non_st_logo.png" title="LTER : Network"> </a></div>
 			<div class="span9 menu">
 			<ul id="menu-nav" class="menu">
-				<li<%= homeClass %>><a href="home.jsp">Home</a>
-				<ul class="sub-menu">
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
-					Beta:</p>
-					<li><a href="home.jsp">Welcome to LTER</a> </li>
-					<li><a href="tigerTeam.jsp">Tiger Team Message</a> </li>
-				</ul>
-				</li>
+				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
 				<li<%= discoverClass %>><a href="#">Discover</a>
 				<ul class="sub-menu">
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
@@ -104,7 +96,7 @@
 					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
 					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
 					Manage Data Packages:</p>
-					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Package</a></li>
+					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li>
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
 					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
 					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>
