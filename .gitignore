@@ -4,6 +4,7 @@
 .mymetadata
 .myeclipse
 .DS_Store
+.idea/workspace.xml
 /out
 classes
 build
