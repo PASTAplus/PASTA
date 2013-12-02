@@ -1,0 +1,52 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="DataPackageManager:war exploded">
+    <output-path>$USER_HOME$/local/apache-tomcat-6.0.33/webapps/package</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="DataPackageManager" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/tar.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/xalan.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/common.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/asm-3.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/resolver.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/xml-apis.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/configxml.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/utilities.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/serializer.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/xercesImpl.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/datamanager.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/esapi-2.0.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/junit-4.8.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/log4j-1.2.13.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-io-2.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/httpcore-4.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/httpmime-4.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/metacat-client.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/jersey-core-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-lang-2.6.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/httpclient-4.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/jsr311-api-1.1.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-codec-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-codec-1.7.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-lang3-3.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/jersey-client-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/jersey-server-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-logging-1.1.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/httpclient-cache-4.1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-fileupload-1.2.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/jersey-apache-client-1.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/postgresql-8.4-702.jdbc4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-configuration-1.8.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/datamanager/datamanager.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/commons-net-3.3.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/DataPackageManager/WebRoot/WEB-INF/lib/async-http-client-1.4.0.jar" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="DataPackageManager/web/Web" />
+      <element id="dir-copy" path="$USER_HOME$/svn/ecoinformatics/eml/src" />
+    </root>
+  </artifact>
+</component>

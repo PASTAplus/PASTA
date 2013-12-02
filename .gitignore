@@ -4,13 +4,12 @@
 .mymetadata
 .myeclipse
 .DS_Store
-.idea
+.idea/workspace.xml
 /out
 classes
 build
 java-to-xml
 web-service-api
-*/*.iml
 */WebRoot/META-INF/
 */WebRoot/WEB-INF/lib/
 common/WebRoot
