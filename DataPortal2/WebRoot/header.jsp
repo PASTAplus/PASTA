@@ -143,7 +143,7 @@
 			<div class="pull-right">
 				<div id="search-3" class="widget title_widget widget_search">
 				  <form id="searchform" action="./simpleSearch" class="form-inline" method="post" >
-				    <label style="margin-left: 80px; background-color:transparent">Search Terms (use * for any)</label>
+				    <label style="margin-left: 80px; background-color:transparent">Search Terms</label>
 
 						<input type="search" name="terms" id="lterterms" class="span11 search-query" size="25" required="required">
 
