@@ -73,8 +73,10 @@
 <div class="container">
 	<div class="row-fluid header_container">
 		<div class="span3">
-			<a href="#">
-			<img alt="" src="images/non_st_logo.png" title="LTER : Network"> </a></div>
+			<a href="home.jsp">
+			  <img alt="" src="images/non_st_logo.png" title="LTER : Network">
+			</a>
+	 </div>
 			<div class="span9 menu">
 			<ul id="menu-nav" class="menu">
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>

@@ -57,8 +57,8 @@ public class ReportViewerServlet extends DataPortalServlet {
   private static String cwd = null;
   private static String xslpath = null;
   
-  private static final String HTMLHEAD = "<html>\n"
-      + "<head><title>Report Viewer</title>\n"
+  private static final String HTMLHEAD = "<html lang=\"en\">\n"
+      + "<head><title>LTER :: Network Data Portal</title>\n"
       + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
       + "</head><body>\n";
   

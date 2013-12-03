@@ -55,8 +55,8 @@ public class ArchiveDownloadServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.ArchiveDownloadServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static final String HTMLHEAD = "<html>\n"
-      + "<head><title>Data Package Archive Viewer</title>\n"
+  private static final String HTMLHEAD = "<html lang=\"en\">\n"
+      + "<head><title>LTER :: Network Data Portal</title>\n"
       + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
       + "</head><body><div class=\"body\">\n";
 

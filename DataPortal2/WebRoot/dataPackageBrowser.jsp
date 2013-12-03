@@ -15,11 +15,12 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 <title>LTER :: Network Data Portal</title>
 
+<meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
 <!-- Google Fonts CSS -->
@@ -57,7 +58,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Package Browser</h2>
+								<h2>Data Package Summary</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
