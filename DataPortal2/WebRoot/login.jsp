@@ -14,7 +14,7 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 <title>LTER :: Network Data Portal</title>
