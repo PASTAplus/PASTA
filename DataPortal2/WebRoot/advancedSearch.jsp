@@ -308,7 +308,7 @@
 													-->
 													<tr>
 														<td valign="top">
-                              <select name="siteValues" multiple="multiple" size="10">
+                              <select name="siteValues" multiple="multiple" size="10" style="width: auto">
                                 <%= siteOptions %>
                               </select>
                             </td>
