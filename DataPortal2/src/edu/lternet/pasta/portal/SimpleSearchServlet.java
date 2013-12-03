@@ -129,7 +129,6 @@ public class SimpleSearchServlet extends DataPortalServlet {
 				if (terms.equals("#ALL#")) {
 					query = SimpleSearch.buildPathQueryXml("*", termsList,
 							tokenize, isSiteTerm);
-					termsList.addTerm("#ALL#");
 				}
 				else {
 					query = SimpleSearch.buildPathQueryXml(terms, termsList,
