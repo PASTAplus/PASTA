@@ -13,6 +13,8 @@
 <head>
 <title>LTER :: Network Data Portal</title>
 
+<meta charset="UTF-8" />
+
 <!--  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" > -->
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">

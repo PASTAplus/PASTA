@@ -13,7 +13,9 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>Metadata Previewer</title>
+<title>LTER :: Network Data Portal</title>
+
+<meta charset="UTF-8" />
 
 <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 

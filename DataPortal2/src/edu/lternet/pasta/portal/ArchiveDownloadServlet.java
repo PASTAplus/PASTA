@@ -56,7 +56,7 @@ public class ArchiveDownloadServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
 
   private static final String HTMLHEAD = "<html lang=\"en\">\n"
-      + "<head><title>Data Package Archive Viewer</title>\n"
+      + "<head><title>LTER :: Network Data Portal</title>\n"
       + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
       + "</head><body><div class=\"body\">\n";
 

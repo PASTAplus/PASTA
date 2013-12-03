@@ -63,7 +63,7 @@ public class UploadEvaluateServlet extends DataPortalServlet {
   private static String xslpath = null;
 
   private static final String HTMLHEAD = "<html lang=\"en\">\n"
-      + "<head><title>Report Viewer</title>\n"
+      + "<head><title>LTER :: Network Data Portal</title>\n"
       + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
       + "</head><body>\n";
 

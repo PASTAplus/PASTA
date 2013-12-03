@@ -16,7 +16,9 @@
 <head>
 <base href="<%=basePath%>">
 
-<title>User Registration</title>
+<title>LTER :: Network Data Portal</title>
+
+<meta charset="UTF-8" />
 
 <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
