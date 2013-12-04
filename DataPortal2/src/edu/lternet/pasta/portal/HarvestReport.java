@@ -110,14 +110,9 @@ public class HarvestReport {
    */
   public String harvestReportHTML(String reportId) {
     String reportPath = HarvestReportServlet.getHarvesterPath() + "/" + reportId;
-    String formattedReportId = reportIdFormatter(reportId);
     boolean isEvaluate = (reportId != null && reportId.contains("-evaluate-"));
     String verb = isEvaluate ? "evaluated" : "uploaded";
-    String noun = isEvaluate ? "Evaluate" : "Upload";
     StringBuffer stringBuffer = new StringBuffer("");
-    
-    stringBuffer.append("<fieldset>\n");
-    stringBuffer.append(String.format("<legend>%s Results: %s</legend>\n", noun, formattedReportId));
     
     stringBuffer.append("<table width=\"100%\">\n");
     stringBuffer.append("<tbody>\n");    
@@ -146,7 +141,6 @@ public class HarvestReport {
       
     stringBuffer.append("</tbody>");
     stringBuffer.append("</table>");
-    stringBuffer.append("</fieldset>\n");
     
     String htmlString = stringBuffer.toString();
     return htmlString;
