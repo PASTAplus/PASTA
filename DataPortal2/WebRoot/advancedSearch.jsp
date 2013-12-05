@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
@@ -8,10 +8,12 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 <title>LTER :: Network Data Portal</title>
+
+<meta charset="UTF-8" />
 
 <!--  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" > -->
 <!-- Google Fonts CSS -->
@@ -306,7 +308,7 @@
 													-->
 													<tr>
 														<td valign="top">
-                              <select name="siteValues" multiple="multiple" size="10">
+                              <select name="siteValues" multiple="multiple" size="10" style="width: auto">
                                 <%= siteOptions %>
                               </select>
                             </td>

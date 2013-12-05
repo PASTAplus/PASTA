@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%@ page import="edu.lternet.pasta.portal.HarvestReport"%>
 
@@ -44,11 +44,12 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 <title>LTER :: Network Data Portal</title>
 
+<meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
 <!-- Google Fonts CSS -->
@@ -102,23 +103,17 @@
 								
 			<%=warningMessage%>
 
-			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport">
+			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport" >
 			<table>
 				<tbody>		
 					<tr>
 						<td valign="top">
 						  <label>Select the Evaluate or Upload results to view:</label>
-							<select name="reportId" size="1">
+							<select style="width: auto" name="reportId" size="1" onchange="submitform()" >
 								<%= harvestReportList %>
 							</select>					
 						</td>
 					</tr>
-			  <tr>
-					<td>
-			  		<input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="View Results" />
-			  		<br/><br/>
-					</td>
-				</tr>
 			</table>
 			<table>
 					<tr>				
@@ -130,7 +125,8 @@
 					</tr>
 				</tbody>
 			</table>
-      </form>			
+      </form>
+      
 								<!-- /Content -->
 							</div>
 						</div>
@@ -147,6 +143,27 @@
 		<script src="charts/assets/effects.js"></script>
 		<!-- /Can be removed, loads charts demo -->
 
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery(".dataset-content").hide();
+            jQuery(".dataset-title").click(function()
+            {
+                jQuery(this).next(".dataset-content").slideToggle("fast");
+            });
+         });
+         
+         /* jQuery(".dataset-content").click(function () { jQuery.get("docInfoServlet", function(data) { alert(data); }); }); */
+         /* jQuery(".fetch").click(function (docid) { alert(docid); }); */
+         /* jQuery(".fetch").load("docInfoServlet"); */
+         jQuery("#show").click(function () { jQuery(".dataset-content").show("fast"); });
+         jQuery("#hide").click(function () { jQuery(".dataset-content").hide("fast"); });
+                           
+         function submitform() {
+              document.getElementById('harvestReport').submit();
+         }
+          
+    </script>
+    
 </body>
 
 </html>

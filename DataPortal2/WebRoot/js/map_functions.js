@@ -29,7 +29,8 @@ function initialize() {
   var mapOptions = {
     center: new google.maps.LatLng(0.0, -110.0),
     zoom: 0,
-    mapTypeId: google.maps.MapTypeId.HYBRID 
+    mapTypeId: google.maps.MapTypeId.HYBRID,
+    streetViewControl: false
   };
   
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);

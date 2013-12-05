@@ -39,8 +39,8 @@
         <table>
           <tbody>
             <tr>
-              <td class="header">Identifier</td>
-              <td class="header">PackageId Filter</td>
+              <td class="header">Subscription Id</td>
+              <td class="header">Package Id</td>
               <td class="header">Target URL</td>
             </tr>
 

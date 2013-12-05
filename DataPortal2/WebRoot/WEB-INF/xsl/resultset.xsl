@@ -37,7 +37,7 @@
       <table width="100%">
         <tbody>
           <tr>
-            <td class="header" width="15%">Data Package Identifier</td>
+            <td class="header" width="15%">Package Id</td>
             <td class="header" width="10%">Creators</td>
             <td class="header" width="10%">Publication Date</td>
             <td class="header" width="65%">Title</td>

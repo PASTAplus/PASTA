@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 
 <head>
 <title>LTER :: Network Data Portal</title>
 
+<meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
 <!-- Google Fonts CSS -->
