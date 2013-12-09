@@ -59,6 +59,8 @@ public class AuditManager {
    * Class fields
    */
  
+  public static final String AUDIT_OPENING_TAG = "<auditReport>\n"; 
+  public static final String AUDIT_CLOSING_TAG = "</auditReport>\n";
   private static Logger logger = Logger.getLogger(AuditManager.class);
  
  
@@ -362,14 +364,15 @@ public class AuditManager {
    * matching the provided criteria.
    * 
    * @param queryParams    a map of query parameters and the values they should be matched to
-   * @return               a list of matching LogItem objects
+   * @return               an XML string of audit records
    * @throws ClassNotFoundException
    * @throws SQLException
    * @throws IllegalArgumentException
    */
-  public List<AuditRecord> getAuditRecords(Map<String, List<String>> queryParams)
+  public String getAuditRecords(Map<String, List<String>> queryParams)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-    List<AuditRecord> auditRecords = new ArrayList<AuditRecord>();
+	StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
+    String xmlString = null;
    
     if (queryParams != null) { 
       Connection connection = null;
@@ -414,7 +417,7 @@ public class AuditManager {
           auditRecord.setUser(userId);
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
-          auditRecords.add(auditRecord);
+          stringBuffer.append(auditRecord.toXML());
         }
       }
       catch(ClassNotFoundException e) {
@@ -426,12 +429,14 @@ public class AuditManager {
         throw(e);
       }
       finally {
+        stringBuffer.append(AUDIT_CLOSING_TAG);
+        xmlString = stringBuffer.toString();
         if (stmt != null) stmt.close();
         returnConnection(connection);
       }
     }
    
-    return auditRecords;
+    return xmlString;
   }
  
 

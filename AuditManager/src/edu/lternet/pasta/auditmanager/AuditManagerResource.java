@@ -305,26 +305,6 @@ public class AuditManagerResource extends PastaWebService
     }
 
     
-    /*
-     * Converts a list of AuditRecord objects to an XML format.
-     */
-    private String auditRecordsToXML(List<AuditRecord> auditRecords) {
-      String xmlString = "";
-      StringBuffer stringBuffer = new StringBuffer("<auditReport>\n");
-      
-      if (auditRecords != null) {
-        for (AuditRecord auditRecord : auditRecords) {
-          stringBuffer.append(auditRecord.toXML());
-        }
-      }
-
-      stringBuffer.append("</auditReport>\n");
-      xmlString = stringBuffer.toString();
-      
-      return xmlString;
-    }
-    
-
     /**
      * Returns the API documentation for the Audit Manager.
      */
@@ -399,11 +379,11 @@ public class AuditManagerResource extends PastaWebService
             oidList.add(oidString);            
             Map<String, List<String>> queryParams = new HashMap<String, List<String>>();
             queryParams.put("oid", oidList);
-            List<AuditRecord> auditRecords = auditManager.getAuditRecords(queryParams);
-            if (auditRecords.size() == 0) { 
+            String xmlString = auditManager.getAuditRecords(queryParams);
+            if (xmlString.length() == (AuditManager.AUDIT_OPENING_TAG.length() + 
+            		                   AuditManager.AUDIT_CLOSING_TAG.length())) { 
               throw new ResourceNotFoundException(String.format("Oid %d does not exist.", oid));
             }
-            String xmlString = auditRecordsToXML(auditRecords);
             return Response.ok(xmlString).build();
         }
         catch (ClassNotFoundException e) {
@@ -539,8 +519,7 @@ public class AuditManagerResource extends PastaWebService
             QueryString queryString = new QueryString(uriInfo);
             queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
             Map<String, List<String>> queryParams = queryString.getParams();
-            List<AuditRecord> auditRecords = auditManager.getAuditRecords(queryParams);
-            String xmlString = auditRecordsToXML(auditRecords);
+            String xmlString = auditManager.getAuditRecords(queryParams);
             return Response.ok(xmlString).build();
         }
         catch (ClassNotFoundException e) {
