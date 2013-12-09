@@ -121,7 +121,9 @@ public class AuditManagerResourceTest {
 	@Test
 	public void testServiceMethods() {
 		Integer auditId = testCreate();
+		Integer badAuditId = new Integer(-999);
 		testGetAuditRecord(auditId);
+		testGetAuditRecordBad(badAuditId);
 		testGetAuditRecords();
 	}
 
@@ -186,6 +188,27 @@ public class AuditManagerResourceTest {
 			assertTrue(auditReport.startsWith("<auditReport>"));
 			assertTrue(auditReport.contains(String.format("<oid>%d</oid>", auditId)));
 			assertTrue(auditReport.endsWith("</auditReport>"));
+		}
+	}
+
+
+	/**
+	 * Test the status and message body of the getAuditRecord() service method
+	 * when a non-existent auditId is passed to it.
+	 */
+	private void testGetAuditRecordBad(Integer auditId) {
+		if (auditId == null) {
+			fail("Null auditId value");
+		}
+		else {
+			DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(
+					testUser);
+
+			// Test Evaluate for OK status
+			Response response = auditManagerResource.getAuditRecord(
+					httpHeaders, auditId);
+			int statusCode = response.getStatus();
+			assertEquals(404, statusCode);
 		}
 	}
 
