@@ -217,22 +217,30 @@ public class AuditManagerResourceTest {
 	 * Test the status and message body of the getAuditRecords() service method.
 	 */
 	private void testGetAuditRecords() {
-        Map<String, String> query = Collections.singletonMap("user", testUser);
-        UriInfo uriInfo = new DummyUriInfo(query);
+		Map<String, String> query = Collections.singletonMap("user", testUser);
+		UriInfo uriInfo = new DummyUriInfo(query);
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test READ for OK status
-		Response response = auditManagerResource.getAuditRecords(httpHeaders, uriInfo);
+		Response response = auditManagerResource.getAuditRecords(httpHeaders,
+				uriInfo);
 		int statusCode = response.getStatus();
 		assertEquals(200, statusCode);
 
 		// Check the message body
-		String entityString = (String) response.getEntity();
-		String auditReport = entityString.trim();
-		assertTrue(auditReport.length() > 1);
-		assertTrue(auditReport.startsWith("<auditReport>"));
-		assertTrue(auditReport.contains(String.format("<user>%s</user>", testUser)));
-		assertTrue(auditReport.endsWith("</auditReport>"));
+		File entityFile = (File) response.getEntity();
+		try {
+			String entityString = FileUtils.readFileToString(entityFile);
+			String auditReport = entityString.trim();
+			assertTrue(auditReport.length() > 1);
+			assertTrue(auditReport.startsWith("<auditReport>"));
+			assertTrue(auditReport.contains(String.format("<user>%s</user>",
+					testUser)));
+			assertTrue(auditReport.endsWith("</auditReport>"));
+		}
+		catch (IOException e) {
+			fail("Error reading audit XML file");
+		}
 	}
 
 

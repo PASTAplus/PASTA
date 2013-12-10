@@ -36,7 +36,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,9 +46,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.MethodNameUtility;
@@ -57,7 +58,6 @@ import edu.lternet.pasta.common.PastaWebService;
 import edu.lternet.pasta.common.QueryString;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.WebExceptionFactory;
-import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
@@ -512,19 +512,36 @@ public class AuditManagerResource extends PastaWebService
     @Path("report")
     public Response getAuditRecords(@Context HttpHeaders headers,
                                     @Context UriInfo uriInfo) {
-        try {
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+
+		try {
             Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuditManager auditManager = new AuditManager(properties);
             QueryString queryString = new QueryString(uriInfo);
             queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
             Map<String, List<String>> queryParams = queryString.getParams();
-            String xmlString = auditManager.getAuditRecords(queryParams);
-            return Response.ok(xmlString).build();
+            File xmlFile = auditManager.getAuditRecordsFile(queryParams);
+			if (xmlFile != null && xmlFile.exists()) {
+				Long size = FileUtils.sizeOf(xmlFile);
+				responseBuilder = Response.ok(xmlFile, MediaType.APPLICATION_XML);
+				responseBuilder.header("Content-Length", size.toString());
+				response = responseBuilder.build();
+			}
+			else {
+				ResourceNotFoundException e = new ResourceNotFoundException(
+				    String.format("Unable to process audit query with query parameters: %s", queryParams));
+				throw (e);
+			}
+            return response;
         }
         catch (ClassNotFoundException e) {
           return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
         }
+		catch (ResourceNotFoundException e) {
+		  return WebExceptionFactory.makeNotFound(e).getResponse();
+		}
         catch (SQLException e) {
           return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
         }
