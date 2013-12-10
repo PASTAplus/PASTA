@@ -25,7 +25,6 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -37,10 +36,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaClient;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.ReportUtility;
 
 public class AuditReportServlet extends DataPortalServlet {
