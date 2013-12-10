@@ -76,6 +76,11 @@ public class AuditManager {
   private final String AUDIT_MANAGER_TABLE = "EVENTLOG";
   private final String AUDIT_MANAGER_TABLE_QUALIFIED = AUDIT_MANAGER_SCHEMA + "." + AUDIT_MANAGER_TABLE;
 
+  /*
+   *  Temporary directory for storing audit query XML results file. 
+   */
+  private String tmpDir;
+  
   private String dbDriver;           // database driver
   private String dbURL;              // database URL
   private String dbUser;             // database user name
@@ -101,6 +106,14 @@ public class AuditManager {
     this.dbURL = ConfigurationListener.getProperty(p, "dbURL");
     this.dbUser = ConfigurationListener.getProperty(p, "dbUser");
     this.dbPassword = ConfigurationListener.getProperty(p, "dbPassword");
+    
+    /* Initialize the tmpDir value and create the directory */
+    String tmpDirValue = ConfigurationListener.getProperty(p, "auditmanager.tmpDir");
+    if (tmpDirValue != null && !tmpDirValue.equals("")) {
+    	this.tmpDir = tmpDirValue;
+    	File tmpDirFile = new File(tmpDirValue);
+    	tmpDirFile.mkdirs();
+    }
    
     /*
      * Check for existence of Data Package Registry table. 
@@ -529,8 +542,7 @@ public class AuditManager {
 	final int STRING_BUFFER_SIZE = 100000;
 	Date now = new Date();
 	Long mili = now.getTime();
-	String tempFilePath = "/home/pasta/local/tmp";
-	String auditFileName = String.format("%s/%s-%d.%s", tempFilePath, "audit-records", mili, "xml");
+	String auditFileName = String.format("%s/%s-%d.%s", this.tmpDir, "audit-records", mili, "xml");
 	File auditFile = new File(auditFileName);
 	StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
    

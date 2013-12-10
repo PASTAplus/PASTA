@@ -19,3 +19,4 @@ api.document=../doc/edu.lternet.pasta.auditmanager.AuditServiceResource.html
 tutorial.document=../doc/tutorial.html
 demo.directory=../demo
 
+auditmanager.tmpDir=/home/pasta/local/tmp/audit
