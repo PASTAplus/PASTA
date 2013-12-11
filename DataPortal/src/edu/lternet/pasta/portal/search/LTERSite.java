@@ -41,14 +41,14 @@ public class LTERSite {
     "ARC",
     "BES",
     "BNZ",
-    "CAP",
     "CCE",
     "CDR",
+    "CAP",
     "CWT",
     "FCE",
     "GCE",
-    "HBR",
     "HFR",
+    "HBR",
     "JRN",
     "KBS",
     "KNZ",
@@ -56,9 +56,9 @@ public class LTERSite {
     "LUQ",
     "MCM",
     "MCR",
+    "NWT",
     "NIN",
     "NTL",
-    "NWT",
     "PAL",
     "PIE",
     "SBC",
@@ -67,50 +67,20 @@ public class LTERSite {
     "VCR",
 };
 
-public static final String[] siteKeywords = {
-    "Andrews LTER",
-    "Arctic LTER",
-    "Baltimore Ecosystem Study",
-    "Bonanza Creek",
-    "Central Arizona - Phoenix Urban",
-    "California Current Ecosystem",
-    "Cedar Creek",
-    "Coweeta",
-    "Florida Coastal Everglades",
-    "Georgia Coastal Ecosystems",
-    "Hubbard Brook",
-    "Harvard Forest",
-    "Jornada Basin",
-    "Kellogg Biological Station",
-    "Konza Prairie",
-    "LTER Network Office",
-    "Luquillo",
-    "McMurdo Dry Valleys",
-    "Moorea Coral Reef",
-    "North Inlet",
-    "North Temperate Lakes",
-    "Niwot Ridge",
-    "Palmer Antarctica",
-    "Plum Island Ecosystems",
-    "Santa Barbara Coastal",
-    "Sevilleta",
-    "Shortgrass Steppe",
-    "Virginia Coast Reserve",
-};
 
 public static final String[] siteNames = {
     "Andrews LTER",
     "Arctic LTER",
     "Baltimore Ecosystem Study",
     "Bonanza Creek LTER",
-    "Central Arizona - Phoenix Urban LTER",
     "California Current Ecosystem",
     "Cedar Creek Ecosystem Science Reserve",
+    "Central Arizona - Phoenix Urban LTER",
     "Coweeta LTER",
     "Florida Coastal Everglades LTER",
     "Georgia Coastal Ecosystems LTER",
-    "Hubbard Brook LTER",
     "Harvard Forest LTER",
+    "Hubbard Brook LTER",
     "Jornada Basin LTER",
     "Kellogg Biological Station LTER",
     "Konza Prairie LTER",
@@ -118,9 +88,9 @@ public static final String[] siteNames = {
     "Luquillo LTER",
     "McMurdo Dry Valleys LTER",
     "Moorea Coral Reef LTER",
+    "Niwot Ridge LTER",
     "North Inlet LTER",
     "North Temperate Lakes LTER",
-    "Niwot Ridge LTER",
     "Palmer Antarctica LTER",
     "Plum Island Ecosystems LTER",
     "Santa Barbara Coastal LTER",
@@ -335,28 +305,6 @@ public static final String[] siteNames = {
   }
   
   
-  /**
-   * Get the keyword string for this site. This keyword string is OR'ed with the
-   * packageId to find documents that originated from this site.
-   * 
-   * @return  siteKeyword  The site keyword string.
-   */
-  public String getSiteKeyword() {
-    String siteKeyword = "";
-
-    if (isValidSite()) {
-      for (int i = 0; i < sites.length; i++) {
-        if (site.equals(sites[i])) { 
-          siteKeyword = siteKeywords[i];
-          break;
-        }
-      }
-    }
-    
-    return siteKeyword;
-  }
-
-
   /**
    * Gets the siteName value
    * 
