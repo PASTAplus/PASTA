@@ -66,6 +66,7 @@
   }
 %>
  
+<header role="banner">
 <div class="row-fluid ">
 	<div class="span12 page_top_header base_color_background">
 	</div>
@@ -78,6 +79,7 @@
 			</a>
 	 </div>
 			<div class="span9 menu">
+			<nav role="navigation">
 			<ul id="menu-nav" class="menu">
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
 				<li<%= discoverClass %>><a href="#">Discover</a>
@@ -122,6 +124,7 @@
 				<li<%= contactClass %>><a href="contact.jsp">Contact</a> </li>
 				<li<%= loginClass %>><%= identity %></li>
 			</ul>
+			</nav>
 		</div>
 	</div>
 </div>
@@ -174,3 +177,4 @@
 <div class="container shadow">
 	<span class="bottom_shadow_full"></span>
 </div>
+</header>
