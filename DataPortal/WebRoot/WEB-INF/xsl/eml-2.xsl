@@ -23,8 +23,6 @@
 
 <xsl:stylesheet 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:eml="eml://ecoinformatics.org/eml-2.1.0"
-  exclude-result-prefixes="eml"
   version="2.0"
 >
   
@@ -40,9 +38,9 @@
   <xsl:output method="html" encoding="utf-8" indent="yes" /> 
   
   <!-- *** Variables *** -->
-  <xsl:variable name="packageID" select="/eml:eml/@packageId"/>
+  <xsl:variable name="packageID" select="*/@packageId"/>
   <xsl:variable name="docid" select="$packageID"/>
-  <xsl:variable name="resourcetitle" select="/eml:eml/dataset/title"/>
+  <xsl:variable name="resourcetitle" select="*/dataset/title"/>
   <!-- global variables to store id node set in case to be referenced -->
   <xsl:variable name="ids" select="//*[@id != '']"/>
   <xsl:variable name="prov-stmt" select="'This method step describes provenance-based metadata as specified in the LTER EML Best Practices.'"/>
