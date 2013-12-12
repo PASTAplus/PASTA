@@ -132,6 +132,10 @@ public class AuditManagerResource extends PastaWebService
     public static final String STATUS_CODE = "status";
     // Query parameter for user
     public static final String RESOURCE_ID = "resourceId";
+    
+    //Query parameter for record limit
+    public static final String LIMIT = "limit";
+    
     private static Logger logger = Logger.getLogger(AuditManagerResource.class);
     // Set of valid query parameters
     public static final Set<String> VALID_QUERY_KEYS;
@@ -150,6 +154,7 @@ public class AuditManagerResource extends PastaWebService
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
         set.add(RESOURCE_ID);
+        set.add(LIMIT);
         VALID_QUERY_KEYS = Collections.unmodifiableSet(set);
     }
     
@@ -461,6 +466,10 @@ public class AuditManagerResource extends PastaWebService
      *     <td>toTime</td>
      *     <td>An ISO8601 timestamp</td>
      *   </tr>
+     *   <tr>
+     *     <td>limit</td>
+     *     <td>A positive whole number</td>
+     *   </tr>
      * </table>
      * <br/>
      * The query parameters <code>fromTime</code> and optionally
@@ -472,10 +481,13 @@ public class AuditManagerResource extends PastaWebService
      * The query parameter <code>time</code> may not be used in conjunction
      * with <code>fromTime</code>. All other parameters may be used multiple
      * times.
+     * <br/>
+     * The query parameter <code>limit</code> sets an upper limit on the number
+     * of audit records returned. For example, "limit=1000".
      *
      * <h4>Responses:</h4>
      *
-     * <p>If the request is successful, the response will contain plain text.</p>
+     * <p>If the request is successful, the response will contain XML text.</p>
      *
      * <table border="1" cellspacing="0" cellpadding="3">
      *   <tr>
@@ -488,7 +500,7 @@ public class AuditManagerResource extends PastaWebService
      *     <td>200 OK</td>
      *     <td>If the request was successful.</td>
      *     <td>The specified subscription's attributes.</td>
-     *     <td><code>text/plain</code></td>
+     *     <td><code>application/xml</code></td>
      *   </tr>
      *   <tr>
      *     <td>400 Bad Request</td>
