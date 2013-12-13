@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%
 	String path = request.getContextPath();
@@ -26,6 +27,13 @@
 	} else {
 		type = "class=\"" + type + "\"";
 	}
+	
+	String limitHTML = "";
+	String auditRecordLimit = (String) ConfigurationListener.getOptions().getProperty("auditreport.limit");
+	if (auditRecordLimit != null && !auditRecordLimit.equals("")) {
+	  limitHTML = "<p><small><em>(Only the first " + auditRecordLimit + " matching audit records will be displayed.)</em></small></p>";
+	}
+	
 %>
 
 <!DOCTYPE html>
@@ -220,6 +228,9 @@
 												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
+							        <tr>
+								        <td colspan="3"><%= limitHTML %></td>
+							        </tr>
 										</table>
 									</div>
 									<!-- section -->
