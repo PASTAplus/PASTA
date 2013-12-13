@@ -1,3 +1,36 @@
+<%@ page import="edu.lternet.pasta.portal.PastaStatistics"%>
+
+<%
+	// Generate PASTA data package statistics and store values in session.
+
+	Integer numDataPackages = null;
+	Integer numDataPackagesSites = null;
+	String count = null;
+
+	PastaStatistics pastaStats = new PastaStatistics("public");
+
+	count = (String) session.getAttribute("numDataPackages");
+	if (count != null) {
+		numDataPackages = Integer.valueOf(count);
+	} else {
+		numDataPackages = pastaStats.getNumDataPackages();
+		session.setAttribute("numDataPackages",
+				numDataPackages.toString());
+	}
+
+	count = (String) session.getAttribute("numDataPackagesSites");
+	if (count != null) {
+		numDataPackagesSites = Integer.valueOf(count);
+	} else {
+		numDataPackagesSites = pastaStats.getNumDataPackagesSites();
+		session.setAttribute("numDataPackagesSites",
+				numDataPackagesSites.toString());
+	}
+
+ String hover = "New user registration for non-LTER members coming soon!";
+
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,10 +62,106 @@
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
-<!-- These Scripts are for my Chart Demo and can be removed at any time -->
+<!-- These Scripts are for my Chart Demo and can be removed at any time 
 <script src="charts/assets/Chart.js" type="text/javascript"></script>
 <script src="charts/assets/jquery.min.js" type="text/javascript"></script>
 <!-- /These Scripts are for my Chart Demo and can be removed at any time -->
+
+<!-- Google Chart for NIS Data Package and Site Growth -->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	// Load the Visualization API and the piechart package.
+	google.load('visualization', '1.0', {
+		'packages' : [ 'corechart' ]
+	});
+
+	// Set a callback to run when the Google Visualization API is loaded.
+	google.setOnLoadCallback(drawChart);
+
+	// Callback that creates and populates a data table,
+	// instantiates the pie chart, passes in the data and
+	// draws it.
+	function drawChart() {
+
+		// Create the data table.
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Week');
+		data.addColumn('number', 'Packages');
+		data.addColumn('number', 'Sites');
+		data.addRows([ 
+			['1', 0, 0],
+			['2', 210, 5],
+			['3', 281, 7],
+			['4', 347, 7],
+			['5', 374, 7],
+			['6', 430, 8],
+			['7', 436, 8],
+			['8', 454, 9],
+			['9', 657, 10],
+			['10', 684, 10],
+			['11', 708, 10],
+			['12', 746, 10],
+			['13', 763, 12],
+			['14', 766, 12],
+			['15', 829, 12],
+			['16', 849, 12],
+			['17', 894, 13],
+			['18', 928, 13],
+			['19', 936, 13],
+			['20', 1142, 15],
+			['21', 1274, 15],
+			['22', 1346, 15],
+			['23', 1404, 16],
+			['24', 1430, 16],
+			['25', 1451, 16],
+			['26', 1461, 16],
+			['27', 1466, 17],
+			['28', 1484, 17],
+			['29', 1717, 19],
+			['30', 1729, 19],
+			['31', 1734, 19],
+			['32', 1777, 20],
+			['33', 1787, 20],
+			['34', 1810, 20],
+			['35', 1824, 20],
+			['36', 1955, 21],
+			['37', 1966, 21],
+			['38', 1971, 21]
+		]);
+
+		// Set chart options
+		var options = {
+			'title' : '',
+			'width' : 400,
+			'height' : 200,
+			'hAxis' : {
+				title : 'Week'
+			},
+			'vAxes' : {
+				0 : {
+					logScale : false
+				},
+				1 : {
+					logScale : false,
+					maxValue : 27
+				}
+			},
+			'series' : {
+				0 : {
+					targetAxisIndex : 0
+				},
+				1 : {
+					targetAxisIndex : 1
+				}
+			}
+		};
+
+		// Instantiate and draw our chart, passing in some options.
+		var chart = new google.visualization.ColumnChart(document
+				.getElementById('chart_div'));
+		chart.draw(data, options);
+	}
+</script>
 
 </head>
 
@@ -103,10 +232,18 @@
 							<section id="examples">
 								<article id="lineChart" class=" ">
 									<div>
-										<canvas id="introChart" width="320" height="250"></canvas>		
-											<p>Site contributed data packages:
-											<strong><i>1473</i></strong> <br>Total data 
-											packages: <strong><i>16888</i></strong></p>
+										<!-- 
+										  <canvas id="introChart" width="320" height="250"></canvas> 
+											<p>Site contributed data packages: <strong><i>1473</i></strong></p>
+									  -->
+										<br />
+										<br />
+								<div id="chart_div"></div>
+								<p>Site contributed data packages: 
+								  <strong><em><%=numDataPackagesSites.toString()%></em></strong><br />
+									Total data packages: <strong><em><%=numDataPackages.toString()%></em></strong>
+								</p>
+											<!--   Total data packages: <strong><i>16888</i></strong> -->
 									</div>
 								</article>
 							</section>

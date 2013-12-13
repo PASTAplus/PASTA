@@ -27,12 +27,6 @@
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
-<!-- These Scripts are for my Chart Demo and can be removed at any time -->
-<script src="charts/assets/Chart.js" type="text/javascript"></script>
-<script src="charts/assets/Chart_Demo.js" type="text/javascript"></script>
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
-<!-- /These Scripts are for my Chart Demo and can be removed at any time -->
-
 </head>
 
 <body>

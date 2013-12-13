@@ -52,6 +52,7 @@ public class AuditReportServlet extends DataPortalServlet {
   private static final String forward = "./auditReport.jsp";
 
   private static String cwd = null;
+  private static String limit = null;
   private static String xslpath = null;
 
   /**
@@ -213,8 +214,15 @@ public class AuditReportServlet extends DataPortalServlet {
     		filter.append("&status=" + code);
     	}
     }
+     
+    if (limit != null && !limit.isEmpty()) {
+    	if (filter.length() == 0) {
+    		filter.append("limit=" + limit);
+    	} else {
+    		filter.append("&limit=" + limit);
+    	}
+    }
     
-
     String message = null;
     String type = null;
 
@@ -247,18 +255,22 @@ public class AuditReportServlet extends DataPortalServlet {
 
   }
 
-  /**
-   * Initialization of the servlet. <br>
-   * 
-   * @throws ServletException
-   *           if an error occurs
-   */
-  public void init() throws ServletException {
 
-    PropertiesConfiguration options = ConfigurationListener.getOptions();
-    xslpath = options.getString("auditreport.xslpath");
-    cwd = options.getString("system.cwd");
+	/**
+	 * Initialization of the servlet. <br>
+	 * 
+	 * @throws ServletException
+	 *             if an error occurs
+	 */
+	public void init() throws ServletException {
 
-  }
+		PropertiesConfiguration options = ConfigurationListener.getOptions();
+		
+		// limits the number of audit records returned
+		limit = options.getString("auditreport.limit");
+		
+		xslpath = options.getString("auditreport.xslpath");
+		cwd = options.getString("system.cwd");
+	}
 
 }

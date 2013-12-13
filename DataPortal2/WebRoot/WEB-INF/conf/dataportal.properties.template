@@ -46,6 +46,7 @@ emlutility.idref=/WEB-INF/xsl/id-ref.xsl
 harvester.path=/home/pasta/local/harvester
 subscriptionutility.xslpath=/WEB-INF/xsl/subscription.xsl
 resultsetutility.xslpath=/WEB-INF/xsl/resultset.xsl
+auditreport.limit=10000
 auditreport.xslpath=/WEB-INF/xsl/auditReport.xsl
 datapackageaudit.xslpath=/WEB-INF/xsl/dataPackageAudit.xsl
 system.cwd=/home/pasta/svn/DataPortal/DataPortal

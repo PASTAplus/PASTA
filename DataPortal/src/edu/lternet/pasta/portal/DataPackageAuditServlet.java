@@ -58,6 +58,7 @@ public class DataPackageAuditServlet extends DataPortalServlet {
   private static final String forward = "./dataPackageAudit.jsp";
 
   private static String cwd = null;
+  private static String limit = null;
   private static String xslpath = null;
   
   private static final String PACKAGE = "readDataPackage";
@@ -214,6 +215,14 @@ public class DataPackageAuditServlet extends DataPortalServlet {
     	filter.append("group=" + groupParam + "&");
     }
 
+    if (limit != null && !limit.isEmpty()) {
+    	if (filter.length() == 0) {
+    		filter.append("limit=" + limit);
+    	} else {
+    		filter.append("&limit=" + limit);
+    	}
+    }
+    
     if (uid.equals("public")) {
       message = LOGIN_WARNING;
       type = "warning";
@@ -254,6 +263,9 @@ public class DataPackageAuditServlet extends DataPortalServlet {
   public void init() throws ServletException {
 
     PropertiesConfiguration options = ConfigurationListener.getOptions();
+	// limits the number of audit records returned
+	limit = options.getString("auditreport.limit");
+	
     xslpath = options.getString("datapackageaudit.xslpath");
     cwd = options.getString("system.cwd");
 

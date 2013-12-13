@@ -25,7 +25,6 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -37,10 +36,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaClient;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.ReportUtility;
 
 public class AuditReportServlet extends DataPortalServlet {
@@ -56,6 +52,7 @@ public class AuditReportServlet extends DataPortalServlet {
   private static final String forward = "./auditReport.jsp";
 
   private static String cwd = null;
+  private static String limit = null;
   private static String xslpath = null;
 
   /**
@@ -217,8 +214,15 @@ public class AuditReportServlet extends DataPortalServlet {
     		filter.append("&status=" + code);
     	}
     }
+     
+    if (limit != null && !limit.isEmpty()) {
+    	if (filter.length() == 0) {
+    		filter.append("limit=" + limit);
+    	} else {
+    		filter.append("&limit=" + limit);
+    	}
+    }
     
-
     String message = null;
     String type = null;
 
@@ -251,18 +255,22 @@ public class AuditReportServlet extends DataPortalServlet {
 
   }
 
-  /**
-   * Initialization of the servlet. <br>
-   * 
-   * @throws ServletException
-   *           if an error occurs
-   */
-  public void init() throws ServletException {
 
-    PropertiesConfiguration options = ConfigurationListener.getOptions();
-    xslpath = options.getString("auditreport.xslpath");
-    cwd = options.getString("system.cwd");
+	/**
+	 * Initialization of the servlet. <br>
+	 * 
+	 * @throws ServletException
+	 *             if an error occurs
+	 */
+	public void init() throws ServletException {
 
-  }
+		PropertiesConfiguration options = ConfigurationListener.getOptions();
+		
+		// limits the number of audit records returned
+		limit = options.getString("auditreport.limit");
+		
+		xslpath = options.getString("auditreport.xslpath");
+		cwd = options.getString("system.cwd");
+	}
 
 }

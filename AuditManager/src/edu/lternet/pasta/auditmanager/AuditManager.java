@@ -305,39 +305,68 @@ public class AuditManager {
   }
   
   
-  private String composeWhereClause(Map<String, List<String>> queryParams) {
-    String whereClause = null;
-    
-    StringBuffer stringBuffer = new StringBuffer(" WHERE category IS NOT NULL");
-    
-    for (String key : queryParams.keySet()) {
-      stringBuffer.append(" AND ");
-      List<String> values = queryParams.get(key);
-      
-      if (key.equalsIgnoreCase("fromtime")) {
-        String value = values.get(0);
-        String timestamp = dateToTimestamp(value, false);
-        stringBuffer.append(String.format(" entrytime >= '%s'", timestamp));
-      }
-      else if (key.equalsIgnoreCase("totime")) {
-        String value = values.get(0);
-        String timestamp = dateToTimestamp(value, true);
-        stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
-      }
-      else if (key.equalsIgnoreCase("group")) {
-        String orClause = composeORClause("groups", values);
-        stringBuffer.append(orClause);
-      }
-      else {
-        String orClause = composeORClause(key, values);
-        stringBuffer.append(orClause);
-      }
-    }
-    
-    whereClause = stringBuffer.toString();
-    
-    return whereClause;
-  }
+	private String composeWhereClause(Map<String, List<String>> queryParams) {
+		String whereClause = null;
+		String limit = null;
+
+		StringBuffer stringBuffer = new StringBuffer(
+				" WHERE category IS NOT NULL");
+
+		for (String key : queryParams.keySet()) {
+			if (!key.equalsIgnoreCase("limit")) {
+				stringBuffer.append(" AND ");
+				List<String> values = queryParams.get(key);
+
+				if (key.equalsIgnoreCase("fromtime")) {
+					String value = values.get(0);
+					String timestamp = dateToTimestamp(value, false);
+					stringBuffer.append(String.format(" entrytime >= '%s'",
+							timestamp));
+				}
+				else
+					if (key.equalsIgnoreCase("totime")) {
+						String value = values.get(0);
+						String timestamp = dateToTimestamp(value, true);
+						stringBuffer.append(String.format(" entrytime <= '%s'",
+								timestamp));
+					}
+					else
+						if (key.equalsIgnoreCase("group")) {
+							String orClause = composeORClause("groups", values);
+							stringBuffer.append(orClause);
+						}
+						else {
+							String orClause = composeORClause(key, values);
+							stringBuffer.append(orClause);
+						}
+			}
+		}
+
+		/*
+		 * Append a record limit value if specified
+		 */
+		for (String key : queryParams.keySet()) {
+			List<String> values = queryParams.get(key);
+			if (key.equalsIgnoreCase("limit")) {
+				String limitStr = values.get(0);
+				try {
+					Integer limitInt = new Integer(limitStr);
+					if (limitInt > 0) {
+						limit = limitInt.toString();
+					}
+				}
+				catch (NumberFormatException e) {
+				}
+				if (limit != null) {
+					stringBuffer.append(String.format(" LIMIT %s", limit));
+				}
+			}
+		}
+
+		whereClause = stringBuffer.toString();
+
+		return whereClause;
+	}
  
   
   /**
@@ -555,7 +584,7 @@ public class AuditManager {
         "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
         composeWhereClause(queryParams);
       
-      logger.debug(selectString);
+      logger.warn(selectString);
       
       Statement stmt = null;
      

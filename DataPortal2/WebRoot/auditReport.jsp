@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%
 	String path = request.getContextPath();
@@ -26,6 +27,13 @@
 	} else {
 		type = "class=\"" + type + "\"";
 	}
+
+	String limitHTML = "";
+	String auditRecordLimit = (String) ConfigurationListener.getOptions().getProperty("auditreport.limit");
+	if (auditRecordLimit != null && !auditRecordLimit.equals("")) {
+	  limitHTML = "<p><small><em>(Only the first " + auditRecordLimit + " matching audit records will be displayed.)</em></small></p>";
+	}
+	
 %>
 
 <!DOCTYPE html>
@@ -108,9 +116,7 @@
 							<div class="span12">
 								<!-- Content -->
 								<fieldset>
-								<p>Review a PASTA audit report by entering information
-								 into one or more of the filters below, or see all entries
-								  by leaving the defaults, then select "Submit".</p>
+								<p>Review a PASTA audit report by entering your criteria into one or more of the filters below.</p>
 								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
 									<div class="section">
 										<table>
@@ -239,6 +245,9 @@
 												  <input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
+								<tr>
+									<td colspan="3"><%= limitHTML %></td>
+								</tr>
 										</table>
 									</div>
 									<!-- section -->
