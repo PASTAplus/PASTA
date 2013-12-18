@@ -39,7 +39,19 @@ public class DataPortalServlet extends HttpServlet {
    * Class variables
    */
   
-  final static protected String LOGIN_WARNING = "You must login before using this tool.";
+  protected static final String LOGIN_WARNING = "You must login before using this tool.";
+  private static final long serialVersionUID = 1L;
+  
+  protected static final String CSS_LINK_ELEMENTS = 
+    String.format(
+//		  "%s\n%s\n%s\n%s\n",
+		  "%s\n",
+		  //"    <link href=\"css/style_slate.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\">",
+		  //"    <link href=\"bootstrap/css/bootstrap.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
+		  //"    <link href=\"bootstrap/css/bootstrap-responsive.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
+          "    <link href=\"css/lter-nis.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
+    );
+		  
   
 
   /*
