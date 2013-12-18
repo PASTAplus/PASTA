@@ -37,6 +37,7 @@ public class ConfigurationListener extends PastaConfigListener {
     
     private static String webServiceVersion;
     private static File apiDocument;
+    private static String tmpDir;
     private static File tutorialDocument;
     private static File welcomePage;
     private static File demoDirectory;
@@ -63,6 +64,18 @@ public class ConfigurationListener extends PastaConfigListener {
     }
     
     
+    /**
+     * Returns the temporary directory path of the Audit Manager.
+     *
+     * @return the temporary directory path of the Audit Manager.
+     *
+     * @see #TUTORIAL_DOCUMENT
+     */
+    public static String getTmpDir() {
+        return tmpDir;
+    }
+
+
     /**
      * Returns the tutorial document of the Audit Manager.
      *
@@ -112,6 +125,7 @@ public class ConfigurationListener extends PastaConfigListener {
         loadPropertiesFile(AUDIT_MANAGER_PROPERTIES);        
         apiDocument = getFile(properties, API_DOCUMENT);
         demoDirectory = getFile(properties, "demo.directory");
+        tmpDir = getProperty(properties, "auditmanager.tmpDir");
         tutorialDocument = getFile(properties, TUTORIAL_DOCUMENT);
         webServiceVersion = getProperty(properties, WEB_SERVICE_VERSION);
         welcomePage = getFile(properties, WELCOME_PAGE);

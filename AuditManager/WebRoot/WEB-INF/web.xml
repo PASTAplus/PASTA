@@ -21,8 +21,17 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <display-name>Audit Cleaner Servlet</display-name>
+        <servlet-name>Audit Cleaner Servlet</servlet-name>
+        <servlet-class>edu.lternet.pasta.auditmanager.AuditCleanerServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>JAX-RS REST Servlet</servlet-name>
         <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Audit Cleaner Servlet</servlet-name>
+        <url-pattern>/doclean</url-pattern>
     </servlet-mapping>
 </web-app>
