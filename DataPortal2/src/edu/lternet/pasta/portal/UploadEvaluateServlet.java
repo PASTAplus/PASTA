@@ -38,14 +38,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.client.ReportUtility;
 import edu.lternet.pasta.common.UserErrorException;
 
@@ -62,12 +59,15 @@ public class UploadEvaluateServlet extends DataPortalServlet {
   private static String cwd = null;
   private static String xslpath = null;
 
-  private static final String HTMLHEAD = "<html lang=\"en\">\n"
-      + "<head><title>LTER :: Network Data Portal</title>\n"
-      + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
-      + "</head><body>\n";
+  private static final String HTMLHEAD = "<html lang=\"en\">\n" +
+	      "<head>\n" +
+	      "    <title>LTER :: Network Data Portal</title>\n" +
+	      CSS_LINK_ELEMENTS +
+	      "</head>\n\n" + 
+	      "<body>\n" +
+	      "    <div class=\"body\">\n";
 
-  private static final String HTMLTAIL = "</html>\n";
+  private static final String HTMLTAIL = "    </div>\n</body>\n</html>\n";
 
   /**
    * Constructor of the object.

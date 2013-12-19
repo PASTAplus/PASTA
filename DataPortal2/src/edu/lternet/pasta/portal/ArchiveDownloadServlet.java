@@ -25,25 +25,16 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.common.eml.DataPackage;
-import edu.lternet.pasta.common.eml.EMLParser;
-import edu.lternet.pasta.common.eml.Entity;
+
 
 public class ArchiveDownloadServlet extends DataPortalServlet {
 
@@ -55,12 +46,6 @@ public class ArchiveDownloadServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.ArchiveDownloadServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static final String HTMLHEAD = "<html lang=\"en\">\n"
-      + "<head><title>LTER :: Network Data Portal</title>\n"
-      + "<link rel=\"stylesheet\" type=\"text/css\" href=\"./css/lter-nis.css\">"
-      + "</head><body><div class=\"body\">\n";
-
-  private static final String HTMLTAIL = "</div></body></html>\n";
 
   /**
    * Constructor of the object.
