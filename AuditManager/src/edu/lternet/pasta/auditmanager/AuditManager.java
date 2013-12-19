@@ -108,7 +108,7 @@ public class AuditManager {
     this.dbPassword = ConfigurationListener.getProperty(p, "dbPassword");
     
     /* Initialize the tmpDir value and create the directory */
-    String tmpDirValue = ConfigurationListener.getProperty(p, "auditmanager.tmpDir");
+    String tmpDirValue = ConfigurationListener.getTmpDir();
     if (tmpDirValue != null && !tmpDirValue.equals("")) {
     	this.tmpDir = tmpDirValue;
     	File tmpDirFile = new File(tmpDirValue);
