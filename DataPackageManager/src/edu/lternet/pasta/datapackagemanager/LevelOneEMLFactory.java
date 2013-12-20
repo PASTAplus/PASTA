@@ -313,7 +313,7 @@ public final class LevelOneEMLFactory {
             for (Entry<String, String> entry : entrySet) {
               String entryKey = entry.getKey();
               String entryValue = entry.getValue();
-              if (entryKey.equals(entityName)) {
+              if (entryKey.trim().equals(entityName.trim())) {
                 logger.debug("Matched entityName: " + entityName);
       
                 // Get the objectName
