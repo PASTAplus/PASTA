@@ -20,10 +20,8 @@ package edu.lternet.pasta.utilities.statistics;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * User: servilla
@@ -37,25 +35,128 @@ import java.util.Map;
  */
 public class GrowthStats {
 
+
+ /* Instance variables */
+
+  private DatabaseManager dbm = null;
+
+  private Long millis;
+  private Long seconds;
+  private Long minutes;
+  private Long hours;
+  private Long days;
+  private Long weeks;
+  private Long months;
+  private Long years;
+
+  private final GregorianCalendar now;
+
+ /* Class variables */
+
+  private static String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
+  private static int STARTDAY = 1;
+  private static String STARTHOUR = "00:00:00";
+  private static int ENDDAY = 7;
+  private static String ENDHOUR = "23:59:59";
+  private static int DAYSINWEEK = 7;
+  private static int WEEKSINYEAR = 52;
+
+  private static final Long milliPerSec = 1000L;
+  private static final Long secPerMin = 60L;
+  private static final Long minPerHour = 60L;
+  private static final Long hourPerDay = 24L;
+
+
+  // Create new calendar for PASTA origin at 2013-01-01 00:00:00
+  private static final GregorianCalendar origin = new GregorianCalendar(2013, 1, 1, 0, 0, 0);
+
  /* Constructors */
 
-  public GrowthStats(String dbUrl, String dbUser, String dbPassword) {
-
-    this.dbUrl = dbUrl;
-    this.dbUser = dbUser;
-    this.dbPassword = dbPassword;
+  public GrowthStats(String dbUrl, String dbUser, String dbPassword, String scale) {
 
     try {
-      this.dbm = new DatabaseManager(this.dbUrl, this.dbUser, this.dbPassword);
+      dbm = new DatabaseManager(dbUrl, dbUser, dbPassword);
     }
     catch (SQLException e) {
       System.err.printf("%s%n", e.getMessage());
       e.printStackTrace();
     }
 
+    now = new GregorianCalendar();
+
   }
 
  /* Instance methods */
+
+  /**
+   * Returns the Database Manager object.
+   *
+   * @return Database manager object
+   */
+  public DatabaseManager getDbm() {
+    return dbm;
+  }
+
+  private HashMap<String, Long> buildPackageHashMap(DatabaseManager dbm) {
+
+    HashMap<String, Long> map = new HashMap<String, Long>();
+
+    StringBuilder strBuilder = new StringBuilder();
+    strBuilder.append("SELECT scope,identifier,date_created FROM ");
+    strBuilder.append(RESOURCE_REGISTRY);
+    strBuilder.append(" WHERE resource_type='dataPackage' AND ");
+    strBuilder.append("date_deactivated IS NULL AND ");
+    strBuilder.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
+    strBuilder.append("ORDER BY date_created ASC;");
+
+    String sql = strBuilder.toString();
+
+    ResultSet rs = null;
+
+    try {
+      rs = dbm.doQuery(sql);
+    }
+    catch (SQLException e) {
+      System.err.printf("%s%n", e.getMessage());
+      e.printStackTrace();
+    }
+
+    String pkg;
+    Long date_created;
+
+    try {
+      while(rs.next()) {
+
+        pkg = rs.getString("scope") + "." + rs.getString("identifier");
+        date_created = rs.getDate("date_created").getTime();
+
+        if (!map.containsKey(pkg)) {
+          map.put(pkg,date_created);
+        }
+
+      }
+    }
+    catch (SQLException e) {
+      System.err.printf("%s%n", e.getMessage());
+      e.printStackTrace();
+    }
+
+    return map;
+
+  }
+
+  private Long[] buildList(HashMap<String, Long> map) {
+
+    Long[] list = new Long[map.size()];
+
+    int i = 0;
+    for (Map.Entry<String, Long> entry: map.entrySet()) {
+      list[i++] = entry.getValue();
+    }
+
+    return list;
+
+  }
 
   private HashMap<String, Integer> buildPackageHashMapForYear(int year) {
 
@@ -220,51 +321,19 @@ public class GrowthStats {
     String dbUrl = args[0];
     String dbUser = args[1];
     String dbPassword = args[2];
+    String scale = args[3];
     Integer upToWeek;
 
     Calendar now = Calendar.getInstance();
     upToWeek = now.get(Calendar.WEEK_OF_YEAR);
 
-    GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword);
+    GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword, scale);
 
-    HashMap<String, Integer> packageMap = gs.buildPackageHashMapForYear(2013);
-    int[] packageStats = gs.buildPackageStats(packageMap);
+    HashMap<String, Long> map = gs.buildPackageHashMap(gs.getDbm());
+    Long[] pkgList = gs.buildList(map);
 
-    HashMap<String, Integer> siteMap = gs.buildSiteHashMapForYear(2013);
-    int[] siteStats = gs.buildPackageStats(siteMap);
-
-    int pkgCount = 0;
-    int siteCount = 0;
-
-    // Generate Google chart data structure
-    for (int week = 0; week < upToWeek - 1; week++) {
-      pkgCount += packageStats[week];
-      siteCount += siteStats[week];
-      System.out.printf("['%d', %d, %d],%n", week + 1, pkgCount, siteCount);
-    }
-    pkgCount += packageStats[upToWeek - 1];
-    siteCount += siteStats[upToWeek - 1];
-    System.out.printf("['%d', %d, %d]%n", upToWeek, pkgCount, siteCount);
+    System.out.printf("List length: %d", pkgList.length);
 
   }
- 
- /* Instance variables */
-
-  DatabaseManager dbm = null;
-
-  private String dbUrl = null;
-  private String dbUser = null;
-  private String dbPassword = null;
-
- /* Class variables */
-
-  private static String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
-  private static int STARTDAY = 1;
-  private static String STARTHOUR = "00:00:00";
-  private static int ENDDAY = 7;
-  private static String ENDHOUR = "23:59:59";
-  private static int DAYSINWEEK = 7;
-  private static int WEEKSINYEAR = 52;
-
 
 }
