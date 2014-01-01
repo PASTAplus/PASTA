@@ -267,12 +267,18 @@ public class GrowthStats {
 
     Integer pkgCDist = 0;
     Integer siteCDist = 0;
+    int i;
 
-    for (int i = 0; i < labels.size(); i++) {
+    for (i = 0; i < labels.size() - 1; i++) {
       pkgCDist += pkgFreq.get(i);
       siteCDist += siteFreq.get(i);
       System.out.printf("['%s',%d,%d],%n", labels.get(i), pkgCDist, siteCDist);
     }
+
+    i = labels.size() - 1;
+    pkgCDist += pkgFreq.get(i);
+    siteCDist += siteFreq.get(i);
+    System.out.printf("['%s',%d,%d]%n", labels.get(i), pkgCDist, siteCDist);
 
   }
 
