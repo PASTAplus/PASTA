@@ -21,6 +21,7 @@ package edu.lternet.pasta.utilities.statistics;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -68,7 +69,7 @@ public class GrowthStats {
 
 
   // Create new calendar for PASTA origin at 2013-01-01 00:00:00
-  private static final GregorianCalendar origin = new GregorianCalendar(2013, 1, 1, 0, 0, 0);
+  private static final GregorianCalendar origin = new GregorianCalendar(2013, 0, 1, 0, 0, 0);
 
  /* Constructors */
 
@@ -97,19 +98,10 @@ public class GrowthStats {
     return dbm;
   }
 
-  private HashMap<String, Long> buildPackageHashMap(DatabaseManager dbm) {
+  private HashMap<String, Long> buildPackageHashMap(DatabaseManager dbm,
+                                                    String sql) {
 
     HashMap<String, Long> map = new HashMap<String, Long>();
-
-    StringBuilder strBuilder = new StringBuilder();
-    strBuilder.append("SELECT scope,identifier,date_created FROM ");
-    strBuilder.append(RESOURCE_REGISTRY);
-    strBuilder.append(" WHERE resource_type='dataPackage' AND ");
-    strBuilder.append("date_deactivated IS NULL AND ");
-    strBuilder.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
-    strBuilder.append("ORDER BY date_created ASC;");
-
-    String sql = strBuilder.toString();
 
     ResultSet rs = null;
 
@@ -121,19 +113,14 @@ public class GrowthStats {
       e.printStackTrace();
     }
 
-    String pkg;
-    Long date_created;
-
     try {
-      while(rs.next()) {
 
-        pkg = rs.getString("scope") + "." + rs.getString("identifier");
-        date_created = rs.getDate("date_created").getTime();
-
-        if (!map.containsKey(pkg)) {
-          map.put(pkg,date_created);
+      while (rs.next()) {
+        String key = rs.getString(1);
+        Long date_created = rs.getTimestamp(2).getTime();
+        if (!map.containsKey(key)) {
+          map.put(key, date_created);
         }
-
       }
     }
     catch (SQLException e) {
@@ -145,7 +132,7 @@ public class GrowthStats {
 
   }
 
-  private Long[] buildList(HashMap<String, Long> map) {
+  private Long[] buildSortedList(HashMap<String, Long> map) {
 
     Long[] list = new Long[map.size()];
 
@@ -154,164 +141,67 @@ public class GrowthStats {
       list[i++] = entry.getValue();
     }
 
+    Arrays.sort(list);
+
     return list;
 
   }
 
-  private HashMap<String, Integer> buildPackageHashMapForYear(int year) {
+  private ArrayList<String> buildLabels(GregorianCalendar start,
+                                        GregorianCalendar end,
+                                        int scale) {
 
-    HashMap<String, Integer> map = new HashMap<String, Integer>();
+    ArrayList<String> labels = new ArrayList<String>();
 
-    for (Integer week = 1; week <= WEEKSINYEAR; week++) {
-      for (String pkg: dataPackagesForWeek(year, week)) {
-        if (!map.containsKey(pkg)) {
-          map.put(pkg, week);
-        }
-      }
+    GregorianCalendar lower = (GregorianCalendar) start.clone();
+    GregorianCalendar upper = new GregorianCalendar();
+    GregorianCalendar split = new GregorianCalendar();
+
+    while (lower.getTimeInMillis() <= end.getTimeInMillis()) {
+      upper.setTime(lower.getTime());
+      upper.add(scale, 1);
+      split.setTime(new Date(lower.getTimeInMillis() +
+        (upper.getTimeInMillis() - lower.getTimeInMillis()) / 2));
+      labels.add(getLabel(scale, split));
+      lower.setTime(upper.getTime());
     }
 
-    return map;
+    return labels;
 
   }
 
-  private HashMap<String, Integer> buildSiteHashMapForYear(int year) {
+  private String getLabel(int scale, GregorianCalendar date) {
 
-    HashMap<String, Integer> map = new HashMap<String, Integer>();
+    String label = null;
 
-    for (Integer week = 1; week <= WEEKSINYEAR; week++) {
-      for (String site: sitesForWeek(year, week)) {
-        if (!map.containsKey(site)) {
-          map.put(site, week);
-        }
-      }
+    SimpleDateFormat formatter;
+
+    switch (scale) {
+      case Calendar.HOUR:
+        formatter = new SimpleDateFormat("kk00 yyyy-MMM-d");
+        label = formatter.format(date.getTime());
+        break;
+      case Calendar.DAY_OF_MONTH:
+        formatter = new SimpleDateFormat("yyyy-MMM-d");
+        label = formatter.format(date.getTime());
+        break;
+      case Calendar.WEEK_OF_YEAR:
+        formatter = new SimpleDateFormat("w yyyy");
+        label = formatter.format(date.getTime());
+        break;
+      case Calendar.MONTH:
+        formatter = new SimpleDateFormat("MMM yyyy");
+        label = formatter.format(date.getTime());
+        break;
+      case Calendar.YEAR:
+        formatter = new SimpleDateFormat("yyyy");
+        label = formatter.format(date.getTime());
+        break;
+      default:
+        label = date.getTime().toString();
     }
 
-    return map;
-
-  }
-
-  private int[] buildPackageStats(HashMap<String, Integer> packageHashMap) {
-
-    int[] packageStats = new int[WEEKSINYEAR];
-
-    // Initialize each cell to 0
-    for (int i = 0; i < WEEKSINYEAR; i++) {
-      packageStats[i] = 0;
-    }
-
-    for (Map.Entry<String, Integer> entry: packageHashMap.entrySet()) {
-      packageStats[entry.getValue() - 1]++;
-    }
-
-    return packageStats;
-
-  }
-
-  private ArrayList<String> dataPackagesForWeek(int year, int week) {
-
-    String startDate = this.weekStartToDate(year, week);
-    String endDate = this.weekEndToDate(year, week);
-
-    String sql = "SELECT distinct scope, identifier FROM "
-      + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
-      + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
-      + "AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
-
-    ResultSet rs = null;
-
-    try {
-      rs = this.dbm.doQuery(sql);
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
-
-    ArrayList<String> dataPackages = new ArrayList<String>();
-
-    try {
-      for (String[] pkg: dbm.resultSetAsString(rs)) {
-        dataPackages.add(pkg[0] + "." + pkg[1]);
-      }
-
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
-
-    return dataPackages;
-
-  }
-
-  private ArrayList<String> sitesForWeek(int year, int week) {
-
-    String startDate = this.weekStartToDate(year, week);
-    String endDate = this.weekEndToDate(year, week);
-
-    String sql = "SELECT distinct scope FROM "
-      + RESOURCE_REGISTRY + " WHERE date_created >= " + startDate + " AND "
-      + " date_created <= " + endDate + " AND scope LIKE 'knb-lter-%' "
-      + " AND date_deactivated IS NULL AND NOT scope='knb-lter-nwk'";
-
-    ResultSet rs = null;
-
-    try {
-      rs = this.dbm.doQuery(sql);
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
-
-    ArrayList<String> sites = new ArrayList<String>();
-
-    try {
-      for (String[] site: dbm.resultSetAsString(rs)) {
-        sites.add(site[0]);
-      }
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
-
-    return sites;
-
-  }
-
-  private String weekEndToDate(int year, int week) {
-
-    int dayOfYear = ((week - 1) * DAYSINWEEK) + ENDDAY;
-
-    Calendar now = Calendar.getInstance();
-    now.set(Calendar.YEAR, year);
-    now.set(Calendar.DAY_OF_YEAR, dayOfYear);
-
-    String yearStr = Integer.toString(now.get(Calendar.YEAR));
-    String monthStr = Integer.toString(now.get(Calendar.MONTH) + 1);
-    String dayStr = Integer.toString(now.get(Calendar.DAY_OF_MONTH));
-
-    String date = "'" + yearStr + "-" + monthStr + "-" + dayStr + " 23:59:59'";
-    return date;
-
-  }
-
-  private String weekStartToDate(int year, int week) {
-
-    int dayOfYear = ((week - 1) * DAYSINWEEK) + STARTDAY;
-
-    Calendar now = Calendar.getInstance();
-    now.set(Calendar.YEAR, year);
-    now.set(Calendar.DAY_OF_YEAR, dayOfYear);
-
-    String yearStr = Integer.toString(now.get(Calendar.YEAR));
-    String monthStr = Integer.toString(now.get(Calendar.MONTH) + 1);
-    String dayStr = Integer.toString(now.get(Calendar.DAY_OF_MONTH));
-
-    String date = "'" + yearStr + "-" + monthStr + "-" + dayStr + " 00:00:00'";
-    return date;
-
+    return label;
   }
 
  /* Class methods */
@@ -322,18 +212,43 @@ public class GrowthStats {
     String dbUser = args[1];
     String dbPassword = args[2];
     String scale = args[3];
-    Integer upToWeek;
 
-    Calendar now = Calendar.getInstance();
-    upToWeek = now.get(Calendar.WEEK_OF_YEAR);
+    GregorianCalendar now = new GregorianCalendar();
 
     GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword, scale);
 
-    HashMap<String, Long> map = gs.buildPackageHashMap(gs.getDbm());
-    Long[] pkgList = gs.buildList(map);
+    StringBuilder pkgSql = new StringBuilder();
+    pkgSql.append("SELECT scope || '.' || identifier,date_created FROM ");
+    pkgSql.append(RESOURCE_REGISTRY);
+    pkgSql.append(" WHERE resource_type='dataPackage' AND ");
+    pkgSql.append("date_deactivated IS NULL AND ");
+    pkgSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
+    pkgSql.append("ORDER BY date_created ASC;");
 
-    System.out.printf("List length: %d", pkgList.length);
+    HashMap<String, Long> pkgMap = gs.buildPackageHashMap(gs.getDbm(), pkgSql.toString());
+    Long[] pkgList = gs.buildSortedList(pkgMap);
 
+    System.out.printf("Packages: %d%n", pkgList.length);
+
+    StringBuilder siteSql = new StringBuilder();
+    siteSql.append("SELECT scope,date_created FROM ");
+    siteSql.append(RESOURCE_REGISTRY);
+    siteSql.append(" WHERE resource_type='dataPackage' AND ");
+    siteSql.append("date_deactivated IS NULL AND ");
+    siteSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
+    siteSql.append("ORDER BY date_created ASC;");
+
+    HashMap<String, Long> siteMap = gs.buildPackageHashMap(gs.getDbm(), siteSql.toString());
+    Long[] siteList = gs.buildSortedList(siteMap);
+
+    System.out.printf("Sites: %d%n", siteList.length);
+
+    ArrayList<String> labels = gs.buildLabels(origin, now, Calendar.MONTH);
+
+    for (String label: labels) {
+      System.out.printf("%s%n", label);
+    }
+    
   }
 
 }
