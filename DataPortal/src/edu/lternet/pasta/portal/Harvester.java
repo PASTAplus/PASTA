@@ -190,7 +190,10 @@ public class Harvester implements Runnable {
    * Reads the contents of the document URL into a string.
    */
   private String emlStringFromURL(String documentURL) throws IOException {
-    String emlString = null;
+
+    String emlString;
+
+    logger.info("Shazzam!: " + documentURL);
 
     URL url = new URL(documentURL);
     InputStream inputStream = url.openStream();

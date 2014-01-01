@@ -16,12 +16,16 @@
  * language governing permissions and limitations under the License.
  */
 
-package edu.lternet.pasta.utilities.statistics;
+package edu.lternet.pasta.portal.statistics;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import edu.lternet.pasta.portal.ConfigurationListener;
+import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
+
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 /**
  * User: servilla
@@ -31,75 +35,107 @@ import java.util.*;
  * Project: Utilities
  * Package: edu.lternet.pasta.utilities.statistics
  * <p/>
- * <class description>
+ * Generate data package and site growth statistics for PASTA.
  */
 public class GrowthStats {
 
 
  /* Instance variables */
 
-  private DatabaseManager dbm = null;
+  private Connection conn = null;
 
  /* Class variables */
 
-  private static String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
+  private static final Logger logger = Logger.getLogger(GrowthStats.class);
+  private static final String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
 
   // Create new calendar for PASTA origin at 2013-01-01 00:00:00
   private static final GregorianCalendar origin = new GregorianCalendar(2013, 0, 1, 0, 0, 0);
 
  /* Constructors */
 
-  public GrowthStats(String dbUrl, String dbUser, String dbPassword, String scale) {
+  public GrowthStats() throws SQLException, ClassNotFoundException {
 
-    try {
-      dbm = new DatabaseManager(dbUrl, dbUser, dbPassword);
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
+    String dbUrl = "jdbc:postgresql://package.lternet.edu:5432/pasta";
+
+    Configuration options = ConfigurationListener.getOptions();
+
+    String dbDriver = options.getString("db.Driver");
+    String dbUser = options.getString("db.User");
+    String dbPassword = options.getString("db.Password");
+
+    Class.forName(dbDriver);
+    conn = getConnection(dbUrl, dbUser, dbPassword);
 
   }
 
  /* Instance methods */
 
-  /**
-   * Returns the Database Manager object.
-   *
-   * @return Database manager object
-   */
-  public DatabaseManager getDbm() {
-    return dbm;
+  public String getGoogleChartJson(GregorianCalendar now, int scale)
+      throws SQLException {
+
+    StringBuilder pkgSql = new StringBuilder();
+    pkgSql.append("SELECT scope || '.' || identifier,date_created FROM ");
+    pkgSql.append(RESOURCE_REGISTRY);
+    pkgSql.append(" WHERE resource_type='dataPackage' AND ");
+    pkgSql.append("date_deactivated IS NULL AND ");
+    pkgSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
+    pkgSql.append("ORDER BY date_created ASC;");
+
+    HashMap<String, Long> pkgMap = buildHashMap(pkgSql.toString());
+    Long[] pkgList = buildSortedList(pkgMap);
+
+    StringBuilder siteSql = new StringBuilder();
+    siteSql.append("SELECT scope,date_created FROM ");
+    siteSql.append(RESOURCE_REGISTRY);
+    siteSql.append(" WHERE resource_type='dataPackage' AND ");
+    siteSql.append("date_deactivated IS NULL AND ");
+    siteSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
+    siteSql.append("ORDER BY date_created ASC;");
+
+    HashMap<String, Long> siteMap = buildHashMap(siteSql.toString());
+    Long[] siteList = buildSortedList(siteMap);
+
+    ArrayList<String> labels = buildLabels(origin, now, scale);
+    ArrayList<Integer> pkgFreq = buildFrequencies(origin, now, scale, pkgList);
+    ArrayList<Integer> siteFreq = buildFrequencies(origin, now, scale, siteList);
+
+    Integer pkgCDist = 0;
+    Integer siteCDist = 0;
+    int i;
+
+    StringBuilder json = new StringBuilder();
+
+    for (i = 0; i < labels.size() - 1; i++) {
+      pkgCDist += pkgFreq.get(i);
+      siteCDist += siteFreq.get(i);
+      json.append(String.format("['%s',%d,%d],%n", labels.get(i), pkgCDist,
+                                   siteCDist));
+    }
+
+    i = labels.size() - 1;
+    pkgCDist += pkgFreq.get(i);
+    siteCDist += siteFreq.get(i);
+    json.append(String.format("['%s',%d,%d]%n", labels.get(i), pkgCDist,
+                                 siteCDist));
+
+    return json.toString();
+
   }
 
-  private HashMap<String, Long> buildHashMap(DatabaseManager dbm,
-                                             String sql) {
+  private HashMap<String, Long> buildHashMap(String sql) throws SQLException {
 
     HashMap<String, Long> map = new HashMap<String, Long>();
 
-    ResultSet rs = null;
+    Statement stmnt = conn.createStatement();
+    ResultSet rs = stmnt.executeQuery(sql);
 
-    try {
-      rs = dbm.doQuery(sql);
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
-    }
-
-    try {
-
-      while (rs.next()) {
-        String key = rs.getString(1);
-        Long date_created = rs.getTimestamp(2).getTime();
-        if (!map.containsKey(key)) {
-          map.put(key, date_created);
-        }
+    while (rs.next()) {
+      String key = rs.getString(1);
+      Long date_created = rs.getTimestamp(2).getTime();
+      if (!map.containsKey(key)) {
+        map.put(key, date_created);
       }
-    }
-    catch (SQLException e) {
-      System.err.printf("%s%n", e.getMessage());
-      e.printStackTrace();
     }
 
     return map;
@@ -214,71 +250,50 @@ public class GrowthStats {
 
   }
 
+  private Connection getConnection(String dbUrl, String dbUser, String dbPassword)
+      throws SQLException {
+
+    Connection conn = null;
+    SQLWarning warn;
+
+    conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+
+    // If a SQLWarning object is available, print its warning(s).
+    // There may be multiple warnings chained.
+    warn = conn.getWarnings();
+
+    if (warn != null) {
+      while (warn != null) {
+        logger.error("SQLState: " + warn.getSQLState());
+        logger.error("Message:  " + warn.getMessage());
+        logger.error("Vendor: " + warn.getErrorCode());
+        warn = warn.getNextWarning();
+      }
+    }
+
+    return conn;
+  }
+
+
  /* Class methods */
 
   public static void main(String[] args) {
 
-    String dbUrl = args[0];
-    String dbUser = args[1];
-    String dbPassword = args[2];
-    String scale = args[3];
 
+    ConfigurationListener.configure();
     GregorianCalendar now = new GregorianCalendar();
 
-    GrowthStats gs = new GrowthStats(dbUrl, dbUser, dbPassword, scale);
-
-    StringBuilder pkgSql = new StringBuilder();
-    pkgSql.append("SELECT scope || '.' || identifier,date_created FROM ");
-    pkgSql.append(RESOURCE_REGISTRY);
-    pkgSql.append(" WHERE resource_type='dataPackage' AND ");
-    pkgSql.append("date_deactivated IS NULL AND ");
-    pkgSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
-    pkgSql.append("ORDER BY date_created ASC;");
-
-    HashMap<String, Long> pkgMap = gs.buildHashMap(gs.getDbm(),
-                                                      pkgSql.toString());
-    Long[] pkgList = gs.buildSortedList(pkgMap);
-
-    System.out.printf("Packages: %d%n", pkgList.length);
-
-    StringBuilder siteSql = new StringBuilder();
-    siteSql.append("SELECT scope,date_created FROM ");
-    siteSql.append(RESOURCE_REGISTRY);
-    siteSql.append(" WHERE resource_type='dataPackage' AND ");
-    siteSql.append("date_deactivated IS NULL AND ");
-    siteSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
-    siteSql.append("ORDER BY date_created ASC;");
-
-    HashMap<String, Long> siteMap = gs.buildHashMap(gs.getDbm(),
-                                                       siteSql.toString());
-    Long[] siteList = gs.buildSortedList(siteMap);
-
-    System.out.printf("Sites: %d%n", siteList.length);
-
-    ArrayList<String> labels = gs.buildLabels(origin, now, Calendar.MONTH);
-
-    System.out.printf("Label size: %d%n", labels.size());
-
-    ArrayList<Integer> pkgFreq = gs.buildFrequencies(origin, now, Calendar.MONTH, pkgList);
-
-    System.out.printf("Pkg freq size: %d%n", pkgFreq.size());
-
-    ArrayList<Integer> siteFreq = gs.buildFrequencies(origin, now, Calendar.MONTH, siteList);
-
-    Integer pkgCDist = 0;
-    Integer siteCDist = 0;
-    int i;
-
-    for (i = 0; i < labels.size() - 1; i++) {
-      pkgCDist += pkgFreq.get(i);
-      siteCDist += siteFreq.get(i);
-      System.out.printf("['%s',%d,%d],%n", labels.get(i), pkgCDist, siteCDist);
+    GrowthStats gs = null;
+    try {
+      gs = new GrowthStats();
+      System.out.print(gs.getGoogleChartJson(now, Calendar.MONTH));
     }
-
-    i = labels.size() - 1;
-    pkgCDist += pkgFreq.get(i);
-    siteCDist += siteFreq.get(i);
-    System.out.printf("['%s',%d,%d]%n", labels.get(i), pkgCDist, siteCDist);
+    catch (SQLException e) {
+      e.printStackTrace();
+    }
+    catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
 
   }
 
