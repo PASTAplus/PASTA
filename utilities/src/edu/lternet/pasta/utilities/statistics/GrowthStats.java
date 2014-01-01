@@ -40,32 +40,9 @@ public class GrowthStats {
 
   private DatabaseManager dbm = null;
 
-  private Long millis;
-  private Long seconds;
-  private Long minutes;
-  private Long hours;
-  private Long days;
-  private Long weeks;
-  private Long months;
-  private Long years;
-
-  private final GregorianCalendar now;
-
  /* Class variables */
 
   private static String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
-  private static int STARTDAY = 1;
-  private static String STARTHOUR = "00:00:00";
-  private static int ENDDAY = 7;
-  private static String ENDHOUR = "23:59:59";
-  private static int DAYSINWEEK = 7;
-  private static int WEEKSINYEAR = 52;
-
-  private static final Long milliPerSec = 1000L;
-  private static final Long secPerMin = 60L;
-  private static final Long minPerHour = 60L;
-  private static final Long hourPerDay = 24L;
-
 
   // Create new calendar for PASTA origin at 2013-01-01 00:00:00
   private static final GregorianCalendar origin = new GregorianCalendar(2013, 0, 1, 0, 0, 0);
@@ -81,8 +58,6 @@ public class GrowthStats {
       System.err.printf("%s%n", e.getMessage());
       e.printStackTrace();
     }
-
-    now = new GregorianCalendar();
 
   }
 
