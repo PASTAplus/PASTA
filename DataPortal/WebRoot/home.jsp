@@ -1,30 +1,25 @@
 <!--
-
- $Date$
- $Author$
- $Revision$
- 
- Copyright 2011,2012 the University of New Mexico.
- 
- This work was supported by National Science Foundation Cooperative
- Agreements #DEB-0832652 and #DEB-0936498.
- 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0.
- 
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- either express or implied. See the License for the specific
- language governing permissions and limitations under the License.
-
- -->
+  ~ Copyright 2011-2013 the University of New Mexico.
+  ~
+  ~ This work was supported by National Science Foundation Cooperative
+  ~ Agreements #DEB-0832652 and #DEB-0936498.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0.
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  ~ either express or implied. See the License for the specific
+  ~ language governing permissions and limitations under the License.
+  -->
 
 <%@ page language="java" import="java.util.*" pageEncoding="ISO-8859-1"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms"%>
 <%@ page import="edu.lternet.pasta.portal.PastaStatistics"%>
+<%@ page import="edu.lternet.pasta.portal.statistics.GrowthStats"%>
 <%
 	HttpSession httpSession = request.getSession();
 	httpSession.setAttribute("menuid", "home");
@@ -68,7 +63,20 @@
 				numDataPackagesSites.toString());
 	}
 
- String hover = "New user registration for non-LTER members coming soon!";
+    GrowthStats gs = new GrowthStats();
+    String json;
+    String googleChartJson;
+    GregorianCalendar now = new GregorianCalendar();
+
+    json = (String) httpSession.getAttribute("googleChartJson");
+    if (json != null) {
+        googleChartJson = json;
+    } else {
+        googleChartJson = gs.getGoogleChartJson(now, Calendar.MONTH);
+        httpSession.setAttribute("googleChartJson", googleChartJson);
+    }
+
+    String hover = "New user registration for non-LTER members coming soon!";
 
 %>
 
@@ -125,19 +133,7 @@
 		data.addColumn('number', 'Packages');
 		data.addColumn('number', 'Sites');
 		data.addRows([
-            ['Jan 2013',368,7],
-            ['Feb 2013',619,10],
-            ['Mar 2013',760,12],
-            ['Apr 2013',902,13],
-            ['May 2013',1342,15],
-            ['Jun 2013',1460,16],
-            ['Jul 2013',1729,19],
-            ['Aug 2013',1824,20],
-            ['Sep 2013',2055,21],
-            ['Oct 2013',2762,23],
-            ['Nov 2013',3163,23],
-            ['Dec 2013',3771,23],
-            ['Jan 2014',3771,23]
+            <%=googleChartJson%>
 		]);
 
 		// Set chart options
