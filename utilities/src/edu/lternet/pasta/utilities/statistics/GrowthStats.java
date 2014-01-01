@@ -20,7 +20,6 @@ package edu.lternet.pasta.utilities.statistics;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -98,8 +97,8 @@ public class GrowthStats {
     return dbm;
   }
 
-  private HashMap<String, Long> buildPackageHashMap(DatabaseManager dbm,
-                                                    String sql) {
+  private HashMap<String, Long> buildHashMap(DatabaseManager dbm,
+                                             String sql) {
 
     HashMap<String, Long> map = new HashMap<String, Long>();
 
@@ -161,7 +160,12 @@ public class GrowthStats {
       upper.setTime(lower.getTime());
       upper.add(scale, 1);
       split.setTime(new Date(lower.getTimeInMillis() +
-        (upper.getTimeInMillis() - lower.getTimeInMillis()) / 2));
+                                 (upper.getTimeInMillis() - lower.getTimeInMillis()) / 2));
+      /*
+      System.out.printf("%s-%s-%s%n", lower.getTime().toString(),
+                           split.getTime().toString(),
+                           upper.getTime().toString());
+       */
       labels.add(getLabel(scale, split));
       lower.setTime(upper.getTime());
     }
@@ -204,6 +208,37 @@ public class GrowthStats {
     return label;
   }
 
+  private ArrayList<Integer> buildFrequencies(GregorianCalendar start,
+                                              GregorianCalendar end,
+                                              int scale, Long[] list) {
+
+    ArrayList<Integer> freqs = new ArrayList<Integer>();
+
+    GregorianCalendar lower = (GregorianCalendar) start.clone();
+    GregorianCalendar upper = new GregorianCalendar();
+
+    while (lower.getTimeInMillis() <= end.getTimeInMillis()) {
+      upper.setTime(lower.getTime());
+      upper.add(scale, 1);
+
+      int freq = 0;
+
+      for (int i = 0; i < list.length; i++) {
+        if (lower.getTimeInMillis() <= list[i] &&
+            list[i] < upper.getTimeInMillis()) {
+          freq++;
+          //System.out.printf("%d - %d - %d - %d%n", lower.getTimeInMillis(), list[i], upper.getTimeInMillis(), freq);
+        }
+      }
+      freqs.add(freq);
+      lower.setTime(upper.getTime());
+
+    }
+
+    return freqs;
+
+  }
+
  /* Class methods */
 
   public static void main(String[] args) {
@@ -225,7 +260,8 @@ public class GrowthStats {
     pkgSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
     pkgSql.append("ORDER BY date_created ASC;");
 
-    HashMap<String, Long> pkgMap = gs.buildPackageHashMap(gs.getDbm(), pkgSql.toString());
+    HashMap<String, Long> pkgMap = gs.buildHashMap(gs.getDbm(),
+                                                      pkgSql.toString());
     Long[] pkgList = gs.buildSortedList(pkgMap);
 
     System.out.printf("Packages: %d%n", pkgList.length);
@@ -238,17 +274,31 @@ public class GrowthStats {
     siteSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
     siteSql.append("ORDER BY date_created ASC;");
 
-    HashMap<String, Long> siteMap = gs.buildPackageHashMap(gs.getDbm(), siteSql.toString());
+    HashMap<String, Long> siteMap = gs.buildHashMap(gs.getDbm(),
+                                                       siteSql.toString());
     Long[] siteList = gs.buildSortedList(siteMap);
 
     System.out.printf("Sites: %d%n", siteList.length);
 
     ArrayList<String> labels = gs.buildLabels(origin, now, Calendar.MONTH);
 
-    for (String label: labels) {
-      System.out.printf("%s%n", label);
+    System.out.printf("Label size: %d%n", labels.size());
+
+    ArrayList<Integer> pkgFreq = gs.buildFrequencies(origin, now, Calendar.MONTH, pkgList);
+
+    System.out.printf("Pkg freq size: %d%n", pkgFreq.size());
+
+    ArrayList<Integer> siteFreq = gs.buildFrequencies(origin, now, Calendar.MONTH, siteList);
+
+    Integer pkgCDist = 0;
+    Integer siteCDist = 0;
+
+    for (int i = 0; i < labels.size(); i++) {
+      pkgCDist += pkgFreq.get(i);
+      siteCDist += siteFreq.get(i);
+      System.out.printf("['%s',%d,%d],%n", labels.get(i), pkgCDist, siteCDist);
     }
-    
+
   }
 
 }
