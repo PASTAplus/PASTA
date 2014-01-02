@@ -63,15 +63,11 @@
 				numDataPackagesSites.toString());
 	}
 
-    GrowthStats gs = new GrowthStats();
-    String json;
-    String googleChartJson;
     GregorianCalendar now = new GregorianCalendar();
 
-    json = (String) httpSession.getAttribute("googleChartJson");
-    if (json != null) {
-        googleChartJson = json;
-    } else {
+    String googleChartJson = (String) httpSession.getAttribute("googleChartJson");
+    if (googleChartJson == null) {
+        GrowthStats gs = new GrowthStats();
         googleChartJson = gs.getGoogleChartJson(now, Calendar.MONTH);
         httpSession.setAttribute("googleChartJson", googleChartJson);
     }
