@@ -54,25 +54,36 @@ public class GrowthStats {
 
  /* Constructors */
 
-  public GrowthStats() throws SQLException, ClassNotFoundException {
-
-    String dbUrl = "jdbc:postgresql://package.lternet.edu:5432/pasta";
+  public GrowthStats() {
 
     Configuration options = ConfigurationListener.getOptions();
 
     String dbDriver = options.getString("db.Driver");
+    String dbUrl = options.getString("db.pkg.URL");
     String dbUser = options.getString("db.User");
     String dbPassword = options.getString("db.Password");
 
-    Class.forName(dbDriver);
-    conn = getConnection(dbUrl, dbUser, dbPassword);
+    try {
+      Class.forName(dbDriver);
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("GrowthStats: " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    try {
+      conn = getConnection(dbUrl, dbUser, dbPassword);
+    }
+    catch (SQLException e) {
+      logger.error("GrowthStats: " + e.getMessage());
+      e.printStackTrace();
+    }
 
   }
 
  /* Instance methods */
 
-  public String getGoogleChartJson(GregorianCalendar now, int scale)
-      throws SQLException {
+  public String getGoogleChartJson(GregorianCalendar now, int scale) {
 
     StringBuilder pkgSql = new StringBuilder();
     pkgSql.append("SELECT scope || '.' || identifier,date_created FROM ");
@@ -82,7 +93,17 @@ public class GrowthStats {
     pkgSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
     pkgSql.append("ORDER BY date_created ASC;");
 
-    HashMap<String, Long> pkgMap = buildHashMap(pkgSql.toString());
+    HashMap<String, Long> pkgMap;
+
+    try {
+      pkgMap = buildHashMap(pkgSql.toString());
+    }
+    catch (SQLException e) {
+      logger.error("getGoogleChartJson: " + e.getMessage());
+      e.printStackTrace();
+      pkgMap = new HashMap<String, Long>(); // Create empty package map
+    }
+
     Long[] pkgList = buildSortedList(pkgMap);
 
     StringBuilder siteSql = new StringBuilder();
@@ -93,7 +114,16 @@ public class GrowthStats {
     siteSql.append("scope LIKE 'knb-lter-%' AND NOT scope='knb-lter-nwk' ");
     siteSql.append("ORDER BY date_created ASC;");
 
-    HashMap<String, Long> siteMap = buildHashMap(siteSql.toString());
+    HashMap<String, Long> siteMap = null;
+    try {
+      siteMap = buildHashMap(siteSql.toString());
+    }
+    catch (SQLException e) {
+      logger.error("getGoogleChartJson: " + e.getMessage());
+      e.printStackTrace();
+      siteMap = new HashMap<String, Long>(); // Create empty site map
+    }
+
     Long[] siteList = buildSortedList(siteMap);
 
     ArrayList<String> labels = buildLabels(origin, now, scale);
@@ -127,14 +157,16 @@ public class GrowthStats {
 
     HashMap<String, Long> map = new HashMap<String, Long>();
 
-    Statement stmnt = conn.createStatement();
-    ResultSet rs = stmnt.executeQuery(sql);
+    if (conn != null) {
+      Statement stmnt = conn.createStatement();
+      ResultSet rs = stmnt.executeQuery(sql);
 
-    while (rs.next()) {
-      String key = rs.getString(1);
-      Long date_created = rs.getTimestamp(2).getTime();
-      if (!map.containsKey(key)) {
-        map.put(key, date_created);
+      while (rs.next()) {
+        String key = rs.getString(1);
+        Long date_created = rs.getTimestamp(2).getTime();
+        if (!map.containsKey(key)) {
+          map.put(key, date_created);
+        }
       }
     }
 
@@ -283,17 +315,8 @@ public class GrowthStats {
     ConfigurationListener.configure();
     GregorianCalendar now = new GregorianCalendar();
 
-    GrowthStats gs = null;
-    try {
-      gs = new GrowthStats();
-      System.out.print(gs.getGoogleChartJson(now, Calendar.MONTH));
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-    }
-    catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
+    GrowthStats gs = new GrowthStats();
+    System.out.print(gs.getGoogleChartJson(now, Calendar.MONTH));
 
   }
 
