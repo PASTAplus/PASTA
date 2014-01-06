@@ -4,6 +4,7 @@
 db.Adapter=PostgresAdapter
 db.Driver=org.postgresql.Driver
 db.URL=jdbc:postgresql://localhost/pasta
+db.pkg.URL=jdbc:postgresql://package.lternet.edu:5432/pasta
 db.ServerName=localhost
 db.Name=pasta
 db.User=pasta

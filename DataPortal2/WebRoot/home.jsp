@@ -1,6 +1,43 @@
+<!--
+  ~ Copyright 2011-2013 the University of New Mexico.
+  ~
+  ~ This work was supported by National Science Foundation Cooperative
+  ~ Agreements #DEB-0832652 and #DEB-0936498.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0.
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  ~ either express or implied. See the License for the specific
+  ~ language governing permissions and limitations under the License.
+  -->
+
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.search.LTERTerms"%>
 <%@ page import="edu.lternet.pasta.portal.PastaStatistics"%>
+<%@ page import="edu.lternet.pasta.portal.statistics.GrowthStats"%>
 
 <%
+	HttpSession httpSession = request.getSession();
+	httpSession.setAttribute("menuid", "home");
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+
+	String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+
+	if (uid == null || uid.isEmpty()) {
+		uid = "public";
+	}
+
 	// Generate PASTA data package statistics and store values in session.
 
 	Integer numDataPackages = null;
@@ -9,25 +46,34 @@
 
 	PastaStatistics pastaStats = new PastaStatistics("public");
 
-	count = (String) session.getAttribute("numDataPackages");
+	count = (String) httpSession.getAttribute("numDataPackages");
 	if (count != null) {
 		numDataPackages = Integer.valueOf(count);
 	} else {
 		numDataPackages = pastaStats.getNumDataPackages();
-		session.setAttribute("numDataPackages",
+		httpSession.setAttribute("numDataPackages",
 				numDataPackages.toString());
 	}
 
-	count = (String) session.getAttribute("numDataPackagesSites");
+	count = (String) httpSession.getAttribute("numDataPackagesSites");
 	if (count != null) {
 		numDataPackagesSites = Integer.valueOf(count);
 	} else {
 		numDataPackagesSites = pastaStats.getNumDataPackagesSites();
-		session.setAttribute("numDataPackagesSites",
+		httpSession.setAttribute("numDataPackagesSites",
 				numDataPackagesSites.toString());
 	}
 
- String hover = "New user registration for non-LTER members coming soon!";
+    GregorianCalendar now = new GregorianCalendar();
+
+    String googleChartJson = (String) httpSession.getAttribute("googleChartJson");
+    if (googleChartJson == null) {
+        GrowthStats gs = new GrowthStats();
+        googleChartJson = gs.getGoogleChartJson(now, Calendar.MONTH);
+        httpSession.setAttribute("googleChartJson", googleChartJson);
+    }
+
+    String hover = "New user registration for non-LTER members coming soon!";
 
 %>
 
@@ -85,58 +131,21 @@
 
 		// Create the data table.
 		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Week');
+		data.addColumn('string', 'Month');
 		data.addColumn('number', 'Packages');
 		data.addColumn('number', 'Sites');
-		data.addRows([ 
-			['1', 0, 0],
-			['2', 210, 5],
-			['3', 281, 7],
-			['4', 347, 7],
-			['5', 374, 7],
-			['6', 430, 8],
-			['7', 436, 8],
-			['8', 454, 9],
-			['9', 657, 10],
-			['10', 684, 10],
-			['11', 708, 10],
-			['12', 746, 10],
-			['13', 763, 12],
-			['14', 766, 12],
-			['15', 829, 12],
-			['16', 849, 12],
-			['17', 894, 13],
-			['18', 928, 13],
-			['19', 936, 13],
-			['20', 1142, 15],
-			['21', 1274, 15],
-			['22', 1346, 15],
-			['23', 1404, 16],
-			['24', 1430, 16],
-			['25', 1451, 16],
-			['26', 1461, 16],
-			['27', 1466, 17],
-			['28', 1484, 17],
-			['29', 1717, 19],
-			['30', 1729, 19],
-			['31', 1734, 19],
-			['32', 1777, 20],
-			['33', 1787, 20],
-			['34', 1810, 20],
-			['35', 1824, 20],
-			['36', 1955, 21],
-			['37', 1966, 21],
-			['38', 1971, 21]
+		data.addRows([
+            <%=googleChartJson%>
 		]);
 
 		// Set chart options
 		var options = {
 			'title' : '',
-			'width' : 400,
-			'height' : 200,
-			'hAxis' : {
-				title : 'Week'
-			},
+			'width' : 500,
+			'height' : 300,
+
+
+
 			'vAxes' : {
 				0 : {
 					logScale : false
@@ -148,7 +157,8 @@
 			},
 			'series' : {
 				0 : {
-					targetAxisIndex : 0
+					targetAxisIndex : 0,
+                    type : "line"
 				},
 				1 : {
 					targetAxisIndex : 1
