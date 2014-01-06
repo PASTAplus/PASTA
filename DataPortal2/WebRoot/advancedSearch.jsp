@@ -260,7 +260,7 @@
 														  <tr>
 															  <td>
 															    <!-- <h3 class="separator_border labelBold span1" for="advancedsearch">Geographic Place Name</h3> -->
-															    <label>Geographic Place Name:</label>
+															    <label class="labelBold">Geographic Place Name:</label>
 															  </td>
 														  </tr>
 														  <tr>
@@ -449,7 +449,7 @@
 														  -->
 														  <tr>
 															  <td>
-															    <label>Creator&#39;s Last Name:</label>
+															    <label class="labelBold">Creator&#39;s Last Name:</label>
 															    <select name="creatorSurnameQueryType">
 															      <option selected="selected" value="0">contains</option>
 															      <option value="1">matches exactly</option>
@@ -461,7 +461,7 @@
 														  </tr>
 														  <tr>
 															  <td>
-															    <label>Creator&#39;s Organization:</label>
+															    <label class="labelBold">Creator&#39;s Organization:</label>
 															    <select name="creatorOrganizationQueryType">
 															      <option selected="selected" value="0">contains</option>
 															      <option value="1">matches exactly</option>
@@ -528,12 +528,12 @@
 													  <table>
 														  <tr>
 															  <td>
-															    <label for="userId">Start Date:</label>
+															    <label class="labelBold" for="userId">Start Date:</label>
 															    <input name="startDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 															  </td>
 															  <td></td>
 															  <td>
-															    <label for="group">End Date:</label>
+															    <label class="labelBold" for="group">End Date:</label>
 															    <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
 															  </td>
 															  <td></td>
@@ -554,7 +554,7 @@
 														  </tr>
 														  <tr>
 															  <td>
-															    <label>Named Time-scale:</label>
+															    <label class="labelBold">Named Time-scale:</label>
 															  </td>
 														  </tr>
 														  <tr>
@@ -607,7 +607,7 @@
 														  -->
 														  <tr>
 														    <td>
-														      <label>Taxon:</label>
+														      <label class="labelBold">Taxon:</label>
 														    </td>
 														  </tr>
 															<tr>
