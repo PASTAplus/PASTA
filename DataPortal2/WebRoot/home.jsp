@@ -218,7 +218,7 @@
 							login will gain you access to even more data where contributors 
 							have asked for additional information on use.
 							<span name="New user registration for non-LTER members coming soon!" 
-							class="tooltip" class="searchsubcat">Click here</span> to register now.
+							class="tooltip" class="searchsubcat">Register now</span>!
 							</p>
 							<p>LTER Network scientists make every effort to release 
 							data in a timely fashion and with attention to accurate, 
