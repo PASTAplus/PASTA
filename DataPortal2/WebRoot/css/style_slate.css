@@ -702,7 +702,8 @@ h2 .title_labeled {
 	right: 15px;
 	top: 9px;
 	z-index: 50;
-	}
+	margin-top: 25px;
+}
 .columns2 .portfolio_shadow {
 	background: url('../images/455px.png') no-repeat;
 	bottom: -25px;
@@ -2746,7 +2747,6 @@ a.browseterm hover {
 
 
 /* Data package citation page */
-
 #cite {
 	margin-left: 20px;
 	padding: 5px;
@@ -2758,5 +2758,53 @@ a.browseterm hover {
     border:0;
 	
 }
-
 /* End data package citation page */
+
+.no-list-style {
+	list-style: none;
+}
+
+.date-time-sublabel {
+	margin-top: -16px;
+}
+
+.select-width-auto {
+	width: auto;
+}
+
+.nis-navigation-submenu {
+	margin-left: 2px; 
+	margin-top: 5px
+}
+
+.mini-arrow-margin {
+	margin-top: -1px;
+}
+
+.nis-search-label {
+	margin-left: 80px; 
+	background-color:transparent; 
+}
+
+#advanced-search-label {
+	margin-top: 5px;
+}
+
+#advanced-search-arrow {
+	margin-top: -3px;
+}
+
+#div-arra-img {
+  padding: 20px 30px 0px 40px;
+}
+
+#p-arra-img {
+	margin: 0px 0px 10px 0px; 
+	width: 81px;
+}
+
+#map-canvas {
+  margin: 0 auto; 
+  width: 330px; 
+  height: 258px
+}

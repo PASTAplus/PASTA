@@ -52,6 +52,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -103,7 +105,7 @@
 					<tr>
 						<td valign="top">
 						  <label>Select the Evaluate or Upload results to view:</label>
-							<select style="width: auto" name="reportId" size="1" onchange="submitform()" >
+							<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
 								<%= harvestReportList %>
 							</select>					
 						</td>
