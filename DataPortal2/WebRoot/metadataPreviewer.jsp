@@ -17,6 +17,8 @@
 
 <meta charset="UTF-8" />
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
 <jsp:include page="/WEB-INF/jsp/javascript.jsp" />

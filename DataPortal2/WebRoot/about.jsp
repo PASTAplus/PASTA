@@ -8,6 +8,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -196,14 +198,15 @@
 			<div class="row-fluid distance_2">
 				<div class="row-fluid text_bar_pattern">
 					<span class="right_arrow"></span>
-					<div style="padding: 20px 30px 0px 40px">
+					<div id="div-arra-img">
 						<h1 class="banner_font">Thank You!</h1>
-						<p style="margin-top: 10px">Partial funding for the development 
+						<p></p>
+						<p>Partial funding for the development 
 						of PASTA and the LTER NIS is provided under the American 
 						Recovery and Reinvestment Act of 2009 and is administered 
 						by the National Science Foundation.</p>
-						<p style="margin: 0px 0px 10px 0px; width: 81px">
-						<img id="arra-img" alt="" src="images/ARRA-Small.png" title="US ARRA logo">
+						<p id="p-arra-img">
+						  <img id="arra-img" alt="" src="images/ARRA-Small.png" title="US ARRA logo">
 						</p>
 					</div>
 					<span class="bottom_shadow_full"></span></div>
