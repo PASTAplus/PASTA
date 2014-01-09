@@ -73,7 +73,7 @@
 									NIS Guides</a></li>
 								</ul>
 								<h3 align="left">Physical Address</h3>
-								<ul style="list-style: none;">
+								<ul class="no-list-style">
 									<li>LTER Network Office<br />
 									Suite 320, CERIA Bldg #83,<br />
 									University of New Mexico (Main Campus)<br />
@@ -86,7 +86,7 @@
 									</li>
 								</ul>
 								<h3 align="left">Mailing Address</h3>
-								<ul style="list-style: none;">
+								<ul class="no-list-style">
 									<li>LTER Network Office<br />
 									UNM Dept of Biology, MSC03 2020<br />
 									1 University of New Mexico<br />

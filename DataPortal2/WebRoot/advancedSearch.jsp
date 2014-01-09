@@ -154,7 +154,7 @@
 								<!-- Content -->
 								<div class="spacer">
 								</div>
-								<div class="tabbable  " style="left: 0px; top: 0px">
+								<div class="tabbable">
 									<ul class="nav nav-tabs">
 										<li class="active">
 										  <a data-toggle="tab" href="#tab3">Spatial / Place Name</a> 
@@ -194,14 +194,11 @@
 													  </script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);
             							  </script>
-													  <div style="margin: 5 auto;">
-														Zoom in to the region you&#39;d like to search:
-														</div>
-														
+														<label>Zoom in to the region you&#39;d like to search:</label>											
 														<table>														
 													  	<tr>										
 														    <td>
-                                  <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px"></div>
+                                  <div id="map-canvas"></div>
 													      </td>
 													      <td>
 													        <table>
@@ -310,7 +307,7 @@
 													-->
 													<tr>
 														<td valign="top">
-                              <select name="siteValues" multiple="multiple" size="10" style="width: auto">
+                              <select class="select-width-auto" name="siteValues" multiple="multiple" size="10">
                                 <%= siteOptions %>
                               </select>
                             </td>
@@ -647,24 +644,10 @@
 										
 										
 										  <div id="tab5" class="tab-pane  ">
-											  <div class="row-fluid text_bar_pattern themeple_sc" style="left: 0px; top: 0px">
+											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <!-- Search Options Table -->												
-												    <table style="float:left">
-													    <!--
-													    <tr>
-														    <td colspan="5" valign="top">
-														      <h3 class="separator_border labelBolder span3" for="advancedsearch">Search Options</h3>
-														    </td>
-													    </tr>
-													    <tr>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-													    </tr>
-													    -->
+												    <table>
 													    <tr>
 														    <td>
 															    <ul class="checklist">

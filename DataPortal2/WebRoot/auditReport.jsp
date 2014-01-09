@@ -131,12 +131,12 @@
 												<td>
 												  <label for="userId">Date</label>
 												  <input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												  <label style="margin-top:-16px;">&nbsp;</label>
+												  <label class="date-time-sublabel">&nbsp;</label>
 												</td>
 												<td>
 												  <label for="group">Time</label>
 												  <input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												  <label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
+												  <label class="date-time-sublabel"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
 										</table>
@@ -148,12 +148,12 @@
 												<td>
 												  <label for="userId">Date</label>
 												  <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												  <label style="margin-top:-16px;">&nbsp;</label>
+												  <label class="date-time-sublabel">&nbsp;</label>
 												</td>
 												<td>
 												  <label for="group">Time</label>
 												  <input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												  <label style="margin-top:-16px;"> Values are Mountain TZ (default 00:00:00)</label>
+												  <label class="date-time-sublabel"> Values are Mountain TZ (default 00:00:00)</label>
 												</td>
 											</tr>
 										</table>
@@ -206,7 +206,7 @@
 										<table>
 											<tr>
 												<td>
-												  <label style="margin-top:20px" class="labelBold">HTTP Code:</label>
+												  <label class="labelBold">HTTP Code:</label>
 												</td>
 											</tr>
 											<tr>
@@ -243,8 +243,8 @@
 											<tr>
 												<td></td>
 												<td>
-												  <input style="margin-top:10px" class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
-												  <input style="margin-top:10px" class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
+												  <input class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
+												  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 								<tr>

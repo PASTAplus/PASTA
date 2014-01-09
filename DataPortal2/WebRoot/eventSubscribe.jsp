@@ -87,10 +87,15 @@
 								<!-- Content -->
 								<fieldset>
 								<legend>Subscribe</legend>
-								<p>Subscribe to a NIS data package &quot;insert-&quot; or 
-								&quot;update-event&quot; using the full package identifier 
-								(scope-identifier-revision), the scope-identifier, 
-								or just the scope.</p>
+								<p>Subscribe to NIS data package <strong><em>insert</em></strong> or <strong><em>update</em></strong> events by entering
+								   a package id that matches:
+								<ol>
+								  <li>a particular data package revision (e.g. <code>mypackages.1.1</code>); or,</li>
+								  <li>any revision of a data package with a given scope and identifier (e.g. <code>mypackages.1</code>); or,</li>
+								  <li>any data package with a given scope (e.g.<code>mypackages</code>).</li>
+                </ol>
+								</p>
+								<p>Then enter the URL of a workflow or other procedure for the NIS to invoke whenever the data packages you specified are inserted or updated.</p>
 								<div class="section">
 									<form id="eventsubscribe" action="eventsubscribe" method="post" name="eventsubscribe">
 										<table>
@@ -98,13 +103,13 @@
 												<td>
 												<label class="labelBold" for="packageid">Package Id:</label>
 												</td>
+												<td>
+												<label class="labelBold" for="packageid">Target URL:</label>
+												</td>
 											</tr>
 											<tr>
 												<td>
 												<input name="packageid" required="required" type="text" />
-												</td>
-												<td>
-												<label style="padding-left:10px; padding-right:10px;" for="targeturl">Target URL :</label>
 												</td>
 												<td>
 												<input name="targeturl" required="required" size="50" type="text" />

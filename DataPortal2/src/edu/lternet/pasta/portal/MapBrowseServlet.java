@@ -269,7 +269,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			if (titles != null) {
 
 				html += "<h3 align=\"left\">Title</h3>\n";
-				html += "<ul style=\"list-style: none;\">\n";
+				html += "<ul class=\"no-list-style\">\n";
 
 				for (Title title : titles) {
 					html += "<li>" + title.getTite() + "</li>\n";
@@ -284,7 +284,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			if (creators != null) {
 
 				html += "<h3 align=\"left\">Creators</h3>\n";
-				html += "<ul style=\"list-style: none;\">\n";
+				html += "<ul class=\"no-list-style\">\n";
 
 				for (ResponsibleParty creator : creators) {
 					html += "<li>";
@@ -325,7 +325,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			if (pubDate != null) {
 				
 				html += "<h3 align=\"left\">Publication Date</h3>\n";
-				html += "<ul style=\"list-style: none;\">\n";
+				html += "<ul class=\"no-list-style\">\n";
 				html += "<li>" + pubDate + "</li>";
 				html += "</ul>";				
 
@@ -419,11 +419,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 					String hover = "If this data entity is not linked, you may not have permission to access it.";
 					if (data == null) {
 						data = "<li>" + entityName + " [<span name=\"" + hover
-						    + "\" class=\"tooltip\" style=\"color: blue;\">"
+						    + "\" class=\"tooltip\">"
 						    + "<em>more info</em>" + "</span>]</li>\n";
 					} else {
 						data += "<li>" + entityName + " [<span name=\"" + hover
-						    + "\" class=\"tooltip\" style=\"color: blue;\">"
+						    + "\" class=\"tooltip\">"
 						    + "<em>more info</em>" + "</span>]</li>\n";
 					}
 					
@@ -465,7 +465,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 
 		html += "<h3 align=\"left\">Package Identification</h3>\n";
-		html += "<ul style=\"list-style: none;\">\n";
+		html += "<ul class=\"no-list-style\">\n";
 		html += dataPackage;
 		html += "<ul>";
 		html += previous;
@@ -493,11 +493,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 		
 		
 		html += "<h3 align=\"left\">Citation</h3>\n";
-		html += "<ul style=\"list-style: none; padding-bottom: 2.0em;\">\n";
-		html += "<li style=\"padding-bottom: 0.75em;\"><a class=\"searchsubcat\" href=\"./dataPackageCitation?scope=" + scope + "&"
+		html += "<ul class=\"no-list-style\">\n";
+		html += "<li><a class=\"searchsubcat\" href=\"./dataPackageCitation?scope=" + scope + "&"
 				+ "identifier=" + identifier.toString() + "&"
 				+ "revision=" + revision
-		    + "\">How to cite this data package...</a></li>\n";
+		    + "\">How to cite this data package</a></li>\n";
 		
 		if (doiId != null) {
 			html += "<li>Digital Object Identifier - <em>" + doiId + "</em></li>\n";

@@ -45,9 +45,7 @@
   else if (pageName.equals("help")) {
     helpClass = currentClass;
   }
-  else if (pageName.equals("home") ||
-           pageName.equals("tigerTeam")
-          ) {
+  else if (pageName.equals("home")) {
     homeClass = currentClass;
   }
   else if (pageName.equals("dataPackageEvaluate") ||
@@ -84,36 +82,36 @@
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
 				<li<%= discoverClass %>><a href="#">Discover</a>
 				<ul class="sub-menu">
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img style="margin-top: -1px;" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
 					Browse Data By:</p>
 					<li><a href="browse.jsp">Keyword or LTER Site</a> </li>
 					<li><a href="scopebrowse">Package Identifier</a> </li>
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					  <img style="margin-top: -1px;" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
 					Search Data Using:</p>
 					<li><a href="advancedSearch.jsp">Advanced Search</a> </li>
 				</ul>
 				</li>
 				<li<%= toolsClass %>><a href="#">Tools</a>
 				<ul class="sub-menu">
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Manage Data Packages:</p>
 					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li>
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
 					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
 					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Manage Event Subscriptions:</p>
 					<li><a href="eventSubscribe.jsp">Event Subscriptions</a></li>
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					PASTA Provenance Metadata:</p>
 					<li><a href="provenanceViewer.jsp">Provenance Viewer</a></li>
-					<p class="smallmenu pull-left" style="margin-left: 2px; margin-top: 5px">
-					<img alt="" src="images/mini_arrow.png" style="margin-top: -1px;" title="LTER : Network"> 
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Review PASTA Audit Reports:</p>
 					<li><a href="auditReport.jsp">Audit Reports</a></li>
 					<li><a href="dataPackageAudit.jsp">Data Package Access Reports</a></li>
@@ -148,20 +146,13 @@
 			<div class="pull-right">
 				<div id="search-3" class="widget title_widget widget_search">
 				  <form id="searchform" action="./simpleSearch" class="form-inline" method="post" >
-				    <label style="margin-left: 80px; background-color:transparent">Search Terms</label>
-
+				    <label class="nis-search-label">Search Terms</label>
 						<input type="search" name="terms" id="lterterms" class="span11 search-query" size="25" required="required">
-
-<!--  
-	          <div class="ui-widget">
-	            <input type="search" name="terms" required="required" size="50" id="lterterms" style="font-size: 80%;"/>
-	          </div>
--->
-
-						<button class="search_icon" style="margin-top: 25px;" type="submit"></button>
-						<label style="margin-left: 80px; background-color:transparent; margin-top: 5px;">
-						<img alt="" src="images/mini_arrow.png" style="margin-top: -3px;" title="Advanced Search">
-						<a href="advancedSearch.jsp">ADVANCED SEARCH</a></label>
+						<button class="search_icon" type="submit"></button>
+						<label id="advanced-search-label" class="nis-search-label">
+						  <img id="advanced-search-arrow" alt="" src="images/mini_arrow.png" title="Advanced Search">
+						  <a href="advancedSearch.jsp">ADVANCED SEARCH</a>
+						</label>
 					</form>
 					<span class="seperator extralight-border"></span></div>
 			</div>

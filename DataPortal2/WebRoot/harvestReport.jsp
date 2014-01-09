@@ -105,7 +105,7 @@
 					<tr>
 						<td valign="top">
 						  <label>Select the Evaluate or Upload results to view:</label>
-							<select style="width: auto" name="reportId" size="1" onchange="submitform()" >
+							<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
 								<%= harvestReportList %>
 							</select>					
 						</td>
