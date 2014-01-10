@@ -110,11 +110,6 @@
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
-<!-- These Scripts are for my Chart Demo and can be removed at any time 
-<script src="charts/assets/Chart.js" type="text/javascript"></script>
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
-<!-- /These Scripts are for my Chart Demo and can be removed at any time -->
-
 <!-- Google Chart for NIS Data Package and Site Growth -->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -240,26 +235,18 @@
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
-							<!-- My Chart Code. Can be removed anytime -->
 							<section id="examples">
 								<article id="lineChart" class=" ">
 									<div>
-										<!-- 
-										  <canvas id="introChart" width="320" height="250"></canvas> 
-											<p>Site contributed data packages: <strong><i>1473</i></strong></p>
-									  -->
 										<br />
 										<br />
-								<div id="chart_div"></div>
-								<p>Site contributed data packages: 
-								  <strong><em><%=numDataPackagesSites.toString()%></em></strong><br />
-									Total data packages: <strong><em><%=numDataPackages.toString()%></em></strong>
-								</p>
-											<!--   Total data packages: <strong><i>16888</i></strong> -->
+								    <div id="chart_div"></div>
+								    <p>Site contributed data packages: <strong><em><%=numDataPackagesSites.toString()%></em></strong><br />
+									     Total data packages: <strong><em><%=numDataPackages.toString()%></em></strong>
+								    </p>
 									</div>
 								</article>
 							</section>
-							<!-- /My Chart Code. Can be removed anytime -->
 						</div>
 					</div>
 				</div>
@@ -271,8 +258,6 @@
 		
 </div>
 
-  <script src="charts/assets/effects.js"></script>
-  
 </body>
 
 </html>

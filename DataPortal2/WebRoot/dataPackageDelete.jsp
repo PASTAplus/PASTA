@@ -82,7 +82,7 @@
 								<!-- Content -->
 								<fieldset>
 								<p>Delete a data package using the package scope 
-								and identifier (e.g. <code>myscope.100</code>).
+								and identifier (e.g. <b>myscope.100</b>).
 								</p>
 								<p><i>Please note: Deletion of a data package is 
 								permanent and should be given due consideration. 
