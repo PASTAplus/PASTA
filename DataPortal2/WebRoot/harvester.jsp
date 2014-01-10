@@ -145,7 +145,7 @@
 												<legend>Metacat Harvest List URL</legend>
 												<p>Enter the URL of a Metacat Harvest 
 												List and then select &quot;Evaluate&quot; 
-												or &quot;Upload&quot;. All <code>documentURL</code> 
+												or &quot;Upload&quot;. All <code class="nis-code">documentURL</code> 
 												elements in the harvest list will 
 												be processed. </p>
 												<div class="section">

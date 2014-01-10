@@ -135,10 +135,6 @@
 		<jsp:include page="footer.jsp" />
 </div>
 
-		<!-- Can be removed, loads charts demo -->
-		<script src="charts/assets/effects.js"></script>
-		<!-- /Can be removed, loads charts demo -->
-
     <script type="text/javascript">
         jQuery(document).ready(function() {
             jQuery(".dataset-content").hide();

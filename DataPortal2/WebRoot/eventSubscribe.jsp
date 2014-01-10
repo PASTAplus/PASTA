@@ -90,9 +90,9 @@
 								<p>Subscribe to NIS data package <strong><em>insert</em></strong> or <strong><em>update</em></strong> events by entering
 								   a package id that matches:
 								<ol>
-								  <li>a particular data package revision (e.g. <code>mypackages.1.1</code>); or,</li>
-								  <li>any revision of a data package with a given scope and identifier (e.g. <code>mypackages.1</code>); or,</li>
-								  <li>any data package with a given scope (e.g.<code>mypackages</code>).</li>
+								  <li>a particular data package revision (e.g. <code class="nis-code">mypackages.1.1</code>); or,</li>
+								  <li>any revision of a data package with a given scope and identifier (e.g. <code class="nis-code">mypackages.1</code>); or,</li>
+								  <li>any data package with a given scope (e.g.<code class="nis-code">mypackages</code>).</li>
                 </ol>
 								</p>
 								<p>Then enter the URL of a workflow or other procedure for the NIS to invoke whenever the data packages you specified are inserted or updated.</p>
@@ -142,8 +142,7 @@
 								<fieldset>
 								<legend>Review</legend>
 								<p>Review a subscription using the subscription 
-								identifier or leave empty to review &quot;all&quot; of your 
-								subscriptions.</p>
+								identifier or leave empty to review <strong><em>all</em></strong> of your subscriptions.</p>
 								<div class="section">
 									<form id="eventreview" action="eventreview" method="post" name="eventreview">
 										<table>
@@ -270,8 +269,6 @@
 		<jsp:include page="footer.jsp" />
 
 </div>
-
-		<script src="charts/assets/effects.js"></script>
 
 </body>
 

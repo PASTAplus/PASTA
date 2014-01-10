@@ -40,7 +40,7 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- For Custom Checkboxes -->
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
