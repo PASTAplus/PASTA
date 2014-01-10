@@ -1218,6 +1218,7 @@ public class AdvancedSearch  {
     
     try {  
       DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+      logger.info(String.format("queryString:\n%s", queryString));
       resultsetXML = dpmClient.searchDataPackages(queryString);    
     } 
     catch (PastaAuthenticationException e) {
