@@ -2815,3 +2815,26 @@ a.browseterm hover {
 .nis-code {
 	color: black;
 }
+
+table.nis {
+}
+
+th.nis {
+    font-size: 0.9em;
+    font-weight: bold;
+    border: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    padding: 5px;
+    text-align: center;
+    background-color: #F7F7F7;
+}
+
+td.nis {
+    font-size: 0.9em;
+    border: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    padding: 5px;
+    vertical-align: top;
+}

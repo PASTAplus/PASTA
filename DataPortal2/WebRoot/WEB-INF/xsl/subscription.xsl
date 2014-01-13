@@ -39,9 +39,9 @@
         <table>
           <tbody>
             <tr>
-              <td class="header">Subscription Id</td>
-              <td class="header">Package Id</td>
-              <td class="header">Target URL</td>
+              <th class="nis">Subscription Id</th>
+              <th class="nis">Package Id</th>
+              <th class="nis">Target URL</th>
             </tr>
 
             <xsl:choose>
@@ -65,13 +65,13 @@
 
   <xsl:template match="subscription">
     <tr>
-      <td class="data" align="center">
+      <td class="nis" align="center">
         <xsl:value-of select="./id"/>
       </td>
-      <td class="data" align="center">
+      <td class="nis" align="center">
         <xsl:value-of select="./packageId"/>
       </td>
-      <td class="data">
+      <td class="nis">
         <xsl:value-of select="./url"/>
       </td>
     </tr>

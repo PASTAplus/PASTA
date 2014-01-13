@@ -91,8 +91,8 @@
         <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
         
 				<div class="section">
-          <div id='jqxTree'>         
-            <%= browseHTML %>           
+          <div id='jqxTree'>
+            <%= browseHTML %>
 				  </div>
 				</div>
 				<p>
@@ -100,7 +100,7 @@
 				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small>
 				</p>
 			</fieldset>
-								<!-- end of section-table --></div>
+			        </div>
 							<!-- end of content --></div>
 					</div>
 				</div>
