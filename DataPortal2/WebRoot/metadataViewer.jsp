@@ -1,10 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"
 	trimDirectiveWhitespaces="true"%>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
-
   String metadataHtml = (String) request.getAttribute("metadataHtml");
   String packageId = (String) request.getAttribute("packageId");
 

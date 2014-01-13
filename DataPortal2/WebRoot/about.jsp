@@ -183,7 +183,6 @@
 									</form>
 								</div>
 								</fieldset>
-								<!-- end of section-table -->
 							</div>
 							<!-- end of content -->
 						</div>
