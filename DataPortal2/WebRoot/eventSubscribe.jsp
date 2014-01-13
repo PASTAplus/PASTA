@@ -167,7 +167,7 @@
 								</div>
         <%
           if (reviewMessage != null) {
-            out.println("<div class=\"section-table\">\n");
+            out.println("<div>\n");
             out.println("<table align=\"left\" cellpadding=\"4em\">\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
@@ -205,7 +205,6 @@
 								</div>
         <%
           if (testMessage != null) {
-            out.println("<div class=\"section-table\">\n");
             out.println("<table align=\"left\" cellpadding=\"4em\">\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");

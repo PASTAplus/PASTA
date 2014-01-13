@@ -100,27 +100,11 @@
 			<%=warningMessage%>
 
 			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport" >
-			<table>
-				<tbody>		
-					<tr>
-						<td valign="top">
-						  <label>Select the Evaluate or Upload results to view:</label>
-							<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
-								<%= harvestReportList %>
-							</select>					
-						</td>
-					</tr>
-			</table>
-			<table>
-					<tr>				
-						<td valign="top">
-							<div class="section-table">
-								<%=harvestReportHTML%>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			  <label>Select the Evaluate or Upload results to view:</label>
+				<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
+				  <%= harvestReportList %>
+			  </select>					
+				<%=harvestReportHTML%>
       </form>
       
 								<!-- /Content -->
