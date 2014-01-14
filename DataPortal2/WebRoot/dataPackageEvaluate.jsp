@@ -57,7 +57,7 @@
 										<table align="left" cellpadding="4em">
 											<tr>
 												<td align="left">
-												<label for="packageid">File:
+												<label class="labelBold">File:
 												</label>
 												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
 												</td>

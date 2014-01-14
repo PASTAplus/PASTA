@@ -74,14 +74,14 @@
 						<table id="login-form">
 							<tbody>
 								<tr>
-									<td align="right"><label for="uid">User Name:</label></td>
+									<td align="right"><label class="labelBold">User Name:</label></td>
 									<td align="right">
 									   <input type="text" name="uid"
 										size="25px" required="required" autocomplete="on" autofocus />
 									</td>
 								</tr>
 								<tr>
-									<td align="right"><label for="password">Password:</label></td>
+									<td align="right"><label class="labelBold">Password:</label></td>
 									<td align="right">
 									   <input type="password" name="password"
 										size="25px" required="required" />

@@ -2399,11 +2399,18 @@
           <tr>
             <td class="{$firstColStyle}">
               <!--  this is the simple label-only version, instead of the form button. -->
-              <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text><br></br>
-              <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text><br></br>
+              <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text>
             </td>
             <td class="{secondColStyle}">
-              <strong><xsl:value-of select="./entityName"/></strong><br></br>
+              <strong><xsl:value-of select="./entityName"/></strong>
+            </td>
+          </tr>
+          <tr>
+            <td class="{$firstColStyle}">
+              <!--  this is the simple label-only version, instead of the form button. -->
+              <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text>
+            </td>
+            <td class="{secondColStyle}">
               <xsl:value-of select="./entityDescription"/>
             </td>
           </tr>
@@ -2414,10 +2421,17 @@
           <td class="{$firstColStyle}">
             <!--  this is the simple label-only version, instead of the form button. -->
             <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text><br></br>
-            <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text><br></br>
           </td>
           <td class="{secondColStyle}">
             <strong><xsl:value-of select="./entityName"/></strong><br></br>
+          </td>
+        </tr>
+        <tr>
+          <td class="{$firstColStyle}">
+            <!--  this is the simple label-only version, instead of the form button. -->
+            <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text><br></br>
+          </td>
+          <td class="{secondColStyle}">
             <xsl:value-of select="./entityDescription"/>
           </td>
         </tr>
@@ -8807,7 +8821,7 @@
     <xsl:if test="normalize-space(.)!=''">
       <tr>
         <td class="{$resfirstColStyle}">Title:</td>
-        <td class="{$ressecondColStyle}"><em class="bold"><xsl:value-of select="."/></em></td>
+        <td class="{$ressecondColStyle}"><cite><xsl:value-of select="."/></cite></td>
       </tr>
     </xsl:if>
   </xsl:template>
@@ -10697,7 +10711,7 @@
   <xsl:template match="para" mode="text">
     <xsl:param name="textfirstColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para</xsl:text></xsl:message></xsl:if>
-    <p><xsl:apply-templates/></p>
+    <p class="eml"><xsl:apply-templates/></p>
     <!-- <xsl:apply-templates mode="lowlevel"/> -->
   </xsl:template>
 
@@ -10705,7 +10719,7 @@
        Currently, only get the text and it need more revision-->
   <xsl:template match="para" mode="lowlevel">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: para; mode: lowlevel</xsl:text></xsl:message></xsl:if>
-    <p><xsl:value-of select="."/></p>
+    <p class="eml"><xsl:value-of select="."/></p>
   </xsl:template>
   
   <xsl:template match="itemizedlist">

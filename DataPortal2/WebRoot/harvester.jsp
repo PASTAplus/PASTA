@@ -52,10 +52,10 @@
 							<div class="span12">
 								<!-- Content -->
 								<p>Data packages may be evaluated without uploading 
-								them to the NIS by selecting &quot;Evaluate&quot;. Once you 
+								them to the NIS by selecting <b>Evaluate</b>. Once you 
 								are satisfied that data packages are ready to be 
 								uploaded to the NIS, you may do so by selecting 
-								&quot;Upload&quot;. Several alternatives for supplying the 
+								<b>Upload</b>. Several alternatives for supplying the 
 								EML metadata for your data packages are available below.</p>
 								<fieldset>
 								<legend>EML Metadata File</legend>
@@ -65,8 +65,7 @@
 										<table align="left" cellpadding="4em">
 											<tr>
 												<td align="left">
-												<label for="packageid">File:
-												</label>
+												<label class="labelBold">File:</label>
 												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
 												</td>
 											</tr>
@@ -85,8 +84,7 @@
 								<fieldset>
 								<legend>EML Document URLs</legend>
 								<p>Enter a list of EML document URLs into the text 
-								area below, one per line, and then select &quot;Evaluate&quot; 
-								or &quot;Upload&quot;.</p>
+								area below, one per line, and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 								<div class="section">
 									<form id="urlList" action="./harvester" method="post" name="urlList">
 										<table align="left" cellpadding="4em">
@@ -119,10 +117,8 @@
 												<!-- Content -->
 												<fieldset>
 												<legend>Copy EML Metadata Text</legend>
-												<p>Copy the XML for a single EML 
-												metadata document into the text 
-												area below and then select &quot;Evaluate&quot; 
-												or &quot;Upload&quot;.</p>
+												<p>Copy the XML for a single EML metadata document into the text 
+			                     area below and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 												<div class="section">
 													<form id="emlText" action="./harvester" method="post" name="emlText">
 														<table align="left" cellpadding="4em">
@@ -150,7 +146,7 @@
 														<table align="left" cellpadding="4em">
 															<tr>
 																<td align="left">
-																<label for="harvestListURL">Metacat Harvest List URL:</label>
+																<label class="labelBold">Metacat Harvest List URL:</label>
 																<input name="harvestListURL" required="required" size="150" type="text" />
 																</td>
 															</tr>

@@ -2844,3 +2844,16 @@ kbd.nis {
     font-family: monospace;
 	  font-weight: bold;
 }
+
+.nis-title {
+	  font-style: italic;
+	  font-weight: bold;
+}
+
+p.eml {
+	font-family: inherit;
+	line-height: inherit;
+	font-size: inherit;
+	color: inherit;
+}
+
