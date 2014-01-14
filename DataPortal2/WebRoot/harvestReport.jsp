@@ -100,7 +100,7 @@
 			<%=warningMessage%>
 
 			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport" >
-			  <label>Select the Evaluate or Upload results to view:</label>
+			  <label>Select the <b>Evaluate</b> or <b>Upload</b> results to view:</label>
 				<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
 				  <%= harvestReportList %>
 			  </select>					

@@ -65,7 +65,7 @@
 										<table>
 											<tr>
 												<td class="searchcat">
-												<h2 class="package">LTER sites</h2>
+												<h3>LTER sites</h3>
 												</td>
 											</tr>
 											<tr>
@@ -89,7 +89,7 @@
 													<li>the knowledge gained from 
 													the synthesis of LTER data.</li>
 												</ol>
-												<p>The NIS Data Portal uses a &quot;rolling-update&quot; 
+												<p>The NIS Data Portal uses a <i>rolling-update</i>
 												approach to continuously release 
 												improved versions as they are ready 
 												for the community.</p>
@@ -109,21 +109,14 @@
 											</tr>
 											<tr>
 												<td class="searchcat">
-												<h2 class="package">For LTER Site 
-												Information Managers, Software Developers, 
-												and Other Interested Parties</h2>
+												<h3>For LTER Site Information Managers, Software Developers, and Other Interested Parties</h3>
 												</td>
 											</tr>
 											<tr>
 												<td>
-												<p>The PASTA framework is comprised 
-												of the Gatekeeper identity authentication 
-												service and the following application 
-												programming interfaces (APIs) of 
-												the LTER Network Information System 
-												(<b><i>user authentication</i>
-												</b>is required for all data input 
-												to the PASTA system):</p>
+												<p>The PASTA framework is comprised of the Gatekeeper identity authentication 
+												service<sup>*</sup> and the following application programming interfaces (APIs) of 
+												the LTER Network Information System:
 												<ol>
 													<li>The Audit Service API</li>
 													<li>The Event Manager API</li>
@@ -158,7 +151,7 @@
 												and to search for data packages 
 												that reside in PASTA.</p>
 												<p>Like the NIS Data Portal, all 
-												of PASTA&#39;s services use a &quot;rolling-update&quot; 
+												of PASTA&#39;s services use a <i>rolling-update</i>
 												approach to adding bug fixes, improvements, 
 												and new features to each of the 
 												services.</p>
@@ -181,6 +174,7 @@
 											</tr>
 										</table>
 									</form>
+									<p><sup>*</sup><strong>User authentication</strong> is <em>required</em> for all data input to the PASTA system.</p>
 								</div>
 								</fieldset>
 							</div>

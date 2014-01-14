@@ -88,8 +88,6 @@
 			<fieldset>
 				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
 
-        <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
-        
 				<div class="section">
           <div id='jqxTree'>
             <%= browseHTML %>

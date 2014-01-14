@@ -2812,10 +2812,6 @@ a.browseterm hover {
   height: 258px
 }
 
-.nis-code {
-	color: black;
-}
-
 table.nis {
 }
 
@@ -2838,3 +2834,26 @@ td.nis {
     padding: 5px;
     vertical-align: top;
 }
+
+kbd.nis {
+	  font-weight: bold;
+}
+
+.nis-error {
+    background-color: #F7F7F7;
+    font-family: monospace;
+	  font-weight: bold;
+}
+
+.nis-title {
+	  font-style: italic;
+	  font-weight: bold;
+}
+
+p.eml {
+	font-family: inherit;
+	line-height: inherit;
+	font-size: inherit;
+	color: inherit;
+}
+

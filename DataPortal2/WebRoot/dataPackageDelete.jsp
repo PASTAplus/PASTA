@@ -81,14 +81,8 @@
 							<div class="span12">
 								<!-- Content -->
 								<fieldset>
-								<p>Delete a data package using the package scope 
-								and identifier (e.g. <b>myscope.100</b>).
+								<p>Delete a data package<sup>*</sup> using the package <b>scope</b> and <b>identifier</b> (e.g. <kbd class="nis">myscope.100</kbd>).
 								</p>
-								<p><i>Please note: Deletion of a data package is 
-								permanent and should be given due consideration. 
-								Once deleted, no additional data packages can be 
-								uploaded with the specified combination of scope 
-								and identifier.</i></p>
 								<div class="section">
 									<form id="datapackagedelete" action="./dataPackageDelete" method="post" name="datapackagedelete">
 										<table>
@@ -110,6 +104,11 @@
 											</tr>
 										</table>
 									</form>
+								<p><sup>*</sup><strong><em>Please note</em></strong>: Deletion of a data package is 
+								permanent and should be given careful consideration. 
+								Once deleted, <em>no additional data packages</em> can be 
+								uploaded with the specified combination of <var>scope</var> 
+								and <var>identifier</var>.</p>
 								</div>
         <%
           if (deleteMessage != null) {

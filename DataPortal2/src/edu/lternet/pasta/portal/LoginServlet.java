@@ -137,7 +137,7 @@ public class LoginServlet extends DataPortalServlet {
       }
       
     } catch (PastaAuthenticationException e) {
-      String message = "<b>login failed for user '" + uid + "'</b>";
+      String message = "<strong><em>Login failed</em></strong> for user <kbd class=\"nis\">" + uid + "</kbd>.";
       forward = "./login.jsp";
       request.setAttribute("message", message);
     }
