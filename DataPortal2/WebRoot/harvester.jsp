@@ -143,19 +143,14 @@
 												</fieldset>
 												<fieldset>
 												<legend>Metacat Harvest List URL</legend>
-												<p>Enter the URL of a Metacat Harvest 
-												List and then select &quot;Evaluate&quot; 
-												or &quot;Upload&quot;. All <code class="nis-code">documentURL</code> 
-												elements in the harvest list will 
-												be processed. </p>
+												<p>Enter the URL of a Metacat Harvest List and then select <b>Evaluate</b> 
+												or <b>Upload</b>. All <var>documentURL</var> elements in the harvest list will be processed.</p>
 												<div class="section">
 													<form id="harvestList" action="./harvester" method="post" name="harvestList">
 														<table align="left" cellpadding="4em">
 															<tr>
 																<td align="left">
-																<label for="harvestListURL">
-																Metacat Harvest 
-																List URL:</label>
+																<label for="harvestListURL">Metacat Harvest List URL:</label>
 																<input name="harvestListURL" required="required" size="150" type="text" />
 																</td>
 															</tr>

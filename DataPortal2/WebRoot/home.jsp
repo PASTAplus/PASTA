@@ -195,7 +195,7 @@
 							U.S. LTER Network are made available online with as 
 							few restrictions as possible, on a non-discriminatory 
 							basis. In return, the LTER Network expects data users 
-							to <strong>act ethically</strong> by contacting the 
+							to <strong><em>act ethically</em></strong> by contacting the 
 							investigator prior to the use of data for publication.
 							</p>
 							<p>The LTER Network Information System Data Portal contains 
@@ -241,8 +241,8 @@
 										<br />
 										<br />
 								    <div id="chart_div"></div>
-								    <p>Site contributed data packages: <strong><em><%=numDataPackagesSites.toString()%></em></strong><br />
-									     Total data packages: <strong><em><%=numDataPackages.toString()%></em></strong>
+								    <p>Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b></strong><br />
+									     Total data packages: <b><%=numDataPackages.toString()%></b></strong>
 								    </p>
 									</div>
 								</article>

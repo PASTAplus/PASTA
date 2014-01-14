@@ -662,12 +662,12 @@
 														    <td class="spacerwd"></td>
 														    <td valign="top">
 															    <input checked="checked" name="formAllAny" type="radio" value="0" /> 
-															    <strong>AND</strong>&nbsp;&nbsp;all search criteria
+															    <b>AND</b>&nbsp;&nbsp;all search criteria
 														    </td>
 														    <td class="spacerwd"></td>
 														    <td valign="top">
 															    <input name="formAllAny" type="radio" value="1" /> 
-															    <strong>OR</strong>&nbsp;&nbsp;all search criteria
+															    <b>OR</b>&nbsp;&nbsp;all search criteria
 														    </td>
 													    </tr>
 												    </table>												

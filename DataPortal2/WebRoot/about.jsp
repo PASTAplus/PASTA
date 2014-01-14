@@ -116,14 +116,9 @@
 											</tr>
 											<tr>
 												<td>
-												<p>The PASTA framework is comprised 
-												of the Gatekeeper identity authentication 
-												service and the following application 
-												programming interfaces (APIs) of 
-												the LTER Network Information System 
-												(<b><i>user authentication</i>
-												</b>is required for all data input 
-												to the PASTA system):</p>
+												<p>The PASTA framework is comprised of the Gatekeeper identity authentication 
+												service<sup>*</sup> and the following application programming interfaces (APIs) of 
+												the LTER Network Information System:
 												<ol>
 													<li>The Audit Service API</li>
 													<li>The Event Manager API</li>
@@ -181,6 +176,7 @@
 											</tr>
 										</table>
 									</form>
+									<p><sup>*</sup><strong><em>User authentication is required</em></strong> for all data input to the PASTA system.</p>
 								</div>
 								</fieldset>
 							</div>
