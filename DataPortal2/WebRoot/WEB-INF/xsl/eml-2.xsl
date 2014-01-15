@@ -3289,7 +3289,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: taxonRankValue</xsl:text></xsl:message></xsl:if>
     <tr>
       <td class="{$firstColStyle}"><xsl:text>Rank Value:</xsl:text></td>
-      <td class="{$secondColStyle}"><xsl:value-of select="."/></td>
+      <td class="{$secondColStyle}"><i><xsl:value-of select="."/></i></td>
     </tr>
   </xsl:template>
 

@@ -230,7 +230,7 @@ th.rowheader {
 .coleven {
     border-left:                1px;
     border-right:               1px;
-    background-color:           lightgrey;
+    background-color:           #b2cce0;
     padding-left:               2px;
     padding-right:              2px;
     text-align:                 left;
@@ -252,7 +252,7 @@ th.rowheader {
 
 .innercoleven {
     border:                     solid 1px;
-    background-color:           lightgrey;
+    background-color:           #b2cce0;
     font-size:                  .75em;
     padding-left:               2px;
     padding-right:              2px;
@@ -309,7 +309,7 @@ th.rowheader {
     vertical-align:             middle;
     padding:                    0.25em;
     margin-right:               3px;
-    background-color:           lightgrey;                
+    background-color:           #b2cce0;                
 }
 */
 input.view-data-button{
