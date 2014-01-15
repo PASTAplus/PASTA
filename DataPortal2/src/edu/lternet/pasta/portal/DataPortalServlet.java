@@ -49,7 +49,6 @@ public class DataPortalServlet extends HttpServlet {
 		  "    <link href=\"css/style_slate.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\">"
 		  //"    <link href=\"bootstrap/css/bootstrap.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
 		  //"    <link href=\"bootstrap/css/bootstrap-responsive.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
-          //"    <link href=\"css/lter-nis.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
     );
 		  
   
