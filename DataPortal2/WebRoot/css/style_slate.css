@@ -2813,6 +2813,7 @@ a.browseterm hover {
 }
 
 table.nis {
+
 }
 
 th.nis {
@@ -2856,4 +2857,58 @@ p.eml {
 	font-size: inherit;
 	color: inherit;
 }
+
+
+/*
+ * Styling for the quality report table
+ */
+div.qualityreport table {
+    font-size: 1.0em;
+	  font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
+    border: solid;
+    border-width: 1px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.qualityreport table pre {
+    font-size: 0.9em;
+	  font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
+}
+
+div.qualityreport td.header {
+    font-size: 1.0em;
+    font-weight: bold;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.qualityreport td.data {
+    font-size: 1.0em;
+    font-weight: normal;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.valid {
+    color: green;   
+}
+
+div.warn {
+    color: orange;
+}
+
+div.error {
+    color: red;
+}
+
+div.info {
+    color: blue;
+}
+
+/*
+ * End -- Styling for the quality report table
+ */
 

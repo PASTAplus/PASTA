@@ -173,11 +173,9 @@
 
     <xsl:template match="qr:qualityCheck">
         <td class="data" align="left" valign="top" title="qualitycheck">
-            <ul>
-                <li>Type: <xsl:value-of select="@qualityType"/></li>
-                <li>System: <xsl:value-of select="@system"/></li>
-                <li>On Failure: <xsl:value-of select="@statusType"/></li>
-            </ul>
+        <pre> Type: <xsl:value-of select="@qualityType"/>
+ System: <xsl:value-of select="@system"/>
+ On Failure: <xsl:value-of select="@statusType"/></pre>
         </td>
     </xsl:template>
 
