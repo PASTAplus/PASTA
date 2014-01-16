@@ -194,12 +194,13 @@
 													  </script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);
             							  </script>
-														<label>Zoom in to the region you&#39;d like to search:</label>											
 														<table>														
 													  	<tr>										
 														    <td>
+														      <label>Zoom in to the region you&#39;d like to search:</label>											
                                   <div id="map-canvas"></div>
 													      </td>
+													      <td></td>
 													      <td>
 													        <table>
 														        <tr>
@@ -239,6 +240,7 @@
 	  													      </tr>
 		  												    </table>
 			  											  </td>														
+													      <td></td>
 														    <td>
 															    <ul class="checklistLG">
 																    <li>
