@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
+<%@ page import="edu.lternet.pasta.portal.AuditReportServlet"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%
 	String path = request.getContextPath();
@@ -18,6 +19,9 @@
 		    .getRequestDispatcher("./login.jsp");
 		requestDispatcher.forward(request, response);
 	}
+	
+	AuditReportServlet ars = new AuditReportServlet();
+	String serviceMethodsHTML = ars.serviceMethodsHTML(uid);
 
 	String reportMessage = (String) request.getAttribute("reportMessage");
 	String type = (String) request.getAttribute("type");
@@ -31,7 +35,7 @@
 	String limitHTML = "";
 	String auditRecordLimit = (String) ConfigurationListener.getOptions().getProperty("auditreport.limit");
 	if (auditRecordLimit != null && !auditRecordLimit.equals("")) {
-	  limitHTML = "<p><small><em>(Only the first " + auditRecordLimit + " matching audit records will be displayed.)</em></small></p>";
+	  limitHTML = "<sup>*</sup><small><em>Only the first " + auditRecordLimit + " matching audit records will be displayed.</em></small>";
 	}
 	
 %>
@@ -118,49 +122,34 @@
 							<div class="span12">
 								<!-- Content -->
 								<fieldset>
-								<p>Review a PASTA audit report by entering your criteria into one or more of the filters below.</p>
+								<p>Review a PASTA audit report<sup>*</sup> by entering your criteria into one or more of the filters below.</p>
+								<hr/>
 								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
 									<div class="section">
 										<table>
 											<tr>
 												<td>
-												  <label class="labelBold">Begin Date-Time:</label>
+												  <label class="labelBold">Data Package Manager Service Method:</label>
 												</td>
 											</tr>
 											<tr>
-												<td>
-												  <label for="userId">Date</label>
-												  <input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												  <label class="date-time-sublabel">&nbsp;</label>
-												</td>
-												<td>
-												  <label for="group">Time</label>
-												  <input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												  <label class="date-time-sublabel"> Values are Mountain TZ (default 00:00:00)</label>
-												</td>
+												<td class="spacersm"></td>
 											</tr>
-										</table>
-										<table>
-											<tr>
-												<td><label class="labelBold">End Date-Time:</label></td>
-											</tr>
-											<tr>
-												<td>
-												  <label for="userId">Date</label>
-												  <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
-												  <label class="date-time-sublabel">&nbsp;</label>
-												</td>
-												<td>
-												  <label for="group">Time</label>
-												  <input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
-												  <label class="date-time-sublabel"> Values are Mountain TZ (default 00:00:00)</label>
-												</td>
-											</tr>
+													<tr>
+														<td valign="top">
+                              <select class="select-width-auto" name="serviceMethod">
+                                <%= serviceMethodsHTML %>
+                              </select>
+                            </td>
+													</tr>
 										</table>
 										<table>
 											<tr>
 												<td>
 												  <label class="labelBold">Category Status:</label>
+												</td>
+												<td>
+												  <label class="labelBold">HTTP Code:</label>
 												</td>
 											</tr>
 											<tr>
@@ -201,17 +190,92 @@
 													  </fieldset>
 												  </form>
 												</td>
-											</tr>
-										</table>
-										<table>
-											<tr>
 												<td>
-												  <label class="labelBold">HTTP Code:</label>
-												</td>
-											</tr>
-											<tr>
-												<td>
-												  <input name="code" placeholder=" " size="15px" type="text" />
+                              <select class="select-width-auto" name="code">
+<option value="all">All HTTP Codes</option>
+<option value="100">100 Continue</option>
+<option value="101">101 Switching Protocols</option>
+<option value="102">102 Processing</option>
+<option value="200">200 OK</option>
+<option value="201">201 Created</option>
+<option value="202">202 Accepted</option>
+<option value="203">203 Non-Authoritative Information</option>
+<option value="204">204 No Content</option>
+<option value="205">205 Reset Content</option>
+<option value="206">206 Partial Content</option>
+<option value="207">207 Multi-Status</option>
+<option value="208">208 Already Reported</option>
+<option value="226">226 IM Used</option>
+<option value="300">300 Multiple Choices</option>
+<option value="301">301 Moved Permanently</option>
+<option value="302">302 Found</option>
+<option value="303">303 See Other</option>
+<option value="304">304 Not Modified</option>
+<option value="305">305 Use Proxy</option>
+<option value="306">306 Switch Proxy</option>
+<option value="307">307 Temporary Redirect</option>
+<option value="308">308 Permanent Redirect</option>
+<option value="400">400 Bad Request</option>
+<option value="401">401 Unauthorized</option>
+<option value="402">402 Payment Required</option>
+<option value="403">403 Forbidden</option>
+<option value="404">404 Not Found</option>
+<option value="405">405 Method Not Allowed</option>
+<option value="406">406 Not Acceptable</option>
+<option value="407">407 Proxy Authentication Required</option>
+<option value="408">408 Request Timeout</option>
+<option value="409">409 Conflict</option>
+<option value="410">410 Gone</option>
+<option value="411">411 Length Required</option>
+<option value="412">412 Precondition Failed</option>
+<option value="413">413 Request Entity Too Large</option>
+<option value="414">414 Request-URI Too Long</option>
+<option value="415">415 Unsupported Media Type</option>
+<option value="416">416 Requested Range Not Satisfiable</option>
+<option value="417">417 Expectation Failed</option>
+<option value="418">418 I'm a teapot</option>
+<option value="419">419 Authentication Timeout</option>
+<option value="420">420 Method Failure</option>
+<option value="420">420 Enhance Your Calm</option>
+<option value="422">422 Unprocessable Entity</option>
+<option value="423">423 Locked</option>
+<option value="424">424 Failed Dependency</option>
+<option value="424">424 Method Failure</option>
+<option value="425">425 Unordered Collection</option>
+<option value="426">426 Upgrade Required</option>
+<option value="428">428 Precondition Required</option>
+<option value="429">429 Too Many Requests</option>
+<option value="431">431 Request Header Fields Too Large</option>
+<option value="440">440 Login Timeout</option>
+<option value="444">444 No Response</option>
+<option value="449">449 Retry With</option>
+<option value="450">450 Blocked by Windows Parental Controls</option>
+<option value="451">451 Unavailable For Legal Reasons</option>
+<option value="451">451 Redirect</option>
+<option value="494">494 Request Header Too Large</option>
+<option value="495">495 Cert Error</option>
+<option value="496">496 No Cert</option>
+<option value="497">497 HTTP to HTTPS</option>
+<option value="499">499 Client Closed Request</option>
+<option value="500">500 Internal Server Error</option>
+<option value="501">501 Not Implemented</option>
+<option value="502">502 Bad Gateway</option>
+<option value="503">503 Service Unavailable</option>
+<option value="504">504 Gateway Timeout</option>
+<option value="505">505 HTTP Version Not Supported</option>
+<option value="506">506 Variant Also Negotiates</option>
+<option value="507">507 Insufficient Storage</option>
+<option value="508">508 Loop Detected</option>
+<option value="509">509 Bandwidth Limit Exceeded</option>
+<option value="510">510 Not Extended</option>
+<option value="511">511 Network Authentication Required</option>
+<option value="520">520 Origin Error</option>
+<option value="522">522 Connection timed out</option>
+<option value="523">523 Proxy Declined Request</option>
+<option value="524">524 A timeout occurred</option>
+<option value="598">598 Network read timeout error</option>
+<option value="599">599 Network connect timeout error</option>
+</select>
 												</td>
 											</tr>
 										</table>
@@ -220,22 +284,36 @@
 												<td>
 												  <label class="labelBold">User Name:</label>
 												</td>
-											</tr>
-											<tr>
-												<td>
-												  <input name="userId" placeholder=" " size="15px" type="text" />
-												</td>
-											</tr>
-										</table>
-										<table>
-											<tr>
 												<td>
 												  <label class="labelBold">Group:</label>
 												</td>
 											</tr>
 											<tr>
 												<td>
+												  <input name="userId" placeholder=" " size="15px" type="text" />
+												</td>
+												<td>
 												  <input name="group" placeholder=" " size="15px" type="text" />
+												</td>
+											</tr>
+										</table>
+										<table>
+											<tr>
+												<td>
+												  <label class="labelBold">Begin Date:</label>
+												  <input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												</td>
+												<td>
+												  <label class="labelBold">Begin Time:<sup>**</sup></label>
+												  <input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
+												</td>
+												<td>
+												  <label class="labelBold">End Date:</label>
+												  <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												</td>
+												<td>
+												  <label class="labelBold">End Time:<sup>**</sup></label>
+												  <input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
 												</td>
 											</tr>
 										</table>
@@ -247,8 +325,14 @@
 												  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
+							 <tr>
+												<td class="spacersm"></td>
+							</tr>
 								<tr>
 									<td colspan="3"><%= limitHTML %></td>
+								</tr>
+								<tr>
+								  <td colspan="3"><sup>**</sup><small><em>Time values are Mountain TZ (default 00:00:00).</em></small></td>
 								</tr>
 										</table>
 									</div>
