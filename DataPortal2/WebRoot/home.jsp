@@ -241,8 +241,8 @@
 										<br />
 										<br />
 								    <div id="chart_div"></div>
-								    <p>Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b></strong><br />
-									     Total data packages: <b><%=numDataPackages.toString()%></b></strong>
+								    <p>Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
+									     Total data packages: <b><%=numDataPackages.toString()%></b>
 								    </p>
 									</div>
 								</article>

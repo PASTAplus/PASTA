@@ -67,7 +67,7 @@
 							<div class="span12">
 								<!-- Content -->
 								
-				<p class="warning" align="center"><%=message%></p>
+				<p class="warning"><%=message%></p>
 
 					<form id="login" name="loginform" method="post" action="./login"
 						target="_top">

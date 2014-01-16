@@ -36,6 +36,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
+import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaClient;
 import edu.lternet.pasta.client.ReportUtility;
 
@@ -122,6 +123,14 @@ public class AuditReportServlet extends DataPortalServlet {
      * Request and process filter parameters
      */
     
+    String serviceMethodParam = (String) request.getParameter("serviceMethod");
+    if (serviceMethodParam != null && 
+    	!serviceMethodParam.isEmpty() && 
+    	!serviceMethodParam.equalsIgnoreCase("all")
+       ) {
+        filter.append("&serviceMethod=" + serviceMethodParam);
+    }
+
     String beginTime = "00:00:00";
     String endTime   = "00:00:00";
     String time = "";
@@ -207,7 +216,7 @@ public class AuditReportServlet extends DataPortalServlet {
     }
     
     String code = (String) request.getParameter("code");
-    if (code != null && !code.isEmpty()) {
+    if (code != null && !code.isEmpty() && !code.equalsIgnoreCase("all")) {
     	if (filter.length() == 0) {
     		filter.append("status=" + code);
     	} else {
@@ -271,6 +280,32 @@ public class AuditReportServlet extends DataPortalServlet {
 		
 		xslpath = options.getString("auditreport.xslpath");
 		cwd = options.getString("system.cwd");
+	}
+	
+	
+	public String serviceMethodsHTML(String uid) throws ServletException {
+		String html = "";
+		StringBuffer htmlStringBuffer = new StringBuffer(
+				String.format("  <option value=\"%s\">%s</option>\n", "all", "All Service Methods"));
+		try {
+			DataPackageManagerClient dpmc = new DataPackageManagerClient(uid);
+			String serviceMethods = dpmc.listServiceMethods();
+			if (serviceMethods != null && !serviceMethods.equals("")) {
+				String[] serviceMethodsArray = serviceMethods.split("\n");
+			    for (int i = 0; i < serviceMethodsArray.length; i++) {
+			        String serviceMethod = serviceMethodsArray[i];
+			        htmlStringBuffer.append(
+			            String.format("  <option value=\"%s\">%s</option>\n", serviceMethod, serviceMethod));
+			    }
+			      
+			    html = htmlStringBuffer.toString();
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+
+		return html;
 	}
 
 }

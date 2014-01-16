@@ -2296,6 +2296,200 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List Service Mehtods</strong> operation
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/service-methods</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1?filter=newest</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 *
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A newline-separated list of revision values matching the
+	 * specified scope and identifier values</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * appendProvenance
+	 * createDataPackage
+	 * createDataPackageArchive
+	 * .
+	 * .
+	 * . (truncated for brevity)
+     * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal scope
+	 * or identifier value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list
+	 * of the data package revisions</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package revisions associated with the specified
+	 * scope and identifier are found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, containing a newline-separated list of service
+	 *         method names supported by the Data Package Manager
+	 */
+	@GET
+	@Path("/service-methods")
+	@Produces("text/plain")
+	public Response listServiceMethods(@Context HttpHeaders headers) {
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listServiceMethods";
+		Rule.Permission permission = Rule.Permission.read;
+		AuthToken authToken = null;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			String serviceMethods = "";
+			StringBuffer stringBuffer = new StringBuffer();
+			NodeList nodeList = null;
+			String serviceDocumentStr = ConfigurationListener
+					.getServiceDocument();
+			Document document = XmlUtility.xmlStringToDoc(serviceDocumentStr);
+
+			if (document != null) {
+				NodeList documentNodeList = document.getChildNodes();
+				Node rootNode = documentNodeList.item(0);
+				nodeList = rootNode.getChildNodes();
+
+				if (nodeList != null) {
+					int nodeListLength = nodeList.getLength();
+					for (int i = 0; i < nodeListLength; i++) {
+						Node childNode = nodeList.item(i);
+						String nodeName = childNode.getNodeName();
+						String nodeValue = childNode.getNodeValue();
+						if (nodeName.contains("service-method")) {
+							Element serviceElement = (Element) nodeList.item(i);
+							NamedNodeMap serviceAttributesList = serviceElement
+									.getAttributes();
+
+							for (int j = 0; j < serviceAttributesList
+									.getLength(); j++) {
+								Node attributeNode = serviceAttributesList
+										.item(j);
+								nodeName = attributeNode.getNodeName();
+								nodeValue = attributeNode.getNodeValue();
+								if (nodeName.equals("name")) {
+									String name = nodeValue;
+									stringBuffer.append(String.format("%s\n",
+											name));
+								}
+							}
+						}
+					}
+				}
+			}
+			else {
+				String message = "No service methods were found in the service.xml file";
+				throw new IllegalStateException(message);
+			}
+
+			serviceMethods = stringBuffer.toString();
+			responseBuilder = Response.ok(serviceMethods.trim());
+			response = responseBuilder.build();
+		}
+		catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
 	 * <strong>Read Data Entity</strong> operation, specifying the scope,
 	 * identifier, revision, and entity identifier of the data entity to be read
 	 * in the URI.
