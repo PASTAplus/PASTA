@@ -34,7 +34,6 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- Metadata Viewer -->
-<link href="css/sbclter.css" rel="stylesheet" type="text/css">
 <script src="js/toggle.js" type="text/javascript"></script>
 <!-- /Metadata Viewer -->
 

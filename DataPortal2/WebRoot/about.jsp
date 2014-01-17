@@ -174,7 +174,7 @@
 											</tr>
 										</table>
 									</form>
-									<p><sup>*</sup><strong>User authentication</strong> is <em>required</em> for all data input to the PASTA system.</p>
+									<p><sup>*</sup>User authentication is <em>required</em> for all data input to the PASTA system.</p>
 								</div>
 								</fieldset>
 							</div>
