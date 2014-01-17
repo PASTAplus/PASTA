@@ -44,15 +44,13 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Need Help? Have Questions?</h2>
+								<h2>How do I ...</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-
-			<h3>How do I ...</h3>
 
 			<ul>
 				<li>Learn about the PASTA Software Developer's Application

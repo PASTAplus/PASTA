@@ -25,6 +25,7 @@
   String helpClass = "";
   String homeClass = "";
   String loginClass = "";
+  String resourcesClass = "";
   String toolsClass = "";
   String requestURI = request.getRequestURI();
   String pageName = requestURI.substring(requestURI.lastIndexOf("/") + 1, 
@@ -61,6 +62,9 @@
   }
   else if (pageName.equals("login")) {
     loginClass = currentClass;
+  }
+  else if (pageName.equals("resources")) {
+    resourcesClass = currentClass;
   }
 %>
  
@@ -117,6 +121,7 @@
 					<li><a href="dataPackageAudit.jsp">Data Package Access Reports</a></li>
 				</ul>
 				</li>
+				<!--   <li<%= resourcesClass %>><a href="resources.jsp">Resources</a> </li> -->
 				<li<%= aboutClass %>><a href="about.jsp">About</a></li>
 				<li<%= helpClass %>><a href="help.jsp">Help</a> </li>
 				<li<%= contactClass %>><a href="contact.jsp">Contact</a> </li>

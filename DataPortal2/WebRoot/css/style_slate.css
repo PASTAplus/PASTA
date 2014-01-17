@@ -2725,7 +2725,82 @@ ul, ol {
     margin-left:                15px;
 }
 
-/*** Added by D. Costa ***/
+
+/*
+ * Added from sbclter.css. 
+ * This group of style declarations are needed
+ * to support EML rendering.
+ */
+ 
+.subGroup {
+    padding:                    3px;
+    voice-family:               "\"}\""; /* begin ie5win hack */
+    voice-family:               inherit;
+    -moz-border-radius:         10px; /* end ie5win hack */
+}
+ 
+th {
+    text-align:                 left;
+    /*font-style:                 italic;*/
+    font-weight:                700;
+} 
+
+.rowodd {
+	  border-bottom:              white solid 2px;
+	  border-top:                 white solid 2px;
+	  background-color:           #b2cce0;
+	  padding:                    0.25em;
+	  margin:                     0;
+}
+
+.roweven {
+    padding:                    0.25em;
+    margin:                     0;
+} 
+
+.coleven {
+    border-left:                1px;
+    border-right:               1px;
+    background-color:           #b2cce0;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.colodd {
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercolodd {
+    border:                     solid 1px;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercoleven {
+    border:                     solid 1px;
+    background-color:           #b2cce0;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}    
+
+.onehundred_percent {
+    min-width:                  100px;
+    /*width:                      100%;*/
+}
+
+/* End -- Added from sbclter.css. */
+
+
+/*
+ * Added by D. Costa 
+ */
 
 /* Browse page */
 

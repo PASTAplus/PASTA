@@ -225,28 +225,21 @@
             <tr>
               <th colspan="2">By Thesaurus:</th>
             </tr>
-            <tr>
-              <td>
                 <xsl:for-each select="keywordSet">
-                  <table class="{$tabledefaultStyle}">
-                    <tr>
-                      <td class="{$firstColStyle}">
-                        <xsl:choose>
-                          <xsl:when test="keywordThesaurus"> 
-                            <xsl:value-of select="keywordThesaurus" />
-                          </xsl:when>
-                          <xsl:otherwise>      
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </td>
+                     <tr>
+                      <xsl:choose>
+                        <xsl:when test="keywordThesaurus"> 
+                          <td class="{$firstColStyle}"><xsl:value-of select="keywordThesaurus" /></td>
+                        </xsl:when>
+                        <xsl:otherwise>      
+                          <td class="{$firstColStyle}">(No thesaurus)</td>                 
+                        </xsl:otherwise>
+                      </xsl:choose>
                       <td class="{$secondColStyle}">
                         <xsl:call-template name="resourcekeywordsAsPara" ></xsl:call-template>
                       </td>
                     </tr>
-                  </table>
                 </xsl:for-each>
-              </td> 
-            </tr>
           </table>
         </xsl:if>
       </div> <!-- end collapsible -->   
@@ -557,10 +550,10 @@
           <!--  TO DO: this needs to work for all entity types. choose label based on element name  -->
           <xsl:for-each select="dataTable">
             <xsl:if test="coverage or *//attribute/coverage">
-              <h4>
+              <h3>
                 <xsl:text>Temporal, Geographic and/or Taxonomic information that applies to Data Table: </xsl:text>
                 <xsl:value-of select="entityName"/> 
-              </h4>
+              </h3>
               <xsl:if test="coverage"> <!-- if an entity-level cov tree -->
                 <xsl:for-each select="./coverage/temporalCoverage">
                   <xsl:call-template name="temporalCoverage">
@@ -1944,7 +1937,7 @@
     </xsl:if>
     <table class="subgroup onehundred_percent">
       <tr>
-        <th colspan="2">People and Organizations:</th>
+        <th colspan="2"><br/>People and Organizations</th>
       </tr>
       <!-- Put the contacts first -->
       <xsl:for-each select="contact">
@@ -2137,7 +2130,7 @@
       <table class="{$tabledefaultStyle}">
         <xsl:if test="dataTable or spatialRaster or spatialVector or storedProcedures or view or otherEntity">
           <tr>
-            <th colspan="2"><xsl:text>Data Entities:</xsl:text></th>
+            <th colspan="2"><br/><xsl:text>Data Entities</xsl:text></th>
           </tr>
         </xsl:if>
         <!--  when you call the entityurl template, include a label for type of entity  -->
@@ -2408,7 +2401,7 @@
           <tr>
             <td class="{$firstColStyle}">
               <!--  this is the simple label-only version, instead of the form button. -->
-              <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text>
+              Description<xsl:text>:</xsl:text>
             </td>
             <td class="{secondColStyle}">
               <xsl:value-of select="./entityDescription"/>
@@ -2419,7 +2412,6 @@
       <xsl:otherwise>
         <tr>
           <td class="{$firstColStyle}">
-            <!--  this is the simple label-only version, instead of the form button. -->
             <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text><br></br>
           </td>
           <td class="{secondColStyle}">
@@ -2427,13 +2419,8 @@
           </td>
         </tr>
         <tr>
-          <td class="{$firstColStyle}">
-            <!--  this is the simple label-only version, instead of the form button. -->
-            <xsl:value-of select="$showtype"/> Description<xsl:text>:</xsl:text><br></br>
-          </td>
-          <td class="{secondColStyle}">
-            <xsl:value-of select="./entityDescription"/>
-          </td>
+          <td class="{$firstColStyle}">Description<xsl:text>:</xsl:text><br></br></td>
+          <td class="{secondColStyle}"><xsl:value-of select="./entityDescription"/></td>
         </tr>
       </xsl:otherwise>
     </xsl:choose>
@@ -3025,7 +3012,7 @@
   <xsl:template name="temporalCovCommon">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: temporalCovCommon</xsl:text></xsl:message></xsl:if>
     <tr>
-      <th colspan="2"><xsl:text>Time Period:</xsl:text></th>
+      <th colspan="2"><br/><xsl:text>Time Period</xsl:text></th>
     </tr>
     <xsl:apply-templates select="singleDateTime"/>
     <xsl:apply-templates select="rangeOfDates"/>
@@ -3330,7 +3317,7 @@
     </xsl:param>  
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: dataTable</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Data Table:</big></label>
+    <h2>Data Table</h2>
     <table class="subGroup onehundred_percent">
       <tr>
         <td>
@@ -3368,7 +3355,7 @@
             <!-- moved this out of datatablecommon, to break up linear arrangment  -->
             <xsl:if test="physical">
               <tr>
-                <th colspan="2">Table Structure:</th>
+                <th colspan="2"><br/>Table Structure</th>
               </tr>
               <!-- distrubution is still under datatablecommon 
               <xsl:for-each select="physical">
@@ -3398,7 +3385,7 @@
     <!-- a second table for the attributeList -->
     <table class="{$tabledefaultStyle}">
       <tr>
-        <th colspan="2">Table Column Descriptions</th>
+        <th colspan="2"><br/>Table Column Descriptions</th>
       </tr>
       <tr>
         <td>
@@ -3906,7 +3893,7 @@
     </tr>
     <!-- Second row for attribute label, the ugly one, element required -->
     <tr>
-      <th class="rowodd">Column Name</th>
+      <td class="rowodd">Column Name:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -3958,7 +3945,7 @@
     </tr>
     <!-- Third row for attribute defination-->
     <tr>
-      <th class="rowodd">Definition</th>
+      <td class="rowodd">Definition:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -3986,7 +3973,7 @@
     </tr>
     <!-- The fourth row for attribute storage type-->
     <tr>
-      <th class="rowodd">Storage Type</th>
+      <td class="rowodd">Storage Type:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -4036,7 +4023,7 @@
     </tr>
     <!-- The fifth row for meaturement type-->
     <tr>
-      <th class="rowodd">Measurement Type</th>
+      <td class="rowodd">Measurement Type:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -4073,7 +4060,7 @@
     <!-- The sixth row for meaturement domain-->
     <tr>
    <!--    <th class="rowodd">Description of Allowed Values</th>-->
-      <th class="rowodd">Measurement Values Domain</th> 
+      <td class="rowodd">Measurement Values Domain:</td> 
       <xsl:for-each select="attribute">
         <!-- mob added, pass this index to measurementscale, not position. should move this earlier? -->
         <xsl:variable name="attributeindex" select="position()"/>
@@ -4133,7 +4120,7 @@
     </tr>
     <!-- The seventh row for missing value code-->
     <tr>
-      <th class="rowodd">Missing Value Code</th>
+      <td class="rowodd">Missing Value Code:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -4211,7 +4198,7 @@
     </tr>
     <!-- The eighth row for accuracy report-->
     <tr>
-      <th class="rowodd">Accuracy Report</th>
+      <td class="rowodd">Accuracy Report:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -4261,7 +4248,7 @@
     </tr>
     <!-- The ninth row for quality accuracy accessment -->
     <tr>
-      <th class="rowodd">Accuracy Assessment</th>
+      <td class="rowodd">Accuracy Assessment:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="stripes">
           <xsl:choose>
@@ -4343,7 +4330,7 @@
     </tr>
     <!-- The tenth row for coverage-->
     <tr>
-      <th class="rowodd">Coverage</th>
+      <td class="rowodd">Coverage:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="index" select="position()"/>
         <xsl:variable name="stripes">
@@ -4404,7 +4391,7 @@
     </tr>
     <!-- The eleventh row for method-->
     <tr>
-      <th class="rowodd">Methods</th>
+      <td class="rowodd">Methods:</td>
       <xsl:for-each select="attribute">
         <xsl:variable name="index" select="position()"/>
         <xsl:variable name="stripes">
@@ -6182,7 +6169,7 @@
       <td class="{$disfirstColStyle}"><xsl:text>Request data:</xsl:text></td>
       <td class="{$secondColStyle}">   
         <!-- as a form button. -->
-        <form method="GET"  class="entity-link" >
+        <form method="GET" >
           <xsl:attribute name="action">
             mailto:<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/>
           </xsl:attribute>          
@@ -6192,7 +6179,7 @@
             </xsl:attribute>       
             <xsl:attribute name="name" >subject</xsl:attribute>        
           </input>   
-          <input type="submit" class="view-data-button" >
+          <input type="submit">
             <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" />
             </xsl:attribute>       
           </input> 
@@ -7563,7 +7550,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: otherEntity</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Non-Categorized Data Resource:</big></label>
+    <h2>Non-Categorized Data Resource</h2>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -9294,7 +9281,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialRaster</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Spatial Raster:</big></label>
+    <h2>Spatial Raster</h2>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -10195,7 +10182,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: spatialVector</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Spatial Vector:</big></label>
+    <h2>Spatial Vector</h2>
     <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -10429,7 +10416,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: storedProcedure</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>Stored Procedure:</big></label>
+    <h2>Stored Procedure</h2>
     <table xsl:use-attribute-sets="cellspacing" class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
@@ -10678,7 +10665,6 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section</xsl:text></xsl:message></xsl:if>
     <xsl:if test="normalize-space(.)!=''">
       <xsl:if test="title and normalize-space(title[1])!=''">
-        <!-- <h4 class="bold"><xsl:value-of select="title"/></h4> -->
 	      <h4><xsl:value-of select="title"/></h4>
       </xsl:if>
       <xsl:if test="para and normalize-space(para[1])!=''">
@@ -10695,7 +10681,6 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section; mode: lowlevel</xsl:text></xsl:message></xsl:if>
     <div>
       <xsl:if test="title and normalize-space(title[1]) != ''">
-        <!-- <h4 class="bold"><xsl:value-of select="title"/></h4>  -->
         <h5><xsl:value-of select="title"/></h5>
       </xsl:if>
       <xsl:if test="para and normalize-space(para[1]) != ''">
@@ -10785,7 +10770,7 @@
     <xsl:param name="entitytype"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: view</xsl:text></xsl:message></xsl:if>
     <hr></hr>
-    <label><big>View:</big></label>
+    <h2>View</h2>
     <table class="{$tabledefaultStyle}">
       <xsl:choose>
         <xsl:when test="references!=''">
