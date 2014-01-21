@@ -101,22 +101,22 @@
 				<ul class="sub-menu">
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
-					Manage Data Packages:</p>
+					Data Packages:</p>
 					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li>
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
 					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
 					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
-					Manage Event Subscriptions:</p>
+					Events:</p>
 					<li><a href="eventSubscribe.jsp">Event Subscriptions</a></li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
-					PASTA Provenance Metadata:</p>
+					Provenance:</p>
 					<li><a href="provenanceViewer.jsp">Provenance Viewer</a></li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
-					Review PASTA Audit Reports:</p>
+					Reports:</p>
 					<li><a href="auditReport.jsp">Audit Reports</a></li>
 					<li><a href="dataPackageAudit.jsp">Data Package Access Reports</a></li>
 				</ul>

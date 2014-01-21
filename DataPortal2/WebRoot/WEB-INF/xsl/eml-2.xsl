@@ -2055,7 +2055,7 @@
               </xsl:if>
               <xsl:if test="organizationName">
                 <!-- Organization appears alone if alone under creator -->
-                <td class="{$firstColStyle}">Organization</td>
+                <td class="{$firstColStyle}">Organization:</td>
                 <td class="{$secondColStyle}"><xsl:value-of select="organizationName"/></td>
               </xsl:if>
             </xsl:otherwise>
@@ -10676,7 +10676,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Section template for low level. Cteate a nested table and second column -->
+  <!-- Section template for low level. Create a nested table and second column -->
   <xsl:template match="section" mode="lowlevel">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: section; mode: lowlevel</xsl:text></xsl:message></xsl:if>
     <div>

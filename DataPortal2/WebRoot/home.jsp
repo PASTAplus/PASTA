@@ -235,18 +235,12 @@
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
-							<section id="examples">
-								<article id="lineChart" class=" ">
-									<div>
 										<br />
 										<br />
 								    <div id="chart_div"></div>
 								    <p>Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
 									     Total data packages: <b><%=numDataPackages.toString()%></b>
 								    </p>
-									</div>
-								</article>
-							</section>
 						</div>
 					</div>
 				</div>

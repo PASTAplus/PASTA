@@ -113,7 +113,7 @@
         <%
           if (deleteMessage != null) {
             out.println("<div class=\"section\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
