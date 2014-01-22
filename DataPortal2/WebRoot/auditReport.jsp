@@ -339,16 +339,7 @@
 									<!-- section -->
 					<%
 						if (reportMessage != null && type.equals("class=\"warning\"")) {
-							out.println("<div class=\"section\">\n");
-							out.println("<table>\n");
-							out.println("<tbody>\n");
-							out.println("<tr>\n");
-							out.println("<td " + type + ">\n");
-							out.println(reportMessage + "\n");
-							out.println("</td>\n");
-							out.println("</tr>\n");
-							out.println("</tbody>\n");
-							out.println("</table>\n");
+							out.println(String.format("<p class=\"nis-warn\">%s</p>", reportMessage));
 						}
 					%>
 

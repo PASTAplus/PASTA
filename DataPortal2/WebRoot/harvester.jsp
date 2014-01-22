@@ -1,3 +1,21 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+	HttpSession httpSession = request.getSession();
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	if (uid == null || uid.isEmpty()) {
+		request.setAttribute("from", "./harvester.jsp");
+		String loginWarning = DataPortalServlet.getLoginWarning();
+		request.setAttribute("message", loginWarning);
+		RequestDispatcher requestDispatcher = request
+		    .getRequestDispatcher("./login.jsp");
+		requestDispatcher.forward(request, response);
+	}
+	
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
