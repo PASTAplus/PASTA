@@ -137,9 +137,9 @@
 
 		// Set chart options
 		var options = {
-			'title' : '',
-			'width' : 500,
-			'height' : 300,
+			'title' : 'Site/Data Package Growth',
+			'width' :  400,
+			'height' : 250,
 
 
 
@@ -195,7 +195,7 @@
 							U.S. LTER Network are made available online with as 
 							few restrictions as possible, on a non-discriminatory 
 							basis. In return, the LTER Network expects data users 
-							to <strong><em>act ethically</em></strong> by contacting the 
+							to <em>act ethically</em> by contacting the 
 							investigator prior to the use of data for publication.
 							</p>
 							<p>The LTER Network Information System Data Portal contains 
@@ -228,17 +228,9 @@
 				</div>
 				<div class="span4 box_shadow box_layout">
 					<div class="row-fluid">
-						<div class="span12">
-							<div class="recent_title">
-								<h2>Site / Data Package Growth</h2>
-							</div>
-							<span class="row-fluid separator_border"></span>
-						</div>
 						<div class="row-fluid">
-										<br />
-										<br />
 								    <div id="chart_div"></div>
-								    <p>Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
+								    <p id="nis-growth">Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
 									     Total data packages: <b><%=numDataPackages.toString()%></b>
 								    </p>
 						</div>
