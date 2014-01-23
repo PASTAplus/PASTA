@@ -200,41 +200,36 @@
 														      <label>Zoom in to the region you&#39;d like to search:</label>											
                                   <div id="map-canvas"></div>
 													      </td>
-													      <td></td>
 													      <td>
-													        <table>
+													        <table id="nis-coordinates">
 														        <tr>
 															        <td></td>
 															        <td>
-															          <label>North:
-															            <input maxlength="12" name="northBound" onchange="boundsChanged()" 
-															                  size="12" type="text" value="90.0" />
-															          </label>
+															          <label>North:</label>
+															            <input name="northBound" onchange="boundsChanged()" 
+															                  size="8" type="text" value="90.0" />
 															        </td>
 															        <td></td>
 		  												      </tr>
 			  											      <tr>
 				  											      <td>
-					  										        <label>West:
-						  									          <input maxlength="12" name="westBound" onchange="boundsChanged()" 
-							  								                 size="12" type="text" value="-180.0" />
-								  							        </label>
+					  										        <label>West:</label>
+						  									          <input name="westBound" onchange="boundsChanged()" 
+							  								                 size="8" type="text" value="-180.0" />						  							        
 									  						      </td>
 										  					      <td></td>
 											  				      <td>
-												  			        <label>East:
-													  		          <input maxlength="12" name="eastBound" onchange="boundsChanged()" 
-														  	                 size="12" type="text" value="180.0" />
-															          </label>
+												  			        <label>East:</label>
+													  		          <input name="eastBound" onchange="boundsChanged()" 
+														  	                 size="8" type="text" value="180.0" />									          
 															        </td>
 						  								      </tr>
 							  							      <tr>
 								  							      <td></td>
 									  						      <td>
-										  					        <label>South:
-											  				          <input maxlength="12" name="southBound" onchange="boundsChanged()" 
-												  			                 size="12" type="text" value="-90.0" />
-													  		        </label>
+										  					        <label>South:</label>
+											  				          <input name="southBound" onchange="boundsChanged()" 
+												  			                 size="8" type="text" value="-90.0" />
 														  	      </td>
 															        <td></td>
 	  													      </tr>
@@ -263,9 +258,6 @@
 															    <!-- <h3 class="separator_border labelBold span1" for="advancedsearch">Geographic Place Name</h3> -->
 															    <label class="labelBold">Geographic Place Name:</label>
 															  </td>
-														  </tr>
-														  <tr>
-															  <td class="spacersmh"></td>
 														  </tr>
 														<tr>
 														<td>													  

@@ -114,11 +114,12 @@ public class HarvestReport {
     String verb = isEvaluate ? "evaluated" : "uploaded";
     StringBuffer stringBuffer = new StringBuffer("");
     
-    stringBuffer.append("<table class=\"nis\">\n");
+    stringBuffer.append("<table>\n");
+    stringBuffer.append("<thead>\n");
     stringBuffer.append("<tr>\n");
-    stringBuffer.append("<th class=\"nis\">PackageId</th>\n");
+    stringBuffer.append("<th class=\"nis\">Package Id</th>\n");
     stringBuffer.append("<th class=\"nis\">Was<br/>" + verb + "</th>\n");
-    stringBuffer.append("<th class=\"nis\">Quality<br/>Report</th>\n");
+    stringBuffer.append("<th class=\"nis\">Report</th>\n");
     stringBuffer.append("<th class=\"nis\">Total<br/>Quality<br/>Checks</th>\n");
     stringBuffer.append("<th class=\"nis\">Valid</th>\n");
     stringBuffer.append("<th class=\"nis\">Info</th>\n");
@@ -126,6 +127,8 @@ public class HarvestReport {
     stringBuffer.append("<th class=\"nis\">Error</th>\n");
     stringBuffer.append("<th class=\"nis\" width=\"50%\">System Message</th>\n");
     stringBuffer.append("</tr>\n");
+    stringBuffer.append("</thead>\n");
+    stringBuffer.append("<tbody>\n");
     
     String urlMessagesPath = reportPath + "/urlMessages.txt";
     ArrayList<String> urlMessages = getUrlMessages(urlMessagesPath);
@@ -138,6 +141,7 @@ public class HarvestReport {
       stringBuffer.append(dataPackageHTML(reportPath, reportId, packageId, isEvaluate));
     }
       
+    stringBuffer.append("</tbody>\n");
     stringBuffer.append("</table>\n");
     
     String htmlString = stringBuffer.toString();

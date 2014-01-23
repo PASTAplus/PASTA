@@ -2885,12 +2885,8 @@ p.cite cite {
 
 #map-canvas {
   margin: 0 auto; 
-  width: 330px; 
-  height: 258px
-}
-
-table.nis {
-
+  width: 400px; 
+  height: 250px;
 }
 
 th.nis {
@@ -2904,6 +2900,7 @@ th.nis {
     background-color: #F7F7F7;
 }
 
+
 td.nis {
     font-size: 0.9em;
     border: solid;
@@ -2912,6 +2909,7 @@ td.nis {
     padding: 5px;
     vertical-align: top;
 }
+
 
 kbd.nis {
 	  font-weight: bold;
@@ -2944,6 +2942,20 @@ p.eml {
 	line-height: inherit;
 	font-size: inherit;
 	color: inherit;
+}
+
+table#nis-coordinates {
+	margin: 0px 10px;
+}
+
+
+table#nis-coordinates input {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+#nis-growth {
+	margin-left: 75px;
 }
 
 
