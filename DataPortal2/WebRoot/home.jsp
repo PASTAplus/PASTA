@@ -141,8 +141,6 @@
 			'width' :  400,
 			'height' : 250,
 
-
-
 			'vAxes' : {
 				0 : {
 					logScale : false
