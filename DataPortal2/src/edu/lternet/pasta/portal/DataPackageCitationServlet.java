@@ -230,7 +230,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 				for (Title title : titles) {
 					if (title.getTitleType().equals(Title.MAIN)) {
-						titleText += title.getTite() + ". ";
+						titleText += title.getTite() + ".";
 					}
 				}
 
@@ -316,8 +316,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				logger.error(e.getMessage());
 				e.printStackTrace();
 				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
-				caveat = "<p>Note: DOIs are generated hourly for all data packages"
-				    + " that are \"publicly\" accessible.</p>";
+				caveat = "Note: DOIs are generated hourly for all data packages"
+				    + " that are \"publicly\" accessible.";
 			}
 			
 			citationUrl = "<a href=\"" + citationId + "\">" + citationId + "</a>"; 
@@ -345,8 +345,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			return html;
 		}
 
-		html = "<p id=\"cite\">" + creatorText + pubDateText + titleText + orgText + PUBLISHER
-		    + citationUrl + "</p>" + caveat;
+		html = String.format("<p class=\"cite\">%s %s <cite>%s</cite> %s %s %s</p><p>%s</p>", 
+               creatorText, pubDateText, titleText, orgText, PUBLISHER, citationUrl, caveat);
 		
 		return html;
 
