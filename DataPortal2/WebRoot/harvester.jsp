@@ -1,3 +1,21 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+	HttpSession httpSession = request.getSession();
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	if (uid == null || uid.isEmpty()) {
+		request.setAttribute("from", "./harvester.jsp");
+		String loginWarning = DataPortalServlet.getLoginWarning();
+		request.setAttribute("message", loginWarning);
+		RequestDispatcher requestDispatcher = request
+		    .getRequestDispatcher("./login.jsp");
+		requestDispatcher.forward(request, response);
+	}
+	
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -62,7 +80,7 @@
 								<p>Select an Ecological Metadata Language (EML) file to evaluate or upload.</p>
 								<div class="section">
                   <form id="emlFile" name="emlFile" method="post" enctype="multipart/form-data" action="./harvester">
-										<table align="left" cellpadding="4em">
+										<table>
 											<tr>
 												<td align="left">
 												<label class="labelBold">File:</label>
@@ -87,7 +105,7 @@
 								area below, one per line, and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 								<div class="section">
 									<form id="urlList" action="./harvester" method="post" name="urlList">
-										<table align="left" cellpadding="4em">
+										<table>
 											<tr>
 												<td align="left">
 												<textarea id="urlTextArea" cols="80" name="urlTextArea" required="required" rows="8"></textarea>
@@ -121,7 +139,7 @@
 			                     area below and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 												<div class="section">
 													<form id="emlText" action="./harvester" method="post" name="emlText">
-														<table align="left" cellpadding="4em">
+														<table>
 															<tr>
 																<td align="left">
 																<textarea id="emlTextArea" cols="100" name="emlTextArea" required="required" rows="8"></textarea></td>
@@ -143,7 +161,7 @@
 												or <b>Upload</b>. All <var>documentURL</var> elements in the harvest list will be processed.</p>
 												<div class="section">
 													<form id="harvestList" action="./harvester" method="post" name="harvestList">
-														<table align="left" cellpadding="4em">
+														<table>
 															<tr>
 																<td align="left">
 																<label class="labelBold">Metacat Harvest List URL:</label>

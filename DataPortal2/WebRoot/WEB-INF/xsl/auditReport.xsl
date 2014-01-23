@@ -26,11 +26,11 @@
 
   <xsl:template match="/">
 
+    <hr/>
+    <h3>PASTA Audit Report</h3>
     <div class="section-table">
-      <fieldset>
-        <legend>PASTA Audit Report</legend>
         <table>
-          <tbody>
+          <thead>
             <tr>
               <th class="nis">Id</th>
               <th class="nis">Date/Time</th>
@@ -44,6 +44,8 @@
               <!-- <th class="nis">AuthSystem</th> -->
               <th class="nis">Message</th>
             </tr>
+          </thead>
+          <tbody>
             <xsl:for-each select="/auditReport/auditRecord">
               <xsl:sort select="./oid" data-type="number" />
               <tr>
@@ -62,7 +64,6 @@
             </xsl:for-each>
           </tbody>
         </table>
-      </fieldset>
     </div>
     <!-- section-table -->
 

@@ -126,7 +126,7 @@
 				<%
 				  if (subscribeMessage != null) {
 				    out.println("<div class=\"section\">\n");
-				    out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+				    out.println("<table>\n");
 				    out.println("<tbody>\n");
 				    out.println("<tr>\n");
 				    out.println("<td " + type + ">\n");
@@ -167,7 +167,7 @@
         <%
           if (reviewMessage != null) {
             out.println("<div>\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
@@ -204,7 +204,7 @@
 								</div>
         <%
           if (testMessage != null) {
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
@@ -244,7 +244,7 @@
         <%
           if (deleteMessage != null) {
             out.println("<div class=\"section\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");

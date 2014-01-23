@@ -2,7 +2,7 @@ em {
 	font-family: 'Open Sans';
 	line-height: 18px;
 	/* font-size: 12px; */
-	color: #666666;
+	/* color: #666666; */
 }
 textarea {
 	font-family: 'Open Sans';
@@ -2290,7 +2290,7 @@ p {
 	font-family: 'Open Sans';
 	line-height: 22px;
 	font-size: 14px;
-	color: #666666;
+	/* color: #666666; */
 }
 
 p.smallmenu {
@@ -2741,7 +2741,6 @@ ul, ol {
  
 th {
     text-align:                 left;
-    /*font-style:                 italic;*/
     font-weight:                700;
 } 
 
@@ -2802,7 +2801,9 @@ th {
  * Added by D. Costa 
  */
 
-/* Browse page */
+/* 
+ * Browse page 
+ */
 
 .browsegroup {
     font-weight: bold;
@@ -2824,18 +2825,19 @@ a.browseterm hover {
 /* End browse page */
 
 
-/* Data package citation page */
-#cite {
-	margin-left: 20px;
-	padding: 5px;
-	padding-left: 10px;
-	font-weight: normal;
-	font-style: italic;
-	width: 90%;
-	background: #e6e6e6;
-    border:0;
-	
+/* 
+ * Data package citation page 
+ */
+p.cite {
+	margin: 10px 30px 10px 30px;
+	padding: 5px 10px 5px 10px;
+	background: #F7F7F7;
 }
+
+p.cite cite {
+	font-style: italic;
+}
+
 /* End data package citation page */
 
 .no-list-style {
@@ -2921,6 +2923,17 @@ kbd.nis {
 	  font-weight: bold;
 }
 
+.nis-warn {
+	  font-style: italic;
+    font-weight: bold;
+}
+
+.nis-info {
+    background-color: #F7F7F7;
+    font-family: monospace;
+	  font-weight: bold;
+}
+
 .nis-title {
 	  font-style: italic;
 	  font-weight: bold;
@@ -2983,7 +2996,5 @@ div.info {
     color: blue;
 }
 
-/*
- * End -- Styling for the quality report table
- */
+/* End -- Styling for the quality report table */
 

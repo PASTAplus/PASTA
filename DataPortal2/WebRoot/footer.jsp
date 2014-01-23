@@ -16,15 +16,17 @@
 							<div class="span4">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Latest News</h2>
+										<h2 class="widget-title">Most Popular</h2>
 									</div>
 									<dl>
-										<dd class="with_avatar">This is news item number one. This is news item number one...
-										<a href="#">July 15, 2013</a> </dd>
+										<dt><a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar">2013-12-05
+										<a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036">MCR LTER: Coral Reef: Bathymetry Grid for North Shore</a> </dd>
 									</dl>
 									<dl>
-										<dd class="with_avatar">This is news item number two. This is news item number two...
-										<a href="#">May 15, 2013</a> </dd>
+										<dt><a href="./mapbrowse?scope=knb-lter-sbc&identifier=21"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar">2013-07-07
+										<a href="./mapbrowse?scope=knb-lter-sbc&identifier=21">SBCLTER: Reef: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California</a> </dd>
 									</dl>
 								</div>
 							</div>
@@ -34,14 +36,14 @@
 										<h2 class="widget-title">Recent Uploads</h2>
 									</div>
 									<dl>
-										<dt><span class="post_icon"></span></dt>
-										<dd class="without_avatar">This is data package upload number one. This is data package upload number one...
-										<a href="#">July 01, 2013</a> </dd>
+										<dt><a href="./mapbrowse?scope=knb-lter-nin&identifier=1"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar">2014-01-13
+										<a href="./mapbrowse?scope=knb-lter-nin&identifier=1">Daily Water Sample Nutrient Data for North Inlet Estuary, South Carolina, from 1978 to 1992, North Inlet LTER</a> </dd>
 									</dl>
 									<dl>
-										<dt><span class="post_icon"></span></dt>
-										<dd class="without_avatar">This is data package upload number two. This is data package upload number two...
-										<a href="#">April 06, 2013</a> </dd>
+										<dt><a href="./mapbrowse?scope=knb-lter-nin&identifier=99"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar">2014-01-15
+										<a href="./mapbrowse?scope=knb-lter-nin&identifier=99">Meteorological data for North Inlet Estuary, South Carolina, from 1982 to 1985, North Inlet LTER</a> </dd>
 									</dl>
 								</div>
 							</div>

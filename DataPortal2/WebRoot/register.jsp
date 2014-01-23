@@ -48,8 +48,6 @@
 
 	<div class="wrapper">
 
-		<jsp:include page="/WEB-INF/jsp/head.jsp" />
-
 		<div class="content">
 
 			<h2 align="center">New User Registration</h2>
@@ -67,7 +65,7 @@
 
 					<fieldset>
 						<legend>User Information</legend>
-						<table align="left" cellpadding="4em">
+						<table>
 							<tbody>
 								<tr>
 									<td align="left" width="130px"><label for="givenName">First
@@ -99,7 +97,7 @@
 
 					<fieldset>
 						<legend>Data Use Purpose/Intent</legend>
-						<table align="left" cellpadding="4em">
+						<table>
 							<tbody>
 								<tr>
 									<td><input type="radio" name="intent" />&nbsp;Research
@@ -142,8 +140,8 @@
 
 							</tbody>
 						</table>
+						</fieldset>
 				</form>
-				</fieldset>
 
 				<p>
 					<input type="checkbox" name="acknowledgement" />&nbsp; I
@@ -160,8 +158,6 @@
 
 		</div>
 		<!-- end of content -->
-
-		<jsp:include page="/WEB-INF/jsp/foot.jsp" />
 
 	</div>
 	<!-- end of wrapper -->

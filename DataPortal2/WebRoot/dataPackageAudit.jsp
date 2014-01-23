@@ -227,20 +227,11 @@
 										</table>
 									</div>
 									<!-- section -->
-					<%
-						if (reportMessage != null && type.equals("class=\"warning\"")) {
-							out.println("<div class=\"section\">\n");
-							out.println("<table align=\"left\" cellpadding=\"4em\">\n");
-							out.println("<tbody>\n");
-							out.println("<tr>\n");
-							out.println("<td " + type + ">\n");
-							out.println(reportMessage + "\n");
-							out.println("</td>\n");
-							out.println("</tr>\n");
-							out.println("</tbody>\n");
-							out.println("</table>\n");
-						}
-					%>
+			<%
+				if (reportMessage != null && type.equals("class=\"warning\"")) {
+				  out.println(String.format("<p class=\"nis-warn\">%s</p>", reportMessage));
+			  }
+			%>
 								</form>
 								</fieldset>
 			<%
@@ -248,7 +239,6 @@
 					out.println(reportMessage);
 				}
 			%>
-
 								<!-- /Content -->
 							</div>
 						</div>

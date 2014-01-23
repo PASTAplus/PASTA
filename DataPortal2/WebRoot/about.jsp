@@ -49,7 +49,6 @@
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-								<fieldset>
 								<p>The NIS Data Portal is the public facing information 
 								management and technology interface to the Provenance 
 								Aware Synthesis Tracking Architecture (PASTA). The 
@@ -60,16 +59,7 @@
 								<a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">
 								NIS Community Website</a> for information about 
 								upcoming updates to the LTER Network Portal.</p>
-								<div class="section">
-									<form id="browsesearch" action="./browseServlet" method="post" name="browsesearch">
-										<table>
-											<tr>
-												<td class="searchcat">
 												<h3>LTER sites</h3>
-												</td>
-											</tr>
-											<tr>
-												<td>
 												<p>The LTER is able to support high-level 
 												analysis and synthesis of complex 
 												ecosystem data across the science-policy-management 
@@ -105,15 +95,7 @@
 												User Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
-												</td>
-											</tr>
-											<tr>
-												<td class="searchcat">
 												<h3>For LTER Site Information Managers, Software Developers, and Other Interested Parties</h3>
-												</td>
-											</tr>
-											<tr>
-												<td>
 												<p>The PASTA framework is comprised of the Gatekeeper identity authentication 
 												service<sup>*</sup> and the following application programming interfaces (APIs) of 
 												the LTER Network Information System:
@@ -170,13 +152,8 @@
 												Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
-												</td>
-											</tr>
-										</table>
-									</form>
 									<p><sup>*</sup>User authentication is <em>required</em> for all data input to the PASTA system.</p>
 								</div>
-								</fieldset>
 							</div>
 							<!-- end of content -->
 						</div>
@@ -209,8 +186,6 @@
 	<!-- /Banner -->
 
 	  <jsp:include page="footer.jsp" />
-		
-	</div>
 
 </body>
 

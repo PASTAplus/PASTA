@@ -117,28 +117,22 @@ public class DataPackageDeleteServlet extends DataPortalServlet {
     Integer identifier = null;
     String[] tokens = packageId.split("\\.");
     String message = null;
-    String type = null;
 
     try {
     if (uid.equals("public")) {
 
       message = LOGIN_WARNING;
-      type = "warning";
-
     } 
     else if (tokens.length == 2) {
       
       scope = tokens[0];
       identifier = Integer.valueOf(tokens[1]);
 
-        logger.info("PACKAGEID: " + scope + "." + identifier);
+      DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+      dpmClient.deleteDataPackage(scope, identifier);
         
-        DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-        dpmClient.deleteDataPackage(scope, identifier);
-        
-         message = "Data package with scope and identifier '<b>" + packageId
+      message = "Data package with scope and identifier '<b>" + packageId
             + "</b>' has been deleted.";
-        type = "info";
     } 
     else if (tokens.length == 3) {
         message = String.format("The provided packaged identifier '%s' could not be parsed correctly. A revision value should not be included.", 
@@ -152,7 +146,6 @@ public class DataPackageDeleteServlet extends DataPortalServlet {
     }
 
     request.setAttribute("deletemessage", message);
-    request.setAttribute("type", type);
     }
 	catch (Exception e) {
 		handleDataPortalError(logger, e);

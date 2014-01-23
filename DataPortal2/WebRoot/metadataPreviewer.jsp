@@ -50,44 +50,38 @@
 					<div class="row-fluid">
 						<div class="row-fluid">
 							<div class="span12">
-							
-		<div class="content">
-
-			<h2 align="center">Metadata Previewer</h2>
-
-      <fieldset>
-        <legend>Preview Metadata Rendering</legend>
+							  <div class="recent_title">
+								  <h2>Metadata Previewer</h2>
+							  </div>
+							<span class="row-fluid separator_border"></span>
+						</div>
+						<div class="row-fluid">
+							<div class="span12">
+		            <div class="content">
 
         <p>Preview a rendered version of EML in HTML format by uploading your
-           EML file</p>
+           EML file.</p>
 
         <div class="section">
           <form id="metadataPreviewer" name="metadataPreviewer" method="post"
             action="./metadataPreviewer" enctype="multipart/form-data"
             target="_blank">
-            <table align="left" cellpadding="4em">
-              <tbody>
-                <tr>
-                  <td align="left" width="130px"><label for="packageid">File:</label>
-                  </td>
-                  <td align="left" width="200px"><input type="file"
-                    name="emlfile" accept="application/xml" size="60" 
-                    required="required" /></td>
-                  <td align="center" width="70px">
-                    <input type="submit" name="upload" value="Upload" />
-                  </td>
-                  <td align="center" width="40px">
-                    <input type="reset" name="reset" value="Clear" />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <label for="packageid">File:</label>
+            <input type="file"
+                   name="emlfile" 
+                   accept="application/xml" 
+                   size="60" 
+                   required="required" />
+            <div>
+            <input type="submit" name="upload" value="Upload" />
+            <input type="reset" name="reset" value="Clear" />
+            </div>
           </form>
         </div>
-      </fieldset>
 
+             </div>
 
-		</div>
+		       </div>
 		<!-- end of content -->
 							  
 						  </div>
