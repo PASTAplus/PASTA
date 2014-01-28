@@ -125,7 +125,7 @@ public class HarvestReport {
     stringBuffer.append("<th class=\"nis\">Info</th>\n");
     stringBuffer.append("<th class=\"nis\">Warn</th>\n");
     stringBuffer.append("<th class=\"nis\">Error</th>\n");
-    stringBuffer.append("<th class=\"nis\" width=\"50%\">System Message</th>\n");
+    stringBuffer.append("<th class=\"nis\">System Message</th>\n");
     stringBuffer.append("</tr>\n");
     stringBuffer.append("</thead>\n");
     stringBuffer.append("<tbody>\n");

@@ -121,7 +121,6 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
 								<p>Review a PASTA audit report<sup>*</sup> by entering your criteria into one or more of the filters below.</p>
 								<hr/>
 								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
@@ -158,7 +157,6 @@
 											<tr>
 												<td>
 												  <form>
-													  <fieldset>
 													    <label for="choices">
 													      <ul class="checklist">
 														      <li>
@@ -187,7 +185,6 @@
 														      </li>
 													      </ul>
 													    </label>
-													  </fieldset>
 												  </form>
 												</td>
 												<td>
@@ -350,7 +347,6 @@
 				    }
 			    %>
 
-								</fieldset>
 								<!-- /Content -->
 							</div>
 						</div>

@@ -2885,8 +2885,8 @@ p.cite cite {
 
 #map-canvas {
   margin: 0 auto; 
-  width: 400px; 
-  height: 250px;
+  max-width: 400px; 
+  max-height: 250px;
 }
 
 th.nis {
@@ -2957,6 +2957,7 @@ table#nis-coordinates input {
 #nis-growth {
 	margin-left: 75px;
 	font-size: smaller;
+	text-align: center;
 }
 
 

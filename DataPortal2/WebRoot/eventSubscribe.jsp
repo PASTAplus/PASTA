@@ -85,8 +85,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
-								<legend>Subscribe</legend>
+                <h3>Subscribe</h3>
 								<p>Subscribe to NIS data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:
 								<ol>
 								  <li>a particular data package revision (e.g. <kbd class="nis">mypackages.1.1</kbd>); or,</li>
@@ -137,9 +136,8 @@
 				    out.println("</table>\n");
 				  }
 				%>
-								</fieldset>
-								<fieldset>
-								<legend>Review</legend>
+				      <hr/>
+              <h3>Review</h3>
 								<p>Review a subscription using the subscription 
 								identifier or leave empty to review <em>all</em> of your subscriptions.</p>
 								<div class="section">
@@ -178,8 +176,8 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset> <fieldset>
-								<legend>Test</legend>
+				        <hr/>
+								<h3>Test</h3>
 								<p>Test a subscription using the subscription identifier.</p>
 								<div class="section">
 									<form id="eventtest" action="eventtest" method="post" name="eventtest">
@@ -215,8 +213,8 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset> <fieldset>
-								<legend>Delete</legend>
+				        <hr/>
+								<h3>Delete</h3>
 								<p>Delete a subscription using the subscription 
 								identifier.</p>
 								<div class="section">
@@ -255,7 +253,6 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset>
 								<!-- /Content --></div>
 						</div>
 					</div>

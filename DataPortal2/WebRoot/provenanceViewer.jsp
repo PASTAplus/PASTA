@@ -81,9 +81,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
-								<p>View provenance metadata of a data package using 
-								the package identifier</p>
+								<p>View provenance metadata of a data package using the package identifier.</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
 										<table>

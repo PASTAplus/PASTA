@@ -85,7 +85,6 @@
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-			<fieldset>
 				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.<sup>*</sup> <sup>**</sup></p>
 
 				<div class="section">
@@ -99,7 +98,6 @@
 				<p>
 				   <sup>**</sup><small><em>Search results are refreshed nightly.</em></small>
 				</p>
-			</fieldset>
 			        </div>
 							<!-- end of content --></div>
 					</div>
