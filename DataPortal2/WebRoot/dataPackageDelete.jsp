@@ -78,7 +78,6 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
 								<p>Delete a data package<sup>*</sup> using the package <b>scope</b> and <b>identifier</b> (e.g. <kbd class="nis">myscope.100</kbd>).
 								</p>
 								<div class="section">
@@ -109,7 +108,6 @@
 								and <var>identifier</var>.</p>
 								</div>
                 <%= deleteMessageHTML %>
-								</fieldset>
 								<!-- /Content -->
 							</div>
 						</div>

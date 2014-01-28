@@ -116,7 +116,7 @@
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
-								<!-- Content --><fieldset>
+								<!-- Content -->
 								<p>Review a PASTA Data Package access report<sup>*</sup> by entering information into one or more of the filters 
 								   below.
 								</p>
@@ -233,7 +233,6 @@
 			  }
 			%>
 								</form>
-								</fieldset>
 			<%
 				if (reportMessage != null && type.equals("class=\"info\"")) {
 					out.println(reportMessage);

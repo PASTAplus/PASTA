@@ -1,4 +1,56 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!--
+  ~ Copyright 2011-2013 the University of New Mexico.
+  ~
+  ~ This work was supported by National Science Foundation Cooperative
+  ~ Agreements #DEB-0832652 and #DEB-0936498.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0.
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  ~ either express or implied. See the License for the specific
+  ~ language governing permissions and limitations under the License.
+  -->
+<%@ page import="edu.lternet.pasta.portal.DataPackageSurvey" pageEncoding="UTF-8" %>
+
+<%
+
+DataPackageSurvey dps = new DataPackageSurvey();
+String[] popular = dps.surveyDataPackages("popular", 2);
+//String[][] recent = DataPackageSurvey.surveyDataPackages("recent", 2);
+
+//String popularScope1 = "knb-lter-mcr";
+//String popularIdentifier1 = "1036";
+//String popularTitle1 = "MCR LTER: Coral Reef: Bathymetry Grid for North Shore";
+//String popularDate1 = "2013-12-05";
+
+String popularScope1 = popular[0];
+String popularIdentifier1 = popular[1];
+String popularTitle1 = popular[2];
+String popularDate1 = popular[3];
+
+/*
+String popularScope2 = popular[1][0];
+String popularIdentifier2 = popular[1][1];
+String popularTitle2 = popular[1][2];
+String popularDate2 = popular[1][3];
+
+String recentScope1 = recent[0][0];
+String recentIdentifier1 = recent[0][1];
+String recentTitle1 = recent[0][2];
+String recentDate1 = recent[0][3];
+
+String recentScope2 = recent[1][0];
+String recentIdentifier2 = recent[1][1];
+String recentTitle2 = recent[1][2];
+String recentDate2 = recent[1][3];
+*/
+
+%>
 
 	<!-- Divider -->
 	<div class="footers row-fluid pull-left distance_1">
@@ -19,9 +71,9 @@
 										<h2 class="widget-title">Most Popular</h2>
 									</div>
 									<dl>
-										<dt><a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar">2013-12-05
-										<a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036">MCR LTER: Coral Reef: Bathymetry Grid for North Shore</a> </dd>
+										<dt><a href="./mapbrowse?scope=<%= popularScope1 %>&identifier=<%= popularIdentifier1 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= popularDate1 %>
+										<a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036"><%= popularTitle1 %></a> </dd>
 									</dl>
 									<dl>
 										<dt><a href="./mapbrowse?scope=knb-lter-sbc&identifier=21"><span class="post_icon"></span></a></dt>
