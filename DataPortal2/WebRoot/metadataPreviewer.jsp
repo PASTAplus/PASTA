@@ -67,11 +67,7 @@
             action="./metadataPreviewer" enctype="multipart/form-data"
             target="_blank">
             <label for="packageid">File:</label>
-            <input type="file"
-                   name="emlfile" 
-                   accept="application/xml" 
-                   size="60" 
-                   required="required" />
+            <input type="file" name="emlfile" accept="application/xml" required="required" />
             <div>
             <input type="submit" name="upload" value="Upload" />
             <input type="reset" name="reset" value="Clear" />

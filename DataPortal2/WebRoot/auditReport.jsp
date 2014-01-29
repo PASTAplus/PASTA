@@ -287,10 +287,10 @@
 											</tr>
 											<tr>
 												<td>
-												  <input name="userId" placeholder=" " size="15px" type="text" />
+												  <input name="userId" size="15" type="text" />
 												</td>
 												<td>
-												  <input name="group" placeholder=" " size="15px" type="text" />
+												  <input name="group" size="15" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -298,19 +298,19 @@
 											<tr>
 												<td>
 												  <label class="labelBold">Begin Date:</label>
-												  <input name="beginDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <input name="beginDate" placeholder="YYYY-MM-DD" type="date" />
 												</td>
 												<td>
 												  <label class="labelBold">Begin Time:<sup>**</sup></label>
-												  <input name="beginTime" placeholder="HH:MM:SS" size="15px" type="time" />
+												  <input name="beginTime" placeholder="HH:MM:SS" type="time" />
 												</td>
 												<td>
 												  <label class="labelBold">End Date:</label>
-												  <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <input name="endDate" placeholder="YYYY-MM-DD" type="date" />
 												</td>
 												<td>
 												  <label class="labelBold">End Time:<sup>**</sup></label>
-												  <input name="endTime" placeholder="HH:MM:SS" size="15px" type="time" />
+												  <input name="endTime" placeholder="HH:MM:SS" type="time" />
 												</td>
 											</tr>
 										</table>

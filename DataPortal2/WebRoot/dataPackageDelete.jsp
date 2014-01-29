@@ -90,7 +90,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" type="text" />
+												<input name="packageid" required="required" type="text" autofocus />
 												</td>
 											</tr>
 											<tr>
