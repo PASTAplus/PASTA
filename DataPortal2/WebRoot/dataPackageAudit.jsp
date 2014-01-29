@@ -126,15 +126,15 @@
 											<tr>
 												<td>
 												  <label class="labelBold">Scope:</label>
-												  <input autofocus required name="scope" size="30px" type="text" />
+												  <input autofocus required name="scope" size="15" type="text" />
 												</td>
 												<td>
 												  <label class="labelBold">Identifier:</label>
-												  <input name="identifier" size="5px" type="number" />
+												  <input name="identifier" size="5" type="number" />
 												</td>
 												<td>
 												  <label class="labelBold">Revision:</label>
-												  <input name="revision" size="5px" type="number" />
+												  <input name="revision" size="5" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -152,7 +152,6 @@
 											<tr>
 												<td>
 												  <form>
-													  <fieldset>
 													    <label for="choices">
 													    <ul class="checklist">
 														    <li>
@@ -181,7 +180,6 @@
 														    </li>
 													    </ul>
 													    </label>
-													  </fieldset>
 												  </form>
 												</td>
 											</tr>
@@ -193,11 +191,11 @@
 											<tr>
 												<td>
 												  <label class="labelBold">User Name:</label>
-												  <input name="userId" size="30px" type="text" />
+												  <input name="userId" size="15" type="text" />
 												</td>
 												<td>
 												  <label class="labelBold">Group:</label>
-												  <input name="group" size="30px" type="text" />
+												  <input name="group" size="15" type="text" />
 												</td>
 											</tr>
 										</table>
@@ -205,11 +203,11 @@
 											<tr>
 												<td>
 												  <label class="labelBold">Begin Date:</label>
-												  <input name="begin" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <input name="begin" placeholder="YYYY-MM-DD" type="date" />
 												</td>
 												<td>
 												  <label class="labelBold">End Date:</label>
-												  <input name="end" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												  <input name="end" placeholder="YYYY-MM-DD" type="date" />
 												</td>
 											</tr>
 										</table>

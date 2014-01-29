@@ -261,7 +261,7 @@
 														  </tr>
 														<tr>
 														<td>													  
-															    <input name="locationName" size="40" type="text" value="" />
+															    <input name="locationName" size="40" type="text" />
 													  </td>
 													  </tr>
 													  </table>
@@ -358,7 +358,7 @@
 															  </td>
 															  <td class="spacerwd"></td>														  
 															  <td>
-															    <input name="subjectValue" type="text" value="" placeholder="enter search terms" />
+															    <input name="subjectValue" type="search" placeholder="enter search terms" />
 															  </td>
 															</tr>
 															<tr>
@@ -449,7 +449,7 @@
 															      <option value="2">starts with</option>
 															      <option value="3">ends with</option>
 															    </select>
-															    <input name="creatorSurname" type="text" value="" />
+															    <input name="creatorSurname" type="text" />
 															  </td>
 														  </tr>
 														  <tr>
@@ -461,7 +461,7 @@
 															      <option value="2">starts with</option>
 															      <option value="3">ends with</option>
 															    </select>
-															    <input name="creatorOrganization" type="text" value="" />
+															    <input name="creatorOrganization" type="text" />
 															  </td>
 														  </tr>
 													  </table>
@@ -522,12 +522,12 @@
 														  <tr>
 															  <td>
 															    <label class="labelBold" for="userId">Start Date:</label>
-															    <input name="startDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <input name="startDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
 															  <td></td>
 															  <td>
 															    <label class="labelBold" for="group">End Date:</label>
-															    <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <input name="endDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
 															  <td></td>
 															  <td></td>
@@ -561,7 +561,7 @@
 															  </td>
 															  <td></td>
 															  <td>
-															    <input name="namedTimescale" type="text" value="">
+															    <input name="namedTimescale" type="text" >
 															  </td>
 														  </tr>
 													  </table>
@@ -614,7 +614,7 @@
 																</td>
 																<td></td>
 															  <td>
-															    <input name="taxon" type="text" value="" />
+															    <input name="taxon" type="text" />
 															  </td>
 															</tr>
 														</table>

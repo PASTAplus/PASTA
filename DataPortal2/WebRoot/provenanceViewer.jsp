@@ -91,7 +91,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" size="30" type="text" /></td>
+												<input name="packageid" required="required" autofocus size="20" type="text" /></td>
 											</tr>
 											<tr>
 												<td>
@@ -102,11 +102,9 @@
 										</table>
 									</form>
 								</div>
-								</fieldset>
 			<%
 				if (message != null && !type.equals("warning")) {
-				    out.println("<fieldset>\n");
-				    out.println("<legend>" + packageid + "</legend>\n");
+				    out.println("<h3>" + packageid + "</h3>\n");
 					out.println("<div class=\"section\">\n");
 					out.println("<table>\n");
 					out.println("<tbody>\n");
@@ -118,7 +116,6 @@
 					out.println("</tbody>\n");
 					out.println("</table>\n");
 					out.println("</div>\n");
-					out.println("</fieldset>\n");
 				}
 			%>
 

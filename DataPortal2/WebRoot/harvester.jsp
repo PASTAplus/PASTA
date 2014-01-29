@@ -165,7 +165,7 @@
 															<tr>
 																<td align="left">
 																<label class="labelBold">Metacat Harvest List URL:</label>
-																<input name="harvestListURL" required="required" size="150" type="text" />
+																<input name="harvestListURL" required="required" size="50" type="url" />
 																</td>
 															</tr>
 															<tr>

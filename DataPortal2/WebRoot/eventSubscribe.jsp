@@ -110,7 +110,7 @@
 												<input name="packageid" required="required" type="text" />
 												</td>
 												<td>
-												<input name="targeturl" required="required" size="50" type="text" />
+												<input name="targeturl" required="required" size="50" type="url" />
 												</td>
 											</tr>
 											<tr>
@@ -150,7 +150,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" type="text" />
+												<input name="subscriptionid" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -189,7 +189,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="text" />
+												<input name="subscriptionid" required="required" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -227,7 +227,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="text" />
+												<input name="subscriptionid" required="required" type="number" />
 												</td>
 											</tr>
 											<tr>
