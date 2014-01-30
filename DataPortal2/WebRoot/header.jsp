@@ -77,14 +77,14 @@
 	<div class="row-fluid header_container">
 		<div class="span3">
 			<a href="home.jsp">
-			  <img alt="" src="images/non_st_logo.png" title="LTER : Network">
+			  <img alt="" src="images/nis_logo.png" title="LTER : Network">
 			</a>
 	 </div>
 			<div class="span9 menu">
 			<nav role="navigation">
 			<ul id="menu-nav" class="menu">
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
-				<li<%= discoverClass %>><a href="#">Discover</a>
+				<li<%= discoverClass %>><a href="#">Data</a>
 				<ul class="sub-menu">
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
