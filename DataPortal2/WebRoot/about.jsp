@@ -176,7 +176,7 @@
 						Recovery and Reinvestment Act of 2009 and is administered 
 						by the National Science Foundation.</p>
 						<p id="p-arra-img">
-						  <img id="arra-img" alt="" src="images/ARRA-Small.png" title="US ARRA logo">
+						  <img id="arra-img" alt="US ARRA logo" src="images/ARRA-Small.png" title="US ARRA logo">
 						</p>
 					</div>
 					<span class="bottom_shadow_full"></span></div>

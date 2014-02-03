@@ -77,7 +77,7 @@
 	<div class="row-fluid header_container">
 		<div class="span3">
 			<a href="home.jsp">
-			  <img alt="" src="images/nis_logo.png" title="LTER : Network">
+			  <img alt="LTER Network Data Portal logo" src="images/nis_logo.png" title="LTER : Network">
 			</a>
 	 </div>
 			<div class="span9 menu">
