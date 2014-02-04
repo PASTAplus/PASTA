@@ -93,32 +93,37 @@ public class DataPackageSurvey {
 	
 	
 	public String[] parseAuditXML(String auditXML, String criterion, int n) {
-		String[] surveyResults = new String[4]; // data package (1) scope, (2) identifier, (3) title, (4) date
-		
-		surveyResults[0] = "knb-lter-mcr";
-		surveyResults[1] = "1036";
-		surveyResults[2] = "MCR LTER: Coral Reef: Bathymetry Grid for North Shore";
-		surveyResults[3] = "2013-12-06";
-		
-		/*
-		surveyResults[1][0] = "knb-lter-sbc";
-		surveyResults[1][1] = "21";
-		surveyResults[1][2] = "SBCLTER: Reef: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California";
-		surveyResults[1][3] = "2013-07-07";
-		
-		surveyResults[2][0] = "knb-lter-nin";
-		surveyResults[2][1] = "1";
-		surveyResults[2][2] = "Daily Water Sample Nutrient Data for North Inlet Estuary, South Carolina, from 1978 to 1992, North Inlet LTER";
-		surveyResults[2][3] = "2014-01-13";
-		
-		surveyResults[3][0] = "knb-lter-nin";
-		surveyResults[3][1] = "99";
-		surveyResults[3][2] = "Meteorological data for North Inlet Estuary, South Carolina, from 1982 to 1985, North Inlet LTER";
-		surveyResults[3][3] = "2014-01-15";
-		*/
-				
+		String[] surveyResults = null;
+
+		if (criterion != null) {
+			surveyResults = new String[n * 4]; // (1) scope, (2) identifier, (3) title, (4) date
+
+			if (criterion.equals("popular")) {
+				surveyResults[0] = "knb-lter-mcr";
+				surveyResults[1] = "1036";
+				surveyResults[2] = "MCR LTER: Coral Reef: Bathymetry Grid for North Shore";
+				surveyResults[3] = "2013-12-06";
+
+				surveyResults[4] = "knb-lter-sbc";
+				surveyResults[5] = "21";
+				surveyResults[6] = "SBCLTER: Reef: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California";
+				surveyResults[7] = "2013-07-07";
+			}
+			else
+				if (criterion.equals("recent")) {
+					surveyResults[0] = "knb-lter-nin";
+					surveyResults[1] = "1";
+					surveyResults[2] = "Daily Water Sample Nutrient Data for North Inlet Estuary, South Carolina, from 1978 to 1992, North Inlet LTER";
+					surveyResults[3] = "2014-01-13";
+
+					surveyResults[4] = "knb-lter-nin";
+					surveyResults[5] = "99";
+					surveyResults[6] = "Meteorological data for North Inlet Estuary, South Carolina, from 1982 to 1985, North Inlet LTER";
+					surveyResults[7] = "2014-01-15";
+				}
+		}
+
 		return surveyResults;
 	}
-
  
 }
