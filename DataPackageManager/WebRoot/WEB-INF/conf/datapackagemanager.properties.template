@@ -95,13 +95,16 @@ datapackagemanager.test.initialsleeptime=5000
 datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-1.0
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
+
+# For DOI processing on production set prefix to 10.6073 and context to "pasta"; for
+# staging and development set prefix to 10.5072 and context to "FK2"
 #datapackagemanager.doiPrefix=10.6073
 #datapackagemanager.doiContext=pasta
 datapackagemanager.doiPrefix=10.5072
 datapackagemanager.doiContext=FK2
 datapackagemanager.doiTest=true
-datapackagemanager.ezidHost=n2t-stage.cdlib.org
-datapackagemanager.ezidPort=443
+datapackagemanager.ezidHost=ezid.cdlib.org
+datapackagemanager.ezidPort=-1
 datapackagemanager.ezidProtocol=https
 datapackagemanager.ezidUser=lternet
 datapackagemanager.ezidPassword=HIDE_PASSWORD
