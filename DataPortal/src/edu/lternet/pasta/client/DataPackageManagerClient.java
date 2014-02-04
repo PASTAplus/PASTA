@@ -915,6 +915,16 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode != HttpStatus.SC_OK) {
 				String gripe = "An error occurred while attempting to read the data enity: "
 				    + entityId;
+				if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+					if (this.uid.equals("public")) {
+						gripe = String.format("%s. %s", gripe,
+										"You may need to log in before you can access the data entity.");
+					}
+					else {
+						gripe = String.format("%s. %s", gripe,
+										"You may not have permission to access the data entity.");
+					}
+				}
 				handleStatusCode(statusCode, gripe);
 			} else {
 
