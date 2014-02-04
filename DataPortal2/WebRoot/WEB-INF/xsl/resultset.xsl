@@ -37,10 +37,10 @@
       <table width="100%">
         <tbody>
           <tr>
-            <td class="header" width="15%">Package Id</td>
-            <td class="header" width="10%">Creators</td>
-            <td class="header" width="10%">Publication Date</td>
-            <td class="header" width="65%">Title</td>
+            <th class="nis" width="15%">Package Id</th>
+            <th class="nis" width="10%">Creators</th>
+            <th class="nis" width="10%">Publication Date</th>
+            <th class="nis" width="65%">Title</th>
           </tr>
           <xsl:for-each select="/resultset/document">
             <xsl:sort select="./packageId/@scope" data-type="text"/>
@@ -54,19 +54,19 @@
 
   <xsl:template match="document">
     <tr>
-      <td class="data" align="center">
+      <td class="nis" align="center">
         <xsl:variable name="pid" select="./packageId"/>
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
       </td>
-      <td class="data" align="center">
+      <td class="nis" align="center">
         <xsl:apply-templates select="./param" mode="creator"/>
       </td>
-      <td class="data" align="center">
+      <td class="nis" align="center">
         <xsl:apply-templates select="./param" mode="pubdate"/>
       </td>
-      <td class="data" align="left">
+      <td class="nis" align="left">
         <xsl:apply-templates select="./param" mode="title"/>
       </td>
     </tr>
@@ -89,26 +89,5 @@
       <xsl:value-of select="."/>
     </xsl:if>    
   </xsl:template>
-
-  <!--
-  <xsl:template match="document">
-    <tr>
-      <td class="data" align="center">
-        <xsl:value-of select="./packageId"/>
-      </td>
-      <td class="data">
-        <xsl:for-each select="./param">
-          <xsl:if test="./@name = 'dataset/title'">
-            <xsl:variable name="title" select="."/>
-            <xsl:variable name="packageId" select="../packageId"/>
-            <a href="./mapbrowse?packageid={$packageId}">
-              <xsl:value-of select="$title"/>
-            </a>
-          </xsl:if>
-        </xsl:for-each>
-      </td>
-    </tr>
-  </xsl:template>
--->
 
 </xsl:stylesheet>

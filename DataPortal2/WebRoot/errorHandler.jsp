@@ -51,20 +51,16 @@
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
-							<div class="span12">
+							<div class="span12">							
 								<!-- Content -->
-								
-                <h3>An error has occurred in the LTER Network Data Portal:</h3>
-                  <p>
-                  <code><% out.println(exception.toString()); %></code>
-                  </p>
-                  <p>For further assistance, please contact:
+					      <p><strong>An <em>error</em> has occurred</strong> in the LTER Network Data Portal:</p>                
+                <p class="nis-error"><% out.println(exception.toString()); %></p>        
+                <p>For further assistance, please contact:
                     <a href="mailto:tech_support@LTERnet.edu?Subject=NIS%20Data%20Portal%20error" target="_top">
                     LTER Technical Support</a>. Please copy the error message shown 
                     above into your email message, along with any other information 
-                    that might help us assist you more promptly.
-			         </div>
-									
+                    that might help us to assist you more promptly.</p>
+			         </div>									
 								<!-- /Content -->
 							</div>
 						</div>
@@ -76,10 +72,6 @@
 
 		<jsp:include page="footer.jsp" />
 </div>
-
-		<!-- Can be removed, loads charts demo -->
-		<script src="charts/assets/effects.js"></script>
-		<!-- /Can be removed, loads charts demo -->
 
 </body>
 

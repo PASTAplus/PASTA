@@ -85,22 +85,20 @@
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-			<fieldset>
-				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.&#42;&nbsp;&#42;&#42;</p>
+				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.<sup>*</sup> <sup>**</sup></p>
 
-        <!-- <p><strong>Alternative:</strong> <a href="http://vocab.lternet.edu" target="new">Multi-level Browse</a></p> -->
-        
 				<div class="section">
-          <div id='jqxTree'>         
-            <%= browseHTML %>           
+          <div id='jqxTree'>
+            <%= browseHTML %>
 				  </div>
 				</div>
 				<p>
-				   <small>&#42; <em>Only public documents are accessible from this page.</em></small><br/>
-				   <small>&#42;&#42; <em>Search results are refreshed nightly.</em></small>
+				   <sup>*</sup><small><em>Only public documents are accessible from this page.</em></small>
 				</p>
-			</fieldset>
-								<!-- end of section-table --></div>
+				<p>
+				   <sup>**</sup><small><em>Search results are refreshed nightly.</em></small>
+				</p>
+			        </div>
 							<!-- end of content --></div>
 					</div>
 				</div>

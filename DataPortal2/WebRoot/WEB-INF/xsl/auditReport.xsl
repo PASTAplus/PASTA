@@ -26,24 +26,26 @@
 
   <xsl:template match="/">
 
+    <hr/>
+    <h3>PASTA Audit Report</h3>
     <div class="section-table">
-      <fieldset>
-        <legend>PASTA Audit Report</legend>
         <table>
-          <tbody>
+          <thead>
             <tr>
-              <td class="header">Id</td>
-              <td class="header">Date/Time</td>
-              <td class="header">Status</td>
-              <td class="header">Service</td>
-              <td class="header">Method</td>
-              <td class="header">Code</td>
-              <td class="header">Resource</td>
-              <td class="header">User</td>
-              <td class="header">Group(s)</td>
-              <!-- <td class="header">AuthSystem</td> -->
-              <td class="header">Message</td>
+              <th class="nis">Id</th>
+              <th class="nis">Date/Time</th>
+              <th class="nis">Status</th>
+              <th class="nis">Service</th>
+              <th class="nis">Method</th>
+              <th class="nis">Code</th>
+              <th class="nis">Resource</th>
+              <th class="nis">User</th>
+              <th class="nis">Group(s)</th>
+              <!-- <th class="nis">AuthSystem</th> -->
+              <th class="nis">Message</th>
             </tr>
+          </thead>
+          <tbody>
             <xsl:for-each select="/auditReport/auditRecord">
               <xsl:sort select="./oid" data-type="number" />
               <tr>
@@ -62,74 +64,73 @@
             </xsl:for-each>
           </tbody>
         </table>
-      </fieldset>
     </div>
     <!-- section-table -->
 
   </xsl:template>
   
   <xsl:template match="oid">
-    <td class="data" align="center">
+    <td class="nis" align="center">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="entryTime">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="category">
-    <td class="data" align="center">
+    <td class="nis" align="center">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="service">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="serviceMethod">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="responseStatus">
-    <td class="data" align="center">
+    <td class="nis" align="center">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="resourceId">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="user">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="groups">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="authSystem">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="entryText">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>

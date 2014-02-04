@@ -25,7 +25,6 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -37,13 +36,9 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaClient;
-import edu.lternet.pasta.client.PastaConfigurationException;
-import edu.lternet.pasta.client.PastaEventException;
 import edu.lternet.pasta.client.ReportUtility;
-import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
+
 
 public class DataPackageAuditServlet extends DataPortalServlet {
 
@@ -172,32 +167,42 @@ public class DataPackageAuditServlet extends DataPortalServlet {
     
     // Filter on "info"
     filter.append("category=info&");
-      
+    
+    boolean packageResource = false || (request.getParameter("package") != null);
+    boolean metadataResource = false || (request.getParameter("metadata") != null);
+    boolean dataResource = false || (request.getParameter("entity") != null);
+    boolean reportResource = false || (request.getParameter("report") != null);
+    boolean includeAllResources = false;
+    
+    if (!(packageResource || metadataResource || dataResource || reportResource)) {
+    	includeAllResources = true;
+    }
+    
     // Filter on "readDataPackage"
-    if (request.getParameter("package") != null) {
+    if (packageResource || includeAllResources) {
     	filter.append("serviceMethod=readDataPackage&");
     	resourceId = getResourceId(pastaUriHead, packageId, PACKAGE);
     	filter.append("resourceId=" + resourceId + "&");
     }
 
     // Filter on "readMetadata"
-    if (request.getParameter("metadata") != null) {
+    if (metadataResource || includeAllResources) {
     	filter.append("serviceMethod=readMetadata&");
     	resourceId = getResourceId(pastaUriHead, packageId, METADATA);
     	filter.append("resourceId=" + resourceId + "&");
     }
     
-    // Filter on "readDataPackageReport"
-    if (request.getParameter("report") != null) {
-    	filter.append("serviceMethod=readDataPackageReport&");
-    	resourceId = getResourceId(pastaUriHead, packageId, REPORT);
+    // Filter on "readDataEntity"
+    if (dataResource || includeAllResources) {
+    	filter.append("serviceMethod=readDataEntity&");
+    	resourceId = getResourceId(pastaUriHead, packageId, ENTITY);
     	filter.append("resourceId=" + resourceId + "&");
     }
 
-    // Filter on "readDataEntity"
-    if (request.getParameter("entity") != null) {
-    	filter.append("serviceMethod=readDataEntity&");
-    	resourceId = getResourceId(pastaUriHead, packageId, ENTITY);
+    // Filter on "readDataPackageReport"
+    if (reportResource || includeAllResources) {
+    	filter.append("serviceMethod=readDataPackageReport&");
+    	resourceId = getResourceId(pastaUriHead, packageId, REPORT);
     	filter.append("resourceId=" + resourceId + "&");
     }
 
@@ -227,14 +232,8 @@ public class DataPackageAuditServlet extends DataPortalServlet {
       message = LOGIN_WARNING;
       type = "warning";
     }
-    else if (resourceId == null) {
-	  message = "A valid resource type must be selected (at least one of Package, Metadata, Report, or Data).";
-      type = "warning";
-    }
     else if (auditClient != null) {
-    	
       	String filterStr = filter.toString();
-	      logger.info("Non-encoded: " + filterStr);
         xml = auditClient.reportByFilter(filterStr);
         ReportUtility reportUtility = new ReportUtility(xml);
         message = reportUtility.xmlToHtmlTable(cwd + xslpath);

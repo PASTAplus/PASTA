@@ -184,7 +184,7 @@ public class EzidRegistrar {
 		BasicHttpContext localcontext = new BasicHttpContext();
 		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
-		HttpGet httpGet = new HttpGet(this.getEzidUrl("/ezid/login"));
+		HttpGet httpGet = new HttpGet(this.getEzidUrl("/login"));
 
 		HttpResponse response = null;
 		Header[] headers = null;
@@ -245,7 +245,7 @@ public class EzidRegistrar {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
-		String url = this.getEzidUrl("/ezid/logout");
+		String url = this.getEzidUrl("/logout");
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 		Integer statusCode = null;
@@ -308,7 +308,7 @@ public class EzidRegistrar {
 		BasicHttpContext localcontext = new BasicHttpContext();
 		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 		String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-		String url = this.getEzidUrl("/ezid/id/" + doi);
+		String url = this.getEzidUrl("/id/" + doi);
 		StringBuffer metadata = new StringBuffer("");
 		metadata
 		    .append("datacite: " + this.dataCiteMetadata.toDataCiteXml() + "\n");
@@ -380,7 +380,7 @@ public class EzidRegistrar {
 		BasicHttpContext localcontext = new BasicHttpContext();
 		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 		
-		String url = this.getEzidUrl("/ezid/id/" + doi);
+		String url = this.getEzidUrl("/id/" + doi);
 
 		StringBuffer metadata = new StringBuffer("");
 		metadata.append("_status: unavailable | withdrawn by author\n");

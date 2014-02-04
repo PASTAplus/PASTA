@@ -44,15 +44,13 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Need Help, Have Questions?</h2>
+								<h2>How do I ...</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-
-			<h3>How do I ...</h3>
 
 			<ul>
 				<li>Learn about the PASTA Software Developer's Application
@@ -78,10 +76,10 @@
 			</ul>
 
 			<p>
-				Have more questions, go to the <a
+				Have more questions? Go to the <a
 					href="https://nis.lternet.edu:8443/x/swFZ" class="searchsubcat" target="_blank">Frequently
 					Asked Questions</a> page, enter your question as a comment in either
-				the NIS User's Guide or the NIS Software Developer's Guide, or you
+				the <cite>NIS User's Guide</cite> or the <cite>NIS Software Developer's Guide</cite>, or you
 				can always email <a href="mailto:tech-support@lternet.edu" class="searchsubcat"
 					target="_blank">tech-support@lternet.edu</a>.
 			</p>

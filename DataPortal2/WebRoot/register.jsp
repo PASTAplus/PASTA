@@ -48,8 +48,6 @@
 
 	<div class="wrapper">
 
-		<jsp:include page="/WEB-INF/jsp/head.jsp" />
-
 		<div class="content">
 
 			<h2 align="center">New User Registration</h2>
@@ -62,44 +60,35 @@
         please select the "login" link above. If not, you can register here
         for access to these data.  Clicking "Submit" will send a confirmation
         email to the address provided.  Thank you!</p>
+        
 
 				<form id="" name="" method="post" action="">
 
-					<fieldset>
-						<legend>User Information</legend>
-						<table align="left" cellpadding="4em">
+        <hr/>
+            <h3>User Information</h3>
+						<table>
 							<tbody>
 								<tr>
-									<td align="left" width="130px"><label for="givenName">First
-											Name:</label></td>
-									<td align="left" width="200px"><input type="text"
-										name="givenName" required="required" size="30" /></td>
+									<td align="left"><label for="givenName">First Name:</label></td>
+									<td align="left"><input type="text" name="givenName" required="required" size="30" /></td>
 								</tr>
 								<tr>
-									<td align="left" width="130px"><label for="surName">Last
-											Name:</label></td>
-									<td align="left" width="200px"><input type="text"
-										name="surName" required="required" size="30" /></td>
+									<td align="left"><label for="surName">Last Name:</label></td>
+									<td align="left"><input type="text" name="surName" required="required" size="30" /></td>
 								</tr>
 								<tr>
-									<td align="left" width="130px"><label for="email">Email:</label>
-									</td>
-									<td align="left" width="200px"><input type="text"
-										name="email" required="required" size="30" /></td>
+									<td align="left"><label for="email">Email:</label></td>
+									<td align="left"><input type="email" name="email" required="required" size="30" /></td>
 								</tr>
 								<tr>
-									<td align="left" width="130px"><label for="institution">Institution:</label>
-									</td>
-									<td align="left" width="200px"><input type="text"
-										name="institution" required="required" size="30" /></td>
+									<td align="left"><label for="institution">Institution:</label></td>
+									<td align="left"><input type="text" name="institution" required="required" size="30" /></td>
 								</tr>
 							</tbody>
 						</table>
-					</fieldset>
 
-					<fieldset>
-						<legend>Data Use Purpose/Intent</legend>
-						<table align="left" cellpadding="4em">
+					<h3>Data Use Purpose/Intent</h3>
+						<table>
 							<tbody>
 								<tr>
 									<td><input type="radio" name="intent" />&nbsp;Research
@@ -143,7 +132,6 @@
 							</tbody>
 						</table>
 				</form>
-				</fieldset>
 
 				<p>
 					<input type="checkbox" name="acknowledgement" />&nbsp; I
@@ -160,8 +148,6 @@
 
 		</div>
 		<!-- end of content -->
-
-		<jsp:include page="/WEB-INF/jsp/foot.jsp" />
 
 	</div>
 	<!-- end of wrapper -->

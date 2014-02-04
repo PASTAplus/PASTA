@@ -81,9 +81,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
-								<p>View provenance metadata of a data package using 
-								the package identifier</p>
+								<p>View provenance metadata of a data package using the package identifier.</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
 										<table>
@@ -93,7 +91,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" size="30" type="text" /></td>
+												<input name="packageid" required="required" autofocus size="20" type="text" /></td>
 											</tr>
 											<tr>
 												<td>
@@ -104,13 +102,11 @@
 										</table>
 									</form>
 								</div>
-								</fieldset>
 			<%
 				if (message != null && !type.equals("warning")) {
-				    out.println("<fieldset>\n");
-				    out.println("<legend>" + packageid + "</legend>\n");
+				    out.println("<h3>" + packageid + "</h3>\n");
 					out.println("<div class=\"section\">\n");
-					out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+					out.println("<table>\n");
 					out.println("<tbody>\n");
 					out.println("<tr>\n");
 					out.println("<td " + type + ">\n");
@@ -120,7 +116,6 @@
 					out.println("</tbody>\n");
 					out.println("</table>\n");
 					out.println("</div>\n");
-					out.println("</fieldset>\n");
 				}
 			%>
 

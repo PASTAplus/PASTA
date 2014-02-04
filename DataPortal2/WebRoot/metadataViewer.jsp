@@ -1,10 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"
 	trimDirectiveWhitespaces="true"%>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
-
   String metadataHtml = (String) request.getAttribute("metadataHtml");
   String packageId = (String) request.getAttribute("packageId");
 
@@ -47,7 +43,6 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- Metadata Viewer -->
-<link href="css/sbclter.css" rel="stylesheet" type="text/css">
 <script src="js/toggle.js" type="text/javascript"></script>
 <!-- /Metadata Viewer -->
 

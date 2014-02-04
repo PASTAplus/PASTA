@@ -19,13 +19,11 @@
   }
 
   String deleteMessage = (String) request.getAttribute("deletemessage");
-  String type = (String) request.getAttribute("type");
-
-  if (type == null) {
-    type = "";
-  } else {
-    type = "class=\"" + type + "\"";
+  String deleteMessageHTML = "";
+  if (deleteMessage != null) {
+    deleteMessageHTML = String.format("<p class=\"nis-info\">%s</p>", deleteMessage);
   }
+  
 %>
 
 <!DOCTYPE html>
@@ -80,15 +78,8 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
-								<p>Delete a data package using the package scope 
-								and identifier (e.g. <code>myscope.100</code>).
+								<p>Delete a data package<sup>*</sup> using the package <b>scope</b> and <b>identifier</b> (e.g. <kbd class="nis">myscope.100</kbd>).
 								</p>
-								<p><i>Please note: Deletion of a data package is 
-								permanent and should be given due consideration. 
-								Once deleted, no additional data packages can be 
-								uploaded with the specified combination of scope 
-								and identifier.</i></p>
 								<div class="section">
 									<form id="datapackagedelete" action="./dataPackageDelete" method="post" name="datapackagedelete">
 										<table>
@@ -99,7 +90,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" type="text" />
+												<input name="packageid" required="required" type="text" autofocus />
 												</td>
 											</tr>
 											<tr>
@@ -110,22 +101,13 @@
 											</tr>
 										</table>
 									</form>
+								<p><sup>*</sup><strong><em>Please note</em></strong>: Deletion of a data package is 
+								permanent and should be given careful consideration. 
+								Once deleted, <em>no additional data packages</em> can be 
+								uploaded with the specified combination of <var>scope</var> 
+								and <var>identifier</var>.</p>
 								</div>
-        <%
-          if (deleteMessage != null) {
-            out.println("<div class=\"section\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
-            out.println("<tbody>\n");
-            out.println("<tr>\n");
-            out.println("<td " + type + ">\n");
-            out.println(deleteMessage + "\n");
-            out.println("</td>\n");
-            out.println("</tr>\n");
-            out.println("</tbody>\n");
-            out.println("</table>\n");
-          }
-        %>
-								</fieldset>
+                <%= deleteMessageHTML %>
 								<!-- /Content -->
 							</div>
 						</div>

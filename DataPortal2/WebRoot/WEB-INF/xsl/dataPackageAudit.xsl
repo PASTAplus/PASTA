@@ -26,17 +26,16 @@
 
   <xsl:template match="/">
 
-    <div class="section-table">
       <fieldset>
         <legend>PASTA Audit Report</legend>
         <table>
           <tbody>
             <tr>
-              <td class="header">Date/Time</td>
-              <td class="header">Method</td>
-              <td class="header">Resource</td>
-              <td class="header">User</td>
-              <td class="header">Group(s)</td>
+              <th class="nis">Date/Time</th>
+              <th class="nis">Method</th>
+              <th class="nis">Resource</th>
+              <th class="nis">User</th>
+              <th class="nis">Group(s)</th>
             </tr>
             <xsl:for-each select="/auditReport/auditRecord">
               <xsl:sort select="./oid" data-type="number" />
@@ -51,37 +50,35 @@
           </tbody>
         </table>
       </fieldset>
-    </div>
-    <!-- section-table -->
 
   </xsl:template>
   
   <xsl:template match="entryTime">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="serviceMethod">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="resourceId">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="user">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>
   
   <xsl:template match="groups">
-    <td class="data">
+    <td class="nis">
       <xsl:value-of select="."/>
     </td>
   </xsl:template>

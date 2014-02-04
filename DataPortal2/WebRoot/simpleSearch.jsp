@@ -66,7 +66,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-			          <div class="section-table"><%=searchResult%></div>
+			          <%=searchResult%>
 						  </div>
 		 		    </div>
 				  </div>
