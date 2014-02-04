@@ -319,8 +319,11 @@ public class DOIScannerTest {
 		} catch (DOIException e) {
 			fail(e.getMessage());
 		}
+    catch (ConfigurationException e) {
+      fail(e.getMessage());
+    }
 
-		// Test that the test data package did receive a DOI
+    // Test that the test data package did receive a DOI
 		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,
 		    testScope, testIdentifier, testRevisionStr);
 		statusCode = response.getStatus();
