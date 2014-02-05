@@ -20,18 +20,7 @@
 <%
 
 DataPackageSurvey dps = new DataPackageSurvey();
-String[] popular = dps.surveyDataPackages("popular", 2);
-String[] recent = dps.surveyDataPackages("recent", 2);
-
-String popularScope1 = popular[0];
-String popularIdentifier1 = popular[1];
-String popularTitle1 = popular[2];
-String popularDate1 = popular[3];
-
-String popularScope2 = popular[4];
-String popularIdentifier2 = popular[5];
-String popularTitle2 = popular[6];
-String popularDate2 = popular[7];
+String[] recent = dps.surveyDataPackages("recent", 4);
 
 String recentScope1 = recent[0];
 String recentIdentifier1 = recent[1];
@@ -42,6 +31,16 @@ String recentScope2 = recent[4];
 String recentIdentifier2 = recent[5];
 String recentTitle2 = recent[6];
 String recentDate2 = recent[7];
+
+String recentScope3 = recent[8];
+String recentIdentifier3 = recent[9];
+String recentTitle3 = recent[10];
+String recentDate3 = recent[11];
+
+String recentScope4 = recent[12];
+String recentIdentifier4 = recent[13];
+String recentTitle4 = recent[14];
+String recentDate4 = recent[15];
 
 %>
 
@@ -61,24 +60,7 @@ String recentDate2 = recent[7];
 							<div class="span4">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Popular</h2>
-									</div>
-									<dl>
-										<dt><a href="./mapbrowse?scope=<%= popularScope1 %>&identifier=<%= popularIdentifier1 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= popularDate1 %>
-										<a href="./mapbrowse?scope=<%= popularScope1 %>&identifier=<%= popularIdentifier1 %>"><%= popularTitle1 %></a> </dd>
-									</dl>
-									<dl>
-										<dt><a href="./mapbrowse?scope=<%= popularScope2 %>&identifier=<%= popularIdentifier2 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= popularDate2 %>
-										<a href="./mapbrowse?scope=<%= popularScope2 %>&identifier=<%= popularIdentifier2 %>"><%= popularTitle2 %></a> </dd>
-									</dl>
-								</div>
-							</div>
-							<div class="span6">
-								<div class="widget widget_recent_posts">
-									<div class="footer_title">
-										<h2 class="widget-title">Recent</h2>
+										<h2 class="widget-title">Recent Inserts</h2>
 									</div>
 									<dl>
 										<dt><a href="./mapbrowse?scope=<%= recentScope1 %>&identifier=<%= recentIdentifier1 %>"><span class="post_icon"></span></a></dt>
@@ -89,6 +71,23 @@ String recentDate2 = recent[7];
 										<dt><a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><span class="post_icon"></span></a></dt>
 										<dd class="without_avatar"><%= recentDate2 %>
 										<a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><%= recentTitle2 %></a> </dd>
+									</dl>
+								</div>
+							</div>
+							<div class="span6">
+								<div class="widget widget_recent_posts">
+									<div class="footer_title">
+										<h2 class="widget-title">Recent Updates</h2>
+									</div>
+									<dl>
+										<dt><a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate3%>
+										<a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><%= recentTitle3 %></a> </dd>
+									</dl>
+									<dl>
+										<dt><a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate4 %>
+										<a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><%= recentTitle4 %></a> </dd>
 									</dl>
 								</div>
 							</div>
