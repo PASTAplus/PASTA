@@ -1,3 +1,21 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%
+	HttpSession httpSession = request.getSession();
+
+	String uid = (String) httpSession.getAttribute("uid");
+
+	if (uid == null || uid.isEmpty()) {
+		request.setAttribute("from", "./harvester.jsp");
+		String loginWarning = DataPortalServlet.getLoginWarning();
+		request.setAttribute("message", loginWarning);
+		RequestDispatcher requestDispatcher = request
+		    .getRequestDispatcher("./login.jsp");
+		requestDispatcher.forward(request, response);
+	}
+	
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +24,9 @@
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -49,21 +70,20 @@
 							<div class="span12">
 								<!-- Content -->
 								<p>Data packages may be evaluated without uploading 
-								them to the NIS by selecting &quot;Evaluate&quot;. Once you 
+								them to the NIS by selecting <b>Evaluate</b>. Once you 
 								are satisfied that data packages are ready to be 
 								uploaded to the NIS, you may do so by selecting 
-								&quot;Upload&quot;. Several alternatives for supplying the 
+								<b>Upload</b>. Several alternatives for supplying the 
 								EML metadata for your data packages are available below.</p>
 								<fieldset>
 								<legend>EML Metadata File</legend>
 								<p>Select an Ecological Metadata Language (EML) file to evaluate or upload.</p>
 								<div class="section">
                   <form id="emlFile" name="emlFile" method="post" enctype="multipart/form-data" action="./harvester">
-										<table align="left" cellpadding="4em">
+										<table>
 											<tr>
 												<td align="left">
-												<label for="packageid">File:
-												</label>
+												<label class="labelBold">File:</label>
 												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
 												</td>
 											</tr>
@@ -82,11 +102,10 @@
 								<fieldset>
 								<legend>EML Document URLs</legend>
 								<p>Enter a list of EML document URLs into the text 
-								area below, one per line, and then select &quot;Evaluate&quot; 
-								or &quot;Upload&quot;.</p>
+								area below, one per line, and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 								<div class="section">
 									<form id="urlList" action="./harvester" method="post" name="urlList">
-										<table align="left" cellpadding="4em">
+										<table>
 											<tr>
 												<td align="left">
 												<textarea id="urlTextArea" cols="80" name="urlTextArea" required="required" rows="8"></textarea>
@@ -116,13 +135,11 @@
 												<!-- Content -->
 												<fieldset>
 												<legend>Copy EML Metadata Text</legend>
-												<p>Copy the XML for a single EML 
-												metadata document into the text 
-												area below and then select &quot;Evaluate&quot; 
-												or &quot;Upload&quot;.</p>
+												<p>Copy the XML for a single EML metadata document into the text 
+			                     area below and then select <b>Evaluate</b> or <b>Upload</b>.</p>
 												<div class="section">
 													<form id="emlText" action="./harvester" method="post" name="emlText">
-														<table align="left" cellpadding="4em">
+														<table>
 															<tr>
 																<td align="left">
 																<textarea id="emlTextArea" cols="100" name="emlTextArea" required="required" rows="8"></textarea></td>
@@ -140,20 +157,15 @@
 												</fieldset>
 												<fieldset>
 												<legend>Metacat Harvest List URL</legend>
-												<p>Enter the URL of a Metacat Harvest 
-												List and then select &quot;Evaluate&quot; 
-												or &quot;Upload&quot;. All <code>documentURL</code> 
-												elements in the harvest list will 
-												be processed. </p>
+												<p>Enter the URL of a Metacat Harvest List and then select <b>Evaluate</b> 
+												or <b>Upload</b>. All <var>documentURL</var> elements in the harvest list will be processed.</p>
 												<div class="section">
 													<form id="harvestList" action="./harvester" method="post" name="harvestList">
-														<table align="left" cellpadding="4em">
+														<table>
 															<tr>
 																<td align="left">
-																<label for="harvestListURL">
-																Metacat Harvest 
-																List URL:</label>
-																<input name="harvestListURL" required="required" size="150" type="text" />
+																<label class="labelBold">Metacat Harvest List URL:</label>
+																<input name="harvestListURL" required="required" size="50" type="url" />
 																</td>
 															</tr>
 															<tr>

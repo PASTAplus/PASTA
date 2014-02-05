@@ -41,6 +41,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -83,12 +85,15 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<fieldset>
-								<legend>Subscribe</legend>
-								<p>Subscribe to a NIS data package &quot;insert-&quot; or 
-								&quot;update-event&quot; using the full package identifier 
-								(scope-identifier-revision), the scope-identifier, 
-								or just the scope.</p>
+                <h3>Subscribe</h3>
+								<p>Subscribe to NIS data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:
+								<ol>
+								  <li>a particular data package revision (e.g. <kbd class="nis">mypackages.1.1</kbd>); or,</li>
+								  <li>any revision of a data package with a given scope and identifier (e.g. <kbd class="nis">mypackages.1</kbd>); or,</li>
+								  <li>any data package with a given scope (e.g. <kbd class="nis">mypackages</kbd>).</li>
+                </ol>
+								</p>
+								<p>Then enter the URL of a workflow or other procedure for the NIS to invoke whenever the data packages you specified are inserted or updated.</p>
 								<div class="section">
 									<form id="eventsubscribe" action="eventsubscribe" method="post" name="eventsubscribe">
 										<table>
@@ -96,16 +101,16 @@
 												<td>
 												<label class="labelBold" for="packageid">Package Id:</label>
 												</td>
+												<td>
+												<label class="labelBold" for="packageid">Target URL:</label>
+												</td>
 											</tr>
 											<tr>
 												<td>
 												<input name="packageid" required="required" type="text" />
 												</td>
 												<td>
-												<label style="padding-left:10px; padding-right:10px;" for="targeturl">Target URL :</label>
-												</td>
-												<td>
-												<input name="targeturl" required="required" size="50" type="text" />
+												<input name="targeturl" required="required" size="50" type="url" />
 												</td>
 											</tr>
 											<tr>
@@ -120,7 +125,7 @@
 				<%
 				  if (subscribeMessage != null) {
 				    out.println("<div class=\"section\">\n");
-				    out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+				    out.println("<table>\n");
 				    out.println("<tbody>\n");
 				    out.println("<tr>\n");
 				    out.println("<td " + type + ">\n");
@@ -131,12 +136,10 @@
 				    out.println("</table>\n");
 				  }
 				%>
-								</fieldset>
-								<fieldset>
-								<legend>Review</legend>
+				      <hr/>
+              <h3>Review</h3>
 								<p>Review a subscription using the subscription 
-								identifier or leave empty to review &quot;all&quot; of your 
-								subscriptions.</p>
+								identifier or leave empty to review <em>all</em> of your subscriptions.</p>
 								<div class="section">
 									<form id="eventreview" action="eventreview" method="post" name="eventreview">
 										<table>
@@ -147,7 +150,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" type="text" />
+												<input name="subscriptionid" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -161,8 +164,8 @@
 								</div>
         <%
           if (reviewMessage != null) {
-            out.println("<div class=\"section-table\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<div>\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
@@ -173,8 +176,8 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset> <fieldset>
-								<legend>Test</legend>
+				        <hr/>
+								<h3>Test</h3>
 								<p>Test a subscription using the subscription identifier.</p>
 								<div class="section">
 									<form id="eventtest" action="eventtest" method="post" name="eventtest">
@@ -186,7 +189,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="text" />
+												<input name="subscriptionid" required="required" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -199,8 +202,7 @@
 								</div>
         <%
           if (testMessage != null) {
-            out.println("<div class=\"section-table\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
@@ -211,8 +213,8 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset> <fieldset>
-								<legend>Delete</legend>
+				        <hr/>
+								<h3>Delete</h3>
 								<p>Delete a subscription using the subscription 
 								identifier.</p>
 								<div class="section">
@@ -225,7 +227,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="text" />
+												<input name="subscriptionid" required="required" type="number" />
 												</td>
 											</tr>
 											<tr>
@@ -240,7 +242,7 @@
         <%
           if (deleteMessage != null) {
             out.println("<div class=\"section\">\n");
-            out.println("<table align=\"left\" cellpadding=\"4em\">\n");
+            out.println("<table>\n");
             out.println("<tbody>\n");
             out.println("<tr>\n");
             out.println("<td " + type + ">\n");
@@ -251,7 +253,6 @@
             out.println("</table>\n");
           }
         %>
-								</fieldset>
 								<!-- /Content --></div>
 						</div>
 					</div>
@@ -263,8 +264,6 @@
 		<jsp:include page="footer.jsp" />
 
 </div>
-
-		<script src="charts/assets/effects.js"></script>
 
 </body>
 

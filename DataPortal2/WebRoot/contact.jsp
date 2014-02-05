@@ -7,6 +7,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -71,7 +73,7 @@
 									NIS Guides</a></li>
 								</ul>
 								<h3 align="left">Physical Address</h3>
-								<ul style="list-style: none;">
+								<ul class="no-list-style">
 									<li>LTER Network Office<br />
 									Suite 320, CERIA Bldg #83,<br />
 									University of New Mexico (Main Campus)<br />
@@ -84,7 +86,7 @@
 									</li>
 								</ul>
 								<h3 align="left">Mailing Address</h3>
-								<ul style="list-style: none;">
+								<ul class="no-list-style">
 									<li>LTER Network Office<br />
 									UNM Dept of Biology, MSC03 2020<br />
 									1 University of New Mexico<br />

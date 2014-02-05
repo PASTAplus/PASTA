@@ -87,6 +87,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -107,11 +109,6 @@
 <!-- Mobile Device CSS -->
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
-
-<!-- These Scripts are for my Chart Demo and can be removed at any time 
-<script src="charts/assets/Chart.js" type="text/javascript"></script>
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
-<!-- /These Scripts are for my Chart Demo and can be removed at any time -->
 
 <!-- Google Chart for NIS Data Package and Site Growth -->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -140,11 +137,9 @@
 
 		// Set chart options
 		var options = {
-			'title' : '',
-			'width' : 500,
-			'height' : 300,
-
-
+			'title' : 'Site/Data Package Growth',
+			'width' :  400,
+			'height' : 250,
 
 			'vAxes' : {
 				0 : {
@@ -198,7 +193,7 @@
 							U.S. LTER Network are made available online with as 
 							few restrictions as possible, on a non-discriminatory 
 							basis. In return, the LTER Network expects data users 
-							to <strong>act ethically</strong> by contacting the 
+							to <em>act ethically</em> by contacting the 
 							investigator prior to the use of data for publication.
 							</p>
 							<p>The LTER Network Information System Data Portal contains 
@@ -216,7 +211,7 @@
 							login will gain you access to even more data where contributors 
 							have asked for additional information on use.
 							<span name="New user registration for non-LTER members coming soon!" 
-							class="tooltip" class="searchsubcat">Click here</span> to register now.
+							class="tooltip" class="searchsubcat">Register now</span>!
 							</p>
 							<p>LTER Network scientists make every effort to release 
 							data in a timely fashion and with attention to accurate, 
@@ -231,33 +226,11 @@
 				</div>
 				<div class="span4 box_shadow box_layout">
 					<div class="row-fluid">
-						<div class="span12">
-							<div class="recent_title">
-								<h2>Site / Data Package Growth</h2>
-							</div>
-							<span class="row-fluid separator_border"></span>
-						</div>
 						<div class="row-fluid">
-							<!-- My Chart Code. Can be removed anytime -->
-							<section id="examples">
-								<article id="lineChart" class=" ">
-									<div>
-										<!-- 
-										  <canvas id="introChart" width="320" height="250"></canvas> 
-											<p>Site contributed data packages: <strong><i>1473</i></strong></p>
-									  -->
-										<br />
-										<br />
-								<div id="chart_div"></div>
-								<p>Site contributed data packages: 
-								  <strong><em><%=numDataPackagesSites.toString()%></em></strong><br />
-									Total data packages: <strong><em><%=numDataPackages.toString()%></em></strong>
-								</p>
-											<!--   Total data packages: <strong><i>16888</i></strong> -->
-									</div>
-								</article>
-							</section>
-							<!-- /My Chart Code. Can be removed anytime -->
+								    <div id="chart_div"></div>
+								    <p id="nis-growth">Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
+									     Total data packages: <b><%=numDataPackages.toString()%></b>
+								    </p>
 						</div>
 					</div>
 				</div>
@@ -269,8 +242,6 @@
 		
 </div>
 
-  <script src="charts/assets/effects.js"></script>
-  
 </body>
 
 </html>

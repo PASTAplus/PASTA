@@ -52,6 +52,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -98,27 +100,11 @@
 			<%=warningMessage%>
 
 			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport" >
-			<table>
-				<tbody>		
-					<tr>
-						<td valign="top">
-						  <label>Select the Evaluate or Upload results to view:</label>
-							<select style="width: auto" name="reportId" size="1" onchange="submitform()" >
-								<%= harvestReportList %>
-							</select>					
-						</td>
-					</tr>
-			</table>
-			<table>
-					<tr>				
-						<td valign="top">
-							<div class="section-table">
-								<%=harvestReportHTML%>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			  <label>Select the <b>Evaluate</b> or <b>Upload</b> results to view:</label>
+				<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
+				  <%= harvestReportList %>
+			  </select>					
+				<%=harvestReportHTML%>
       </form>
       
 								<!-- /Content -->
@@ -132,10 +118,6 @@
 
 		<jsp:include page="footer.jsp" />
 </div>
-
-		<!-- Can be removed, loads charts demo -->
-		<script src="charts/assets/effects.js"></script>
-		<!-- /Can be removed, loads charts demo -->
 
     <script type="text/javascript">
         jQuery(document).ready(function() {

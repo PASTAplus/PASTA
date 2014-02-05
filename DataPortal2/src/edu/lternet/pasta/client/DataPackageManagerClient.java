@@ -78,25 +78,24 @@ public class DataPackageManagerClient extends PastaClient {
 	    .getLogger(edu.lternet.pasta.client.DataPackageManagerClient.class);
 
 	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-	    + "<pathquery version=\"1.0\">\n"
-	    + "  <meta_file_id>unspecified</meta_file_id>\n"
-	    + "  <querytitle>unspecified</querytitle>\n"
-	    + "  <returnfield>dataset/title</returnfield>\n"
-	    + "  <returnfield>keyword</returnfield>\n"
-	    + "  <returnfield>originator/individualName/surName</returnfield>\n"
-	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n"
-	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n"
-	    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
-	    + "  <querygroup operator=\"UNION\">\n"
-	    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-	    + "      <value>bug</value>\n"
-	    + "      <pathexpr>dataset/title</pathexpr>\n"
-	    + "    </queryterm>\n"
-	    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-	    + "      <value>Carroll</value>\n"
-	    + "      <pathexpr>surName</pathexpr>\n"
-	    + "    </queryterm>\n"
-	    + "  </querygroup>\n" + "</pathquery>\n";
+		    + "<pathquery version=\"1.0\">\n"
+		    + "  <meta_file_id>unspecified</meta_file_id>\n"
+		    + "  <querytitle>unspecified</querytitle>\n"
+		    + "  <returnfield>dataset/title</returnfield>\n"
+		    + "  <returnfield>keyword</returnfield>\n"
+		    + "  <returnfield>originator/individualName/surName</returnfield>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
+		    + "  <querygroup operator=\"UNION\">\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>bug</value>\n"
+		    + "      <pathexpr>dataset/title</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>Carroll</value>\n"
+		    + "      <pathexpr>surName</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "  </querygroup>\n" + "</pathquery>\n";
 
 	/*
 	 * Instance variables
@@ -860,6 +859,44 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 	}
 
+	
+	/**
+	 * Executes the 'listServiceMethods' web service method.
+	 * 
+	 * @return a newline-separated list of service method names representing all the
+	 *         service methods supported by the Data Package Manager
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listServiceMethods() throws Exception {
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		String url = BASE_URL + "/service-methods";
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			httpClient.getConnectionManager().shutdown();
+		}
+
+		return entityString;
+	}
+
+	
 	/**
 	 * Executes the 'readDataEntity' web service method.
 	 * 
@@ -916,6 +953,16 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode != HttpStatus.SC_OK) {
 				String gripe = "An error occurred while attempting to read the data enity: "
 				    + entityId;
+				if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+					if (this.uid.equals("public")) {
+						gripe = String.format("%s. %s", gripe,
+										"You may need to log in before you can access the data entity.");
+					}
+					else {
+						gripe = String.format("%s. %s", gripe,
+										"You may not have permission to access the data entity.");
+					}
+				}
 				handleStatusCode(statusCode, gripe);
 			} else {
 

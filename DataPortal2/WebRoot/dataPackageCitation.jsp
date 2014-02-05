@@ -23,6 +23,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -99,10 +101,6 @@
 
 		<jsp:include page="footer.jsp" />
 </div>
-
-		<!-- Can be removed, loads charts demo -->
-		<script src="charts/assets/effects.js"></script>
-		<!-- /Can be removed, loads charts demo -->
 
 </body>
 

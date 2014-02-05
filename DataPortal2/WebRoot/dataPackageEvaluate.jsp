@@ -7,6 +7,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -52,22 +54,13 @@
 								<p>Select an Ecological Metadata Language (EML) file to evaluate.</p>
 								<div class="section">
                   <form id="uploadevaluate" name="uploadevaluate" method="post" action="./uploadevaluate" enctype="multipart/form-data" target="_blank">
-										<table align="left" cellpadding="4em">
-											<tr>
-												<td align="left">
-												<label for="packageid">File:
-												</label>
-												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
-												</td>
-											</tr>
-											<tr>
-												<td align="left">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-												</td>
-											</tr>
-										</table>
-										<input id="metadataSource" name="metadataSource" type="hidden" value="emlFile" />
+									  <label class="labelBold">File:</label>
+										<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
+										<div>
+										  <input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
+										  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
+										  <input id="metadataSource" name="metadataSource" type="hidden" value="emlFile" />
+										</div>
 									</form>
 								</div>
 								<!-- /Content --></div>

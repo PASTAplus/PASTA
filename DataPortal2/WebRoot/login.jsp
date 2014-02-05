@@ -22,6 +22,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -65,21 +67,21 @@
 							<div class="span12">
 								<!-- Content -->
 								
-				<p class="warning" align="center"><%=message%></p>
+				<p class="nis-warn"><%=message%></p>
 
 					<form id="login" name="loginform" method="post" action="./login"
 						target="_top">
 						<table id="login-form">
 							<tbody>
 								<tr>
-									<td align="right"><label for="uid">User Name:</label></td>
+									<td align="right"><label class="labelBold">User Name:</label></td>
 									<td align="right">
 									   <input type="text" name="uid"
 										size="25px" required="required" autocomplete="on" autofocus />
 									</td>
 								</tr>
 								<tr>
-									<td align="right"><label for="password">Password:</label></td>
+									<td align="right"><label class="labelBold">Password:</label></td>
 									<td align="right">
 									   <input type="password" name="password"
 										size="25px" required="required" />
@@ -107,10 +109,6 @@
 
 		<jsp:include page="footer.jsp" />
 </div>
-
-		<!-- Can be removed, loads charts demo -->
-		<script src="charts/assets/effects.js"></script>
-		<!-- /Can be removed, loads charts demo -->
 
 </body>
 

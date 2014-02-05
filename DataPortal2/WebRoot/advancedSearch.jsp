@@ -15,6 +15,8 @@
 
 <meta charset="UTF-8" />
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!--  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" > -->
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
@@ -38,7 +40,7 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- For Custom Checkboxes -->
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -152,7 +154,7 @@
 								<!-- Content -->
 								<div class="spacer">
 								</div>
-								<div class="tabbable  " style="left: 0px; top: 0px">
+								<div class="tabbable">
 									<ul class="nav nav-tabs">
 										<li class="active">
 										  <a data-toggle="tab" href="#tab3">Spatial / Place Name</a> 
@@ -192,54 +194,48 @@
 													  </script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);
             							  </script>
-													  <div style="margin: 5 auto;">
-														Zoom in to the region you&#39;d like to search:
-														</div>
-														
 														<table>														
 													  	<tr>										
 														    <td>
-                                  <div id="map-canvas" style="margin: 0 auto; width: 330px; height: 258px"></div>
+														      <label>Zoom in to the region you&#39;d like to search:</label>											
+                                  <div id="map-canvas"></div>
 													      </td>
 													      <td>
-													        <table>
+													        <table id="nis-coordinates">
 														        <tr>
 															        <td></td>
 															        <td>
-															          <label>North:
-															            <input maxlength="12" name="northBound" onchange="boundsChanged()" 
-															                  size="12" type="text" value="90.0" />
-															          </label>
+															          <label>North:</label>
+															            <input name="northBound" onchange="boundsChanged()" 
+															                  size="8" type="text" value="90.0" />
 															        </td>
 															        <td></td>
 		  												      </tr>
 			  											      <tr>
 				  											      <td>
-					  										        <label>West:
-						  									          <input maxlength="12" name="westBound" onchange="boundsChanged()" 
-							  								                 size="12" type="text" value="-180.0" />
-								  							        </label>
+					  										        <label>West:</label>
+						  									          <input name="westBound" onchange="boundsChanged()" 
+							  								                 size="8" type="text" value="-180.0" />						  							        
 									  						      </td>
 										  					      <td></td>
 											  				      <td>
-												  			        <label>East:
-													  		          <input maxlength="12" name="eastBound" onchange="boundsChanged()" 
-														  	                 size="12" type="text" value="180.0" />
-															          </label>
+												  			        <label>East:</label>
+													  		          <input name="eastBound" onchange="boundsChanged()" 
+														  	                 size="8" type="text" value="180.0" />									          
 															        </td>
 						  								      </tr>
 							  							      <tr>
 								  							      <td></td>
 									  						      <td>
-										  					        <label>South:
-											  				          <input maxlength="12" name="southBound" onchange="boundsChanged()" 
-												  			                 size="12" type="text" value="-90.0" />
-													  		        </label>
+										  					        <label>South:</label>
+											  				          <input name="southBound" onchange="boundsChanged()" 
+												  			                 size="8" type="text" value="-90.0" />
 														  	      </td>
 															        <td></td>
 	  													      </tr>
 		  												    </table>
 			  											  </td>														
+													      <td></td>
 														    <td>
 															    <ul class="checklistLG">
 																    <li>
@@ -263,12 +259,9 @@
 															    <label class="labelBold">Geographic Place Name:</label>
 															  </td>
 														  </tr>
-														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
 														<tr>
 														<td>													  
-															    <input name="locationName" size="40" type="text" value="" />
+															    <input name="locationName" size="40" type="text" />
 													  </td>
 													  </tr>
 													  </table>
@@ -308,7 +301,7 @@
 													-->
 													<tr>
 														<td valign="top">
-                              <select name="siteValues" multiple="multiple" size="10" style="width: auto">
+                              <select class="select-width-auto" name="siteValues" multiple="multiple" size="10">
                                 <%= siteOptions %>
                               </select>
                             </td>
@@ -365,7 +358,7 @@
 															  </td>
 															  <td class="spacerwd"></td>														  
 															  <td>
-															    <input name="subjectValue" type="text" value="" placeholder="enter search terms" />
+															    <input name="subjectValue" type="search" placeholder="enter search terms" />
 															  </td>
 															</tr>
 															<tr>
@@ -456,7 +449,7 @@
 															      <option value="2">starts with</option>
 															      <option value="3">ends with</option>
 															    </select>
-															    <input name="creatorSurname" type="text" value="" />
+															    <input name="creatorSurname" type="text" />
 															  </td>
 														  </tr>
 														  <tr>
@@ -468,7 +461,7 @@
 															      <option value="2">starts with</option>
 															      <option value="3">ends with</option>
 															    </select>
-															    <input name="creatorOrganization" type="text" value="" />
+															    <input name="creatorOrganization" type="text" />
 															  </td>
 														  </tr>
 													  </table>
@@ -529,12 +522,12 @@
 														  <tr>
 															  <td>
 															    <label class="labelBold" for="userId">Start Date:</label>
-															    <input name="startDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <input name="startDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
 															  <td></td>
 															  <td>
 															    <label class="labelBold" for="group">End Date:</label>
-															    <input name="endDate" placeholder="YYYY-MM-DD" size="15px" type="date" />
+															    <input name="endDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
 															  <td></td>
 															  <td></td>
@@ -568,7 +561,7 @@
 															  </td>
 															  <td></td>
 															  <td>
-															    <input name="namedTimescale" type="text" value="">
+															    <input name="namedTimescale" type="text" >
 															  </td>
 														  </tr>
 													  </table>
@@ -621,7 +614,7 @@
 																</td>
 																<td></td>
 															  <td>
-															    <input name="taxon" type="text" value="" />
+															    <input name="taxon" type="text" />
 															  </td>
 															</tr>
 														</table>
@@ -645,24 +638,10 @@
 										
 										
 										  <div id="tab5" class="tab-pane  ">
-											  <div class="row-fluid text_bar_pattern themeple_sc" style="left: 0px; top: 0px">
+											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <!-- Search Options Table -->												
-												    <table style="float:left">
-													    <!--
-													    <tr>
-														    <td colspan="5" valign="top">
-														      <h3 class="separator_border labelBolder span3" for="advancedsearch">Search Options</h3>
-														    </td>
-													    </tr>
-													    <tr>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-														    <td class="spacer"></td>
-													    </tr>
-													    -->
+												    <table>
 													    <tr>
 														    <td>
 															    <ul class="checklist">
@@ -677,12 +656,12 @@
 														    <td class="spacerwd"></td>
 														    <td valign="top">
 															    <input checked="checked" name="formAllAny" type="radio" value="0" /> 
-															    &quot;<strong>And</strong>&quot; all search criteria
+															    <b>AND</b>&nbsp;&nbsp;all search criteria
 														    </td>
 														    <td class="spacerwd"></td>
 														    <td valign="top">
 															    <input name="formAllAny" type="radio" value="1" /> 
-															    &quot;<strong>Or</strong>&quot; all search criteria
+															    <b>OR</b>&nbsp;&nbsp;all search criteria
 														    </td>
 													    </tr>
 												    </table>												

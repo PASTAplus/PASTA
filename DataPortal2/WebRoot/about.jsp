@@ -8,6 +8,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -47,7 +49,6 @@
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-								<fieldset>
 								<p>The NIS Data Portal is the public facing information 
 								management and technology interface to the Provenance 
 								Aware Synthesis Tracking Architecture (PASTA). The 
@@ -58,16 +59,7 @@
 								<a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">
 								NIS Community Website</a> for information about 
 								upcoming updates to the LTER Network Portal.</p>
-								<div class="section">
-									<form id="browsesearch" action="./browseServlet" method="post" name="browsesearch">
-										<table>
-											<tr>
-												<td class="searchcat">
-												<h2 class="package">LTER sites</h2>
-												</td>
-											</tr>
-											<tr>
-												<td>
+												<h3>LTER sites</h3>
 												<p>The LTER is able to support high-level 
 												analysis and synthesis of complex 
 												ecosystem data across the science-policy-management 
@@ -87,7 +79,7 @@
 													<li>the knowledge gained from 
 													the synthesis of LTER data.</li>
 												</ol>
-												<p>The NIS Data Portal uses a &quot;rolling-update&quot; 
+												<p>The NIS Data Portal uses a <i>rolling-update</i>
 												approach to continuously release 
 												improved versions as they are ready 
 												for the community.</p>
@@ -103,25 +95,10 @@
 												User Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
-												</td>
-											</tr>
-											<tr>
-												<td class="searchcat">
-												<h2 class="package">For LTER Site 
-												Information Managers, Software Developers, 
-												and Other Interested Parties</h2>
-												</td>
-											</tr>
-											<tr>
-												<td>
-												<p>The PASTA framework is comprised 
-												of the Gatekeeper identity authentication 
-												service and the following application 
-												programming interfaces (APIs) of 
-												the LTER Network Information System 
-												(<b><i>user authentication</i>
-												</b>is required for all data input 
-												to the PASTA system):</p>
+												<h3>For LTER Site Information Managers, Software Developers, and Other Interested Parties</h3>
+												<p>The PASTA framework is comprised of the Gatekeeper identity authentication 
+												service<sup>*</sup> and the following application programming interfaces (APIs) of 
+												the LTER Network Information System:
 												<ol>
 													<li>The Audit Service API</li>
 													<li>The Event Manager API</li>
@@ -156,7 +133,7 @@
 												and to search for data packages 
 												that reside in PASTA.</p>
 												<p>Like the NIS Data Portal, all 
-												of PASTA&#39;s services use a &quot;rolling-update&quot; 
+												of PASTA&#39;s services use a <i>rolling-update</i>
 												approach to adding bug fixes, improvements, 
 												and new features to each of the 
 												services.</p>
@@ -175,13 +152,8 @@
 												Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
-												</td>
-											</tr>
-										</table>
-									</form>
+									<p><sup>*</sup>User authentication is <em>required</em> for all data input to the PASTA system.</p>
 								</div>
-								</fieldset>
-								<!-- end of section-table -->
 							</div>
 							<!-- end of content -->
 						</div>
@@ -196,14 +168,15 @@
 			<div class="row-fluid distance_2">
 				<div class="row-fluid text_bar_pattern">
 					<span class="right_arrow"></span>
-					<div style="padding: 20px 30px 0px 40px">
+					<div id="div-arra-img">
 						<h1 class="banner_font">Thank You!</h1>
-						<p style="margin-top: 10px">Partial funding for the development 
+						<p></p>
+						<p>Partial funding for the development 
 						of PASTA and the LTER NIS is provided under the American 
 						Recovery and Reinvestment Act of 2009 and is administered 
 						by the National Science Foundation.</p>
-						<p style="margin: 0px 0px 10px 0px; width: 81px">
-						<img id="arra-img" alt="" src="images/ARRA-Small.png" title="US ARRA logo">
+						<p id="p-arra-img">
+						  <img id="arra-img" alt="US ARRA logo" src="images/ARRA-Small.png" title="US ARRA logo">
 						</p>
 					</div>
 					<span class="bottom_shadow_full"></span></div>
@@ -213,8 +186,6 @@
 	<!-- /Banner -->
 
 	  <jsp:include page="footer.jsp" />
-		
-	</div>
 
 </body>
 

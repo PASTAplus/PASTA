@@ -46,10 +46,9 @@ public class DataPortalServlet extends HttpServlet {
     String.format(
 //		  "%s\n%s\n%s\n%s\n",
 		  "%s\n",
-		  //"    <link href=\"css/style_slate.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\">",
+		  "    <link href=\"css/style_slate.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\">"
 		  //"    <link href=\"bootstrap/css/bootstrap.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
 		  //"    <link href=\"bootstrap/css/bootstrap-responsive.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">",
-          "    <link href=\"css/lter-nis.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\">"
     );
 		  
   
@@ -97,10 +96,10 @@ public class DataPortalServlet extends HttpServlet {
 	  }
 	  
 	  if (className.equals("javax.servlet.ServletException")) {
-	      errorMessage = String.format("%s:<br/><br/>%s", this.getClass().getName(), eMessage);
+	      errorMessage = String.format("%s: %s", this.getClass().getName(), eMessage);
 	  }
 	  else {
-	      errorMessage = String.format("%s:<br/><br/>%s", className, eMessage);
+	      errorMessage = String.format("%s: %s", className, eMessage);
 	  }
       logger.error(errorMessage);
       e.printStackTrace();

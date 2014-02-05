@@ -22,6 +22,8 @@
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
@@ -64,7 +66,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-			          <div class="section-table"><%=searchResult%></div>
+			          <%=searchResult%>
 						  </div>
 		 		    </div>
 				  </div>

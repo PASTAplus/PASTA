@@ -92,7 +92,7 @@ public class HarvestReport {
     for (String harvestDir : harvestDirs) {
       String selected = (harvestDir.equals(reportId)) ? " selected='selected'" : "";
       String formattedReportId = reportIdFormatter(harvestDir);
-      htmlStringBuffer.append(String.format("<option value='%s'%s>%s</option>",
+      htmlStringBuffer.append(String.format("<option value='%s'%s>%s</option>\n",
       				                        harvestDir, selected, formattedReportId)
       				         );
     }
@@ -114,19 +114,21 @@ public class HarvestReport {
     String verb = isEvaluate ? "evaluated" : "uploaded";
     StringBuffer stringBuffer = new StringBuffer("");
     
-    stringBuffer.append("<table width=\"100%\">\n");
-    stringBuffer.append("<tbody>\n");    
+    stringBuffer.append("<table>\n");
+    stringBuffer.append("<thead>\n");
     stringBuffer.append("<tr>\n");
-    stringBuffer.append("<th>PackageId</td>\n");
-    stringBuffer.append("<th>Was<br/>" + verb + "</td>\n");
-    stringBuffer.append("<th>Quality<br/>Report</td>\n");
-    stringBuffer.append("<th>Total<br/>Quality<br/>Checks</td>\n");
-    stringBuffer.append("<th>Valid</td>");
-    stringBuffer.append("<th>Info</td>");
-    stringBuffer.append("<th>Warn</td>");
-    stringBuffer.append("<th>Error</td>");
-    stringBuffer.append("<th width=\"50%\">System Message</td>");
-    stringBuffer.append("</tr>");
+    stringBuffer.append("<th class=\"nis\">Package Id</th>\n");
+    stringBuffer.append("<th class=\"nis\">Was<br/>" + verb + "</th>\n");
+    stringBuffer.append("<th class=\"nis\">Report</th>\n");
+    stringBuffer.append("<th class=\"nis\">Total<br/>Quality<br/>Checks</th>\n");
+    stringBuffer.append("<th class=\"nis\">Valid</th>\n");
+    stringBuffer.append("<th class=\"nis\">Info</th>\n");
+    stringBuffer.append("<th class=\"nis\">Warn</th>\n");
+    stringBuffer.append("<th class=\"nis\">Error</th>\n");
+    stringBuffer.append("<th class=\"nis\">System Message</th>\n");
+    stringBuffer.append("</tr>\n");
+    stringBuffer.append("</thead>\n");
+    stringBuffer.append("<tbody>\n");
     
     String urlMessagesPath = reportPath + "/urlMessages.txt";
     ArrayList<String> urlMessages = getUrlMessages(urlMessagesPath);
@@ -139,8 +141,8 @@ public class HarvestReport {
       stringBuffer.append(dataPackageHTML(reportPath, reportId, packageId, isEvaluate));
     }
       
-    stringBuffer.append("</tbody>");
-    stringBuffer.append("</table>");
+    stringBuffer.append("</tbody>\n");
+    stringBuffer.append("</table>\n");
     
     String htmlString = stringBuffer.toString();
     return htmlString;
@@ -263,7 +265,7 @@ public class HarvestReport {
                                  String packageId, boolean isEvaluate) {
     String dataPackageLink = packageId;
     String qualityReportLink = "n/a";
-    StringBuffer stringBuffer = new StringBuffer("<tr>");
+    StringBuffer stringBuffer = new StringBuffer("<tr>\n");
     String packageIdPath = harvestReportPath + "/" + packageId;
     String qualityReportPath = packageIdPath + "/qualityReport.xml";
     File qualityReportFile = new File(qualityReportPath);
@@ -287,21 +289,17 @@ public class HarvestReport {
     String serviceMessage = serviceMessage(packageIdPath);
     int[] statusCounts = getStatusCounts(qualityReportFile);
     
-    stringBuffer.append("<td class=\"data\" align=\"center\">" + dataPackageLink + "</td>");
-    stringBuffer.append("<td class=\"data\" align=\"center\">" + inserted
-        + "</td>");
-    stringBuffer.append("<td class=\"data\" align=\"center\">"
-        + qualityReportLink + "</td>");
+    stringBuffer.append("<td class=\"nis\">" + dataPackageLink + "</td>\n");
+    stringBuffer.append("<td class=\"nis\">" + inserted + "</td>\n");
+    stringBuffer.append("<td class=\"nis\">" + qualityReportLink + "</td>\n");
 
     for (int i = 0; i < statusCounts.length; i++) {
-      stringBuffer.append("<td class=\"data\" align=\"center\">"
-          + statusCounts[i] + "</td>");
+      stringBuffer.append("<td class=\"nis\">" + statusCounts[i] + "</td>\n");
     }
 
-    stringBuffer.append("<td class=\"data\" align=\"center\">" + serviceMessage
-        + "</td>");
+    stringBuffer.append("<td class=\"nis\" align=\"left\" >" + serviceMessage + "</td>\n");
     
-    stringBuffer.append("</tr>");
+    stringBuffer.append("</tr>\n");
     String html = stringBuffer.toString();
     return html;
   }

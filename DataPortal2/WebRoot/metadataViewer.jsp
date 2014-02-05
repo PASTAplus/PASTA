@@ -1,10 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"
 	trimDirectiveWhitespaces="true"%>
 <%
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
-
   String metadataHtml = (String) request.getAttribute("metadataHtml");
   String packageId = (String) request.getAttribute("packageId");
 
@@ -22,6 +18,8 @@
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
 
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
@@ -45,7 +43,6 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- Metadata Viewer -->
-<link href="css/sbclter.css" rel="stylesheet" type="text/css">
 <script src="js/toggle.js" type="text/javascript"></script>
 <!-- /Metadata Viewer -->
 

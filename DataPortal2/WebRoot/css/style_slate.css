@@ -1,8 +1,8 @@
 em {
 	font-family: 'Open Sans';
 	line-height: 18px;
-	font-size: 12px;
-	color: #666666;
+	/* font-size: 12px; */
+	/* color: #666666; */
 }
 textarea {
 	font-family: 'Open Sans';
@@ -174,6 +174,9 @@ aside .widget_twitter .tweet_list li a {
 }
 .footer_copyright span {
 	color: #fff;
+}
+.footer_copyright a {
+	color: skyblue;
 }
 .tweet_time {
 	color: #5990bd;
@@ -702,7 +705,8 @@ h2 .title_labeled {
 	right: 15px;
 	top: 9px;
 	z-index: 50;
-	}
+	margin-top: 25px;
+}
 .columns2 .portfolio_shadow {
 	background: url('../images/455px.png') no-repeat;
 	bottom: -25px;
@@ -2286,7 +2290,7 @@ p {
 	font-family: 'Open Sans';
 	line-height: 22px;
 	font-size: 14px;
-	color: #666666;
+	/* color: #666666; */
 }
 
 p.smallmenu {
@@ -2721,9 +2725,85 @@ ul, ol {
     margin-left:                15px;
 }
 
-/*** Added by D. Costa ***/
 
-/* Browse page */
+/*
+ * Added from sbclter.css. 
+ * This group of style declarations are needed
+ * to support EML rendering.
+ */
+ 
+.subGroup {
+    padding:                    3px;
+    voice-family:               "\"}\""; /* begin ie5win hack */
+    voice-family:               inherit;
+    -moz-border-radius:         10px; /* end ie5win hack */
+}
+ 
+th {
+    text-align:                 left;
+    font-weight:                700;
+} 
+
+.rowodd {
+	  border-bottom:              white solid 2px;
+	  border-top:                 white solid 2px;
+	  background-color:           #b2cce0;
+	  padding:                    0.25em;
+	  margin:                     0;
+}
+
+.roweven {
+    padding:                    0.25em;
+    margin:                     0;
+} 
+
+.coleven {
+    border-left:                1px;
+    border-right:               1px;
+    background-color:           #b2cce0;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.colodd {
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercolodd {
+    border:                     solid 1px;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}
+
+.innercoleven {
+    border:                     solid 1px;
+    background-color:           #b2cce0;
+    font-size:                  .75em;
+    padding-left:               2px;
+    padding-right:              2px;
+    text-align:                 left;
+}    
+
+.onehundred_percent {
+    min-width:                  100px;
+    /*width:                      100%;*/
+}
+
+/* End -- Added from sbclter.css. */
+
+
+/*
+ * Added by D. Costa 
+ */
+
+/* 
+ * Browse page 
+ */
 
 .browsegroup {
     font-weight: bold;
@@ -2734,29 +2814,201 @@ ul, ol {
 }
                     
 a.browseterm {
-	color:#5990bd;
+	color: #5990bd;
 }
 
 a.browseterm hover {
-	color:aqua;
+	color: aqua;
 	text-decoration: underline;
 }
 
 /* End browse page */
 
 
-/* Data package citation page */
+/* 
+ * Data package citation page 
+ */
+p.cite {
+	margin: 10px 30px 10px 30px;
+	padding: 5px 10px 5px 10px;
+	background: #F7F7F7;
+}
 
-#cite {
-	margin-left: 20px;
-	padding: 5px;
-	padding-left: 10px;
-	font-weight: normal;
+p.cite cite {
 	font-style: italic;
-	width: 90%;
-	background: #e6e6e6;
-    border:0;
-	
 }
 
 /* End data package citation page */
+
+.no-list-style {
+	list-style: none;
+}
+
+.date-time-sublabel {
+	margin-top: -16px;
+}
+
+.select-width-auto {
+	width: auto;
+}
+
+.nis-navigation-submenu {
+	margin-left: 2px; 
+	margin-top: 5px
+}
+
+.mini-arrow-margin {
+	margin-top: -1px;
+}
+
+.nis-search-label {
+	margin-left: 80px; 
+	background-color:transparent; 
+}
+
+#advanced-search-label {
+	margin-top: 5px;
+}
+
+#advanced-search-arrow {
+	margin-top: -3px;
+}
+
+#div-arra-img {
+  padding: 20px 30px 0px 40px;
+}
+
+#p-arra-img {
+	margin: 0px 0px 10px 0px; 
+	width: 81px;
+}
+
+#map-canvas {
+  margin: 0 auto; 
+  width: 400px; 
+  height: 250px;
+}
+
+th.nis {
+    font-size: 0.9em;
+    font-weight: bold;
+    border: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    padding: 5px;
+    text-align: center;
+    background-color: #F7F7F7;
+}
+
+
+td.nis {
+    font-size: 0.9em;
+    border: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    padding: 5px;
+    vertical-align: top;
+}
+
+
+kbd.nis {
+	  font-weight: bold;
+}
+
+.nis-error {
+    background-color: #F7F7F7;
+    font-family: monospace;
+	  font-weight: bold;
+}
+
+.nis-warn {
+	  font-style: italic;
+    font-weight: bold;
+}
+
+.nis-info {
+    background-color: #F7F7F7;
+    font-family: monospace;
+	  font-weight: bold;
+}
+
+.nis-title {
+	  font-style: italic;
+	  font-weight: bold;
+}
+
+p.eml {
+	font-family: inherit;
+	line-height: inherit;
+	font-size: inherit;
+	color: inherit;
+}
+
+table#nis-coordinates {
+	margin: 0px 10px;
+}
+
+
+table#nis-coordinates input {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+#nis-growth {
+	margin-left: 75px;
+	font-size: smaller;
+	text-align: center;
+}
+
+
+/*
+ * Styling for the quality report table
+ */
+div.qualityreport table {
+    font-size: 1.0em;
+	  font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
+    border: solid;
+    border-width: 1px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.qualityreport table pre {
+    font-size: 0.9em;
+	  font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
+}
+
+div.qualityreport td.header {
+    font-size: 1.0em;
+    font-weight: bold;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.qualityreport td.data {
+    font-size: 1.0em;
+    font-weight: normal;
+    border: solid;
+    border-width: 1px;
+    padding: 5px;
+}
+
+div.valid {
+    color: green;   
+}
+
+div.warn {
+    color: orange;
+}
+
+div.error {
+    color: red;
+}
+
+div.info {
+    color: blue;
+}
+
+/* End -- Styling for the quality report table */
+

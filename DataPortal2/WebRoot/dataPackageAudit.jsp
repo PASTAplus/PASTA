@@ -31,7 +31,7 @@
 	String limitHTML = "";
 	String auditRecordLimit = (String) ConfigurationListener.getOptions().getProperty("auditreport.limit");
 	if (auditRecordLimit != null && !auditRecordLimit.equals("")) {
-	  limitHTML = "<p><small><em>(Only the first " + auditRecordLimit + " matching audit records will be displayed.)</em></small></p>";
+	  limitHTML = "<p><small><sup>*</sup><em>Only the first " + auditRecordLimit + " matching audit records will be displayed.</em></small></p>";
 	}
 	
 %>
@@ -44,6 +44,8 @@
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
 
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
@@ -67,7 +69,7 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- For Custom Checkboxes -->
-<script src="charts/assets/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 	$(document).ready(function() {
@@ -114,78 +116,71 @@
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
-								<!-- Content --><fieldset>
-								<p>Review a PASTA Data Package access report by 
-								entering information into one or more of the filters 
-								below, then select &quot;Submit&quot;:</p>
+								<!-- Content -->
+								<p>Review a PASTA Data Package access report<sup>*</sup> by entering information into one or more of the filters 
+								   below.
+								</p>
 								<form id="dataPackageAudit" action="./dataPackageAudit" method="post" name="dataPackageAudit">
 									<div class="section">
 										<table>
 											<tr>
 												<td>
-												<label class="labelBold" for="scope">
-												Package Id:</label></td>
-											</tr>
-											<tr>
-												<td><label for="scope">Scope</label>
-												<input autofocus name="scope" placeholder="knb-lter-xyz" size="30px" type="text" />
+												  <label class="labelBold">Scope:</label>
+												  <input autofocus required name="scope" size="15" type="text" />
 												</td>
-												<td><label for="identifier">Identifier</label>
-												<input name="identifier" size="5px" type="number" />
+												<td>
+												  <label class="labelBold">Identifier:</label>
+												  <input name="identifier" size="5" type="number" />
 												</td>
-												<td><label for="revision">Revision</label>
-												<input name="revision" size="5px" type="number" />
+												<td>
+												  <label class="labelBold">Revision:</label>
+												  <input name="revision" size="5" type="number" />
 												</td>
 											</tr>
 											<tr>
 												<td class="spacer"></td>
 											</tr>
 										</table>
+										
 										<table>
 											<tr>
-												<td><label class="labelBold">Resource 
-												type:</label></td>
+												<td><label class="labelBold">Resource Type:</label></td>
 											</tr>
 											<tr>
 												<td class="spacersm"></td>
 											</tr>
 											<tr>
 												<td>
-												<form>
-													<fieldset>
-													<label for="choices">
-													<ul class="checklist">
-														<li>
-														<input name="package" type="checkbox" value="value1" />
-														<p>Package</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="metadata" type="checkbox" value="value2" />
-														<p>Metadata</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="entity" type="checkbox" value="value4" />
-														<p>Data</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-														<li>
-														<input name="report" type="checkbox" value="value3" />
-														<p>Report</p>
-														<a class="checkbox-select" href="#">
-														Select</a>
-														<a class="checkbox-deselect" href="#">
-														Cancel</a> </li>
-													</ul>
-													</label></fieldset>
-												</form>
+												  <form>
+													    <label for="choices">
+													    <ul class="checklist">
+														    <li>
+														      <input name="package" type="checkbox" value="value1" />
+														      <p>Package</p>
+														      <a class="checkbox-select" href="#">Select</a>
+														      <a class="checkbox-deselect" href="#">Cancel</a> 
+														    </li>
+														    <li>
+														      <input name="metadata" type="checkbox" value="value2" />
+														      <p>Metadata</p>
+														      <a class="checkbox-select" href="#">Select</a>
+														      <a class="checkbox-deselect" href="#">Cancel</a>
+														    </li>
+														    <li>
+														      <input name="entity" type="checkbox" value="value4" />
+														      <p>Data</p>
+														      <a class="checkbox-select" href="#">Select</a>
+														      <a class="checkbox-deselect" href="#">Cancel</a>
+														    </li>
+													    	<li>
+														      <input name="report" type="checkbox" value="value3" />
+														      <p>Report</p>
+														      <a class="checkbox-select" href="#">Select</a>
+														      <a class="checkbox-deselect" href="#">Cancel</a>
+														    </li>
+													    </ul>
+													    </label>
+												  </form>
 												</td>
 											</tr>
 											<tr>
@@ -194,29 +189,25 @@
 										</table>
 										<table>
 											<tr>
-												<td><label class="labelBold">Who:</label></td>
-											</tr>
-											<tr>
-												<td><label for="userId">User Name
-												</label>
-												<input name="userId" size="30px" type="text" />
+												<td>
+												  <label class="labelBold">User Name:</label>
+												  <input name="userId" size="15" type="text" />
 												</td>
-												<td><label for="group">Group
-												</label>
-												<input name="group" size="30px" type="text" />
+												<td>
+												  <label class="labelBold">Group:</label>
+												  <input name="group" size="15" type="text" />
 												</td>
 											</tr>
 										</table>
 										<table>
 											<tr>
-												<td><label class="labelBold">Date:</label></td>
-											</tr>
-											<tr>
-												<td><label for="userId">Begin</label>
-												<input name="begin" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												<td>
+												  <label class="labelBold">Begin Date:</label>
+												  <input name="begin" placeholder="YYYY-MM-DD" type="date" />
 												</td>
-												<td><label for="group">End</label>
-												<input name="end" placeholder="YYYY-MM-DD" size="15px" type="date" />
+												<td>
+												  <label class="labelBold">End Date:</label>
+												  <input name="end" placeholder="YYYY-MM-DD" type="date" />
 												</td>
 											</tr>
 										</table>
@@ -224,8 +215,8 @@
 											<tr>
 												<td></td>
 												<td colspan="3">
-												<input class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
+												  <input class="btn btn-info btn-default" name="submit" type="submit" value="Submit" />
+												  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 							        <tr>
@@ -234,28 +225,17 @@
 										</table>
 									</div>
 									<!-- section -->
-					<%
-						if (reportMessage != null && type.equals("class=\"warning\"")) {
-							out.println("<div class=\"section\">\n");
-							out.println("<table align=\"left\" cellpadding=\"4em\">\n");
-							out.println("<tbody>\n");
-							out.println("<tr>\n");
-							out.println("<td " + type + ">\n");
-							out.println(reportMessage + "\n");
-							out.println("</td>\n");
-							out.println("</tr>\n");
-							out.println("</tbody>\n");
-							out.println("</table>\n");
-						}
-					%>
+			<%
+				if (reportMessage != null && type.equals("class=\"warning\"")) {
+				  out.println(String.format("<p class=\"nis-warn\">%s</p>", reportMessage));
+			  }
+			%>
 								</form>
-								</fieldset>
 			<%
 				if (reportMessage != null && type.equals("class=\"info\"")) {
 					out.println(reportMessage);
 				}
 			%>
-
 								<!-- /Content -->
 							</div>
 						</div>
@@ -267,8 +247,6 @@
 
 		<jsp:include page="footer.jsp" />
 </div>
-
-		<script src="charts/assets/effects.js"></script>
 
 </body>
 

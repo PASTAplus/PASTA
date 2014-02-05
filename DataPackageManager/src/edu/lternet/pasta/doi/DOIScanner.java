@@ -85,8 +85,7 @@ public class DOIScanner {
 	 */
 	public DOIScanner() throws ConfigurationException, ClassNotFoundException, SQLException {
 
-		Options options = null;
-		options = ConfigurationListener.getOptions();
+		Options options = ConfigurationListener.getOptions();
 
 		if (options == null) {
 			ConfigurationListener configurationListener = new ConfigurationListener();
@@ -94,7 +93,7 @@ public class DOIScanner {
 			options = ConfigurationListener.getOptions();
 		}
 
-		this.loadOptions(options);
+		loadOptions(options);
 		
 		if (this.doiTest.equalsIgnoreCase(TRUE)) {
 			this.setDoiTest(true);
@@ -159,7 +158,7 @@ public class DOIScanner {
 	 * 
 	 * @throws DOIException
 	 */
-	public void doScanToRegister() throws DOIException {
+	public void doScanToRegister() throws DOIException, ConfigurationException {
 
 		ArrayList<Resource> resourceList = null;
 
@@ -186,7 +185,7 @@ public class DOIScanner {
 	 * 
 	 * @throws DOIException
 	 */
-	public void processOneResource(Resource resource) throws DOIException {
+	public void processOneResource(Resource resource) throws DOIException, ConfigurationException {
 
 		File emlFile = null;
 		EmlObject emlObject = null;

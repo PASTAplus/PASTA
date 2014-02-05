@@ -52,8 +52,8 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
   private static final String browseMessage = "Select a data package "
-  		+ "<em>scope.identifier</em> value to see the most current "
-  		+ "<em>revision</em> of the data package lineage:";
+  		+ "<b>scope.identifier</b> value to see the most current "
+  		+ "<b>revision</b> of the data package lineage:";
   private static String pastaUriHead = null;
 
   /**
