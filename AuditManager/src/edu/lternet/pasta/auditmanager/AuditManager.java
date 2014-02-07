@@ -485,6 +485,92 @@ public class AuditManager {
   }
  
 
+  /**
+   * Gets a list of audit log records from the audit table (named "eventlog")
+   * matching the provided criteria.
+   * 
+   * @param queryParams    a map of query parameters and the values they should be matched to
+   * @return               an XML string of audit records
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws IllegalArgumentException
+   */
+  public String getRecentUploads()
+           throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
+    String xmlString = null;
+   
+      Connection connection = null;
+      
+      final String WHERE_CLAUSE =
+    		  " WHERE category='info' AND " +
+    		  "   (servicemethod='createDataPackage' OR servicemethod='updateDataPackage') AND " +
+              "   entrytime > '2013-10-01' ";
+      final String LIMIT_CLAUSE = " LIMIT 10 ";
+      final String ORDER_CLAUSE = " ORDER BY entrytime DESC";
+     
+      String selectString = 
+        "SELECT oid, entrytime, service, category, servicemethod," +
+        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
+        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
+        WHERE_CLAUSE + ORDER_CLAUSE + LIMIT_CLAUSE ;
+      
+      logger.debug(selectString);
+      
+      Statement stmt = null;
+     
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(selectString);
+       
+        while (rs.next()) {
+          int oid = rs.getInt(1);
+          java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
+          String service = rs.getString(3);
+          String category = rs.getString(4);
+          String serviceMethod = rs.getString(5);
+          String entryText = rs.getString(6);
+          String resourceId = rs.getString(7);
+          int statusCode = rs.getInt(8);
+          String userId = rs.getString(9);
+          String groups = rs.getString(10);
+          String authSystem = rs.getString(11);
+          AuditRecord auditRecord = new AuditRecord();
+          auditRecord.setOid(oid);
+          java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
+          auditRecord.setEntryTime(entryTime);
+          auditRecord.setService(service);
+          auditRecord.setCategory(category);
+          auditRecord.setServiceMethod(serviceMethod);
+          auditRecord.setEntryText(entryText);
+          auditRecord.setResourceId(resourceId);
+          auditRecord.setResponseStatus(new Integer(statusCode));
+          auditRecord.setUser(userId);
+          auditRecord.setGroups(groups);
+          auditRecord.setAuthSystem(authSystem);
+          stringBuffer.append(auditRecord.toXML());
+        }
+      }
+      catch(ClassNotFoundException e) {
+        logger.error("ClassNotFoundException: " + e.getMessage());
+        throw(e);
+      }
+      catch(SQLException e) {
+        logger.error("SQLException: " + e.getMessage());
+        throw(e);
+      }
+      finally {
+        stringBuffer.append(AUDIT_CLOSING_TAG);
+        xmlString = stringBuffer.toString();
+        if (stmt != null) stmt.close();
+        returnConnection(connection);
+      }
+   
+    return xmlString;
+  }
+ 
+
   /*
    * Saves an XML list of audit records to the file system for subsequent
    * processing.

@@ -20,27 +20,28 @@
 <%
 
 DataPackageSurvey dps = new DataPackageSurvey();
-String[] recent = dps.surveyDataPackages("recent", 4);
+String[] recentInserts = dps.surveyDataPackages("recentInserts", 2);
+String[] recentUpdates = dps.surveyDataPackages("recentUpdates", 2);
 
-String recentScope1 = recent[0];
-String recentIdentifier1 = recent[1];
-String recentTitle1 = recent[2];
-String recentDate1 = recent[3];
+String recentScope1 = recentInserts[0];
+String recentIdentifier1 = recentInserts[1];
+String recentTitle1 = recentInserts[2];
+String recentDate1 = recentInserts[3];
 
-String recentScope2 = recent[4];
-String recentIdentifier2 = recent[5];
-String recentTitle2 = recent[6];
-String recentDate2 = recent[7];
+String recentScope2 = recentInserts[4];
+String recentIdentifier2 = recentInserts[5];
+String recentTitle2 = recentInserts[6];
+String recentDate2 = recentInserts[7];
 
-String recentScope3 = recent[8];
-String recentIdentifier3 = recent[9];
-String recentTitle3 = recent[10];
-String recentDate3 = recent[11];
+String recentScope3 = recentUpdates[0];
+String recentIdentifier3 = recentUpdates[1];
+String recentTitle3 = recentUpdates[2];
+String recentDate3 = recentUpdates[3];
 
-String recentScope4 = recent[12];
-String recentIdentifier4 = recent[13];
-String recentTitle4 = recent[14];
-String recentDate4 = recent[15];
+String recentScope4 = recentUpdates[4];
+String recentIdentifier4 = recentUpdates[5];
+String recentTitle4 = recentUpdates[6];
+String recentDate4 = recentUpdates[7];
 
 %>
 
