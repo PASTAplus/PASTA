@@ -570,6 +570,145 @@ public class AuditManagerResource extends PastaWebService
     
     
     /**
+     * Gets a list of zero or more audit records matching the query parameters
+     * as specified in the request.
+     *
+     * <h4>Query Parameters:</h4>
+     * <table border="1" cellspacing="0" celpadding="3">
+     *   <tr>
+     *     <td><b>Parameter</b></td>
+     *     <td><b>Value Constraints</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>category</td>
+     *     <td>debug, info, error, warn</td>
+     *   </tr>
+     *   <tr>
+     *     <td>service</td>
+     *     <td>Any of the PASTA services.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>serviceMethod</td>
+     *     <td>Any of the PASTA service Resource class JAX-RS methods.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>user</td>
+     *     <td>Any user.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>group</td>
+     *     <td>Any group.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>authSystem</td>
+     *     <td>A valid auth system identifier.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>status</td>
+     *     <td>A valid HTTP Response Code.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>resourceId</td>
+     *     <td>A Resource Id.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>time</td>
+     *     <td>An ISO8601 timestamp</td>
+     *   </tr>
+     *   <tr>
+     *     <td>fromTime</td>
+     *     <td>An ISO8601 timestamp</td>
+     *   </tr>
+     *   <tr>
+     *     <td>toTime</td>
+     *     <td>An ISO8601 timestamp</td>
+     *   </tr>
+     *   <tr>
+     *     <td>limit</td>
+     *     <td>A positive whole number</td>
+     *   </tr>
+     * </table>
+     * <br/>
+     * The query parameters <code>fromTime</code> and optionally
+     * <code>toTime</code> should be used to indicate a time span. When
+     * <code>toTime</code> is absent, the report will consist of all matching
+     * records up to the current time. Either of these parameters may only be
+     * used once.
+     * <br/>
+     * The query parameter <code>time</code> may not be used in conjunction
+     * with <code>fromTime</code>. All other parameters may be used multiple
+     * times.
+     * <br/>
+     * The query parameter <code>limit</code> sets an upper limit on the number
+     * of audit records returned. For example, "limit=1000".
+     *
+     * <h4>Responses:</h4>
+     *
+     * <p>If the request is successful, the response will contain XML text.</p>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     *   <tr>
+     *     <td><b>Status</b></td>
+     *     <td><b>Reason</b></td>
+     *     <td><b>Entity</b></td>
+     *     <td><b>MIME type</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>200 OK</td>
+     *     <td>If the request was successful.</td>
+     *     <td>The specified subscription's attributes.</td>
+     *     <td><code>application/xml</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>400 Bad Request</td>
+     *     <td>If the specified identification number cannot be parsed as an integer.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>401 Unauthorized</td>
+     *     <td>If the requesting user is not authorized to read the specified subscription.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     * </table>
+     *
+     * @param headers  the HTTP request headers containing the authorization token.
+     * @param uriInfo  the POST request's body, of XML representing a log entry.
+     * @return an appropriate HTTP response.
+     */
+    @GET
+    @Path("recent-uploads")
+    public Response getRecentUploads(@Context HttpHeaders headers) {
+		try {
+            Properties properties = ConfigurationListener.getProperties();
+            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+            AuditManager auditManager = new AuditManager(properties);
+            String xmlString = auditManager.getRecentUploads();
+            return Response.ok(xmlString).build();
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+		catch (ResourceNotFoundException e) {
+		  return WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            return WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (WebApplicationException e) {
+            return e.getResponse();
+        }
+        catch (IllegalStateException e) {
+            return WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+    }
+    
+    
+    /**
      * Returns the tutorial document for the Audit Manager.
      */
     @Override

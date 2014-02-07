@@ -20,35 +20,28 @@
 <%
 
 DataPackageSurvey dps = new DataPackageSurvey();
-String[] popular = dps.surveyDataPackages("popular", 2);
-//String[][] recent = DataPackageSurvey.surveyDataPackages("recent", 2);
+String[] recentInserts = dps.surveyDataPackages("recentInserts", 2);
+String[] recentUpdates = dps.surveyDataPackages("recentUpdates", 2);
 
-//String popularScope1 = "knb-lter-mcr";
-//String popularIdentifier1 = "1036";
-//String popularTitle1 = "MCR LTER: Coral Reef: Bathymetry Grid for North Shore";
-//String popularDate1 = "2013-12-05";
+String recentScope1 = recentInserts[0];
+String recentIdentifier1 = recentInserts[1];
+String recentTitle1 = recentInserts[2];
+String recentDate1 = recentInserts[3];
 
-String popularScope1 = popular[0];
-String popularIdentifier1 = popular[1];
-String popularTitle1 = popular[2];
-String popularDate1 = popular[3];
+String recentScope2 = recentInserts[4];
+String recentIdentifier2 = recentInserts[5];
+String recentTitle2 = recentInserts[6];
+String recentDate2 = recentInserts[7];
 
-/*
-String popularScope2 = popular[1][0];
-String popularIdentifier2 = popular[1][1];
-String popularTitle2 = popular[1][2];
-String popularDate2 = popular[1][3];
+String recentScope3 = recentUpdates[0];
+String recentIdentifier3 = recentUpdates[1];
+String recentTitle3 = recentUpdates[2];
+String recentDate3 = recentUpdates[3];
 
-String recentScope1 = recent[0][0];
-String recentIdentifier1 = recent[0][1];
-String recentTitle1 = recent[0][2];
-String recentDate1 = recent[0][3];
-
-String recentScope2 = recent[1][0];
-String recentIdentifier2 = recent[1][1];
-String recentTitle2 = recent[1][2];
-String recentDate2 = recent[1][3];
-*/
+String recentScope4 = recentUpdates[4];
+String recentIdentifier4 = recentUpdates[5];
+String recentTitle4 = recentUpdates[6];
+String recentDate4 = recentUpdates[7];
 
 %>
 
@@ -68,34 +61,34 @@ String recentDate2 = recent[1][3];
 							<div class="span4">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Most Popular</h2>
+										<h2 class="widget-title">Recent Inserts</h2>
 									</div>
 									<dl>
-										<dt><a href="./mapbrowse?scope=<%= popularScope1 %>&identifier=<%= popularIdentifier1 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= popularDate1 %>
-										<a href="./mapbrowse?scope=knb-lter-mcr&identifier=1036"><%= popularTitle1 %></a> </dd>
+										<dt><a href="./mapbrowse?scope=<%= recentScope1 %>&identifier=<%= recentIdentifier1 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate1 %>
+										<a href="./mapbrowse?scope=<%= recentScope1 %>&identifier=<%= recentIdentifier1 %>"><%= recentTitle1 %></a> </dd>
 									</dl>
 									<dl>
-										<dt><a href="./mapbrowse?scope=knb-lter-sbc&identifier=21"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar">2013-07-07
-										<a href="./mapbrowse?scope=knb-lter-sbc&identifier=21">SBCLTER: Reef: Net primary production, growth and standing crop of Macrocystis pyrifera in Southern California</a> </dd>
+										<dt><a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate2 %>
+										<a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><%= recentTitle2 %></a> </dd>
 									</dl>
 								</div>
 							</div>
 							<div class="span6">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Recent Uploads</h2>
+										<h2 class="widget-title">Recent Updates</h2>
 									</div>
 									<dl>
-										<dt><a href="./mapbrowse?scope=knb-lter-nin&identifier=1"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar">2014-01-13
-										<a href="./mapbrowse?scope=knb-lter-nin&identifier=1">Daily Water Sample Nutrient Data for North Inlet Estuary, South Carolina, from 1978 to 1992, North Inlet LTER</a> </dd>
+										<dt><a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate3%>
+										<a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><%= recentTitle3 %></a> </dd>
 									</dl>
 									<dl>
-										<dt><a href="./mapbrowse?scope=knb-lter-nin&identifier=99"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar">2014-01-15
-										<a href="./mapbrowse?scope=knb-lter-nin&identifier=99">Meteorological data for North Inlet Estuary, South Carolina, from 1982 to 1985, North Inlet LTER</a> </dd>
+										<dt><a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><span class="post_icon"></span></a></dt>
+										<dd class="without_avatar"><%= recentDate4 %>
+										<a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><%= recentTitle4 %></a> </dd>
 									</dl>
 								</div>
 							</div>

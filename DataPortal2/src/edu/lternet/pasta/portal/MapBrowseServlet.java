@@ -59,7 +59,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static String pastaUriHead;
-	private static final String forward = "./dataPackageBrowser.jsp";
+	private static final String forward = "./dataPackageSummary.jsp";
 
 	/**
 	 * Instance variables
@@ -182,7 +182,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 
 		httpSession.setAttribute("browsemessage", null);
-		httpSession.setAttribute("html", html);
+		httpSession.setAttribute("dataPackageSummaryHTML", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 	}
