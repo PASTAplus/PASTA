@@ -6,7 +6,7 @@
   HttpSession httpSession = request.getSession();
   
   String browseMessage = (String) httpSession.getAttribute("browsemessage");
-  String html = (String) httpSession.getAttribute("html");
+  String html = (String) httpSession.getAttribute("dataPackageSummaryHTML");
   String cnt = (String) httpSession.getAttribute("count");
 
   if (html == null) {
@@ -60,7 +60,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Package Browser</h2>
+								<h2>Data Package Summary</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
