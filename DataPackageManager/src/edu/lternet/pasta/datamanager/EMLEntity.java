@@ -104,13 +104,25 @@ public class EMLEntity {
         logger.debug("Constructed URL object: " + aURL.toString());
       }
     }
-    catch (MalformedURLException e) {
-      String message = 
-        "Error when attempting to process entity '" + entityName + 
-        "' with entity URL '" + url + "'. " + e.getMessage();
-      logger.error(message);
-      throw new MalformedURLException(message);
-    }
+		catch (MalformedURLException e) {
+			String message = null;
+			if (url == null || url.equals("")) {
+				message = 
+			        String.format("Error when attempting to process entity \"%s\". " +
+                                  "All data entities in PASTA must specify an online URL. " +
+								  "No online URL value was found at this XPath: " +
+                                  "\"dataset/[entity-type]/physical/distribution/online/url\". " +
+                                  "(PASTA will use only the first occurrence of this XPath.)",
+						          entityName);
+			}
+			else {
+				message = 
+				    String.format("Error when attempting to process entity \"%s\" with entity URL \"%s\": %s",
+								  entityName, url, e.getMessage());
+			}
+			logger.error(message);
+			throw new MalformedURLException(message);
+		}
   }
   
 
