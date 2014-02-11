@@ -28,15 +28,15 @@
 <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 <meta http-equiv="description" content="This is my page">
 
-    <link rel="stylesheet"        href="./js/jqwidgets/styles/jqx.base.css" type="text/css" />
+    <link rel="stylesheet"        href="./js/jqwidgets-ver3.2.1/styles/jqx.base.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="./css/lter-nis.css">
 
     <script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxcore.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxbuttons.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxscrollbar.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxpanel.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxtree.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxbuttons.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxpanel.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxtree.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             // Create jqxTree
