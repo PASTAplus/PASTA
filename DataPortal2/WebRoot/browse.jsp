@@ -48,11 +48,11 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
     <script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxcore.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxbuttons.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxscrollbar.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxpanel.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets/jqxtree.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxbuttons.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxscrollbar.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxpanel.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxtree.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             // Create jqxTree

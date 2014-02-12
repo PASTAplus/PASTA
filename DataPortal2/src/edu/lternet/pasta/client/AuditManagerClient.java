@@ -26,6 +26,7 @@ package edu.lternet.pasta.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import edu.lternet.pasta.client.RecentUpload.Service;
+import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.EMLParser;
 
 
 /**
@@ -171,6 +175,25 @@ public class AuditManagerClient extends PastaClient {
   /*
    * Instance Methods
    */
+  
+  
+  /*
+   * Compose a fromTime date string to use with generating the list of
+   * recent uploads.
+   */
+  private String composeFromTime() {
+	  String fromTimeStr = "";
+	  SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	  final long ninetyDays = 90 * 24 * 60 * 60 * 1000L;
+	  
+	  Date now = new Date();
+	  long nowTime = now.getTime();
+	  long fromTime = nowTime - ninetyDays; // the last 90 days is a good period for recent uploads
+	  Date fromTimeDate = new Date(fromTime);
+	  fromTimeStr = simpleDateFormat.format(fromTimeDate);
+	  
+	  return fromTimeStr;
+  }
 
 
   /**
@@ -232,19 +255,22 @@ public class AuditManagerClient extends PastaClient {
   /**
    * Gets a list of recent uploads to PASTA.
    * 
-   * @return
+   * @return a list of RecentUpload objects
    * @throws PastaEventException
    */
-	public List<RecentUpload> recentUploads() throws PastaEventException {
+	public List<RecentUpload> recentUploads() throws 
+	        PastaAuthenticationException, PastaConfigurationException, PastaEventException {
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		String entity = null;
 		Integer statusCode = null;
 		HttpEntity responseEntity = null;
+		String fromTime = composeFromTime();
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		HttpResponse response = null;
-		HttpGet httpGet = new HttpGet(BASE_URL + "/recent-uploads");
+		String url = String.format("%s/recent-uploads?fromTime=%s", BASE_URL, fromTime);
+		HttpGet httpGet = new HttpGet(url);
 
 		// Set header content
 		if (this.token != null) {
@@ -291,7 +317,15 @@ public class AuditManagerClient extends PastaClient {
 	
 	
 	private List<RecentUpload> parseRecentUploads(String xmlString)
-	        throws PastaEventException {
+	        throws PastaAuthenticationException, PastaConfigurationException, PastaEventException {
+		int limit = 3;
+		int insertCount = 0;
+		int updateCount = 0;
+		/*
+		 * We only want to display public documents as recent uploads. The list of recent
+		 * uploads is stored as a class variable, not as a session variable.
+		 */
+		DataPackageManagerClient dpmClient = new DataPackageManagerClient("public");
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		
 	    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); 
@@ -301,13 +335,14 @@ public class AuditManagerClient extends PastaClient {
 			Document document = documentBuilder.parse(inputStream);
 			Element documentElement = document.getDocumentElement();
 			NodeList auditRecordList = documentElement.getElementsByTagName("auditRecord");
+			int nAuditRecords = auditRecordList.getLength();
 			
-			for (int i = 0; i < auditRecordList.getLength(); i++) {
+			for (int i = 0; i < nAuditRecords; i++) {
 				Node auditRecordNode = auditRecordList.item(i);
 				NodeList auditRecordChildren = auditRecordNode.getChildNodes();
 				String uploadDate = null;
 				String serviceMethod = null;
-				String url = null;
+				String resourceId = null;
 				for (int j = 0; j < auditRecordChildren.getLength(); j++) {
 					Node childNode = auditRecordChildren.item(j);
 				    if (childNode instanceof Element) {
@@ -322,12 +357,44 @@ public class AuditManagerClient extends PastaClient {
 					    }
 					    else if (auditRecordElement.getTagName().equals("resourceId")) {
 						    Text text = (Text) auditRecordElement.getFirstChild();
-						    url = text.getData().trim();
+						    resourceId = text.getData().trim();
 					    }
 				    }
 				}
-			    RecentUpload recentUpload = new RecentUpload(uploadDate, serviceMethod, url);
-			    recent.add(recentUpload);
+				
+				/*
+				 * Add the data package to the list of recent uploads only if the user 
+				 * is authorized to read it.
+				 */
+				boolean isAuthorized = dpmClient.isAuthorized(resourceId);
+				if (isAuthorized) {
+					if ((serviceMethod.equals("createDataPackage") && (insertCount < limit)) || 
+					    (serviceMethod.equals("updateDataPackage") && (updateCount < limit))
+					   ) {
+						try {
+							RecentUpload recentUpload = 
+									new RecentUpload(dpmClient, uploadDate, serviceMethod, resourceId);
+							String title = recentUpload.getTitle();
+							if (title != null && !title.equals("")) {
+								recent.add(recentUpload);
+								if (serviceMethod.equals("createDataPackage")) {
+									insertCount++;
+								}
+								else if (serviceMethod.equals("updateDataPackage")) {
+								    updateCount++;
+								}
+							}
+						}
+						catch (ResourceNotFoundException e) {
+							/*
+							 * If not found, do nothing. The data package has
+							 * been deleted or replaced by a higher revision, so
+							 * we want to exclude it from the list of recent
+							 * uploads.
+							 */
+						}
+					}
+				}
 			}
 		}
 		catch (Exception e) {

@@ -1,4 +1,33 @@
+/*
+ *
+ * $Date$
+ * $Author$
+ * $Revision$
+ *
+ * Copyright 2011,2012 the University of New Mexico.
+ *
+ * This work was supported by National Science Foundation Cooperative
+ * Agreements #DEB-0832652 and #DEB-0936498.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ */
+
 package edu.lternet.pasta.client;
+
+import java.util.ArrayList;
+
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.EMLParser;
 
 
 public class RecentUpload {
@@ -21,22 +50,42 @@ public class RecentUpload {
 	
 	// Constructors
 	
-	public RecentUpload(String uploadDate, String serviceMethod, String url) {
+	public RecentUpload(DataPackageManagerClient dpmClient, String uploadDate, String serviceMethod, String url) {
 		this.uploadDate = uploadDate;
-		String titlePreface = "A Data Package Recently ";
+
 		if (serviceMethod.equals("createDataPackage")) {
 			this.service = Service.INSERT;
-			titlePreface = titlePreface + "Inserted";
 		}
 		else if (serviceMethod.equals("updateDataPackage")) {
 			this.service = Service.UPDATE;
-			titlePreface = titlePreface + "Updated";
 		}
+
 		this.url = url;
 		this.scope = parseScope(url);
 		this.identifier = parseIdentifier(url);
 		this.revision = parseRevision(url);
-		this.title = String.format("%s: %s.%s.%s", titlePreface, scope, identifier, revision);
+		this.title = parseTitle(dpmClient);
+	}
+	
+	
+	private String parseTitle(DataPackageManagerClient dpmClient) {
+		String title = "";
+		Integer id = new Integer(this.identifier);
+
+		try {
+			String eml = dpmClient.readMetadata(scope, id, revision);
+			EMLParser emlParser = new EMLParser();
+			DataPackage dataPackage = emlParser.parseDocument(eml);
+			ArrayList<String> titleList = dataPackage.getTitles();
+			if (titleList.size() > 0) {
+				title = titleList.get(0);
+			}
+		}
+		catch (Exception e) {
+
+		}
+
+		return title;
 	}
 
 
