@@ -26,6 +26,7 @@ package edu.lternet.pasta.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -174,6 +175,25 @@ public class AuditManagerClient extends PastaClient {
   /*
    * Instance Methods
    */
+  
+  
+  /*
+   * Compose a fromTime date string to use with generating the list of
+   * recent uploads.
+   */
+  private String composeFromTime() {
+	  String fromTimeStr = "";
+	  SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	  final long ninetyDays = 90 * 24 * 60 * 60 * 1000L;
+	  
+	  Date now = new Date();
+	  long nowTime = now.getTime();
+	  long fromTime = nowTime - ninetyDays; // the last 90 days is a good period for recent uploads
+	  Date fromTimeDate = new Date(fromTime);
+	  fromTimeStr = simpleDateFormat.format(fromTimeDate);
+	  
+	  return fromTimeStr;
+  }
 
 
   /**
@@ -235,7 +255,7 @@ public class AuditManagerClient extends PastaClient {
   /**
    * Gets a list of recent uploads to PASTA.
    * 
-   * @return
+   * @return a list of RecentUpload objects
    * @throws PastaEventException
    */
 	public List<RecentUpload> recentUploads() throws 
@@ -244,7 +264,7 @@ public class AuditManagerClient extends PastaClient {
 		String entity = null;
 		Integer statusCode = null;
 		HttpEntity responseEntity = null;
-		String fromTime = "2013-11-01";
+		String fromTime = composeFromTime();
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
@@ -301,7 +321,11 @@ public class AuditManagerClient extends PastaClient {
 		int limit = 3;
 		int insertCount = 0;
 		int updateCount = 0;
-		DataPackageManagerClient dpmClient = new DataPackageManagerClient(this.uid);
+		/*
+		 * We only want to display public documents as recent uploads. The list of recent
+		 * uploads is stored as a class variable, not as a session variable.
+		 */
+		DataPackageManagerClient dpmClient = new DataPackageManagerClient("public");
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		
 	    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); 
