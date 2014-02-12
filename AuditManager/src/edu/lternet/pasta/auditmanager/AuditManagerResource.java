@@ -139,6 +139,7 @@ public class AuditManagerResource extends PastaWebService
     private static Logger logger = Logger.getLogger(AuditManagerResource.class);
     // Set of valid query parameters
     public static final Set<String> VALID_QUERY_KEYS;
+    public static final Set<String> VALID_RECENT_UPLOADS_KEYS;
     private static final String SERVICE_OWNER = "pasta";
 
     static {
@@ -156,6 +157,13 @@ public class AuditManagerResource extends PastaWebService
         set.add(RESOURCE_ID);
         set.add(LIMIT);
         VALID_QUERY_KEYS = Collections.unmodifiableSet(set);
+    }
+    
+    static {
+        Set<String> set = new TreeSet<String>();
+        set.add(FROM_TIME);
+        set.add(LIMIT);
+        VALID_RECENT_UPLOADS_KEYS = Collections.unmodifiableSet(set);
     }
     
     
@@ -679,12 +687,16 @@ public class AuditManagerResource extends PastaWebService
      */
     @GET
     @Path("recent-uploads")
-    public Response getRecentUploads(@Context HttpHeaders headers) {
+    public Response getRecentUploads(@Context HttpHeaders headers,
+                                     @Context UriInfo uriInfo) {
 		try {
             Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuditManager auditManager = new AuditManager(properties);
-            String xmlString = auditManager.getRecentUploads();
+            QueryString queryString = new QueryString(uriInfo);
+            queryString.checkForIllegalKeys(VALID_RECENT_UPLOADS_KEYS);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            String xmlString = auditManager.getRecentUploads(queryParams);
             return Response.ok(xmlString).build();
         }
         catch (ClassNotFoundException e) {
