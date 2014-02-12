@@ -369,6 +369,57 @@ public class AuditManager {
 	}
  
   
+	private String composeWhereClauseRecentUploads(Map<String, List<String>> queryParams) {
+		String whereClause = null;
+		String limit = null;
+	    final String ORDER_CLAUSE = " ORDER BY entrytime DESC";
+		StringBuffer stringBuffer = new StringBuffer(
+				" WHERE category='info' AND" +
+			    " (servicemethod='createDataPackage' OR servicemethod='updateDataPackage') ");
+
+		for (String key : queryParams.keySet()) {
+			if (!key.equalsIgnoreCase("limit")) {
+				stringBuffer.append(" AND ");
+				List<String> values = queryParams.get(key);
+
+				if (key.equalsIgnoreCase("fromtime")) {
+					String value = values.get(0);
+					String timestamp = dateToTimestamp(value, false);
+					stringBuffer.append(String.format(" entrytime >= '%s'",
+							timestamp));
+				}
+			}
+		}
+		
+		stringBuffer.append(ORDER_CLAUSE);
+
+		/*
+		 * Append a record limit value if specified
+		 */
+		for (String key : queryParams.keySet()) {
+			List<String> values = queryParams.get(key);
+			if (key.equalsIgnoreCase("limit")) {
+				String limitStr = values.get(0);
+				try {
+					Integer limitInt = new Integer(limitStr);
+					if (limitInt > 0) {
+						limit = limitInt.toString();
+					}
+				}
+				catch (NumberFormatException e) {
+				}
+				if (limit != null) {
+					stringBuffer.append(String.format(" LIMIT %s", limit));
+				}
+			}
+		}
+
+		whereClause = stringBuffer.toString();
+
+		return whereClause;
+	}
+ 
+  
   /**
    * Creates a new audit entry and returns its identifier.
    * 
@@ -495,25 +546,20 @@ public class AuditManager {
    * @throws SQLException
    * @throws IllegalArgumentException
    */
-  public String getRecentUploads()
+  public String getRecentUploads(Map<String, List<String>> queryParams)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
 	StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
     String xmlString = null;
    
       Connection connection = null;
       
-      final String WHERE_CLAUSE =
-    		  " WHERE category='info' AND " +
-    		  "   (servicemethod='createDataPackage' OR servicemethod='updateDataPackage') AND " +
-              "   entrytime > '2013-10-01' ";
-      final String LIMIT_CLAUSE = " LIMIT 10 ";
-      final String ORDER_CLAUSE = " ORDER BY entrytime DESC";
-     
+      final String WHERE_CLAUSE = composeWhereClauseRecentUploads(queryParams);
+          
       String selectString = 
         "SELECT oid, entrytime, service, category, servicemethod," +
         " entrytext, resourceid, statuscode, userid, groups, authsystem " +
         "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
-        WHERE_CLAUSE + ORDER_CLAUSE + LIMIT_CLAUSE ;
+        WHERE_CLAUSE;
       
       logger.debug(selectString);
       
