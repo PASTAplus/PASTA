@@ -51,6 +51,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import edu.lternet.pasta.client.RecentUpload.Service;
+import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.EMLParser;
 
 
 /**
@@ -235,16 +238,19 @@ public class AuditManagerClient extends PastaClient {
    * @return
    * @throws PastaEventException
    */
-	public List<RecentUpload> recentUploads() throws PastaEventException {
+	public List<RecentUpload> recentUploads() throws 
+	        PastaAuthenticationException, PastaConfigurationException, PastaEventException {
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		String entity = null;
 		Integer statusCode = null;
 		HttpEntity responseEntity = null;
+		String fromTime = "2013-11-01";
 
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		HttpResponse response = null;
-		HttpGet httpGet = new HttpGet(BASE_URL + "/recent-uploads");
+		String url = String.format("%s/recent-uploads?fromTime=%s", BASE_URL, fromTime);
+		HttpGet httpGet = new HttpGet(url);
 
 		// Set header content
 		if (this.token != null) {
@@ -291,7 +297,11 @@ public class AuditManagerClient extends PastaClient {
 	
 	
 	private List<RecentUpload> parseRecentUploads(String xmlString)
-	        throws PastaEventException {
+	        throws PastaAuthenticationException, PastaConfigurationException, PastaEventException {
+		int limit = 3;
+		int insertCount = 0;
+		int updateCount = 0;
+		DataPackageManagerClient dpmClient = new DataPackageManagerClient(this.uid);
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		
 	    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); 
@@ -301,13 +311,14 @@ public class AuditManagerClient extends PastaClient {
 			Document document = documentBuilder.parse(inputStream);
 			Element documentElement = document.getDocumentElement();
 			NodeList auditRecordList = documentElement.getElementsByTagName("auditRecord");
+			int nAuditRecords = auditRecordList.getLength();
 			
-			for (int i = 0; i < auditRecordList.getLength(); i++) {
+			for (int i = 0; i < nAuditRecords; i++) {
 				Node auditRecordNode = auditRecordList.item(i);
 				NodeList auditRecordChildren = auditRecordNode.getChildNodes();
 				String uploadDate = null;
 				String serviceMethod = null;
-				String url = null;
+				String resourceId = null;
 				for (int j = 0; j < auditRecordChildren.getLength(); j++) {
 					Node childNode = auditRecordChildren.item(j);
 				    if (childNode instanceof Element) {
@@ -322,12 +333,44 @@ public class AuditManagerClient extends PastaClient {
 					    }
 					    else if (auditRecordElement.getTagName().equals("resourceId")) {
 						    Text text = (Text) auditRecordElement.getFirstChild();
-						    url = text.getData().trim();
+						    resourceId = text.getData().trim();
 					    }
 				    }
 				}
-			    RecentUpload recentUpload = new RecentUpload(uploadDate, serviceMethod, url);
-			    recent.add(recentUpload);
+				
+				/*
+				 * Add the data package to the list of recent uploads only if the user 
+				 * is authorized to read it.
+				 */
+				boolean isAuthorized = dpmClient.isAuthorized(resourceId);
+				if (isAuthorized) {
+					if ((serviceMethod.equals("createDataPackage") && (insertCount < limit)) || 
+					    (serviceMethod.equals("updateDataPackage") && (updateCount < limit))
+					   ) {
+						try {
+							RecentUpload recentUpload = 
+									new RecentUpload(dpmClient, uploadDate, serviceMethod, resourceId);
+							String title = recentUpload.getTitle();
+							if (title != null && !title.equals("")) {
+								recent.add(recentUpload);
+								if (serviceMethod.equals("createDataPackage")) {
+									insertCount++;
+								}
+								else if (serviceMethod.equals("updateDataPackage")) {
+								    updateCount++;
+								}
+							}
+						}
+						catch (ResourceNotFoundException e) {
+							/*
+							 * If not found, do nothing. The data package has
+							 * been deleted or replaced by a higher revision, so
+							 * we want to exclude it from the list of recent
+							 * uploads.
+							 */
+						}
+					}
+				}
 			}
 		}
 		catch (Exception e) {
