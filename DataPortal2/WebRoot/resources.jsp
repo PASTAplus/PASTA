@@ -53,16 +53,19 @@
 								<!-- Content -->
 								<h3 align="left">Websites</h3>
 								<ul>
-									<li><a class="searchsubcat" href="https://www.lternet.edu">LTER Network</a></li>
-									<li><a class="searchsubcat" href="https://lno.lternet.edu">LTER Network Office</a></li>
+									<li><a class="searchsubcat" href="http://www.lternet.edu">LTER Network</a></li>
+									<li><a class="searchsubcat" href="http://lno.lternet.edu">LTER Network Office</a></li>
 									<li>
 									  <a class="searchsubcat" href="https://nis.lternet.edu:8443/x/agBP">
 								  	  <abbr title="Network Information System">NIS</abbr> Guides</a>
 								  </li>
 								</ul>
 								<h3 align="left">Tools</h3>
-								<ul class="no-list-style">
-									<li></li>
+								<ul>
+									<li><a class="searchsubcat" href="http://vocab.lternet.edu/vocab/vocab/index.php">LTER Network Controlled Vocabulary</a></li>
+									<li><a class="searchsubcat" href="http://unit.lternet.edu/unitregistry/">LTER Network Unit Registry</a></li>
+									<li><a class="searchsubcat" href="https://lter.dev.gios.asu.edu/lter/html/index.php">LTER Network Information System Reporting Tool</a>
+								  </li>
 								</ul>
 								<!-- /Content --></div>
 						</div>

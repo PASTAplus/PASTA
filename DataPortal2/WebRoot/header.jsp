@@ -19,7 +19,6 @@
 	}
 
   final String currentClass = " class='current-menu-item current_page_item'";
-  String aboutClass = "";
   String dataClass = "";
   String helpClass = "";
   String homeClass = "";
@@ -29,12 +28,7 @@
   String pageName = requestURI.substring(requestURI.lastIndexOf("/") + 1, 
                                         requestURI.lastIndexOf(".")
                                        );
-  if (pageName.equals("about") ||
-      pageName.equals("contact")
-     ) {
-    aboutClass = currentClass;
-  }
-  else if (pageName.equals("browse") ||
+  if (pageName.equals("browse") ||
            pageName.equals("packageIdentifier") ||
            pageName.equals("advancedSearch")
           ) {
@@ -117,16 +111,21 @@
 					<li><a href="dataPackageAudit.jsp">Data Package Access Reports</a></li>
 				</ul>
 				</li>
-				<li<%= aboutClass %>><a href="#">About</a>
-				<ul class="sub-menu">
-				  <li><a href="about.jsp">About the LTER Network Data Portal</a></li>
-				  <li><a href="contact.jsp">Contact Us</a></li>
-				</ul>
-				</li>
 				<li<%= helpClass %>><a href="#">Help</a>
 				<ul class="sub-menu">
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
+					Support:</p>
 				  <li><a href="help.jsp">How Do I...</a></li>
+				  <li><a href="contact.jsp">Contact Us</a></li>
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
+					Resources:</p>
 				  <li><a href="resources.jsp">LTER Resources</a></li>
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
+					About:</p>
+				  <li><a href="about.jsp">About the LTER Network Data Portal</a></li>
 				</ul>
 				</li>
 				<li<%= loginClass %>><%= identity %></li>
