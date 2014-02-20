@@ -467,7 +467,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Downloads and stores a data entity.
 	 * 
-   * @param emlPackageId     an EmlPackageId object
+	 * @param emlPackageId     an EmlPackageId object
 	 * @param entityId         the entity id
 	 * @param entity           an Entity object
 	 * @return success, true when the download succeeds, else false
@@ -475,10 +475,11 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	public boolean downloadEntity(EmlPackageId emlPackageId,
 	                              EMLEntity emlEntity) {
 	  boolean success = false;
+	  boolean preserveFormat = true;
 	  Entity entity = emlEntity.getEntity();
 	  
 	  if (dataManager != null) {
-	    success = dataManager.downloadData(entity, eepi, dataStorageList);
+	    success = dataManager.downloadData(entity, eepi, dataStorageList, preserveFormat);
 	  }
 		
 	  return success;
