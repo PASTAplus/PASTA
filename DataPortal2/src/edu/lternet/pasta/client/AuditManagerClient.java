@@ -53,8 +53,6 @@ import org.w3c.dom.Text;
 
 import edu.lternet.pasta.client.RecentUpload.Service;
 import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.common.eml.DataPackage;
-import edu.lternet.pasta.common.eml.EMLParser;
 
 
 /**
@@ -75,8 +73,11 @@ public class AuditManagerClient extends PastaClient {
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.AuditManagerClient.class);
   
+  /*
+   * The cache of RecentUpload objects.
+   */
   private static List<RecentUpload> recentUploads = null;
-  private static long lastRefreshTime = 0L; 
+  private static long recentUploadsLastRefreshTime = 0L; 
 
   
   /*
@@ -112,6 +113,12 @@ public class AuditManagerClient extends PastaClient {
    * Class methods
    */
   
+  /**
+   * Retrieves a list of recent inserts.
+   * 
+   * @return A list of RecentUpload objects, where each upload was an insert,
+   *         i.e. the serviceMethod for each is "createDataPackage".
+   */
   public static List<RecentUpload> getRecentInserts() {
 	  List<RecentUpload> recentUploads = getRecentUploads();
 	  List<RecentUpload> recentInserts = new ArrayList<RecentUpload>();
@@ -126,6 +133,12 @@ public class AuditManagerClient extends PastaClient {
   }
   
   
+  /**
+   * Retrieves a list of recent updates.
+   * 
+   * @return A list of RecentUpload objects, where each upload was an update,
+   *         i.e. the serviceMethod for each is "updateDataPackage".
+   */
   public static List<RecentUpload> getRecentUpdates() {
 	  List<RecentUpload> recentUploads = getRecentUploads();
 	  List<RecentUpload> recentUpdates = new ArrayList<RecentUpload>();
@@ -140,13 +153,18 @@ public class AuditManagerClient extends PastaClient {
   }
   
   
-  public static List<RecentUpload> getRecentUploads() {
+  /*
+   * Retrieves the current cache of RecentUpload objects. Generates a new
+   * list of RecentUpload objects if the cache is empty or if it's time
+   * to refresh the cache.
+   */
+  private static List<RecentUpload> getRecentUploads() {
 	  if (recentUploads == null || shouldRefresh()) {
 		  try {
 		     AuditManagerClient auditManagerClient = new AuditManagerClient("public");
 		     recentUploads = auditManagerClient.recentUploads();
 		     Date now = new Date();
-		     lastRefreshTime = now.getTime();
+		     recentUploadsLastRefreshTime = now.getTime();
 		  }
 		  catch (Exception e) {
 			  logger.error("Error refreshing recent uploads: " + e.getMessage());
@@ -157,12 +175,17 @@ public class AuditManagerClient extends PastaClient {
   }
   
   
+  /*
+   * Boolean to determine whether the cache of recent uploads is due to be
+   * refreshed. Returns true is the current time is more than 12 hours
+   * past the last refresh time.
+   */
   private static boolean shouldRefresh() {
 	  boolean shouldRefresh = false;
 	  final long twelveHours = 12 * 60 * 60 * 1000;
 	  Date now = new Date();
 	  long nowTime = now.getTime();
-	  long refreshTime = lastRefreshTime + twelveHours;
+	  long refreshTime = recentUploadsLastRefreshTime + twelveHours;
 	  
 	  if (refreshTime < nowTime) {
 		  shouldRefresh = true;
@@ -316,6 +339,10 @@ public class AuditManagerClient extends PastaClient {
 	}
 	
 	
+	/*
+	 * Parses the recent uploads audit records XML returned by the Audit Manager.
+	 * Converts it to a list of RecentUpload objects.
+	 */
 	private List<RecentUpload> parseRecentUploads(String xmlString)
 	        throws PastaAuthenticationException, PastaConfigurationException, PastaEventException {
 		int limit = 3;
@@ -375,6 +402,10 @@ public class AuditManagerClient extends PastaClient {
 							RecentUpload recentUpload = 
 									new RecentUpload(dpmClient, uploadDate, serviceMethod, resourceId);
 							String title = recentUpload.getTitle();
+							/*
+							 * Add the data package to the list only if we have a title
+							 * to display.
+							 */
 							if (title != null && !title.equals("")) {
 								recent.add(recentUpload);
 								if (serviceMethod.equals("createDataPackage")) {
