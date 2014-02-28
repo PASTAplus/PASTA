@@ -119,7 +119,7 @@ public class EventDeleteServlet extends DataPortalServlet {
 
         EventSubscriptionClient eventClient = new EventSubscriptionClient(uid);
         eventClient.deleteBySid(subscriptionId);
-        message = "An Event Subscription with identifier '<b>" + subscriptionId
+        message = "Event subscription with identifier '<b>" + subscriptionId
             + "</b>' has been deleted.";
         type = "info";
 
