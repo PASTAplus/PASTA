@@ -491,6 +491,42 @@ public class EventSubscriptionClient extends PastaClient {
   }
   
 
+    /**
+     * Return the number of subscriptions for a given user.
+     * 
+     * @return  the number of subscriptions for this user.
+     */
+	public int numberOfSubscriptions() throws PastaEventException {
+		int numberOfSubscriptions = 0;
+
+		if (this.uid != null && !this.uid.equals("public")) {
+			String xmlString = readByFilter("");
+
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			try {
+				DocumentBuilder documentBuilder = documentBuilderFactory
+						.newDocumentBuilder();
+				InputStream inputStream = IOUtils.toInputStream(xmlString,
+						"UTF-8");
+				Document document = documentBuilder.parse(inputStream);
+				Element documentElement = document.getDocumentElement();
+				NodeList subscriptionList = documentElement
+						.getElementsByTagName("subscription");
+				numberOfSubscriptions = subscriptionList.getLength();
+
+			}
+			catch (Exception e) {
+				logger.error("Exception:\n" + e.getMessage());
+				e.printStackTrace();
+				throw new PastaEventException(e.getMessage());
+			}
+		}
+		
+		return numberOfSubscriptions;
+	}
+
+	
 	public String subscriptionTableHTML() throws PastaEventException {
 		String html = "";
 
