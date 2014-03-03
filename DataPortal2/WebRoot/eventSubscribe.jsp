@@ -20,6 +20,12 @@
   }
   
   EventSubscriptionClient esc = new EventSubscriptionClient(uid);
+  int numberOfSubscriptions = esc.numberOfSubscriptions();
+  String displayDivOpen = "<div>";
+  String displayDivClose = "</div>";
+  if (numberOfSubscriptions == 0) {
+    displayDivOpen = "<div class='display-none'>";
+  }
   String subscriptionTableHTML = esc.subscriptionTableHTML();
   String subscriptionOptionsHTML = esc.subscriptionOptionsHTML();
 
@@ -132,6 +138,7 @@
 					<%= subscribeMessage %>
 				        <hr/>
 
+     <%= displayDivOpen %>
       <h2>Current subscriptions for <%= uid %></h2>
         <table>
           <tbody>
@@ -193,6 +200,7 @@
 										</table>
 									</form>
 									<%= deleteMessage %>
+					  <%= displayDivClose %>
 									
 								<!-- /Content --></div>
 						</div>
