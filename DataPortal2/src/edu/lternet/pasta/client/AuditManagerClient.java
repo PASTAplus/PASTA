@@ -119,18 +119,20 @@ public class AuditManagerClient extends PastaClient {
    * @return A list of RecentUpload objects, where each upload was an insert,
    *         i.e. the serviceMethod for each is "createDataPackage".
    */
-  public static List<RecentUpload> getRecentInserts() {
-	  List<RecentUpload> recentUploads = getRecentUploads();
-	  List<RecentUpload> recentInserts = new ArrayList<RecentUpload>();
-	  
-	  for (RecentUpload recentUpload : recentUploads) {
-		  if (recentUpload.getService() == Service.INSERT) {
-			  recentInserts.add(recentUpload);
-		  }
-	  }
-	  
-	  return recentInserts;  
-  }
+	public static List<RecentUpload> getRecentInserts() {
+		List<RecentUpload> recentUploads = getRecentUploads();
+		List<RecentUpload> recentInserts = new ArrayList<RecentUpload>();
+
+		if (recentUploads != null) {
+			for (RecentUpload recentUpload : recentUploads) {
+				if (recentUpload.getService() == Service.INSERT) {
+					recentInserts.add(recentUpload);
+				}
+			}
+		}
+
+		return recentInserts;
+	}
   
   
   /**
@@ -139,18 +141,20 @@ public class AuditManagerClient extends PastaClient {
    * @return A list of RecentUpload objects, where each upload was an update,
    *         i.e. the serviceMethod for each is "updateDataPackage".
    */
-  public static List<RecentUpload> getRecentUpdates() {
-	  List<RecentUpload> recentUploads = getRecentUploads();
-	  List<RecentUpload> recentUpdates = new ArrayList<RecentUpload>();
-	  
-	  for (RecentUpload recentUpload : recentUploads) {
-		  if (recentUpload.getService() == Service.UPDATE) {
-			  recentUpdates.add(recentUpload);
-		  }
-	  }
-	  
-	  return recentUpdates;  
-  }
+	public static List<RecentUpload> getRecentUpdates() {
+		List<RecentUpload> recentUploads = getRecentUploads();
+		List<RecentUpload> recentUpdates = new ArrayList<RecentUpload>();
+
+		if (recentUploads != null) {
+			for (RecentUpload recentUpload : recentUploads) {
+				if (recentUpload.getService() == Service.UPDATE) {
+					recentUpdates.add(recentUpload);
+				}
+			}
+		}
+
+		return recentUpdates;
+	}
   
   
   /*

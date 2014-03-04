@@ -44,7 +44,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>How do I ...</h2>
+								<h2>How do I...</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -52,36 +52,31 @@
 							<div class="span12">
 								<!-- Content -->
 
-			<ul>
-				<li>Learn about the PASTA Software Developer's Application
-					Programming Interface (API) - <a
-					href="https://nis.lternet.edu:8443/x/BAAF" class="searchsubcat" target="_blank">NIS
-						Software Developer's Guide</a>
-				</li>
-				<li>Search for LTER data - <a
-					href="https://nis.lternet.edu:8443/x/IoBH" class="searchsubcat" target="_blank">NIS
-						Users' Guide</a>
-				</li>
-				<li>Find out more about the LTER Network Information System
-					(NIS) and its Mission - <a
-					href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">NIS
-						Community Website</a>
-				</li>
-				<li>Use the NIS Data Portal to create synthetic data - <a
-					href="https://nis.lternet.edu:8443/x/NQFZ" class="searchsubcat" target="_blank">Synthesis</a>
-				</li>
-				<li>Find out who has been downloading my data - <a
-					href="https://nis.lternet.edu:8443/x/OwFZ" class="searchsubcat" target="_blank">Reports</a>
-				</li>
-			</ul>
+			<dl>
+
+				<dt>Search for LTER data?</dt>
+				<dd><a href="https://nis.lternet.edu:8443/x/IoBH" class="searchsubcat">Searching for data</a></dd>
+			  
+				<dt>Find out more about the LTER Network Information System (NIS) and its mission?</dt>
+			  <dd><a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat">LTER Network Information System Community Website</a></dd>
+			  
+				<dt>Use the NIS Data Portal to create synthetic data?</dt>
+				<dd><a href="https://nis.lternet.edu:8443/x/NQFZ" class="searchsubcat">How does the NIS enable Network Synthesis?</a></dd>
+				
+				<dt>Find out who has been downloading my data?</dt> 
+			  <dd><a href="https://nis.lternet.edu:8443/x/OwFZ" class="searchsubcat">Who is using my data?</a></dd>
+
+				<dt>Learn about the PASTA Software Developer's Application Programming Interface (API)?</dt>
+			  <dd><a href="https://nis.lternet.edu:8443/x/BAAF" class="searchsubcat">NIS Software Developer's Guide</a></dd>				
+
+			</dl>
 
 			<p>
-				Have more questions? Go to the <a
-					href="https://nis.lternet.edu:8443/x/swFZ" class="searchsubcat" target="_blank">Frequently
-					Asked Questions</a> page, enter your question as a comment in either
-				the <cite>NIS User's Guide</cite> or the <cite>NIS Software Developer's Guide</cite>, or you
-				can always email <a href="mailto:tech-support@lternet.edu" class="searchsubcat"
-					target="_blank">tech-support@lternet.edu</a>.
+				Have more questions? Go to the 
+				<a href="https://nis.lternet.edu:8443/x/swFZ" class="searchsubcat">Frequently Asked Questions</a> page, 
+				enter your question as a comment in either the <cite>NIS User's Guide</cite> or the 
+				<cite>NIS Software Developer's Guide</cite>, or you can always email 
+				<a href="mailto:tech-support@lternet.edu" class="searchsubcat">tech-support@lternet.edu</a>.
 			</p>
 								<!-- /Content -->
 							</div>

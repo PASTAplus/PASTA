@@ -36,7 +36,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.EventSubscriptionClient;
-import edu.lternet.pasta.client.SubscriptionUtility;
 
 public class EventTestServlet extends DataPortalServlet {
 
@@ -122,10 +121,8 @@ public class EventTestServlet extends DataPortalServlet {
         EventSubscriptionClient eventClient = new EventSubscriptionClient(uid);
         eventClient.testSubscription(subscriptionId);
         xml = eventClient.readBySid(subscriptionId);
-        SubscriptionUtility subscriptionUtility = new SubscriptionUtility(xml);
-        message = "<h3 align='center'>Event subscription with identifier '" + subscriptionId
-            + "' has been tested by posting to the Target URL:</h3>";
-        message += subscriptionUtility.xmlToHtml(cwd + xslpath);
+        message = "Event subscription with identifier '<b>" + subscriptionId
+            + "</b>' has been tested by posting to the Target URL.</strong>";
         type = "info";
       } 
       catch (Exception e) {

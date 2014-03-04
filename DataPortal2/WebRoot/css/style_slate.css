@@ -2960,6 +2960,13 @@ table#nis-coordinates input {
 	text-align: center;
 }
 
+dd + dt { 
+     margin-top: 1em; 
+}
+
+.display-none {
+	display: none;
+}
 
 /*
  * Styling for the quality report table

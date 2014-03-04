@@ -25,7 +25,13 @@
 package edu.lternet.pasta.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -40,6 +46,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 /**
  * @author servilla
@@ -478,5 +489,194 @@ public class EventSubscriptionClient extends PastaClient {
     }
 
   }
+  
+
+    /**
+     * Return the number of subscriptions for a given user.
+     * 
+     * @return  the number of subscriptions for this user.
+     */
+	public int numberOfSubscriptions() throws PastaEventException {
+		int numberOfSubscriptions = 0;
+
+		if (this.uid != null && !this.uid.equals("public")) {
+			String xmlString = readByFilter("");
+
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			try {
+				DocumentBuilder documentBuilder = documentBuilderFactory
+						.newDocumentBuilder();
+				InputStream inputStream = IOUtils.toInputStream(xmlString,
+						"UTF-8");
+				Document document = documentBuilder.parse(inputStream);
+				Element documentElement = document.getDocumentElement();
+				NodeList subscriptionList = documentElement
+						.getElementsByTagName("subscription");
+				numberOfSubscriptions = subscriptionList.getLength();
+
+			}
+			catch (Exception e) {
+				logger.error("Exception:\n" + e.getMessage());
+				e.printStackTrace();
+				throw new PastaEventException(e.getMessage());
+			}
+		}
+		
+		return numberOfSubscriptions;
+	}
+
+	
+	public String subscriptionTableHTML() throws PastaEventException {
+		String html = "";
+
+		if (this.uid != null && !this.uid.equals("public")) {
+			StringBuilder sb = new StringBuilder("");
+			String xmlString = readByFilter("");
+
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			try {
+				DocumentBuilder documentBuilder = documentBuilderFactory
+						.newDocumentBuilder();
+				InputStream inputStream = IOUtils.toInputStream(xmlString,
+						"UTF-8");
+				Document document = documentBuilder.parse(inputStream);
+				Element documentElement = document.getDocumentElement();
+				NodeList subscriptionList = documentElement
+						.getElementsByTagName("subscription");
+				int nSubscriptions = subscriptionList.getLength();
+
+				for (int i = 0; i < nSubscriptions; i++) {
+					Node subscriptionNode = subscriptionList.item(i);
+					NodeList subscriptionChildren = subscriptionNode
+							.getChildNodes();
+					String subscriptionId = null;
+					String packageId = null;
+					String url = null;
+					for (int j = 0; j < subscriptionChildren.getLength(); j++) {
+						Node childNode = subscriptionChildren.item(j);
+						if (childNode instanceof Element) {
+							Element subscriptionElement = (Element) childNode;
+							if (subscriptionElement.getTagName().equals("id")) {
+								Text text = (Text) subscriptionElement
+										.getFirstChild();
+								subscriptionId = text.getData().trim();
+							}
+							else
+								if (subscriptionElement.getTagName().equals(
+										"packageId")) {
+									Text text = (Text) subscriptionElement
+											.getFirstChild();
+									packageId = text.getData().trim();
+								}
+								else
+									if (subscriptionElement.getTagName()
+											.equals("url")) {
+										Text text = (Text) subscriptionElement
+												.getFirstChild();
+										url = text.getData().trim();
+									}
+						}
+					}
+
+					sb.append("<tr>\n");
+
+					sb.append("<td class='nis' align='center'>");
+					sb.append(subscriptionId);
+					sb.append("</td>\n");
+
+					sb.append("<td class='nis' align='center'>");
+					sb.append(packageId);
+					sb.append("</td>\n");
+
+					sb.append("<td class='nis'>");
+					sb.append(url);
+					sb.append("</td>\n");
+
+					sb.append("</tr>\n");
+				}
+				
+				html = sb.toString();
+			}
+			catch (Exception e) {
+				logger.error("Exception:\n" + e.getMessage());
+				e.printStackTrace();
+				throw new PastaEventException(e.getMessage());
+			}
+		}
+		
+		return html;
+	}
+
+	
+	public String subscriptionOptionsHTML() throws PastaEventException {
+		String html = "";
+
+		if (this.uid != null && !this.uid.equals("public")) {
+			StringBuilder sb = new StringBuilder("");
+			String xmlString = readByFilter("");
+
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			try {
+				DocumentBuilder documentBuilder = documentBuilderFactory
+						.newDocumentBuilder();
+				InputStream inputStream = IOUtils.toInputStream(xmlString,
+						"UTF-8");
+				Document document = documentBuilder.parse(inputStream);
+				Element documentElement = document.getDocumentElement();
+				NodeList subscriptionList = documentElement
+						.getElementsByTagName("subscription");
+				int nSubscriptions = subscriptionList.getLength();
+
+				for (int i = 0; i < nSubscriptions; i++) {
+					Node subscriptionNode = subscriptionList.item(i);
+					NodeList subscriptionChildren = subscriptionNode
+							.getChildNodes();
+					String subscriptionId = null;
+					String packageId = null;
+					String url = null;
+					for (int j = 0; j < subscriptionChildren.getLength(); j++) {
+						Node childNode = subscriptionChildren.item(j);
+						if (childNode instanceof Element) {
+							Element subscriptionElement = (Element) childNode;
+							if (subscriptionElement.getTagName().equals("id")) {
+								Text text = (Text) subscriptionElement
+										.getFirstChild();
+								subscriptionId = text.getData().trim();
+							}
+							else
+								if (subscriptionElement.getTagName().equals(
+										"packageId")) {
+									Text text = (Text) subscriptionElement
+											.getFirstChild();
+									packageId = text.getData().trim();
+								}
+								else
+									if (subscriptionElement.getTagName()
+											.equals("url")) {
+										Text text = (Text) subscriptionElement
+												.getFirstChild();
+										url = text.getData().trim();
+									}
+						}
+					}
+
+					sb.append(String.format("<option value='%s'>%s</option>\n", 
+							                subscriptionId, subscriptionId));
+				}
+				
+				html = sb.toString();
+			}
+			catch (Exception e) {
+				logger.error("Exception:\n" + e.getMessage());
+				e.printStackTrace();
+				throw new PastaEventException(e.getMessage());
+			}
+		}
+		
+		return html;
+	}
 
 }
