@@ -59,7 +59,16 @@
 								<a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">
 								NIS Community Website</a> for information about 
 								upcoming updates to the LTER Network Portal.</p>
-												<h3>LTER sites</h3>
+								
+								<!-- For Scientists, Researchers, Students, and the General Public -->
+								<!-- <div class="spacer"></div> -->
+								<div id="accordion1" class="accordion">
+									<div class="accordion-group">
+										<div class="accordion-heading ">
+											<a class="accordion-toggle" data-parent="#accordion1" data-toggle="collapse" href="#Accordion_1">
+											For Scientists, Researchers, Students, and the General Public</a> </div>
+										<div id="Accordion_1" class="accordion-body  collapse">
+											<div class="accordion-inner ">
 												<p>The LTER is able to support high-level 
 												analysis and synthesis of complex 
 												ecosystem data across the science-policy-management 
@@ -95,7 +104,21 @@
 												User Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
-												<h3>For LTER Site Information Managers, Software Developers, and Other Interested Parties</h3>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- /For Scientists, Researchers, Students, and the General Public -->
+												
+								<!-- For LTER Site Information Managers,... -->
+								<!-- <div class="spacer"></div> -->
+								<div id="accordion2" class="accordion">
+									<div class="accordion-group">
+										<div class="accordion-heading ">
+											<a class="accordion-toggle" data-parent="#accordion2" data-toggle="collapse" href="#Accordion_2">
+											For LTER Site Information Managers, Software Developers, and Other Interested Parties</a> </div>
+										<div id="Accordion_2" class="accordion-body  collapse">
+											<div class="accordion-inner ">
 												<p>The PASTA framework is comprised of the Gatekeeper identity authentication 
 												service<sup>*</sup> and the following application programming interfaces (APIs) of 
 												the LTER Network Information System:
@@ -153,9 +176,15 @@
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
 									<p><sup>*</sup>User authentication is <em>required</em> for all data input to the PASTA system.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- /For LTER Site Information Managers,... -->
+												
+												
 								</div>
 							</div>
-							<!-- end of content -->
 						</div>
 					</div>
 				</div>

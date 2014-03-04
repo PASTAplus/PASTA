@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%@ page import="edu.lternet.pasta.client.EventSubscriptionClient"%>
 <%
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -17,11 +18,19 @@
         .getRequestDispatcher("./login.jsp");
     requestDispatcher.forward(request, response);
   }
+  
+  EventSubscriptionClient esc = new EventSubscriptionClient(uid);
+  int numberOfSubscriptions = esc.numberOfSubscriptions();
+  String displayDivOpen = "<div>";
+  String displayDivClose = "</div>";
+  if (numberOfSubscriptions == 0) {
+    displayDivOpen = "<div class='display-none'>";
+  }
+  String subscriptionTableHTML = esc.subscriptionTableHTML();
+  String subscriptionOptionsHTML = esc.subscriptionOptionsHTML();
 
-  String subscribeMessage = (String) request
-      .getAttribute("subscribemessage");
+  String subscribeMessage = (String) request.getAttribute("subscribemessage");
   String deleteMessage = (String) request.getAttribute("deletemessage");
-  String reviewMessage = (String) request.getAttribute("reviewmessage");
   String testMessage = (String) request.getAttribute("testmessage");
   String type = (String) request.getAttribute("type");
 
@@ -30,6 +39,10 @@
   } else {
     type = "class=\"" + type + "\"";
   }
+  
+  if (subscribeMessage  == null) { subscribeMessage = ""; }
+  if (testMessage  == null) { testMessage = ""; }
+  if (deleteMessage  == null) { deleteMessage = ""; }
 %>
 
 <!DOCTYPE html>
@@ -78,21 +91,21 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Event Subscriptions</h2>
+								<h1>Event Subscriptions</h1>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
+						
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-                <h3>Subscribe</h3>
-								<p>Subscribe to NIS data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:
+                <h2>Subscribe</h2>
+								<p>Subscribe to NIS data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:</p>
 								<ol>
 								  <li>a particular data package revision (e.g. <kbd class="nis">mypackages.1.1</kbd>); or,</li>
 								  <li>any revision of a data package with a given scope and identifier (e.g. <kbd class="nis">mypackages.1</kbd>); or,</li>
 								  <li>any data package with a given scope (e.g. <kbd class="nis">mypackages</kbd>).</li>
                 </ol>
-								</p>
 								<p>Then enter the URL of a workflow or other procedure for the NIS to invoke whenever the data packages you specified are inserted or updated.</p>
 								<div class="section">
 									<form id="eventsubscribe" action="eventsubscribe" method="post" name="eventsubscribe">
@@ -122,137 +135,73 @@
 										</table>
 									</form>
 								</div>
-				<%
-				  if (subscribeMessage != null) {
-				    out.println("<div class=\"section\">\n");
-				    out.println("<table>\n");
-				    out.println("<tbody>\n");
-				    out.println("<tr>\n");
-				    out.println("<td " + type + ">\n");
-				    out.println(subscribeMessage + "\n");
-				    out.println("</td>\n");
-				    out.println("</tr>\n");
-				    out.println("</tbody>\n");
-				    out.println("</table>\n");
-				  }
-				%>
-				      <hr/>
-              <h3>Review</h3>
-								<p>Review a subscription using the subscription 
-								identifier or leave empty to review <em>all</em> of your subscriptions.</p>
-								<div class="section">
-									<form id="eventreview" action="eventreview" method="post" name="eventreview">
-										<table>
-											<tr>
-												<td>
-												<label class="labelBold" for="subscriptionid">Subscription Id:</label>
-												</td>
-											</tr>
-											<tr>
-												<td>
-												<input name="subscriptionid" type="number" />
-												</td>
-											</tr>
-											<tr>
-												<td>
-												<input class="btn btn-info btn-default" name="review" type="submit" value="Review" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-												</td>
-											</tr>
-										</table>
-									</form>
-								</div>
-        <%
-          if (reviewMessage != null) {
-            out.println("<div>\n");
-            out.println("<table>\n");
-            out.println("<tbody>\n");
-            out.println("<tr>\n");
-            out.println("<td " + type + ">\n");
-            out.println(reviewMessage + "\n");
-            out.println("</td>\n");
-            out.println("</tr>\n");
-            out.println("</tbody>\n");
-            out.println("</table>\n");
-          }
-        %>
+					<%= subscribeMessage %>
 				        <hr/>
-								<h3>Test</h3>
+
+     <%= displayDivOpen %>
+      <h2>Current subscriptions for <%= uid %></h2>
+        <table>
+          <tbody>
+            <tr>
+              <th class="nis">Subscription Id</th>
+              <th class="nis">Package Id</th>
+              <th class="nis">Target URL</th>
+            </tr>
+            <%= subscriptionTableHTML %>
+          </tbody>
+        </table>
+							
+								<h2>Test</h2>
 								<p>Test a subscription using the subscription identifier.</p>
-								<div class="section">
 									<form id="eventtest" action="eventtest" method="post" name="eventtest">
 										<table>
 											<tr>
 												<td>
-												<label class="labelBold" for="subscriptionid">Subscription Id:</label>
+												<label class="labelBold">Subscription Id:</label>
 												</td>
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="number" />
+                    <select class="select-width-auto" name="subscriptionid">
+                      <%= subscriptionOptionsHTML %>
+                    </select>									
 												</td>
 											</tr>
 											<tr>
 												<td>
-												<input class="btn btn-info btn-default" name="test" type="submit" value="Test" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" /></td>
+										<input class="btn btn-info btn-default" name="test" type="submit" value="Test" />
+												</td>
 											</tr>
 										</table>
 									</form>
-								</div>
-        <%
-          if (testMessage != null) {
-            out.println("<table>\n");
-            out.println("<tbody>\n");
-            out.println("<tr>\n");
-            out.println("<td " + type + ">\n");
-            out.println(testMessage + "\n");
-            out.println("</td>\n");
-            out.println("</tr>\n");
-            out.println("</tbody>\n");
-            out.println("</table>\n");
-          }
-        %>
-				        <hr/>
-								<h3>Delete</h3>
-								<p>Delete a subscription using the subscription 
-								identifier.</p>
-								<div class="section">
+									<%= testMessage %>
+
+								<h2>Delete</h2>
+								<p>Delete a subscription using the subscription identifier.</p>
 									<form id="eventdelete" action="eventdelete" method="post" name="eventdelete">
 										<table>
 											<tr>
 												<td>
-												<label class="labelBold" for="subscriptionid">Subscription Id:</label>
+												<label class="labelBold">Subscription Id:</label>
 												</td>
 											</tr>
 											<tr>
 												<td>
-												<input name="subscriptionid" required="required" type="number" />
+                    <select class="select-width-auto" name="subscriptionid">
+                      <%= subscriptionOptionsHTML %>
+                    </select>									
 												</td>
 											</tr>
 											<tr>
 												<td>
 												<input class="btn btn-info btn-default" name="delete" type="submit" value="Delete" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</td>
 											</tr>
 										</table>
 									</form>
-								</div>
-        <%
-          if (deleteMessage != null) {
-            out.println("<div class=\"section\">\n");
-            out.println("<table>\n");
-            out.println("<tbody>\n");
-            out.println("<tr>\n");
-            out.println("<td " + type + ">\n");
-            out.println(deleteMessage + "\n");
-            out.println("</td>\n");
-            out.println("</tr>\n");
-            out.println("</tbody>\n");
-            out.println("</table>\n");
-          }
-        %>
+									<%= deleteMessage %>
+					  <%= displayDivClose %>
+									
 								<!-- /Content --></div>
 						</div>
 					</div>
