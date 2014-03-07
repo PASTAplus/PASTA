@@ -78,7 +78,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<p>Delete a data package<sup>*</sup> using the package <b>scope</b> and <b>identifier</b> (e.g. <kbd class="nis">myscope.100</kbd>).
+								<p>Delete a data package using the package <b>scope</b> and <b>identifier</b>.<sup>*</sup>
 								</p>
 								<div class="section">
 									<form id="datapackagedelete" action="./dataPackageDelete" method="post" name="datapackagedelete">
@@ -90,7 +90,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" type="text" autofocus />
+												<input name="packageid" required="required" type="text" autofocus  placeholder="e.g., myscope.100"/>
 												</td>
 											</tr>
 											<tr>

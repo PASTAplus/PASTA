@@ -3019,3 +3019,25 @@ div.info {
 
 /* End -- Styling for the quality report table */
 
+
+/* Tabular layout when the contents is NOT tabular data */
+
+.display-table {
+    display: table;
+}
+
+.display-table .table-row {
+    display: table-row;
+}
+
+.display-table .table-cell {
+    display: table-cell;
+    padding: 5px;
+    margin: 5px;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+/* End -- Tabular layout when the contents is NOT tabular data */

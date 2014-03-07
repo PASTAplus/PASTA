@@ -49,15 +49,15 @@
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-								<p>The NIS Data Portal is the public facing information 
+								<p>The <abbr title="Network Information System">NIS</abbr> Data Portal is the public facing information 
 								management and technology interface to the Provenance 
 								Aware Synthesis Tracking Architecture (PASTA). The 
-								NIS Data Portal is the main path for uploading and 
+								<abbr title="Network Information System">NIS</abbr> Data Portal is the main path for uploading and 
 								discovery of varied LTER data products that are 
 								in PASTA.</p>
 								<p>Visit the
 								<a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">
-								NIS Community Website</a> for information about 
+								<abbr title="Network Information System">NIS</abbr> Community Website</a> for information about 
 								upcoming updates to the LTER Network Portal.</p>
 								
 								<!-- For Scientists, Researchers, Students, and the General Public -->
@@ -88,17 +88,17 @@
 													<li>the knowledge gained from 
 													the synthesis of LTER data.</li>
 												</ol>
-												<p>The NIS Data Portal uses a <i>rolling-update</i>
+												<p>The <abbr title="Network Information System">NIS</abbr> Data Portal uses a <i>rolling-update</i>
 												approach to continuously release 
 												improved versions as they are ready 
 												for the community.</p>
 												<p>Visit the
 												<a href="https://nis.lternet.edu:8443/x/BIBH" class="searchsubcat" target="_blank">
-												NIS User&#39;s Guide</a> for detailed 
+												<abbr title="Network Information System">NIS</abbr> User&#39;s Guide</a> for detailed 
 												information on how to best utilize 
 												the LTER Network Data Portal.</p>
 												<p>Any questions not answered by 
-												the NIS User&#39;s Guide may be addressed 
+												the <abbr title="Network Information System">NIS</abbr> User&#39;s Guide may be addressed 
 												in either the comments section (at 
 												the bottom of every page in the 
 												User Guide) or by emailing
@@ -155,7 +155,7 @@
 												data package uploads into PASTA 
 												and to search for data packages 
 												that reside in PASTA.</p>
-												<p>Like the NIS Data Portal, all 
+												<p>Like the <abbr title="Network Information System">NIS</abbr> Data Portal, all 
 												of PASTA&#39;s services use a <i>rolling-update</i>
 												approach to adding bug fixes, improvements, 
 												and new features to each of the 
@@ -165,10 +165,10 @@
 												overall source-code documentation 
 												for PASTA is available at the
 												<a href="https://nis.lternet.edu:8443/x/BAAF" class="searchsubcat" target="_blank">
-												NIS Software Developer&#39;s Guide</a>.
+												<abbr title="Network Information System">NIS</abbr> Software Developer&#39;s Guide</a>.
 												</p>
 												<p>Any questions not answered by 
-												the NIS Software Developer&#39;s Guide 
+												the <abbr title="Network Information System">NIS</abbr> Software Developer&#39;s Guide 
 												may be addressed in either the comments 
 												section (at the bottom of every 
 												page in the Software Developer&#39;s 
@@ -201,7 +201,7 @@
 						<h1 class="banner_font">Thank You!</h1>
 						<p></p>
 						<p>Partial funding for the development 
-						of PASTA and the LTER NIS is provided under the American 
+						of PASTA and the LTER <abbr title="Network Information System">NIS</abbr> is provided under the American 
 						Recovery and Reinvestment Act of 2009 and is administered 
 						by the National Science Foundation.</p>
 						<p id="p-arra-img">

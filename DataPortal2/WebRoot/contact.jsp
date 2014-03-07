@@ -63,15 +63,6 @@
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13757">
 									Duane Costa</a>, NIS Analyst/Programmer III</li>
 								</ul>
-								<h3 align="left">Websites</h3>
-								<ul>
-									<li><a class="searchsubcat" href="https://www.lternet.edu">LTER Network</a></li>
-									<li><a class="searchsubcat" href="https://lno.lternet.edu">LTER Network 
-									Office</a></li>
-									<li>
-									<a class="searchsubcat" href="https://nis.lternet.edu:8443/x/agBP">
-									NIS Guides</a></li>
-								</ul>
 								<h3 align="left">Physical Address</h3>
 								<ul class="no-list-style">
 									<li>LTER Network Office<br />
