@@ -84,38 +84,32 @@
 								<p>View provenance metadata of a data package using the package identifier.</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
-										<table>
-											<tr>
-												<td><label class="labelBold" for="packageid">Package 
-												Id:</label> </td>
-											</tr>
-											<tr>
-												<td>
-												<input name="packageid" required="required" autofocus size="20" type="text" /></td>
-											</tr>
-											<tr>
-												<td>
-												<input class="btn btn-info btn-default" name="view" type="submit" value="View" />
-												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-												</td>
-											</tr>
-										</table>
+						        <div class="display-table">
+											<div class="table-row">
+												<div class="table-cell">
+												  <label class="labelBold" for="packageid">Package Id:</label>
+												</div>
+										  </div>
+											<div class="table-row">
+												<div class="table-cell">
+												  <input name="packageid" required="required" autofocus size="20" type="text" placeholder="e.g., knb-lter-nin.1.3" />
+												</div>
+											</div>
+											<div class="table-row">
+												<div class="table-cell">
+												  <input class="btn btn-info btn-default" name="view" type="submit" value="View" />
+												  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
+												</div>
+											</div>
+										</div>
 									</form>
 								</div>
 			<%
 				if (message != null && !type.equals("warning")) {
 				    out.println("<h3>" + packageid + "</h3>\n");
-					out.println("<div class=\"section\">\n");
-					out.println("<table>\n");
-					out.println("<tbody>\n");
-					out.println("<tr>\n");
-					out.println("<td " + type + ">\n");
-					out.println(message + "\n");
-					out.println("</td>\n");
-					out.println("</tr>\n");
-					out.println("</tbody>\n");
-					out.println("</table>\n");
-					out.println("</div>\n");
+					out.println("<p><pre>");
+					out.println(message);
+					out.println("</pre></p>\n");
 				}
 			%>
 

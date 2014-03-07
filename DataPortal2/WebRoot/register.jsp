@@ -70,19 +70,19 @@
 							<tbody>
 								<tr>
 									<td align="left"><label for="givenName">First Name:</label></td>
-									<td align="left"><input type="text" name="givenName" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="givenName" name="givenName" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="surName">Last Name:</label></td>
-									<td align="left"><input type="text" name="surName" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="surName" name="surName" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="email">Email:</label></td>
-									<td align="left"><input type="email" name="email" required="required" size="30" /></td>
+									<td align="left"><input type="email" id="email" name="email" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="institution">Institution:</label></td>
-									<td align="left"><input type="text" name="institution" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="institution" name="institution" required="required" size="30" /></td>
 								</tr>
 							</tbody>
 						</table>
