@@ -126,6 +126,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			if (terms != null) {
 				boolean tokenize = true;
 				boolean isSiteTerm = false;
+				// Searching on term "#ALL#" is intended for developer testing only
 				if (terms.equalsIgnoreCase("#ALL#")) {
 					query = SimpleSearch.buildPathQueryXml("", termsList,
 							tokenize, isSiteTerm);

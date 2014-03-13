@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,12 +47,13 @@ import edu.lternet.pasta.portal.search.LTERSite;
  * Metacat. It can execute either an advanced search, where the user fills in
  * fields in a web form, or a simple search on a string.
  */
-public class AdvancedSearch  {
+public class AdvancedSearch extends Search  {
   
   /*
    * Class fields
    */
-  private static final Logger logger = Logger.getLogger(AdvancedSearch.class);
+
+	private static final Logger logger = Logger.getLogger(AdvancedSearch.class);
 
   
   /*
@@ -207,28 +209,10 @@ public class AdvancedSearch  {
    */
 
   /**
-   * Adds a string to an ArrayList of terms. An auxiliary method to the
-   * parseTermsAdvanced() method.
-   * 
-   * @param terms      ArrayList of strings.
-   * @param term       the new string to add to the ArrayList, but only if
-   *                   it isn't an empty string.
-   */
-  private void addTerm(ArrayList<String> terms, final StringBuffer term) {
-    final String s = term.toString().trim();
-      
-    if (s.length() > 0) {
-      terms.add(s);
-    }
-  }
-
-
-  /**
    * A full subject query searches the title, abstract, and keyword sections of
    * the document. Individual searches on these sections is also supported.
    */
   private void buildQuerySubject(TermsList termsList) {
-    String emlField;
     String indent;
     AdvancedSearchQueryGroup innerQuery = null;
     final String outerOperator;
@@ -251,7 +235,7 @@ public class AdvancedSearch  {
 
       indent = getIndent(INDENT_LEVEL * 2);
       outerQuery = new AdvancedSearchQueryGroup(outerOperator, indent);
-      terms = parseTermsAdvanced(this.subjectValue);
+      terms = parseTerms(this.subjectValue);
       searchMode = metacatSearchMode(subjectQueryType);
       
       for (String term : terms) {
@@ -281,35 +265,35 @@ public class AdvancedSearch  {
           derivedTerms.add(term);
         }
         
-        for (String derivedTerm : derivedTerms) {
-          
+        boolean abstracts = false;
+        boolean keywords = false;
+        boolean packageIds = false;
+        boolean titles = false;
+        if (subjectField.equals("ALL")) {
+            abstracts = true;
+            keywords = true;
+            titles = true;
+        }
+        else if (subjectField.equals("ABSTRACT")) {
+            abstracts = true;
+        }
+        else if (subjectField.equals("KEYWORDS")) {
+            keywords = true;
+        }
+        else if (subjectField.equals("TITLE")) {
+            titles = true;
+        }
+        
+        List<String> emlFields = Search.getIndexedPaths(abstracts, keywords, packageIds, titles);
+        
+        for (String derivedTerm : derivedTerms) {       
           termsList.addTerm(derivedTerm);
           
-          if (subjectField.equals("ALL") || subjectField.equals("TITLE")) {
-            emlField = "dataset/title";
-            qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                             derivedTerm, indent);
-            innerQuery.addQueryTerm(qt);
-          }
-
-          if (subjectField.equals("ALL") || subjectField.equals("ABSTRACT")) {
-            emlField = "dataset/abstract/para";
-            qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                             derivedTerm, indent);
-            innerQuery.addQueryTerm(qt);
-
-            emlField = "dataset/abstract/section/para";
-            qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                             derivedTerm, indent);
-            innerQuery.addQueryTerm(qt);
-          }
-
-          if (subjectField.equals("ALL") || subjectField.equals("KEYWORDS")) {
-            emlField = "keyword";
-            qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                            derivedTerm, indent);
-            innerQuery.addQueryTerm(qt);
-          }
+          for (String emlField : emlFields) {
+              qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
+                      derivedTerm, indent);
+              innerQuery.addQueryTerm(qt);
+          }        
         }
       
         outerQuery.addQueryGroup(innerQuery);
@@ -1003,7 +987,7 @@ public class AdvancedSearch  {
       queryGroup.setIncludeOuterQueryGroup(false);
     }
 
-    queryString = pathQuery.toString();
+    queryString = pathQuery.pathqueryXML();
     logger.info(queryString);
     String resultsetXML = runQuery(request, uid);
 
@@ -1055,7 +1039,7 @@ public class AdvancedSearch  {
     if (queryType.equals("1")) return "equals";
     if (queryType.equals("2")) return "starts-with";
     if (queryType.equals("3")) return "ends-with";
-    return "containts";  
+    return "contains";  
   }
   
   
@@ -1110,92 +1094,6 @@ public class AdvancedSearch  {
     return optimizedWebValues;
   }
   
-
-  /**
-   * Parses search terms from a string. In this simple implementation, the 
-   * string is considered to be a list of tokens separated by spaces. The more 
-   * advanced implementation (parserTermsAdvanced) parses quoted strings 
-   * containing spaces as a term. This method can be eliminated if we are
-   * satisfied that parseTermsAdvanced() is working properly.
-   * 
-   * @param  value    The string value as entered by the user.
-   * 
-   * @return terms    An ArrayList of String objects. Each space-separated 
-   *                  token is a single term.
-   *
-  private ArrayList parseTerms(final String value) {
-    StringTokenizer st;
-    ArrayList terms = new ArrayList();
-    String token;
-    final int tokenCount;
-    
-    st = new StringTokenizer(value, " ");
-    tokenCount = st.countTokens();
-    
-    for (int i = 0; i < tokenCount; i++) {
-      token = st.nextToken();
-      terms.add(token);
-    }
-    
-    return terms;
-  }
-  */
-
-  
-  /**
-   * Parses search terms from a string. In this advanced implementation,
-   * double-quoted strings that contain spaces are considered a single term.
-   * 
-   * @param  value     The string value as entered by the user.
-   * 
-   * @return terms    An ArrayList of String objects. Each string is a term.
-   */
-  private ArrayList<String> parseTermsAdvanced(String value) {
-    char c;
-    StringBuffer currentTerm = new StringBuffer(100);
-    boolean keepSpaces = false;
-    final int stringLength;
-    ArrayList<String> terms = new ArrayList<String>();
-
-    value = value.trim();
-    stringLength = value.length();
-    
-    for (int i = 0; i < stringLength; i++) {
-      c = value.charAt(i);
-  
-      if (c == '\"') {
-        // Termination of a quote-enclosed term. Add the current term to the
-        // list and start a new term.
-        if (keepSpaces) {
-          addTerm(terms, currentTerm);
-          currentTerm = new StringBuffer(100);
-        }
-      
-        keepSpaces = !(keepSpaces); // Toggle keepSpaces to its opposite value.
-      }
-      else if (c == ' ') {
-        // If we are inside a quote-enclosed term, append the space.
-        if (keepSpaces) {
-          currentTerm.append(c);
-        }
-        // Else, add the current term to the list and start a new term.
-        else {
-          addTerm(terms, currentTerm);
-          currentTerm = new StringBuffer(100);
-        }
-      }
-      else {
-        // Append any non-quote, non-space characters to the current term.
-        currentTerm.append(c);
-      }
-    }
-
-    // Add the final term to the list.
-    addTerm(terms, currentTerm);
-
-    return terms;
-  }
-
 
   /**
    * Runs the Metacat query for a browse search, simple search, or advanced

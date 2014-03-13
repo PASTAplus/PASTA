@@ -24,7 +24,10 @@
 
 package edu.lternet.pasta.portal.search;
 
+import java.util.List;
+
 import org.apache.commons.lang3.text.StrTokenizer;
+import org.apache.log4j.Logger;
 
 /**
  * The SimpleSearch class supports query operations common to the simple
@@ -33,8 +36,15 @@ import org.apache.commons.lang3.text.StrTokenizer;
  * @author dcosta
  *
  */
-public class SimpleSearch {
+public class SimpleSearch extends Search {
 
+	/*
+	 * Class fields
+	 */
+
+    private static final Logger logger = Logger.getLogger(SimpleSearch.class);
+
+	  
   /**
    * Builds a PathQuery XML string for submission to the DataPackageManager
    * and then to Metacat.
@@ -45,39 +55,23 @@ public class SimpleSearch {
    *                     newline and formfeed, else splits only on newline treating
    *                     space-separated words as a single term.
    * @param isSiteQuery  true if we are querying by site name, else false
-   * @return  the PathQuery XML string
+   * @return the PathQuery XML string
    */
   public static String buildPathQueryXml(String terms, TermsList termsList, boolean tokenize, boolean isSiteQuery) {
     StrTokenizer strTokenizer = null;
-    final String openQueryTerm = 
-      "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n";
-    final String closeQueryTerm = "    </queryterm>\n";
-    String[] xpaths;
-    String[] sitePaths = { "@packageId" };
-    String[] nonSitePaths = { "dataset/title", "dataset/abstract", "dataset/keywordSet/keyword" };
+    final String operator = "UNION";
+    final String title = "Simple Search";
+    final String searchMode = "contains";
+    final String caseSensitive = "false";
+    final String indent = "    ";
+    List<String> sitePaths = getIndexedPaths(false, false, true, false);
+    List<String> nonSitePaths = getIndexedPaths(true, true, true, true);
+    List<String> xpaths = isSiteQuery ? sitePaths : nonSitePaths;
     
-    if (isSiteQuery)  {
-      xpaths = sitePaths;
-    }
-    else {
-      xpaths = nonSitePaths;
-    }
-    
-    StringBuffer query = new StringBuffer(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-        + "<pathquery version=\"1.0\">\n"
-        + "  <meta_file_id>unspecified</meta_file_id>\n"
-        + "  <querytitle>unspecified</querytitle>\n"
-        + "  <returnfield>dataset/title</returnfield>\n"
-        + "  <returnfield>dataset/creator/individualName/surName</returnfield>\n"
-        + "  <returnfield>dataset/pubDate</returnfield>\n"
-        + "  <returnfield>originator/individualName/surName</returnfield>\n"
-        + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
-        + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
-        + "  <querygroup operator=\"UNION\">\n");
+    AdvancedSearchQueryGroup queryGroup = new AdvancedSearchQueryGroup(operator, indent);
     
     if (tokenize) {
-      strTokenizer = new StrTokenizer(terms);  // splits on space, tab, newline and formfeed
+      strTokenizer = new StrTokenizer(terms); // splits on space, tab, newline and formfeed
     }
     else {
       strTokenizer = new StrTokenizer(terms, "\n"); // splits only on newline
@@ -85,21 +79,17 @@ public class SimpleSearch {
     
     while(strTokenizer.hasNext()) {
       String token = strTokenizer.nextToken();    
-      termsList.addTerm(token);     
-      String value = "      <value>" + token + "</value>\n";
-      
+      termsList.addTerm(token);           
       for (String xpath : xpaths) {
-        query.append(openQueryTerm);
-        query.append(value);
-        query.append(String.format("      <pathexpr>%s</pathexpr>\n", xpath));
-        query.append(closeQueryTerm);
-      }     
+        AdvancedSearchQueryTerm queryTerm = new AdvancedSearchQueryTerm(searchMode, caseSensitive, xpath, token, indent + indent);
+        queryGroup.addQueryTerm(queryTerm);
+      }
     }
     
-    query.append("  </querygroup>\n" + "</pathquery>\n");
-
-    String queryStr = query.toString();
-    return queryStr;
+    AdvancedSearchPathQuery pathQuery = new AdvancedSearchPathQuery(title, queryGroup, indent);
+    String pathqueryXML = pathQuery.pathqueryXML();
+    logger.debug(pathqueryXML);
+    return pathqueryXML;
   }
   
 }
