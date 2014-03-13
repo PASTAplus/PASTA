@@ -68,6 +68,26 @@ public class DataPackageManagerClientTest {
   private static Integer testEntitySize = null;
 
 
+	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		    + "<pathquery version=\"1.0\">\n"
+		    + "  <meta_file_id>unspecified</meta_file_id>\n"
+		    + "  <querytitle>unspecified</querytitle>\n"
+		    + "  <returnfield>dataset/title</returnfield>\n"
+		    + "  <returnfield>keyword</returnfield>\n"
+		    + "  <returnfield>originator/individualName/surName</returnfield>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
+		    + "  <querygroup operator=\"UNION\">\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>bug</value>\n"
+		    + "      <pathexpr>dataset/title</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>Carroll</value>\n"
+		    + "      <pathexpr>surName</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "  </querygroup>\n" + "</pathquery>\n";
+
   /*
    * Instance fields
    */
@@ -454,7 +474,6 @@ public class DataPackageManagerClientTest {
   @Test
   public void testSearchDataPackages() {
     try {
-      String pathqueryXML = DataPackageManagerClient.pathqueryXML;
       String entityString = dpmClient.searchDataPackages(pathqueryXML);
 
       // Check the message body

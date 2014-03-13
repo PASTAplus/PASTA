@@ -77,26 +77,6 @@ public class DataPackageManagerClient extends PastaClient {
 	private static final Logger logger = Logger
 	    .getLogger(edu.lternet.pasta.client.DataPackageManagerClient.class);
 
-	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		    + "<pathquery version=\"1.0\">\n"
-		    + "  <meta_file_id>unspecified</meta_file_id>\n"
-		    + "  <querytitle>unspecified</querytitle>\n"
-		    + "  <returnfield>dataset/title</returnfield>\n"
-		    + "  <returnfield>keyword</returnfield>\n"
-		    + "  <returnfield>originator/individualName/surName</returnfield>\n"
-		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
-		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
-		    + "  <querygroup operator=\"UNION\">\n"
-		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-		    + "      <value>bug</value>\n"
-		    + "      <pathexpr>dataset/title</pathexpr>\n"
-		    + "    </queryterm>\n"
-		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-		    + "      <value>Carroll</value>\n"
-		    + "      <pathexpr>surName</pathexpr>\n"
-		    + "    </queryterm>\n"
-		    + "  </querygroup>\n" + "</pathquery>\n";
-
 	/*
 	 * Instance variables
 	 */
@@ -182,89 +162,6 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 		return identifier;
-	}
-
-	/**
-	 * main() program. Can be used as a lightweight unit test to test the methods
-	 * in this class.
-	 * 
-	 * @param args
-	 *          No command arguments are passed to this program.
-	 */
-	public static void main(String[] args) {
-		String user = "ucarroll";
-		String scope = "knb-lter-lno";
-		Integer identifier = null;
-		String revision = "1";
-
-		ConfigurationListener.configure();
-
-		try {
-			DataPackageManagerClient dpmClient = new DataPackageManagerClient(user);
-
-			String dataPackageScopes = dpmClient.listDataPackageScopes();
-			System.out.println("\nData package scopes:\n" + dataPackageScopes);
-
-			// Create the test data package in PASTA
-			identifier = determineTestIdentifier(dpmClient, scope, "1000");
-			String testEMLPath = "test/data/NoneSuchBugCount.xml";
-			File testEMLFile = new File(testEMLPath);
-			String createPackageId = scope + "." + identifier.toString() + "."
-			    + revision;
-			modifyTestEmlFile(testEMLFile, scope, createPackageId);
-			String resourceMap = dpmClient.createDataPackage(testEMLFile);
-			System.out.println("\nResource map:\n" + resourceMap);
-
-			// Update the test data package in PASTA
-			String dataPackageRevisions = dpmClient.listDataPackageRevisions(scope,
-			    identifier, null);
-			System.out.println("\nData package revisions:\n" + dataPackageRevisions);
-			String[] revisionStrings = dataPackageRevisions.split("\n");
-			int maxRevision = -1;
-			for (int i = 0; i < revisionStrings.length; i++) {
-				String revStr = revisionStrings[i];
-				if (revStr != null && !revStr.equals("")) {
-					Integer revInteger = new Integer(revisionStrings[i]);
-					int rev = revInteger.intValue();
-					maxRevision = Math.max(maxRevision, rev);
-				}
-			}
-			int updateRevision = maxRevision + 1;
-			String updatePackageId = scope + "." + identifier.toString() + "."
-			    + updateRevision;
-			modifyTestEmlFile(testEMLFile, scope, updatePackageId);
-			resourceMap = dpmClient.updateDataPackage(scope, identifier, testEMLFile);
-			System.out.println("\nResource map:\n" + resourceMap);
-
-			String dataEntities = dpmClient.listDataEntities(scope, identifier,
-			    revision);
-			System.out.println("\nData entities:\n" + dataEntities);
-
-			String dataPackage = dpmClient.readDataPackage(scope, identifier,
-			    revision);
-			System.out.println("\nData package:\n" + dataPackage);
-
-			String metadata = dpmClient.readMetadata(scope, identifier, revision);
-			System.out.println("\nMetadata:\n" + metadata);
-
-			// dpmClient.readDataEntity(scope, identifier, revision, entityId,
-			// System.out);
-			// System.out.println("\nData entity:\n" + dataEntity);
-
-			String dataPackageReport = dpmClient.readDataPackageReport(scope,
-			    identifier, revision);
-			System.out.println("\nData package report:\n" + dataPackageReport);
-
-			String resultSetXML = dpmClient.searchDataPackages(pathqueryXML);
-			System.out.println("\nResult set XML:\n" + resultSetXML);
-
-			// Delete the test data package from PASTA
-			dpmClient.deleteDataPackage(scope, identifier);
-			System.out.println("\nDeleted data package: " + scope + "." + identifier);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
 	}
 
 	/**
