@@ -54,19 +54,15 @@ public class Search {
 	  }
 
 	
-	/*
-	 * Instance methods
-	 */
-	
 	  /**
-	   * Adds a string to an ArrayList of terms. An auxiliary method to the
+	   * Adds a string to a list of terms. An auxiliary method to the
 	   * parseTermsAdvanced() method.
 	   * 
-	   * @param terms      ArrayList of strings.
-	   * @param term       the new string to add to the ArrayList, but only if
-	   *                   it isn't an empty string.
+	   * @param terms list of term strings.
+	   * @param term  the new string to add to the list, but only if
+	   *              it isn't an empty string.
 	   */
-	  private void addTerm(ArrayList<String> terms, final StringBuffer term) {
+	  private static void addTerm(List<String> terms, final StringBuffer term) {
 	    final String s = term.toString().trim();
 	      
 	    if (s.length() > 0) {
@@ -84,12 +80,12 @@ public class Search {
 	 * 
 	 * @return terms An ArrayList of String objects. Each string is a term.
 	 */
-	protected ArrayList<String> parseTerms(String value) {
+	protected static List<String> parseTerms(String value) {
 		char c;
-		StringBuffer currentTerm = new StringBuffer(100);
+		StringBuffer currentTerm = new StringBuffer();
 		boolean keepSpaces = false;
 		final int stringLength;
-		ArrayList<String> terms = new ArrayList<String>();
+		List<String> terms = new ArrayList<String>();
 
 		value = value.trim();
 		stringLength = value.length();
@@ -103,7 +99,7 @@ public class Search {
 				 */
 				if (keepSpaces) {
 					addTerm(terms, currentTerm);
-					currentTerm = new StringBuffer(100);
+					currentTerm = new StringBuffer();
 				}
 
 				keepSpaces = !(keepSpaces); // Toggle keepSpaces
@@ -117,7 +113,7 @@ public class Search {
 					// Else, add the current term to the list and start a new term.
 					else {
 						addTerm(terms, currentTerm);
-						currentTerm = new StringBuffer(100);
+						currentTerm = new StringBuffer();
 					}
 				}
 				else {
@@ -132,4 +128,9 @@ public class Search {
 		return terms;
 	}
 
+	
+	/*
+	 * Instance methods
+	 */
+	
 }

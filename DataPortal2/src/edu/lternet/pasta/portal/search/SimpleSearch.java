@@ -49,39 +49,30 @@ public class SimpleSearch extends Search {
    * Builds a PathQuery XML string for submission to the DataPackageManager
    * and then to Metacat.
    * 
-   * @param terms        The string terms entered by the user (e.g. "climate change")
+   * @param userInput    The terms entered by the user (e.g. "climate change")
    * @param termsList    List of terms used in the search, which may include terms other
-   * @param tokenize     If true, splits the terms string into tokens on space, tab, 
-   *                     newline and formfeed, else splits only on newline treating
-   *                     space-separated words as a single term.
    * @param isSiteQuery  true if we are querying by site name, else false
    * @return the PathQuery XML string
    */
-  public static String buildPathQueryXml(String terms, TermsList termsList, boolean tokenize, boolean isSiteQuery) {
-    StrTokenizer strTokenizer = null;
+  public static String buildPathQueryXml(String userInput, TermsList termsList, boolean isSiteQuery) {
     final String operator = "UNION";
     final String title = "Simple Search";
     final String searchMode = "contains";
     final String caseSensitive = "false";
     final String indent = "    ";
+    
     List<String> sitePaths = getIndexedPaths(false, false, true, false);
     List<String> nonSitePaths = getIndexedPaths(true, true, true, true);
     List<String> xpaths = isSiteQuery ? sitePaths : nonSitePaths;
-    
+    List<String> terms = parseTerms(userInput);
     AdvancedSearchQueryGroup queryGroup = new AdvancedSearchQueryGroup(operator, indent);
     
-    if (tokenize) {
-      strTokenizer = new StrTokenizer(terms); // splits on space, tab, newline and formfeed
-    }
-    else {
-      strTokenizer = new StrTokenizer(terms, "\n"); // splits only on newline
-    }
-    
-    while(strTokenizer.hasNext()) {
-      String token = strTokenizer.nextToken();    
-      termsList.addTerm(token);           
+    for (String term : terms) {
+      termsList.addTerm(term);           
       for (String xpath : xpaths) {
-        AdvancedSearchQueryTerm queryTerm = new AdvancedSearchQueryTerm(searchMode, caseSensitive, xpath, token, indent + indent);
+        AdvancedSearchQueryTerm queryTerm = 
+        		new AdvancedSearchQueryTerm(
+        				searchMode, caseSensitive, xpath, term, indent + indent);
         queryGroup.addQueryTerm(queryTerm);
       }
     }

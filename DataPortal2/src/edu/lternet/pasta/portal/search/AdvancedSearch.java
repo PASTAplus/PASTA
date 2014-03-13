@@ -219,7 +219,7 @@ public class AdvancedSearch extends Search  {
     AdvancedSearchQueryGroup outerQuery;
     AdvancedSearchQueryTerm qt;
     String searchMode;
-    ArrayList<String> terms;
+    List<String> terms;
  
     if ((this.subjectValue != null) && (!(this.subjectValue.equals("")))) {
       hasSubjectSearch = true;
@@ -305,7 +305,7 @@ public class AdvancedSearch extends Search  {
       if (terms.size() > 1) {
         queryGroup.addQueryGroup(outerQuery);
       }
-      else if (terms.size() == 1){
+      else if (terms.size() == 1) {
         queryGroup.addQueryGroup(innerQuery);
       }       
     }

@@ -124,21 +124,17 @@ public class SimpleSearchServlet extends DataPortalServlet {
 
 		try {
 			if (terms != null) {
-				boolean tokenize = true;
 				boolean isSiteTerm = false;
 				// Searching on term "#ALL#" is intended for developer testing only
 				if (terms.equalsIgnoreCase("#ALL#")) {
-					query = SimpleSearch.buildPathQueryXml("", termsList,
-							tokenize, isSiteTerm);
+					query = SimpleSearch.buildPathQueryXml("", termsList, isSiteTerm);
 				}
 				else {
-					query = SimpleSearch.buildPathQueryXml(terms, termsList,
-							tokenize, isSiteTerm);
+					query = SimpleSearch.buildPathQueryXml(terms, termsList, isSiteTerm);
 				}
 			}
 
-			DataPackageManagerClient dpmClient = new DataPackageManagerClient(
-					uid);
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			xml = dpmClient.searchDataPackages(query);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
 			html = "<p> Terms used in this search: " + termsList.toHTML()
