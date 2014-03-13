@@ -2472,16 +2472,16 @@ select.select-menu {
 }
 
 /* LTER TOOLTIP CSS */
-.tooltip{
-    display: inline;
-    position: relative;
+.tooltip {
+  display: inline;
+  position: relative;
 	font-family: 'Open Sans';
 	line-height: 20px;
 	font-size: 14px;
 	color: #666666;
 }
 
-.tooltip:hover:after{
+.tooltip:hover:after {
     background: #333;
     background: rgba(0,0,0,.8);
 /*    font-style: italic;  */
@@ -2497,7 +2497,7 @@ select.select-menu {
     width: 240px;
 }
 
-.tooltip:hover:before{
+.tooltip:hover:before {
     border: solid;
     border-color: #333 transparent;
     border-width: 6px 6px 0 6px;
@@ -3032,8 +3032,8 @@ div.info {
 
 .display-table .table-cell {
     display: table-cell;
-    padding: 5px;
-    margin: 5px;
+    padding: 2px;
+    margin: 2px;
 }
 
 .text-align-right {
