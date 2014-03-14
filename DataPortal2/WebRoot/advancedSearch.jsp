@@ -1,7 +1,11 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
+  final String pageTitle = "Advanced Search";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
+
   final String indent = "              ";
   boolean includeNIN = true;      // include North Inlet in the options list
   String siteOptions = LTERSite.composeHTMLOptions(indent, includeNIN, null);
@@ -11,7 +15,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 
