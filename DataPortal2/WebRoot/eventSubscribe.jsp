@@ -1,7 +1,10 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%@ page import="edu.lternet.pasta.client.EventSubscriptionClient"%>
+
 <%
+  final String pageTitle = "Event Subscriptions";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
@@ -49,7 +52,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
