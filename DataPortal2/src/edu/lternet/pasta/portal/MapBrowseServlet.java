@@ -268,7 +268,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			if (titles != null) {
 
-				html += "<h3 align=\"left\">Title</h3>\n";
+				html += "<h3>Title</h3>\n";
 				html += "<ul class=\"no-list-style\">\n";
 
 				for (Title title : titles) {
@@ -283,7 +283,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			if (creators != null) {
 
-				html += "<h3 align=\"left\">Creators</h3>\n";
+				html += "<h3>Creators</h3>\n";
 				html += "<ul class=\"no-list-style\">\n";
 
 				for (ResponsibleParty creator : creators) {
@@ -324,7 +324,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			
 			if (pubDate != null) {
 				
-				html += "<h3 align=\"left\">Publication Date</h3>\n";
+				html += "<h3>Publication Date</h3>\n";
 				html += "<ul class=\"no-list-style\">\n";
 				html += "<li>" + pubDate + "</li>";
 				html += "</ul>";				
@@ -470,7 +470,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 		}
 
-		html += "<h3 align=\"left\">Package Identification</h3>\n";
+		html += "<h3>Package Id</h3>\n";
 		html += "<ul class=\"no-list-style\">\n";
 		html += dataPackage;
 		html += "<ul>";
@@ -479,7 +479,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += revisions;
 		html += "</ul>";
 		html += "</ul>\n";
-		html += "<h3 align=\"left\">Resources</h3>\n";
+		html += "<h3>Resources</h3>\n";
 		html += "<ul>\n";
 		html += metadata;
 		html += report;
@@ -498,7 +498,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		html += "</div>";
 		
 		
-		html += "<h3 align=\"left\">Citation</h3>\n";
+		html += "<h3>Citation</h3>\n";
 		html += "<ul class=\"no-list-style\">\n";
 		html += "<li><a class=\"searchsubcat\" href=\"./dataPackageCitation?scope=" + scope + "&"
 				+ "identifier=" + identifier.toString() + "&"
