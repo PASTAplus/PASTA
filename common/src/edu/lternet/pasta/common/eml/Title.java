@@ -85,7 +85,7 @@ public class Title {
 		return this.titleType.toString();
 	}
 	
-	public String getTite() {
+	public String getTitle() {
 		return this.title;
 	}
 	

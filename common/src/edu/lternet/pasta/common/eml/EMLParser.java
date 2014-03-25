@@ -43,6 +43,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+import edu.lternet.pasta.common.XmlUtility;
+
 
 /*
  * This class parses EML metadata for values needed by the DAS, such
@@ -163,6 +165,7 @@ public class EMLParser {
         NodeList titleNodeList = xpathapi.selectNodeList(document, TITLE_PATH);
         for (int i = 0; i < titleNodeList.getLength(); i++) {
           String title = titleNodeList.item(i).getTextContent();
+          title = XmlUtility.xmlEncode(title);
           dataPackage.titles.add(title);
         }
 

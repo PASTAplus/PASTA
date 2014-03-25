@@ -1,6 +1,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+
 <%
+  final String pageTitle = "New User Registration";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://" + request.getServerName()
 	    + ":" + request.getServerPort() + path + "/";
@@ -12,9 +15,11 @@
 %>
 
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
@@ -70,19 +75,19 @@
 							<tbody>
 								<tr>
 									<td align="left"><label for="givenName">First Name:</label></td>
-									<td align="left"><input type="text" name="givenName" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="givenName" name="givenName" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="surName">Last Name:</label></td>
-									<td align="left"><input type="text" name="surName" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="surName" name="surName" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="email">Email:</label></td>
-									<td align="left"><input type="email" name="email" required="required" size="30" /></td>
+									<td align="left"><input type="email" id="email" name="email" required="required" size="30" /></td>
 								</tr>
 								<tr>
 									<td align="left"><label for="institution">Institution:</label></td>
-									<td align="left"><input type="text" name="institution" required="required" size="30" /></td>
+									<td align="left"><input type="text" id="institution" name="institution" required="required" size="30" /></td>
 								</tr>
 							</tbody>
 						</table>

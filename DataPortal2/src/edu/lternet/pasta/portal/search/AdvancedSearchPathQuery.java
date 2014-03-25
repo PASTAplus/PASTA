@@ -41,13 +41,13 @@ public class AdvancedSearchPathQuery  {
   /*
    * Instance fields
    */
-  private String indent;                       // String of spaces
+  private final String INDENT;                 // String of spaces
   private final int initialLength = 500;       // Initial length of stringBuffer
   private StringBuffer stringBuffer;           // Holds the pathquery xml
   private ArrayList<String> returnFieldList = new ArrayList<String>(); 
                                               // List of returnfields
-  private AdvancedSearchQueryGroup queryGroup;         // The outer query group
-  private String title;                                // The pathquery title
+  private AdvancedSearchQueryGroup queryGroup; // The outer query group
+  private String title;                        // The pathquery title
   
 
   /*
@@ -67,11 +67,11 @@ public class AdvancedSearchPathQuery  {
                                  final String indent) {
     this.title = title;
     this.queryGroup = queryGroup;
-    this.indent = indent;
-    addReturnField("dataset/title");
-    addReturnField("originator/individualName/surName");
-    addReturnField("dataset/creator/individualName/surName");
-    addReturnField("dataset/pubDate");
+    this.INDENT = indent;
+    returnFieldList.add("dataset/title");
+    returnFieldList.add("originator/individualName/surName");
+    returnFieldList.add("dataset/creator/individualName/surName");
+    returnFieldList.add("dataset/pubDate");
   }
   
   
@@ -85,42 +85,22 @@ public class AdvancedSearchPathQuery  {
    */
 
   /**
-   * Adds a returnfield to the pathquery xml.
-   * 
-   * @param s       the name of the returnfield to add
-   */
-  public void addReturnField(final String s) {
-    returnFieldList.add(s);
-  }
-  
-
-  /**
-   * Set the queryGroup instance field to a new value
-   * 
-   * @param qg   the new value for the queryGroup instance field
-   */
-  public void setQueryGroup(AdvancedSearchQueryGroup qg) {
-    this.queryGroup = qg;
-  }
-  
-
-  /**
    * Creates the pathquery xml string.
    * 
    * @return  a string holding the PathQuery XML.
    */
-  public String toString() {
+  public String pathqueryXML() {
     String returnField;
 
     stringBuffer = new StringBuffer(initialLength);
     stringBuffer.append("<?xml version=\"1.0\"?>\n");
     stringBuffer.append("<pathquery version=\"1.2\">\n");
-    stringBuffer.append(indent + "<querytitle>" + 
+    stringBuffer.append(INDENT + "<querytitle>" + 
                         title + "</querytitle>\n");
 
     for (int i = 0; i < returnFieldList.size(); i++) {
       returnField = returnFieldList.get(i);
-      stringBuffer.append(indent + "<returnfield>" + 
+      stringBuffer.append(INDENT + "<returnfield>" + 
                           returnField + "</returnfield>\n");
     }
     

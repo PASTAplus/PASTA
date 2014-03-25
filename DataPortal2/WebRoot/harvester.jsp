@@ -1,6 +1,10 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+
 <%
+  final String pageTitle = "Evaluate/Upload Data Packages";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
+
 	HttpSession httpSession = request.getSession();
 
 	String uid = (String) httpSession.getAttribute("uid");
@@ -20,7 +24,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
@@ -75,53 +79,64 @@
 								uploaded to the NIS, you may do so by selecting 
 								<b>Upload</b>. Several alternatives for supplying the 
 								EML metadata for your data packages are available below.</p>
+
 								<fieldset>
 								<legend>EML Metadata File</legend>
 								<p>Select an Ecological Metadata Language (EML) file to evaluate or upload.</p>
 								<div class="section">
                   <form id="emlFile" name="emlFile" method="post" enctype="multipart/form-data" action="./harvester">
-										<table>
-											<tr>
-												<td align="left">
+						<div class="display-table">
+								<div class="table-row">
+									<div class="table-cell">
 												<label class="labelBold">File:</label>
+									</div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
 												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
-												</td>
-											</tr>
-											<tr>
-												<td align="left">
+									</div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
 												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
 												<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
 												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-												</td>
-											</tr>
-										</table>
+								  </div>
+								</div>
+						</div>
 										<input id="metadataSource" name="metadataSource" type="hidden" value="emlFile" />
 									</form>
 								</div>
 								</fieldset>
+								
 								<fieldset>
 								<legend>EML Document URLs</legend>
 								<p>Enter a list of EML document URLs into the text 
 								area below, one per line, and then select <b>Evaluate</b> or <b>Upload</b>.</p>
-								<div class="section">
+
 									<form id="urlList" action="./harvester" method="post" name="urlList">
-										<table>
-											<tr>
-												<td align="left">
+						<div class="display-table">
+								<div class="table-row">
+									<div class="table-cell">
+												<label class="labelBold">URLs:</label>
+								  </div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
 												<textarea id="urlTextArea" cols="80" name="urlTextArea" required="required" rows="8"></textarea>
-												</td>
-											</tr>
-											<tr>
-												<td align="left">
+								  </div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
 												<input class="btn btn-info btn-default" name="submit" type="submit" value="Evaluate" />
 												<input class="btn btn-info btn-default" name="submit" type="submit" value="Upload" />
 												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-												</td>
-											</tr>
-										</table>
+									</div>
+								</div>
+						</div>
 										<input id="metadataSource" name="metadataSource" type="hidden" value="urlList" />
 									</form>
-								</div>
+
 								</fieldset>
 								<!-- More Options for Upload -->
 								<!-- <div class="spacer"></div> -->

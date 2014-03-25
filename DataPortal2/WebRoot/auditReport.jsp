@@ -3,6 +3,9 @@
 <%@ page import="edu.lternet.pasta.portal.AuditReportServlet"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%
+  final String pageTitle = "Audit Reports";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
+
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://" + request.getServerName()
 	    + ":" + request.getServerPort() + path + "/";
@@ -44,7 +47,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">

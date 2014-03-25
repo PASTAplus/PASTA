@@ -1,7 +1,11 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
+  final String pageTitle = "Advanced Search";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
+
   final String indent = "              ";
   boolean includeNIN = true;      // include North Inlet in the options list
   String siteOptions = LTERSite.composeHTMLOptions(indent, includeNIN, null);
@@ -11,7 +15,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 
@@ -278,7 +282,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -315,7 +319,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -417,7 +421,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -475,7 +479,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -575,7 +579,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -628,7 +632,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>
@@ -642,6 +646,11 @@
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <!-- Search Options Table -->												
 												    <table>
+														  <tr>
+														    <td>
+														      <label class="labelBold">Case Sensitivity:</label>
+														    </td>
+														  </tr>
 													    <tr>
 														    <td>
 															    <ul class="checklist">
@@ -653,15 +662,25 @@
 																    </li>
 															    </ul>
 														    </td>
-														    <td class="spacerwd"></td>
+														  </tr>
+														  <tr>
+															  <td class="spacersmh"></td>
+														  </tr>
+														  <tr>
+														    <td>
+														      <label class="labelBold">Match Options:</label>
+														    </td>
+														  </tr>
+														  <tr>
 														    <td valign="top">
 															    <input checked="checked" name="formAllAny" type="radio" value="0" /> 
-															    <b>AND</b>&nbsp;&nbsp;all search criteria
+															    Match <b>ALL</b> search criteria
 														    </td>
-														    <td class="spacerwd"></td>
+														  </tr>
+														  <tr>
 														    <td valign="top">
 															    <input name="formAllAny" type="radio" value="1" /> 
-															    <b>OR</b>&nbsp;&nbsp;all search criteria
+															    Match <b>ANY</b> search criteria
 														    </td>
 													    </tr>
 												    </table>												
@@ -674,7 +693,7 @@
 											      <tr>
 												      <td align="left">
 												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
 												      </td>
 											      </tr>
 										      </table>

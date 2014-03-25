@@ -167,7 +167,7 @@ public class DataCiteMetadata extends CitationMetadata {
 
 		if (titles != null) {
 			for (Title title : titles) {
-				xml.append("        <title>" + title.getTite() + "</title>\n");
+				xml.append("        <title>" + title.getTitle() + "</title>\n");
 			}
 		}
 
