@@ -1,6 +1,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+
 <%
+  final String pageTitle = "Delete Data Packages";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
@@ -30,7 +33,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
@@ -78,7 +81,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<p>Delete a data package<sup>*</sup> using the package <b>scope</b> and <b>identifier</b> (e.g. <kbd class="nis">myscope.100</kbd>).
+								<p>Delete a data package using the package <b>scope</b> and <b>identifier</b>.<sup>*</sup>
 								</p>
 								<div class="section">
 									<form id="datapackagedelete" action="./dataPackageDelete" method="post" name="datapackagedelete">
@@ -90,7 +93,7 @@
 											</tr>
 											<tr>
 												<td>
-												<input name="packageid" required="required" type="text" autofocus />
+												<input name="packageid" required="required" type="text" autofocus  placeholder="e.g., myscope.100"/>
 												</td>
 											</tr>
 											<tr>

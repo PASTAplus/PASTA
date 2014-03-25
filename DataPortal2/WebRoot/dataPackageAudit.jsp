@@ -2,6 +2,8 @@
 <%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%
+  final String pageTitle = "Data Package Access Reports";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://" + request.getServerName()
 	    + ":" + request.getServerPort() + path + "/";
@@ -40,7 +42,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
@@ -126,15 +128,15 @@
 											<tr>
 												<td>
 												  <label class="labelBold">Scope:</label>
-												  <input autofocus required name="scope" size="15" type="text" />
+												  <input autofocus required name="scope" size="15" type="text" placeholder="e.g., knb-lter-nin" />
 												</td>
 												<td>
 												  <label class="labelBold">Identifier:</label>
-												  <input name="identifier" size="5" type="number" />
+												  <input name="identifier" size="5" type="number"  placeholder="e.g., 1"/>
 												</td>
 												<td>
 												  <label class="labelBold">Revision:</label>
-												  <input name="revision" size="5" type="number" />
+												  <input name="revision" size="5" type="number"  placeholder="e.g., 3"/>
 												</td>
 											</tr>
 											<tr>

@@ -104,10 +104,16 @@ public class BrowseTerm {
   private String composeQueryString() {
     boolean isSiteQuery = isLTERSite();
     TermsList termsList = new TermsList();
-    boolean tokenize = false;
-    String searchValue = this.value;
-    if (isSiteQuery) { searchValue = String.format("knb-lter-%s", this.value.toLowerCase()); }   
-    String queryString = SimpleSearch.buildPathQueryXml(searchValue, termsList, tokenize, isSiteQuery);
+    String searchValue = null;
+    
+    if (isSiteQuery) { 
+    	searchValue = String.format("knb-lter-%s", this.value.toLowerCase()); 
+    } 
+    else {
+    	searchValue = String.format("\"%s\"", this.value);
+    }
+    
+    String queryString = SimpleSearch.buildPathQueryXml(searchValue, termsList, isSiteQuery);
 
     return queryString;
   }

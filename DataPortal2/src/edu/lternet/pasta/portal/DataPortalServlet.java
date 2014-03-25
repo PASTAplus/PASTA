@@ -74,6 +74,24 @@ public class DataPortalServlet extends HttpServlet {
   public static String getLoginWarning() {
     return LOGIN_WARNING;
   }
+  
+  
+  /**
+   * Composes the title text appropriate for a given page in the
+   * Data Portal web application.
+   * 
+   * @param pageTitle   A short page title, e.g. "About", "Home".
+   *           Best practice is for title length to be
+   *           70 characters or less but oftentimes it's not possible
+   *           to keep the title that short.
+   * @return the text to be inserted inside the <title> element
+   *         of a particular Data Portal web page
+   */
+  public static String getTitleText(String pageTitle) {
+	  return String.format(
+			  "Data Portal - %s | Long Term Ecological Research Network (LTER)",
+			  pageTitle);
+  }
 
   
   /*

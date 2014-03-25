@@ -1,4 +1,8 @@
+<%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+
 <%
+  final String pageTitle = "Login";
+  final String titleText = DataPortalServlet.getTitleText(pageTitle);
   HttpSession httpSession = request.getSession();
   
   String message = (String) request.getAttribute("message");
@@ -17,7 +21,7 @@
 <html lang="en">
 
 <head>
-<title>LTER :: Network Data Portal</title>
+<title><%= titleText %></title>
 
 <meta charset="UTF-8" />
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
@@ -71,31 +75,32 @@
 
 					<form id="login" name="loginform" method="post" action="./login"
 						target="_top">
-						<table id="login-form">
-							<tbody>
-								<tr>
-									<td align="right"><label class="labelBold">User Name:</label></td>
-									<td align="right">
-									   <input type="text" name="uid"
-										size="25px" required="required" autocomplete="on" autofocus />
-									</td>
-								</tr>
-								<tr>
-									<td align="right"><label class="labelBold">Password:</label></td>
-									<td align="right">
-									   <input type="password" name="password"
-										size="25px" required="required" />
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>
+						<div class="display-table">
+								<div class="table-row">
+									<div class="table-cell">
+									  <label class="labelBold text-align-right">User Name:</label>
+									</div>
+									<div class="table-cell">
+									   <input type="text" name="uid" size="25px" required="required" autocomplete="on" autofocus />
+									</div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
+									  <label class="labelBold text-align-right">Password:</label>
+									</div>
+									<div class="table-cell">
+									  <input type="password" name="password" size="25px" required="required" />
+									</div>
+							  </div>
+								<div class="table-row">
+									<div class="table-cell">
+									</div>
+									<div class="table-cell">
 										<input class="btn btn-info btn-default" name="login" type="submit" value="Login" />
 										<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
-									</td>
-								</tr>
-							</tbody>
-						</table>
+									</div>
+							  </div>
+						</div>
 					</form>
 									
 								<!-- /Content -->
