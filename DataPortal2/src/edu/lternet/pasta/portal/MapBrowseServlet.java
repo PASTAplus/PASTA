@@ -272,7 +272,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				html += "<ul class=\"no-list-style\">\n";
 
 				for (Title title : titles) {
-					html += "<li>" + title.getTite() + "</li>\n";
+					html += "<li>" + title.getTitle() + "</li>\n";
 				}
 
 				html += "</ul>\n";
