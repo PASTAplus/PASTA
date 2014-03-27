@@ -230,7 +230,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 
 				for (Title title : titles) {
 					if (title.getTitleType().equals(Title.MAIN)) {
-						titleText += title.getTite() + ".";
+						titleText += title.getTitle() + ".";
 					}
 				}
 
