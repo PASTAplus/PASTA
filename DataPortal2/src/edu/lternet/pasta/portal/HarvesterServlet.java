@@ -129,6 +129,7 @@ public class HarvesterServlet extends DataPortalServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
    
+    boolean isDataUpload = false;
     HttpSession httpSession = request.getSession();
     String uid = (String) httpSession.getAttribute("uid");
     String warningMessage = "";
@@ -191,14 +192,24 @@ public class HarvesterServlet extends DataPortalServlet {
                   }
                 } 
                 else {                  
+                  /*
+                   * Parse the request parameters. Note that getRequestParameter()
+                   * doesn't work in this case because this is a multipart form.
+                   * Instead we let Apache Commons parse the parameters for us.
+                   */
                   String fieldName = item.getFieldName();
                   String itemString = item.getString();
-                  if (fieldName != null && 
-                      fieldName.equals("submit") &&
-                      itemString != null &&
-                      itemString.equalsIgnoreCase("evaluate")
-                     ) {
-                    isEvaluate = true;                   
+                  if (fieldName != null && itemString != null) {
+                	  if (fieldName.equals("submit") &&
+                          itemString.equalsIgnoreCase("evaluate")
+                         ) {
+                        isEvaluate = true; 
+                	  }
+                      else if (fieldName.equals("dataUpload") &&
+                               itemString.equalsIgnoreCase("1")
+                              ) {
+                    	  isDataUpload = true;                   
+                      }
                   }
                 }
               }
@@ -251,7 +262,12 @@ public class HarvesterServlet extends DataPortalServlet {
           harvester.processSingleDocument(emlTextArea);
         }
         else if (emlFile != null) {
-          harvester.processSingleDocument(emlFile);
+        	if (isDataUpload) {
+                httpSession.setAttribute("emlFile", emlFile);
+            }
+        	else {
+                harvester.processSingleDocument(emlFile);
+        	}
         }
         else if (documentURLs != null) {
           harvester.setDocumentURLs(documentURLs);
@@ -281,7 +297,11 @@ public class HarvesterServlet extends DataPortalServlet {
         httpSession.setAttribute("harvestReportID", reportId);
       }
       
-      if (warningMessage.length() == 0) {
+      if (isDataUpload)  {
+          RequestDispatcher requestDispatcher = request.getRequestDispatcher("./harvester.jsp");
+          requestDispatcher.forward(request, response);
+      }
+      else if (warningMessage.length() == 0) {
         response.sendRedirect("./harvestReport.jsp");
       }
       else {

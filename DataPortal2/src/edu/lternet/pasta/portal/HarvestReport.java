@@ -464,8 +464,7 @@ public class HarvestReport {
   
   /*
    * Gets a list of harvest report directory names for the specified 
-   * user id. If removeNewest is true, omits the newest harvest directory
-   * name from the list.
+   * user id.
    */
   private ArrayList<String> getHarvestDirs(String uid) {
     ArrayList<String> harvestDirs = new ArrayList<String>();
