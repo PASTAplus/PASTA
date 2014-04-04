@@ -228,10 +228,32 @@ public class DataPackageManagerResourceTest {
   }
   
   
+  @Test public void runAllTests() {
+	  testEvaluateDataPackage();
+	  testCreateDataPackage();
+	  testListDataPackageScopes();
+	  testListDataPackageIdentifiers();
+	  testListDataPackageRevisions();
+	  testListDataEntities();
+	  testReadDataPackage();
+	  testReadDataPackageAcl();
+	  testReadMetadata();
+	  testReadMetadataAcl();
+	  testReadDataEntity();
+	  testReadDataEntityName();
+	  testReadDataEntityAcl();
+	  testReadDataPackageReport();
+	  testReadDataPackageReportAcl();
+	  testSearchDataPackages();
+	  testUpdateDataPackage();
+	  testDeleteDataPackage();
+  }
+  
+  
   /**
    * Test the status and message body of the Create Data Package use case
    */
-  @Test public void testCreateDataPackage() {
+  private void testCreateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String utcString = "1364505531871";
     String errorSnippet = "Attempting to insert a data package that already exists in PASTA";
@@ -324,7 +346,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Evaluate Data Package use case
    */
-  @Test public void testEvaluateDataPackage() {
+  private void testEvaluateDataPackage() {
     String utcString = "1364505531871";
     DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     List<MediaType> acceptHeaders = new ArrayList<MediaType>();
@@ -371,7 +393,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the List Data Entities use case
    */
-  @Test public void testListDataEntities() {
+  private void testListDataEntities() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -392,7 +414,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the List Data Package Identifiers use case
    */
-  @Test public void testListDataPackageIdentifiers() {
+  private void testListDataPackageIdentifiers() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -413,7 +435,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the List Data Package Revisions use case
    */
-  @Test public void testListDataPackageRevisions() {
+  private void testListDataPackageRevisions() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -434,7 +456,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the List Data Package Scopes use case
    */
-  @Test public void testListDataPackageScopes() {
+  private void testListDataPackageScopes() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -455,7 +477,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package use case
    */
-  @Test public void testReadDataPackage() {
+  private void testReadDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -501,7 +523,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Entity
    */
-  @Test public void testReadDataEntity() {
+  private void testReadDataEntity() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -524,7 +546,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Entity Name operation
    */
-  @Test public void testReadDataEntityName() {
+  private void testReadDataEntityName() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -548,7 +570,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package Report use case
    */
-  @Test public void testReadDataPackageReport() {
+  private void testReadDataPackageReport() {
     DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     List<MediaType> acceptHeaders = new ArrayList<MediaType>();
     MediaType xmlMediaType = new MediaType("application", "xml");
@@ -650,7 +672,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Metadata use case
    */
-  @Test public void testReadMetadata() {
+  private void testReadMetadata() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
@@ -675,7 +697,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Entity ACL operation
    */
-  @Test public void testReadDataEntityAcl() {
+  private void testReadDataEntityAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
@@ -700,7 +722,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package ACL operation
    */
-  @Test public void testReadDataPackageAcl() {
+  private void testReadDataPackageAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
@@ -725,7 +747,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package Report ACL operation
    */
-  @Test public void testReadDataPackageReportAcl() {
+  private void testReadDataPackageReportAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
@@ -750,7 +772,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Metadata ACL operation
    */
-  @Test public void testReadMetadataAcl() {
+  private void testReadMetadataAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
@@ -775,7 +797,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Search Data Packages use case
    */
-  @Test public void testSearchDataPackages() {
+  private void testSearchDataPackages() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String pathqueryXML = 
       "<pathquery version=\"1.0\">\n" +
@@ -818,7 +840,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Update Data Package use case
    */
-  @Test public void testUpdateDataPackage() {
+  private void testUpdateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String conflictError = "but an equal or higher revision";
     String utcString = "1364505531871";
@@ -892,7 +914,7 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the DELETE use case
    */
-  @Test public void testDeleteDataPackage() {
+  private void testDeleteDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test DELETE for OK status
