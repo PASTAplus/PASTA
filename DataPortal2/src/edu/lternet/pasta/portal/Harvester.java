@@ -69,8 +69,10 @@ public class Harvester implements Runnable {
    */
   
   private int dummyPackageIdCounter = 1;
+  private String harvesterPath = null;
+  private String harvestReportId = null;
   private String harvestDirPath = null;
-  private boolean isEvaluate;
+  private boolean evaluate;
   // List of EML documents URLs to batch process
   private ArrayList<String> documentURLs = null;
   private String uid = null;
@@ -87,10 +89,12 @@ public class Harvester implements Runnable {
    * @param uid  the user identifier, e.g. "ucarroll"
    * @param isEvaluate  true if evaluate, false if upload
    */
-  public Harvester(String harvestDirPath, String uid, boolean isEvaluate) {
-    this.harvestDirPath = harvestDirPath;
+  public Harvester(String harvesterPath, String harvestReportId, String uid, boolean isEvaluate) {
+    this.harvesterPath = harvesterPath;
+    this.harvestReportId = harvestReportId;	
+	this.harvestDirPath = String.format("%s/%s", harvesterPath, harvestReportId);
     this.uid = uid;
-    this.isEvaluate = isEvaluate;
+    this.evaluate = isEvaluate;
   }
   
 
@@ -142,7 +146,8 @@ public class Harvester implements Runnable {
         uid = "ucarroll";
       }
       boolean isEvaluate = true;
-      Harvester harvester = new Harvester(harvesterPath, uid, isEvaluate);
+      String harvestReportId = uid + "-evaluate";
+      Harvester harvester = new Harvester(harvesterPath, harvestReportId, uid, isEvaluate);
       password = options.getString("eventservice.password");
       if (password == null) {
         logger.error("No value found for property: 'eventservice.password'");
@@ -267,6 +272,37 @@ public class Harvester implements Runnable {
       throws IOException {
     StringBuffer sb = getAsStringBuffer(reader, closeWhenFinished);
     return sb.toString();
+  }
+  
+  
+  /**
+   * Accesses the harvesterPath value.
+   * 
+   * @return  harvesterPath
+   */
+  public String getHarvesterPath() {
+	  return harvesterPath;
+  }
+
+  
+  /**
+   * Accesses the harvestReportId value.
+   * 
+   * @return  harvestReportId
+   */
+  public String getHarvestReportId() {
+	  return harvestReportId;
+  }
+  
+  
+  /**
+   * Access the evaluate boolean value.
+   * 
+   * @return  evaluate: true if this is an evaluate operation, 
+   *          false if this is an upload operation
+   */
+  public boolean isEvaluate() {
+	  return evaluate;
   }
 
   
@@ -502,8 +538,8 @@ public class Harvester implements Runnable {
            * Save the EML to file then process it for evaluation or upload
            */
           if (emlString != null) {
-            File emlFile = saveEmlToFile(harvestEMLPath, emlString, isEvaluate);
-            processEMLFile(harvestDirPath, uid, emlFile, isEvaluate);
+            File emlFile = saveEmlToFile(harvestEMLPath, emlString, evaluate);
+            processEMLFile(harvestDirPath, uid, emlFile, evaluate);
             // Sleep to allow DAS database connection recovery
             Thread.sleep(30000);
           }
@@ -534,8 +570,8 @@ public class Harvester implements Runnable {
      * Save the EML to file then process it for evaluation or upload
      */
     if (emlString != null) {
-      File emlFile = saveEmlToFile(harvestEMLPath, emlString, isEvaluate);
-      processEMLFile(harvestDirPath, uid, emlFile, isEvaluate);
+      File emlFile = saveEmlToFile(harvestEMLPath, emlString, evaluate);
+      processEMLFile(harvestDirPath, uid, emlFile, evaluate);
     }
   }
    
@@ -558,7 +594,7 @@ public class Harvester implements Runnable {
      * Process the EML file for evaluation or upload
      */
     if (emlFile != null) {
-      processEMLFile(harvestDirPath, uid, emlFile, isEvaluate);
+      processEMLFile(harvestDirPath, uid, emlFile, evaluate);
     }
   }
    
