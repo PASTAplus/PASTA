@@ -86,7 +86,7 @@
 								   please select the corresponding data file from your
 								   desktop's file system.</p>
 								<div class="section">
-                  <form id="desktopUpload" name="desktopUpload" method="post" enctype="multipart/form-data" action="./multipleUploads">
+                  <form id="desktopUpload" name="desktopUpload" method="post" enctype="multipart/form-data" action="./harvester">
 
                    <table>
                      <tr style="background:#ababff">

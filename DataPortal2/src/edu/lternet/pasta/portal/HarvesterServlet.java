@@ -29,25 +29,23 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
@@ -65,6 +63,7 @@ import edu.lternet.pasta.common.eml.Entity;
  * @author dcosta
  *
  */
+@MultipartConfig
 public class HarvesterServlet extends DataPortalServlet {
 
   /*
@@ -82,9 +81,11 @@ public class HarvesterServlet extends DataPortalServlet {
    */
   
   private final String CHECK_BACK_LATER =
-      "<p class=\"warning\">This may take a few minutes. Please check the <a href=\"./harvestReport.jsp\">View Upload Reports</a> page for available reports.</p>";
-  
-  
+      "This may take a few minutes. Please check the " + 
+      "<a href=\"./harvestReport.jsp\">View Evaluate/Upload Results</a> page " +
+      "for available reports.";
+      
+
   /*
    * Constructors
    */
@@ -130,192 +131,178 @@ public class HarvesterServlet extends DataPortalServlet {
    * @throws IOException
    *           if an error occurred
    */
-  public void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-   
-    boolean isDesktopUpload = false;
-    HttpSession httpSession = request.getSession();
-    String uid = (String) httpSession.getAttribute("uid");
-    String warningMessage = "";
-    
-    ArrayList<String> documentURLs = null;
-    boolean isEvaluate = false;
-    boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-    String emlTextArea = null;
-    File emlFile = null;
-    String urlTextArea = null;
-    String harvestListURL = null;
-    String harvestReportId = null;
-    
-    try {
-      if (uid == null) {
-        throw new PastaAuthenticationException(LOGIN_WARNING);
-      } 
-      else {
-        /*
-         * "metadataSource" can have a value of "emlText", "emlFile",
-         * "urlList", or "harvestList". It is set as a hidden input field 
-         * in each of the harvester forms except the file upload form,
-         * which is detected by the above call to:
-         *   ServletFileUpload.isMultipartContent(request)
-         */
-        String metadataSource = request.getParameter("metadataSource");
-        if (isMultipart) metadataSource = "emlFile";
-    
-        if (metadataSource != null) {
-          if (metadataSource.equals("emlText")) {
-            emlTextArea = request.getParameter("emlTextArea");
-            if (emlTextArea == null || emlTextArea.trim().isEmpty()) {
-              warningMessage = "<p class=\"warning\">Please enter the text of an EML document into the text area.</p>";
-            }
-          }
-          else if (metadataSource.equals("emlFile")) {
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		HttpSession httpSession = request.getSession();
+		ArrayList<String> documentURLs = null;
+		File emlFile = null;
+		String emlTextArea = null;
+		String harvestListURL = null;
+		String harvestReportId = null;
+		boolean isDesktopUpload = false;
+		boolean isEvaluate = false;
+		String uid = (String) httpSession.getAttribute("uid");
+		String urlTextArea = null;
+		String warningMessage = "";
 
-            if (isMultipart) {
-              // Create a factory for disk-based file items
-              FileItemFactory factory = new DiskFileItemFactory();
-              
-              // Create a new file upload handler
-              ServletFileUpload upload = new ServletFileUpload(factory);
+		try {
+			if (uid == null) {
+				throw new PastaAuthenticationException(LOGIN_WARNING);
+			}
+			else {
+				/*
+				 * The "metadataSource" request parameter can have a value of
+				 * "emlText", "emlFile", "urlList", or "harvestList". It is set
+				 * as a hidden input field in each of the harvester forms.
+				 */
+				String metadataSource = request.getParameter("metadataSource");
 
-              // Parse the request
-              List /* FileItem */items = upload.parseRequest(request);
+				if (metadataSource != null) {
+					if (metadataSource.equals("emlText")) {
+						emlTextArea = request.getParameter("emlTextArea");
+						if (emlTextArea == null || emlTextArea.trim().isEmpty()) {
+							warningMessage = "<p class=\"warning\">Please enter the text of an EML document into the text area.</p>";
+						}
+					}
+					else if (metadataSource.equals("emlFile")) {
+						Collection<Part> parts = request.getParts();
+						for (Part part : parts) {
+							if (part.getContentType() != null) {
+								// save EML file to disk
+								emlFile = processUploadedFile(part);
+							}
+							else {
+								/*
+								 * Parse the request parameters.
+								 */
+								String fieldName = part.getName();
+								String fieldValue = request
+											.getParameter(fieldName);
+								if (fieldName != null && fieldValue != null) {
+									if (fieldName.equals("submit") && 
+										fieldValue.equalsIgnoreCase("evaluate")
+									   ) {
+										isEvaluate = true;
+									}
+									else if (fieldName.equals("desktopUpload") && 
+											 fieldValue.equalsIgnoreCase("1")
+											) {
+											isDesktopUpload = true;
+									}
+								}
+							}
+						}
+					}
+					else if (metadataSource.equals("urlList")) {
+						urlTextArea = request.getParameter("urlTextArea");
+						if (urlTextArea == null || 
+							urlTextArea.trim().isEmpty()
+						   ) {
+							warningMessage = "<p class=\"warning\">Please enter one or more EML document URLs into the text area.</p>";
+						}
+						else {
+							documentURLs = parseDocumentURLsFromTextArea(urlTextArea);
+							warningMessage = CHECK_BACK_LATER;
+						}
+					} 
+					else if (metadataSource.equals("harvestList")) {
+						harvestListURL = request.getParameter("harvestListURL");
+						if (harvestListURL == null || 
+							harvestListURL.trim().isEmpty()
+						) {
+							warningMessage = "<p class=\"warning\">Please enter the URL to a Metacat Harvest List.</p>";
+						}
+						else {
+							documentURLs = parseDocumentURLsFromHarvestList(harvestListURL);
+							warningMessage = CHECK_BACK_LATER;
+						}
+					}
+				}
+				else {
+					throw new IllegalStateException(
+							"No value specified for request parameter 'metadataSource'");
+				}
 
-              // Process the uploaded items
-              Iterator iter = items.iterator();
-                
-              while (iter.hasNext()) {                 
-                FileItem item = (FileItem) iter.next();
-                if (!(item.isFormField())) {
-                  String fileName = item.getName();
-                  if (fileName != null && !fileName.isEmpty()) {
-                    emlFile = processUploadedFile(item);
-                  }
-                  else {
-                    warningMessage = "<p class=\"warning\">Please enter an EML file.</p>";
-                  }
-                } 
-                else {                  
-                  /*
-                   * Parse the request parameters. Note that getRequestParameter()
-                   * doesn't work in this case because this is a multipart form.
-                   * Instead we let Apache Commons parse the parameters for us.
-                   */
-                  String fieldName = item.getFieldName();
-                  String itemString = item.getString();
-                  if (fieldName != null && itemString != null) {
-                	  if (fieldName.equals("submit") &&
-                          itemString.equalsIgnoreCase("evaluate")
-                         ) {
-                        isEvaluate = true; 
-                	  }
-                      else if (fieldName.equals("desktopUpload") &&
-                               itemString.equalsIgnoreCase("1")
-                              ) {
-                    	  isDesktopUpload = true;                   
-                      }
-                  }
-                }
-              }
-            }
-          } // end metadataSource.equals("emlFile")
-          else if (metadataSource.equals("urlList")) {
-            urlTextArea = request.getParameter("urlTextArea");
-            if (urlTextArea == null || urlTextArea.trim().isEmpty()) {
-              warningMessage = "<p class=\"warning\">Please enter one or more EML document URLs into the text area.</p>";
-            }
-            else {
-              documentURLs = parseDocumentURLsFromTextArea(urlTextArea);
-              warningMessage = CHECK_BACK_LATER;
-            }
-          }
-          else if (metadataSource.equals("harvestList")) {
-            harvestListURL = request.getParameter("harvestListURL");
-            if (harvestListURL == null || harvestListURL.trim().isEmpty()) {
-              warningMessage = "<p class=\"warning\">Please enter the URL to a Metacat Harvest List.</p>";
-            }
-            else {
-              documentURLs = parseDocumentURLsFromHarvestList(harvestListURL);
-              warningMessage = CHECK_BACK_LATER;
-            }
-          }
-        }
-    
-        /*
-         * "mode" can have a value of "evaluate" or "upgrade". It is set as the
-         * value of the submit button in each of the harvester forms.
-         */
-        String mode = request.getParameter("submit");
-        if (mode != null && mode.equalsIgnoreCase("evaluate")) {
-          isEvaluate = true;
-        }
-        
-        String harvestId = generateHarvestId();
-        
-        if (isEvaluate) {
-          harvestReportId = uid + "-evaluate-" + harvestId;
-        }
-        else {
-          harvestReportId = uid + "-upload-" + harvestId;
-        }
-        
-        Harvester harvester = new Harvester(harvesterPath, harvestReportId, uid, isEvaluate);
-        
-        if (emlTextArea != null) {
-          harvester.processSingleDocument(emlTextArea);
-        }
-        else if (emlFile != null) {
-        	if (isDesktopUpload) {
-        		List<Entity> entityList = parseEntityList(emlFile);
-        		httpSession.setAttribute("entityList", entityList);
-                httpSession.setAttribute("emlFile", emlFile);
-                httpSession.setAttribute("harvester", harvester);
-            }
-        	else {
-                harvester.processSingleDocument(emlFile);
-        	}
-        }
-        else if (documentURLs != null) {
-          harvester.setDocumentURLs(documentURLs);
-          ExecutorService executorService = Executors.newCachedThreadPool();
-          executorService.execute(harvester);
-          executorService.shutdown();
-        }
-      }
-    }
-    catch (Exception e) {
-  	  handleDataPortalError(logger, e);
-    }    
+				/*
+				 * "mode" can have a value of "evaluate" or "upgrade". It is set
+				 * as the value of the submit button in each of the harvester
+				 * forms.
+				 */
+				String mode = request.getParameter("submit");
+				if ((mode != null) && 
+					(mode.equalsIgnoreCase("evaluate"))
+				   ) {
+					isEvaluate = true;
+				}
 
-      request.setAttribute("message", warningMessage);
-      
-      /*
-       * If we have a new reportId, and either there is no warning message
-       * or it's the "Check back later" message, set the harvestReportID
-       * session attribute to the new reportId value.
-       */
-      if (harvestReportId != null && 
-          harvestReportId.length() > 0 &&
-          (warningMessage.length() == 0 || 
-           warningMessage.equals(CHECK_BACK_LATER)
-          )
-         ) {
-        httpSession.setAttribute("harvestReportID", harvestReportId);
-      }
-      
-      if (isDesktopUpload)  {
-          RequestDispatcher requestDispatcher = request.getRequestDispatcher("./desktopHarvester.jsp");
-          requestDispatcher.forward(request, response);
-      }
-      else if (warningMessage.length() == 0) {
-        response.sendRedirect("./harvestReport.jsp");
-      }
-      else {
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("./harvester.jsp");
-        requestDispatcher.forward(request, response);
-      }
+				String harvestId = generateHarvestId();
 
-  }
+				if (isEvaluate) {
+					harvestReportId = uid + "-evaluate-" + harvestId;
+				}
+				else {
+					harvestReportId = uid + "-upload-" + harvestId;
+				}
+
+				Harvester harvester = new Harvester(harvesterPath,
+						harvestReportId, uid, isEvaluate);
+
+				if (emlTextArea != null) {
+					harvester.processSingleDocument(emlTextArea);
+				}
+				else if (emlFile != null) {
+					if (isDesktopUpload) {
+						List<Entity> entityList = parseEntityList(emlFile);
+						httpSession.setAttribute("entityList", entityList);
+						httpSession.setAttribute("emlFile", emlFile);
+						httpSession.setAttribute("harvester", harvester);
+					}
+					else {
+						harvester.processSingleDocument(emlFile);
+					}
+				}
+				else if (documentURLs != null) {
+					harvester.setDocumentURLs(documentURLs);
+					ExecutorService executorService = Executors
+									.newCachedThreadPool();
+					executorService.execute(harvester);
+					executorService.shutdown();
+				}
+			}
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+
+		request.setAttribute("message", warningMessage);
+
+		/*
+		 * If we have a new reportId, and either there is no warning message or
+		 * it's the "Check back later" message, set the harvestReportID session
+		 * attribute to the new reportId value.
+		 */
+		if (harvestReportId != null
+				&& harvestReportId.length() > 0
+				&& (warningMessage.length() == 0 || warningMessage
+						.equals(CHECK_BACK_LATER))) {
+			httpSession.setAttribute("harvestReportID", harvestReportId);
+		}
+
+		if (isDesktopUpload) {
+			RequestDispatcher requestDispatcher = request
+					.getRequestDispatcher("./desktopHarvester.jsp");
+			requestDispatcher.forward(request, response);
+		}
+		else if (warningMessage.length() == 0) {
+				response.sendRedirect("./harvestReport.jsp");
+			}
+		else {
+			RequestDispatcher requestDispatcher = request
+						.getRequestDispatcher("./harvester.jsp");
+			requestDispatcher.forward(request, response);
+		}
+
+	}
   
   
     /*
@@ -351,6 +338,20 @@ public class HarvesterServlet extends DataPortalServlet {
   }
   
   
+  private String getFilename(Part part) {
+      String contentDispositionHeader =
+              part.getHeader("content-disposition");
+      String[] elements = contentDispositionHeader.split(";");
+      for (String element : elements) {
+          if (element.trim().startsWith("filename")) {
+              return element.substring(element.indexOf('=') + 1)
+                      .trim().replace("\"", "");
+          }
+      }
+      return null;
+  }
+
+
   /**
    * Initialization of the servlet. <br>
    * 
@@ -425,23 +426,23 @@ public class HarvesterServlet extends DataPortalServlet {
    * 
    * @throws Exception
    */
-  private File processUploadedFile(FileItem item) throws Exception {
+  private File processUploadedFile(Part part) throws Exception {
 
     File eml = null;
 
-    // Process a file upload
-    if (!item.isFormField()) {
-      // Get object information
-      String fileName = item.getName();
-      long timestamp = new Date().getTime();
-      String tmpDir = String.format("%s/%d", System.getProperty("java.io.tmpdir"), timestamp);
-      Harvester.createDirectory(tmpDir);
-      String tmpPath = String.format("%s/%s", tmpDir, fileName);
-      logger.debug(String.format("FILE: %s", tmpPath));
-      eml = new File(tmpPath);
-      item.write(eml);
+    if (part.getContentType() != null) {
+        // save file Part to disk
+        String fileName = getFilename(part);
+        if (fileName != null && !fileName.isEmpty()) {
+            long timestamp = new Date().getTime();
+            String tmpDir = String.format("%s/%d", System.getProperty("java.io.tmpdir"), timestamp);
+            Harvester.createDirectory(tmpDir);
+            String tmpPath = String.format("%s/%s", tmpDir, fileName);
+            part.write(tmpPath);
+            eml = new File(tmpPath);
+        }
     }
-
+    
     return eml;
   }
 

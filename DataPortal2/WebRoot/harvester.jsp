@@ -8,6 +8,7 @@
 	HttpSession httpSession = request.getSession();
 
 	String uid = (String) httpSession.getAttribute("uid");
+  String warningMessage = (String) request.getAttribute("message");
 
 	if (uid == null || uid.isEmpty()) {
 		request.setAttribute("from", "./harvester.jsp");
@@ -17,7 +18,11 @@
 		    .getRequestDispatcher("./login.jsp");
 		requestDispatcher.forward(request, response);
 	}
-	
+	else {
+    if (warningMessage == null) {
+      warningMessage = "";
+    }
+  }
 %>
 
 <!DOCTYPE html>
@@ -72,7 +77,11 @@
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
+
 								<!-- Content -->
+
+								<p class="nis-warn"><%= warningMessage %></p>								
+
 								<p>Data packages may be evaluated without uploading 
 								them to the NIS by selecting <b>Evaluate</b>. Once you 
 								are satisfied that data packages are ready to be 
@@ -169,11 +178,16 @@
 												<input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 									</div>
 								</div>
+								<div class="table-row">
+								  <div class="table-cell nis-warn">
+								    <%=warningMessage%>
+								  </div>
+								</div>
 						</div>
 										<input id="metadataSource" name="metadataSource" type="hidden" value="urlList" />
 									</form>
-
 								</fieldset>
+								
 								<!-- More Options for Upload -->
 								<!-- <div class="spacer"></div> -->
 								<div id="accordion1" class="accordion">
@@ -183,7 +197,9 @@
 											More Options for Upload</a> </div>
 										<div id="Accordion_1" class="accordion-body  collapse">
 											<div class="accordion-inner ">
+											
 												<!-- Content -->
+												
 												<fieldset>
 												<legend>Copy EML Metadata Text</legend>
 												<p>Copy the XML for a single EML metadata document into the text 
@@ -206,6 +222,7 @@
 													</form>
 												</div>
 												</fieldset>
+												
 												<fieldset>
 												<legend>Metacat Harvest List URL</legend>
 												<p>Enter the URL of a Metacat Harvest List and then select <b>Evaluate</b> 
@@ -231,6 +248,7 @@
 													</form>
 												</div>
 												</fieldset>
+												
 												<!-- /Content -->
 											</div>
 										</div>
