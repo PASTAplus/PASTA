@@ -88,13 +88,49 @@
 						<div class="display-table">
 								<div class="table-row">
 									<div class="table-cell">
-												<label class="labelBold">File:</label>
+												<label class="labelBold">EML Metadata File:</label>
 									</div>
 								</div>
 								<div class="table-row">
 									<div class="table-cell">
 												<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
 									</div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell"></div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell"></div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell">
+                    <label class="labelBold">Data Upload Options:</label>
+                  </div>
+                </div>
+								<div class="table-row">
+									<div class="table-cell">
+										<input checked="checked" name="desktopUpload" type="radio" value="0" />
+									  Data will be accessed using the online URLs as documented in the EML 
+									</div>
+                </div>
+								<div class="table-row">
+									<div class="table-cell">
+								    <input name="desktopUpload" type="radio" value="1" /> 
+									  I want to manually upload the data by selecting files on my local system
+									  <span name="When using this method to upload data, any online data URLs documented in the EML will be ignored and the data files you select will be used in their place." 
+									        class="tooltip">
+									    [<em> Please note </em>]
+									  </span>
+                  </div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell"></div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell"></div>
+								</div>
+								<div class="table-row">
+									<div class="table-cell"></div>
 								</div>
 								<div class="table-row">
 									<div class="table-cell">

@@ -225,6 +225,10 @@ public class DataPackageManagerClientTest {
         assertFalse(resourceMap.isEmpty());
         assertTrue(resourceMap.contains(testEntityId));
       }
+      testListDataPackageScopes();
+      testListDataPackageIdentifiers();
+      testListDataPackageRevisions();
+      testListDataEntities();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -261,8 +265,7 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the List Data Entities use case
    */
-  @Test
-  public void testListDataEntities() {
+  private void testListDataEntities() {
     try {
       // Test READ for OK status
       String entityString = dpmClient.listDataEntities(testScope,
@@ -286,8 +289,7 @@ public class DataPackageManagerClientTest {
    * Test the status and message body of the List Data Package Identifiers use
    * case
    */
-  @Test
-  public void testListDataPackageIdentifiers() {
+  private void testListDataPackageIdentifiers() {
     try {
       String entityString = dpmClient.listDataPackageIdentifiers(testScope);
 
@@ -309,8 +311,7 @@ public class DataPackageManagerClientTest {
    * Test the status and message body of the List Data Package Revisions use
    * case
    */
-  @Test
-  public void testListDataPackageRevisions() {
+  private void testListDataPackageRevisions() {
     try {
       String entityString = dpmClient.listDataPackageRevisions(testScope,
           testIdentifier, null);
@@ -332,8 +333,7 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the List Data Package Scopes use case
    */
-  @Test
-  public void testListDataPackageScopes() {
+  private void testListDataPackageScopes() {
     try {
       String entityString = dpmClient.listDataPackageScopes();
 
