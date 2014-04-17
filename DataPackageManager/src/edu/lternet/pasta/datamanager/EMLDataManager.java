@@ -42,7 +42,6 @@ import org.ecoinformatics.datamanager.download.DataStorageInterface;
 import org.ecoinformatics.datamanager.download.EcogridEndPointInterface;
 import org.ecoinformatics.datamanager.parser.DataPackage;
 import org.ecoinformatics.datamanager.parser.Entity;
-import org.ecoinformatics.datamanager.quality.QualityReport;
 import org.ecoinformatics.datamanager.sample.EcogridEndPoint;
 
 import edu.ucsb.nceas.utilities.Options;
@@ -339,29 +338,27 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
               String url = emlEntity.getUrl();
               emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);
 
-              // Download the entity and check for successful download
-	            boolean downloadSuccess = downloadEntity(emlPackageId, emlEntity);
+              // Download the entity
+	          downloadEntity(emlPackageId, emlEntity, evaluateMode);
 	          
 	            // Unless this is evaluate mode, register the entity
-              if (!evaluateMode && downloadSuccess) {
+              if (!evaluateMode) {
                 registerEntity(emlDataCache, emlPackageId, emlEntity);
               }
             
-              /* If the entity was downloaded successfully,
-               * load entity into a database unless it's an
+              /* Load entity into a database unless it's an
                * image entity (spatialRaster or spatialVector)
                * or an otherEntity or it uses an externally defined
                * format
                */
-              if (downloadSuccess &&
-                  !entity.getIsImageEntity() &&
+              if (!entity.getIsImageEntity() &&
                   !entity.isExternallyDefinedFormat() &&
                   !entity.isOtherEntity()
                  ) {
 	              loadEntity(emlPackageId, emlEntity);
               }
-		        }
-		      }
+		    }
+		  }
 		      
           /*
            * Delete the entities from the Data Manager Library's Data Registry.
@@ -470,19 +467,51 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * @param emlPackageId     an EmlPackageId object
 	 * @param entityId         the entity id
 	 * @param entity           an Entity object
-	 * @return success, true when the download succeeds, else false
+	 * @param evaluateMode     boolean to determine whether the downloadEntity
+	 *                         operation should be run in evaluate mode.
+	 * @throws IllegalStateException if the Data Manager Library indicates
+	 *         that the entity failed to download successfully
 	 */
-	public boolean downloadEntity(EmlPackageId emlPackageId,
-	                              EMLEntity emlEntity) {
+	public void downloadEntity(EmlPackageId emlPackageId,
+	                              EMLEntity emlEntity,
+	                              boolean evaluateMode)
+	        throws IllegalStateException {
 	  boolean success = false;
 	  boolean preserveFormat = true;
 	  Entity entity = emlEntity.getEntity();
+	  String entityName = emlEntity.getEntityName();
+	  String entityId = emlEntity.getEntityId();
+	  String packageId = emlPackageId.toString();
 	  
 	  if (dataManager != null) {
 	    success = dataManager.downloadData(entity, eepi, dataStorageList, preserveFormat);
+        if (!success) {
+      	  String errorMsg = 
+              String.format("An entity failed to download successfully: packageId: %s; entity name: %s; entity id: %s",
+      			            packageId, entityName, entityId);
+      	  throw new IllegalStateException(errorMsg);
+        }
+	    else {
+				if (!evaluateMode) {
+					// Double-check to ensure that the entity file exists on the
+					// system in the expected location
+					EMLFileSystemEntity efse = new EMLFileSystemEntity(
+							entityDir, emlPackageId, entityId);
+					File entityFile = efse.getEntityFile();
+					if ((entityFile == null) || (!entityFile.exists())) {
+						String errorMsg = 
+							String.format("An entity file is missing from the data repository: " +
+								          "entityDir: %s; packageId: %s; entity id: %s",
+										   entityDir, packageId, entityId);
+						throw new IllegalStateException(errorMsg);
+					}
+				}
+			}
 	  }
-		
-	  return success;
+	  else {
+      	  String errorMsg = "dataManager is null.";
+          throw new IllegalStateException(errorMsg);
+	  }
 	}
 
 	
