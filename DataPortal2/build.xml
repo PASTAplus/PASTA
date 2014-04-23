@@ -19,6 +19,10 @@
          </fileset>
   	 </copy>
   	
+  	 <!-- Make a data directory that holds data files for desktop uploads -->
+  	 <mkdir dir="${web.dir}/data"/>
+  	 <!-- <chmod file="${web.dir}/data" perm="ugo+rwx"/> -->
+  	
      <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
       <fileset dir="${shared.lib.dir}/apache-commons">
@@ -62,6 +66,9 @@
       </fileset>
       <fileset dir="${shared.lib.dir}/junit">
         <include name="**/junit-4.8.2.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/metacat">
+       <include name="**/utilities.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/owasp">
         <include name="**/esapi-2.0.1.jar"/>

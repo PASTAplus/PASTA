@@ -20,8 +20,7 @@
 	String desktopUploadHTML = (String) httpSession.getAttribute("desktopUploadHTML");
 	File emlFile = (File) httpSession.getAttribute("emlFile");
 	String emlFileName = emlFile.getName();
-	Harvester harvester = (Harvester) httpSession.getAttribute("harvester");
-	boolean isEvaluate = harvester.isEvaluate();
+	Boolean isEvaluate = (Boolean) httpSession.getAttribute("isEvaluate");
 	String buttonVerb = isEvaluate ? "Evaluate" : "Upload";
 	
   final String pageTitle = buttonVerb + " Data Package";
@@ -86,7 +85,7 @@
 								   please select the corresponding data file from your
 								   desktop's file system.</p>
 								<div class="section">
-                  <form id="desktopUpload" name="desktopUpload" method="post" enctype="multipart/form-data" action="./multipleUploads">
+                  <form id="desktopUpload" name="desktopUpload" method="post" enctype="multipart/form-data" action="./harvester">
 
                    <table>
                      <tr style="background:#ababff">
@@ -101,7 +100,7 @@
                          <td class="nis">${entity.name}</td>
                          <td class="nis">${entity.objectName}</td>
                          <td class="nis">
-							             <input accept="application/xml" name="dataFile" required="required" size="60" type="file" />
+							             <input name="entity-${entity.entityId}" required="required" size="60" type="file" />
                          </td>
                        </tr>
                    </c:forEach>
@@ -118,7 +117,7 @@
 								       </div>
 						         </div>
 						         
-								     <input id="metadataSource" name="metadataSource" type="hidden" value="emlFile" />
+								     <input id="metadataSource" name="metadataSource" type="hidden" value="desktopHarvester" />
 								</form>
 								</div>								
 							<!-- /Content -->

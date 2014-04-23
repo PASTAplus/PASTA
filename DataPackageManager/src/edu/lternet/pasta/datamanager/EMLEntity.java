@@ -92,7 +92,7 @@ public class EMLEntity {
     this.entityName = entity.getName();
     
     if (entityName != null) { 
-        entityId = DigestUtils.md5Hex(entityName);
+        entityId = edu.lternet.pasta.common.eml.Entity.entityIdFromEntityName(entityName);
     }
 
     this.packageId = entity.getPackageId();

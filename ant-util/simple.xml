@@ -180,6 +180,7 @@
         <include name="**/*.jpg"/>
         <include name="**/*.gif"/>
         <include name="**/*.xml"/>
+      	<include name="data"/>
       </fileset>
     </war>
   </target>
