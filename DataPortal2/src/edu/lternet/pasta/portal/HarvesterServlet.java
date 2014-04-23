@@ -25,17 +25,20 @@
 package edu.lternet.pasta.portal;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +47,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
@@ -52,11 +57,15 @@ import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.Entity;
+import edu.ucsb.nceas.utilities.IOUtil;
+import edu.ucsb.nceas.utilities.XMLUtilities;
 
 /**
  * 
@@ -70,6 +79,7 @@ public class HarvesterServlet extends DataPortalServlet {
    * Class variables
    */
 
+  private static String desktopUrlHead = null;
   private static String harvesterPath = null;
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.portal.HarvesterServlet.class);
@@ -85,6 +95,11 @@ public class HarvesterServlet extends DataPortalServlet {
       "<a href=\"./harvestReport.jsp\">View Evaluate/Upload Results</a> page " +
       "for available reports.";
       
+  private final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
+  private final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
+  private final String DESKTOP_FILE_NAME = "DESKTOP-EML.xml";
+  private final String PASTA_READY_FILE_NAME = "PASTA-READY-EML.xml";
+  
 
   /*
    * Constructors
@@ -134,9 +149,12 @@ public class HarvesterServlet extends DataPortalServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession httpSession = request.getSession();
+		ServletContext servletContext = httpSession.getServletContext();
 		ArrayList<String> documentURLs = null;
 		File emlFile = null;
 		String emlTextArea = null;
+		Harvester harvester = null;
+		String harvestId = null;
 		String harvestListURL = null;
 		String harvestReportId = null;
 		boolean isDesktopUpload = false;
@@ -217,6 +235,43 @@ public class HarvesterServlet extends DataPortalServlet {
 							warningMessage = CHECK_BACK_LATER;
 						}
 					}
+					/*
+					 * If the metadata source is "desktopHarvester", we already have the
+					 * EML file stored in a session attribute. Now we need to retrieve
+					 * the data files from the brower's form fields and write the
+					 * data files to a URL accessible location.
+					 */
+					else if (metadataSource.equals("desktopHarvester")) {
+						emlFile = (File) httpSession.getAttribute("emlFile");
+						ArrayList<Entity> entityList = parseEntityList(emlFile);
+						harvestId = (String) httpSession.getAttribute("harvestId");
+						String dataPath = servletContext.getRealPath("data");
+				        String harvestPath = String.format("%s/%s", dataPath, harvestId);
+						
+						Collection<Part> parts = request.getParts();
+						for (Part part : parts) {
+							if (part.getContentType() != null) {
+								// save data file to disk
+								processDataFile(part, harvestId, harvestPath);
+							}
+							else {
+								/*
+								 * Parse the request parameters.
+								 */
+								String fieldName = part.getName();
+								String fieldValue = request.getParameter(fieldName);
+								if (fieldName != null && fieldValue != null) {
+									if (fieldName.equals("submit") && 
+										fieldValue.equalsIgnoreCase("evaluate")
+									   ) {
+										isEvaluate = true;
+									}
+								}
+							}
+						}
+						
+						emlFile = transformDesktopEML(harvestPath, emlFile, harvestId, entityList);
+					}
 				}
 				else {
 					throw new IllegalStateException(
@@ -235,7 +290,9 @@ public class HarvesterServlet extends DataPortalServlet {
 					isEvaluate = true;
 				}
 
-				String harvestId = generateHarvestId();
+				if (harvestId == null) {
+					harvestId = generateHarvestId();
+				}
 
 				if (isEvaluate) {
 					harvestReportId = uid + "-evaluate-" + harvestId;
@@ -244,18 +301,21 @@ public class HarvesterServlet extends DataPortalServlet {
 					harvestReportId = uid + "-upload-" + harvestId;
 				}
 
-				Harvester harvester = new Harvester(harvesterPath,
+				if (harvester == null) {
+					harvester = new Harvester(harvesterPath,
 						harvestReportId, uid, isEvaluate);
+				}
 
 				if (emlTextArea != null) {
 					harvester.processSingleDocument(emlTextArea);
 				}
 				else if (emlFile != null) {
 					if (isDesktopUpload) {
-						List<Entity> entityList = parseEntityList(emlFile);
+						ArrayList<Entity> entityList = parseEntityList(emlFile);
 						httpSession.setAttribute("entityList", entityList);
 						httpSession.setAttribute("emlFile", emlFile);
-						httpSession.setAttribute("harvester", harvester);
+						httpSession.setAttribute("harvestId", harvestId);
+						httpSession.setAttribute("isEvaluate", new Boolean(isEvaluate));
 					}
 					else {
 						harvester.processSingleDocument(emlFile);
@@ -308,12 +368,12 @@ public class HarvesterServlet extends DataPortalServlet {
     /*
      * Parses the EML file and returns a list of Entity objects
      */
-	private List<Entity> parseEntityList(File emlFile)
+	private ArrayList<Entity> parseEntityList(File emlFile)
 			throws IOException {
 		String eml = FileUtils.readFileToString(emlFile);
 		EMLParser emlParser = new EMLParser();
 		DataPackage dataPackage = emlParser.parseDocument(eml);		
-		List<Entity> entityList = dataPackage.getEntityList();
+		ArrayList<Entity> entityList = dataPackage.getEntityList();
 
 		return entityList;
 	}
@@ -361,7 +421,66 @@ public class HarvesterServlet extends DataPortalServlet {
   public void init() throws ServletException {
     PropertiesConfiguration options = ConfigurationListener.getOptions();
     harvesterPath = options.getString("harvester.path");
-  }
+    desktopUrlHead = options.getString("dataportal.desktopUrlHead");
+}
+  
+  
+	/**
+	 * Stores a local copy of EML metadata on the file system.
+	 * 
+	 * @param   xmlContent   the XML string content
+	 * @return  the EML file that was created
+	 */
+	 public File storeMetadata(String dirPath, String xmlContent, boolean isPastaReady) 
+	         throws IOException {
+	     File emlFile = null;
+	   
+	     File dirFile = new File(dirPath);
+	     if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
+	     String filename = isPastaReady ? PASTA_READY_FILE_NAME : DESKTOP_FILE_NAME;
+	     emlFile = new File(dirPath, filename);
+	     FileWriter fileWriter = null;
+	     
+	     StringBuffer stringBuffer = new StringBuffer(xmlContent);
+	     try {
+	       fileWriter = new FileWriter(emlFile);
+	       IOUtil.writeToWriter(stringBuffer, fileWriter, true);
+	     }
+	     catch (IOException e) {
+	       logger.error("IOException storing PASTA-ready metadata file:\n" + 
+	                    e.getMessage());
+	       e.printStackTrace();
+	       throw(e);
+	     }
+	     finally {
+	       if (fileWriter != null) { fileWriter.close(); }
+	     }
+	    
+	   return emlFile;
+	 }
+
+	 
+  /*
+   * Transforms the user's desktop EML to PASTA-ready EML.
+   */
+  private File transformDesktopEML(String harvestPath, File desktopEMLFile, String harvestId, ArrayList<Entity> entityList)
+	  throws IOException, TransformerException, SAXException, ParserConfigurationException {
+      boolean isPastaReady = false;
+	  File pastaReadyEMLFile = null;
+      Document desktopEMLDocument = XmlUtility.xmlFileToDocument(desktopEMLFile);
+      Node documentElement = desktopEMLDocument.getDocumentElement();
+      String desktopEMLString = FileUtils.readFileToString(desktopEMLFile);
+      storeMetadata(harvestPath, desktopEMLString, isPastaReady);
+      String harvestUrlHead = String.format("%s/%s", desktopUrlHead, harvestId);
+      DesktopEMLFactory desktopEMLFactory = new DesktopEMLFactory(harvestUrlHead);
+      Document pastaReadyEMLDocument = desktopEMLFactory.makePastaReady(desktopEMLDocument, entityList);
+      documentElement = pastaReadyEMLDocument.getDocumentElement();
+      String pastaReadyEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+      isPastaReady = true;
+      pastaReadyEMLFile = storeMetadata(harvestPath, pastaReadyEMLString, isPastaReady);      
+
+      return pastaReadyEMLFile;
+    }
   
   
   /*
@@ -418,11 +537,11 @@ public class HarvesterServlet extends DataPortalServlet {
 
   
   /**
-   * Process the uploaded file
+   * Process the uploaded EML file
    * 
-   * @param item The multipart form file data.
+   * @param part The multipart form file data.
    * 
-   * @return The uploaded file as File object.
+   * @return The uploaded EML file as File object.
    * 
    * @throws Exception
    */
@@ -444,6 +563,32 @@ public class HarvesterServlet extends DataPortalServlet {
     }
     
     return eml;
+  }
+
+  
+  /**
+   * Process the uploaded data file
+   * 
+   * @param part The multipart form file data.
+   * 
+   * @return The uploaded data file as File object.
+   * 
+   * @throws Exception
+   */
+  private String processDataFile(Part part, String harvestId, String harvestDir)
+		  throws Exception {
+    String fileName = null;
+    if (part.getContentType() != null) {
+        // save the data file to disk where it can be harvested
+        fileName = getFilename(part);
+        if (fileName != null && !fileName.isEmpty()) {
+            Harvester.createDirectory(harvestDir);
+            String filePath = String.format("%s/%s", harvestDir, fileName);
+            part.write(filePath);
+        }
+    }
+    
+    return fileName;
   }
 
 }
