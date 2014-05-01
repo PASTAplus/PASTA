@@ -82,6 +82,7 @@ public class HarvesterServlet extends DataPortalServlet {
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.portal.HarvesterServlet.class);
   private static final long serialVersionUID = 1L;
+  public static final String DESKTOP_DATA_DIR = "data";
   
   
   /*
@@ -266,7 +267,7 @@ public class HarvesterServlet extends DataPortalServlet {
 						emlFile = (File) httpSession.getAttribute("emlFile");
 						ArrayList<Entity> entityList = parseEntityList(emlFile);
 						harvestReportId = (String) httpSession.getAttribute("harvestReportId");
-						String dataPath = servletContext.getRealPath("data");
+						String dataPath = servletContext.getRealPath(DESKTOP_DATA_DIR);
 				        String harvestPath = String.format("%s/%s", dataPath, harvestReportId);
 						
 						Collection<Part> parts = request.getParts();
