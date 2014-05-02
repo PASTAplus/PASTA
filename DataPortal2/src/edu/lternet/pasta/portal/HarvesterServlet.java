@@ -32,8 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -84,6 +82,7 @@ public class HarvesterServlet extends DataPortalServlet {
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.portal.HarvesterServlet.class);
   private static final long serialVersionUID = 1L;
+  public static final String DESKTOP_DATA_DIR = "data";
   
   
   /*
@@ -95,8 +94,6 @@ public class HarvesterServlet extends DataPortalServlet {
       "<a href=\"./harvestReport.jsp\">View Evaluate/Upload Results</a> page " +
       "for available reports.";
       
-  private final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
-  private final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
   private final String DESKTOP_FILE_NAME = "DESKTOP-EML.xml";
   private final String PASTA_READY_FILE_NAME = "PASTA-READY-EML.xml";
   
@@ -170,11 +167,36 @@ public class HarvesterServlet extends DataPortalServlet {
 			else {
 				/*
 				 * The "metadataSource" request parameter can have a value of
-				 * "emlText", "emlFile", "urlList", or "harvestList". It is set
-				 * as a hidden input field in each of the harvester forms.
+				 * "emlText", "emlFile", "urlList", "harvestList", or
+				 * "desktopHarvester". It is set as a hidden input field in 
+				 * each of the harvester forms.
 				 */
 				String metadataSource = request.getParameter("metadataSource");
 
+				/*
+				 * "mode" can have a value of "evaluate" or "upgrade". It is set
+				 * as the value of the submit button in each of the harvester
+				 * forms.
+				 */
+				String mode = request.getParameter("submit");
+				if ((mode != null) && 
+					(mode.equalsIgnoreCase("evaluate"))
+				   ) {
+					isEvaluate = true;
+				}
+
+				if ((metadataSource != null) && 
+					(!metadataSource.equals("desktopHarvester"))
+				   ) {
+					harvestId = generateHarvestId();
+					if (isEvaluate) {
+						harvestReportId = uid + "-evaluate-" + harvestId;
+					}
+					else {
+						harvestReportId = uid + "-upload-" + harvestId;
+					}
+				}
+				
 				if (metadataSource != null) {
 					if (metadataSource.equals("emlText")) {
 						emlTextArea = request.getParameter("emlTextArea");
@@ -244,15 +266,15 @@ public class HarvesterServlet extends DataPortalServlet {
 					else if (metadataSource.equals("desktopHarvester")) {
 						emlFile = (File) httpSession.getAttribute("emlFile");
 						ArrayList<Entity> entityList = parseEntityList(emlFile);
-						harvestId = (String) httpSession.getAttribute("harvestId");
-						String dataPath = servletContext.getRealPath("data");
-				        String harvestPath = String.format("%s/%s", dataPath, harvestId);
+						harvestReportId = (String) httpSession.getAttribute("harvestReportId");
+						String dataPath = servletContext.getRealPath(DESKTOP_DATA_DIR);
+				        String harvestPath = String.format("%s/%s", dataPath, harvestReportId);
 						
 						Collection<Part> parts = request.getParts();
 						for (Part part : parts) {
 							if (part.getContentType() != null) {
 								// save data file to disk
-								processDataFile(part, harvestId, harvestPath);
+								processDataFile(part, harvestPath);
 							}
 							else {
 								/*
@@ -270,35 +292,12 @@ public class HarvesterServlet extends DataPortalServlet {
 							}
 						}
 						
-						emlFile = transformDesktopEML(harvestPath, emlFile, harvestId, entityList);
+						emlFile = transformDesktopEML(harvestPath, emlFile, harvestReportId, entityList);
 					}
 				}
 				else {
 					throw new IllegalStateException(
 							"No value specified for request parameter 'metadataSource'");
-				}
-
-				/*
-				 * "mode" can have a value of "evaluate" or "upgrade". It is set
-				 * as the value of the submit button in each of the harvester
-				 * forms.
-				 */
-				String mode = request.getParameter("submit");
-				if ((mode != null) && 
-					(mode.equalsIgnoreCase("evaluate"))
-				   ) {
-					isEvaluate = true;
-				}
-
-				if (harvestId == null) {
-					harvestId = generateHarvestId();
-				}
-
-				if (isEvaluate) {
-					harvestReportId = uid + "-evaluate-" + harvestId;
-				}
-				else {
-					harvestReportId = uid + "-upload-" + harvestId;
 				}
 
 				if (harvester == null) {
@@ -314,7 +313,7 @@ public class HarvesterServlet extends DataPortalServlet {
 						ArrayList<Entity> entityList = parseEntityList(emlFile);
 						httpSession.setAttribute("entityList", entityList);
 						httpSession.setAttribute("emlFile", emlFile);
-						httpSession.setAttribute("harvestId", harvestId);
+						httpSession.setAttribute("harvestReportId", harvestReportId);
 						httpSession.setAttribute("isEvaluate", new Boolean(isEvaluate));
 					}
 					else {
@@ -463,7 +462,7 @@ public class HarvesterServlet extends DataPortalServlet {
   /*
    * Transforms the user's desktop EML to PASTA-ready EML.
    */
-  private File transformDesktopEML(String harvestPath, File desktopEMLFile, String harvestId, ArrayList<Entity> entityList)
+  private File transformDesktopEML(String harvestPath, File desktopEMLFile, String harvestReportId, ArrayList<Entity> entityList)
 	  throws IOException, TransformerException, SAXException, ParserConfigurationException {
       boolean isPastaReady = false;
 	  File pastaReadyEMLFile = null;
@@ -471,7 +470,7 @@ public class HarvesterServlet extends DataPortalServlet {
       Node documentElement = desktopEMLDocument.getDocumentElement();
       String desktopEMLString = FileUtils.readFileToString(desktopEMLFile);
       storeMetadata(harvestPath, desktopEMLString, isPastaReady);
-      String harvestUrlHead = String.format("%s/%s", desktopUrlHead, harvestId);
+      String harvestUrlHead = String.format("%s/%s", desktopUrlHead, harvestReportId);
       DesktopEMLFactory desktopEMLFactory = new DesktopEMLFactory(harvestUrlHead);
       Document pastaReadyEMLDocument = desktopEMLFactory.makePastaReady(desktopEMLDocument, entityList);
       documentElement = pastaReadyEMLDocument.getDocumentElement();
@@ -575,7 +574,7 @@ public class HarvesterServlet extends DataPortalServlet {
    * 
    * @throws Exception
    */
-  private String processDataFile(Part part, String harvestId, String harvestDir)
+  private String processDataFile(Part part, String harvestDir)
 		  throws Exception {
     String fileName = null;
     if (part.getContentType() != null) {
