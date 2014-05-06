@@ -58,6 +58,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
@@ -271,10 +272,14 @@ public class HarvesterServlet extends DataPortalServlet {
 				        String harvestPath = String.format("%s/%s", dataPath, harvestReportId);
 						
 						Collection<Part> parts = request.getParts();
+						String objectName = null;
+						Part filePart = null;
+
 						for (Part part : parts) {
 							if (part.getContentType() != null) {
 								// save data file to disk
-								processDataFile(part, harvestPath);
+								//processDataFile(part, harvestPath);
+								filePart = part;
 							}
 							else {
 								/*
@@ -288,8 +293,19 @@ public class HarvesterServlet extends DataPortalServlet {
 									   ) {
 										isEvaluate = true;
 									}
+									else if (fieldName.startsWith("object-name-")
+										   ) {
+										objectName = fieldValue;
+									}
 								}
 							}
+							
+							if (filePart != null && objectName != null) {
+								processDataFile(filePart, harvestPath, objectName);
+								objectName = null;
+								filePart = null;
+							}
+							
 						}
 						
 						emlFile = transformDesktopEML(harvestPath, emlFile, harvestReportId, entityList);
@@ -574,13 +590,21 @@ public class HarvesterServlet extends DataPortalServlet {
    * 
    * @throws Exception
    */
-  private String processDataFile(Part part, String harvestDir)
+  private String processDataFile(Part part, String harvestDir, String objectName)
 		  throws Exception {
     String fileName = null;
+    
     if (part.getContentType() != null) {
         // save the data file to disk where it can be harvested
         fileName = getFilename(part);
+        
         if (fileName != null && !fileName.isEmpty()) {
+        	
+        	if (!fileName.equals(objectName)) {
+        		String msg = String.format("Filename \"%s\" does not match objectName \"%s\".", fileName, objectName);
+        		throw new UserErrorException(msg);
+        	}
+        	
             Harvester.createDirectory(harvestDir);
             String filePath = String.format("%s/%s", harvestDir, fileName);
             part.write(filePath);
