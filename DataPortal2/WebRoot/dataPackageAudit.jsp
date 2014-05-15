@@ -22,14 +22,7 @@
 	}
 
 	String reportMessage = (String) request.getAttribute("reportMessage");
-	String type = (String) request.getAttribute("type");
 
-	if (type == null) {
-		type = "";
-	} else {
-		type = "class=\"" + type + "\"";
-	}
-	
 	String limitHTML = "";
 	String auditRecordLimit = (String) ConfigurationListener.getOptions().getProperty("auditreport.limit");
 	if (auditRecordLimit != null && !auditRecordLimit.equals("")) {
@@ -227,17 +220,11 @@
 										</table>
 									</div>
 									<!-- section -->
-			<%
-				if (reportMessage != null && type.equals("class=\"warning\"")) {
-				  out.println(String.format("<p class=\"nis-warn\">%s</p>", reportMessage));
-			  }
-			%>
-								</form>
-			<%
-				if (reportMessage != null && type.equals("class=\"info\"")) {
-					out.println(reportMessage);
-				}
-			%>
+					<%
+						if (reportMessage != null) {
+							out.println(String.format("<p class=\"nis-warn\">%s</p>", reportMessage));
+						}
+					%>
 								<!-- /Content -->
 							</div>
 						</div>

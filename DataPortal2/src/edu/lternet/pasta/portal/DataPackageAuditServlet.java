@@ -50,8 +50,6 @@ public class DataPackageAuditServlet extends DataPortalServlet {
       .getLogger(edu.lternet.pasta.portal.DataPackageAuditServlet.class);
   private static final long serialVersionUID = 1L;
 
-  private static final String forward = "./dataPackageAudit.jsp";
-
   private static String cwd = null;
   private static String limit = null;
   private static String xslpath = null;
@@ -115,12 +113,13 @@ public class DataPackageAuditServlet extends DataPortalServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
+	String forward = "./auditReportTable.jsp";
+
 	AuditManagerClient auditClient = null;
     HttpSession httpSession = request.getSession();
     String xml = null;
     StringBuffer filter = new StringBuffer();
     String message = null;
-    String type = null;
     String pastaUriHead = null;
     String uid = (String) httpSession.getAttribute("uid");
 
@@ -229,19 +228,17 @@ public class DataPackageAuditServlet extends DataPortalServlet {
     }
     
     if (uid.equals("public")) {
-      message = LOGIN_WARNING;
-      type = "warning";
-    }
+        message = LOGIN_WARNING;
+        forward = "./login.jsp";
+    } 
     else if (auditClient != null) {
       	String filterStr = filter.toString();
         xml = auditClient.reportByFilter(filterStr);
         ReportUtility reportUtility = new ReportUtility(xml);
         message = reportUtility.xmlToHtmlTable(cwd + xslpath);
-        type="info"; 
     }
 
     request.setAttribute("reportMessage", message);
-    request.setAttribute("type", type);
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);

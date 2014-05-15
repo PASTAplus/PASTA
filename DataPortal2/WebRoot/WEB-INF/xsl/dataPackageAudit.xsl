@@ -26,8 +26,6 @@
 
   <xsl:template match="/">
 
-      <fieldset>
-        <legend>PASTA Audit Report</legend>
         <table>
           <tbody>
             <tr>
@@ -49,7 +47,6 @@
             </xsl:for-each>
           </tbody>
         </table>
-      </fieldset>
 
   </xsl:template>
   
