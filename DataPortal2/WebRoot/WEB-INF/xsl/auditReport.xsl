@@ -26,8 +26,6 @@
 
   <xsl:template match="/">
 
-    <hr/>
-    <h3>PASTA Audit Report</h3>
     <div class="section-table">
         <table>
           <thead>
