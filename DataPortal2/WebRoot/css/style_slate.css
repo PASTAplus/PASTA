@@ -2473,12 +2473,12 @@ select.select-menu {
 
 /* LTER TOOLTIP CSS */
 .tooltip {
-  display: inline;
-  position: relative;
+	display: inline;
+	position: relative;
 	font-family: 'Open Sans';
 	line-height: 20px;
 	font-size: 14px;
-	color: #666666;
+	color: #5990bd;
 }
 
 .tooltip:hover:after {
