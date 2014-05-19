@@ -103,13 +103,13 @@
 							<div class="span12">
 								<!-- Content -->
                 <h2>Subscribe</h2>
-								<p>Subscribe to NIS data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:</p>
+								<p>Subscribe to <abbr title="Network Information System">NIS</abbr> data package <b>insert</b> or <b>update</b> events by entering a package identifier that matches:</p>
 								<ol>
 								  <li>a particular data package revision (e.g. <kbd class="nis">mypackages.1.1</kbd>); or,</li>
 								  <li>any revision of a data package with a given scope and identifier (e.g. <kbd class="nis">mypackages.1</kbd>); or,</li>
 								  <li>any data package with a given scope (e.g. <kbd class="nis">mypackages</kbd>).</li>
                 </ol>
-								<p>Then enter the URL of a workflow or other procedure for the NIS to invoke whenever the data packages you specified are inserted or updated.</p>
+								<p>Then enter the URL of a workflow or other procedure for the <abbr title="Network Information System">NIS</abbr> to invoke whenever the data packages you specified are inserted or updated.</p>
 								<div class="section">
 									<form id="eventsubscribe" action="eventsubscribe" method="post" name="eventsubscribe">
 										<table>

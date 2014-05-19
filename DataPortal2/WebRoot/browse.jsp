@@ -8,14 +8,8 @@
 <%
   final String pageTitle = "Browse Data Packages";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
-  HttpSession httpSession = request.getSession();
-  ServletContext servletContext = httpSession.getServletContext();
-  String path = request.getContextPath();
-  String basePath = request.getScheme() + "://" + request.getServerName()
-      + ":" + request.getServerPort() + path + "/";
-  
   String attributeName = "browseKeywordHTML";
-  String browseHTML = (String) servletContext.getAttribute(attributeName);
+  String browseHTML = (String) application.getAttribute(attributeName);
 %>
 
 <!DOCTYPE html>

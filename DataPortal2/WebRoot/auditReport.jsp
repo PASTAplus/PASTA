@@ -119,7 +119,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<p>Review a PASTA audit report<sup>*</sup> by entering your criteria into one or more of the filters below.</p>
+								<p>Review an audit report<sup>*</sup> by entering your criteria into one or more of the filters below.</p>
 								<hr/>
 								<form id="auditReport" action="./auditReport" method="post" name="auditReport">
 									<div class="section">

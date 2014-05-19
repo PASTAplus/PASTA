@@ -65,10 +65,10 @@
 									James Brunt</a>, LTER Chief Information Officer</li>
 									<li>
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13823">
-									Mark Servilla</a>, NIS Lead Scientist</li>
+									Mark Servilla</a>, <abbr title="Network Information System">NIS</abbr> Lead Scientist</li>
 									<li>
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13757">
-									Duane Costa</a>, NIS Analyst/Programmer III</li>
+									Duane Costa</a>, <abbr title="Network Information System">NIS</abbr> Analyst/Programmer III</li>
 								</ul>
 								<h3 align="left">Physical Address</h3>
 								<ul class="no-list-style">

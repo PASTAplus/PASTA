@@ -64,25 +64,25 @@
 				<dt>Search for LTER data?</dt>
 				<dd><a href="https://nis.lternet.edu:8443/x/IoBH" class="searchsubcat">Searching for data</a></dd>
 			  
-				<dt>Find out more about the LTER Network Information System (NIS) and its mission?</dt>
+				<dt>Find out more about the LTER Network Information System (<abbr title="Network Information System">NIS</abbr>) and its mission?</dt>
 			  <dd><a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat">LTER Network Information System Community Website</a></dd>
 			  
-				<dt>Use the NIS Data Portal to create synthetic data?</dt>
-				<dd><a href="https://nis.lternet.edu:8443/x/NQFZ" class="searchsubcat">How does the NIS enable Network Synthesis?</a></dd>
+				<dt>Use the <abbr title="Network Information System">NIS</abbr> Data Portal to create synthetic data?</dt>
+				<dd><a href="https://nis.lternet.edu:8443/x/NQFZ" class="searchsubcat">How does the <abbr title="Network Information System">NIS</abbr> enable Network Synthesis?</a></dd>
 				
 				<dt>Find out who has been downloading my data?</dt> 
 			  <dd><a href="https://nis.lternet.edu:8443/x/OwFZ" class="searchsubcat">Who is using my data?</a></dd>
 
-				<dt>Learn about the PASTA Software Developer's Application Programming Interface (API)?</dt>
-			  <dd><a href="https://nis.lternet.edu:8443/x/BAAF" class="searchsubcat">NIS Software Developer's Guide</a></dd>				
+				<dt>Learn about the <abbr title="Provenance Aware Synthesis Tracking Architecture">PASTA</abbr> Software Developer's Application Programming Interface (API)?</dt>
+			  <dd><a href="https://nis.lternet.edu:8443/x/BAAF" class="searchsubcat"><abbr title="Network Information System">NIS</abbr> Software Developer's Guide</a></dd>				
 
 			</dl>
 
 			<p>
 				Have more questions? Go to the 
 				<a href="https://nis.lternet.edu:8443/x/swFZ" class="searchsubcat">Frequently Asked Questions</a> page, 
-				enter your question as a comment in either the <cite>NIS User's Guide</cite> or the 
-				<cite>NIS Software Developer's Guide</cite>, or you can always email 
+				enter your question as a comment in either the <cite><abbr title="Network Information System">NIS</abbr> User's Guide</cite> or the 
+				<cite><abbr title="Network Information System">NIS</abbr> Software Developer's Guide</cite>, or you can always email 
 				<a href="mailto:tech-support@lternet.edu" class="searchsubcat">tech-support@lternet.edu</a>.
 			</p>
 								<!-- /Content -->

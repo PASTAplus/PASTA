@@ -112,7 +112,7 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<p>Review a PASTA Data Package access report<sup>*</sup> by entering information into one or more of the filters 
+								<p>Review a Data Package access report<sup>*</sup> by entering information into one or more of the filters 
 								   below.
 								</p>
 								<form id="dataPackageAudit" action="./dataPackageAudit" method="post" name="dataPackageAudit">

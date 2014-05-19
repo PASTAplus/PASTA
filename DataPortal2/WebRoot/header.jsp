@@ -92,7 +92,7 @@
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Data Packages:</p>
-					<li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li>
+					<!-- <li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li> -->
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
 					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
 					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>

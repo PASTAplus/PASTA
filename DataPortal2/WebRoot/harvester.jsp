@@ -83,9 +83,9 @@
 								<p class="nis-warn"><%= warningMessage %></p>								
 
 								<p>Data packages may be evaluated without uploading 
-								them to the NIS by selecting <b>Evaluate</b>. Once you 
+								them to the <abbr title="Network Information System">NIS</abbr> by selecting <b>Evaluate</b>. Once you 
 								are satisfied that data packages are ready to be 
-								uploaded to the NIS, you may do so by selecting 
+								uploaded to the <abbr title="Network Information System">NIS</abbr>, you may do so by selecting 
 								<b>Upload</b>. Several alternatives for supplying the 
 								EML metadata for your data packages are available below.</p>
 
