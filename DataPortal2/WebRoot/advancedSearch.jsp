@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+<%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
 
 <%
@@ -357,7 +358,10 @@
 															  </td>
 															  <td class="spacerwd"></td>														  
 															  <td>
-															    <input name="subjectValue" type="search" placeholder="enter search terms" />
+															  	<span name='<%= Tooltip.SEARCH_TERMS %>'
+															  		  class="tooltip">
+															  		<input name="subjectValue" type="search" placeholder="enter search terms" />
+															  	</span>
 															  </td>
 															</tr>
 															<tr>

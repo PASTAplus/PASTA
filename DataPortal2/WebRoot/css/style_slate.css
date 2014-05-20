@@ -705,7 +705,7 @@ h2 .title_labeled {
 	right: 15px;
 	top: 9px;
 	z-index: 50;
-	margin-top: 25px;
+	margin-top: 0px;
 }
 .columns2 .portfolio_shadow {
 	background: url('../images/455px.png') no-repeat;

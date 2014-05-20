@@ -1,5 +1,6 @@
-<!-- Header -->
+<%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 
+<!-- Header -->
 <%
 
 	HttpSession httpSession = request.getSession();
@@ -154,8 +155,16 @@
 			<div class="pull-right">
 				<div id="search-3" class="widget title_widget widget_search">
 				  <form id="searchform" action="./simpleSearch" class="form-inline" method="post" >
-				    <label class="nis-search-label">Search Terms</label>
-						<input type="search" name="terms" id="lterterms" class="span11 search-query" size="25" required="required">
+				    <!-- <label class="nis-search-label">Search Terms</label> -->
+					<!-- <span name='<%= Tooltip.SEARCH_TERMS %>'
+						  class="tooltip"> -->
+						<input type="search" 
+							name="terms" 
+							id="lterterms" 
+							class="span11 search-query"
+							placeholder="enter search terms" 
+							size="25" required="required">
+					<!-- </span> -->
 						<button class="search_icon" type="submit"></button>
 						<label id="advanced-search-label" class="nis-search-label">
 						  <img id="advanced-search-arrow" alt="" src="images/mini_arrow.png" title="Advanced Search">
