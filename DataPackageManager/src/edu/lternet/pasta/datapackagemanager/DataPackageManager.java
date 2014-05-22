@@ -2423,22 +2423,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The exception object of the error
 	 */
 	public void writeDataPackageError(String transaction, Exception error) {
-
 		DataPackageError dpError = null;
+		error.printStackTrace();
 
 		try {
 			dpError = new DataPackageError();
-		} catch (Exception e) {
+			dpError.writeError(transaction, error);
+		}
+		catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
-
-		try {
-	    dpError.writeError(transaction, error);
-    } catch (Exception e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
 
 	}
 
