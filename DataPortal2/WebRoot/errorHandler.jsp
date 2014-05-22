@@ -61,7 +61,7 @@
 							<div class="span12">							
 								<!-- Content -->
 					      <p><strong>An <em>error</em> has occurred</strong> in the LTER Network Data Portal:</p>                
-                <p class="nis-error"><% out.println(exception.toString()); %></p>        
+                <p class="nis-error">${pageContext.exception.message}</p>        
                 <p>For further assistance, please contact:
                     <a href="mailto:tech_support@LTERnet.edu?Subject=NIS%20Data%20Portal%20error" target="_top">
                     LTER Technical Support</a>. Please copy the error message shown 
