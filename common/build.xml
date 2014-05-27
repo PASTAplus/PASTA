@@ -34,11 +34,10 @@
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-commons">
         <include name="commons-codec-1.4.jar"/>
-        <include name="commons-httpclient-3.1.jar"/>
         <include name="commons-logging-1.1.1.jar"/>
         <include name="commons-io-2.1.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.1.2">
+      <fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.3.3">
         <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/owasp">
