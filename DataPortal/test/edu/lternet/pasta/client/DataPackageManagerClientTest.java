@@ -68,6 +68,26 @@ public class DataPackageManagerClientTest {
   private static Integer testEntitySize = null;
 
 
+	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		    + "<pathquery version=\"1.0\">\n"
+		    + "  <meta_file_id>unspecified</meta_file_id>\n"
+		    + "  <querytitle>unspecified</querytitle>\n"
+		    + "  <returnfield>dataset/title</returnfield>\n"
+		    + "  <returnfield>keyword</returnfield>\n"
+		    + "  <returnfield>originator/individualName/surName</returnfield>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
+		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
+		    + "  <querygroup operator=\"UNION\">\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>bug</value>\n"
+		    + "      <pathexpr>dataset/title</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
+		    + "      <value>Carroll</value>\n"
+		    + "      <pathexpr>surName</pathexpr>\n"
+		    + "    </queryterm>\n"
+		    + "  </querygroup>\n" + "</pathquery>\n";
+
   /*
    * Instance fields
    */
@@ -205,6 +225,10 @@ public class DataPackageManagerClientTest {
         assertFalse(resourceMap.isEmpty());
         assertTrue(resourceMap.contains(testEntityId));
       }
+      testListDataPackageScopes();
+      testListDataPackageIdentifiers();
+      testListDataPackageRevisions();
+      testListDataEntities();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -241,8 +265,7 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the List Data Entities use case
    */
-  @Test
-  public void testListDataEntities() {
+  private void testListDataEntities() {
     try {
       // Test READ for OK status
       String entityString = dpmClient.listDataEntities(testScope,
@@ -266,8 +289,7 @@ public class DataPackageManagerClientTest {
    * Test the status and message body of the List Data Package Identifiers use
    * case
    */
-  @Test
-  public void testListDataPackageIdentifiers() {
+  private void testListDataPackageIdentifiers() {
     try {
       String entityString = dpmClient.listDataPackageIdentifiers(testScope);
 
@@ -289,8 +311,7 @@ public class DataPackageManagerClientTest {
    * Test the status and message body of the List Data Package Revisions use
    * case
    */
-  @Test
-  public void testListDataPackageRevisions() {
+  private void testListDataPackageRevisions() {
     try {
       String entityString = dpmClient.listDataPackageRevisions(testScope,
           testIdentifier, null);
@@ -312,8 +333,7 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the List Data Package Scopes use case
    */
-  @Test
-  public void testListDataPackageScopes() {
+  private void testListDataPackageScopes() {
     try {
       String entityString = dpmClient.listDataPackageScopes();
 
@@ -454,7 +474,6 @@ public class DataPackageManagerClientTest {
   @Test
   public void testSearchDataPackages() {
     try {
-      String pathqueryXML = DataPackageManagerClient.pathqueryXML;
       String entityString = dpmClient.searchDataPackages(pathqueryXML);
 
       // Check the message body
