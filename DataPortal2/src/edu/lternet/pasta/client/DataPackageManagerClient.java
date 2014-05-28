@@ -39,7 +39,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpDelete;
@@ -47,9 +46,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
@@ -57,7 +56,6 @@ import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
-import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
  * @author dcosta
@@ -217,8 +215,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String createDataPackage(File emlFile) throws Exception {
 
 		String contentType = "application/xml";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(BASE_URL + "/eml");
 		String resourceMap = null;
 
@@ -230,7 +227,7 @@ public class DataPackageManagerClient extends PastaClient {
 		httpPost.setHeader("Content-Type", contentType);
 
 		// Set the request entity
-		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		HttpEntity fileEntity = new FileEntity(emlFile, ContentType.create(contentType));
 		httpPost.setEntity(fileEntity);
 
 		try {
@@ -284,7 +281,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return resourceMap;
@@ -305,8 +302,7 @@ public class DataPackageManagerClient extends PastaClient {
 	    String revision, HttpServletResponse servletResponse) throws Exception {
 
 		String contentType = "text/plain";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		HttpPost httpPost = new HttpPost(BASE_URL + "/archive/eml" + urlTail);
 		String resourceMap = null;
@@ -326,12 +322,6 @@ public class DataPackageManagerClient extends PastaClient {
 
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
-				EmlPackageId emlPackageId = new EmlPackageId(scope, identifier,
-				    Integer.valueOf(revision));
-				String packageScope = emlPackageId.getScope();
-				Integer packageIdentifier = emlPackageId.getIdentifier();
-				Integer packageRevision = emlPackageId.getRevision();
-
 				Integer idleTime = 0;
 
 				// Initial sleep period to mitigate potential error-check race condition 
@@ -369,7 +359,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return resourceMap;
@@ -389,8 +379,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String deleteDataPackage(String scope, Integer identifier)
 	    throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
 		HttpDelete httpDelete = new HttpDelete(BASE_URL + "/eml" + urlTail);
 		String entityString = null;
@@ -409,7 +398,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -429,8 +418,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String evaluateDataPackage(File emlFile) throws Exception {
 		String contentType = "application/xml";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
 		String qualityReport = null;
 
@@ -441,7 +429,7 @@ public class DataPackageManagerClient extends PastaClient {
 		httpPost.setHeader("Content-Type", contentType);
 
 		// Set the request entity
-		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		HttpEntity fileEntity = new FileEntity(emlFile, ContentType.create(contentType));
 		httpPost.setEntity(fileEntity);
 
 		try {
@@ -500,7 +488,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return qualityReport;
@@ -524,8 +512,7 @@ public class DataPackageManagerClient extends PastaClient {
 		// a kludge to deal with encoding nonsense.
 		resourceId = resourceId.replace("+", "%2B");
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = BASE_URL + "/authz?resourceId=" + resourceId;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -546,7 +533,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 		
 		return isAuthorized;
@@ -569,8 +556,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String listDataEntities(String scope, Integer identifier,
 	    String revision) throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/data/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -590,7 +576,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -607,8 +593,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String listDataPackageIdentifiers(String scope) throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = BASE_URL + "/eml/" + scope;
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -630,7 +615,7 @@ public class DataPackageManagerClient extends PastaClient {
 				entityString = "";
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -650,8 +635,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String listDataPackageRevisions(String scope, Integer identifier, String filter)
 	    throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
 		
 		// Test for "oldest" or "newest" filter
@@ -679,7 +663,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -694,8 +678,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String listDataPackageScopes() throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = BASE_URL + "/eml";
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -714,7 +697,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -730,8 +713,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String listDeletedDataPackages() throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = BASE_URL + "/eml/deleted";
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -750,7 +732,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -767,8 +749,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String listServiceMethods() throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = BASE_URL + "/service-methods";
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -787,7 +768,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -827,8 +808,7 @@ public class DataPackageManagerClient extends PastaClient {
 		// a kludge to deal with encoding nonsense.
 		entityId = entityId.replace("%", "%25");
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
 		    entityId);
 		String url = BASE_URL + "/data/eml" + urlTail;
@@ -876,7 +856,7 @@ public class DataPackageManagerClient extends PastaClient {
 			}
 
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 	}
@@ -905,8 +885,7 @@ public class DataPackageManagerClient extends PastaClient {
 		// a kludge to deal with encoding nonsense.
 		entityId = entityId.replace("%", "%25");
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
 		    entityId);
 		String url = BASE_URL + "/name/eml" + urlTail;
@@ -929,7 +908,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -951,8 +930,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataPackage(String scope, Integer identifier,
 	    String revision) throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -972,7 +950,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1008,8 +986,7 @@ public class DataPackageManagerClient extends PastaClient {
 			throw new Exception(gripe);
 		}
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String url = String.format("%s/archive/eml/%s/%d/%s/%s",  
 				                    BASE_URL, scope, identifier, revision, transaction);
 		HttpGet httpGet = new HttpGet(url);
@@ -1046,7 +1023,7 @@ public class DataPackageManagerClient extends PastaClient {
 			}
 
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 	}
@@ -1068,7 +1045,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataPackageReport(String scope, Integer identifier,
 	    String revision) throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/report/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1088,7 +1065,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1113,7 +1090,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String readEvaluateReport(String scope, Integer identifier,
 	    String revision, String transaction) throws Exception {
 		String contentType = "application/xml";
-		HttpClient httpClient = new DefaultHttpClient();
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = "/" + transaction;
 		String url = BASE_URL + "/evaluate/report/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1136,7 +1113,7 @@ public class DataPackageManagerClient extends PastaClient {
 			}
 			
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1158,8 +1135,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readMetadata(String scope, Integer identifier, String revision)
 	    throws Exception {
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/metadata/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1179,7 +1155,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1198,8 +1174,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String readDataPackageDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1219,7 +1194,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1242,8 +1217,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String readDataPackageError(String transaction) throws Exception {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = "/" + transaction;
 		String url = BASE_URL + "/error/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1263,7 +1237,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1283,8 +1257,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String readMetadataDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/metadata/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1304,7 +1277,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1324,8 +1297,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String readDataPackageReportDoi(String scope, Integer identifier,
 	    String revision) throws Exception {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
 		String url = BASE_URL + "/report/doi/eml" + urlTail;
 		HttpGet httpGet = new HttpGet(url);
@@ -1345,7 +1317,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1366,8 +1338,7 @@ public class DataPackageManagerClient extends PastaClient {
 	public String readDataEntityDoi(String scope, Integer identifier,
 	    String revision, String entityId) throws Exception {
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
 		    entityId);
 		String url = BASE_URL + "/data/doi/eml" + urlTail;
@@ -1388,7 +1359,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return entityString;
@@ -1407,8 +1378,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String searchDataPackages(String pathQuery) throws Exception {
 		String contentType = "application/xml";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPut httpPut = new HttpPut(BASE_URL + "/search/eml");
 		String resultSetXML = null;
 
@@ -1433,7 +1403,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return resultSetXML;
@@ -1458,8 +1428,7 @@ public class DataPackageManagerClient extends PastaClient {
 	    throws Exception {
 		
 		final String contentType = "application/xml";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
 		final String url = BASE_URL + "/eml" + urlTail;
 		HttpPut httpPut = new HttpPut(url);
@@ -1472,7 +1441,7 @@ public class DataPackageManagerClient extends PastaClient {
 		httpPut.setHeader("Content-Type", contentType);
 
 		// Set the request entity
-		HttpEntity fileEntity = new FileEntity(emlFile, contentType);
+		HttpEntity fileEntity = new FileEntity(emlFile, ContentType.create(contentType));
 		httpPut.setEntity(fileEntity);
 
 		try {
@@ -1526,7 +1495,7 @@ public class DataPackageManagerClient extends PastaClient {
 				handleStatusCode(statusCode, entityString);
 			}
 		} finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return resourceMap;
@@ -1591,4 +1560,5 @@ public class DataPackageManagerClient extends PastaClient {
 		}
 
 	}
+
 }

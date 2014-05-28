@@ -37,13 +37,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -124,8 +123,7 @@ public class EventSubscriptionClient extends PastaClient {
     HttpEntity responseEntity = null;
     String statusMessage = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpPost httpPost = new HttpPost(BASE_URL_SUBSCRIPTION);
 
@@ -165,7 +163,7 @@ public class EventSubscriptionClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode == HttpStatus.SC_CREATED) {
@@ -218,8 +216,7 @@ public class EventSubscriptionClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "/" + sid);
 
@@ -245,7 +242,7 @@ public class EventSubscriptionClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {
@@ -278,8 +275,7 @@ public class EventSubscriptionClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "?" + filter);
 
@@ -305,7 +301,7 @@ public class EventSubscriptionClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {
@@ -335,8 +331,7 @@ public class EventSubscriptionClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL_SUBSCRIPTION + "/" + "schema");
 
@@ -362,7 +357,7 @@ public class EventSubscriptionClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {
@@ -392,8 +387,7 @@ public class EventSubscriptionClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpDelete httpDelete = new HttpDelete(BASE_URL_SUBSCRIPTION + "/" + sid);
 
@@ -419,7 +413,7 @@ public class EventSubscriptionClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {
@@ -447,8 +441,7 @@ public class EventSubscriptionClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
     String statusMessage = null;
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     String subscriptionURL = BASE_URL_EVENT + "/" + subscriptionId;
     HttpPost httpPost = new HttpPost(subscriptionURL);
@@ -479,7 +472,7 @@ public class EventSubscriptionClient extends PastaClient {
       e.printStackTrace();
     } 
     finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {

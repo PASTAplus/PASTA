@@ -24,10 +24,12 @@
 
 package edu.lternet.pasta.client;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.http.HttpStatus;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.ResourceDeletedException;
@@ -173,7 +175,20 @@ public class PastaClient {
    * Instance methods
    */
   
-  
+  	/*
+  	 * Closes the HTTP client
+  	 */
+	protected void closeHttpClient(CloseableHttpClient httpClient) {
+		try {
+			httpClient.close();
+		}
+		catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
   /*
    * Gets the pastaHost instance variable.
    */

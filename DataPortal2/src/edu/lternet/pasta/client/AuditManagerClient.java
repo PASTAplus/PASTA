@@ -39,10 +39,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -235,8 +234,7 @@ public class AuditManagerClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL + "/report/" + oid);
 
@@ -261,9 +259,10 @@ public class AuditManagerClient extends PastaClient {
     } catch (IOException e) {
       logger.error(e);
       e.printStackTrace();
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    } 
+    finally {
+		closeHttpClient(httpClient);
+ 	}
 
     if (statusCode != HttpStatus.SC_OK) {
 
@@ -293,8 +292,7 @@ public class AuditManagerClient extends PastaClient {
 		HttpEntity responseEntity = null;
 		String fromTime = composeFromTime();
 
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpResponse response = null;
 		String url = String.format("%s/recent-uploads?fromTime=%s", BASE_URL, fromTime);
 		HttpGet httpGet = new HttpGet(url);
@@ -324,9 +322,9 @@ public class AuditManagerClient extends PastaClient {
 			logger.error(e);
 			e.printStackTrace();
 		}
-		finally {
-			httpClient.getConnectionManager().shutdown();
-		}
+	    finally {
+			closeHttpClient(httpClient);
+	 	}
 
 		if (statusCode != HttpStatus.SC_OK) {
 
@@ -455,8 +453,7 @@ public class AuditManagerClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpGet httpGet = new HttpGet(BASE_URL + "/report?" + filter);
 
@@ -481,9 +478,10 @@ public class AuditManagerClient extends PastaClient {
     } catch (IOException e) {
       logger.error(e);
       e.printStackTrace();
-    } finally {
-      httpClient.getConnectionManager().shutdown();
-    }
+    } 
+    finally {
+		closeHttpClient(httpClient);
+ 	}
 
     if (statusCode != HttpStatus.SC_OK) {
 

@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.portal.search;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.TreeSet;
@@ -31,14 +32,22 @@ import java.util.TreeSet;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 
 public class ControlledVocabularyClient {
 
+	/*
+	 * Class variables
+	 */
+
+	private static final Logger logger = Logger
+	    .getLogger(edu.lternet.pasta.portal.search.ControlledVocabularyClient.class);
+	
   // Controlled vocabulary settings
   private static final String BASE_SERVICE_URL = 
       "http://vocab.lternet.edu/webservice/keywordlist.php/"; 
@@ -56,6 +65,20 @@ public class ControlledVocabularyClient {
 
 
  
+	/*
+	 * Closes the HTTP client
+	 */
+	private static void closeHttpClient(CloseableHttpClient httpClient) {
+		try {
+			httpClient.close();
+		}
+		catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
   /**
    * Case One: Simple Search
    * 
@@ -94,7 +117,7 @@ public class ControlledVocabularyClient {
                                                  boolean hasAll
                                                 ) {
     HttpGet httpGet = null;
-    HttpClient httpClient = new DefaultHttpClient();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String format = "list";
     TreeSet<String> searchValues = new TreeSet<String>();
     
@@ -214,8 +237,8 @@ public class ControlledVocabularyClient {
         e.printStackTrace();
       }
       finally {
-        httpClient.getConnectionManager().shutdown();
-      }
+  		closeHttpClient(httpClient);
+   	  }
     }
     
     return searchValues;
@@ -231,7 +254,7 @@ public class ControlledVocabularyClient {
    */
   public static String[] webServicePreferredTerms() {
     HttpGet httpGet = null;
-    HttpClient httpClient = new DefaultHttpClient();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String[] preferredTerms = null;
     
     if (PREFERRED_TERMS_ARRAY != null) {
@@ -255,8 +278,8 @@ public class ControlledVocabularyClient {
         e.printStackTrace();
       }
       finally {
-        httpClient.getConnectionManager().shutdown();
-      }
+  		closeHttpClient(httpClient);
+   	  }
     }
 
     return preferredTerms;
@@ -285,7 +308,7 @@ public class ControlledVocabularyClient {
 	 */
 	public static String webServiceFetchDown(String termId) {
 		HttpGet httpGet = null;
-		HttpClient httpClient = new DefaultHttpClient();
+	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String xmlString = null;
 
 		try {
@@ -301,9 +324,9 @@ public class ControlledVocabularyClient {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		finally {
-			httpClient.getConnectionManager().shutdown();
-		}
+	    finally {
+			closeHttpClient(httpClient);
+	   	}
 
 		return xmlString;
 	}
@@ -333,7 +356,7 @@ public class ControlledVocabularyClient {
 	 */
 	public static String webServiceFetchTopTerms() {
 		HttpGet httpGet = null;
-		HttpClient httpClient = new DefaultHttpClient();
+	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String xmlString = null;
 
 		try {
@@ -349,7 +372,7 @@ public class ControlledVocabularyClient {
 			e.printStackTrace();
 		}
 		finally {
-			httpClient.getConnectionManager().shutdown();
+			closeHttpClient(httpClient);
 		}
 
 		return xmlString;

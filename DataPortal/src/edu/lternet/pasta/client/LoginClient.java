@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.codec.binary.Base64;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -178,7 +177,6 @@ public class LoginClient {
     // Define host parameters
     HttpHost httpHost = new HttpHost(this.pastaHost, this.pastaPort, this.pastaProtocol);
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 
     // Define user authentication credentials that will be used with the host
     AuthScope authScope = new AuthScope(httpHost.getHostName(),

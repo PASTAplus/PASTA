@@ -41,7 +41,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -172,7 +171,6 @@ public class EzidRegistrar {
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 		    this.protocol);
 		DefaultHttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
@@ -244,7 +242,6 @@ public class EzidRegistrar {
 	public void logout() throws EzidException {
 
 		HttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		String url = this.getEzidUrl("/logout");
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
@@ -296,7 +293,6 @@ public class EzidRegistrar {
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 		    this.protocol);
 		DefaultHttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
@@ -368,7 +364,6 @@ public class EzidRegistrar {
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 		    this.protocol);
 		DefaultHttpClient httpClient = new DefaultHttpClient();
-		HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
