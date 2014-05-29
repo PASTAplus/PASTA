@@ -38,13 +38,14 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.portal.ConfigurationListener;
@@ -146,6 +147,21 @@ public class LoginClient {
 
   }
 
+  
+	/*
+	 * Closes the HTTP client
+	 */
+	private static void closeHttpClient(CloseableHttpClient httpClient) {
+		try {
+			httpClient.close();
+		}
+		catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
   /**
    * Perform a PASTA login operation using the user's credentials. Because there
    * is not a formal PASTA login method, we will use a simple query for the Data
@@ -176,15 +192,16 @@ public class LoginClient {
 
     // Define host parameters
     HttpHost httpHost = new HttpHost(this.pastaHost, this.pastaPort, this.pastaProtocol);
-    DefaultHttpClient httpClient = new DefaultHttpClient();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
     // Define user authentication credentials that will be used with the host
     AuthScope authScope = new AuthScope(httpHost.getHostName(),
         httpHost.getPort());
     UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
         username, password);
-    httpClient.getCredentialsProvider().setCredentials(authScope, credentials);
-
+    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(authScope, credentials);
+    
     // Create AuthCache instance
     AuthCache authCache = new BasicAuthCache();
 
@@ -193,8 +210,9 @@ public class LoginClient {
     authCache.put(httpHost, basicAuth);
 
     // Add AuthCache to the execution context
-    BasicHttpContext localcontext = new BasicHttpContext();
-    localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+    HttpClientContext context = HttpClientContext.create();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthCache(authCache);
 
     HttpGet httpGet = new HttpGet(this.LOGIN_URL);
     HttpResponse response = null;
@@ -203,7 +221,7 @@ public class LoginClient {
 
     try {
 
-      response = httpClient.execute(httpHost, httpGet, localcontext);
+      response = httpClient.execute(httpHost, httpGet, context);
       headers = response.getAllHeaders();
       statusCode = (Integer) response.getStatusLine().getStatusCode();
       logger.info("STATUS: " + statusCode.toString());
@@ -218,7 +236,7 @@ public class LoginClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode == HttpStatus.SC_OK) {
@@ -256,7 +274,6 @@ public class LoginClient {
     String authToken = null;
 
     String[] headerParts = setCookieHeader.split(";");
-    String[] headerPart = null;
 
     for (int i = 0; i < headerParts.length; i++) {
 
