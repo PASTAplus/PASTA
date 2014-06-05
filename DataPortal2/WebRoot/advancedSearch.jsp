@@ -360,8 +360,9 @@
 															  <td>
 															  	<span name='<%= Tooltip.SEARCH_TERMS %>'
 															  		  class="tooltip">
-															  		<input name="subjectValue" type="search" placeholder="enter search terms" />
+															  		<img src="images/hand.png" />
 															  	</span>
+															  	<input name="subjectValue" type="search" placeholder="enter search terms" />
 															  </td>
 															</tr>
 															<tr>

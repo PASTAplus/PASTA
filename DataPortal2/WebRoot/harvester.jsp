@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+<%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 
 <%
   final String pageTitle = "Evaluate/Upload Data Packages";
@@ -118,17 +119,23 @@
                 </div>
 								<div class="table-row">
 									<div class="table-cell">
-										<input checked="checked" name="desktopUpload" type="radio" value="0" />
-									  Data will be accessed using the online URLs as documented in the EML 
+									    <input checked="checked" name="desktopUpload" type="radio" value="0" />
+									    Data will be accessed using the online URLs as documented in the EML 
+									</div>
+									<div class="table-cell">
 									</div>
                                 </div>
 								<div class="table-row">
 									<div class="table-cell">
-										<span name="Important: When using this method to upload data, online data URLs documented in the EML will be replaced with links to the data files you select." 
-									          class="tooltip">
-								    		<input name="desktopUpload" type="radio" value="1" /> 
-								    	</span>
+								    	<input name="desktopUpload" type="radio" value="1" /> 
 										I want to manually upload the data by selecting files on my local system
+									</div>
+									<div class="table-cell">
+									<span name='<%= Tooltip.DESKTOP_HARVEST %>'
+									      class="tooltip">
+									    <img src="images/hand.png" />
+									    <dfn>Please note</dfn>
+								    </span>
 									</div>
 								</div>
 								<div class="table-row">
