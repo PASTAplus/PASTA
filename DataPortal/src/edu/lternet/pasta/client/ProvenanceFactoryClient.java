@@ -30,11 +30,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -96,8 +95,7 @@ public class ProvenanceFactoryClient extends PastaClient {
     Integer statusCode = null;
     HttpEntity responseEntity = null;
 
-    HttpClient httpClient = new DefaultHttpClient();
-    HttpProtocolParams.setUseExpectContinue(httpClient.getParams(), false);
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse response = null;
     HttpPut httpPut = new HttpPut(BASE_URL + "/?" + pid);
 
@@ -129,7 +127,7 @@ public class ProvenanceFactoryClient extends PastaClient {
       logger.error(e);
       e.printStackTrace();
     } finally {
-      httpClient.getConnectionManager().shutdown();
+		closeHttpClient(httpClient);
     }
 
     if (statusCode != HttpStatus.SC_OK) {

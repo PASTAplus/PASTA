@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.common.audit;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,7 +34,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -171,7 +173,7 @@ public class AuditManagerClient implements Runnable {
   * Run in a separate thread.
   */
  public void run() {
-   DefaultHttpClient httpClient = new DefaultHttpClient();
+   CloseableHttpClient httpClient = HttpClientBuilder.create().build();
    String url = this.urlHead;
    HttpPost httpPost = new HttpPost(url);
    
@@ -201,8 +203,14 @@ public class AuditManagerClient implements Runnable {
      e.printStackTrace();
    }
    finally {
-     httpClient.getConnectionManager().shutdown();
-   }
+			try {
+				httpClient.close();
+			}
+			catch (IOException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+	}
  }
 
 }

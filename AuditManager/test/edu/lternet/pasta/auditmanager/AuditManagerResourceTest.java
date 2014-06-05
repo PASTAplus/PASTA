@@ -86,9 +86,8 @@ public class AuditManagerResourceTest {
 	@BeforeClass
 	public static void setUpClass() {
 		auditManagerResource = new AuditManagerResource();
-		ConfigurationListener.setPastaServiceAcr();
-		ConfigurationListener
-				.loadPropertiesFile(ConfigurationListener.AUDIT_MANAGER_PROPERTIES);
+		ConfigurationListener configurationListener = new ConfigurationListener();
+		configurationListener.setContextSpecificProperties();
 	}
 
 
