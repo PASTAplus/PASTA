@@ -358,24 +358,23 @@
 															  </td>
 															  <td class="spacerwd"></td>														  
 															  <td>
-															  	<span name='<%= Tooltip.SEARCH_TERMS %>'
-															  		  class="tooltip">
-															  		<img src="images/hand.png" />
-															  	</span>
 															  	<input name="subjectValue" type="search" placeholder="enter search terms" />
 															  </td>
 															</tr>
 															<tr>
-															  <td class="spacerwd"></td>
-															  <td class="spacerwd"></td>
-															  <td class="spacerwd"></td>
-															  <td class="spacerwd"></td>
-															  <td>
-															    <input checked="checked" name="subjectAllAny" type="radio" value="0" />
+															  <td class="spacerwd" colspan="3">															    <input checked="checked" name="subjectAllAny" type="radio" value="0" />
 															    Match All Terms
 															    &nbsp;&nbsp;&nbsp;
 															    <input name="subjectAllAny" type="radio" value="1" /> 
 															    Match Any Term
+															  </td>
+															  <td class="spacerwd"></td>
+															  <td>
+															  	<span name='<%= Tooltip.SEARCH_TERMS %>'
+															  		  class="tooltip">
+															  		<img src="images/hand.png" />
+									                                <dfn>Search tip</dfn>
+															  	</span>
 															  </td>
 														  </tr>
 												  </table>
