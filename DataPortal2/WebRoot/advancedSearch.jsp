@@ -322,114 +322,129 @@
 											  </div>
 										  </div>
 										  <!-- /#tab1 -->
-										
-										
-										  <div id="tab2" class="tab-pane  ">
-											  <div class="row-fluid text_bar_pattern themeple_sc">
-												  <div>
-													  <table>
-													    <!-- 
-														  <tr>
-															  <td colspan="6">
-															    <h3 class="separator_border labelBolder span1">Subject</h3>
-															  </td>
-														  </tr>
-														  <tr>
-															  <td class="spacersm2"></td>
-														  </tr>
-														  -->
-														  <tr>
-															  <td>
-															    <select name="subjectField">
-															      <option value="ALL">Subject</option>
-															      <option value="TITLE">Title only</option>
-															      <option value="ABSTRACT">Abstract only</option>
-															      <option value="KEYWORDS">Keywords only</option>
-															    </select>
-															  </td>
-															  <td class="spacerwd"></td>
-															  <td>
-															    <select name="subjectQueryType">
-															      <option selected="selected" value="0">contains</option>
-															      <option value="1">matches exactly</option>
-															      <option value="2">starts with</option>
-															      <option value="3">ends with</option>
-															    </select>
-															  </td>
-															  <td class="spacerwd"></td>														  
-															  <td>
-															  	<input name="subjectValue" type="search" placeholder="enter search terms" />
-															  </td>
-															</tr>
+
+
+												<div id="tab2" class="tab-pane  ">
+													<div class="row-fluid text_bar_pattern themeple_sc">
+														<div>
+															<table>
+																<tr>
+																	<td>
+																		<select name="subjectField">
+																			<option value="ALL">Subject</option>
+																			<option value="TITLE">Title only</option>
+																			<option value="ABSTRACT">Abstract only</option>
+																			<option value="KEYWORDS">Keywords only</option>
+																		</select>
+																	</td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<select name="subjectQueryType">
+																			<option selected="selected" value="0">contains</option>
+																			<option value="1">matches exactly</option>
+																			<option value="2">starts with</option>
+																			<option value="3">ends with</option>
+																		</select>
+																	</td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<input name="subjectValue" type="search"
+																			placeholder="enter search terms" />
+																	</td>
+																</tr>
+																<tr>
+																<tr>
+																	<td class="spacerwd"></td>
+																	<td class="spacerwd"></td>
+																	<td class="spacerwd"></td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<span name='<%=Tooltip.SEARCH_TERMS%>'
+																			class="tooltip"> 
+																			<img src="images/hand.png" />
+																			<dfn>Search tip</dfn>
+																		</span>
+																	</td>
+																</tr>
+																<tr>
+																	<td>
+																		<label class="labelBold">Match Options:</label>
+																	</td>
+																</tr>
+																<tr>
+																	<td>
+																		<input
+																			checked="checked" 
+																			name="subjectAllAny" 
+																			type="radio"
+																			value="0" />
+																			Match <strong>All</strong> Search Terms<br/>
+																		<input
+																			name="subjectAllAny" 
+																			type="radio" 
+																			value="1" />
+																			Match <strong>Any</strong> Search Term
+																	</td>
+																</tr>
+																<tr>
+																	<td class="spacersmh"></td>
+																</tr>
+															</table>
+															<table>
+																<tr>
+																	<td>
+																		<label class="labelBold">Expand Search By Adding:</label>
+																	</td>
+																</tr>
+																<tr>
+																	<td>
+																		<ul class="checklistLG">
+																			<li>
+																				<input name="specific" type="checkbox" value="value1">
+																					<p>More Specific Terms</p> 
+																					<a class="checkboxLG-select" href="#">Select</a> 
+																					<a class="checkboxLG-deselect" href="#">Cancel</a>
+																			</li>
+																			<li>
+																				<input name="related" type="checkbox" value="value1">
+																				<p>Related Terms</p> 
+																				<a class="checkboxLG-select" href="#">Select</a> 
+																				<a class="checkboxLG-deselect" href="#">Cancel</a>
+																			</li>
+																			<li>
+																				<input name="relatedSpecific" type="checkbox" value="value1">
+																				<p>Related / More Specific Terms</p> 
+																				<a class="checkboxLG-select" href="#">Select</a> 
+																				<a class="checkboxLG-deselect" href="#">Cancel</a>
+																			</li>
+																		</ul>
+																	</td>
+																</tr>
+															</table>
+														</div>
+														<div class="row-fluid text_bar_pattern themeple_sc">
+															<div class="span12">
+																<span class="row-fluid separator_border"></span>
+															</div>
+														</div>
+														<table>
 															<tr>
-															  <td class="spacerwd" colspan="3">															    <input checked="checked" name="subjectAllAny" type="radio" value="0" />
-															    Match All Terms
-															    &nbsp;&nbsp;&nbsp;
-															    <input name="subjectAllAny" type="radio" value="1" /> 
-															    Match Any Term
-															  </td>
-															  <td class="spacerwd"></td>
-															  <td>
-															  	<span name='<%= Tooltip.SEARCH_TERMS %>'
-															  		  class="tooltip">
-															  		<img src="images/hand.png" />
-									                                <dfn>Search tip</dfn>
-															  	</span>
-															  </td>
-														  </tr>
-												  </table>
-													  <table>
-														  <tr>
-														  </tr>
-														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
-													  </table>
-													  <table>
-														  <tr>
-															  <td>
-															    <ul class="checklistLG">
-																    <li>
-																      <input name="specific" type="checkbox" value="value1">
-																      <p>More Specific Terms</p>
-																      <a class="checkboxLG-select" href="#">Select</a>
-																      <a class="checkboxLG-deselect" href="#">Cancel</a> </li>
-																    <li>
-																      <input name="related" type="checkbox" value="value1">
-																      <p>Related Terms</p>
-																      <a class="checkboxLG-select" href="#">Select</a>
-																      <a class="checkboxLG-deselect" href="#">Cancel</a>
-																    </li>
-																    <li>
-																      <input name="relatedSpecific" type="checkbox" value="value1">
-																      <p>Related / More Specific Terms</p>
-																      <a class="checkboxLG-select" href="#">Select</a>
-																      <a class="checkboxLG-deselect" href="#">Cancel</a>
-																    </li>
-															    </ul>
-															  </td>
-														  </tr>
-													  </table>													  
-												  </div>
-												  <div class="row-fluid text_bar_pattern themeple_sc">												
-												    <div class="span12">
-													    <span class="row-fluid separator_border"></span>
-												    </div>
-											    </div>
-										      <table>
-											      <tr>
-												      <td align="left">
-												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
-												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
-												      </td>
-											      </tr>
-										      </table>
-											  </div>
-										  </div>
-										  <!-- /#tab2 -->
-										
-										
-										  <div id="tab6" class="tab-pane  ">
+																<td align="left">
+																	<input
+																	class="btn btn-large btn-info btn-default"
+																	name="submit" type="submit" value="Submit" /> 
+																	<input
+																	class="btn btn-large btn-info btn-default" name="reset"
+																	type="reset" value="Clear All" />
+																</td>
+															</tr>
+														</table>
+													</div>
+												</div>
+												<!-- /#tab2 -->
+
+
+											<div id="tab6" class="tab-pane  ">
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
