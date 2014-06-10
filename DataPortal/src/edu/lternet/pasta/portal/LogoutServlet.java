@@ -96,25 +96,28 @@ public class LogoutServlet extends DataPortalServlet {
 	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+      throws ServletException, IOException {
 
 		HttpSession httpSession = request.getSession();
 		String uid = (String) httpSession.getAttribute("uid");
-		
-		TokenManager tokenManager = new TokenManager();
-		
-		try {
-			tokenManager.deleteToken(uid);
-		}
-	    catch (Exception e) {
-	    	handleDataPortalError(logger, e);
-	    }
-		finally {
-			httpSession.invalidate();
-		}
-	
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher("./home.jsp");
-		requestDispatcher.forward(request, response);
+
+    if (uid == null) {
+      logger.error("User identifier \"uid\" is null\n");
+    } else {
+      TokenManager tokenManager = new TokenManager();
+      try {
+        tokenManager.deleteToken(uid);
+      }
+      catch (Exception e) {
+        handleDataPortalError(logger, e);
+      }
+    }
+
+    httpSession.invalidate();
+
+    RequestDispatcher requestDispatcher = request.getRequestDispatcher("./home.jsp");
+    requestDispatcher.forward(request, response);
+
 	}
 
 	/**
