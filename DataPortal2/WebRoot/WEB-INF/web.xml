@@ -12,6 +12,10 @@
   <listener>
     <listener-class>edu.lternet.pasta.portal.ConfigurationListener</listener-class>
   </listener>
+  <listener>
+    <description>sessionListener</description>
+    <listener-class>edu.lternet.pasta.portal.listener.SessionListener</listener-class>
+  </listener>  
   <servlet>
     <description>Login Servlet</description>
     <display-name>LoginServlet</display-name>
