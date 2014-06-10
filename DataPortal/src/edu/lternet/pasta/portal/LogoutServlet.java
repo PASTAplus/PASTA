@@ -103,6 +103,7 @@ public class LogoutServlet extends DataPortalServlet {
 
     if (uid == null) {
       logger.error("User identifier \"uid\" is null\n");
+      httpSession.invalidate();
     } else {
       TokenManager tokenManager = new TokenManager();
       try {
@@ -111,9 +112,10 @@ public class LogoutServlet extends DataPortalServlet {
       catch (Exception e) {
         handleDataPortalError(logger, e);
       }
+      finally {
+        httpSession.invalidate();
+      }
     }
-
-    httpSession.invalidate();
 
     RequestDispatcher requestDispatcher = request.getRequestDispatcher("./home.jsp");
     requestDispatcher.forward(request, response);
