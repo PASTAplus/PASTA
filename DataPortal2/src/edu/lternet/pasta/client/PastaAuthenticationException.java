@@ -30,6 +30,8 @@ package edu.lternet.pasta.client;
  * 
  */
 public class PastaAuthenticationException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
 
 	/*
 	 * Constructors
