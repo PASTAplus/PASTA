@@ -22,6 +22,7 @@
 
 package edu.lternet.pasta.portal.listener;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
@@ -51,9 +52,10 @@ public class SessionListener implements HttpSessionListener {
 		synchronized (this) {
 			sessionCount++;
 		}
-
-		String sessionId = event.getSession().getId();
-		logger.warn(String.format("Session Created: %s; Total Sessions: %d", sessionId, sessionCount));
+		HttpSession httpSession = event.getSession();
+		String sessionId = httpSession.getId();
+		String uid = (String) httpSession.getAttribute("uid");
+		logger.warn(String.format("Session Created: %s; User Id: %s; Total Sessions: %d", sessionId, uid, sessionCount));
 	}
 
 
@@ -61,8 +63,10 @@ public class SessionListener implements HttpSessionListener {
 		synchronized (this) {
 			sessionCount--;
 		}
-		String sessionId = event.getSession().getId();
-		logger.warn(String.format("Session Destroyed: %s;  Total Sessions: %d", sessionId, sessionCount));
+		HttpSession httpSession = event.getSession();
+		String sessionId = httpSession.getId();
+		String uid = (String) httpSession.getAttribute("uid");
+		logger.warn(String.format("Session Destroyed: %s; User Id: %s; Total Sessions: %d", sessionId, uid, sessionCount));
 	}
 	
 }
