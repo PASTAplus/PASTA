@@ -8,6 +8,7 @@
   <property name="src.dir" value="src"/>
   <property name="web.dir" value="WebRoot"/>
   <property name="classes.dir" value="${web.dir}/WEB-INF/classes"/>
+  <property name="conf.dir" value="${web.dir}/WEB-INF/conf"/>
   <property name="web.lib.dir" value="${web.dir}/WEB-INF/lib"/>
   <property name="web.doc.dir" value="${web.dir}/WEB-INF/doc"/>
   <property name="war.name" value="${webapp.name}.war"/>
@@ -32,6 +33,19 @@
   <property name="test.data.dir" location="${test.dir}/data"/>
   <property name="test.reports.dir" location="${test.dir}/reports"/>
   <property name="test.coverage.dir" location="${test.dir}/coverage"/>
+
+
+  <!-- Copy log4j.properties.template to log4j.properties if the latter is missing -->
+  <target name="check-log4j-exists">
+  	<condition property="log4j-exists">
+    	<available file="${conf.dir}/log4j.properties"/>
+  	</condition>
+  </target>
+  <target name="copylog4j" depends="check-log4j-exists" unless="log4j-exists">
+    <copy file="${conf.dir}/log4j.properties.template" 
+          tofile="${conf.dir}/log4j.properties" 
+          preservelastmodified="true" verbose="true" filtering="no" />
+  </target>
 
   <!-- Path for compiling the source code -->
   <path id="compile.classpath">
@@ -82,7 +96,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="prepare"
+  <target name="compile" depends="prepare,copylog4j"
 	  description="Compiles all Java source files">
     <mkdir dir="${classes.dir}"/>
     <javac destdir="${classes.dir}" debug="true" deprecation="true"
