@@ -22,6 +22,7 @@
 
 package edu.lternet.pasta.portal.listener;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -53,9 +54,11 @@ public class SessionListener implements HttpSessionListener {
 			sessionCount++;
 		}
 		HttpSession httpSession = event.getSession();
+		ServletContext servletContext = httpSession.getServletContext();
 		String sessionId = httpSession.getId();
 		String uid = (String) httpSession.getAttribute("uid");
-		logger.warn(String.format("Session Created: %s; User Id: %s; Total Sessions: %d", sessionId, uid, sessionCount));
+		String contextPath = servletContext.getContextPath();
+		logger.warn(String.format("Session Created: %s; Context Path: %s; User Id: %s; Total Sessions: %d", sessionId, contextPath, uid, sessionCount));
 	}
 
 
@@ -64,9 +67,11 @@ public class SessionListener implements HttpSessionListener {
 			sessionCount--;
 		}
 		HttpSession httpSession = event.getSession();
+		ServletContext servletContext = httpSession.getServletContext();
 		String sessionId = httpSession.getId();
 		String uid = (String) httpSession.getAttribute("uid");
-		logger.warn(String.format("Session Destroyed: %s; User Id: %s; Total Sessions: %d", sessionId, uid, sessionCount));
+		String contextPath = servletContext.getContextPath();
+		logger.warn(String.format("Session Destroyed: %s; Context Path: %s; User Id: %s; Total Sessions: %d", sessionId, contextPath, uid, sessionCount));
 	}
 	
 }
