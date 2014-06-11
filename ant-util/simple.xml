@@ -36,12 +36,14 @@
 
 
   <!-- Copy log4j.properties.template to log4j.properties if the latter is missing -->
-  <target name="check-log4j-exists">
-  	<condition property="log4j-exists">
+  <target name="check-log4j-exists" unless="is-common-code">
+  	<condition property="log4j-is-missing">
+  	  <not>
     	<available file="${conf.dir}/log4j.properties"/>
+      </not>
   	</condition>
   </target>
-  <target name="copylog4j" depends="check-log4j-exists" unless="log4j-exists">
+  <target name="copylog4j" depends="check-log4j-exists" if="log4j-is-missing">
     <copy file="${conf.dir}/log4j.properties.template" 
           tofile="${conf.dir}/log4j.properties" 
           preservelastmodified="true" verbose="true" filtering="no" />

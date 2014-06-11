@@ -2,6 +2,7 @@
 <project basedir="." default="compile" name="common">
 
   <property file="build.properties"/>
+  <property name="is-common-code" value="true"/>
   <import file="../ant-util/simple.xml"/>
 
   <!-- Properties for building and deploying -->
