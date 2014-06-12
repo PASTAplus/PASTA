@@ -210,11 +210,11 @@ public class AuditManagerClient extends PastaClient {
   private String composeFromTime() {
 	  String fromTimeStr = "";
 	  SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	  final long ninetyDays = 90 * 24 * 60 * 60 * 1000L;
+	  final long nDays = 30 * 24 * 60 * 60 * 1000L; // set the time period for recent uploads
 	  
 	  Date now = new Date();
 	  long nowTime = now.getTime();
-	  long fromTime = nowTime - ninetyDays; // the last 90 days is a good period for recent uploads
+	  long fromTime = nowTime - nDays; 
 	  Date fromTimeDate = new Date(fromTime);
 	  fromTimeStr = simpleDateFormat.format(fromTimeDate);
 	  
