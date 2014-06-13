@@ -32,6 +32,8 @@ package edu.lternet.pasta.common.security.authorization;
 public class InvalidPermissionException extends Exception {
 
 
+	private static final long serialVersionUID = 1L;
+
 	/*
 	 * Class fields
 	 */

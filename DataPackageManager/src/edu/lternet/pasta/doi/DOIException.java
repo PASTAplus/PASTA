@@ -31,6 +31,8 @@ package edu.lternet.pasta.doi;
  */
 public class DOIException extends Exception {
 
+	private static final long serialVersionUID = 1L;
+
   /*
    * Constructors
    */
