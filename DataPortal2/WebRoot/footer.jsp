@@ -15,6 +15,7 @@
   ~ either express or implied. See the License for the specific
   ~ language governing permissions and limitations under the License.
   -->
+
 <%@ page import="edu.lternet.pasta.portal.DataPackageSurvey" pageEncoding="UTF-8" %>
 
 <%
@@ -43,6 +44,48 @@ String recentIdentifier4 = recentUpdates[5];
 String recentTitle4 = recentUpdates[6];
 String recentDate4 = recentUpdates[7];
 
+String icon1 = "";
+String icon2 = "";
+String icon3 = "";
+String icon4 = "";
+
+String title1 = "";
+String title2 = "";
+String title3 = "";
+String title4 = "";
+
+String date1 = "";
+String date2 = "";
+String date3 = "";
+String date4 = "";
+
+String iconLink = "<a href='./mapbrowse?scope=%s&identifier=%s'><span class='post_icon'></span></a>";
+String titleLink = "<a href='./mapbrowse?scope=%s&identifier=%s'>%s</a>";
+
+if (recentScope1 != null && !recentScope1.equals("")) {
+  icon1 = String.format(iconLink, recentScope1,  recentIdentifier1);
+  title1 = String.format(titleLink, recentScope1, recentIdentifier1, recentTitle1);
+  date1 = recentDate1;
+}
+
+if (recentScope2 != null && !recentScope2.equals("")) {
+  icon2 = String.format(iconLink, recentScope2,  recentIdentifier2);
+  title2 = String.format(titleLink, recentScope2, recentIdentifier2, recentTitle2);
+  date2 = recentDate2;
+}
+
+if (recentScope3 != null && !recentScope3.equals("")) {
+  icon3 = String.format(iconLink, recentScope3, recentIdentifier3);
+  title3 = String.format(titleLink, recentScope3, recentIdentifier3, recentTitle3);
+  date3 = recentDate3;
+}
+
+if (recentScope4 != null && !recentScope4.equals("")) {
+  icon4 = String.format(iconLink, recentScope4,  recentIdentifier4);
+  title4 = String.format(titleLink, recentScope4,  recentIdentifier4, recentTitle4);
+  date4 = recentDate4;
+}
+
 %>
 
 	<!-- Divider -->
@@ -64,14 +107,12 @@ String recentDate4 = recentUpdates[7];
 										<h2 class="widget-title">Recent Inserts</h2>
 									</div>
 									<dl>
-										<dt><a href="./mapbrowse?scope=<%= recentScope1 %>&identifier=<%= recentIdentifier1 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= recentDate1 %>
-										<a href="./mapbrowse?scope=<%= recentScope1 %>&identifier=<%= recentIdentifier1 %>"><%= recentTitle1 %></a> </dd>
+										<dt><%= icon1 %></dt>
+										<dd class="without_avatar"><%= date1 %><%= title1 %></dd>
 									</dl>
 									<dl>
-										<dt><a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= recentDate2 %>
-										<a href="./mapbrowse?scope=<%= recentScope2 %>&identifier=<%= recentIdentifier2 %>"><%= recentTitle2 %></a> </dd>
+										<dt><%= icon2 %></dt>
+										<dd class="without_avatar"><%= date2 %><%= title2 %></dd>
 									</dl>
 								</div>
 							</div>
@@ -81,14 +122,12 @@ String recentDate4 = recentUpdates[7];
 										<h2 class="widget-title">Recent Updates</h2>
 									</div>
 									<dl>
-										<dt><a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= recentDate3%>
-										<a href="./mapbrowse?scope=<%= recentScope3 %>&identifier=<%= recentIdentifier3 %>"><%= recentTitle3 %></a> </dd>
+										<dt><%= icon3 %></dt>
+										<dd class="without_avatar"><%= date3 %><%= title3 %></dd>
 									</dl>
 									<dl>
-										<dt><a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><span class="post_icon"></span></a></dt>
-										<dd class="without_avatar"><%= recentDate4 %>
-										<a href="./mapbrowse?scope=<%= recentScope4 %>&identifier=<%= recentIdentifier4 %>"><%= recentTitle4 %></a> </dd>
+										<dt><%= icon4 %></dt>
+										<dd class="without_avatar"><%= date4 %><%= title4 %></dd>
 									</dl>
 								</div>
 							</div>
