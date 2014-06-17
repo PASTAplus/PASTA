@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
   final String pageTitle = "Provenance Viewer";
@@ -29,6 +30,11 @@
     type = "";
   }
           
+	boolean showProvenance = false;	
+	if (message != null && !type.equals("warning")) {
+		showProvenance = true;
+	}
+			
 %>
 
 <!DOCTYPE html>
@@ -81,9 +87,29 @@
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
+						
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
+
+							<c:set var="showProv" value="<%= showProvenance %>"/>						
+							<c:choose>
+							
+								<c:when test="${showProv}">
+									<div class="display-table">										
+										<div class="table-row">										
+											<div class="table-cell">
+												<label class="labelBold">Package Identifier:</label>
+											</div>											
+											<div class="table-cell"><%= packageid %></div>											
+										</div>
+									</div>
+									<p></p>
+									<pre><%= message %></pre>							
+								</c:when>
+								
+								<c:otherwise>
+
 								<p>View provenance metadata of a data package using the package identifier.</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
@@ -107,15 +133,9 @@
 										</div>
 									</form>
 								</div>
-			<%
-				if (message != null && !type.equals("warning")) {
-				    out.println("<h3>" + packageid + "</h3>\n");
-					out.println("<p><pre>");
-					out.println(message);
-					out.println("</pre></p>\n");
-				}
-			%>
 
+								</c:otherwise>
+							</c:choose>
 
 								<!-- /Content --></div>
 						</div>

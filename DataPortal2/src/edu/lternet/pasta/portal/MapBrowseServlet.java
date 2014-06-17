@@ -40,8 +40,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
@@ -73,6 +71,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 	private String citationHTML = "";
 	private String digitalObjectIdentifier = "";
 	private String pastaDataObjectIdentifier = "";
+	private String provenanceHTML = "";
+	private String codeGenerationHTML = "";
 
 
 	/**
@@ -135,6 +135,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		packageIdHTML = "";
 		resourcesHTML = "";
 		citationHTML = "";
+		provenanceHTML = "";
+		codeGenerationHTML = "";
 
 		String uid = (String) httpSession.getAttribute("uid");
 
@@ -204,6 +206,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		request.setAttribute("dataPackageCitationHTML", citationHTML);
 		request.setAttribute("digitalObjectIdentifier", digitalObjectIdentifier);
 		request.setAttribute("pastaDataObjectIdentifier", pastaDataObjectIdentifier);
+		request.setAttribute("provenanceHTML", provenanceHTML);
+		request.setAttribute("codeGenerationHTML", codeGenerationHTML);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 	}
@@ -242,6 +246,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		StringBuilder packageIdHTMLBuilder = new StringBuilder();
 		StringBuilder resourcesHTMLBuilder = new StringBuilder();
 		StringBuilder citationHTMLBuilder = new StringBuilder();
+		StringBuilder provenanceHTMLBuilder = new StringBuilder();
+		StringBuilder codeGenerationHTMLBuilder = new StringBuilder();
 
 		String packageId = null;
 
@@ -483,35 +489,35 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		packageIdHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 		packageIdHTMLBuilder.append(dataPackage);
-		//packageIdHTMLBuilder.append("<ul>");
 		packageIdHTMLBuilder.append(previous);
 		packageIdHTMLBuilder.append(next);
 		packageIdHTMLBuilder.append(revisions);
-		//packageIdHTMLBuilder.append("</ul>");
 		packageIdHTMLBuilder.append("</ul>\n");
 		packageIdHTML = packageIdHTMLBuilder.toString();
 				
 		resourcesHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 		resourcesHTMLBuilder.append(metadata);
 		resourcesHTMLBuilder.append(report);
-		resourcesHTMLBuilder.append("<li>Data *\n");
+		resourcesHTMLBuilder.append("<li>Data <sup><strong>*</strong></sup>\n");
 		resourcesHTMLBuilder.append("<ol>\n");
 		resourcesHTMLBuilder.append(data);
 		resourcesHTMLBuilder.append("</ol>\n");
 		resourcesHTMLBuilder.append("</li>\n");
+
+		resourcesHTMLBuilder.append("<li>&nbsp;</li>\n");
 
 		resourcesHTMLBuilder.append("<li>\n");
 		resourcesHTMLBuilder.append("<div class=\"zip\">");
 		resourcesHTMLBuilder.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">");
 		resourcesHTMLBuilder.append("<input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" />");
 		resourcesHTMLBuilder.append("<input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />");
-		resourcesHTMLBuilder.append("</form>");
+		resourcesHTMLBuilder.append(" <sup><strong>*</strong></sup></form>");
 		resourcesHTMLBuilder.append("</div>");
 		resourcesHTMLBuilder.append("</li>\n");
 		
 		resourcesHTMLBuilder.append("<li>\n");
 		resourcesHTMLBuilder.append(
-			"<em>* By downloading any data you implicitly acknowledge the " +
+			"<sup><strong>*</strong></sup> <em>By downloading any data you implicitly acknowledge the " +
 			"<a class=\"searchsubcat\" href=\"http://www.lternet.edu/data/netpolicy.html\">" +
 			"LTER Data Policy</a></em>");
 		resourcesHTMLBuilder.append("</li>\n");
@@ -519,16 +525,24 @@ public class MapBrowseServlet extends DataPortalServlet {
 		resourcesHTMLBuilder.append("</ul>\n");
 		resourcesHTML = resourcesHTMLBuilder.toString();
 		
-		citationHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./dataPackageCitation?scope=" + scope + "&"
-				+ "identifier=" + identifier.toString() + "&"
-				+ "revision=" + revision
-		    + "\">How to cite this data package</a>\n");
-		
 		if (doiId != null) {
 			digitalObjectIdentifier = doiId;
 		}
 		
+		citationHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./dataPackageCitation?scope=" + scope + "&"
+				+ "identifier=" + identifier.toString() + "&"
+				+ "revision=" + revision
+		    + "\">How to cite this data package</a>\n");		
 		citationHTML = citationHTMLBuilder.toString();
+
+		provenanceHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=" + packageId +
+		    "\">View provenance metadata for this data package</a>\n");		
+		provenanceHTML = provenanceHTMLBuilder.toString();
+
+		codeGenerationHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./codeGeneration?packageid=" + packageId +
+			    "\">Work with this data package in R, SAS, SPSS, SPS, or Matlab</a>\n");		
+		codeGenerationHTML = codeGenerationHTMLBuilder.toString();
+
 	}
 
 }

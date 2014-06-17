@@ -1,4 +1,6 @@
+<%@ page language="java" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
   final String pageTitle = "Data Package Summary";
@@ -12,8 +14,12 @@
   String citationHTML = (String) request.getAttribute("dataPackageCitationHTML");
   String digitalObjectIdentifier = (String) request.getAttribute("digitalObjectIdentifier");
   String pastaDataObjectIdentifier = (String) request.getAttribute("pastaDataObjectIdentifier");
+  String provenanceHTML = (String) request.getAttribute("provenanceHTML");
+  String codeGenerationHTML = (String) request.getAttribute("codeGenerationHTML");
 
-  String cnt = (String) session.getAttribute("count");
+  String uid = (String) session.getAttribute("uid");
+  boolean showProvenance = !(uid == null || uid.isEmpty());
+  boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
 %>
 
 <!DOCTYPE html>
@@ -88,6 +94,9 @@
 										</div>											
 									</div>
 
+							<c:set var="showDate" value="<%= showPubDate %>"/>
+							<c:choose>
+								<c:when test="${showDate}">
 									<div class="table-row">										
 										<div class="table-cell">
 											<label class="labelBold">Publication Date</label>
@@ -96,6 +105,8 @@
 											<%= publicationDateHTML %>
 										</div>											
 									</div>
+								</c:when>
+							</c:choose>
 
 									<div class="table-row">										
 										<div class="table-cell">
@@ -117,41 +128,64 @@
 
 									<div class="table-row">										
 										<div class="table-cell">
+											<label class="labelBold">Digital Object Identifier</label>
+										</div>
+										<div class="table-cell">
+											<ul class="no-list-style">
+												<li><%= digitalObjectIdentifier %></li>
+											</ul>
+										</div>											
+									</div>
+
+									<div class="table-row">										
+										<div class="table-cell">
+											<label class="labelBold">PASTA Identifier</label>
+										</div>
+										<div class="table-cell">
+											<ul class="no-list-style">
+												<li><%= pastaDataObjectIdentifier %></li>
+											</ul>
+										</div>											
+									</div>
+
+									<div class="table-row">										
+										<div class="table-cell">
 											<label class="labelBold">Citation</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
-												<li>
-									  		<div class="table">											
-												<div class="table-row">										
-													<div class="table-cell">
-														<label class="labelBold">Digital Object Identifier</label>
-													</div>
-													<div class="table-cell">
-														<%= digitalObjectIdentifier %>
-													</div>											
-												</div>
-												<div class="table-row">										
-													<div class="table-cell">
-														<label class="labelBold">PASTA Data Object Identifier</label>
-													</div>
-													<div class="table-cell">
-														<%= pastaDataObjectIdentifier %>
-													</div>											
-												</div>
-												<div class="table-row">										
-													<div class="table-cell">
-														<label class="labelBold">Complete Citation Info</label>
-													</div>
-													<div class="table-cell">
-														<%= citationHTML %>
-													</div>											
-												</div>
-											</div>
-											</li>
+												<li><%= citationHTML %></li>
 											</ul>
-										</div>
+										</div>											
 									</div>
+
+							<c:set var="showProv" value="<%= showProvenance %>"/>
+							<c:choose>
+								<c:when test="${showProv}">
+									<div class="table-row">										
+										<div class="table-cell">
+											<label class="labelBold">Provenance</label>
+										</div>
+										<div class="table-cell">
+											<ul class="no-list-style">
+												<li><%= provenanceHTML %></li>
+											</ul>
+										</div>											
+									</div>
+								</c:when>
+							</c:choose>
+
+									<div class="table-row">										
+										<div class="table-cell">
+											<label class="labelBold">Code Generation</label>
+										</div>
+										<div class="table-cell">
+											<ul class="no-list-style">
+												<li><%= codeGenerationHTML %></li>
+											</ul>
+										</div>											
+									</div>
+									
 								</div>
 							</div>
 						</div>
