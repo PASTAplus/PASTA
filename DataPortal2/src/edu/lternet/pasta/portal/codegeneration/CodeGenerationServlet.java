@@ -1,0 +1,229 @@
+/*
+ *
+ * $Date: 2012-05-09 22:10:39 -0600 (Wed, 09 May 2012) $
+ * $Author: mservilla $
+ * $Revision: 2178 $
+ *
+ * Copyright 2011,2012 the University of New Mexico.
+ *
+ * This work was supported by National Science Foundation Cooperative
+ * Agreements #DEB-0832652 and #DEB-0936498.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ */
+
+package edu.lternet.pasta.portal.codegeneration;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.owasp.esapi.codecs.XMLEntityCodec;
+
+import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient;
+import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient.StatisticalFileType;
+import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.portal.DataPortalServlet;
+
+public class CodeGenerationServlet extends DataPortalServlet {
+
+	/*
+	 * Class variables
+	 */
+
+	private static final Logger logger = Logger
+			.getLogger(edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet.class);
+	private static final long serialVersionUID = 1L;
+	private static final String forward = "./codeGeneration.jsp";
+
+
+	/*
+	 * Constructors
+	 */
+
+	public CodeGenerationServlet() {
+		super();
+	}
+	
+	
+	/*
+	 * Class methods
+	 */
+	
+	/**
+	 * Get the list of program links that are allowable for interacting with this servlet.
+	 * One link is generated for each of the supported statistical file types.
+	 * 
+	 * @param packageId    the package ID to be used as a request parameter in each link
+	 * @return  an array list of strings, each is an anchor tag for use in the JSP page
+	 */
+	public static ArrayList<String> getProgramLinks(String packageId) {
+		ArrayList<String> programLinks = new ArrayList<String>();
+		
+		String mLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=m'>Matlab</a>", packageId);
+		String rLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=r'>R</a>", packageId);
+		String sasLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sas'>SAS</a>", packageId);
+		String spsLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sps'>SPS</a>", packageId);
+		String spssLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=spss'>SPSS</a>", packageId);
+		
+		programLinks.add(mLink);
+		programLinks.add(rLink);
+		programLinks.add(sasLink);
+		programLinks.add(spsLink);
+		programLinks.add(spssLink);
+		
+		return programLinks;
+	}
+	
+	
+	/*
+	 * Instance methods
+	 */
+
+
+	/**
+	 * Destruction of the servlet. <br>
+	 */
+	public void destroy() {
+		super.destroy();
+	}
+
+
+	/**
+	 * The doGet method of the servlet. <br>
+	 * 
+	 * This method is called when a form has its tag value method equals to get.
+	 * 
+	 * @param request
+	 *            the request send by the client to the server
+	 * @param response
+	 *            the response send by the server to the client
+	 * @throws ServletException
+	 *             if an error occurred
+	 * @throws IOException
+	 *             if an error occurred
+	 */
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		doPost(request, response);
+
+	}
+
+
+	/**
+	 * The doPost method of the servlet. <br>
+	 * 
+	 * This method is called when a form has its tag value method equals to
+	 * post.
+	 * 
+	 * @param request
+	 *            the request send by the client to the server
+	 * @param response
+	 *            the response send by the server to the client
+	 * @throws ServletException
+	 *             if an error occurred
+	 * @throws IOException
+	 *             if an error occurred
+	 */
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			String programCode = null;
+			String packageId = request.getParameter("packageId");
+			String statisticalFileTypeParam = request.getParameter("statisticalFileType");
+			StatisticalFileType statisticalFileType = null;
+			
+			switch (statisticalFileTypeParam) {
+			case "m":
+				/* For Matlab programs substitute _ for the periods in the package 
+				 * name to avoid problems with Matlab's file naming conventions.  
+				 * Thus: "knb-lter-vcr.26.20.m" becomes "knb-lter-vcr_26_20.m".
+				 */
+				statisticalFileType = StatisticalFileType.m;
+				break;
+			case "r":
+				statisticalFileType = StatisticalFileType.r;
+				break;
+			case "sas":
+				statisticalFileType = StatisticalFileType.sas;
+				break;
+			case "sps":
+				statisticalFileType = StatisticalFileType.sps;
+				break;
+			case "spss":
+				statisticalFileType = StatisticalFileType.spss;
+				break;
+			}
+
+			if (packageId != null) {
+				CodeGenerationClient codeGenerationClient = new CodeGenerationClient(statisticalFileType, packageId);
+				programCode = codeGenerationClient.getProgramCode();
+				programCode = xmlEncode(programCode);
+				request.setAttribute("statisticalFileType", statisticalFileTypeParam);
+				request.setAttribute("packageId", packageId);
+				request.setAttribute("programCode", programCode);
+				RequestDispatcher requestDispatcher = request
+						.getRequestDispatcher(forward);
+				requestDispatcher.forward(request, response);
+			}
+			else {
+				throw new UserErrorException("Package identifier is null.");
+			}
+
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+	}
+
+
+	/**
+	 * Initialization of the servlet. <br>
+	 * 
+	 * @throws ServletException
+	 *             if an error occurs
+	 */
+	public void init() throws ServletException {
+	}
+
+
+	private String xmlEncode(String rawXml) {
+		String encodedXml = null;
+
+		if (rawXml == null) {
+			encodedXml = "";
+		}
+		else {
+			// Encodings for XML
+			XMLEntityCodec xmlEntityCodec = new XMLEntityCodec();
+			char[] immune = new char[0];
+			StringBuffer xml = new StringBuffer();
+
+			for (int a = 0; a < rawXml.length(); a++) {
+				xml.append(xmlEntityCodec.encodeCharacter(immune,
+						rawXml.charAt(a)));
+			}
+
+			encodedXml = xml.toString();
+		}
+		
+		return encodedXml;
+	}
+
+}
