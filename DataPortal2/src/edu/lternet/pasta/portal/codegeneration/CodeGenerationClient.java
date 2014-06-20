@@ -154,14 +154,6 @@ public class CodeGenerationClient {
 				programCode = EntityUtils.toString(responseEntity);
 			}
 		}
-		catch (ClientProtocolException e) {
-			logger.error(e);
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			logger.error(e);
-			e.printStackTrace();
-		}
 		finally {
 			closeHttpClient(httpClient);
 		}
@@ -169,8 +161,8 @@ public class CodeGenerationClient {
 		if (statusCode != HttpStatus.SC_OK) {
 			// Something went wrong; return message from the response entity
 			String gripe = String.format(
-				"The code generation service responded with response code '%s' and message '%s'\n", 
-				statusCode.toString(), programCode);
+				"The code generation service at URL '%s' responded with response code '%s' and message '%s'\n", 
+				this.url, statusCode.toString(), programCode);
 			throw new Exception(gripe);
 		}
 

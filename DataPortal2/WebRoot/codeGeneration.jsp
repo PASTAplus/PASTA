@@ -81,7 +81,7 @@
 										</div>
 									</div>
 									<p></p>
-									<pre><%= programCode %></pre>
+									<textarea id="programCodeTextArea" name="programCodeTextArea" cols="132" rows="18"><%= programCode %></textarea>
 								<!-- /Content -->
 							</div>
 						</div>
