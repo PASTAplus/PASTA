@@ -512,7 +512,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		resourcesHTMLBuilder.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">");
 		resourcesHTMLBuilder.append("<input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" />");
 		resourcesHTMLBuilder.append("<input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />");
-		resourcesHTMLBuilder.append(" <sup><strong>*</strong></sup></form>");
+		resourcesHTMLBuilder.append("</form>");
 		resourcesHTMLBuilder.append("</div>");
 		resourcesHTMLBuilder.append("</li>\n");
 		

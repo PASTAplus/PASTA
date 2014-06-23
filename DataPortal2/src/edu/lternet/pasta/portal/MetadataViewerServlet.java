@@ -179,7 +179,7 @@ public class MetadataViewerServlet extends DataPortalServlet {
           response.setContentType("application/xml");
           response.setCharacterEncoding("UTF-8");
           PrintWriter out = response.getWriter();
-          out.print(message);
+          out.print(metadataStr);
           out.flush();
           out.close();      
         } 

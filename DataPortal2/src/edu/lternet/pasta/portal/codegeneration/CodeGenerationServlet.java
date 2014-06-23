@@ -1,7 +1,7 @@
 /*
  *
- * $Date: 2012-05-09 22:10:39 -0600 (Wed, 09 May 2012) $
- * $Author: mservilla $
+ * $Date: 2014-06-23 22:10:39 -0600 (Mon, 23 June 2014) $
+ * $Author: costa $
  * $Revision: 2178 $
  *
  * Copyright 2011,2012 the University of New Mexico.
@@ -78,13 +78,13 @@ public class CodeGenerationServlet extends DataPortalServlet {
 		String mLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=m'>Matlab</a>", packageId);
 		String rLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=r'>R</a>", packageId);
 		String sasLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sas'>SAS</a>", packageId);
-		String spsLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sps'>SPS</a>", packageId);
+		//String spsLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sps'>SPS</a>", packageId);
 		String spssLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=spss'>SPSS</a>", packageId);
 		
 		programLinks.add(mLink);
 		programLinks.add(rLink);
 		programLinks.add(sasLink);
-		programLinks.add(spsLink);
+		//programLinks.add(spsLink);
 		programLinks.add(spssLink);
 		
 		return programLinks;
@@ -144,17 +144,15 @@ public class CodeGenerationServlet extends DataPortalServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
+			String filename = null;
 			String programCode = null;
 			String packageId = request.getParameter("packageId");
 			String statisticalFileTypeParam = request.getParameter("statisticalFileType");
 			StatisticalFileType statisticalFileType = null;
+			String statisticalPackageName = null;
 			
 			switch (statisticalFileTypeParam) {
 			case "m":
-				/* For Matlab programs substitute _ for the periods in the package 
-				 * name to avoid problems with Matlab's file naming conventions.  
-				 * Thus: "knb-lter-vcr.26.20.m" becomes "knb-lter-vcr_26_20.m".
-				 */
 				statisticalFileType = StatisticalFileType.m;
 				break;
 			case "r":
@@ -173,9 +171,12 @@ public class CodeGenerationServlet extends DataPortalServlet {
 
 			if (packageId != null) {
 				CodeGenerationClient codeGenerationClient = new CodeGenerationClient(statisticalFileType, packageId);
+				filename = codeGenerationClient.getFilename();
 				programCode = codeGenerationClient.getProgramCode();
-				programCode = xmlEncode(programCode);
+				statisticalPackageName = codeGenerationClient.getStatisticalPackageName();
+				request.setAttribute("filename", filename);
 				request.setAttribute("statisticalFileType", statisticalFileTypeParam);
+				request.setAttribute("statisticalPackageName", statisticalPackageName);
 				request.setAttribute("packageId", packageId);
 				request.setAttribute("programCode", programCode);
 				RequestDispatcher requestDispatcher = request

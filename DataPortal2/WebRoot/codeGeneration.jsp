@@ -6,10 +6,12 @@
   final String pageTitle = "Code Generation";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
         
+  String filename = (String) request.getAttribute("filename");
   String statisticalFileType = (String) request.getAttribute("statisticalFileType");
+  String statisticalPackageName = (String) request.getAttribute("statisticalPackageName");
   String packageid = (String) request.getAttribute("packageId");
   String programCode = (String) request.getAttribute("programCode");
-
+  session.setAttribute("programCode", programCode);
 %>
 
 <!DOCTYPE html>
@@ -69,15 +71,21 @@
 									<div class="display-table">										
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">Package Identifier:</label>
+												<label class="labelBold">Package ID:</label>
 											</div>											
 											<div class="table-cell"><%= packageid %></div>											
 										</div>
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">Statistical File Type:</label>
+												<label class="labelBold">Language Format:</label>
 											</div>											
-											<div class="table-cell"><%= statisticalFileType %></div>											
+											<div class="table-cell"><%= statisticalPackageName %></div>							
+										</div>
+										<div class="table-row">										
+											<div class="table-cell">
+												<label class="labelBold">File Download:</label>
+											</div>											
+											<div class="table-cell"><a  class="searchsubcat" href="codegenerationdownload?filename=<%= filename %>"><%= filename %></a></div>							
 										</div>
 									</div>
 									<p></p>

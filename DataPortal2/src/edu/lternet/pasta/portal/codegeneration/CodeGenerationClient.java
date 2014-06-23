@@ -1,8 +1,8 @@
 /*
  *
- * $Date:$
- * $Author:$
- * $Revision:$
+ * $Date: 2014-06-23 22:10:39 -0600 (Mon, 23 June 2014) $
+ * $Author: costa $
+ * $Revision: 2178 $
  *
  * Copyright 2011,2012 the University of New Mexico.
  *
@@ -29,7 +29,6 @@ import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -67,6 +66,8 @@ public class CodeGenerationClient {
 	 */
 
 	private final String BASE_URL = "http://www.vcrlter.virginia.edu/webservice/PASTAprog";
+	private String filename = null;
+	private String statisticalPackageName = null;
 	private String url;
 
 
@@ -86,8 +87,6 @@ public class CodeGenerationClient {
 			throw new IllegalArgumentException("null statisticalFileType");
 		}
 		
-		String urlSuffix = "";
-
 		switch (statisticalFileType) {
 		case m:
 			/* For Matlab programs substitute _ for the periods in the package 
@@ -95,23 +94,28 @@ public class CodeGenerationClient {
 			 * Thus: "knb-lter-vcr.26.20.m" becomes "knb-lter-vcr_26_20.m".
 			 */
 			packageId = packageId.replace('.', '_');
-			urlSuffix = String.format("%s.m", packageId);
+			this.statisticalPackageName = "Matlab";
+			this.filename = String.format("%s.m", packageId);
 			break;
 		case r:
-			urlSuffix = String.format("%s.r", packageId);
+			this.statisticalPackageName = "R";
+			this.filename = String.format("%s.r", packageId);
 			break;
 		case sas:
-			urlSuffix = String.format("%s.sas", packageId);
+			this.statisticalPackageName = "SAS";
+			this.filename = String.format("%s.sas", packageId);
 			break;
 		case sps:
-			urlSuffix = String.format("%s.sps", packageId);
+			this.statisticalPackageName = "SPSS";
+			this.filename = String.format("%s.sps", packageId);
 			break;
 		case spss:
-			urlSuffix = String.format("%s.spss", packageId);
+			this.statisticalPackageName = "SPSS";
+			this.filename = String.format("%s.spss", packageId);
 			break;
 		}
 		
-		this.url = String.format("%s/%s", BASE_URL, urlSuffix);
+		this.url = String.format("%s/%s", BASE_URL, filename);
 	}
 
 
@@ -126,6 +130,16 @@ public class CodeGenerationClient {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+
+	/**
+	 * Accessor method
+	 * 
+	 * @return  the filename value
+	 */
+	public String getFilename() {
+		return filename;
 	}
 
 
@@ -167,6 +181,16 @@ public class CodeGenerationClient {
 		}
 
 		return programCode;
+	}
+	
+	
+	/**
+	 * Accessor method
+	 * 
+	 * @return  the statisticalPackageName value
+	 */
+	public String getStatisticalPackageName() {
+		return statisticalPackageName;
 	}
 
 }
