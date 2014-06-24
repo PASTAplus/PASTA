@@ -11,6 +11,15 @@
 
   HttpSession httpSession = request.getSession();
 
+  String displayDivOpen = "<div>";
+  String displayDivClose = "</div>";
+  String subscriptionTableHTML = "";
+  String subscriptionOptionsHTML = "";
+  String subscribeMessage = (String) request.getAttribute("subscribemessage");
+  String deleteMessage = (String) request.getAttribute("deletemessage");
+  String testMessage = (String) request.getAttribute("testmessage");
+  String type = (String) request.getAttribute("type");
+
   String uid = (String) httpSession.getAttribute("uid");
 
   if (uid == null || uid.isEmpty()) {
@@ -21,31 +30,28 @@
         .getRequestDispatcher("./login.jsp");
     requestDispatcher.forward(request, response);
   }
-  
-  EventSubscriptionClient esc = new EventSubscriptionClient(uid);
-  int numberOfSubscriptions = esc.numberOfSubscriptions();
-  String displayDivOpen = "<div>";
-  String displayDivClose = "</div>";
-  if (numberOfSubscriptions == 0) {
-    displayDivOpen = "<div class='display-none'>";
-  }
-  String subscriptionTableHTML = esc.subscriptionTableHTML();
-  String subscriptionOptionsHTML = esc.subscriptionOptionsHTML();
+  else {
+  	EventSubscriptionClient esc = new EventSubscriptionClient(uid);
+  	int numberOfSubscriptions = esc.numberOfSubscriptions();
+  	
+  	if (numberOfSubscriptions == 0) {
+    	displayDivOpen = "<div class='display-none'>";
+  	}
+  	
+  	subscriptionTableHTML = esc.subscriptionTableHTML();
+  	subscriptionOptionsHTML = esc.subscriptionOptionsHTML();
 
-  String subscribeMessage = (String) request.getAttribute("subscribemessage");
-  String deleteMessage = (String) request.getAttribute("deletemessage");
-  String testMessage = (String) request.getAttribute("testmessage");
-  String type = (String) request.getAttribute("type");
-
-  if (type == null) {
-    type = "";
-  } else {
-    type = "class=\"" + type + "\"";
-  }
+  	if (type == null) {
+    	type = "";
+  	} 
+  	else {
+    	type = "class=\"" + type + "\"";
+  	}
   
-  if (subscribeMessage  == null) { subscribeMessage = ""; }
-  if (testMessage  == null) { testMessage = ""; }
-  if (deleteMessage  == null) { deleteMessage = ""; }
+  	if (subscribeMessage  == null) { subscribeMessage = ""; }
+  	if (testMessage  == null) { testMessage = ""; }
+  	if (deleteMessage  == null) { deleteMessage = ""; }
+  }
 %>
 
 <!DOCTYPE html>
