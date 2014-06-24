@@ -9,7 +9,9 @@
   String filename = (String) request.getAttribute("filename");
   String statisticalFileType = (String) request.getAttribute("statisticalFileType");
   String statisticalPackageName = (String) request.getAttribute("statisticalPackageName");
-  String packageid = (String) request.getAttribute("packageId");
+  String packageId = (String) request.getAttribute("packageId");
+  String mapBrowseURL = (String) request.getAttribute("mapBrowseURL");
+  String instructions = (String) request.getAttribute("instructions");
   String programCode = (String) request.getAttribute("programCode");
   session.setAttribute("programCode", programCode);
 %>
@@ -60,7 +62,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Program Code</h2>
+								<h2><%= statisticalPackageName %> Code</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -73,13 +75,7 @@
 											<div class="table-cell">
 												<label class="labelBold">Package ID:</label>
 											</div>											
-											<div class="table-cell"><%= packageid %></div>											
-										</div>
-										<div class="table-row">										
-											<div class="table-cell">
-												<label class="labelBold">Language Format:</label>
-											</div>											
-											<div class="table-cell"><%= statisticalPackageName %></div>							
+											<div class="table-cell"><a class='searchsubcat' href="<%= mapBrowseURL %>"><%= packageId %></a></div>											
 										</div>
 										<div class="table-row">										
 											<div class="table-cell">
@@ -87,9 +83,21 @@
 											</div>											
 											<div class="table-cell"><a  class="searchsubcat" href="codegenerationdownload?filename=<%= filename %>"><%= filename %></a></div>							
 										</div>
+										<div class="table-row">										
+											<div class="table-cell">
+												<label class="labelBold">Instructions:</label>
+											</div>											
+											<div class="table-cell"><%= instructions %></div>							
+										</div>
+										<div class="table-row">										
+											<div class="table-cell">
+												<label class="labelBold">Code:</label>
+											</div>											
+											<div class="table-cell">						
+												<textarea id="programCodeTextArea" name="programCodeTextArea" cols="124" rows="12"><%= programCode %></textarea>
+											</div>
+										</div>
 									</div>
-									<p></p>
-									<textarea id="programCodeTextArea" name="programCodeTextArea" cols="132" rows="18"><%= programCode %></textarea>
 								<!-- /Content -->
 							</div>
 						</div>

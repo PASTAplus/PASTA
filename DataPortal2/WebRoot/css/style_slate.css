@@ -2912,29 +2912,33 @@ td.nis {
 
 
 kbd.nis {
-	  font-weight: bold;
+	font-weight: bold;
+}
+
+code.nis {
+	color: black;
 }
 
 .nis-error {
     background-color: #F7F7F7;
     font-family: monospace;
-	  font-weight: bold;
+	font-weight: bold;
 }
 
 .nis-warn {
-	  font-style: italic;
+	font-style: italic;
     font-weight: bold;
 }
 
 .nis-info {
     background-color: #F7F7F7;
     font-family: monospace;
-	  font-weight: bold;
+	font-weight: bold;
 }
 
 .nis-title {
-	  font-style: italic;
-	  font-weight: bold;
+	font-style: italic;
+	font-weight: bold;
 }
 
 p.eml {
