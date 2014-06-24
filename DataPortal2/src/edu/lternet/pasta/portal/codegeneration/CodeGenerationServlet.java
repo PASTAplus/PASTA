@@ -39,6 +39,7 @@ import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient;
 import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient.StatisticalFileType;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.portal.DataPortalServlet;
+import edu.lternet.pasta.portal.MapBrowseServlet;
 
 public class CodeGenerationServlet extends DataPortalServlet {
 
@@ -50,7 +51,44 @@ public class CodeGenerationServlet extends DataPortalServlet {
 			.getLogger(edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static final String forward = "./codeGeneration.jsp";
+	
+	private static final String rInstructions =
+		"Download the R program and open it in R to run. Alternatively, you can " +
+	    "copy and paste the program code into the R console.<br/><br/>For datasets that " +
+		"require authenticated access to data tables, you may need to download the " +
+	    "data separately and alter the<br/><code class='nis'>infile <-</code> lines to reflect where the data " +
+		"is stored on your computer.<br/>&nbsp;";
+	
+	private static final String sasInstructions =
+		"Download the .sas program and open it in SAS to run. Alternatively the " +
+		"code may be cut and pasted into the SAS program editor.<br/><br/>For datasets " +
+		"that require authenticated access to data tables, you may need to download " +
+		"the data separately and alter the <code class='nis'>filename datafile</code> lines to reflect " +
+		"where the data is stored on your computer.<br/>&nbsp;";
+			
+	private static final String spssInstructions =
+		"Download the .spss program and the data files. Open the .spss file as a " +
+		"syntax file and edit it so that the <code class='nis'>FILE=\"PUT-PATH-TO-DATA-FILE-HERE\"</code> " +
+		"statements contain the path to the appropriate data file on your computer. " +
+		"Alternatively the code may be cut and pasted into an SPSS Syntax Editor " +
+		"and altered there.<br/>&nbsp;";
 
+	private static final String matlabInstructions =
+		"Download the .m file and save it to a directory in the MATLAB path, then " +
+		"start MATLAB and run it using the syntax:<br/>" + 
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>[data,msg] = knb_lter_XX_YY(pn,cachedata,username,password,entities)</code><br/><br/>" +
+		"Where:<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>knb_lter_XX_YY</code> is the function m-file name derived from the packageID of the dataset (e.g. knb_lter_knz_95_5)<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>pn</code> = file system path for saving temporary files (default = pwd)<br/>" + 
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>cachedata</code> = option to use cached entity files if they exist in pn (0 = no/default, 1 = yes)<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>username</code> = username for HTTPS authentication (default = for anonymous)<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>password</code> = password for HTTPS authentication (default = for anonymous)<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>entities</code> = cell array of entities to retrieve (default = for all)<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>data</code> = structure containing fields for parsed metadata and data arrays<br/>" +
+		"&nbsp;&nbsp;&nbsp;&nbsp;<code class='nis'>msg</code> = text of any error messages ( for no errors)<br/><br/>" +
+		"Note that username and password are only required for data tables where " +
+		"authenticated access is required, and the cURL executable must be present " +
+		"in the MATLAB path (see <a href=\"http://curl.haxx.se/\">http://curl.haxx.se/</a>).<br/>&nbsp;";
 
 	/*
 	 * Constructors
@@ -78,13 +116,11 @@ public class CodeGenerationServlet extends DataPortalServlet {
 		String mLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=m'>Matlab</a>", packageId);
 		String rLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=r'>R</a>", packageId);
 		String sasLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sas'>SAS</a>", packageId);
-		//String spsLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sps'>SPS</a>", packageId);
 		String spssLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=spss'>SPSS</a>", packageId);
 		
 		programLinks.add(mLink);
 		programLinks.add(rLink);
 		programLinks.add(sasLink);
-		//programLinks.add(spsLink);
 		programLinks.add(spssLink);
 		
 		return programLinks;
@@ -150,22 +186,29 @@ public class CodeGenerationServlet extends DataPortalServlet {
 			String statisticalFileTypeParam = request.getParameter("statisticalFileType");
 			StatisticalFileType statisticalFileType = null;
 			String statisticalPackageName = null;
+			String mapBrowseURL = MapBrowseServlet.getRelativeURL(packageId);
+			String instructions = null;
 			
 			switch (statisticalFileTypeParam) {
 			case "m":
 				statisticalFileType = StatisticalFileType.m;
+				instructions = CodeGenerationServlet.matlabInstructions;
 				break;
 			case "r":
 				statisticalFileType = StatisticalFileType.r;
+				instructions = CodeGenerationServlet.rInstructions;
 				break;
 			case "sas":
 				statisticalFileType = StatisticalFileType.sas;
+				instructions = CodeGenerationServlet.sasInstructions;
 				break;
 			case "sps":
 				statisticalFileType = StatisticalFileType.sps;
+				instructions = CodeGenerationServlet.spssInstructions;
 				break;
 			case "spss":
 				statisticalFileType = StatisticalFileType.spss;
+				instructions = CodeGenerationServlet.spssInstructions;
 				break;
 			}
 
@@ -178,6 +221,8 @@ public class CodeGenerationServlet extends DataPortalServlet {
 				request.setAttribute("statisticalFileType", statisticalFileTypeParam);
 				request.setAttribute("statisticalPackageName", statisticalPackageName);
 				request.setAttribute("packageId", packageId);
+				request.setAttribute("mapBrowseURL", mapBrowseURL);
+				request.setAttribute("instructions", instructions);
 				request.setAttribute("programCode", programCode);
 				RequestDispatcher requestDispatcher = request
 						.getRequestDispatcher(forward);
