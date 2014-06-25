@@ -2296,7 +2296,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
-	 * <strong>List Service Mehtods</strong> operation
+	 * <strong>List Service Methods</strong> operation, returning a simple list
+	 * of web service methods supported by the Data Package Manager web service.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
