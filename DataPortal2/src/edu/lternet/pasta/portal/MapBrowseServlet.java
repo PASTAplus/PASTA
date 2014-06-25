@@ -43,6 +43,7 @@ import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
@@ -325,7 +326,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			emlString = dpmClient.readMetadata(scope, identifier, revision);
 			emlObject = new EmlObject(emlString);
-
 			titles = emlObject.getTitles();
 
 			if (titles != null) {
@@ -402,7 +402,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		URLCodec urlCodec = new URLCodec();
 		
-		String dataPackage = null;
+		String packageIdListItem = null;
 		String metadata = null;
 		String report = null;
 		String data = null;
@@ -495,7 +495,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				pastaDataObjectIdentifier = dpmClient.getPastaPackageUri(scope, identifier, revision);
 
-				dataPackage = "<li>" + packageId + "</li>\n";
+				packageIdListItem = "<li>" + packageId + "</li>\n";
 				
 				if (predecessor != null) {
 					previous = "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope=" + scope + "&identifier="
@@ -520,7 +520,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 
 		packageIdHTMLBuilder.append("<ul class=\"no-list-style\">\n");
-		packageIdHTMLBuilder.append(dataPackage);
+		packageIdHTMLBuilder.append(packageIdListItem);
 		packageIdHTMLBuilder.append(previous);
 		packageIdHTMLBuilder.append(next);
 		packageIdHTMLBuilder.append(revisions);
@@ -571,13 +571,26 @@ public class MapBrowseServlet extends DataPortalServlet {
 		    "\">provenance metadata</a> for this data package\n");	
 		provenanceHTML = provenanceHTMLBuilder.toString();
 
-		ArrayList<String> programLinks = CodeGenerationServlet.getProgramLinks(packageId);
-		codeGenerationHTMLBuilder.append("Analyze this data package using ");
-		for (String programLink : programLinks) {
-			codeGenerationHTMLBuilder.append(String.format("%s, ", programLink));
+		/*
+		 * Add code generation section only if this data package has
+		 * at least one entity that is a data table.
+		 */
+		DataPackage dataPackage = emlObject.getDataPackage();
+		boolean hasDataTableEntity = dataPackage.hasDataTableEntity();
+		if (hasDataTableEntity) {
+			ArrayList<String> programLinks = CodeGenerationServlet
+					.getProgramLinks(packageId);
+			codeGenerationHTMLBuilder
+					.append("Analyze this data package using ");
+			for (String programLink : programLinks) {
+				codeGenerationHTMLBuilder.append(String.format("%s, ",
+						programLink));
+			}
+			codeGenerationHTML = codeGenerationHTMLBuilder.toString();
+			codeGenerationHTML = codeGenerationHTML.substring(0,
+					codeGenerationHTML.length() - 2); // trim the last comma and
+														// space
 		}
-		codeGenerationHTML = codeGenerationHTMLBuilder.toString();
-		codeGenerationHTML = codeGenerationHTML.substring(0, codeGenerationHTML.length() - 2); // trim the last comma and space
 
 	}
 

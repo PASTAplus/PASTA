@@ -73,25 +73,29 @@
 									<div class="display-table">										
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">Package ID:</label>
+												<label class="labelBold text-align-right margin-right-15">Package ID:</label>
 											</div>											
-											<div class="table-cell"><a class='searchsubcat' href="<%= mapBrowseURL %>"><%= packageId %></a></div>											
+											<div class="table-cell">
+												<a class='searchsubcat' href="<%= mapBrowseURL %>"><%= packageId %></a>
+											</div>											
 										</div>
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">File Download:</label>
+												<label class="labelBold text-align-right margin-right-15">File Download:</label>
 											</div>											
-											<div class="table-cell"><a  class="searchsubcat" href="codegenerationdownload?filename=<%= filename %>"><%= filename %></a></div>							
+											<div class="table-cell">
+												<a  class="searchsubcat" href="codegenerationdownload?filename=<%= filename %>"><%= filename %></a>
+											</div>							
 										</div>
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">Instructions:</label>
+												<label class="labelBold text-align-right margin-right-15">Instructions:</label>
 											</div>											
 											<div class="table-cell"><%= instructions %></div>							
 										</div>
 										<div class="table-row">										
 											<div class="table-cell">
-												<label class="labelBold">Code:</label>
+												<label class="labelBold text-align-right margin-right-15">Code:</label>
 											</div>											
 											<div class="table-cell">						
 												<textarea id="programCodeTextArea" name="programCodeTextArea" cols="124" rows="12"><%= programCode %></textarea>

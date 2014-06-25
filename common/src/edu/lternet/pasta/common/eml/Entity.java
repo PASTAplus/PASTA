@@ -35,6 +35,14 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class Entity {
   
+	/*
+	 * The entity types supported by EML
+	 */
+	public enum EntityType {
+		dataTable, otherEntity, spatialRaster, spatialVector, storedProcedure, view;
+	}
+
+
   /*
    * Class fields
    */
@@ -45,6 +53,7 @@ public class Entity {
    */
   
   String entityId = null;
+  EntityType entityType = null;
   String name = null;
   String objectName = null;
   String url = null;
@@ -76,6 +85,34 @@ public class Entity {
   }
   
   
+	public static EntityType entityTypeFromElementName(String elementName) {
+		EntityType entityType = null;
+
+		switch (elementName) {
+		case "dataTable":
+			entityType = EntityType.dataTable;
+			break;
+		case "otherEntity":
+			entityType = EntityType.otherEntity;
+			break;
+		case "spatialRaster":
+			entityType = EntityType.spatialRaster;
+			break;
+		case "spatialVector":
+			entityType = EntityType.spatialVector;
+			break;
+		case "storedProcedure":
+			entityType = EntityType.storedProcedure;
+			break;
+		case "view":
+			entityType = EntityType.view;
+			break;
+		}
+
+		return entityType;
+	}
+  
+  
   /*
    * Instance methods
    */
@@ -85,6 +122,11 @@ public class Entity {
   
   public String getEntityId() {
 	  return entityId;
+  }
+  
+  
+  public EntityType getEntityType() {
+	  return entityType;
   }
   
   
@@ -103,6 +145,11 @@ public class Entity {
   }
 
   
+  public void setEntityType(EntityType entityType) {
+	    this.entityType = entityType;
+  }
+	  
+	  
   public void setName(String name) {
     this.name = name;
     // If we know the entity's name, then we can also derive its id

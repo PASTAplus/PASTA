@@ -44,6 +44,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.eml.Entity.EntityType;
 
 
 /*
@@ -188,16 +189,18 @@ public class EMLParser {
         }
 
         for (int j = 0; j < ENTITY_TYPES.length; j++) {
-          String ENTITY_TYPE = ENTITY_TYPES[j];
-          String ENTITY_PATH = ENTITY_PATH_PARENT + ENTITY_TYPE;
+          String elementName = ENTITY_TYPES[j];
+          String elementPath = ENTITY_PATH_PARENT + elementName;
+          EntityType entityType = Entity.entityTypeFromElementName(elementName);
       
           // Parse the entity name
           NodeList entityNodeList = 
-                                xpathapi.selectNodeList(document, ENTITY_PATH);
+                                xpathapi.selectNodeList(document, elementPath);
       
           if (entityNodeList != null) {
             for (int i = 0; i < entityNodeList.getLength(); i++) {
               Entity entity = new Entity();
+              entity.setEntityType(entityType);
               Node entityNode = entityNodeList.item(i);
           
               // get the entityName

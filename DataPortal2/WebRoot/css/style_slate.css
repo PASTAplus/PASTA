@@ -3044,4 +3044,8 @@ div.info {
     text-align: right;
 }
 
+.margin-right-15 {
+    margin-right: 15px;
+}
+
 /* End -- Tabular layout when the contents is NOT tabular data */

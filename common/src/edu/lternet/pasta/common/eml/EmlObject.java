@@ -58,11 +58,12 @@ public class EmlObject {
 	/**
 	 * Create the EML 2.1.0 POJO from an EML file.
 	 * 
-	 * @param emlString The EML XML document
+	 * @param emlString
+	 *            The EML XML document
 	 */
 	public EmlObject(String emlString) {
 		EMLParser emlParser = new EMLParser();
-    this.dataPackage = emlParser.parseDocument(emlString);
+		this.dataPackage = emlParser.parseDocument(emlString);
 	}
 
 	
@@ -106,6 +107,16 @@ public class EmlObject {
   }
 
   
+  	/**
+  	 * Access the dataPackage instance variable.
+  	 * 
+  	 * @return  the dataPackage object
+  	 */
+	public DataPackage getDataPackage() {
+		return this.dataPackage;
+	}
+
+
 	/**
 	 * Returns the number of creators of type PERSON after the call to 
 	 * getCreators().
