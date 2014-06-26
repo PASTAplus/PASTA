@@ -43,6 +43,8 @@ public class DataPackageSurvey {
    * Instance methods
    */
 	public String[] surveyDataPackages(String criterion, int n) {
+		Integer numberOfDays = new Integer(100);
+		Integer limit = new Integer(n);
 		int arrayLength = n * 4;
 		String[] surveyResults = new String[arrayLength]; // (1) scope, (2) identifier, (3) title, (4) date
 		List<RecentUpload> recentUploads = null;
@@ -56,10 +58,10 @@ public class DataPackageSurvey {
 		}
 
 		if (criterion.equals("recentInserts")) {
-			recentUploads = AuditManagerClient.getRecentInserts();
+			recentUploads = AuditManagerClient.getRecentInserts(numberOfDays, limit);
 		}
 		else if (criterion.equals("recentUpdates")) {
-			recentUploads = AuditManagerClient.getRecentUpdates();
+			recentUploads = AuditManagerClient.getRecentUpdates(numberOfDays, limit);
 		}
 		
 		if (recentUploads != null) {
