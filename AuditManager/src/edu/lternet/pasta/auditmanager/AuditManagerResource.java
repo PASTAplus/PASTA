@@ -162,6 +162,7 @@ public class AuditManagerResource extends PastaWebService
     static {
         Set<String> set = new TreeSet<String>();
         set.add(FROM_TIME);
+        set.add(SERVICEMETHOD);
         set.add(LIMIT);
         VALID_RECENT_UPLOADS_KEYS = Collections.unmodifiableSet(set);
     }

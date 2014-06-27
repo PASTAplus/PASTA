@@ -373,9 +373,7 @@ public class AuditManager {
 		String whereClause = null;
 		String limit = null;
 	    final String ORDER_CLAUSE = " ORDER BY entrytime DESC";
-		StringBuffer stringBuffer = new StringBuffer(
-				" WHERE category='info' AND" +
-			    " (servicemethod='createDataPackage' OR servicemethod='updateDataPackage') ");
+		StringBuffer stringBuffer = new StringBuffer(" WHERE category='info'");
 
 		for (String key : queryParams.keySet()) {
 			if (!key.equalsIgnoreCase("limit")) {
@@ -387,6 +385,11 @@ public class AuditManager {
 					String timestamp = dateToTimestamp(value, false);
 					stringBuffer.append(String.format(" entrytime >= '%s'",
 							timestamp));
+				}
+				else if (key.equalsIgnoreCase("serviceMethod")) {
+					String value = values.get(0);
+					stringBuffer.append(String.format(" servicemethod='%s'",
+							value));
 				}
 			}
 		}
