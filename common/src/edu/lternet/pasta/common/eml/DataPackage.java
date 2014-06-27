@@ -26,6 +26,8 @@ package edu.lternet.pasta.common.eml;
 
 import java.util.ArrayList;
 
+import edu.lternet.pasta.common.eml.Entity.EntityType;
+
 
 /**
  * DataPackage holds metadata values about a data package that were parsed 
@@ -157,6 +159,25 @@ public class DataPackage {
 	  
 	  return hasCreator;
   }
+  
+  
+  	/**
+  	 * Boolean method to determine whether this data package has at
+  	 * least one data table entity within it. 
+  	 * 
+  	 * @return  true if at least one data table entity is found, else false
+  	 */
+	public boolean hasDataTableEntity() {
+		boolean hasDataTable = false;
+
+		for (Entity entity : getEntityList()) {
+			if (entity.getEntityType() == EntityType.dataTable) {
+				hasDataTable = true;
+			}
+		}
+
+		return hasDataTable;
+	}
 
   
   public void setPackageId(String packageId) {

@@ -156,6 +156,12 @@
     <servlet-class>edu.lternet.pasta.portal.ProvenanceViewerServlet</servlet-class>
   </servlet>
   <servlet>
+    <description>Code Generation Servlet</description>
+    <display-name>CodeGenerationServlet</display-name>
+    <servlet-name>CodeGenerationServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet</servlet-class>
+  </servlet>
+  <servlet>
     <description>Data Package Citation Servlet</description>
     <display-name>DataPackageCitationServlet</display-name>
     <servlet-name>DataPackageCitationServlet</servlet-name>
@@ -277,6 +283,10 @@
   <servlet-mapping>
     <servlet-name>ProvenanceViewerServlet</servlet-name>
     <url-pattern>/provenanceViewer</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CodeGenerationServlet</servlet-name>
+    <url-pattern>/codeGeneration</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>DataPackageCitationServlet</servlet-name>

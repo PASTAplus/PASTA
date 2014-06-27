@@ -50,13 +50,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import edu.lternet.pasta.client.RecentUpload.Service;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 
 
 /**
- * @author servilla
- * @since May 2, 2012
+ * @author costa
+ * @since June 26, 2014
  * 
  *        The AuditManagerClient provides an interface to PASTA's Audit Manager
  *        service. Specifically, this class supports access to the Audit Manager
@@ -75,9 +74,11 @@ public class AuditManagerClient extends PastaClient {
   /*
    * The cache of RecentUpload objects.
    */
-  private static List<RecentUpload> recentUploads = null;
-  private static long recentUploadsLastRefreshTime = 0L; 
-
+  private static List<RecentUpload> recentInserts = null;
+  private static List<RecentUpload> recentUpdates = null;
+  private static long recentInsertsLastRefreshTime = 0L;
+  private static long recentUpdatesLastRefreshTime = 0L;
+  
   
   /*
    * Instance variables
@@ -118,18 +119,12 @@ public class AuditManagerClient extends PastaClient {
    * @return A list of RecentUpload objects, where each upload was an insert,
    *         i.e. the serviceMethod for each is "createDataPackage".
    */
-	public static List<RecentUpload> getRecentInserts() {
-		List<RecentUpload> recentUploads = getRecentUploads();
-		List<RecentUpload> recentInserts = new ArrayList<RecentUpload>();
-
-		if (recentUploads != null) {
-			for (RecentUpload recentUpload : recentUploads) {
-				if (recentUpload.getService() == Service.INSERT) {
-					recentInserts.add(recentUpload);
-				}
-			}
+	public static List<RecentUpload> getRecentInserts(Integer numberOfDays, Integer limit) {
+		if (recentInserts == null || recentInserts.size() < limit || shouldRefresh(recentInsertsLastRefreshTime)) {
+			recentInserts = getRecentUploads("createDataPackage", numberOfDays, limit);
+		    Date now = new Date();
+		    recentInsertsLastRefreshTime = now.getTime();
 		}
-
 		return recentInserts;
 	}
   
@@ -140,18 +135,12 @@ public class AuditManagerClient extends PastaClient {
    * @return A list of RecentUpload objects, where each upload was an update,
    *         i.e. the serviceMethod for each is "updateDataPackage".
    */
-	public static List<RecentUpload> getRecentUpdates() {
-		List<RecentUpload> recentUploads = getRecentUploads();
-		List<RecentUpload> recentUpdates = new ArrayList<RecentUpload>();
-
-		if (recentUploads != null) {
-			for (RecentUpload recentUpload : recentUploads) {
-				if (recentUpload.getService() == Service.UPDATE) {
-					recentUpdates.add(recentUpload);
-				}
-			}
+	public static List<RecentUpload> getRecentUpdates(Integer numberOfDays, Integer limit) {
+		if (recentUpdates == null || recentUpdates.size() < limit || shouldRefresh(recentUpdatesLastRefreshTime)) {
+			recentUpdates = getRecentUploads("updateDataPackage", numberOfDays, limit);
+		    Date now = new Date();
+		    recentUpdatesLastRefreshTime = now.getTime();
 		}
-
 		return recentUpdates;
 	}
   
@@ -161,18 +150,15 @@ public class AuditManagerClient extends PastaClient {
    * list of RecentUpload objects if the cache is empty or if it's time
    * to refresh the cache.
    */
-  private static List<RecentUpload> getRecentUploads() {
-	  if (recentUploads == null || shouldRefresh()) {
-		  try {
+  private static List<RecentUpload> getRecentUploads(String serviceMethod, Integer numberOfDays, Integer limit) {
+	  List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
+	  try {
 		     AuditManagerClient auditManagerClient = new AuditManagerClient("public");
-		     recentUploads = auditManagerClient.recentUploads();
-		     Date now = new Date();
-		     recentUploadsLastRefreshTime = now.getTime();
+		     recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
 		  }
 		  catch (Exception e) {
 			  logger.error("Error refreshing recent uploads: " + e.getMessage());
 		  }
-	  }
 	  
 	  return recentUploads;	  
   }
@@ -183,12 +169,12 @@ public class AuditManagerClient extends PastaClient {
    * refreshed. Returns true is the current time is more than 12 hours
    * past the last refresh time.
    */
-  private static boolean shouldRefresh() {
+  private static boolean shouldRefresh(long lastRefreshTime) {
 	  boolean shouldRefresh = false;
 	  final long twelveHours = 12 * 60 * 60 * 1000;
 	  Date now = new Date();
 	  long nowTime = now.getTime();
-	  long refreshTime = recentUploadsLastRefreshTime + twelveHours;
+	  long refreshTime = lastRefreshTime + twelveHours;
 	  
 	  if (refreshTime < nowTime) {
 		  shouldRefresh = true;
@@ -207,10 +193,10 @@ public class AuditManagerClient extends PastaClient {
    * Compose a fromTime date string to use with generating the list of
    * recent uploads.
    */
-  private String composeFromTime() {
+  private String composeFromTime(int numberOfDays) {
 	  String fromTimeStr = "";
 	  SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	  final long nDays = 30 * 24 * 60 * 60 * 1000L; // set the time period for recent uploads
+	  final long nDays = numberOfDays * 24 * 60 * 60 * 1000L; // set the time period for recent uploads
 	  
 	  Date now = new Date();
 	  long nowTime = now.getTime();
@@ -284,17 +270,17 @@ public class AuditManagerClient extends PastaClient {
    * @return a list of RecentUpload objects
    * @throws PastaEventException
    */
-	public List<RecentUpload> recentUploads() throws 
+	private List<RecentUpload> recentUploads(String serviceMethod, Integer numberOfDays, Integer limit) throws 
 	        PastaAuthenticationException, PastaConfigurationException, PastaEventException {
-		List<RecentUpload> recent = new ArrayList<RecentUpload>();
+		List<RecentUpload> recentUploadsList = new ArrayList<RecentUpload>();
 		String entity = null;
 		Integer statusCode = null;
 		HttpEntity responseEntity = null;
-		String fromTime = composeFromTime();
+		String fromTime = composeFromTime(numberOfDays);
 
 	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpResponse response = null;
-		String url = String.format("%s/recent-uploads?fromTime=%s", BASE_URL, fromTime);
+		String url = String.format("%s/recent-uploads?serviceMethod=%s&fromTime=%s&limit=%d", BASE_URL, serviceMethod, fromTime, limit);
 		HttpGet httpGet = new HttpGet(url);
 
 		// Set header content
@@ -303,14 +289,13 @@ public class AuditManagerClient extends PastaClient {
 		}
 
 		try {
-
 			response = httpClient.execute(httpGet);
 			statusCode = (Integer) response.getStatusLine().getStatusCode();
 			responseEntity = response.getEntity();
 
 			if (responseEntity != null) {
 				entity = EntityUtils.toString(responseEntity);
-				recent = parseRecentUploads(entity);
+				recentUploadsList = parseRecentUploads(entity);
 			}
 
 		}
@@ -327,17 +312,14 @@ public class AuditManagerClient extends PastaClient {
 	 	}
 
 		if (statusCode != HttpStatus.SC_OK) {
-
 			// Something went wrong; return message from the response entity
 			String gripe = "The AuditManager responded with response code '"
 					+ statusCode.toString() + "' and message '" + entity
 					+ "'\n";
 			throw new PastaEventException(gripe);
-
 		}
-
-		return recent;
-
+		
+		return recentUploadsList;
 	}
 	
 	
@@ -347,7 +329,6 @@ public class AuditManagerClient extends PastaClient {
 	 */
 	private List<RecentUpload> parseRecentUploads(String xmlString)
 	        throws PastaAuthenticationException, PastaConfigurationException, PastaEventException {
-		int limit = 3;
 		int insertCount = 0;
 		int updateCount = 0;
 		/*
@@ -397,8 +378,8 @@ public class AuditManagerClient extends PastaClient {
 				 */
 				boolean isAuthorized = dpmClient.isAuthorized(resourceId);
 				if (isAuthorized) {
-					if ((serviceMethod.equals("createDataPackage") && (insertCount < limit)) || 
-					    (serviceMethod.equals("updateDataPackage") && (updateCount < limit))
+					if ((serviceMethod.equals("createDataPackage")) || 
+					    (serviceMethod.equals("updateDataPackage"))
 					   ) {
 						try {
 							RecentUpload recentUpload = 

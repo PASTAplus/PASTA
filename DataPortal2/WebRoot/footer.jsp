@@ -104,7 +104,7 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 							<div class="span4">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Recent Inserts</h2>
+										<h2 class="widget-title">Recently Added</h2>
 									</div>
 									<dl>
 										<dt><%= icon1 %></dt>
@@ -119,7 +119,7 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 							<div class="span6">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
-										<h2 class="widget-title">Recent Updates</h2>
+										<h2 class="widget-title">Recently Updated</h2>
 									</div>
 									<dl>
 										<dt><%= icon3 %></dt>

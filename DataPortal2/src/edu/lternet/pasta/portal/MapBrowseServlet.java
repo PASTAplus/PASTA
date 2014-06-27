@@ -40,10 +40,14 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
+import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
+import edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet;
 
 
 public class MapBrowseServlet extends DataPortalServlet {
@@ -81,7 +85,36 @@ public class MapBrowseServlet extends DataPortalServlet {
 	public MapBrowseServlet() {
 		super();
 	}
+	
+	
+	/*
+	 * Class methods 
+	 */
+	
+	/**
+	 * Composes a relative URL to the mapbrowse servlet for the specified
+	 * packageId.
+	 * 
+	 * @param packageId  the packageId value
+	 * @return the URL for the specified packageId
+	 */
+	public static String getRelativeURL(String packageId) {
+		String mapBrowseURL = null;
+		
+		if (packageId != null) {
+			EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+			EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
+			String scope = emlPackageId.getScope();
+			Integer identifier = emlPackageId.getIdentifier();
+			Integer revision = emlPackageId.getRevision();
+			mapBrowseURL = String.format("./mapbrowse?scope=%s&identifier=%d&revision=%d", 
+										scope, identifier, revision);
+		}
 
+		return mapBrowseURL;
+	}
+
+	
 	/**
 	 * Destruction of the servlet. <br>
 	 */
@@ -150,7 +183,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String identifier = request.getParameter("identifier");
 		String revision = request.getParameter("revision");
 		String packageid = request.getParameter("packageid");
-
+		
 		try {
 			if (scope != null && 
 				!(scope.isEmpty()) && 
@@ -293,7 +326,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			emlString = dpmClient.readMetadata(scope, identifier, revision);
 			emlObject = new EmlObject(emlString);
-
 			titles = emlObject.getTitles();
 
 			if (titles != null) {
@@ -370,7 +402,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		URLCodec urlCodec = new URLCodec();
 		
-		String dataPackage = null;
+		String packageIdListItem = null;
 		String metadata = null;
 		String report = null;
 		String data = null;
@@ -463,7 +495,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				pastaDataObjectIdentifier = dpmClient.getPastaPackageUri(scope, identifier, revision);
 
-				dataPackage = "<li>" + packageId + "</li>\n";
+				packageIdListItem = "<li>" + packageId + "</li>\n";
 				
 				if (predecessor != null) {
 					previous = "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope=" + scope + "&identifier="
@@ -488,7 +520,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 
 		packageIdHTMLBuilder.append("<ul class=\"no-list-style\">\n");
-		packageIdHTMLBuilder.append(dataPackage);
+		packageIdHTMLBuilder.append(packageIdListItem);
 		packageIdHTMLBuilder.append(previous);
 		packageIdHTMLBuilder.append(next);
 		packageIdHTMLBuilder.append(revisions);
@@ -511,7 +543,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		resourcesHTMLBuilder.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">");
 		resourcesHTMLBuilder.append("<input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" />");
 		resourcesHTMLBuilder.append("<input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />");
-		resourcesHTMLBuilder.append(" <sup><strong>*</strong></sup></form>");
+		resourcesHTMLBuilder.append("</form>");
 		resourcesHTMLBuilder.append("</div>");
 		resourcesHTMLBuilder.append("</li>\n");
 		
@@ -535,13 +567,30 @@ public class MapBrowseServlet extends DataPortalServlet {
 		    + "\">How to cite this data package</a>\n");		
 		citationHTML = citationHTMLBuilder.toString();
 
-		provenanceHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=" + packageId +
-		    "\">View provenance metadata for this data package</a>\n");		
+		provenanceHTMLBuilder.append("View <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=" + packageId +
+		    "\">provenance metadata</a> for this data package\n");	
 		provenanceHTML = provenanceHTMLBuilder.toString();
 
-		codeGenerationHTMLBuilder.append("<a class=\"searchsubcat\" href=\"./codeGeneration?packageid=" + packageId +
-			    "\">Work with this data package in R, SAS, SPSS, SPS, or Matlab</a>\n");		
-		codeGenerationHTML = codeGenerationHTMLBuilder.toString();
+		/*
+		 * Add code generation section only if this data package has
+		 * at least one entity that is a data table.
+		 */
+		DataPackage dataPackage = emlObject.getDataPackage();
+		boolean hasDataTableEntity = dataPackage.hasDataTableEntity();
+		if (hasDataTableEntity) {
+			ArrayList<String> programLinks = CodeGenerationServlet
+					.getProgramLinks(packageId);
+			codeGenerationHTMLBuilder
+					.append("Analyze this data package using ");
+			for (String programLink : programLinks) {
+				codeGenerationHTMLBuilder.append(String.format("%s, ",
+						programLink));
+			}
+			codeGenerationHTML = codeGenerationHTMLBuilder.toString();
+			codeGenerationHTML = codeGenerationHTML.substring(0,
+					codeGenerationHTML.length() - 2); // trim the last comma and
+														// space
+		}
 
 	}
 

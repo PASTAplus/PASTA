@@ -20,6 +20,7 @@
   String uid = (String) session.getAttribute("uid");
   boolean showProvenance = !(uid == null || uid.isEmpty());
   boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
+  boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
 %>
 
 <!DOCTYPE html>
@@ -77,8 +78,8 @@
 								<div class="display-table">
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Title</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Title:</label>
 										</div>
 										<div class="table-cell">
 											<%= titleHTML %>
@@ -86,8 +87,8 @@
 									</div>
 											
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Creators</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Creators:</label>
 										</div>
 										<div class="table-cell">
 											<%= creatorsHTML %>
@@ -98,8 +99,8 @@
 							<c:choose>
 								<c:when test="${showDate}">
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Publication Date</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Publication Date:</label>
 										</div>
 										<div class="table-cell">
 											<%= publicationDateHTML %>
@@ -109,8 +110,8 @@
 							</c:choose>
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Package ID</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Package ID:</label>
 										</div>
 										<div class="table-cell">
 											<%= packageIdHTML %>
@@ -118,8 +119,8 @@
 									</div>
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Resources</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Resources:</label>
 										</div>
 										<div class="table-cell">
 											<%= resourcesHTML %>
@@ -127,8 +128,8 @@
 									</div>
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Digital Object Identifier</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Digital Object Identifier:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
@@ -138,8 +139,8 @@
 									</div>
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">PASTA Identifier</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">PASTA Identifier:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
@@ -149,8 +150,8 @@
 									</div>
 
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Citation</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Citation:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
@@ -163,8 +164,8 @@
 							<c:choose>
 								<c:when test="${showProv}">
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Provenance</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Provenance:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
@@ -175,9 +176,11 @@
 								</c:when>
 							</c:choose>
 
+							<c:set var="showCodeGen" value="<%= showCodeGeneration %>"/>
+							<c:if test="${showCodeGen}">
 									<div class="table-row">										
-										<div class="table-cell">
-											<label class="labelBold">Code Generation</label>
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Code Generation:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
@@ -185,6 +188,7 @@
 											</ul>
 										</div>											
 									</div>
+							</c:if>
 									
 								</div>
 							</div>
