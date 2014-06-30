@@ -3,7 +3,7 @@
   <property file="build.properties"/>
   <property file="./WebRoot/WEB-INF/conf/dataportal.properties"/>
 
-  <property name="webapp.name" value="nis2"/>
+  <property name="webapp.name" value="nis"/>
 
   <!-- Import standard build file -->
   <import file="../ant-util/simple.xml"/>
