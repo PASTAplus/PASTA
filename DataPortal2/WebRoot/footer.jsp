@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2011-2013 the University of New Mexico.
+  ~ Copyright 2011-2014 the University of New Mexico.
   ~
   ~ This work was supported by National Science Foundation Cooperative
   ~ Agreements #DEB-0832652 and #DEB-0936498.
@@ -145,7 +145,7 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 					</span>
 					<div class="row-fluid">
 						<div class="span12 ">
-							Copyright 2009-2013 <a href="http://www.lternet.edu">Long Term Ecological Research
+							Copyright 2009-2014 <a href="http://www.lternet.edu">Long Term Ecological Research
 							Network</a>. This material is based upon work supported 
 							by the <a href="http://www.nsf.gov/">National Science 
 							Foundation</a> under Cooperative Agreements

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2011-2013 the University of New Mexico.
+  ~ Copyright 2011-2014 the University of New Mexico.
   ~
   ~ This work was supported by National Science Foundation Cooperative
   ~ Agreements #DEB-0832652 and #DEB-0936498.
@@ -207,6 +207,7 @@
 							and unpublished works whenever possible. Digital object 
 							identifiers (DOI) are provided for each dataset to facilitate 
 							citation. </p>
+							<!--  
 							<p>Voluntary registration on this site will allow us 
 							to notify you of updates to data and metadata of interest 
 							and of corrections made to data. In addition, your validated 
@@ -215,6 +216,7 @@
 							<span name="New user registration for non-LTER members coming soon!" 
 							class="tooltip">Register now</span>!
 							</p>
+							-->
 							<p>LTER Network scientists make every effort to release 
 							data in a timely fashion and with attention to accurate, 
 							well-designed and well-documented data. To understand 
