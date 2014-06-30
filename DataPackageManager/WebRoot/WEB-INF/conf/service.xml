@@ -18,6 +18,10 @@
                 <principal>authenticated</principal>
                 <permission>write</permission>
             </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>write</permission>
+            </allow>
         </access>
     </pasta:service-method>
 

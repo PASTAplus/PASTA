@@ -197,11 +197,19 @@ public class Harvester implements Runnable {
   private String emlStringFromURL(String documentURL) throws IOException {
     String emlString = null;
 
-    URL url = new URL(documentURL);
-    InputStream inputStream = url.openStream();
-    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-    emlString = getAsString(inputStreamReader, true);
-
+    try {
+    	URL url = new URL(documentURL);
+    	// Use Java 7 try-with-resources. It closes the stream automatically.
+    	try (InputStream inputStream = url.openStream()) {
+    		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+    		emlString = getAsString(inputStreamReader, true);
+    	}
+    }
+    catch (IOException e) {
+    	logger.error(e.getMessage());
+    	throw(e);
+    }
+     		
     return emlString;
   }
 

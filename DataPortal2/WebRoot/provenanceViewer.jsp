@@ -8,10 +8,9 @@
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
-      
-  HttpSession httpSession = request.getSession();
-  
-    String uid = (String) httpSession.getAttribute("uid");
+
+/* 
+  String uid = (String) session.getAttribute("uid");
 
   if (uid == null || uid.isEmpty()) {
     request.setAttribute("from", "./provenanceViewer.jsp");
@@ -21,6 +20,7 @@
         .getRequestDispatcher("./login.jsp");
     requestDispatcher.forward(request, response);
   }
+*/
   
   String message = (String) request.getAttribute("message");
   String type = (String) request.getAttribute("type");

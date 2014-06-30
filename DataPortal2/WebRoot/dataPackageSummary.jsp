@@ -18,7 +18,6 @@
   String codeGenerationHTML = (String) request.getAttribute("codeGenerationHTML");
 
   String uid = (String) session.getAttribute("uid");
-  boolean showProvenance = !(uid == null || uid.isEmpty());
   boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
 %>
@@ -160,9 +159,6 @@
 										</div>											
 									</div>
 
-							<c:set var="showProv" value="<%= showProvenance %>"/>
-							<c:choose>
-								<c:when test="${showProv}">
 									<div class="table-row">										
 										<div class="table-cell text-align-right">
 											<label class="labelBold">Provenance:</label>
@@ -173,8 +169,6 @@
 											</ul>
 										</div>											
 									</div>
-								</c:when>
-							</c:choose>
 
 							<c:set var="showCodeGen" value="<%= showCodeGeneration %>"/>
 							<c:if test="${showCodeGen}">

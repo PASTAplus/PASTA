@@ -567,8 +567,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		    + "\">How to cite this data package</a>\n");		
 		citationHTML = citationHTMLBuilder.toString();
 
-		provenanceHTMLBuilder.append("View <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=" + packageId +
-		    "\">provenance metadata</a> for this data package\n");	
+		provenanceHTMLBuilder.append("Generate <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=" + packageId +
+		    "\">provenance metadata</a> for use within your derived data package\n");	
 		provenanceHTML = provenanceHTMLBuilder.toString();
 
 		/*
