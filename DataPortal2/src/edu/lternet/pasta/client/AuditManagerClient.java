@@ -170,11 +170,12 @@ public class AuditManagerClient extends PastaClient {
    * past the last refresh time.
    */
   private static boolean shouldRefresh(long lastRefreshTime) {
+	  double hours = 0.25;
 	  boolean shouldRefresh = false;
-	  final long twelveHours = 12 * 60 * 60 * 1000;
+	  final long refreshInterval = (long) (hours * 60 * 60 * 1000);
 	  Date now = new Date();
 	  long nowTime = now.getTime();
-	  long refreshTime = lastRefreshTime + twelveHours;
+	  long refreshTime = lastRefreshTime + refreshInterval;
 	  
 	  if (refreshTime < nowTime) {
 		  shouldRefresh = true;
