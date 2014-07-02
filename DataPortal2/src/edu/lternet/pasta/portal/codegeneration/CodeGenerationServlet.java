@@ -214,7 +214,7 @@ public class CodeGenerationServlet extends DataPortalServlet {
 
 			if (packageId != null) {
 				CodeGenerationClient codeGenerationClient = new CodeGenerationClient(statisticalFileType, packageId);
-				filename = codeGenerationClient.getFilename();
+				filename = codeGenerationClient.getDownloadFilename();
 				programCode = codeGenerationClient.getProgramCode();
 				statisticalPackageName = codeGenerationClient.getStatisticalPackageName();
 				request.setAttribute("filename", filename);

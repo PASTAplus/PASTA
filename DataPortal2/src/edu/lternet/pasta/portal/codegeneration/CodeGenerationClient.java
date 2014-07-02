@@ -66,7 +66,7 @@ public class CodeGenerationClient {
 	 */
 
 	private final String BASE_URL = "http://www.vcrlter.virginia.edu/webservice/PASTAprog";
-	private String filename = null;
+	private String downloadFilename = null;
 	private String statisticalPackageName = null;
 	private String url;
 
@@ -87,36 +87,44 @@ public class CodeGenerationClient {
 			throw new IllegalArgumentException("null statisticalFileType");
 		}
 		
+		String urlFilename = null;
+		
 		switch (statisticalFileType) {
 		case m:
-			/* For Matlab programs substitute _ for the periods and hyphens in the package 
-			 * name to avoid problems with Matlab's file naming conventions.  
+			urlFilename = String.format("%s.m", packageId);
+			
+			/* For Matlab programs substitute _ for the periods and hyphens in the
+			 * download filename to avoid problems with Matlab's file naming conventions.  
 			 * Thus: "knb-lter-vcr.26.20.m" becomes "knb_lter_vcr_26_20.m".
-			 *
+			 */
 			packageId = packageId.replace('.', '_');
-			packageId = packageId.replace('-', '_'); Nope, no longer required */
+			packageId = packageId.replace('-', '_');
 			this.statisticalPackageName = "Matlab";
-			this.filename = String.format("%s.m", packageId);
+			this.downloadFilename = String.format("%s.m", packageId);
 			break;
 		case r:
 			this.statisticalPackageName = "R";
-			this.filename = String.format("%s.r", packageId);
+			this.downloadFilename = String.format("%s.r", packageId);
+			urlFilename = this.downloadFilename;
 			break;
 		case sas:
 			this.statisticalPackageName = "SAS";
-			this.filename = String.format("%s.sas", packageId);
+			this.downloadFilename = String.format("%s.sas", packageId);
+			urlFilename = this.downloadFilename;
 			break;
 		case sps:
 			this.statisticalPackageName = "SPSS";
-			this.filename = String.format("%s.sps", packageId);
+			this.downloadFilename = String.format("%s.sps", packageId);
+			urlFilename = this.downloadFilename;
 			break;
 		case spss:
 			this.statisticalPackageName = "SPSS";
-			this.filename = String.format("%s.spss", packageId);
+			this.downloadFilename = String.format("%s.spss", packageId);
+			urlFilename = this.downloadFilename;
 			break;
 		}
 		
-		this.url = String.format("%s/%s", BASE_URL, filename);
+		this.url = String.format("%s/%s", BASE_URL, urlFilename);
 	}
 
 
@@ -139,8 +147,8 @@ public class CodeGenerationClient {
 	 * 
 	 * @return  the filename value
 	 */
-	public String getFilename() {
-		return filename;
+	public String getDownloadFilename() {
+		return downloadFilename;
 	}
 
 
