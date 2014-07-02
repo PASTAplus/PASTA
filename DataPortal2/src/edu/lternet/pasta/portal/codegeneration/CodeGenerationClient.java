@@ -92,9 +92,9 @@ public class CodeGenerationClient {
 			/* For Matlab programs substitute _ for the periods and hyphens in the package 
 			 * name to avoid problems with Matlab's file naming conventions.  
 			 * Thus: "knb-lter-vcr.26.20.m" becomes "knb_lter_vcr_26_20.m".
-			 */
+			 *
 			packageId = packageId.replace('.', '_');
-			packageId = packageId.replace('-', '_');
+			packageId = packageId.replace('-', '_'); Nope, no longer required */
 			this.statisticalPackageName = "Matlab";
 			this.filename = String.format("%s.m", packageId);
 			break;
