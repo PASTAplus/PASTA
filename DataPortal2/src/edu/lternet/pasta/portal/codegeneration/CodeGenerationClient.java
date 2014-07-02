@@ -180,6 +180,15 @@ public class CodeGenerationClient {
 				this.url, statusCode.toString(), programCode);
 			throw new Exception(gripe);
 		}
+		else if (programCode == null || programCode.trim().equals("")) {
+			// Although a 200 OK was returned, something went wrong and no
+			// no program code is in the entity body; return an error message from the response entity
+			String gripe = String.format(
+				"The code generation service at URL '%s' responded with response code '%s' but " +
+			    "did not generate any program code. A dependent web service may be down.\n", 
+				this.url, statusCode.toString(), programCode);
+			throw new Exception(gripe);
+		}
 
 		return programCode;
 	}
