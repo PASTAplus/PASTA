@@ -116,11 +116,21 @@ public class AuditManagerClient extends PastaClient {
   /**
    * Retrieves a list of recent inserts.
    * 
+   * @param numberOfDays   the number of prior days to search for inserts, for example,
+   *                       the past 100 days
+   * @param limit          an upper limit on the number of matches returned
+   * @param forceRefresh   if true, refresh the search results regardless of when 
+   *                       they were last refreshed
+   * 
    * @return A list of RecentUpload objects, where each upload was an insert,
    *         i.e. the serviceMethod for each is "createDataPackage".
    */
-	public static List<RecentUpload> getRecentInserts(Integer numberOfDays, Integer limit) {
-		if (recentInserts == null || recentInserts.size() < limit || shouldRefresh(recentInsertsLastRefreshTime)) {
+	synchronized public static List<RecentUpload> getRecentInserts(Integer numberOfDays, Integer limit, boolean forceRefresh) {
+		if (forceRefresh || 
+			recentInserts == null || 
+			recentInserts.size() < limit || 
+			shouldRefresh(recentInsertsLastRefreshTime)
+		   ) {
 			recentInserts = getRecentUploads("createDataPackage", numberOfDays, limit);
 		    Date now = new Date();
 		    recentInsertsLastRefreshTime = now.getTime();
@@ -131,12 +141,22 @@ public class AuditManagerClient extends PastaClient {
   
   /**
    * Retrieves a list of recent updates.
+   *  
+   * @param numberOfDays   the number of prior days to search for inserts, for example,
+   *                       the past 100 days
+   * @param limit          an upper limit on the number of matches returned
+   * @param forceRefresh   if true, refresh the search results regardless of when 
+   *                       they were last refreshed
    * 
    * @return A list of RecentUpload objects, where each upload was an update,
    *         i.e. the serviceMethod for each is "updateDataPackage".
    */
-	public static List<RecentUpload> getRecentUpdates(Integer numberOfDays, Integer limit) {
-		if (recentUpdates == null || recentUpdates.size() < limit || shouldRefresh(recentUpdatesLastRefreshTime)) {
+	synchronized public static List<RecentUpload> getRecentUpdates(Integer numberOfDays, Integer limit, boolean forceRefresh) {
+		if (forceRefresh || 
+			recentUpdates == null || 
+			recentUpdates.size() < limit || 
+			shouldRefresh(recentUpdatesLastRefreshTime)
+		   ) {
 			recentUpdates = getRecentUploads("updateDataPackage", numberOfDays, limit);
 		    Date now = new Date();
 		    recentUpdatesLastRefreshTime = now.getTime();

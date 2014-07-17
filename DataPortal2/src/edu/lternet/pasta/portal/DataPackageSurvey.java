@@ -34,16 +34,47 @@ import edu.lternet.pasta.client.RecentUpload;
 
 public class DataPackageSurvey {
 
-  /*
-   * Class variables
-   */
+	/*
+	 * Class variables
+	 */
 
+	
+	/*
+	 * Instance variables
+	 */
+
+	Integer numberOfDays = new Integer(100);
+	
   
-  /*
-   * Instance methods
-   */
+	/*
+	 * Instance methods
+	 */
+
+	/**
+	 * Forces the refresh of the data package survey results stored in the
+	 * AuditManagerClient class. We do this when we're certain that the
+	 * results need to be refreshed, such as when an event subscription tells
+	 * us that a data package in PASTA has been inserted or updated.
+	 */
+	public void refreshSurveyResults() {
+		boolean forceRefresh = true;
+		Integer limit = new Integer(2);
+		AuditManagerClient.getRecentInserts(numberOfDays, limit, forceRefresh);
+		AuditManagerClient.getRecentUpdates(numberOfDays, limit, forceRefresh);
+	}
+	
+	
+	/**
+	 * Survey the audit manager to get a list of recent inserts and recent update in PASTA.
+	 * 
+	 * @param criterion  One of two supported values, "recentInserts" or "recentUpdates"
+	 * @param n  The number of survey results to return
+	 * @return  An array of strings which is 4 times the length of n. Each set of four
+	 *          strings contains the scope, identifier, title, and date of the data
+	 *          package insert or update.
+	 */
 	public String[] surveyDataPackages(String criterion, int n) {
-		Integer numberOfDays = new Integer(100);
+		boolean forceRefresh = false;
 		Integer limit = new Integer(n);
 		int arrayLength = n * 4;
 		String[] surveyResults = new String[arrayLength]; // (1) scope, (2) identifier, (3) title, (4) date
@@ -58,10 +89,10 @@ public class DataPackageSurvey {
 		}
 
 		if (criterion.equals("recentInserts")) {
-			recentUploads = AuditManagerClient.getRecentInserts(numberOfDays, limit);
+			recentUploads = AuditManagerClient.getRecentInserts(numberOfDays, limit, forceRefresh);
 		}
 		else if (criterion.equals("recentUpdates")) {
-			recentUploads = AuditManagerClient.getRecentUpdates(numberOfDays, limit);
+			recentUploads = AuditManagerClient.getRecentUpdates(numberOfDays, limit, forceRefresh);
 		}
 		
 		if (recentUploads != null) {
