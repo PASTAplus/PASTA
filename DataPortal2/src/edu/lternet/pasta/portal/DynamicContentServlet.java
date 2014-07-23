@@ -25,7 +25,10 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +36,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.portal.statistics.GrowthStats;
 
 /**
  * Servlet implementation class ArchiveCleanerServlet
@@ -61,13 +68,56 @@ public class DynamicContentServlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		
+			HttpServletResponse response) throws ServletException, IOException {	
+		refreshGrowthStats();
 		refreshSurveyResults();
-
 	}
 	
 	
+	/*
+	 * Refresh the growth stats and store them in a context attribute.
+	 */
+	private void refreshGrowthStats() throws ServletException {
+        ServletContext servletContext = getServletContext();
+		String numDataPackages = null;
+		String numDataPackagesSites = null;
+				
+        logger.info("Refreshing PASTA data package growth stats.");
+
+        try {
+			PastaStatistics pastaStats = new PastaStatistics("public");
+			numDataPackages = pastaStats.getNumDataPackages().toString();
+			numDataPackagesSites = pastaStats.getNumDataPackagesSites().toString();
+		}
+		catch (PastaConfigurationException | PastaAuthenticationException e) {
+			ServletException se = new ServletException("Pasta statistics exception");
+			se.initCause(e);
+			throw se;		
+		}
+
+        GrowthStats gs = new GrowthStats();
+        String googleChartJson = gs.getGoogleChartJson(new GregorianCalendar(), Calendar.MONTH);
+
+        /* Lock the servlet context object to guarantee that only one thread at a
+         * time can be getting or setting the context attribute. 
+         */
+        synchronized(servletContext) {
+        	if (numDataPackages != null) 
+        		servletContext.setAttribute("numDataPackages", numDataPackages);
+        	
+        	if (numDataPackagesSites != null) 
+        		servletContext.setAttribute("numDataPackagesSites", numDataPackagesSites);
+        	
+        	if (googleChartJson != null) 
+        		servletContext.setAttribute("googleChartJson", googleChartJson);
+        }
+	}
+
+
+	/*
+	 * Refresh the survey results. The DataPackageSurvey class handles the
+	 * refresh and storage logic.
+	 */
 	private void refreshSurveyResults() {
 		DataPackageSurvey dps = new DataPackageSurvey();
 		long sleepTime = 3000L;
