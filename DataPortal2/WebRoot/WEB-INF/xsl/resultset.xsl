@@ -21,19 +21,63 @@
 	language governing permissions and limitations under the License.
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  version="2.0"
+>
 
   <xsl:output method="html"/>
 
+  <xsl:param name="includeEcotrends"></xsl:param>
+  <xsl:param name="includeLandsat5"></xsl:param>
+  
+  <xsl:variable name="documentCount">
+      <xsl:value-of select="count(/resultset/document)"/>
+  </xsl:variable>
+
+  <xsl:variable name="ecotrendsCount" >
+  	<xsl:value-of select="count(/resultset/document/packageId[@scope = 'ecotrends'])" />
+  </xsl:variable>
+
+  <xsl:variable name="landsat5Count" >
+  	<xsl:value-of select="count(/resultset/document/packageId[starts-with(@scope, 'lter-landsat5')])" />
+  </xsl:variable>
+
   <xsl:template match="/">
 
-    <xsl:variable name="results">
-      <xsl:value-of select="count(/resultset/document)"/>
-    </xsl:variable>
+  <xsl:choose>
+    <xsl:when test="(($includeEcotrends = 'true') and ($includeLandsat5 = 'true'))">
+		<xsl:variable name="results" >
+  			<xsl:value-of select="$documentCount" />
+  		</xsl:variable>
+        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
+    </xsl:when>
+    <xsl:when test="$includeEcotrends = 'true'">
+		<xsl:variable name="results" >
+  			<xsl:value-of select="$documentCount - $landsat5Count" />
+  		</xsl:variable>
+        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
+    </xsl:when>
+    <xsl:when test="$includeLandsat5 = 'true'">
+		<xsl:variable name="results" >
+  			<xsl:value-of select="$documentCount - $ecotrendsCount" />
+  		</xsl:variable>
+        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
+    </xsl:when>
+    <xsl:otherwise>
+		<xsl:variable name="results" >
+  			<xsl:value-of select="$documentCount - $landsat5Count - $ecotrendsCount" />
+  		</xsl:variable>
+        <p>Number of matches: <b><xsl:value-of select="$results"/></b></p>
+    </xsl:otherwise>    
+  </xsl:choose>
 
-    <p>Number of results: <b><xsl:value-of select="$results"/></b></p>
+<!-- for debugging
+    <p>Number of documents matched: <b><xsl:value-of select="$documentCount"/></b></p>
+    <p>Number of ecotrends: <b><xsl:value-of select="$ecotrendsCount"/></b></p>
+    <p>Number of landsat5: <b><xsl:value-of select="$landsat5Count"/></b></p>
+-->
 
-    <xsl:if test="$results > 0">
       <table width="100%">
         <tbody>
           <tr>
@@ -49,13 +93,21 @@
           </xsl:for-each>
         </tbody>
       </table>
-    </xsl:if>
   </xsl:template>
 
   <xsl:template match="document">
+  
+	<xsl:variable name="pid" select="./packageId"/>
+	
+	<xsl:choose>
+    <xsl:when test="(
+                      ((not(starts-with($pid, 'ecotrends'))) and (not(starts-with($pid, 'lter-landsat5')))) or 
+                      (starts-with($pid, 'ecotrends') and ($includeEcotrends = 'true')) or
+                      (starts-with($pid, 'lter-landsat5') and ($includeLandsat5 = 'true'))
+                    )">
+      
     <tr>
       <td class="nis" align="center">
-        <xsl:variable name="pid" select="./packageId"/>
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
@@ -70,11 +122,17 @@
         <xsl:apply-templates select="./param" mode="title"/>
       </td>
     </tr>
+    
+    </xsl:when>
+    <xsl:otherwise></xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <xsl:template match="param" mode="creator">
     <xsl:if test="./@name = 'dataset/creator/individualName/surName'">
-      <xsl:value-of select="."/><br/></xsl:if>
+      <xsl:value-of select="."/><br/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="param" mode="title">

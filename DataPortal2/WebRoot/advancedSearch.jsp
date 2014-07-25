@@ -367,8 +367,25 @@
 																	</td>
 																</tr>
 																<tr>
+																</tr>
+																<tr>
+																</tr>
+																<tr>
+																	<td class="spacersmh"></td>
+																</tr>
+															</table>
+															<table>
+																<tr>
 																	<td>
 																		<label class="labelBold">Match Options:</label>
+																	</td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<label class="labelBold">Expand Search By Adding:</label>
+																	</td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<label class="labelBold">Optional Content:</label>
 																	</td>
 																</tr>
 																<tr>
@@ -385,18 +402,7 @@
 																			value="1" />
 																			Match <strong>Any</strong> Search Term
 																	</td>
-																</tr>
-																<tr>
-																	<td class="spacersmh"></td>
-																</tr>
-															</table>
-															<table>
-																<tr>
-																	<td>
-																		<label class="labelBold">Expand Search By Adding:</label>
-																	</td>
-																</tr>
-																<tr>
+																	<td class="spacerwd"></td>
 																	<td>
 																		<ul class="checklistLG">
 																			<li>
@@ -414,6 +420,23 @@
 																			<li>
 																				<input name="relatedSpecific" type="checkbox" value="value1">
 																				<p>Related / More Specific Terms</p> 
+																				<a class="checkboxLG-select" href="#">Select</a> 
+																				<a class="checkboxLG-deselect" href="#">Cancel</a>
+																			</li>
+																		</ul>
+																	</td>
+																	<td class="spacerwd"></td>
+																	<td>
+																		<ul class="checklistLG">
+																			<li>
+																				<input name="ecotrends" type="checkbox" value="value1">
+																				<p>EcoTrends Data Packages</p> 
+																				<a class="checkboxLG-select" href="#">Select</a> 
+																				<a class="checkboxLG-deselect" href="#">Cancel</a>
+																			</li>
+																			<li>
+																				<input name="landsat5" type="checkbox" value="value1">
+																				<p>Landsat5 Data Packages</p> 
 																				<a class="checkboxLG-select" href="#">Select</a> 
 																				<a class="checkboxLG-deselect" href="#">Cancel</a>
 																			</li>

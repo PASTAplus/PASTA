@@ -165,6 +165,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     String specific = request.getParameter("specific");
     String related = request.getParameter("related");
     String relatedSpecific = request.getParameter("relatedSpecific");
+    String ecotrends = request.getParameter("ecotrends");
+    String landsat5 = request.getParameter("landsat5");
     String taxon = request.getParameter("taxon");
     String taxonQueryType = request.getParameter("taxonQueryType");
     
@@ -175,6 +177,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     
     boolean isBoundaryContainedChecked = (boundaryContained != null);
     boolean isDatesContainedChecked = (datesContained != null);
+    boolean isIncludeEcotrendsChecked = (ecotrends != null);
+    boolean isIncludeLandsat5Checked = (landsat5 != null);
     boolean isSpecificChecked = (specific != null);
     boolean isRelatedChecked = (related != null);
     boolean isRelatedSpecificChecked = (relatedSpecific != null);
@@ -219,6 +223,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       }
 
       ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+      resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
+      resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
       html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
       html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
