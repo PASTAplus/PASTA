@@ -40,7 +40,7 @@
   </xsl:variable>
 
   <xsl:variable name="landsat5Count" >
-  	<xsl:value-of select="count(/resultset/document/packageId[starts-with(@scope, 'lter-landsat5')])" />
+  	<xsl:value-of select="count(/resultset/document/packageId[starts-with(@scope, 'lter-landsat')])" />
   </xsl:variable>
 
   <xsl:template match="/">
@@ -101,9 +101,9 @@
 	
 	<xsl:choose>
     <xsl:when test="(
-                      ((not(starts-with($pid, 'ecotrends'))) and (not(starts-with($pid, 'lter-landsat5')))) or 
+                      ((not(starts-with($pid, 'ecotrends'))) and (not(starts-with($pid, 'lter-landsat')))) or 
                       (starts-with($pid, 'ecotrends') and ($includeEcotrends = 'true')) or
-                      (starts-with($pid, 'lter-landsat5') and ($includeLandsat5 = 'true'))
+                      (starts-with($pid, 'lter-landsat') and ($includeLandsat5 = 'true'))
                     )">
       
     <tr>
