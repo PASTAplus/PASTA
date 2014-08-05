@@ -214,37 +214,39 @@ public class PastaClient {
       throws Exception {
     final Exception e;
     
+    String msg = String.format("PASTA returned status code %d: %s", statusCode, entityString);
+    
     switch (statusCode) {
       case HttpStatus.SC_BAD_REQUEST:
-        e = new UserErrorException(entityString);
+        e = new UserErrorException(msg);
         throw(e);
         
       case HttpStatus.SC_CONFLICT:
-        e = new ResourceExistsException(entityString);
+        e = new ResourceExistsException(msg);
         throw(e);
         
       case HttpStatus.SC_EXPECTATION_FAILED:
-        e = new Exception(entityString);
+        e = new Exception(msg);
         throw(e);
            
       case HttpStatus.SC_FORBIDDEN:
-        e = new UnauthorizedException(entityString);
+        e = new UnauthorizedException(msg);
         throw(e);
       
       case HttpStatus.SC_GONE:
-        e = new ResourceDeletedException(entityString);
+        e = new ResourceDeletedException(msg);
         throw(e);
 
       case HttpStatus.SC_NOT_FOUND:
-        e = new ResourceNotFoundException(entityString);
+        e = new ResourceNotFoundException(msg);
         throw(e);
 
       case HttpStatus.SC_UNAUTHORIZED:
-        e = new UnauthorizedException(entityString);
+        e = new UnauthorizedException(msg);
         throw(e);
         
       default:
-        e = new Exception(entityString);
+        e = new Exception(msg);
         throw(e);
     }
   }
