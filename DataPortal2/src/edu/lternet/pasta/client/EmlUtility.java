@@ -131,11 +131,14 @@ public class EmlUtility {
 	 * 
 	 * @param xslPath
 	 *            The path to the quality report XSL stylesheet.
-	 * 
+	 * @param parameters
+	 *            The parameters and their associated values, passed
+	 *            to the XSLT processor in a map object
+	 *
 	 * @return The HTML document as a String object.
 	 */
-	public String xmlToHtml(String xslPath) {
-		String html = XSLTUtility.xmlToHtml(this.eml, xslPath);
+	public String xmlToHtml(String xslPath, HashMap<String, String> parameters) {
+		String html = XSLTUtility.xmlToHtml(this.eml, xslPath, parameters);
 		return html;
 	}
 
@@ -189,7 +192,7 @@ public class EmlUtility {
       e.printStackTrace();
     }
 
-    String html = eu.xmlToHtml(emlXslPath);
+    String html = eu.xmlToHtml(emlXslPath, null);
 
     try {
       FileUtils.writeStringToFile(outFile, html);

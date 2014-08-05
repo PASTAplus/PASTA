@@ -63,12 +63,18 @@ public class XSLTUtility {
 	/**
 	 * Transforms an EML XML document to an HTML document.
 	 * 
+	 * @param xml
+	 *            The EML XML document to be transformed
 	 * @param xslPath
 	 *            The path to the quality report XSL stylesheet.
+	 * @param parameters
+	 *            The parameters and their associated values, passed
+	 *            to the XSLT processor in a map object
 	 * 
 	 * @return The HTML document as a String object.
 	 */
-	public static String xmlToHtml(String xml, String xslPath) {
+	public static String xmlToHtml(String xml, String xslPath,
+			HashMap<String, String> parameters) {
 		String html = null;
 		File styleSheet = new File(xslPath);
 		StringReader stringReader = new StringReader(xml);
@@ -78,9 +84,17 @@ public class XSLTUtility {
 		Source source = new StreamSource(stringReader);
 
 		try {
-			Transformer t = TransformerFactory.newInstance().newTransformer(
+			Transformer transformer = TransformerFactory.newInstance().newTransformer(
 					styleSource);
-			t.transform(source, result);
+			if (parameters != null) {
+				for (String parameterName : parameters.keySet()) {
+					String parameterValue = parameters.get(parameterName);
+					if (parameterValue != null && !parameterValue.equals("")) {
+						transformer.setParameter(parameterName, parameterValue);
+					}
+				}
+			}
+			transformer.transform(source, result);
 			html = stringWriter.toString();
 		}
 		catch (TransformerConfigurationException e) {
