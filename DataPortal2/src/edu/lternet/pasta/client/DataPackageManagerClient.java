@@ -52,6 +52,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
@@ -249,7 +250,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logger.info(idleTime);
+					logIdleTime("createDataPackage", emlPackageId.toString(), idleTime);
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
@@ -319,6 +320,8 @@ public class DataPackageManagerClient extends PastaClient {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			String entityString = EntityUtils.toString(httpEntity);
+			EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, new Integer(revision));
+			
 
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
@@ -328,7 +331,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logger.info(idleTime);
+					logIdleTime("getDataPackageArchive", emlPackageId.toString(), idleTime);
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
@@ -452,7 +455,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 
 				while (idleTime <= maxIdleTime) {
-					logger.info(idleTime);
+					logIdleTime("evaluateDataPackage", emlPackageId.toString(), idleTime);
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
@@ -1365,7 +1368,14 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 
 	}
+	
+	
+	private void logIdleTime(String methodName, String packageId, Integer idleTime) {
+		logger.info(String.format("%s: %s; Idle Time: %d", 
+				                  methodName, packageId, idleTime));
+	}
 
+	
 	/**
 	 * Executes the 'searchDataPackages' web service method.
 	 * 
@@ -1463,7 +1473,7 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logger.info(idleTime);
+					logIdleTime("updateDataPackage", emlPackageId.toString(), idleTime);
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
