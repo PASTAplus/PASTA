@@ -85,7 +85,8 @@ public class Harvester implements Runnable {
   /**
    * Constructs a Harvester object with the specified values.
    * 
-   * @param harvestDirPath  the directory under which harvest results are stored
+   * @param harvesterPath  the directory under which harvest results are stored
+   * @param harvestReportId  the harvest report identifier
    * @param uid  the user identifier, e.g. "ucarroll"
    * @param isEvaluate  true if evaluate, false if upload
    */
@@ -229,12 +230,13 @@ public class Harvester implements Runnable {
    *
    *  @throws IOException if there are problems accessing or using the Reader.
    */
-  public StringBuffer getAsStringBuffer(Reader reader,
-      boolean closeWhenFinished) throws IOException {
+  public StringBuffer getAsStringBuffer(Reader reader, boolean closeWhenFinished) 
+		  throws IOException {
     if (reader == null)
       return null;
 
     StringBuffer sb = new StringBuffer();
+    
     try {
       char[] buff = new char[4096];
       int numCharsRead;
@@ -257,6 +259,7 @@ public class Harvester implements Runnable {
         }
       }
     }
+    
     return sb;
   }
 
@@ -345,6 +348,7 @@ public class Harvester implements Runnable {
       
       String packageIdPath = harvestDirPath + "/" + packageId;
       String verb = isEvaluate ? "Evaluating" : "Uploading";
+      logger.info(String.format("%s data package: %s", verb, packageId));
 
       Harvester.createDirectory(packageIdPath);
 
@@ -384,7 +388,8 @@ public class Harvester implements Runnable {
             }
           }
           catch (Exception e) {
-            serviceMessage = e.getMessage();
+            serviceMessage = String.format("Harvester error for packageId '%s': %s",
+            		packageId, e.getMessage());
             logger.error(serviceMessage);
             e.printStackTrace();
             String fileName = isQualityReport(serviceMessage) ? 
@@ -534,6 +539,7 @@ public class Harvester implements Runnable {
         if (documentURL != null && !documentURL.equals("")) {
           String urlErrorMessage = null;
           String emlString = null;
+          
           try {
             emlString = emlStringFromURL(documentURL);
           }
