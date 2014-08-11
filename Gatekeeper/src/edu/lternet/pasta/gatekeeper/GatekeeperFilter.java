@@ -128,10 +128,10 @@ public final class GatekeeperFilter implements Filter
 
         // Output HttpServletRequest diagnostic information
 		    logger.debug("Request URL: " + req.getMethod() + " - "
-		    		+ req.getRequestURL().toString());
-        //this.dumpHeader(req);
-        //this.dumpBody(req);
-        
+ 		    		+ req.getRequestURL().toString());
+
+        doDiagnostics(req);
+
         try {
             Cookie internalCookie = hasAuthToken(req.getCookies()) ?
                                         doCookie(req) : doHeader(req, res);
@@ -329,22 +329,30 @@ public final class GatekeeperFilter implements Filter
 	 * @param req
 	 *          The HttpServletRequest object.
 	 */
-	private void dumpHeader(HttpServletRequest req) {
+	private void dumpHeader(HttpServletRequest req, Boolean noAuthPeek) {
 		Enumeration<String> headerNames = req.getHeaderNames();
 		String headerName = null;
 
 		String header = null;
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("Header: %n"));
 
 		while (headerNames.hasMoreElements()) {
+
 			headerName = headerNames.nextElement();
 			header = req.getHeader(headerName);
+
+      if (headerName.equals("Authorization") && noAuthPeek) header = "********";
 
 			if (headerName.equals("Content-Length")) {
 				this.contentLength = Integer.valueOf(header);
 			}
 
-			logger.info("Header: " + headerName + " - " + header);
+			sb.append(String.format("     %s: %s%n", headerName, header));
+
 		}
+
+    logger.info(sb.toString());
 
 	}
   
@@ -387,6 +395,21 @@ public final class GatekeeperFilter implements Filter
 		}
 
 	}
+
+  private void doDiagnostics(HttpServletRequest req) {
+
+    String remoteAddr = req.getRemoteAddr();
+    logger.info("Remote address: " + remoteAddr);
+
+    String requestUri = req.getRequestURI();
+    logger.info("Request URI: " + requestUri);
+
+    Boolean noAuthPeek = true;
+
+    dumpHeader(req, noAuthPeek);
+    dumpBody(req);
+
+  }
 
   /*
    * Generate MD5withRSA digital signature for tokenString and return base64
