@@ -127,7 +127,7 @@ public final class GatekeeperFilter implements Filter
         HttpServletResponse res = (HttpServletResponse) response;
 
         // Output HttpServletRequest diagnostic information
-		    logger.debug("Request URL: " + req.getMethod() + " - "
+		    logger.info("Request URL: " + req.getMethod() + " - "
  		    		+ req.getRequestURL().toString());
 
         doDiagnostics(req);
@@ -407,7 +407,7 @@ public final class GatekeeperFilter implements Filter
     Boolean noAuthPeek = true;
 
     dumpHeader(req, noAuthPeek);
-    dumpBody(req);
+    //dumpBody(req);
 
   }
 
