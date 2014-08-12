@@ -20,7 +20,6 @@ package edu.lternet.pasta.client;
 
 import edu.lternet.pasta.common.HTMLUtility;
 import edu.lternet.pasta.portal.ConfigurationListener;
-import net.sf.saxon.s9api.*;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -126,100 +125,39 @@ public class EmlUtility {
     
   }
 
-  /**
-   * Transforms an EML XML document to an HTML document.
-   * 
-   * @param xslPath
-   *          The path to the quality report XSL stylesheet.
-   * 
-   * @return The HTML document as a String object.
-   */
-  public String xmlToHtml(String xslPath) {
-
-    String html = null;
-
-    File styleSheet = new File(xslPath);
-
-    StringReader stringReader = new StringReader(this.eml);
-    StringWriter stringWriter = new StringWriter();
-    StreamSource styleSource = new StreamSource(styleSheet);
-    Result result = new StreamResult(stringWriter);
-    Source source = new StreamSource(stringReader);
-
-    try {
-      Transformer t = TransformerFactory.newInstance().newTransformer(
-          styleSource);
-      t.transform(source, result);
-      html = stringWriter.toString();
-    } catch (TransformerConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    } catch (TransformerFactoryConfigurationError e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    } catch (TransformerException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    }
-
-    return html;
-  }
-
   
-  /**
-   * Transforms an EML XML document to an HTML document using the
-   * Saxon XSLT engine which can process XSLT 2.0.
-   * 
-   * @param xslPath
-   *          The path to the quality report XSL stylesheet.
-   * 
-   * @return The HTML document as a String object.
-   */
+	/**
+	 * Transforms an EML XML document to an HTML document.
+	 * 
+	 * @param xslPath
+	 *            The path to the quality report XSL stylesheet.
+	 * @param parameters
+	 *            The parameters and their associated values, passed
+	 *            to the XSLT processor in a map object
+	 *
+	 * @return The HTML document as a String object.
+	 */
+	public String xmlToHtml(String xslPath, HashMap<String, String> parameters) {
+		String html = XSLTUtility.xmlToHtml(this.eml, xslPath, parameters);
+		return html;
+	}
+
+
+	/**
+	 * Transforms an EML XML document to an HTML document using the Saxon XSLT
+	 * engine which can process XSLT 2.0.
+	 * 
+	 * @param xslPath
+	 *            The path to the quality report XSL stylesheet.
+	 * 
+	 * @return The HTML document as a String object.
+	 */
 	public String xmlToHtmlSaxon(String xslPath,
-	    HashMap<String, String> parameters) throws ParseException {
-		
-    String html = null;
-    File xsltFile = new File(xslPath);
-    StringReader stringReader = new StringReader(this.eml);
-    StringWriter stringWriter = new StringWriter();
-    StreamSource xsltSource = new StreamSource(xsltFile);
-    Source source = new StreamSource(stringReader);
+			HashMap<String, String> parameters) throws ParseException {
+		String html = XSLTUtility.xmlToHtmlSaxon(this.eml, xslPath, parameters);
+		return html;
+	}
 
-    try {
-      Processor processor = new Processor(false);
-      XsltCompiler xsltCompiler = processor.newXsltCompiler();
-      XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
-      XdmNode xdmNode = processor.newDocumentBuilder().build(source);
-      Serializer out = new Serializer();
-      out.setOutputProperty(Serializer.Property.METHOD, "html");
-      out.setOutputProperty(Serializer.Property.INDENT, "yes");
-      out.setOutputProperty(Serializer.Property.ENCODING, "UTF-8");
-      out.setOutputWriter(stringWriter);
-      XsltTransformer xsltTransformer = xsltExecutable.load();
-      xsltTransformer.setInitialContextNode(xdmNode);
-      if (parameters != null) {
-        for (String parameterName : parameters.keySet()) {
-          String parameterValue = parameters.get(parameterName);
-          if (parameterValue != null && !parameterValue.equals("")) {
-            QName qName = new QName(parameterName);
-            XdmAtomicValue xdmAtomicValue = new XdmAtomicValue(parameterValue, ItemType.STRING);
-            xsltTransformer.setParameter(qName, xdmAtomicValue);
-          }
-        }
-      }
-      xsltTransformer.setDestination(out);
-      xsltTransformer.transform();
-      html = stringWriter.toString();
-    }
-    catch (SaxonApiException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      throw new ParseException("EML Parse Error: " + e.getMessage(), 0);
-    }
-    
-    return html;
-  }
-  
 
   /**
    * @param args   String array with three arguments:
@@ -254,7 +192,7 @@ public class EmlUtility {
       e.printStackTrace();
     }
 
-    String html = eu.xmlToHtml(emlXslPath);
+    String html = eu.xmlToHtml(emlXslPath, null);
 
     try {
       FileUtils.writeStringToFile(outFile, html);

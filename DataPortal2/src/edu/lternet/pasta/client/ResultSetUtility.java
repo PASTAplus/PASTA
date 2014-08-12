@@ -24,26 +24,11 @@
 
 package edu.lternet.pasta.client;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.text.ParseException;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.apache.commons.io.FileUtils;
 
-import edu.lternet.pasta.portal.ConfigurationListener;
 
 /**
  * @author servilla
@@ -67,6 +52,8 @@ public class ResultSetUtility {
    */
 
   String resultSet = null;
+  boolean includeEcotrends = false;
+  boolean includeLandsat5 = false;
 
   /*
    * Constructors
@@ -90,48 +77,58 @@ public class ResultSetUtility {
 
   }
 
+  
   /*
    * Methods
    */
+  
+  
+  	/**
+  	 * Sets the value of the includeEcotrends instance variable.
+  	 * 
+  	 * @param include 
+  	 * 			true if EcoTrends data packages should be searched, else false
+  	 */
+	public void setIncludeEcotrends(boolean include) {
+		this.includeEcotrends = include;
+	}
 
-  /**
-   * Transforms a quality report XML document to an HTML table.
-   * 
-   * @param xslPath
-   *          The path to the quality report XSL stylesheet.
-   * 
-   * @return The HTML table as a String object.
-   */
-  public String xmlToHtmlTable(String xslPath) {
 
-    String html = null;
+  	/**
+  	 * Sets the value of the includeLandsat5 instance variable.
+  	 * 
+  	 * @param include 
+  	 * 			true if Landsat5 data packages should be searched, else false
+  	 */
+	public void setIncludeLandsat5(boolean include) {
+		this.includeLandsat5 = include;
+	}
 
-    File styleSheet = new File(xslPath);
 
-    StringReader stringReader = new StringReader(this.resultSet);
-    StringWriter stringWriter = new StringWriter();
-    StreamSource styleSource = new StreamSource(styleSheet);
-    Result result = new StreamResult(stringWriter);
-    Source source = new StreamSource(stringReader);
+	/**
+	 * Transforms Metacat search results XML to an HTML table.
+	 * 
+	 * @param xslPath
+	 *            The path to the search results-set stylesheet.
+	 * 
+	 * @return The HTML table as a String object.
+	 */
+	public String xmlToHtmlTable(String xslPath) throws ParseException {
+		HashMap<String, String> parameterMap = new HashMap<String, String>();
 
-    try {
-      Transformer t = TransformerFactory.newInstance().newTransformer(
-          styleSource);
-      t.transform(source, result);
-      html = stringWriter.toString();
-    } catch (TransformerConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    } catch (TransformerFactoryConfigurationError e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    } catch (TransformerException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    }
+		// Pass the includeEcotrends value as a parameter to the XSLT
+		if (this.includeEcotrends) {
+			parameterMap.put("includeEcotrends", "true");
+		}
 
-    return html;
-    
-  }
+		// Pass the includeLandsat5 value as a parameter to the XSLT
+		if (this.includeLandsat5) {
+			parameterMap.put("includeLandsat5", "true");
+		}
+
+		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
+				parameterMap);
+		return html;
+	}
 
 }

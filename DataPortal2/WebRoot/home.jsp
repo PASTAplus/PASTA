@@ -23,57 +23,42 @@
 <%@ page import="edu.lternet.pasta.portal.statistics.GrowthStats"%>
 
 <%
-  final String pageTitle = "Home";
-  final String titleText = DataPortalServlet.getTitleText(pageTitle);
-	HttpSession httpSession = request.getSession();
-	httpSession.setAttribute("menuid", "home");
+	final String pageTitle = "Home";
+	final String titleText = DataPortalServlet.getTitleText(pageTitle);
+	session.setAttribute("menuid", "home");
 
-	String uid = (String) httpSession.getAttribute("uid");
-
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
-			+ path + "/";
-
-	String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
-
+	String uid = (String) session.getAttribute("uid");
 	if (uid == null || uid.isEmpty()) {
 		uid = "public";
 	}
 
+	//String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+
 	// Generate PASTA data package statistics and store values in session.
 
-	Integer numDataPackages = null;
-	Integer numDataPackagesSites = null;
-	String count = null;
-
+	String numDataPackages = null;
+	String numDataPackagesSites = null;
 	PastaStatistics pastaStats = new PastaStatistics("public");
 
-	count = (String) httpSession.getAttribute("numDataPackages");
-	if (count != null) {
-		numDataPackages = Integer.valueOf(count);
-	} else {
-		numDataPackages = pastaStats.getNumDataPackages();
-		httpSession.setAttribute("numDataPackages",
-				numDataPackages.toString());
+	numDataPackages = (String) application.getAttribute("numDataPackages");
+	if (numDataPackages == null) {
+		numDataPackages = pastaStats.getNumDataPackages().toString();
+		application.setAttribute("numDataPackages", numDataPackages);
 	}
 
-	count = (String) httpSession.getAttribute("numDataPackagesSites");
-	if (count != null) {
-		numDataPackagesSites = Integer.valueOf(count);
-	} else {
-		numDataPackagesSites = pastaStats.getNumDataPackagesSites();
-		httpSession.setAttribute("numDataPackagesSites",
-				numDataPackagesSites.toString());
+	numDataPackagesSites = (String) application.getAttribute("numDataPackagesSites");
+	if (numDataPackagesSites == null) {
+		numDataPackagesSites = pastaStats.getNumDataPackagesSites().toString();
+		application.setAttribute("numDataPackagesSites", numDataPackagesSites);
 	}
 
     GregorianCalendar now = new GregorianCalendar();
 
-    String googleChartJson = (String) httpSession.getAttribute("googleChartJson");
+    String googleChartJson = (String) application.getAttribute("googleChartJson");
     if (googleChartJson == null) {
         GrowthStats gs = new GrowthStats();
         googleChartJson = gs.getGoogleChartJson(now, Calendar.MONTH);
-        httpSession.setAttribute("googleChartJson", googleChartJson);
+        application.setAttribute("googleChartJson", googleChartJson);
     }
 
     String hover = "New user registration for non-LTER members coming soon!";
@@ -232,8 +217,8 @@
 					<div class="row-fluid">
 						<div class="row-fluid">
 								    <div id="chart_div"></div>
-								    <p id="nis-growth">Site contributed data packages: <b><%=numDataPackagesSites.toString()%></b><br />
-									     Total data packages: <b><%=numDataPackages.toString()%></b>
+								    <p id="nis-growth">Site contributed data packages: <b><%= numDataPackagesSites %></b><br />
+									     Total data packages: <b><%= numDataPackages %></b>
 								    </p>
 						</div>
 					</div>

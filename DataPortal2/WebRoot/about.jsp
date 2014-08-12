@@ -41,7 +41,8 @@
 
 <body>
 
-<jsp:include page="header.jsp" />
+<%@ include file="header.jsp" %>
+
 <div class="row-fluid ">
 	<div>
 		<div class="container">

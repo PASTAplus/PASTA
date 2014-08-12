@@ -544,32 +544,37 @@ public class EventSubscriptionClient extends PastaClient {
 					Node subscriptionNode = subscriptionList.item(i);
 					NodeList subscriptionChildren = subscriptionNode
 							.getChildNodes();
-					String subscriptionId = null;
-					String packageId = null;
-					String url = null;
+					String subscriptionId = "";
+					String packageId = "";
+					String url = "";
 					for (int j = 0; j < subscriptionChildren.getLength(); j++) {
 						Node childNode = subscriptionChildren.item(j);
 						if (childNode instanceof Element) {
 							Element subscriptionElement = (Element) childNode;
+							
 							if (subscriptionElement.getTagName().equals("id")) {
 								Text text = (Text) subscriptionElement
 										.getFirstChild();
-								subscriptionId = text.getData().trim();
+								if (text != null) {
+									subscriptionId = text.getData().trim();
+								}
 							}
-							else
-								if (subscriptionElement.getTagName().equals(
+							else if (subscriptionElement.getTagName().equals(
 										"packageId")) {
-									Text text = (Text) subscriptionElement
+								Text text = (Text) subscriptionElement
 											.getFirstChild();
+								if (text != null) {
 									packageId = text.getData().trim();
 								}
-								else
-									if (subscriptionElement.getTagName()
+							}
+							else if (subscriptionElement.getTagName()
 											.equals("url")) {
-										Text text = (Text) subscriptionElement
+								Text text = (Text) subscriptionElement
 												.getFirstChild();
-										url = text.getData().trim();
-									}
+								if (text != null) {
+									url = text.getData().trim();
+								}
+							}
 						}
 					}
 
@@ -627,9 +632,7 @@ public class EventSubscriptionClient extends PastaClient {
 					Node subscriptionNode = subscriptionList.item(i);
 					NodeList subscriptionChildren = subscriptionNode
 							.getChildNodes();
-					String subscriptionId = null;
-					String packageId = null;
-					String url = null;
+					String subscriptionId = "";
 					for (int j = 0; j < subscriptionChildren.getLength(); j++) {
 						Node childNode = subscriptionChildren.item(j);
 						if (childNode instanceof Element) {
@@ -637,22 +640,10 @@ public class EventSubscriptionClient extends PastaClient {
 							if (subscriptionElement.getTagName().equals("id")) {
 								Text text = (Text) subscriptionElement
 										.getFirstChild();
-								subscriptionId = text.getData().trim();
-							}
-							else
-								if (subscriptionElement.getTagName().equals(
-										"packageId")) {
-									Text text = (Text) subscriptionElement
-											.getFirstChild();
-									packageId = text.getData().trim();
+								if (text != null) {
+									subscriptionId = text.getData().trim();
 								}
-								else
-									if (subscriptionElement.getTagName()
-											.equals("url")) {
-										Text text = (Text) subscriptionElement
-												.getFirstChild();
-										url = text.getData().trim();
-									}
+							}
 						}
 					}
 
