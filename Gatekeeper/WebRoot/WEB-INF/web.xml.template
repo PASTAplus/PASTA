@@ -9,19 +9,6 @@
       <listener-class>edu.lternet.pasta.gatekeeper.ConfigurationListener</listener-class>
   </listener>
   <servlet>
-    <servlet-name>GatekeeperEventManagerProxy</servlet-name>
-    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
-    <init-param>
-      <param-name>Prefix</param-name>
-      <param-value>/eventmanager</param-value>
-    </init-param>
-    <init-param>
-      <param-name>ProxyTo</param-name>
-      <param-value>http://event.lternet.edu:8080/eventmanager</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet>
     <servlet-name>GatekeeperDataPackageManagerProxy</servlet-name>
     <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
     <init-param>
@@ -74,15 +61,10 @@
   </filter>
   <filter-mapping>
     <filter-name>GatekeeperFilter</filter-name>
-    <servlet-name>GatekeeperEventManagerProxy</servlet-name>
     <servlet-name>GatekeeperDataPackageManagerProxy</servlet-name>
     <servlet-name>GatekeeperAuditManagerProxy</servlet-name>
     <servlet-name>GatekeeperTester</servlet-name>
   </filter-mapping>
-  <servlet-mapping>
-    <servlet-name>GatekeeperEventManagerProxy</servlet-name>
-    <url-pattern>/eventmanager/*</url-pattern>
-  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>GatekeeperDataPackageManagerProxy</servlet-name>
     <url-pattern>/package/*</url-pattern>
