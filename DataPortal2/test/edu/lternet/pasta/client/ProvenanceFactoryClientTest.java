@@ -27,6 +27,8 @@ package edu.lternet.pasta.client;
 import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
+import java.sql.SQLException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
@@ -112,7 +114,12 @@ public class ProvenanceFactoryClientTest {
 		TokenManager tokenManager = new TokenManager();
 
 		// Clean up "tokenstore" database and remove user.
-		tokenManager.deleteToken(uid);
+		try {
+		  tokenManager.deleteToken(uid);
+		}
+		catch (ClassNotFoundException | SQLException e) {
+		   // no-op since we don't want test to fail if token is not found
+		}
 
 		uid = null;
 		password = null;
