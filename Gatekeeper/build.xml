@@ -35,11 +35,7 @@
         <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${tomcat.lib}">
-        <include name="jetty-client*.jar"/>
-        <include name="jetty-http*.jar"/>
-        <include name="jetty-io*.jar"/>
-        <include name="jetty-servlets*.jar"/>
-        <include name="jetty-util*.jar"/>
+        <include name="**/*.jar"/>
       </fileset>
     </copy>
   </target>
