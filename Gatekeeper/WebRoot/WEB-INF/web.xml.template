@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
   <context-param>
       <param-name>CONFIG_DIR</param-name>
       <param-value>WEB-INF/conf</param-value>
@@ -10,54 +12,60 @@
   </listener>
   <servlet>
     <servlet-name>GatekeeperDataPackageManagerProxy</servlet-name>
-    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
+    <servlet-class>org.eclipse.jetty.proxy.ProxyServlet$Transparent</servlet-class>
     <init-param>
-      <param-name>Prefix</param-name>
+      <param-name>prefix</param-name>
       <param-value>/package</param-value>
     </init-param>
     <init-param>
-      <param-name>ProxyTo</param-name>
+      <param-name>proxyTo</param-name>
       <param-value>http://package.lternet.edu:8080/package</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
+	<async-supported>true</async-supported>
   </servlet>
   <servlet>
     <servlet-name>GatekeeperAuditManagerProxy</servlet-name>
-    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
+    <servlet-class>org.eclipse.jetty.proxy.ProxyServlet$Transparent</servlet-class>
     <init-param>
-      <param-name>Prefix</param-name>
+      <param-name>prefix</param-name>
       <param-value>/audit</param-value>
     </init-param>
     <init-param>
-      <param-name>ProxyTo</param-name>
+      <param-name>proxyTo</param-name>
       <param-value>http://audit.lternet.edu:8080/audit</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
+	<async-supported>true</async-supported>
   </servlet>
   <servlet>
     <servlet-name>GatekeeperTester</servlet-name>
-    <servlet-class>org.eclipse.jetty.servlets.ProxyServlet$Transparent</servlet-class>
+    <servlet-class>org.eclipse.jetty.proxy.ProxyServlet$Transparent</servlet-class>
     <init-param>
-      <param-name>Prefix</param-name>
+      <param-name>prefix</param-name>
       <param-value>/test</param-value>
     </init-param>
     <init-param>
-      <param-name>ProxyTo</param-name>
+      <param-name>proxyTo</param-name>
       <param-value>http://localhost:8080/gatekeepertester</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
+	<async-supported>true</async-supported>
   </servlet>
   <servlet>
     <servlet-name>api-docs</servlet-name>
     <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+	<async-supported>true</async-supported>
   </servlet>
   <servlet>
     <servlet-name>demo</servlet-name>
     <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+	<async-supported>true</async-supported>
   </servlet>
   <filter>
     <filter-name>GatekeeperFilter</filter-name>
     <filter-class>edu.lternet.pasta.gatekeeper.GatekeeperFilter</filter-class>
+	<async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>GatekeeperFilter</filter-name>
