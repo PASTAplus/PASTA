@@ -65,8 +65,8 @@
 							<div class="span12">
 		            <div class="content">
 
-        <p>Preview a rendered version of EML in HTML format by uploading your
-           EML file.</p>
+        <p>Preview a rendered version of EML in HTML format by browsing to your
+           EML file and then selecting <b>Preview</b>.</p>
 
         <div class="section">
           <form id="metadataPreviewer" name="metadataPreviewer" method="post"
@@ -75,7 +75,7 @@
             <label for="packageid">File:</label>
             <input type="file" name="emlfile" accept="application/xml" required="required" />
             <div>
-            <input type="submit" name="upload" value="Upload" />
+            <input type="submit" name="upload" value="Preview" />
             <input type="reset" name="reset" value="Clear" />
             </div>
           </form>

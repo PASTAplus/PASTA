@@ -26,10 +26,10 @@ package edu.lternet.pasta.portal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,6 +106,7 @@ public class MetadataPreviewerServlet extends DataPortalServlet {
 
     HttpSession httpSession = request.getSession();
     String uid = (String) httpSession.getAttribute("uid");
+	String forward = "./metadataViewer.jsp";
 
     if (uid == null || uid.isEmpty())
       uid = "public";
@@ -149,12 +150,10 @@ public class MetadataPreviewerServlet extends DataPortalServlet {
     	  handleDataPortalError(logger, e);
       }    
     }
-
-    response.setContentType("text/html");
-    PrintWriter out = response.getWriter();
-    out.print(html);
-    out.flush();
-    out.close();
+    
+    request.setAttribute("metadataHtml", html);
+    RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+    requestDispatcher.forward(request, response);
   }
 
   /**
