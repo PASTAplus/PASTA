@@ -164,7 +164,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			throw new ServletException("The 'scope', 'identifier', or 'revision' field of the packageId is empty.");
 		}
 
-		httpSession.setAttribute("html", html);
+		request.setAttribute("citationHtml", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 		}

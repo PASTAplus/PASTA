@@ -8,10 +8,7 @@
 	String basePath = request.getScheme() + "://" + request.getServerName()
 	    + ":" + request.getServerPort() + path + "/";
 
-	HttpSession httpSession = request.getSession();
-	String citationMessage = (String) httpSession
-	    .getAttribute("citationmessage");
-	String html = (String) httpSession.getAttribute("html");
+	String html = (String) request.getAttribute("citationHtml");
 
 	if (html == null) {
 		html = "";
@@ -79,11 +76,6 @@
 					publication or in the metadata of any derived data product that is
 					produced using the <em>Data Package</em>.
 				<p>The citation should have the following general form:</p>
-
-				<%
-					if (citationMessage != null)
-						out.println(citationMessage);
-				%>
 
 				<%=html%>
 				

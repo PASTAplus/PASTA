@@ -80,27 +80,31 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Browse Data Packages</h2>
+								<h2>Browse Data by Keyword or LTER Site</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
 							<div class="content span12 box_layout">
-				<p>Browse data packages by keyword or LTER site using the links below. The number of matching data packages is shown in parentheses.<sup>*</sup> <sup>**</sup></p>
+								<p>
+									Browse data packages by keyword or LTER site using the links
+									below. The number of matching data packages is shown in
+									parentheses.<sup>*</sup> <sup>**</sup>
+								</p>
 
-				<div class="section">
-          <div id='jqxTree'>
-            <%= browseHTML %>
-				  </div>
-				</div>
-				<p>
-				   <sup>*</sup><small><em>Only public documents are accessible from this page.</em></small>
-				</p>
-				<p>
-				   <sup>**</sup><small><em>Search results are refreshed nightly.</em></small>
-				</p>
-			        </div>
-							<!-- end of content --></div>
+								<div id='jqxTree'>
+									<%=browseHTML%>
+								</div>
+								<p>
+									<sup>*</sup>
+									<small><em>Only public documents are accessible from this page.</em></small>
+								</p>
+								<p>
+									<sup>**</sup>
+									<small><em>Search results are refreshed nightly.</em></small>
+								</p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

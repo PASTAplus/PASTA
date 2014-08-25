@@ -52,8 +52,8 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
   private static final String browseMessage = "Select a data package "
-  		+ "<b>scope.identifier</b> value to see the most current "
-  		+ "<b>revision</b> of the data package lineage:";
+  		+ "<em>scope.identifier</em> value to view the most current "
+  		+ "revision of the data package lineage.";
   private static String pastaUriHead = null;
 
   /**
@@ -162,9 +162,9 @@ public class IdentifierBrowseServlet extends DataPortalServlet {
       html = "<p class=\"warning\"> Error: \"scope\" field empty</p>\n";
     }
 
-    httpSession.setAttribute("browsemessage", browseMessage);
-    httpSession.setAttribute("html", html);
-    httpSession.setAttribute("count", count.toString());
+    request.setAttribute("browsemessage", browseMessage);
+    request.setAttribute("html", html);
+    request.setAttribute("count", count.toString());
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
 

@@ -51,7 +51,7 @@ public class ScopeBrowseServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
 	private static final String browseMessage = "Select a data package " +
-			"<em>scope</em> value to see a list of associated <em>identifiers</em>:";
+			"<em>scope</em> value to view a list of associated identifiers.";
 
   /**
    * Constructor of the object.
@@ -147,9 +147,9 @@ public class ScopeBrowseServlet extends DataPortalServlet {
   	  handleDataPortalError(logger, e);
     }    
 
-    httpSession.setAttribute("browsemessage", browseMessage);
-    httpSession.setAttribute("html", html);
-    httpSession.setAttribute("count", count.toString());
+    request.setAttribute("browsemessage", browseMessage);
+    request.setAttribute("html", html);
+    request.setAttribute("count", count.toString());
     RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
     requestDispatcher.forward(request, response);
 

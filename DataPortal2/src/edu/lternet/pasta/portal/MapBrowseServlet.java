@@ -230,7 +230,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 			handleDataPortalError(logger, e);
 		}
 
-		httpSession.setAttribute("browsemessage", null);
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("dataPackagePublicationDateHTML", publicationDateHTML);

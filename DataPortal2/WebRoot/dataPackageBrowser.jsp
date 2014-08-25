@@ -9,9 +9,9 @@
 
   HttpSession httpSession = request.getSession();
   
-  String browseMessage = (String) httpSession.getAttribute("browsemessage");
-  String html = (String) httpSession.getAttribute("html");
-  String cnt = (String) httpSession.getAttribute("count");
+  String browseMessage = (String) request.getAttribute("browsemessage");
+  String html = (String) request.getAttribute("html");
+  String cnt = (String) request.getAttribute("count");
 
   if (html == null) {
     html = "";
@@ -64,13 +64,18 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Package Browser</h2>
+								<h2>Browse Data by Package Identifier</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
+							<div class="content span12 box_layout">
+								<p><%=browseMessage%></p>
+							<span class="row-fluid separator_border"></span>
+						</div>
+						<div class="row-fluid">
 							<div class="span12">
-				        <%=html%>
+				        		<%=html%>
 							</div>
 						</div>
 					</div>
@@ -78,6 +83,7 @@
 			</div>
 		</div>
 	</div>
+  </div>
 
 	<jsp:include page="footer.jsp" />
 

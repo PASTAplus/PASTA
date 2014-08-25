@@ -51,9 +51,8 @@ public class RevisionBrowseServlet extends DataPortalServlet {
   private static final long serialVersionUID = 1L;
   private static final String forward = "./dataPackageBrowser.jsp";
   private static final String browseMessage = "Select a data package "
-  		+ "<em>scope.identifer.revision</em> value to see an overview of the "
-  		+ "data package for the selected <em>revision</em>:";
-
+  		+ "<em>scope.identifer.revision</em> value to view a specific "
+  		+ "revision of the data package lineage.";
 
   /**
    * Constructor of the object.
@@ -148,9 +147,9 @@ public class RevisionBrowseServlet extends DataPortalServlet {
 			handleDataPortalError(logger, e);
 		}
 
-		httpSession.setAttribute("browsemessage", browseMessage);
-		httpSession.setAttribute("html", html);
-		httpSession.setAttribute("count", count.toString());
+		request.setAttribute("browsemessage", browseMessage);
+		request.setAttribute("html", html);
+		request.setAttribute("count", count.toString());
 		RequestDispatcher requestDispatcher = request
 				.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
