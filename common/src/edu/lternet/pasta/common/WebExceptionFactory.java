@@ -37,6 +37,8 @@ import edu.lternet.pasta.common.proxy.BufferedClientResponse;
  *
  */
 public final class WebExceptionFactory {
+	
+	private static final String UNAUTHORIZED_CHALLENGE = "Basic realm=\"https://pasta.lternet.edu\"";
 
     private WebExceptionFactory() {
         // preventing instantiation
@@ -62,6 +64,10 @@ public final class WebExceptionFactory {
 
         ResponseBuilder rb = Response.status(status);
         rb.entity(message);
+        if (status == Response.Status.UNAUTHORIZED) {
+        	rb.header("WWW-Authenticate", UNAUTHORIZED_CHALLENGE);
+        }
+
         rb.type(MediaType.TEXT_PLAIN);
 
         return new WebApplicationException(cause, rb.build());
@@ -87,6 +93,9 @@ public final class WebExceptionFactory {
 
         ResponseBuilder rb = Response.status(status);
         rb.entity(message);
+        if (status == Response.Status.UNAUTHORIZED.getStatusCode()) {
+        	rb.header("WWW-Authenticate", UNAUTHORIZED_CHALLENGE);
+        }
 
         return new WebApplicationException(cause, rb.build());
     }
