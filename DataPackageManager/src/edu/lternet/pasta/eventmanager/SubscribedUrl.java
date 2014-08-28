@@ -54,6 +54,7 @@ public class SubscribedUrl {
      * The 'http' scheme.
      */
     public static final String HTTP = "http";
+    public static final String HTTPS = "https";
 
     private final String url;
 
@@ -94,10 +95,11 @@ public class SubscribedUrl {
 
         String scheme = parsedUrl.getScheme();
 
-        if (!scheme.equalsIgnoreCase(HTTP)) {
-            String s = "The scheme '" + scheme +
-                       "' of the provided URL '" + url +
-                       "' is not allowed. It must be 'http'.";
+        if (!scheme.equalsIgnoreCase(HTTP) && 
+        	!scheme.equalsIgnoreCase(HTTPS)) {
+            String s = String.format(
+            	"The scheme '%s' of the provided URL '%s' is not allowed. It must be '%s' or '%s'.", 
+            	scheme, url, HTTP, HTTPS);
             throw new IllegalArgumentException(s);
         }
 
