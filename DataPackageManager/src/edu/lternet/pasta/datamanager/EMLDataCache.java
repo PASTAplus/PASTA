@@ -26,6 +26,7 @@ package edu.lternet.pasta.datamanager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -70,8 +71,6 @@ public class EMLDataCache {
   
   // Name of the database table where entities in the data cache are registered
   private final String DATA_CACHE_REGISTRY = "datapackagemanager.DATA_CACHE_REGISTRY";
-  private final String DATA_CACHE_REGISTRY_SCHEMA = "datapackagemanager";
-  private final String DATA_CACHE_REGISTRY_TABLE = "DATA_CACHE_REGISTRY";
   private String dbDriver;           // database driver
   private String dbURL;              // database URL
   private String dbUser;             // database user name
@@ -87,7 +86,7 @@ public class EMLDataCache {
    * 
    * @param   dbDriver      the database driver
    * @param   dbURL         the database URL
-   * @paramm  dbUser        the database user name
+   * @param   dbUser        the database user name
    * @param   dbPassword    the database user password
    * @return  an EMLDataCache object
    */
@@ -190,11 +189,9 @@ public class EMLDataCache {
   public boolean addDataEntity(EmlPackageId emlPackageId, EMLEntity emlEntity)
           throws ClassNotFoundException, SQLException {
     boolean success = false;
-    String insertString;
-    Date now = new Date();
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Statement stmt = null;
     EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+    java.util.Date now = new java.util.Date();
+    java.sql.Date sqlDate = new java.sql.Date(now.getTime());
     
     if (emlPackageIdFormat != null) {
       String entityId = emlEntity.getEntityId();
@@ -218,33 +215,36 @@ public class EMLDataCache {
         /*
          * Insert a new entry for this entity into the data cache registry.
          */
-        insertString = 
-        "INSERT INTO " + DATA_CACHE_REGISTRY + " values(" + 
-        "'" + packageId + "', " + 
-        "'" + scope + "', " + 
-        "'" + identifier + "', " + 
-        "'" + revision + "', " + 
-        "'" + entityId + "', " + 
-        "'" + entityName + "', " + 
-        "'" + dataFormat + "', " + 
-        "'" + simpleDateFormat.format(now) + "', " + 
-        "'" + simpleDateFormat.format(now) + "' " + 
-        ")";
+        StringBuffer insertSQL = 
+        	      new StringBuffer("INSERT INTO " + DATA_CACHE_REGISTRY + "(");
+        insertSQL.append("PACKAGE_ID, SCOPE, IDENTIFIER, REVISION, ENTITY_ID, ENTITY_NAME, DATA_FORMAT, DATE_CREATED, UPDATE_DATE) " + 
+        	             "VALUES(?,?,?,?,?,?,?,?,?)");      
+        String insertString = insertSQL.toString();
+        logger.debug("insertString: " + insertString);
 
         Connection connection = null;
-        
         try {
           connection = getConnection();
-          stmt = connection.createStatement();
-          stmt.executeUpdate(insertString);
-          if (stmt != null) stmt.close();
-          success = true;
+          PreparedStatement pstmt = connection.prepareStatement(insertString);
+	      pstmt.setString(1, packageId);
+	      pstmt.setString(2, scope);
+	      pstmt.setInt(3, identifier);
+	      pstmt.setInt(4, revision);
+	      pstmt.setString(5, entityId);
+	      pstmt.setString(6, entityName);
+	      pstmt.setString(7, dataFormat);
+	      pstmt.setDate(8, sqlDate);
+	      pstmt.setDate(9, sqlDate);
+	      pstmt.executeUpdate();
+	      if (pstmt != null) {
+	        pstmt.close();
+	      }
+	      success = true;
         }
         catch (SQLException e) {
           logger.error(
             "Error inserting record for " + entityId + 
-            " into the data cache registry (" + DATA_CACHE_REGISTRY + ")");
-        
+            " into the data cache registry (" + DATA_CACHE_REGISTRY + ")");      
           logger.error("SQLException: " + e.getMessage());
           throw(e);
         }
