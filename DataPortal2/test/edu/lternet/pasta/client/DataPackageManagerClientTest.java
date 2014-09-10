@@ -212,9 +212,24 @@ public class DataPackageManagerClientTest {
   
 
   /**
-   * Test the status and message body of the Create Data Package use case
+   * Test the operations of the DataPackageManagerClient class
    */
   @Test
+  public void testDataPackageManagerClient() {
+	  testCreateDataPackage();
+	  testEvaluateDataPackage();
+	  testReadDataPackage();
+	  testReadDataEntityName();
+	  testReadDataPackageReport();
+	  testReadMetadata();
+	  testSearchDataPackages();
+	  testUpdateDataPackage();
+	  testDeleteDataPackage();
+  }
+
+  /**
+   * Test the status and message body of the Create Data Package use case
+   */
   public void testCreateDataPackage() {
     String resourceMap = null;
     // Test CREATE for OK status
@@ -240,7 +255,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Evaluate Data Package use case
    */
-  @Test
   public void testEvaluateDataPackage() {
     try {
       // Test Evaluate for OK status
@@ -354,7 +368,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Read Data Package use case
    */
-  @Test
   public void testReadDataPackage() {
     try {
       String entityString = dpmClient.readDataPackage(testScope,
@@ -378,7 +391,6 @@ public class DataPackageManagerClientTest {
    * Test the status and message body of the Read Data Entity
    */
   /*
-  @Test
   public void testReadDataEntity() {
     final long expectedLength = testEntitySize;
     
@@ -401,7 +413,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Read Data Entity Name
    */
-  @Test
   public void testReadDataEntityName() {
     
     try {
@@ -423,7 +434,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Read Data Package Report use case
    */
-  @Test
   public void testReadDataPackageReport() {
     try {
       String entityString = dpmClient.readDataPackageReport(testScope,
@@ -448,7 +458,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Read Metadata use case
    */
-  @Test
   public void testReadMetadata() {
     try {
       String entityString = dpmClient.readMetadata(testScope, testIdentifier,
@@ -471,7 +480,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Search Data Packages use case
    */
-  @Test
   public void testSearchDataPackages() {
     try {
       String entityString = dpmClient.searchDataPackages(pathqueryXML);
@@ -494,7 +502,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Update Data Package use case
    */
-  @Test
   public void testUpdateDataPackage() {
     try {
       String testPackageId = testScope + "." + testIdentifier + "."
@@ -521,7 +528,6 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the DELETE use case
    */
-  @Test
   public void testDeleteDataPackage() {
     try {
       String entityString = dpmClient.deleteDataPackage(testScope,
