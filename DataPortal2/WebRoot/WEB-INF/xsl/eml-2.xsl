@@ -387,7 +387,7 @@
               </xsl:for-each>
             </xsl:if>     
             <xsl:if test="creator">
-              <th>Owners:</th>
+              <th>Creators:</th>
               <xsl:for-each select="creator">
                 <tr>
                   <td>
@@ -2009,7 +2009,7 @@
           <xsl:choose>
             <xsl:when test="individualName">
               <!--  if creator has an individual, so it and make creator's  with other labels subordinate  -->
-              <td class="{$firstColStyle}">Owner:</td>
+              <td class="{$firstColStyle}">Creator:</td>
               <td class="{$secondColStyle}">
                 <xsl:for-each select="individualName">
                   <xsl:value-of select="surName"/>
@@ -8662,7 +8662,7 @@
   <xsl:template name="resource">
     <xsl:param name="resfirstColStyle"/>
     <xsl:param name="ressubHeaderStyle"/>
-    <xsl:param name="creator">Data Package Owner(s):</xsl:param>
+    <xsl:param name="creator">Data Package Creator(s):</xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resource</xsl:text></xsl:message></xsl:if>
     <!--
       <xsl:for-each select="alternateIdentifier">
