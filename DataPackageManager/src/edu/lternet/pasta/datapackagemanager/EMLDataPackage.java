@@ -239,6 +239,18 @@ public class EMLDataPackage {
 	}
 
 	
+	/**
+	 * Return the metadata format type, which is equivalent to the
+	 * EML namespace value of the data package.
+	 * 
+	 * @return  the metadata format type, 
+	 *          e.g. "eml://ecoinformatics.org/eml-2.1.1"
+	 */
+	public String getFormatType() {
+		return dataPackage.getEmlNamespace();
+	}
+	
+	
 	public Integer getIdentifier() {
 	  return this.identifier;
 	}

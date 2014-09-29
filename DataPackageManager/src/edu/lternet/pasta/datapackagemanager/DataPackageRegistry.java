@@ -353,6 +353,8 @@ public class DataPackageRegistry {
 	 * @param entityId     The entityId value (may be null if this is not a data entity resource)
 	 * @param entityName   The entityName value (may be null if this is not a data entity resource)
 	 * @param principalOwner The user (principal) who owns the the resource 
+	 * @param formatType   The format type, currently used for metadata resources only,
+	 *                       may be null, e.g. "eml://ecoinformatics.org/eml-2.1.1"
 	 * @param mayOverwrite If true, an existing resource with the same resourceId may
 	 *                     be overwritten by the new resource by updating its creation date.
 	 *                     This would be typically be set true only for evaluation resources
@@ -363,7 +365,7 @@ public class DataPackageRegistry {
  	   DataPackageManager.ResourceType resourceType,
  	   String resourceLocation,
  	   String packageId, String scope, Integer identifier, Integer revision,
- 	   String entityId, String entityName, String principalOwner, 
+ 	   String entityId, String entityName, String principalOwner, String formatType,
  	   boolean mayOverwrite)
           throws ClassNotFoundException, SQLException {
     Connection connection = null;
@@ -411,8 +413,8 @@ public class DataPackageRegistry {
       }
       else {
         insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                         "revision, principal_owner, date_created) " + 
-                         "VALUES(?,?,?,?,?,?,?,?)");
+                         "revision, principal_owner, date_created, format_type) " + 
+                         "VALUES(?,?,?,?,?,?,?,?,?)");
       }
       String insertString = insertSQL.toString();
       logger.debug("insertString: " + insertString);
@@ -436,6 +438,7 @@ public class DataPackageRegistry {
         else {
           pstmt.setString(7, principalOwner);
           pstmt.setTimestamp(8, ts);
+          pstmt.setString(9, formatType);
         }
         pstmt.executeUpdate();
         if (pstmt != null) {
@@ -951,6 +954,55 @@ public class DataPackageRegistry {
     return doi;
     
   }
+
+
+	/**
+	 * Gets the format type value for a given resourceId.
+	 * 
+	 * @param resourceId
+	 *            the resource identifier
+	 * @return the value of the 'format_type' field matching the specified
+	 *         resourceId ('resource_id') value
+	 */
+	public String getFormatType(String resourceId)
+			throws ClassNotFoundException, SQLException {
+
+		String formatType = null;
+
+		Connection connection = null;
+		String selectString = "SELECT format_type FROM " + RESOURCE_REGISTRY
+				+ "  WHERE resource_id='" + resourceId + "'";
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				formatType = rs.getString(1);
+			}
+
+			if (stmt != null)
+				stmt.close();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+
+		return formatType;
+	}
 
 
   /**

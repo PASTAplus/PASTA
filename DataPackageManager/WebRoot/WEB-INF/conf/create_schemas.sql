@@ -16,6 +16,8 @@ CREATE TABLE datapackagemanager.resource_registry (
   date_created TIMESTAMP NOT NULL,                          -- creation date/time
   date_deactivated TIMESTAMP,                               -- deactivation date/time; NULL indicates still active
   sha1_checksum CHAR(40),                                   -- SHA-1 checksum of this resource, a 40-character string
+  format_type VARCHAR(100),                                 -- the metadata format type, e.g. 'eml://ecoinformatics.org/eml-2.1.1'
+  mime_type VARCHAR(100),                                   -- the mime type, e.g. 'text/csv'
   CONSTRAINT resource_registry_pk PRIMARY KEY (resource_id)
 );
 

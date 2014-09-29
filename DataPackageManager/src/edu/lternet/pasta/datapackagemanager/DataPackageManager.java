@@ -510,6 +510,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					ClientProtocolException, TransformerException, Exception {
 		Authorizer authorizer = new Authorizer(dataPackageRegistry);
 		DataManagerClient dataManagerClient = new DataManagerClient();
+		String formatType = null;   // used for metadata resources
 		boolean isDataPackageValid;
 		boolean isDataValid = false;
 		HashMap<String, String> entityURIHashMap = new HashMap<String, String>();
@@ -637,7 +638,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 				dataPackageRegistry.addDataPackageResource(entityURI,
 				    ResourceType.data, entityDir, packageId, scope, identifier,
-				    revision, entityId, entityName, user, mayOverwrite);
+				    revision, entityId, entityName, user, formatType, mayOverwrite);
 				
 				// Store the checksum of the data entity resource
 				File file = getDataEntityFile(scope, identifier,
@@ -658,9 +659,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * Add the metadata resource to the registry
 			 */
+			
+			String metadataFormatType = levelZeroDataPackage.getFormatType();
+			
 			dataPackageRegistry.addDataPackageResource(metadataURI,
 			    ResourceType.metadata, resourceLocation, packageId, scope,
-			    identifier, revision, null, null, user, mayOverwrite);
+			    identifier, revision, null, null, user, metadataFormatType, mayOverwrite);
 			
 			// Store the checksum of the metadata resource
 			File file = getMetadataFile(scope, identifier, revision.toString(),
@@ -682,7 +686,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			dataPackageRegistry.addDataPackageResource(reportURI,
 			    ResourceType.report, resourceLocation, packageId, scope, identifier,
-			    revision, null, null, user, mayOverwrite);
+			    revision, null, null, user, formatType, mayOverwrite);
 
 			// Store the checksum of the report resource
 			File file = readDataPackageReport(scope, identifier,
@@ -717,7 +721,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    scope, identifier, revision, null);
 				dataPackageRegistry.addDataPackageResource(dataPackageURI,
 				    ResourceType.dataPackage, resourceLocation, packageId, scope,
-				    identifier, revision, null, null, user, mayOverwrite);
+				    identifier, revision, null, null, user, formatType, mayOverwrite);
 
 				resourceMap = generateDataPackageResourceGraph(dataPackageURI,
 				    metadataURI, entityURIList, reportURI);
@@ -2188,6 +2192,68 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		return doi;
 
+	}
+
+	
+	/**
+	 * Returns the format type stored for the given resource identifier if
+	 * the resource exists; otherwise, throw a ResourceNotFoundException.
+	 * 
+	 * @param resourceId
+	 * @param authToken
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readResourceFormatType(String resourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String formatType = null;
+		String user = authToken.getUserId();
+
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			/*
+			 * Check whether user is authorized to read the resource
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
+			    Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = String.format(
+						"User %s does not have permission to read this resource: %s", 
+						user, resourceId);
+				throw new UnauthorizedException(gripe);
+			}
+
+			formatType = dataPackageRegistry.getFormatType(resourceId);
+
+			if (formatType == null) {
+				String gripe = String.format(
+						"A formatType does not exist for this resource: %s",
+						resourceId);
+				throw new ResourceNotFoundException(gripe);
+			}
+
+		} 
+		catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} 
+		catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+
+		return formatType;
 	}
 
 	
