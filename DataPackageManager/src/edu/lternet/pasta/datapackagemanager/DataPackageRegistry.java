@@ -982,6 +982,7 @@ public class DataPackageRegistry {
 
 			while (rs.next()) {
 				formatType = rs.getString(1);
+				if (formatType != null) { formatType = formatType.trim(); }
 			}
 
 			if (stmt != null)
@@ -1998,6 +1999,65 @@ public class DataPackageRegistry {
 
 	
 	/**
+	 * Returns an array list of resources that are lacking format_type
+	 * values in the resource registry.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listFormatlessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND format_type IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setPackageId(packageId);
+				resource.setEntityId(entityId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
 	 * Returns an array list of resources that are both publicly accessible and
 	 * lacking DOIs.
 	 * 
@@ -2203,6 +2263,59 @@ public class DataPackageRegistry {
   }
 
   
+  /**
+   * Update the format_type field of a resource in the resource registry.
+   * 
+   * @param resourceId
+   *          The resource identifier of the resource to be updated
+   * @param formatType
+   *          The value to be stored in the format_type field.
+   * @throws ClassNotFoundException, IllegalArgumentException, SQLException
+   */
+	public void updateFormatType(String resourceId, String formatType)
+			throws ClassNotFoundException, SQLException {
+		Connection conn = null;
+
+		if (formatType == null) {
+			throw new IllegalArgumentException("Format type is null");
+		}
+
+		try {
+			conn = this.getConnection();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+
+		String queryString = String.format(
+			"UPDATE datapackagemanager.resource_registry SET format_type='%s' WHERE resource_id='%s'",
+			formatType, resourceId);
+
+		try {
+			Statement statement = conn.createStatement();
+			int rowCount = statement.executeUpdate(queryString);
+			if (rowCount != 1) {
+				String msg = String.format(
+						"When updating format_type, expected 1 row updated, instead %d rows were updated.",
+						rowCount);
+				throw new SQLException(msg);
+			}
+		}
+		catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			if (conn != null)
+				conn.close();
+		}
+
+  }
+
+	
   /**
    * Update the SHA-1 checksum of a resource to the resource registry.
    * 

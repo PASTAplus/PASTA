@@ -89,6 +89,7 @@ public class DataPackageManagerResourceTest {
   
   private static final String ACL_START_TEXT = "<access:access";
   private static final String ACL_END_TEXT = "</access:access>";
+  private static final String METADATA_FORMAT_START_TEXT = "eml://ecoinformatics.org/eml-2.1.";
 
   
   /*
@@ -239,6 +240,7 @@ public class DataPackageManagerResourceTest {
 	  testReadDataPackageAcl();
 	  testReadMetadata();
 	  testReadMetadataAcl();
+	  testReadMetadataFormat();
 	  testReadDataEntity();
 	  testReadDataEntityName();
 	  testReadDataEntityAcl();
@@ -795,6 +797,30 @@ public class DataPackageManagerResourceTest {
     
 
   /**
+   * Test the status and message body of the Read Metadata Format operation
+   */
+  private void testReadMetadataFormat() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readMetadataFormat(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith(METADATA_FORMAT_START_TEXT));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readMetadataFormat(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
    * Test the status and message body of the Search Data Packages use case
    */
   private void testSearchDataPackages() {
@@ -809,6 +835,7 @@ public class DataPackageManagerResourceTest {
       "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n" +
       "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n" +
       "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n" +
+      "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n" +
       "  <querygroup operator=\"UNION\">\n" +
       "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n" +
       "      <value>bug</value>\n" +
