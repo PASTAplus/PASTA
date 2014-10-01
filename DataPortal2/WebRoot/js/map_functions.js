@@ -22,18 +22,20 @@
   *
   */
 
-var map;
-
 function initialize() {
 		
   var mapOptions = {
-    center: new google.maps.LatLng(0.0, -110.0),
+    center: new google.maps.LatLng(0, -106.67648),
     zoom: 0,
     mapTypeId: google.maps.MapTypeId.HYBRID,
-    streetViewControl: false
+    mapTypeControl: true,
+    panControl: true,
+    scaleControl: true,
+    streetViewControl: false,
+    zoomControl: true
   };
   
-  map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         
   // Add map listener for map moves
   google.maps.event.addListener(map, "bounds_changed", function() {
@@ -52,5 +54,6 @@ function initialize() {
     document.advancedSearchForm.boundsChangedCount.value = boundsChangedCount;
     
   });
-        	
+  
+  map.enableKeyDragZoom();
 }
