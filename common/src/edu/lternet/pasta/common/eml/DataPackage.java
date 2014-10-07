@@ -98,19 +98,22 @@ public class DataPackage {
    * @param entityName    The entity name, e.g. "Data Entity One"
    * @return the matching object name, or null if no match was found
    */
-  public String findObjectName(String entityName) {
-    String objectName = null;
-    
-    for (Entity entity : getEntityList()) {
-      String name = entity.getName();
-      if ((name != null) && (name.equals(entityName))) {
-        objectName = entity.getObjectName();
-      }
-    }
-     
-    return objectName;
-  }
-  
+	public String findObjectName(String entityName) {
+		String objectName = null;
+
+		for (Entity entity : getEntityList()) {
+			String name = entity.getName();
+			if ((name != null) && 
+				(entityName != null) && 
+				(name.trim().equals(entityName.trim()))
+			) {
+				objectName = entity.getObjectName();
+			}
+		}
+
+		return objectName;
+	}
+
   
   /* Getters and Setter */
   
