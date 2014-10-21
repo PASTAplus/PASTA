@@ -124,30 +124,6 @@ public class MetacatMetadataCatalog implements MetadataCatalog {
 
     
     /**
-     * Reads an EML Document from the Metacat Repository.
-     * 
-     * @param epid
-     *            an EmlPackageId representing the EML Document.
-     * @return a String from Metacat representing the requested EML Document.
-     * @throws IllegalStateException
-     *             failure in input/output including inability to connect to
-     *             Metacat.
-     * @throws ResourceNotFoundException
-     *             the request EmlPackageId was not found.
-     * @throws UnauthorizedException
-     *             failure to authenticate.
-     * @throws UserErrorException
-     *             any further Metacat based exceptions.
-     */
-    public String readEmlDocument(EmlPackageId epid)
-            throws IllegalStateException, ResourceNotFoundException,
-            UnauthorizedException, UserErrorException {
-
-        return metacatAction(Action.READ, epid, null);
-    }
-
-    
-    /**
      * Updates an EML Document in the Metacat Repository.
      * 
      * @param epid
@@ -216,29 +192,6 @@ public class MetacatMetadataCatalog implements MetadataCatalog {
             UserErrorException {
 
         return metacatAction(Action.QUERY, null, xmlQuery);
-    }
-
-    
-    /**
-     * Gets the Access Control List of an EML Document in the Metacat
-     * Repository.
-     * 
-     * @param epid
-     *            an EmlPackageId representing the EML Document.
-     * @return a String from Metacat representing the ACL.
-     * @throws IllegalStateException
-     *             failure in input/output including inability to connect to
-     *             Metacat.
-     * @throws UnauthorizedException
-     *             failure to authenticate.
-     * @throws UserErrorException
-     *             any further Metacat based exceptions.
-     */
-    public String getAccessControlList(EmlPackageId epid)
-            throws IllegalStateException, UnauthorizedException,
-            UserErrorException {
-
-        return metacatAction(Action.READACL, epid, null);
     }
 
     

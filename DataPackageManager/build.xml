@@ -59,8 +59,10 @@
       <fileset dir="${shared.lib.dir}/postgresql">
         <include name="**/*.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/owasp">
-        <include name="esapi-2.0.1.jar"/>
+      <fileset dir="${shared.lib.dir}/solrj">
+        <include name="solr-solrj-4.10.0.jar"/>
+        <include name="solrj-lib/noggit-0.5.jar"/>
+        <include name="solrj-lib/slf4j-api-1.7.6.jar"/>
       </fileset>    
     </copy>
   </target>

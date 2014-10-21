@@ -67,6 +67,7 @@ import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetacatMetadataCatalog;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
+import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.ucsb.nceas.utilities.Options;
@@ -582,10 +583,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		if (isDataPackageValid && !isEvaluate) {
 			MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
 			    pastaUser);
+			MetadataCatalog solrCatalog = new SolrMetadataCatalog();
 			File levelOneEMLFile = levelZeroDataPackage.toLevelOne(emlFile,
 			    entityURIHashMap);
 			String emlDocument = FileUtils.readFileToString(levelOneEMLFile);
 			String metacatResult = null;
+			String solrResult = null;
 
 			/*
 			 * If the Metadata Catalog client throws an exception during an insert or
@@ -597,8 +600,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				if (isUpdate) {
 					metacatResult = metadataCatalog.updateEmlDocument(emlPackageId,
 					    emlDocument);
+					solrResult = solrCatalog.updateEmlDocument(emlPackageId,
+						    emlDocument);
 				} else {
 					metacatResult = metadataCatalog.createEmlDocument(emlDocument);
+					solrResult = solrCatalog.createEmlDocument(emlDocument);
 				}
 			} catch (Exception e) {
 				rollbackDataEntities(scope, identifier, revision);
@@ -855,10 +861,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(
 				    metacatUrl, pastaUser);
+				MetadataCatalog solrCatalog = new SolrMetadataCatalog();
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 				EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
 				    identifier.toString(), revision.toString());
 				metadataCatalog.deleteEmlDocument(emlPackageId);
+				solrCatalog.deleteEmlDocument(emlPackageId);
 
 				/*
 				 * If the metadata was successfully deleted, then delete the data
@@ -2308,7 +2316,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
 		    pastaUser);
+		MetadataCatalog solrCatalog = new SolrMetadataCatalog();
 		String metacatXML = metadataCatalog.query(queryString);
+		String solrXML = solrCatalog.query(queryString);
+		
 		ResultSet resultSet = new ResultSet(metacatXML);
 		resultsetXML = resultSet.toPastaFormat(authToken);
 

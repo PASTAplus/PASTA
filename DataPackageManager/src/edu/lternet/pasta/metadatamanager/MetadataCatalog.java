@@ -33,14 +33,10 @@ public interface MetadataCatalog
 
     public String createEmlDocument(String emlDocument);
 
-    public String readEmlDocument(EmlPackageId epid);
-
-    public String updateEmlDocument(EmlPackageId epid, String emlDocument);
-
     public String deleteEmlDocument(EmlPackageId epid);
 
     public String query(String xmlQuery);
 
-    public String getAccessControlList(EmlPackageId epid);
+    public String updateEmlDocument(EmlPackageId epid, String emlDocument);
 
 }
