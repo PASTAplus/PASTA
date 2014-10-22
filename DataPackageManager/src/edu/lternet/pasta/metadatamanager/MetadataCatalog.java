@@ -31,7 +31,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 public interface MetadataCatalog
 {
 
-    public String createEmlDocument(String emlDocument);
+    public String createEmlDocument(EmlPackageId epid, String emlDocument);
 
     public String deleteEmlDocument(EmlPackageId epid);
 

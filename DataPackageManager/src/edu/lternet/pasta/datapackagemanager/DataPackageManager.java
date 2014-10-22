@@ -598,13 +598,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			try {
 				if (isUpdate) {
-					metacatResult = metadataCatalog.updateEmlDocument(emlPackageId,
-					    emlDocument);
+					metacatResult = metadataCatalog.updateEmlDocument(
+							emlPackageId, emlDocument);
 					solrResult = solrCatalog.updateEmlDocument(emlPackageId,
-						    emlDocument);
-				} else {
-					metacatResult = metadataCatalog.createEmlDocument(emlDocument);
-					solrResult = solrCatalog.createEmlDocument(emlDocument);
+							emlDocument);
+				}
+				else {
+					metacatResult = metadataCatalog.createEmlDocument(
+							emlPackageId, emlDocument);
+					solrResult = solrCatalog.createEmlDocument(emlPackageId,
+							emlDocument);
 				}
 			} catch (Exception e) {
 				rollbackDataEntities(scope, identifier, revision);

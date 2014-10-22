@@ -113,12 +113,10 @@ public class MetacatMetadataCatalog implements MetadataCatalog {
      * @throws UserErrorException
      *             any further Metacat based exceptions.
      */
-    public String createEmlDocument(String emlDocument)
+    public String createEmlDocument(EmlPackageId epid, String emlDocument)
             throws IllegalStateException, UnauthorizedException,
             UserErrorException {
 
-        Document doc = XmlUtility.xmlStringToDoc(emlDocument);
-        EmlPackageId epid = EmlUtility.getEmlPackageId(doc);
         return metacatAction(Action.CREATE, epid, emlDocument);
     }
 
