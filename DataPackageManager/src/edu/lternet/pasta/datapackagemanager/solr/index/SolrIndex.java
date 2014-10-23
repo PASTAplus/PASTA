@@ -14,38 +14,41 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
 
+
 public class SolrIndex {
 
-	private final String docid = "552199";
-	private final String serverURL = "http://localhost:8983/solr";
-
-	public void addSampleDocument() 
-			throws IOException, SolrServerException {
-		SolrServer solrServer = new HttpSolrServer(serverURL);
-		SolrInputDocument solrInputDocument = new SolrInputDocument();
-		solrInputDocument.addField("id", this.docid);
-		solrInputDocument.addField("name", "Gouda cheese wheel");
-		solrInputDocument.addField("price", "49.99");
-		UpdateResponse updateResponse = solrServer.add(solrInputDocument);
-		int status = updateResponse.getStatus(); // Non-zero indicates failure
-		System.out.println(String.format("Add of docid %s; update status %d", this.docid, status));
-
-		// Remember to commit your changes!
-		solrServer.commit();
+	private SolrServer solrServer = null;
+	
+	
+	/*
+	 * Constructors
+	 */
+	
+	public SolrIndex(String serverURL) {
+		this.solrServer = new HttpSolrServer(serverURL);
 	}
 	
+	
+	/*
+	 * Instance methods
+	 */
 
-	public void deleteSampleDocument() 
+	public String deleteEmlDocument(EmlPackageId epid) 
 			throws IOException, SolrServerException {
-		SolrServer solrServer = new HttpSolrServer(serverURL);
-		List<String> ids = new ArrayList<String>();
-		ids.add(this.docid);
+    	String id = String.format("%s.%d", epid.getScope(), epid.getIdentifier());
+    	String result = null;
+
+		List<String> ids = new ArrayList<String>();		
+		ids.add(id);
+
 		UpdateResponse updateResponse = solrServer.deleteById(ids);
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
-		System.out.println(String.format("Delete of docid %s; update status %d", this.docid, status));
+		System.out.println(String.format("Delete of document id %s; delete status %d", id, status));
 
 		// Remember to commit your changes!
 		solrServer.commit();
+		
+		return result;
 	}
 	
 	
@@ -61,9 +64,7 @@ public class SolrIndex {
 		if (dataPackage != null) {
 			List<String> titles = dataPackage.getTitles();
 
-			SolrServer solrServer = new HttpSolrServer(serverURL);
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
-
 			solrInputDocument.addField("id", id);
 
 			for (String title : titles) {
@@ -84,20 +85,5 @@ public class SolrIndex {
     	
     	return result;
     }
-
-    
-	public static void main(String[] args) {
-		SolrIndex solrIndex = new SolrIndex();
-
-		try {
-			solrIndex.addSampleDocument();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		catch (SolrServerException e) {
-			e.printStackTrace();
-		}
-	}
 
 }

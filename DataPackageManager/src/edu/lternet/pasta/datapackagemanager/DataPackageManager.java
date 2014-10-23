@@ -117,6 +117,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String metacatUrl = null;
 	private static String pastaUriHead = null;
 	private static String pastaUser = null;
+	private static String solrUrl = null;
 	
 	private static Logger logger = Logger.getLogger(DataPackageManager.class);
 
@@ -583,7 +584,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		if (isDataPackageValid && !isEvaluate) {
 			MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
 			    pastaUser);
-			MetadataCatalog solrCatalog = new SolrMetadataCatalog();
+			MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 			File levelOneEMLFile = levelZeroDataPackage.toLevelOne(emlFile,
 			    entityURIHashMap);
 			String emlDocument = FileUtils.readFileToString(levelOneEMLFile);
@@ -864,7 +865,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(
 				    metacatUrl, pastaUser);
-				MetadataCatalog solrCatalog = new SolrMetadataCatalog();
+				MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 				EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
 				    identifier.toString(), revision.toString());
@@ -1135,6 +1136,38 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	
 	
 	/**
+	 * List the docid values of all data packages that are active
+	 * (not deleted) in the resource registry.
+	 * 
+	 * @return A newline-separated list of document id strings corresponding 
+	 *         to the list of active (undeleted) data packages, where a 
+	 *         document id is the packageId minus the revision value
+	 */
+	public String listActiveDataPackages() throws ClassNotFoundException,
+	    SQLException {
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String packageListString = null;
+		StringBuffer stringBuffer = new StringBuffer("");
+		ArrayList<String> packageList = 
+				dataPackageRegistry.listActiveDataPackages();
+
+		// Throw a ResourceNotFoundException if the list is empty
+		if (packageList == null || packageList.size() == 0) {
+			String message = "No resources found\n\n";
+			throw new ResourceNotFoundException(message);
+		}
+
+		for (String dataPackage : packageList) {
+			stringBuffer.append(dataPackage + "\n");
+		}
+
+		packageListString = stringBuffer.toString();
+		return packageListString;
+	}
+
+	
+	/**
 	 * List the data entity resources for the specified data package that are
 	 * readable by the specified user.
 	 * 
@@ -1280,12 +1313,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
-	 * List the scope values for all data packages that are readable by the
-	 * specified user.
+	 * Lists all data packages that have been deleted from the resource
+	 * registry.
 	 * 
-	 * @param user
-	 *          the user name
-	 * @return a newline-separated list of scope values
+	 * @return A newline-separated list of document id strings corresponding 
+	 *         to the list of deleted data packages, where a document id is 
+	 *         the packageId minus the revision value
 	 */
 	public String listDeletedDataPackages() throws ClassNotFoundException,
 	    SQLException {
@@ -1332,6 +1365,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			resourceDir = options.getOption("datapackagemanager.metadataDir");
 			metacatUrl = options
 			    .getOption("datapackagemanager.metadatacatalog.metacatUrl");
+			solrUrl = options
+				 .getOption("datapackagemanager.metadatacatalog.solrUrl");
 			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
@@ -2319,7 +2354,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
 		    pastaUser);
-		MetadataCatalog solrCatalog = new SolrMetadataCatalog();
+		MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 		String metacatXML = metadataCatalog.query(queryString);
 		String solrXML = solrCatalog.query(queryString);
 		

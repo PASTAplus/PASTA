@@ -1632,7 +1632,57 @@ public class DataPackageRegistry {
 	}
 
   
-  /**
+	  /**
+	   * Lists all active (undeleted) data packages.
+	   * 
+	   * @return A list of document id strings corresponding to the list of
+	   *         active (undeleted) data packages, where a document id is the packageId
+	   *         minus the revision value.
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
+	  public ArrayList<String> listActiveDataPackages()
+	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	    ArrayList<String> docidList = new ArrayList<String>();
+
+	    Connection connection = null;
+	    String selectString = "SELECT DISTINCT scope, identifier FROM " + RESOURCE_REGISTRY +
+	        "  WHERE resource_type='dataPackage'" +
+	        "  AND date_deactivated IS NULL" +
+	        "  ORDER BY scope, identifier";
+	    Statement stmt = null;
+
+	    try {
+	      connection = getConnection();
+	      stmt = connection.createStatement();
+	      ResultSet rs = stmt.executeQuery(selectString);
+
+	      while (rs.next()) {
+	        String scope = rs.getString("scope");
+	        int identifier = rs.getInt("identifier");
+	        String docid = scope + "." + identifier;
+	        docidList.add(docid);
+	      }
+	    }
+	    catch (ClassNotFoundException e) {
+	      logger.error("ClassNotFoundException: " + e.getMessage());
+	      throw (e);
+	    }
+	    catch (SQLException e) {
+	      logger.error("SQLException: " + e.getMessage());
+	      throw (e);
+	    }
+	    finally {
+	      if (stmt != null) stmt.close();
+	      returnConnection(connection);
+	    }
+
+	    return docidList;
+	  }
+
+	  
+ /**
    * 
    * @param scope
    */
