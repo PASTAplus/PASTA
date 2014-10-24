@@ -32,6 +32,11 @@ public class SolrIndex {
 	/*
 	 * Instance methods
 	 */
+	
+	public void commit() throws IOException, SolrServerException {
+		solrServer.commit();
+	}
+	
 
 	public String deleteEmlDocument(EmlPackageId epid) 
 			throws IOException, SolrServerException {
@@ -75,9 +80,6 @@ public class SolrIndex {
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
 			System.out.println(String.format(
 					"Add of id %s; update status %d", id, status));
-
-			// Remember to commit your changes!
-			solrServer.commit();
 		}
 		else {
 			result = String.format("Solr indexing failed with error while parsing docid %s", id);

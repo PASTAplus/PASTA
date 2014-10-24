@@ -49,11 +49,11 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     
     private String indexEmlDocument(EmlPackageId epid, String emlDocument) {
     	String result = null;
-
     	SolrIndex solrIndex = new SolrIndex(solrUrl);
     	
     	try {
     		result = solrIndex.indexEmlDocument(epid, emlDocument);
+    		solrIndex.commit(); // Always do a commit after individual document uploads
     	}
     	catch (IOException | SolrServerException e) {
     		e.printStackTrace();
