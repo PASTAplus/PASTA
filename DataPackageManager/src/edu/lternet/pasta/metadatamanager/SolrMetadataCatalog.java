@@ -37,6 +37,7 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     	
     	try {
     		result = solrIndex.deleteEmlDocument(epid);
+    		solrIndex.commit(); // Always commit after individual document deletes
     	}
     	catch (IOException | SolrServerException e) {
     		e.printStackTrace();
@@ -53,7 +54,7 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     	
     	try {
     		result = solrIndex.indexEmlDocument(epid, emlDocument);
-    		solrIndex.commit(); // Always do a commit after individual document uploads
+    		solrIndex.commit(); // Always commit after individual document uploads
     	}
     	catch (IOException | SolrServerException e) {
     		e.printStackTrace();

@@ -50,9 +50,6 @@ public class SolrIndex {
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
 		System.out.println(String.format("Delete of document id %s; delete status %d", id, status));
 
-		// Remember to commit your changes!
-		solrServer.commit();
-		
 		return result;
 	}
 	
