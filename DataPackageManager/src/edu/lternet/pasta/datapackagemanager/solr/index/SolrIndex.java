@@ -13,6 +13,7 @@ import org.apache.solr.common.SolrInputDocument;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
 
 
 public class SolrIndex {
@@ -59,18 +60,32 @@ public class SolrIndex {
     	String result = null;
     	
     	String id = String.format("%s.%d", epid.getScope(), epid.getIdentifier());
+    	String packageId = String.format("%s.%d", id, epid.getRevision());
     	
     	EMLParser emlParser = new EMLParser();
     	DataPackage dataPackage = emlParser.parseDocument(emlDocument);
     	
 		if (dataPackage != null) {
 			List<String> titles = dataPackage.getTitles();
+			List<ResponsibleParty> responsibleParties = dataPackage.getCreatorList();
 
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.addField("id", id);
+			solrInputDocument.addField("packageid", packageId);
 
 			for (String title : titles) {
 				solrInputDocument.addField("title", title);
+			}
+			
+			for (ResponsibleParty responsibleParty : responsibleParties) {
+				if (responsibleParty.isPerson()) {
+					String author = responsibleParty.getCreatorName();
+					solrInputDocument.addField("author", author);
+				}
+				if (responsibleParty.isOrganization()) {
+					String organization = responsibleParty.getOrganizationName();
+					solrInputDocument.addField("organization", organization);
+				}
 			}
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
