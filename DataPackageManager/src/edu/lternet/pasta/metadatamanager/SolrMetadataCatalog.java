@@ -36,7 +36,7 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     	SolrIndex solrIndex = new SolrIndex(solrUrl);
     	
     	try {
-    		result = solrIndex.deleteEmlDocument(epid);
+    		solrIndex.deleteEmlDocument(epid);
     		solrIndex.commit(); // Always commit after individual document deletes
     	}
     	catch (IOException | SolrServerException e) {

@@ -127,11 +127,19 @@
    <field name="author" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="organization" type="text_general" indexed="true" stored="true" multiValued="true"/>
    <field name="abstract" type="text_general" indexed="true" stored="true" multiValued="false"/>
+   <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 
-   <!-- catchall field, containing all other searchable text fields (implemented
+   <!-- 'site' is the LTER site, which is always a three-letter site code such as 'BNZ' -->
+   <field name="site" type="string" indexed="true" stored="true" multiValued="false"/>
+
+   <!-- 'text' is a catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
-   <field name="subject" type="text_general" indexed="true" stored="false" multiValued="true"/>
    <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
+
+   <!-- 'subject' is an aggregate of several other fields, containing searchable text
+        from the 'author', 'organization', 'title', 'keyword', and 'abstract' fields 
+        (implemented via copyField further on in this schema  -->
+   <field name="subject" type="text_general" indexed="true" stored="false" multiValued="true"/>
 
    <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
