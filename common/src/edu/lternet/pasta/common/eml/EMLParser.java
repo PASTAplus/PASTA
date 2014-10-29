@@ -64,6 +64,8 @@ public class EMLParser {
   public static final String ENTITY_PATH_PARENT = "//dataset/";
   public static final String PUB_DATE_PATH = "//eml/dataset/pubDate";
   public static final String TITLE_PATH = "//dataset/title";
+  public static final String ABSTRACT_PATH = "//dataset/abstract";
+  public static final String KEYWORD_PATH = "//keyword";
   public static final String OTHER_ENTITY = "otherEntity";
   public static final String TABLE_ENTITY = "dataTable";
   public static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
@@ -170,6 +172,13 @@ public class EMLParser {
           dataPackage.titles.add(title);
         }
 
+        // Parse the abstract text
+        Node abstractNode = xpathapi.selectSingleNode(document, ABSTRACT_PATH);
+        if (abstractNode != null) {
+          String abstractText = abstractNode.getTextContent().trim();
+          this.dataPackage.setAbstractText(abstractText);
+        }
+
         // Parse the creator nodes
         NodeList creatorNodeList = xpathapi.selectNodeList(document, CREATOR_PATH);
         if (creatorNodeList != null) {
@@ -178,6 +187,16 @@ public class EMLParser {
             ResponsibleParty rp = new ResponsibleParty("creator");
             parseResponsibleParty(creatorNode, rp);
             dataPackage.addCreator(rp);
+          }
+        }
+
+        // Parse the keyword nodes
+        NodeList keywordNodeList = xpathapi.selectNodeList(document, KEYWORD_PATH);
+        if (keywordNodeList != null) {
+          for (int i =0; i < keywordNodeList.getLength(); i++) {
+            Node keywordNode = keywordNodeList.item(i);
+            String keyword = keywordNode.getTextContent();
+            dataPackage.addKeyword(keyword);
           }
         }
 

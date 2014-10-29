@@ -51,7 +51,10 @@ public class DataPackage {
   String pubDate = null;
   ArrayList<ResponsibleParty> creatorList = null;
   ArrayList<Entity> entityList = null;
+  ArrayList<String> keywords = null;
   ArrayList<String> titles = null;
+  String site = null;
+  String abstractText = null;
 
   
   /*
@@ -66,6 +69,7 @@ public class DataPackage {
   DataPackage() {
     this.creatorList = new ArrayList<ResponsibleParty>();
     this.entityList = new ArrayList<Entity>();
+    this.keywords = new ArrayList<String>();
     this.titles = new ArrayList<String>();
   }
   
@@ -88,6 +92,14 @@ public class DataPackage {
 	  if ((responsibleParty != null) && (!hasCreator(responsibleParty))) {
 		  creatorList.add(responsibleParty);
 	  }
+  }
+  
+  
+  /**
+   * Add a new keyword for this data package.
+   */
+  public void addKeyword(String keyword) {
+		 keywords.add(keyword);
   }
   
   
@@ -117,6 +129,11 @@ public class DataPackage {
   
   /* Getters and Setter */
   
+	public String getAbstractText() {
+		return abstractText;
+	}
+
+
   public ArrayList<ResponsibleParty> getCreatorList() {
     return creatorList;
   }
@@ -127,6 +144,16 @@ public class DataPackage {
   }
 
   
+  public ArrayList<String> getKeywords() {
+	return keywords;
+  }
+
+	  
+  public String getSite() {
+	return site;
+  }
+
+	  
   public String getPackageId() {
     return packageId;
   }
@@ -181,10 +208,22 @@ public class DataPackage {
 
 		return hasDataTable;
 	}
+	
+	
+	public void setAbstractText(String abstractText) {
+		this.abstractText = abstractText;
+	}
 
   
   public void setPackageId(String packageId) {
     this.packageId = packageId;
+    
+    // If we can derive the LTER site from packageId, then do so
+    if (packageId != null && 
+    	packageId.startsWith("knb-lter-") &&
+    	packageId.charAt(12) == '.') {
+    	this.site = packageId.substring(9,12).toLowerCase();
+    }
   }
   
   

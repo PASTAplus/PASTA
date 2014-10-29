@@ -1351,6 +1351,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 			// Load database connection options
 			Options options = ConfigurationListener.getOptions();
+			if (options == null) { throw new Exception("ConfigurationListener.getOptions() returned null."); }
 			dbDriver = options.getOption("dbDriver");
 			dbURL = options.getOption("dbURL");
 			dbUser = options.getOption("dbUser");
@@ -1390,7 +1391,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Error in loading options: " + e.getMessage());
+			logger.error("Error loading options: " + e.getMessage());
 			e.printStackTrace();
 			throw (e);
 		}

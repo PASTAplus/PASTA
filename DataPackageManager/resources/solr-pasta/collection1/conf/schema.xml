@@ -121,25 +121,25 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="packageid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="title" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="keyword" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="author" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="organization" type="text_general" indexed="true" stored="true" multiValued="true"/>
-   <field name="abstract" type="text_general" indexed="true" stored="true" multiValued="false"/>
+    <field name="packageid" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+    <field name="title" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <field name="keyword" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <field name="author" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <field name="organization" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <field name="abstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
    <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 
    <!-- 'site' is the LTER site, which is always a three-letter site code such as 'BNZ' -->
    <field name="site" type="string" indexed="true" stored="true" multiValued="false"/>
 
-   <!-- 'text' is a catchall field, containing all other searchable text fields (implemented
+    <!-- 'text' is a catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
-   <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
+    <field name="text" type="text_pasta" indexed="true" stored="false" multiValued="true"/>
 
-   <!-- 'subject' is an aggregate of several other fields, containing searchable text
+    <!-- 'subject' is an aggregate of several other fields, containing searchable text
         from the 'author', 'organization', 'title', 'keyword', and 'abstract' fields 
         (implemented via copyField further on in this schema  -->
-   <field name="subject" type="text_general" indexed="true" stored="false" multiValued="true"/>
+    <field name="subject" type="text_pasta" indexed="true" stored="false" multiValued="true"/>
 
    <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -354,6 +354,34 @@
         <filter class="solr.ManagedStopFilterFactory" managed="english" />
         <filter class="solr.ManagedSynonymFilterFactory" managed="english" />
       </analyzer>
+    </fieldType>
+
+    <!-- Text analysis customized for PASTA EML metadata -->
+    <fieldType name="text_pasta" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <!-- Case insensitive stop word removal. -->
+            <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_en.txt"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.EnglishPossessiveFilterFactory"/>
+            <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
+            <!-- use this less aggressive stemmer instead of PorterStemFilterFactory -->
+            <filter class="solr.EnglishMinimalStemFilterFactory"/>
+            <!-- <filter class="solr.PorterStemFilterFactory"/> -->
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_en.txt"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.EnglishPossessiveFilterFactory"/>
+            <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
+            <!-- Use synonym list only at query time, not at index time -->
+            <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true"
+                expand="true"/>
+            <!-- use this less aggressive stemmer instead of PorterStemFilterFactory -->
+            <filter class="solr.EnglishMinimalStemFilterFactory"/>
+            <!-- <filter class="solr.PorterStemFilterFactory"/> -->
+        </analyzer>
     </fieldType>
 
     <!-- A general text field that has reasonable, generic

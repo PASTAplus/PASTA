@@ -131,6 +131,9 @@ public class SolrIndex {
 			List<String> titles = dataPackage.getTitles();
 			List<ResponsibleParty> responsibleParties = dataPackage.getCreatorList();
 			String pubDate = dataPackage.getPubDate();
+			List<String> keywords = dataPackage.getKeywords();
+			String site = dataPackage.getSite();
+			String abstractText = dataPackage.getAbstractText();
 
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
@@ -146,6 +149,10 @@ public class SolrIndex {
 				solrInputDocument.addField("title", title);
 			}
 			
+			for (String keyword : keywords) {
+				solrInputDocument.addField("keyword", keyword);
+			}
+			
 			for (ResponsibleParty responsibleParty : responsibleParties) {
 				if (responsibleParty.isPerson()) {
 					String author = responsibleParty.getCreatorName();
@@ -155,6 +162,14 @@ public class SolrIndex {
 					String organization = responsibleParty.getOrganizationName();
 					solrInputDocument.addField("organization", organization);
 				}
+			}
+			
+			if (site != null) {
+				solrInputDocument.setField("site", site);
+			}
+
+			if (abstractText != null) {
+				solrInputDocument.setField("abstract", abstractText);
 			}
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
