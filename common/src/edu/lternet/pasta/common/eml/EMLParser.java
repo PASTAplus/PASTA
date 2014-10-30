@@ -63,9 +63,13 @@ public class EMLParser {
   public static final String CREATOR_PATH = "//eml/dataset/creator";
   public static final String ENTITY_PATH_PARENT = "//dataset/";
   public static final String PUB_DATE_PATH = "//eml/dataset/pubDate";
+  public static final String SINGLE_DATE_TIME_PATH = "//eml/dataset/coverage/temporalCoverage/singleDateTime/calendarDate";
+  public static final String BEGIN_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/beginDate/calendarDate";
+  public static final String END_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/endDate/calendarDate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String KEYWORD_PATH = "//keyword";
+  public static final String TAXONOMIC_COVERAGE_PATH = "//dataset/coverage/taxonomicCoverage";
   public static final String OTHER_ENTITY = "otherEntity";
   public static final String TABLE_ENTITY = "dataTable";
   public static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
@@ -179,6 +183,13 @@ public class EMLParser {
           this.dataPackage.setAbstractText(abstractText);
         }
 
+        // Parse the taxonomic coverage node
+        Node taxonomicCoverageNode = xpathapi.selectSingleNode(document, TAXONOMIC_COVERAGE_PATH);
+        if (taxonomicCoverageNode != null) {
+          String taxonomicCoverageText = taxonomicCoverageNode.getTextContent().trim();
+          this.dataPackage.setTaxonomicCoverageText(taxonomicCoverageText);
+        }
+
         // Parse the creator nodes
         NodeList creatorNodeList = xpathapi.selectNodeList(document, CREATOR_PATH);
         if (creatorNodeList != null) {
@@ -207,7 +218,28 @@ public class EMLParser {
           this.dataPackage.setPubDate(pubDate);
         }
 
-        for (int j = 0; j < ENTITY_TYPES.length; j++) {
+        // Parse the singleDateTime node
+        Node singleDateTimeNode = xpathapi.selectSingleNode(document, SINGLE_DATE_TIME_PATH);
+        if (singleDateTimeNode != null) {
+          String singleDateTime = singleDateTimeNode.getTextContent();
+          this.dataPackage.setSingleDateTime(singleDateTime);
+        }
+
+        // Parse the beginDate node
+        Node beginDateNode = xpathapi.selectSingleNode(document, BEGIN_DATE_PATH);
+        if (beginDateNode != null) {
+          String beginDate = beginDateNode.getTextContent();
+          this.dataPackage.setBeginDate(beginDate);
+        }
+
+        // Parse the endDate node
+        Node endDateNode = xpathapi.selectSingleNode(document, END_DATE_PATH);
+        if (endDateNode != null) {
+          String endDate = endDateNode.getTextContent();
+          this.dataPackage.setEndDate(endDate);
+        }
+
+       for (int j = 0; j < ENTITY_TYPES.length; j++) {
           String elementName = ENTITY_TYPES[j];
           String elementPath = ENTITY_PATH_PARENT + elementName;
           EntityType entityType = Entity.entityTypeFromElementName(elementName);

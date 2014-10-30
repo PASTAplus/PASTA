@@ -21,6 +21,7 @@ import edu.lternet.pasta.common.eml.ResponsibleParty;
 
 public class SolrIndex {
 
+	private final String DATE_GRANULARITY = "DAY";
 	private SolrServer solrServer = null;
 	
 	
@@ -130,18 +131,40 @@ public class SolrIndex {
 		if (dataPackage != null) {
 			List<String> titles = dataPackage.getTitles();
 			List<ResponsibleParty> responsibleParties = dataPackage.getCreatorList();
+			
+			// Get content of several different date nodes
 			String pubDate = dataPackage.getPubDate();
+			String beginDate = dataPackage.getBeginDate();
+			String endDate = dataPackage.getEndDate();
+			String singleDate = dataPackage.getSingleDateTime();
+			
 			List<String> keywords = dataPackage.getKeywords();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
+			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
 			solrInputDocument.setField("packageid", packageId);
 			
-			String pubDateTimestamp = formatTimestamp(pubDate, "DAY");
+			String pubDateTimestamp = formatTimestamp(pubDate, DATE_GRANULARITY);
 			if (pubDateTimestamp != null) {
 				solrInputDocument.setField("pubdate", pubDateTimestamp);
+			}
+
+			String beginDateTimestamp = formatTimestamp(beginDate, DATE_GRANULARITY);
+			if (beginDateTimestamp != null) {
+				solrInputDocument.setField("begindate", beginDateTimestamp);
+			}
+
+			String endDateTimestamp = formatTimestamp(endDate, DATE_GRANULARITY);
+			if (endDateTimestamp != null) {
+				solrInputDocument.setField("enddate", endDateTimestamp);
+			}
+
+			String singleDateTimestamp = formatTimestamp(singleDate, DATE_GRANULARITY);
+			if (singleDateTimestamp != null) {
+				solrInputDocument.setField("singledate", singleDateTimestamp);
 			}
 
 			for (String title : titles) {
@@ -170,6 +193,10 @@ public class SolrIndex {
 
 			if (abstractText != null) {
 				solrInputDocument.setField("abstract", abstractText);
+			}
+
+			if (taxonomicCoverageText != null) {
+				solrInputDocument.setField("taxonomic", taxonomicCoverageText);
 			}
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);

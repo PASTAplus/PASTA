@@ -48,14 +48,19 @@ public class DataPackage {
    */
   
   String packageId = null;
-  String pubDate = null;
   ArrayList<ResponsibleParty> creatorList = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> keywords = null;
   ArrayList<String> titles = null;
   String site = null;
   String abstractText = null;
+  String taxonomicCoverageText = null;
 
+  // Date fields
+  String pubDate = null;
+  String singleDateTime = null;
+  String beginDate = null;
+  String endDate = null;
   
   /*
    * Constructors
@@ -134,11 +139,21 @@ public class DataPackage {
 	}
 
 
+  public String getBeginDate() {
+    return beginDate;
+  }
+		  
+		  
   public ArrayList<ResponsibleParty> getCreatorList() {
     return creatorList;
   }
 
   
+  public String getEndDate() {
+	return endDate;
+  }
+	  
+	  
   public ArrayList<Entity> getEntityList() {
     return entityList;
   }
@@ -164,6 +179,16 @@ public class DataPackage {
   }
   
   
+  public String getSingleDateTime() {
+	return singleDateTime;
+  }
+	  
+	  
+	public String getTaxonomicCoverageText() {
+		return taxonomicCoverageText;
+	}
+
+
   public ArrayList<String> getTitles() {
     return titles;
   }
@@ -215,6 +240,15 @@ public class DataPackage {
 	}
 
   
+	  public void setBeginDate(String beginDate) {
+		    this.beginDate = beginDate;
+	  }
+	  
+	  
+	  public void setEndDate(String endDate) {
+		  this.endDate = endDate;
+	  }
+		  
   public void setPackageId(String packageId) {
     this.packageId = packageId;
     
@@ -231,4 +265,14 @@ public class DataPackage {
     this.pubDate = pubDate;
   }
   
+  
+  public void setSingleDateTime(String singleDateTime) {
+	    this.singleDateTime = singleDateTime;
+  }
+	  
+	  
+	public void setTaxonomicCoverageText(String taxonomicCoverageText) {
+		this.taxonomicCoverageText = taxonomicCoverageText;
+	}
+
 }

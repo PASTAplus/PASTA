@@ -120,14 +120,20 @@
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
     <field name="packageid" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
     <field name="title" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="keyword" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="author" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="organization" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="abstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
-   <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="taxonomic" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
+
+    <!-- tdate fields -->
+    <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="singledate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="begindate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="enddate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 
    <!-- 'site' is the LTER site, which is always a three-letter site code such as 'BNZ' -->
    <field name="site" type="string" indexed="true" stored="true" multiValued="false"/>
@@ -183,6 +189,7 @@
    <copyField source="author" dest="text"/>
    <copyField source="organization" dest="text"/>
    <copyField source="abstract" dest="text"/>
+   <copyField source="taxonomic" dest="text"/>
 
    <!-- Create a string version of author for faceting 
    <copyField source="author" dest="author_s"/> -->
