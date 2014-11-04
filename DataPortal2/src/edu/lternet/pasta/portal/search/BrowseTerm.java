@@ -113,7 +113,7 @@ public class BrowseTerm {
     	searchValue = String.format("\"%s\"", this.value);
     }
     
-    String queryString = SimpleSearch.buildPathQueryXml(searchValue, termsList, isSiteQuery);
+    String queryString = SimpleSearch.buildSolrQuery(searchValue);
 
     return queryString;
   }

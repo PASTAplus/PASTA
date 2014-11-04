@@ -83,4 +83,22 @@ public class SimpleSearch extends Search {
     return pathqueryXML;
   }
   
+  
+  /**
+   * Builds a PathQuery XML string for submission to the DataPackageManager
+   * and then to Metacat.
+   * 
+   * @param userInput    The terms entered by the user (e.g. "climate change")
+   * @param termsList    List of terms used in the search, which may include terms other
+   * @param isSiteQuery  true if we are querying by site name, else false
+   * @return the PathQuery XML string
+   */
+  public static String buildSolrQuery(String userInput) {
+	  String solrQuery = null;
+      
+	  solrQuery = String.format("%s %s", userInput, "AND -ecotrends");
+	  
+	  return solrQuery;
+  }
+  
 }

@@ -68,25 +68,7 @@ public class DataPackageManagerClientTest {
   private static Integer testEntitySize = null;
 
 
-	static final String pathqueryXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		    + "<pathquery version=\"1.0\">\n"
-		    + "  <meta_file_id>unspecified</meta_file_id>\n"
-		    + "  <querytitle>unspecified</querytitle>\n"
-		    + "  <returnfield>dataset/title</returnfield>\n"
-		    + "  <returnfield>keyword</returnfield>\n"
-		    + "  <returnfield>originator/individualName/surName</returnfield>\n"
-		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n"
-		    + "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n"
-		    + "  <querygroup operator=\"UNION\">\n"
-		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-		    + "      <value>bug</value>\n"
-		    + "      <pathexpr>dataset/title</pathexpr>\n"
-		    + "    </queryterm>\n"
-		    + "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n"
-		    + "      <value>Carroll</value>\n"
-		    + "      <pathexpr>surName</pathexpr>\n"
-		    + "    </queryterm>\n"
-		    + "  </querygroup>\n" + "</pathquery>\n";
+	static final String solrQuery = "LTER";
 
   /*
    * Instance fields
@@ -222,7 +204,6 @@ public class DataPackageManagerClientTest {
 	  testReadDataEntityName();
 	  testReadDataPackageReport();
 	  testReadMetadata();
-	  testSearchDataPackages();
 	  testUpdateDataPackage();
 	  testDeleteDataPackage();
   }
@@ -480,16 +461,17 @@ public class DataPackageManagerClientTest {
   /**
    * Test the status and message body of the Search Data Packages use case
    */
+  @Test
   public void testSearchDataPackages() {
     try {
-      String entityString = dpmClient.searchDataPackages(pathqueryXML);
+      String entityString = dpmClient.searchDataPackages(solrQuery);
 
       // Check the message body
       assertFalse(entityString == null);
       if (entityString != null) {
         assertFalse(entityString.isEmpty());
         assertTrue(entityString.contains("<resultset>"));
-        assertTrue(entityString.contains("<pathquery "));
+        assertTrue(entityString.contains(solrQuery));
       }
     }
     catch (Exception e) {

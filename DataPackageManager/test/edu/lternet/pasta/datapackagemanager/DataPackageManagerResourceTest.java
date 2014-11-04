@@ -72,10 +72,6 @@ public class DataPackageManagerResourceTest {
   private static final int PASTA_SLEEP_TIME = 15000;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
-  //private static File testEmlFileLevelOne = null;
-  //private static File testEmlFileNoEntities = null;
-  private static final String testEmlFileNameLevelOne = "Level-1-EML.xml";
-  private static final String testEmlFileNameNoEntities = "NoEntities.xml";
   private static String testPath = null;
   private static String testScope = null;
   private static String testScopeBogus = null;
@@ -90,6 +86,7 @@ public class DataPackageManagerResourceTest {
   private static final String ACL_START_TEXT = "<access:access";
   private static final String ACL_END_TEXT = "</access:access>";
   private static final String METADATA_FORMAT_START_TEXT = "eml://ecoinformatics.org/eml-2.1.";
+  private static final String SOLR_QUERY = "LTER";
 
   
   /*
@@ -246,7 +243,6 @@ public class DataPackageManagerResourceTest {
 	  testReadDataEntityAcl();
 	  testReadDataPackageReport();
 	  testReadDataPackageReportAcl();
-	  testSearchDataPackages();
 	  testUpdateDataPackage();
 	  testDeleteDataPackage();
   }
@@ -823,33 +819,13 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Search Data Packages use case
    */
-  private void testSearchDataPackages() {
+  @Test
+  public void testSearchDataPackages() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
-    String pathqueryXML = 
-      "<pathquery version=\"1.0\">\n" +
-      "  <meta_file_id>unspecified</meta_file_id>\n" +
-      "  <querytitle>unspecified</querytitle>\n" +
-      "  <returnfield>dataset/title</returnfield>\n" +
-      "  <returnfield>keyword</returnfield>\n" +
-      "  <returnfield>originator/individualName/surName</returnfield>\n" +
-      "  <returndoctype>eml://ecoinformatics.org/eml-2.0.0</returndoctype>\n" +
-      "  <returndoctype>eml://ecoinformatics.org/eml-2.0.1</returndoctype>\n" +
-      "  <returndoctype>eml://ecoinformatics.org/eml-2.1.0</returndoctype>\n" +
-      "  <returndoctype>eml://ecoinformatics.org/eml-2.1.1</returndoctype>\n" +
-      "  <querygroup operator=\"UNION\">\n" +
-      "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n" +
-      "      <value>bug</value>\n" +
-      "      <pathexpr>dataset/title</pathexpr>\n" +
-      "    </queryterm>\n" +
-      "    <queryterm casesensitive=\"false\" searchmode=\"contains\">\n" +
-      "      <value>Carroll</value>\n" +
-      "      <pathexpr>surName</pathexpr>\n" +
-      "    </queryterm>\n" +
-      "  </querygroup>\n" +
-      "</pathquery>\n";
+    String queryString = SOLR_QUERY;
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.searchDataPackages(httpHeaders, pathqueryXML);
+    Response response = dataPackageManagerResource.searchDataPackages(httpHeaders, queryString);
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -858,8 +834,8 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.contains(testScope));
-      assertTrue(entityString.contains(testIdentifier.toString()));
+      assertTrue(entityString.contains("<resultset>"));
+      assertTrue(entityString.contains(SOLR_QUERY));
     }
   }
     

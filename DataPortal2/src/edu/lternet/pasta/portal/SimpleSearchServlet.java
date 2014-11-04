@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.portal.search.SimpleSearch;
-import edu.lternet.pasta.portal.search.TermsList;
 
 public class SimpleSearchServlet extends DataPortalServlet {
 
@@ -114,32 +113,18 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			throws ServletException, IOException {
 		String html = null;
 		String xml = null;
-		TermsList termsList = new TermsList();
 		HttpSession httpSession = request.getSession();
 		String uid = (String) httpSession.getAttribute("uid");
 		if (uid == null || uid.isEmpty())
 			uid = "public";
-		String terms = (String) request.getParameter("terms");
-		String query = null;
+		String userInput = (String) request.getParameter("terms");
 
 		try {
-			if (terms != null) {
-				boolean isSiteTerm = false;
-				// Searching on term "#ALL#" is intended for developer testing only
-				if (terms.equalsIgnoreCase("#ALL#")) {
-					query = SimpleSearch.buildPathQueryXml("", termsList, isSiteTerm);
-				}
-				else {
-					query = SimpleSearch.buildPathQueryXml(terms, termsList, isSiteTerm);
-				}
-			}
-
+			String queryText = SimpleSearch.buildSolrQuery(userInput);
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-			xml = dpmClient.searchDataPackages(query);
+			xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-			html = "<p> Terms used in this search: " + termsList.toHTML()
-					+ "</p>\n";
-			html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 		}
 		catch (Exception e) {
 			handleDataPortalError(logger, e);

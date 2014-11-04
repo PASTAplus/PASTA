@@ -14,22 +14,30 @@ import org.apache.solr.common.SolrDocumentList;
 
 public class SimpleSolrSearch {
 
-	private SolrServer server;
+	private SolrServer solrServer;
 
 
-	public SimpleSolrSearch(String solrUrl) {
-		server = new HttpSolrServer(solrUrl);
+	/*
+	 * Constructors
+	 */
+	
+	public SimpleSolrSearch(String serverURL) {
+		this.solrServer = new HttpSolrServer(serverURL);
 	}
-
-
-	public String search(String searchTerms, String endDate) 
+	
+	
+	/*
+	 * Instance methods
+	 */
+	
+	public String search(String queryText) 
 			throws SolrServerException {
 		String xmlString = null;
 		SolrQuery solrQuery = new SolrQuery();
-		solrQuery.addFilterQuery("pubdate:[1900-01-01T00:00:00Z TO " + endDate + "]");
-		solrQuery.setQuery(searchTerms);
+		//solrQuery.addFilterQuery("pubdate:[1900-01-01T00:00:00Z TO " + endDate + "]");
+		solrQuery.setQuery(queryText);
 
-		QueryResponse queryResponse = server.query(solrQuery);
+		QueryResponse queryResponse = solrServer.query(solrQuery);
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
 		xmlString = solrDocumentListToXML(solrDocumentList);
 		
@@ -39,7 +47,7 @@ public class SimpleSolrSearch {
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
-		StringBuilder sb = new StringBuilder("<resultSet>\n");
+		StringBuilder sb = new StringBuilder("<resultset>\n");
 		
 		for (SolrDocument solrDocument : solrDocumentList) {
 			sb.append("  <document>\n");
@@ -52,21 +60,25 @@ public class SimpleSolrSearch {
 			    yearStr = sdf.format(pubDate);
 			}
 			String title = (String) solrDocument.getFirstValue("title");
-			Collection<Object> authors = solrDocument.getFieldValues("author");
 			
 			sb.append(String.format("    <packageId>%s</packageId>\n", packageId));
 			sb.append(String.format("    <pubDate>%s</pubDate>\n", yearStr));
 			sb.append(String.format("    <title>%s</title>\n", title));
+			
 			sb.append("    <authors>\n");
-			for (Object author : authors) {
-				String authorStr = (String) author;
-				sb.append(String.format("      <author>%s</author>\n", authorStr));
+			Collection<Object> authors = solrDocument.getFieldValues("author");
+			if (authors != null) {
+				for (Object author : authors) {
+					String authorStr = (String) author;
+					sb.append(String.format("      <author>%s</author>\n", authorStr));
+				}
 			}
 			sb.append("    </authors>\n");
+			
 		    sb.append("  </document>\n");
 		}
 		
-		sb.append("</resultSet>\n");
+		sb.append("</resultset>\n");
 		xmlString = sb.toString();
 		
 		return xmlString;
@@ -76,11 +88,10 @@ public class SimpleSolrSearch {
 	public static void main(String[] args) {
 		String solrUrl = "http://localhost:8983/solr/collection1";
 		SimpleSolrSearch simpleSolrSearch =  new SimpleSolrSearch(solrUrl);
-		String searchTerms = "Moorea";
-		String endDate = "*";
+		String queryText = args[0];
 		
 		try {
-			String xmlString = simpleSolrSearch.search(searchTerms, endDate);
+			String xmlString = simpleSolrSearch.search(queryText);
 			System.out.println(xmlString);
 		}
 		catch (SolrServerException e) {

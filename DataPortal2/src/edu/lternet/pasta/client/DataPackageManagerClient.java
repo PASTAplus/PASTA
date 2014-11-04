@@ -1387,7 +1387,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String searchDataPackages(String pathQuery) throws Exception {
-		String contentType = "application/xml";
+		String contentType = "text/plain";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPut httpPut = new HttpPut(BASE_URL + "/search/eml");
 		String resultSetXML = null;

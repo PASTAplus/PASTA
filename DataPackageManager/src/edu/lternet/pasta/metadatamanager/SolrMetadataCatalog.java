@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.datapackagemanager.solr.index.SolrIndex;
+import edu.lternet.pasta.datapackagemanager.solr.search.SimpleSolrSearch;
 
 
 public class SolrMetadataCatalog implements MetadataCatalog {
@@ -65,8 +66,19 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     }
 
     
-    public String query(String xmlQuery) {
-    	return null;
+    public String query(String queryText) {
+    	String result = null;
+    	
+    	SimpleSolrSearch simpleSolrSearch = new SimpleSolrSearch(solrUrl);
+    	
+    	try {
+    		result = simpleSolrSearch.search(queryText);
+    	}
+    	catch (SolrServerException e) {
+    		e.printStackTrace();
+    	}
+    	
+    	return result;
     }
 
     

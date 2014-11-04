@@ -28,65 +28,23 @@
 
   <xsl:output method="html"/>
 
-  <xsl:param name="includeEcotrends"></xsl:param>
-  <xsl:param name="includeLandsat5"></xsl:param>
-  
   <xsl:variable name="documentCount">
       <xsl:value-of select="count(/resultset/document)"/>
   </xsl:variable>
 
-  <xsl:variable name="ecotrendsCount" >
-  	<xsl:value-of select="count(/resultset/document/packageId[@scope = 'ecotrends'])" />
-  </xsl:variable>
-
-  <xsl:variable name="landsat5Count" >
-  	<xsl:value-of select="count(/resultset/document/packageId[starts-with(@scope, 'lter-landsat')])" />
-  </xsl:variable>
-
   <xsl:template match="/">
 
-  <xsl:choose>
-    <xsl:when test="(($includeEcotrends = 'true') and ($includeLandsat5 = 'true'))">
-		<xsl:variable name="results" >
-  			<xsl:value-of select="$documentCount" />
-  		</xsl:variable>
-        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
-    </xsl:when>
-    <xsl:when test="$includeEcotrends = 'true'">
-		<xsl:variable name="results" >
-  			<xsl:value-of select="$documentCount - $landsat5Count" />
-  		</xsl:variable>
-        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
-    </xsl:when>
-    <xsl:when test="$includeLandsat5 = 'true'">
-		<xsl:variable name="results" >
-  			<xsl:value-of select="$documentCount - $ecotrendsCount" />
-  		</xsl:variable>
-        <p>Number of results displayed: <b><xsl:value-of select="$results"/></b></p>
-    </xsl:when>
-    <xsl:otherwise>
-		<xsl:variable name="results" >
-  			<xsl:value-of select="$documentCount - $landsat5Count - $ecotrendsCount" />
-  		</xsl:variable>
-        <p>Number of matches: <b><xsl:value-of select="$results"/></b></p>
-    </xsl:otherwise>    
-  </xsl:choose>
-
-<!-- for debugging
-    <p>Number of documents matched: <b><xsl:value-of select="$documentCount"/></b></p>
-    <p>Number of ecotrends: <b><xsl:value-of select="$ecotrendsCount"/></b></p>
-    <p>Number of landsat5: <b><xsl:value-of select="$landsat5Count"/></b></p>
--->
+      <p>Number of matches: <b><xsl:value-of select="$documentCount"/></b></p>
 
       <table width="100%">
         <tbody>
           <tr>
             <th class="nis" width="15%">Package Id</th>
-            <th class="nis" width="10%">Creators</th>
+            <th class="nis" width="50%">Title</th>
+            <th class="nis" width="20%">Creators</th>
             <th class="nis" width="10%">Publication Date</th>
-            <th class="nis" width="65%">Title</th>
           </tr>
-          <xsl:for-each select="/resultSet/document">
+          <xsl:for-each select="/resultset/document">
             <xsl:apply-templates select="."/>
           </xsl:for-each>
         </tbody>
@@ -97,18 +55,14 @@
   
 	<xsl:variable name="pid" select="./packageId"/>
 	
-	<xsl:choose>
-    <xsl:when test="(
-                      ((not(starts-with($pid, 'ecotrends'))) and (not(starts-with($pid, 'lter-landsat')))) or 
-                      (starts-with($pid, 'ecotrends') and ($includeEcotrends = 'true')) or
-                      (starts-with($pid, 'lter-landsat') and ($includeLandsat5 = 'true'))
-                    )">
-      
     <tr>
       <td class="nis" align="center">
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
+      </td>
+      <td class="nis" align="left">
+        <xsl:value-of select="title"/>
       </td>
       <td class="nis" align="center">
         <xsl:apply-templates select="authors"/>
@@ -116,14 +70,7 @@
       <td class="nis" align="center">
         <xsl:value-of select="pubDate"/>
       </td>
-      <td class="nis" align="left">
-        <xsl:value-of select="title"/>
-      </td>
     </tr>
-    
-    </xsl:when>
-    <xsl:otherwise></xsl:otherwise>
-    </xsl:choose>
     
   </xsl:template>
 

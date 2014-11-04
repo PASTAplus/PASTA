@@ -2349,20 +2349,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return The resultset XML string
 	 */
 	public String searchDataPackages(String queryString, String user,
-	    AuthToken authToken) throws ClientProtocolException, IOException,
-	    Exception {
-		String resultsetXML = null;
-
-		MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
-		    pastaUser);
+	    AuthToken authToken) 
+	    		throws ClientProtocolException, IOException, Exception {
 		MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
-		String metacatXML = metadataCatalog.query(queryString);
 		String solrXML = solrCatalog.query(queryString);
 		
-		ResultSet resultSet = new ResultSet(metacatXML);
-		resultsetXML = resultSet.toPastaFormat(authToken);
-
-		return resultsetXML;
+		return solrXML;
 	}
 	
 	
