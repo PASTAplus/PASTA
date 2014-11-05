@@ -47,7 +47,9 @@ public class SimpleSolrSearch {
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
-		StringBuilder sb = new StringBuilder("<resultset>\n");
+		long numFound = solrDocumentList.getNumFound();
+		String firstLine = String.format("<resultset numFound='%d'>\n", numFound);
+		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {
 			sb.append("  <document>\n");

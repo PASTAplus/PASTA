@@ -29,12 +29,25 @@
   <xsl:output method="html"/>
 
   <xsl:variable name="documentCount">
-      <xsl:value-of select="count(/resultset/document)"/>
+      <xsl:value-of select="number(/resultset/@numFound)"/>
+  </xsl:variable>
+
+  <xsl:variable name="displayCount">
+      <xsl:value-of select="min(($documentCount, 10))"/>
+  </xsl:variable>
+
+  <xsl:variable name="packageWord">
+      <xsl:choose>
+        <xsl:when test="($documentCount > 1)">packages</xsl:when>
+        <xsl:otherwise>package</xsl:otherwise>
+      </xsl:choose>
   </xsl:variable>
 
   <xsl:template match="/">
 
-      <p>Number of matches: <b><xsl:value-of select="$documentCount"/></b></p>
+      <xsl:choose>
+      <xsl:when test="($documentCount > 0)">
+      <p>Displaying 1-<xsl:value-of select="$displayCount"/> of <xsl:value-of select="$documentCount"/> matching data <xsl:value-of select="$packageWord"/></p>
 
       <table width="100%">
         <tbody>
@@ -49,6 +62,11 @@
           </xsl:for-each>
         </tbody>
       </table>
+      </xsl:when>
+      <xsl:otherwise>
+      <p>No matching data packages were found</p>
+      </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
   <xsl:template match="document">
