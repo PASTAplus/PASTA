@@ -15,6 +15,8 @@ import org.apache.solr.common.SolrDocumentList;
 public class SimpleSolrSearch {
 
 	private SolrServer solrServer;
+	
+	private final int MAX_PER_PAGE = 10;
 
 
 	/*
@@ -47,8 +49,9 @@ public class SimpleSolrSearch {
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
-		long numFound = solrDocumentList.getNumFound();
-		String firstLine = String.format("<resultset numFound='%d'>\n", numFound);
+		int numFound = (int) solrDocumentList.getNumFound();
+		int displayCount = Math.min(numFound, MAX_PER_PAGE);
+		String firstLine = String.format("<resultset numFound='%d' displayCount='%d'>\n", numFound, displayCount);
 		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {

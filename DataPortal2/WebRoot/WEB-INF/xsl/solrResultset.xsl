@@ -33,7 +33,7 @@
   </xsl:variable>
 
   <xsl:variable name="displayCount">
-      <xsl:value-of select="min(($documentCount, 10))"/>
+      <xsl:value-of select="number(/resultset/@displayCount)"/>
   </xsl:variable>
 
   <xsl:variable name="packageWord">
