@@ -35,7 +35,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.ResultSetUtility;
-import edu.lternet.pasta.portal.search.AdvancedSearch;
+import edu.lternet.pasta.portal.search.SolrAdvancedSearch;
 import edu.lternet.pasta.portal.search.TermsList;
 
 
@@ -183,7 +183,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     boolean isRelatedChecked = (related != null);
     boolean isRelatedSpecificChecked = (relatedSpecific != null);
        
-    AdvancedSearch advancedSearch = new AdvancedSearch(
+    SolrAdvancedSearch solrAdvancedSearch = new SolrAdvancedSearch(
       isCaseSensitive,
       creatorOrganization,
       creatorOrganizationQueryType,
@@ -216,8 +216,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       );
 
     try {
-      xml = advancedSearch.executeSearch(request, uid);
-      termsList = advancedSearch.getTermsList();
+      xml = solrAdvancedSearch.executeSearch(request, uid);
+      termsList = solrAdvancedSearch.getTermsList();
       if (termsList != null) {
         termsListHTML = termsList.toHTML();
       }
