@@ -211,106 +211,61 @@ public class SolrAdvancedSearch extends Search  {
    * A full subject query searches the title, abstract, and keyword sections of
    * the document. Individual searches on these sections is also supported.
    */
-  private void buildQuerySubject(TermsList termsList) {
-    String indent;
-    AdvancedSearchQueryGroup innerQuery = null;
-    final String outerOperator;
-    AdvancedSearchQueryGroup outerQuery;
-    AdvancedSearchQueryTerm qt;
-    String searchMode;
-    List<String> terms;
- 
-    if ((this.subjectValue != null) && (!(this.subjectValue.equals("")))) {
-      hasSubjectSearch = true;
-      
-      if (this.subjectAllAny != null && 
-          this.subjectAllAny.equals("0")
-         ) {
-        outerOperator = "INTERSECT";
-      }
-      else {
-        outerOperator = "UNION";
-      }
+	private void buildQuerySubject(TermsList termsList) {
+		List<String> terms;
+		String field = "subject";
+		String queryTerms = "";
 
-      indent = getIndent(INDENT_LEVEL * 2);
-      outerQuery = new AdvancedSearchQueryGroup(outerOperator, indent);
-      terms = parseTerms(this.subjectValue);
-      searchMode = metacatSearchMode(subjectQueryType);
-      
-      for (String term : terms) {
-        indent = getIndent(INDENT_LEVEL * 3);
-        innerQuery = new AdvancedSearchQueryGroup("UNION", indent);
-        indent = getIndent(INDENT_LEVEL * 4);
-        
-        TreeSet<String> derivedTerms = new TreeSet<String>();
-        TreeSet<String> webTerms = 
-            ControlledVocabularyClient.webServiceSearchValues(
-                term, hasExact, hasNarrow, 
-                hasRelated, hasNarrowRelated, hasAll);
-        webTerms = optimizeTermList(webTerms);
-      
-        for (String webValue : webTerms) {
-          derivedTerms.add(webValue);
-        }
-      
-        /*
-         * Sometimes the original search term (e.g. "fishes") doesn't need to be 
-         * included in the set of search values because it is covered by a
-         * substring term returned by the vocabulary web service (e.g. "fish"). 
-         * However, if the web service failed to return any values, then we need 
-         * to add back the original search term.
-         */
-        if (webTerms.size() < 1) {
-          derivedTerms.add(term);
-        }
-        
-        boolean abstracts = false;
-        boolean keywords = false;
-        boolean packageIds = false;
-        boolean titles = false;
-        if (subjectField.equals("ALL")) {
-            abstracts = true;
-            keywords = true;
-            titles = true;
-        }
-        else if (subjectField.equals("ABSTRACT")) {
-            abstracts = true;
-        }
-        else if (subjectField.equals("KEYWORDS")) {
-            keywords = true;
-        }
-        else if (subjectField.equals("TITLE")) {
-            titles = true;
-        }
-        
-        List<String> emlFields = Search.getIndexedPaths(abstracts, keywords, packageIds, titles);
-        
-        for (String derivedTerm : derivedTerms) {       
-          termsList.addTerm(derivedTerm);
-          
-          for (String emlField : emlFields) {
-              qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                      derivedTerm, indent);
-              innerQuery.addQueryTerm(qt);
-          }        
-        }
-      
-        outerQuery.addQueryGroup(innerQuery);
-      }
+		if ((this.subjectValue != null) && (!(this.subjectValue.equals("")))) {
+			hasSubjectSearch = true;
 
-      // Minimize the number of query groups that get created, depending on
-      // which criteria the user specified.
-      //
-      if (terms.size() > 1) {
-        queryGroup.addQueryGroup(outerQuery);
-      }
-      else if (terms.size() == 1) {
-        queryGroup.addQueryGroup(innerQuery);
-      }       
-    }
+			if (subjectField.equals("ABSTRACT")) {
+				field = "abstract";
+			}
+			else if (subjectField.equals("KEYWORDS")) {
+				field = "keyword";
+			}
+			else if (subjectField.equals("TITLE")) {
+				field = "title";
+			}
 
-  }
-  
+			terms = parseTerms(this.subjectValue);
+
+			for (String term : terms) {
+				TreeSet<String> derivedTerms = new TreeSet<String>();
+				TreeSet<String> webTerms = ControlledVocabularyClient
+						.webServiceSearchValues(term, hasExact, hasNarrow,
+								hasRelated, hasNarrowRelated, hasAll);
+				webTerms = optimizeTermList(webTerms);
+
+				for (String webValue : webTerms) {
+					derivedTerms.add(webValue);
+					queryTerms += " " + webValue;
+				}
+
+				/*
+				 * Sometimes the original search term (e.g. "fishes") doesn't
+				 * need to be included in the set of search values because it is
+				 * covered by a substring term returned by the vocabulary web
+				 * service (e.g. "fish"). However, if the web service failed to
+				 * return any values, then we need to add back the original
+				 * search term.
+				 */
+				if (webTerms.size() < 1) {
+					derivedTerms.add(term);
+				}
+
+				for (String derivedTerm : derivedTerms) {
+					termsList.addTerm(derivedTerm);
+				}
+			}
+
+			queryTerms = queryTerms.trim();
+			String subjectQuery = String.format("%s:%s", field, queryTerms);
+			this.queryString = subjectQuery;
+		}
+	}
+
 
   /**
    * An author query will search the creator/individualName/surName field, the
@@ -949,50 +904,58 @@ public class SolrAdvancedSearch extends Search  {
   }
 
   
-  /**
-   * Builds and runs a search, returning the result XML string.
-   * 
-   * @param request     the servlet request object
-   * @param uid         the user id
-   */
-  public String executeSearch(final HttpServletRequest request,
-                              final String uid) {
-    int searchFields;
-    buildQuerySubject(this.termsList);
-    buildQueryAuthor(this.termsList);
-    buildQueryTaxon(this.termsList);
-    buildQueryGeographicDescription(this.locationName, this.termsList);
-    buildQuerySpatial(this.northBound, this.southBound, 
-                      this.eastBound, this.westBound,
-                      this.isBoundaryContainedChecked);
-    buildQueryTemporalCriteria(this.dateField,
-                               this.startDate,
-                               this.endDate,
-                               this.isDatesContainedChecked,
-                               this.namedTimescale, 
-                               this.namedTimescaleQueryType,
-                               this.termsList);
-    buildSiteFilter(termsList);
+	/**
+	 * Builds and runs a search, returning the result XML string.
+	 * 
+	 * @param request
+	 *            the servlet request object
+	 * @param uid
+	 *            the user id
+	 */
+	public String executeSearch(final HttpServletRequest request,
+			final String uid) {
+		String resultsetXML = null;
+		String htmlMessage = null;
+		buildQuerySubject(this.termsList);
 
-    // Count the number of search types the user has entered.
-    searchFields = countSearchFields();
+		/*
+		 * buildQueryAuthor(this.termsList); buildQueryTaxon(this.termsList);
+		 * buildQueryGeographicDescription(this.locationName, this.termsList);
+		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,
+		 * this.westBound, this.isBoundaryContainedChecked);
+		 * buildQueryTemporalCriteria(this.dateField, this.startDate,
+		 * this.endDate, this.isDatesContainedChecked, this.namedTimescale,
+		 * this.namedTimescaleQueryType, this.termsList);
+		 * buildSiteFilter(termsList);
+		 */
 
-    // If the user has entered values for only one type of search criteria,
-    // then optimize the search by setting the QueryGroup object's
-    // includeOuterQueryGroup to false. This will strip off the outer query
-    // group and result in a more simplified SQL statement.
-    //
-    if (searchFields == 1) {
-      queryGroup.setIncludeOuterQueryGroup(false);
-    }
+		try {
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(
+					uid);
+			logger.warn(String.format("queryString:\n%s", queryString));
+			resultsetXML = dpmClient.searchDataPackages(queryString);
+		}
+		catch (PastaAuthenticationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+		}
+		catch (PastaConfigurationException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
+		}
 
-    queryString = pathQuery.pathqueryXML();
-    logger.info(queryString);
-    String resultsetXML = runQuery(request, uid);
+		request.setAttribute("searchresult", htmlMessage);
 
-    return resultsetXML;
-  }
-  
+		return resultsetXML;
+	}
+
 
   /**
    * Returns a string of spaces that corresponds to the current indent level.
@@ -1093,50 +1056,4 @@ public class SolrAdvancedSearch extends Search  {
     return optimizedWebValues;
   }
   
-
-  /**
-   * Runs the Metacat query for a browse search, simple search, or advanced
-   * search. Stores the search results in a "resultSet" session attribute as a 
-   * ResultSet object.
-   * 
-   * @param request     the servlet request object
-   * @param uid         user id
-   * @param metacat     A metacat client object, possible null.
-   * @param qformat     The qformat (skin) to use when displaying results.
-   * @param xslPath     File path to the resultset.xsl stylesheet.
-   * 
-   * @return resultsetXML  XML search results from Metacat.
-   */
-  private String runQuery(HttpServletRequest request,
-                          String uid
-                         ) {
-    String resultsetXML = null;
-    String htmlMessage = null;
-    
-    try {  
-      DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-      logger.info(String.format("queryString:\n%s", queryString));
-      resultsetXML = dpmClient.searchDataPackages(queryString);    
-    } 
-    catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } 
-    catch (PastaConfigurationException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    } 
-    catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-    }
-
-    request.setAttribute("searchresult", htmlMessage);
-
-    return resultsetXML;
-  }
-
 }
