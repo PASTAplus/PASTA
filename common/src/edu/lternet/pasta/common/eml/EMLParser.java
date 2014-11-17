@@ -70,6 +70,8 @@ public class EMLParser {
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String KEYWORD_PATH = "//keyword";
   public static final String TAXONOMIC_COVERAGE_PATH = "//dataset/coverage/taxonomicCoverage";
+  public static final String GEOGRAPHIC_DESCRIPTION_PATH = "//dataset/coverage/geographicCoverage/geographicDescription";
+  public static final String NAMED_TIME_SCALE_PATH = "//timeScaleName";
   public static final String OTHER_ENTITY = "otherEntity";
   public static final String TABLE_ENTITY = "dataTable";
   public static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
@@ -183,6 +185,13 @@ public class EMLParser {
           this.dataPackage.setAbstractText(abstractText);
         }
 
+        // Parse geographicDescription node
+        Node geographicDescriptionNode = xpathapi.selectSingleNode(document, GEOGRAPHIC_DESCRIPTION_PATH);
+        if (geographicDescriptionNode != null) {
+          String geographicDescriptionText = geographicDescriptionNode.getTextContent().trim();
+          this.dataPackage.setGeographicDescriptionText(geographicDescriptionText);
+        }
+
         // Parse the taxonomic coverage node
         Node taxonomicCoverageNode = xpathapi.selectSingleNode(document, TAXONOMIC_COVERAGE_PATH);
         if (taxonomicCoverageNode != null) {
@@ -208,6 +217,16 @@ public class EMLParser {
             Node keywordNode = keywordNodeList.item(i);
             String keyword = keywordNode.getTextContent();
             dataPackage.addKeyword(keyword);
+          }
+        }
+
+        // Parse the namedTimeScale nodes
+        NodeList timeScaleNodeList = xpathapi.selectNodeList(document, NAMED_TIME_SCALE_PATH);
+        if (timeScaleNodeList != null) {
+          for (int i =0; i < timeScaleNodeList.getLength(); i++) {
+            Node timeScaleNode = timeScaleNodeList.item(i);
+            String timeScale = timeScaleNode.getTextContent();
+            dataPackage.addTimeScale(timeScale);
           }
         }
 

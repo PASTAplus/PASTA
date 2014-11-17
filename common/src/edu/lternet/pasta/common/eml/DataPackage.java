@@ -51,9 +51,11 @@ public class DataPackage {
   ArrayList<ResponsibleParty> creatorList = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> keywords = null;
+  ArrayList<String> timescales = null;
   ArrayList<String> titles = null;
   String site = null;
   String abstractText = null;
+  String geographicDescriptionText = null;
   String taxonomicCoverageText = null;
 
   // Date fields
@@ -75,6 +77,7 @@ public class DataPackage {
     this.creatorList = new ArrayList<ResponsibleParty>();
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
+    this.timescales = new ArrayList<String>();
     this.titles = new ArrayList<String>();
   }
   
@@ -104,7 +107,15 @@ public class DataPackage {
    * Add a new keyword for this data package.
    */
   public void addKeyword(String keyword) {
-		 keywords.add(keyword);
+	keywords.add(keyword);
+  }
+  
+  
+  /**
+   * Add a new named time-scale value for this data package.
+   */
+  public void addTimeScale(String timeScale) {
+	timescales.add(timeScale);
   }
   
   
@@ -164,6 +175,11 @@ public class DataPackage {
   }
 
 	  
+	public String getGeographicDescriptionText() {
+		return geographicDescriptionText;
+	}
+
+
   public String getSite() {
 	return site;
   }
@@ -184,11 +200,16 @@ public class DataPackage {
   }
 	  
 	  
-	public String getTaxonomicCoverageText() {
-		return taxonomicCoverageText;
-	}
+  public String getTaxonomicCoverageText() {
+	return taxonomicCoverageText;
+  }
 
 
+  public ArrayList<String> getTimescales() {
+	return timescales;
+  }
+
+			  
   public ArrayList<String> getTitles() {
     return titles;
   }
@@ -248,7 +269,13 @@ public class DataPackage {
 	  public void setEndDate(String endDate) {
 		  this.endDate = endDate;
 	  }
-		  
+		
+	  
+		public void setGeographicDescriptionText(String geographicDescriptionText) {
+			this.geographicDescriptionText = geographicDescriptionText;
+		}
+
+		
   public void setPackageId(String packageId) {
     this.packageId = packageId;
     

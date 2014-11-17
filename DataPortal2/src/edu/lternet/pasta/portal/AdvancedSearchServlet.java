@@ -142,25 +142,16 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     
     String boundaryContained = request.getParameter("boundaryContained");
     String boundsChangedCount = request.getParameter("boundsChangedCount");
-    String caseSensitive = request.getParameter("caseSensitive");
     String dateField = request.getParameter("dateField");
     String startDate = request.getParameter("startDate");
     String endDate = request.getParameter("endDate");
     String datesContained = request.getParameter("datesContained");
-    boolean isCaseSensitive = (caseSensitive == null) ? false : true;
     String creatorOrganization = request.getParameter("creatorOrganization");
-    String creatorOrganizationQueryType = request.getParameter("creatorOrganizationQueryType");
     String creatorSurname = request.getParameter("creatorSurname");
-    String creatorSurnameQueryType = request.getParameter("creatorSurnameQueryType");
-    String formAllAny = request.getParameter("formAllAny");
     String locationName = request.getParameter("locationName");
-    boolean matchAll = ((formAllAny != null) && (formAllAny.equals("0")));
     String namedTimescale = request.getParameter("namedTimescale");
-    String namedTimescaleQueryType = request.getParameter("namedTimescaleQueryType");
     String[] siteValues = request.getParameterValues("siteValues");
-    String subjectAllAny = request.getParameter("subjectAllAny");
     String subjectField = request.getParameter("subjectField");
-    String subjectQueryType = request.getParameter("subjectQueryType");
     String subjectValue = request.getParameter("subjectValue");
     String specific = request.getParameter("specific");
     String related = request.getParameter("related");
@@ -168,7 +159,6 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     String ecotrends = request.getParameter("ecotrends");
     String landsat5 = request.getParameter("landsat5");
     String taxon = request.getParameter("taxon");
-    String taxonQueryType = request.getParameter("taxonQueryType");
     
     String northBound = request.getParameter("northBound");
     String southBound = request.getParameter("southBound");
@@ -184,28 +174,20 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     boolean isRelatedSpecificChecked = (relatedSpecific != null);
        
     SolrAdvancedSearch solrAdvancedSearch = new SolrAdvancedSearch(
-      isCaseSensitive,
       creatorOrganization,
-      creatorOrganizationQueryType,
       creatorSurname,
-      creatorSurnameQueryType,
       dateField,
       startDate,
       endDate,
-      matchAll,
       namedTimescale,
-      namedTimescaleQueryType,
       siteValues,
-      subjectAllAny,
       subjectField,
-      subjectQueryType,
       subjectValue,
       isDatesContainedChecked,
       isSpecificChecked,
       isRelatedChecked,
       isRelatedSpecificChecked,
       taxon,
-      taxonQueryType,
       isBoundaryContainedChecked,
       boundsChangedCount,
       northBound,

@@ -179,9 +179,9 @@
 										<li>
 										  <a data-toggle="tab" href="#tab7">Taxonomic</a> 
 										</li>
-										<li>
+										<!--   <li>
 										  <a data-toggle="tab" href="#tab5">Search Options</a> 
-										</li>
+										</li>-->
 									</ul>
 								  <form id="advancedSearchForm" action="./advancedSearch" method="post" name="advancedSearchForm" onsubmit="return submitRequest(this)">
 									  <div class="tab-content">
@@ -340,24 +340,9 @@
 																	</td>
 																	<td class="spacerwd"></td>
 																	<td>
-																		<select name="subjectQueryType">
-																			<option selected="selected" value="0">contains</option>
-																			<option value="1">matches exactly</option>
-																			<option value="2">starts with</option>
-																			<option value="3">ends with</option>
-																		</select>
-																	</td>
-																	<td class="spacerwd"></td>
-																	<td>
 																		<input name="subjectValue" type="search"
 																			placeholder="enter search terms" />
 																	</td>
-																</tr>
-																<tr>
-																<tr>
-																	<td class="spacerwd"></td>
-																	<td class="spacerwd"></td>
-																	<td class="spacerwd"></td>
 																	<td class="spacerwd"></td>
 																	<td>
 																		<span name='<%=Tooltip.SEARCH_TERMS%>'
@@ -472,40 +457,20 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
-													    <!--
-														  <tr>
-															  <td>
-															    <h3 class="separator_border labelBold span1">Creator / Organization</h3>
-															  </td>
-														  </tr>
-														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
-														  -->
-														  <tr>
-															  <td>
-															    <label class="labelBold">Creator&#39;s Last Name:</label>
-															    <select name="creatorSurnameQueryType">
-															      <option selected="selected" value="0">contains</option>
-															      <option value="1">matches exactly</option>
-															      <option value="2">starts with</option>
-															      <option value="3">ends with</option>
-															    </select>
-															    <input name="creatorSurname" type="text" />
-															  </td>
-														  </tr>
-														  <tr>
-															  <td>
-															    <label class="labelBold">Creator&#39;s Organization:</label>
-															    <select name="creatorOrganizationQueryType">
-															      <option selected="selected" value="0">contains</option>
-															      <option value="1">matches exactly</option>
-															      <option value="2">starts with</option>
-															      <option value="3">ends with</option>
-															    </select>
-															    <input name="creatorOrganization" type="text" />
-															  </td>
-														  </tr>
+															<tr>
+																<td><label class="labelBold">Creator&#39;s Last Name:</label></td>
+											                    <td class="spacerwd"></td>
+																<td><label class="labelBold">Creator&#39;s Organization:</label></td>
+															</tr>
+															<tr>
+																<td><input name="creatorSurname" type="text" /></td>
+											                    <td class="spacerwd"></td>
+																<td><input name="creatorOrganization" type="text" /></td>
+															</tr>
+															<tr>
+															</tr>
+															<tr>
+															</tr>
 													  </table>
 												  </div>
 												  <div class="row-fluid text_bar_pattern themeple_sc">												
@@ -640,24 +605,11 @@
 														   <td class="spacersmh"></td>
 														  </tr>
 														  -->
-														  <tr>
-														    <td>
-														      <label class="labelBold">Taxon:</label>
-														    </td>
-														  </tr>
 															<tr>
-															  <td>
-																  <select name="taxonQueryType">
-																    <option selected="selected" value="0">contains</option>
-																    <option value="1">matches exactly</option>
-																    <option value="2">starts with</option>
-																    <option value="3">ends with</option>
-																  </select> 
-																</td>
-																<td></td>
-															  <td>
-															    <input name="taxon" type="text" />
-															  </td>
+																<td><label class="labelBold">Taxon:</label></td>
+															</tr>
+															<tr>
+																<td><input name="taxon" type="text" /></td>
 															</tr>
 														</table>
 												  </div>
@@ -678,11 +630,10 @@
 										  </div>
 										  <!-- /#tab7 -->
 										
-										
+										<!--  
 										  <div id="tab5" class="tab-pane  ">
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div class="row-fluid text_bar_pattern themeple_sc">
-												    <!-- Search Options Table -->												
 												    <table>
 														  <tr>
 														    <td>
@@ -722,7 +673,6 @@
 														    </td>
 													    </tr>
 												    </table>												
-												    <!-- /Search Options Table -->
 												    <div class="span12">
 													    <span class="row-fluid separator_border"></span>
 												    </div>
@@ -737,7 +687,7 @@
 										      </table>
 											  </div>
 										  </div>
-										  <!-- /#tab4 -->
+										  /#tab5 -->
 
 										
 									  </div>

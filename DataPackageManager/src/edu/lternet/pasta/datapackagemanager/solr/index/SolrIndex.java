@@ -139,8 +139,10 @@ public class SolrIndex {
 			String singleDate = dataPackage.getSingleDateTime();
 			
 			List<String> keywords = dataPackage.getKeywords();
+			List<String> timescales = dataPackage.getTimescales();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
+			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
@@ -176,6 +178,10 @@ public class SolrIndex {
 				solrInputDocument.addField("keyword", keyword);
 			}
 			
+			for (String timescale : timescales) {
+				solrInputDocument.addField("timescale", timescale);
+			}
+			
 			for (ResponsibleParty responsibleParty : responsibleParties) {
 				if (responsibleParty.isPerson()) {
 					String author = responsibleParty.getCreatorName();
@@ -193,6 +199,10 @@ public class SolrIndex {
 
 			if (abstractText != null) {
 				solrInputDocument.setField("abstract", abstractText);
+			}
+
+			if (geographicDescriptionText != null) {
+				solrInputDocument.setField("geographicdescription", geographicDescriptionText);
 			}
 
 			if (taxonomicCoverageText != null) {

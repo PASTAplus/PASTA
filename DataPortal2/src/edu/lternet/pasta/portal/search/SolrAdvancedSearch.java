@@ -64,31 +64,19 @@ public class SolrAdvancedSearch extends Search  {
    */
   private String caseSensitive;
   private final String creatorOrganization;
-  private final String creatorOrganizationQueryType;
   private final String creatorSurname;
-  private final String creatorSurnameQueryType;
   private final String dateField;
   private final String startDate;
   private final String endDate;
-  private final String globalOperator;
-  private boolean hasAuthorSearch = false;
-  private boolean hasGeographicDescriptionSearch = false;
-  private boolean hasSiteFilter = false;
-  private boolean hasSpatialSearch = false;
-  private boolean hasSubjectSearch = false;
-  private boolean hasTaxonomicSearch = false;
-  private boolean hasTemporalSearch = false;
+  private final String globalOperator = "UNION";
   private int INDENT_LEVEL = 2;
   private boolean isDatesContainedChecked;
   private String namedTimescale;
   private String namedTimescaleQueryType;
   private String[] siteValues = null;
-  private String subjectAllAny;
   private String subjectField;
-  private String subjectQueryType;
   private String subjectValue;
   private String taxon;
-  private String taxonQueryType;
   
   private boolean isBoundaryContainedChecked;
   private String boundsChangedCount;
@@ -98,9 +86,7 @@ public class SolrAdvancedSearch extends Search  {
   private String westBound;
   private String locationName;
   
-  private AdvancedSearchPathQuery pathQuery;
-  private AdvancedSearchQueryGroup queryGroup;
-  private String queryString;
+  private String queryString = "";
   private TermsList termsList;
   private final String title = "Advanced Search";
 
@@ -120,28 +106,20 @@ public class SolrAdvancedSearch extends Search  {
    * Constructor. Passes in a large set of form field parameters.
    */
   public SolrAdvancedSearch(
-      boolean isCaseSensitive,
       String creatorOrganization,
-      String creatorOrganizationQueryType,
       String creatorSurname,
-      String creatorSurnameQueryType,
       String dateField,
       String startDate,
       String endDate,
-      boolean matchAll,
       String namedTimescale,
-      String namedTimescaleQueryType,
       String[] siteValues,
-      String subjectAllAny,
       String subjectField,
-      String subjectQueryType,
       String subjectValue,
       boolean isDatesContainedChecked,
       boolean isSpecificChecked,
       boolean isRelatedChecked,
       boolean isRelatedSpecificChecked,
       String taxon,
-      String taxonQueryType,   
       boolean isBoundaryContainedChecked,
       String boundsChangedCount,
       String northBound,
@@ -151,22 +129,16 @@ public class SolrAdvancedSearch extends Search  {
       String locationName
                        ) { 
     this.creatorOrganization = creatorOrganization;
-    this.creatorOrganizationQueryType = creatorOrganizationQueryType;
     this.creatorSurname = creatorSurname;
-    this.creatorSurnameQueryType = creatorSurnameQueryType;
     this.dateField = dateField;
     this.startDate = startDate;
     this.endDate = endDate;
     this.isDatesContainedChecked = isDatesContainedChecked;
     this.namedTimescale = namedTimescale;
-    this.namedTimescaleQueryType = namedTimescaleQueryType;
     this.siteValues = siteValues;
-    this.subjectAllAny = subjectAllAny;
     this.subjectField = subjectField;
-    this.subjectQueryType = subjectQueryType;
     this.subjectValue = subjectValue;
     this.taxon = taxon;
-    this.taxonQueryType = taxonQueryType;
     
     this.isBoundaryContainedChecked = isBoundaryContainedChecked;
     this.boundsChangedCount = boundsChangedCount;
@@ -182,18 +154,6 @@ public class SolrAdvancedSearch extends Search  {
     this.hasNarrowRelated = isSpecificChecked && isRelatedChecked && !isRelatedSpecificChecked;
     this.hasAll = isRelatedSpecificChecked;
     
-    String indent = getIndent(INDENT_LEVEL * 1);
-    
-    if (matchAll) {
-      globalOperator = "INTERSECT";     
-    }
-    else {
-      globalOperator = "UNION";
-    }
-    
-    this.caseSensitive = isCaseSensitive ? "true" : "false";
-    this.queryGroup = new AdvancedSearchQueryGroup(globalOperator, indent);
-    this.pathQuery = new AdvancedSearchPathQuery(title, queryGroup, indent);
     this.termsList = new TermsList();
   }
 
@@ -217,8 +177,6 @@ public class SolrAdvancedSearch extends Search  {
 		String queryTerms = "";
 
 		if ((this.subjectValue != null) && (!(this.subjectValue.equals("")))) {
-			hasSubjectSearch = true;
-
 			if (subjectField.equals("ABSTRACT")) {
 				field = "abstract";
 			}
@@ -272,42 +230,22 @@ public class SolrAdvancedSearch extends Search  {
    * creator/organizationName field, or an intersection of both fields.
    */
   private void buildQueryAuthor(TermsList termsList) {
-    boolean addQueryGroup = false;
-    String emlField;
-    String indent = getIndent(INDENT_LEVEL * 2);
-    AdvancedSearchQueryGroup qg = 
-                           new AdvancedSearchQueryGroup(globalOperator, indent);
-    AdvancedSearchQueryTerm qt;
-    String searchMode;
     String value = this.creatorSurname;
 
-    indent = getIndent(INDENT_LEVEL * 3);
     if ((value != null) && (!(value.equals("")))) {
-      emlField = "dataset/creator/individualName/surName";
-      searchMode = metacatSearchMode(this.creatorSurnameQueryType);
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       value, indent);
-      qg.addQueryTerm(qt);        
-      addQueryGroup = true;
       termsList.addTerm(value);
+      String authorQuery = String.format("author:%s", value);
+      this.queryString = String.format("%s %s", this.queryString.trim(), authorQuery);
     }
 
     value = this.creatorOrganization;
       
     if ((value != null) && (!(value.equals("")))) {
-      emlField = "creator/organizationName";
-      searchMode = metacatSearchMode(this.creatorOrganizationQueryType);
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       value, indent);
-      qg.addQueryTerm(qt);        
-      addQueryGroup = true;      
       termsList.addTerm(value);
+      String organizationQuery = String.format("organization:%s", value);
+      this.queryString = String.format("%s %s", this.queryString.trim(), organizationQuery);
     }
     
-    if (addQueryGroup) {      
-      hasAuthorSearch = true;
-      queryGroup.addQueryGroup(qg);
-    }
   }
   
 
@@ -315,25 +253,10 @@ public class SolrAdvancedSearch extends Search  {
    * Builds query group for a search on a specific named location.
    */
   private void buildQueryGeographicDescription(String locationName, TermsList termsList) {
-    String emlField;
-    String indent = getIndent(INDENT_LEVEL * 2);
-    final String operator = "INTERSECT";
-    AdvancedSearchQueryGroup qgGeo;
-    AdvancedSearchQueryTerm qt;
-    String searchMode;
-
-    qgGeo = new AdvancedSearchQueryGroup(operator, indent);
-    indent = getIndent(INDENT_LEVEL * 3);
-
     if ((locationName != null) && (!(locationName.equals("")))) {
-      searchMode = "contains";
-      emlField = "geographicDescription";
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       locationName, indent);
-      qgGeo.addQueryTerm(qt);
-      queryGroup.addQueryGroup(qgGeo);
-      hasGeographicDescriptionSearch = true;  
       termsList.addTerm(locationName);
+      String locationQuery = String.format("geographicdescription:%s", locationName);
+      this.queryString = String.format("%s %s", this.queryString.trim(), locationQuery);
     }
   }
   
@@ -379,12 +302,9 @@ public class SolrAdvancedSearch extends Search  {
        ) {
       
       if (Integer.valueOf(boundsChangedCount) == 1) {
-        hasSpatialSearch = false;
         return;
       }
       
-      hasSpatialSearch = true;   
-
       /*
        * Check whether the east/west coordinates cross over the international
        * dateline. If the search crosses the dateline, special handling will
@@ -518,7 +438,6 @@ public class SolrAdvancedSearch extends Search  {
         qgSpatial.addQueryGroup(datelineGroup);
       }
 
-      queryGroup.addQueryGroup(qgSpatial);
     }
   }
   
@@ -697,11 +616,6 @@ public class SolrAdvancedSearch extends Search  {
       addQueryGroup = true;
     }
     
-    if (addQueryGroup) {
-      hasTemporalSearch = true;
-      queryGroup.addQueryGroup(qg);
-    }
-
   }
   
   
@@ -778,31 +692,12 @@ public class SolrAdvancedSearch extends Search  {
    * matching the field if the user-specified value is contained in the field.
    */
   private void buildQueryTaxon(TermsList termsList) {
-    boolean addQueryGroup = false;
-    final String emlField;
-    String indent = getIndent(INDENT_LEVEL * 2);
-    final String operator = "INTERSECT";
-    AdvancedSearchQueryGroup qg= new AdvancedSearchQueryGroup(operator, indent);
-    AdvancedSearchQueryTerm qt;
-    final String searchMode;
-    String taxonQueryType = this.taxonQueryType;
     final String value = this.taxon;
       
-    indent = getIndent(INDENT_LEVEL * 3);
-
     if ((value != null) && (!(value.equals("")))) {
-      emlField = "taxonRankValue";
-      searchMode = metacatSearchMode(taxonQueryType);
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       value, indent);
-      qg.addQueryTerm(qt);        
-      addQueryGroup = true;     
       termsList.addTerm(value);
-    }
-
-    if (addQueryGroup) {      
-      hasTaxonomicSearch = true;
-      queryGroup.addQueryGroup(qg);
+      String taxonQuery = String.format("taxonomic:%s", value);
+      this.queryString = String.format("%s %s", this.queryString.trim(), taxonQuery);
     }
   }
   
@@ -830,8 +725,6 @@ public class SolrAdvancedSearch extends Search  {
         String site = siteValues[i];
         LTERSite lterSite = new LTERSite(site);
         if (lterSite.isValidSite()) {
-          hasSiteFilter = true;
-      
           emlField = "@packageId";
           attributeValue = lterSite.getPackageId();              
           searchMode = "starts-with";
@@ -845,34 +738,9 @@ public class SolrAdvancedSearch extends Search  {
         }
       }
 
-      queryGroup.addQueryGroup(qg); 
     }
   }
 
-
-  /**
-   * Counts the number of search types on the form. For example, if the user
-   * has filled in values for both a subject search and a spatial search,
-   * would return 2.
-   * 
-   * @return  searchFields  An integer representing the total number of search
-   *                        fields that the user has filled in for this advanced 
-   *                        search.
-   */
-  private int countSearchFields() {
-    int searchFields = 0;
-    
-    if (hasSubjectSearch == true)   { searchFields++; }
-    if (hasAuthorSearch == true)    { searchFields++; }
-    if (hasGeographicDescriptionSearch == true)   { searchFields++; }
-    if (hasSpatialSearch == true)   { searchFields++; }
-    if (hasTaxonomicSearch == true) { searchFields++; }
-    if (hasTemporalSearch == true)  { searchFields++; }
-    if (hasSiteFilter == true)      { searchFields++; }
-    
-    return searchFields;
-  }
-  
 
   /**
    * Boolean to determine whether the east/west coordinates of a spatial search
@@ -917,10 +785,13 @@ public class SolrAdvancedSearch extends Search  {
 		String resultsetXML = null;
 		String htmlMessage = null;
 		buildQuerySubject(this.termsList);
+		buildQueryAuthor(this.termsList); 
+		buildQueryTaxon(this.termsList);
+		buildQueryGeographicDescription(this.locationName, this.termsList);
+		
+		queryString = queryString.trim();
 
 		/*
-		 * buildQueryAuthor(this.termsList); buildQueryTaxon(this.termsList);
-		 * buildQueryGeographicDescription(this.locationName, this.termsList);
 		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,
 		 * this.westBound, this.isBoundaryContainedChecked);
 		 * buildQueryTemporalCriteria(this.dateField, this.startDate,
