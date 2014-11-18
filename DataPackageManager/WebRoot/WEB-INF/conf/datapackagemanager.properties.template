@@ -45,7 +45,7 @@ dbMaxConnections=10
 ##
 ## LTER Scope Registry
 ##
-scopeRegistry=ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,msb-tempbiodev
+scopeRegistry=ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,lter-landsat-ledaps,msb-tempbiodev
 
 #
 # Sample document properties. Used by the sample calling application
