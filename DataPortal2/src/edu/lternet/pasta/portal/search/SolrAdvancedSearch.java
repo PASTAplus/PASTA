@@ -31,13 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.portal.search.LTERSite;
 
 
@@ -88,7 +85,6 @@ public class SolrAdvancedSearch extends Search  {
   
   private String queryString = "";
   private TermsList termsList;
-  private final String title = "Advanced Search";
 
   // Controlled vocabulary settings
   private boolean hasExact = false;
@@ -490,89 +486,54 @@ public class SolrAdvancedSearch extends Search  {
                                           String namedTimescaleQueryType,
                                           TermsList termsList
                                          ) {
-    boolean addQueryGroup = false;
-    boolean addQueryGroupDates = false;
-    boolean addQueryGroupNamed = false;
-    String emlField;
-    final String operator = "INTERSECT";
-    String indent = getIndent(INDENT_LEVEL * 2);
-    AdvancedSearchQueryGroup qg= new AdvancedSearchQueryGroup(operator, indent);
-    AdvancedSearchQueryGroup qgNamed, qgDates, qgDatesStart, qgDatesEnd;
-    AdvancedSearchQueryTerm qt;
-    String searchMode;
-    String xDate;     // Will hold either "beginDate" or "endDate"
-
-    indent = getIndent(INDENT_LEVEL * 3);
-
-    /* If the user specified a named timescale, check to see whether it occurs
-     * in any of three possible places: singleDateTime, beginDate, or endDate.
+	  boolean endDateSpecified = false;
+	  boolean startDateSpecified = false;
+	  
+    /* If the user specified a named time-scale query, search for it
+     * in the "timescale" field.
      */
-    qgNamed = new AdvancedSearchQueryGroup("UNION", indent);
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
-      indent = getIndent(INDENT_LEVEL * 4);
-      searchMode = metacatSearchMode(namedTimescaleQueryType);
-      
-      emlField = 
-           "temporalCoverage/singleDateTime/alternativeTimeScale/timeScaleName";
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       namedTimescale, indent);
-      qgNamed.addQueryTerm(qt);
-      
-      emlField = 
-   "temporalCoverage/rangeOfDates/beginDate/alternativeTimeScale/timeScaleName";
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       namedTimescale, indent);
-      qgNamed.addQueryTerm(qt);
-      
-      emlField = 
-     "temporalCoverage/rangeOfDates/endDate/alternativeTimeScale/timeScaleName";
-      qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       namedTimescale, indent);
-      qgNamed.addQueryTerm(qt);
       termsList.addTerm(namedTimescale);
-      
-      addQueryGroupNamed = true;
+      String timescaleQuery = String.format("timescale:%s", namedTimescale);
+      this.queryString = String.format("%s %s", this.queryString.trim(), timescaleQuery);
     }
     
-    qgDates = new AdvancedSearchQueryGroup("INTERSECT", indent);
-    
-    startDate = validateDateString(startDate);
-    endDate = validateDateString(endDate);
-    validateDateRange(startDate, endDate);
+    if ((startDate == null) || (startDate.equals(""))) {
+    	startDate = "*";
+    }
+    else {
+        startDate = ISO8601Utility.formatTimestamp(startDate, "DAY");
+        if (startDate != null) startDateSpecified = true;
+    }
 
-    // If a start date was specified, search for temporal coverage and/or a
-    // pubDate with 'endDate' greater than or equal to the specified start date.
+    if ((endDate == null) || (endDate.equals(""))) {
+    	endDate = "NOW";
+    }
+    else {
+    	endDate = ISO8601Utility.formatTimestamp(endDate, "DAY");
+    	if (endDate != null) endDateSpecified = true;
+    }
+
+    validateDateRange(startDate, endDate);
+    
+    // If a start date or an end date was specified, search temporal coverage
     //
-    if ((startDate != null) && (!(startDate.equals("")))) {
-      indent = getIndent(INDENT_LEVEL * 4);
-      qgDatesStart = new AdvancedSearchQueryGroup("UNION", indent);
-      indent = getIndent(INDENT_LEVEL * 5);
-      searchMode = "greater-than-equals";
+    if (startDateSpecified || endDateSpecified) {
 
       if (dateField.equals("ALL") || dateField.equals("COLLECTION")) {
-        xDate = isDatesContainedChecked ? "beginDate" : "endDate";
-        emlField = "temporalCoverage/rangeOfDates/" + xDate + "/calendarDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         startDate, indent);
-        qgDatesStart.addQueryTerm(qt);        
-
-        emlField = "temporalCoverage/singleDateTime/calendarDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         startDate, indent);
-        qgDatesStart.addQueryTerm(qt);
+    	  String singleDateQuery = String.format("singledate:[%s TO %s]", startDate, endDate);
+          this.queryString = String.format("%s %s", this.queryString.trim(), singleDateQuery);
       }
       
       if (dateField.equals("ALL") || dateField.equals("PUBLICATION")) {
-        emlField = "dataset/pubDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         startDate, indent);
-        qgDatesStart.addQueryTerm(qt);        
+    	  String pubDateQuery = String.format("pubdate:[%s TO %s]", startDate, endDate);
+          this.queryString = String.format("%s %s", this.queryString.trim(), pubDateQuery);
       }
       
-      qgDates.addQueryGroup(qgDatesStart);
-      addQueryGroupDates = true;
     }
 
+    /*
+    
     // If an end date was specified, search for temporal coverage and/or a
     // pubDate with 'beginDate' less than or equal to the end date.
     //
@@ -603,19 +564,8 @@ public class SolrAdvancedSearch extends Search  {
       }      
 
       qgDates.addQueryGroup(qgDatesEnd);
-      addQueryGroupDates = true;
     }
-    
-    if (addQueryGroupNamed) {
-      qg.addQueryGroup(qgNamed);
-      addQueryGroup = true;
-    }
-    
-    if (addQueryGroupDates) {
-      qg.addQueryGroup(qgDates);
-      addQueryGroup = true;
-    }
-    
+    */
   }
   
   
@@ -667,7 +617,6 @@ public class SolrAdvancedSearch extends Search  {
     Date endDate = null;
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
-    
     try {
       if ((startDateStr != null) && (endDateStr != null)) {
         startDate = dateFormat.parse(startDateStr);
@@ -706,40 +655,33 @@ public class SolrAdvancedSearch extends Search  {
    * Build a site filter. If the AdvancedSearch's site value is non-null, add a
    * query group that limits the results to a particular LTER site. Do this
    * by searching for a packageId attribute that starts with "knb-lter-xyz"
-   * where "xyz" is the three-letter site acronym, or for a site keyword
-   * phrase (e.g. "Kellogg Biological Station") anywhere in the documment.
+   * where "xyz" is the three-letter site acronym.
    */
-  private void buildSiteFilter(TermsList termsList) {
-    String attributeValue = "";
-    String emlField = "";
-    String indent = getIndent(INDENT_LEVEL * 2);
-    final String operator = "UNION";
-    AdvancedSearchQueryGroup qg= new AdvancedSearchQueryGroup(operator, indent);
-    AdvancedSearchQueryTerm qt;
-    String searchMode;
-   
-    indent = getIndent(INDENT_LEVEL * 3);
+	private void buildSiteFilter(TermsList termsList) {
+		String attributeValue = "";
+		String siteQuery = "packageid:(";
 
-    if (this.siteValues != null) {
-      for (int i = 0; i < siteValues.length; i++) {  
-        String site = siteValues[i];
-        LTERSite lterSite = new LTERSite(site);
-        if (lterSite.isValidSite()) {
-          emlField = "@packageId";
-          attributeValue = lterSite.getPackageId();              
-          searchMode = "starts-with";
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                       attributeValue, indent);
-          qg.addQueryTerm(qt);
-          String siteName = lterSite.getSiteName();
-          if ((siteName != null) && (!siteName.equals(""))) {
-            termsList.addTerm(siteName);
-          }
-        }
-      }
+		if (this.siteValues != null) {
+			this.queryString = String.format("%s %s", this.queryString.trim(),
+					siteQuery);
 
-    }
-  }
+			for (int i = 0; i < siteValues.length; i++) {
+				String site = siteValues[i];
+				LTERSite lterSite = new LTERSite(site);
+				if (lterSite.isValidSite()) {
+					attributeValue = lterSite.getPackageId();
+					String siteName = lterSite.getSiteName();
+					if ((siteName != null) && (!siteName.equals(""))) {
+						termsList.addTerm(siteName);
+					}
+					siteQuery = String.format("%s*", attributeValue);
+					this.queryString = String.format("%s %s",
+							this.queryString.trim(), siteQuery);
+				}
+			}
+			this.queryString = String.format("%s)", this.queryString.trim());
+		}
+	}
 
 
   /**
@@ -775,54 +717,30 @@ public class SolrAdvancedSearch extends Search  {
 	/**
 	 * Builds and runs a search, returning the result XML string.
 	 * 
-	 * @param request
-	 *            the servlet request object
 	 * @param uid
 	 *            the user id
 	 */
-	public String executeSearch(final HttpServletRequest request,
-			final String uid) {
-		String resultsetXML = null;
-		String htmlMessage = null;
+	public String executeSearch(final String uid) 
+			throws Exception {
 		buildQuerySubject(this.termsList);
 		buildQueryAuthor(this.termsList); 
 		buildQueryTaxon(this.termsList);
 		buildQueryGeographicDescription(this.locationName, this.termsList);
+		buildQueryTemporalCriteria(this.dateField, this.startDate,
+		   this.endDate, this.isDatesContainedChecked, this.namedTimescale,
+		   this.namedTimescaleQueryType, this.termsList);
+		buildSiteFilter(this.termsList);
 		
 		queryString = queryString.trim();
 
 		/*
 		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,
 		 * this.westBound, this.isBoundaryContainedChecked);
-		 * buildQueryTemporalCriteria(this.dateField, this.startDate,
-		 * this.endDate, this.isDatesContainedChecked, this.namedTimescale,
-		 * this.namedTimescaleQueryType, this.termsList);
-		 * buildSiteFilter(termsList);
 		 */
 
-		try {
-			DataPackageManagerClient dpmClient = new DataPackageManagerClient(
-					uid);
-			logger.warn(String.format("queryString:\n%s", queryString));
-			resultsetXML = dpmClient.searchDataPackages(queryString);
-		}
-		catch (PastaAuthenticationException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-		}
-		catch (PastaConfigurationException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-		}
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			htmlMessage = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
-		}
-
-		request.setAttribute("searchresult", htmlMessage);
+		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+		logger.warn(String.format("queryString:\n%s", queryString));
+		String resultsetXML = dpmClient.searchDataPackages(queryString);
 
 		return resultsetXML;
 	}

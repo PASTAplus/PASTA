@@ -1,10 +1,7 @@
 package edu.lternet.pasta.datapackagemanager.solr.index;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServer;
@@ -14,6 +11,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
@@ -68,47 +66,6 @@ public class SolrIndex {
 	}
 	
 	
-	/*
-	 * Given a date string, compose an ISO 8601 timestamp string 
-	 * that is understandable to Solr.
-	 * 
-	 * The granularity (e.g. "DAY") is used by Solr. Use the coarsest
-	 * granularity needed to improve the performance of date range
-	 * searches. For example, don't bother storing publication date
-	 * to the nearest minute; instead round down to the nearest day.
-	 */
-	private String formatTimestamp(String dateStr, String granularity) {
-		SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
-		SimpleDateFormat yearMonthDayFormat = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		String timestamp = null;
-		
-		try {
-			if (dateStr == null) {
-
-			}
-			else if (dateStr.length() == 4) {
-				Date yearDate = yearFormat.parse(dateStr);
-				timestamp = iso8601Format.format(yearDate);
-			}
-			else if (dateStr.length() == 10) {
-				Date yearMonthDayDate = yearMonthDayFormat.parse(dateStr);
-				timestamp = iso8601Format.format(yearMonthDayDate);
-			}
-			
-			// Append the granularity if it is specified
-			if (timestamp != null && granularity != null) {
-				timestamp = String.format("%s/%s", timestamp, granularity);
-			}
-		}
-		catch (ParseException e) {
-			// Can't parse this date string. Just return null.
-		}
-		
-		return timestamp;
-	}
-	
-	
 	/**
 	 * Indexes an EML document, adding it to the Solr repository.
 	 * 
@@ -149,22 +106,22 @@ public class SolrIndex {
 			solrInputDocument.setField("id", id);
 			solrInputDocument.setField("packageid", packageId);
 			
-			String pubDateTimestamp = formatTimestamp(pubDate, DATE_GRANULARITY);
+			String pubDateTimestamp = ISO8601Utility.formatTimestamp(pubDate, DATE_GRANULARITY);
 			if (pubDateTimestamp != null) {
 				solrInputDocument.setField("pubdate", pubDateTimestamp);
 			}
 
-			String beginDateTimestamp = formatTimestamp(beginDate, DATE_GRANULARITY);
+			String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
 			if (beginDateTimestamp != null) {
 				solrInputDocument.setField("begindate", beginDateTimestamp);
 			}
 
-			String endDateTimestamp = formatTimestamp(endDate, DATE_GRANULARITY);
+			String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
 			if (endDateTimestamp != null) {
 				solrInputDocument.setField("enddate", endDateTimestamp);
 			}
 
-			String singleDateTimestamp = formatTimestamp(singleDate, DATE_GRANULARITY);
+			String singleDateTimestamp = ISO8601Utility.formatTimestamp(singleDate, DATE_GRANULARITY);
 			if (singleDateTimestamp != null) {
 				solrInputDocument.setField("singledate", singleDateTimestamp);
 			}

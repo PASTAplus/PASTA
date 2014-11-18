@@ -21,6 +21,7 @@
 package edu.lternet.pasta.common;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -127,6 +128,48 @@ public class ISO8601Utility {
 		return dateStr;
 	}
 
+	
+	/*
+	 * Given a date string, compose an ISO 8601 timestamp string 
+	 * that is understandable to Solr.
+	 * 
+	 * The granularity (e.g. "DAY") is used by Solr. Use the coarsest
+	 * granularity needed to improve the performance of date range
+	 * searches. For example, don't bother storing publication date
+	 * to the nearest minute; instead round down to the nearest day.
+	 */
+	public static String formatTimestamp(String dateStr, String granularity) {
+		SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+		SimpleDateFormat yearMonthDayFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		String timestamp = null;
+		
+		try {
+			if (dateStr == null) {
+
+			}
+			else if (dateStr.length() == 4) {
+				Date yearDate = yearFormat.parse(dateStr);
+				timestamp = iso8601Format.format(yearDate);
+			}
+			else if (dateStr.length() == 10) {
+				Date yearMonthDayDate = yearMonthDayFormat.parse(dateStr);
+				timestamp = iso8601Format.format(yearMonthDayDate);
+			}
+			
+			// Append the granularity if it is specified
+			if (timestamp != null && granularity != null) {
+				timestamp = String.format("%s/%s", timestamp, granularity);
+			}
+		}
+		catch (ParseException e) {
+			// Can't parse this date string. Just return null.
+		}
+		
+		return timestamp;
+	}
+	
+	
 	public static void main(String[] arg) {
 
 		System.out.println(ISO8601Utility.formatDateTime());

@@ -52,7 +52,7 @@ public class LTERSite {
     "JRN",
     "KBS",
     "KNZ",
-    "LNO",
+    "NWK",
     "LUQ",
     "MCM",
     "MCR",

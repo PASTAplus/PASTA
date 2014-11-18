@@ -328,17 +328,34 @@
 												<div id="tab2" class="tab-pane  ">
 													<div class="row-fluid text_bar_pattern themeple_sc">
 														<div>
+													  <table>
+														  <tr>
+															  <td>
+															    <input checked="checked" name="subjectField" type="radio" value="ALL" /> 
+															    Subject
+															  </td>
+															  <td class="spacerwd"></td>
+															  <td>
+															    <input name="subjectField" type="radio" value="TITLE" /> 
+															    Title only
+															  </td>
+															  <td class="spacerwd"></td>
+															  <td>
+															    <input name="subjectField" type="radio" value="ABSTRACT" /> 
+															    Abstract only
+															  </td>															  
+															  <td class="spacerwd"></td>
+															  <td>
+															    <input name="subjectField" type="radio" value="KEYWORDS" /> 
+															    Keywords only
+															  </td>
+														  </tr>
+														  <tr>
+															  <td class="spacersmh"></td>
+														  </tr>
+													  </table>
 															<table>
 																<tr>
-																	<td>
-																		<select name="subjectField">
-																			<option value="ALL">Subject</option>
-																			<option value="TITLE">Title only</option>
-																			<option value="ABSTRACT">Abstract only</option>
-																			<option value="KEYWORDS">Keywords only</option>
-																		</select>
-																	</td>
-																	<td class="spacerwd"></td>
 																	<td>
 																		<input name="subjectValue" type="search"
 																			placeholder="enter search terms" />
@@ -363,10 +380,6 @@
 															<table>
 																<tr>
 																	<td>
-																		<label class="labelBold">Match Options:</label>
-																	</td>
-																	<td class="spacerwd"></td>
-																	<td>
 																		<label class="labelBold">Expand Search By Adding:</label>
 																	</td>
 																	<td class="spacerwd"></td>
@@ -375,20 +388,6 @@
 																	</td>
 																</tr>
 																<tr>
-																	<td>
-																		<input
-																			checked="checked" 
-																			name="subjectAllAny" 
-																			type="radio"
-																			value="0" />
-																			Match <strong>All</strong> Search Terms<br/>
-																		<input
-																			name="subjectAllAny" 
-																			type="radio" 
-																			value="1" />
-																			Match <strong>Any</strong> Search Term
-																	</td>
-																	<td class="spacerwd"></td>
 																	<td>
 																		<ul class="checklistLG">
 																			<li>
@@ -495,16 +494,6 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 													  <table>
-													    <!-- 
-														  <tr>
-															  <td colspan="12">
-															    <h3 class="separator_border labelBold span1">Temporal Criteria</h3>
-															  </td>
-														  </tr>
-														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
-														  -->
 														  <tr>
 															  <td>
 															    <input checked="checked" name="dateField" type="radio" value="COLLECTION" /> 
@@ -531,13 +520,12 @@
 															    <label class="labelBold" for="userId">Start Date:</label>
 															    <input name="startDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
-															  <td></td>
+															  <td class="spacerwd"></td>
 															  <td>
 															    <label class="labelBold" for="group">End Date:</label>
 															    <input name="endDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
-															  <td></td>
-															  <td></td>
+															  <td class="spacerwd"></td>
 															  <td>
 															    <ul class="checklistLG">
 																    <li>
@@ -550,23 +538,11 @@
 															  </td>
 														  </tr>
 														  <tr>
-															  <td class="spacersmh"></td>
-														  </tr>
-														  <tr>
 															  <td>
 															    <label class="labelBold">Named Time-scale:</label>
 															  </td>
 														  </tr>
 														  <tr>
-															  <td>
-															    <select name="namedTimescaleQueryType">
-															      <option selected="selected" value="0">contains</option>
-															      <option value="1">matches exactly</option>
-															      <option value="2">starts with</option>
-															      <option value="3">ends with</option>
-															    </select>
-															  </td>
-															  <td></td>
 															  <td>
 															    <input name="namedTimescale" type="text" >
 															  </td>
@@ -595,16 +571,6 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div>
 														<table>
-														  <!--
-														  <tr>
-														   <td colspan="12">
-														     <h3 class="separator_border labelBold span1">Taxonomic Criteria</h3>
-														   </td>
-														  </tr>
-														  <tr>
-														   <td class="spacersmh"></td>
-														  </tr>
-														  -->
 															<tr>
 																<td><label class="labelBold">Taxon:</label></td>
 															</tr>

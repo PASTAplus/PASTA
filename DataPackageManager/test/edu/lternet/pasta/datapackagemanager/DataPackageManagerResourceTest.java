@@ -834,7 +834,7 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.contains("<resultset>"));
+      assertTrue(entityString.contains("<resultset"));
       assertTrue(entityString.contains(SOLR_QUERY));
     }
   }

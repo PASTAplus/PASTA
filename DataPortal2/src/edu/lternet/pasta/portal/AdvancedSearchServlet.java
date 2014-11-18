@@ -197,26 +197,29 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       locationName
       );
 
-    try {
-      xml = solrAdvancedSearch.executeSearch(request, uid);
-      termsList = solrAdvancedSearch.getTermsList();
-      if (termsList != null) {
-        termsListHTML = termsList.toHTML();
-      }
+		try {
+			xml = solrAdvancedSearch.executeSearch(uid);
 
-      ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-      resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
-      resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
-      html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
-      html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-      request.setAttribute("searchresult", html);
-      RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-      requestDispatcher.forward(request, response);
-    } 
-    catch (Exception e) {
-  	  handleDataPortalError(logger, e);
-    }
+			termsList = solrAdvancedSearch.getTermsList();
+			if (termsList != null) {
+				termsListHTML = termsList.toHTML();
+			}
 
+			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+			resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
+			resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
+			html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
+			html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			request.setAttribute("searchresult", html);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+			requestDispatcher.forward(request, response);
+		}
+		catch (Exception e) {
+			String htmlMessage = 
+					"<p class=\"warning\">" + e.getMessage() + "</p>\n";
+			request.setAttribute("searchresult", htmlMessage);
+			handleDataPortalError(logger, e);
+		}
   }
 
   
