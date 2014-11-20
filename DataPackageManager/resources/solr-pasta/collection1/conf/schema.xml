@@ -193,6 +193,8 @@
    <copyField source="organization" dest="text"/>
    <copyField source="abstract" dest="text"/>
    <copyField source="taxonomic" dest="text"/>
+   <copyField source="timescale" dest="text"/>
+   <copyField source="geographicdescription" dest="text"/>
 
    <!-- Create a string version of author for faceting 
    <copyField source="author" dest="author_s"/> -->
