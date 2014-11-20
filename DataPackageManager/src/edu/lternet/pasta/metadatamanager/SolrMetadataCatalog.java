@@ -1,10 +1,17 @@
 package edu.lternet.pasta.metadatamanager;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.QueryString;
 import edu.lternet.pasta.datapackagemanager.solr.index.SolrIndex;
 import edu.lternet.pasta.datapackagemanager.solr.search.SimpleSolrSearch;
 
@@ -66,15 +73,35 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     }
 
     
-    public String query(String queryText) {
+    public String query(UriInfo uriInfo) {
     	String result = null;
     	
     	SimpleSolrSearch simpleSolrSearch = new SimpleSolrSearch(solrUrl);
     	
     	try {
-    		result = simpleSolrSearch.search(queryText);
+            QueryString queryString = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            
+			if (queryParams != null) {
+
+				for (String key : queryParams.keySet()) {
+					if (key.equalsIgnoreCase("q")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		simpleSolrSearch.setQueryText(value);
+					}
+					else if (key.equals("fq")) {
+						List<String> values = queryParams.get(key);
+						for (String fq : values) {
+							simpleSolrSearch.addFilterQuery(fq);
+						}
+					}
+				}
+			}            
+            
+    		result = simpleSolrSearch.search();
     	}
-    	catch (SolrServerException e) {
+    	catch (SolrServerException | URISyntaxException | UnsupportedEncodingException e) {
     		e.printStackTrace();
     	}
     	

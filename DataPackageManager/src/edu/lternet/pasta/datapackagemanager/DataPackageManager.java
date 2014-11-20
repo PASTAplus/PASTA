@@ -38,6 +38,7 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -65,7 +66,6 @@ import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
-import edu.lternet.pasta.metadatamanager.MetacatMetadataCatalog;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -114,7 +114,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String dbUser = null;
 	private static String dbPassword = null;
 	private static String databaseAdapterName = null;
-	private static String metacatUrl = null;
 	private static String pastaUriHead = null;
 	private static String pastaUser = null;
 	private static String solrUrl = null;
@@ -582,8 +581,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		 * update the metadata to the Metadata Catalog service.
 		 */
 		if (isDataPackageValid && !isEvaluate) {
-			MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(metacatUrl,
-			    pastaUser);
 			MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 			File levelOneEMLFile = levelZeroDataPackage.toLevelOne(emlFile,
 			    entityURIHashMap);
@@ -599,14 +596,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			try {
 				if (isUpdate) {
-					metacatResult = metadataCatalog.updateEmlDocument(
-							emlPackageId, emlDocument);
 					solrResult = solrCatalog.updateEmlDocument(emlPackageId,
 							emlDocument);
 				}
 				else {
-					metacatResult = metadataCatalog.createEmlDocument(
-							emlPackageId, emlDocument);
 					solrResult = solrCatalog.createEmlDocument(emlPackageId,
 							emlDocument);
 				}
@@ -863,13 +856,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * Delete the metadata from the Metadata Catalog
 				 */
-				MetadataCatalog metadataCatalog = new MetacatMetadataCatalog(
-				    metacatUrl, pastaUser);
 				MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 				EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
 				    identifier.toString(), revision.toString());
-				metadataCatalog.deleteEmlDocument(emlPackageId);
 				solrCatalog.deleteEmlDocument(emlPackageId);
 
 				/*
@@ -1364,8 +1354,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			// Load PASTA service options
 			resourceDir = options.getOption("datapackagemanager.metadataDir");
-			metacatUrl = options
-			    .getOption("datapackagemanager.metadatacatalog.metacatUrl");
 			solrUrl = options
 				 .getOption("datapackagemanager.metadatacatalog.solrUrl");
 			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
@@ -2348,11 +2336,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The authentication token object
 	 * @return The resultset XML string
 	 */
-	public String searchDataPackages(String queryString, String user,
+	public String searchDataPackages(UriInfo uriInfo, String user,
 	    AuthToken authToken) 
 	    		throws ClientProtocolException, IOException, Exception {
 		MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
-		String solrXML = solrCatalog.query(queryString);
+		String solrXML = solrCatalog.query(uriInfo);
 		
 		return solrXML;
 	}

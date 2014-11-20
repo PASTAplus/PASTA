@@ -122,6 +122,7 @@
    -->   
     <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
     <field name="packageid" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+    <field name="scope" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
     <field name="title" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="keyword" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="author" type="text_pasta" indexed="true" stored="true" multiValued="true"/>

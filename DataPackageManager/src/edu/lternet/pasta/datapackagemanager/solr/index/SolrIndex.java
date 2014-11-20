@@ -78,8 +78,9 @@ public class SolrIndex {
     public String indexEmlDocument(EmlPackageId epid, String emlDocument)  
     		throws IOException, SolrServerException {
     	String result = null;
+    	String scope = epid.getScope();
     	
-    	String id = String.format("%s.%d", epid.getScope(), epid.getIdentifier());
+    	String id = String.format("%s.%d", scope, epid.getIdentifier());
     	String packageId = String.format("%s.%d", id, epid.getRevision());
     	
     	EMLParser emlParser = new EMLParser();
@@ -105,6 +106,7 @@ public class SolrIndex {
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
 			solrInputDocument.setField("packageid", packageId);
+			solrInputDocument.setField("scope", scope);
 			
 			String pubDateTimestamp = ISO8601Utility.formatTimestamp(pubDate, DATE_GRANULARITY);
 			if (pubDateTimestamp != null) {

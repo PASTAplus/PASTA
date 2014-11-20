@@ -1,9 +1,17 @@
 package edu.lternet.pasta.datapackagemanager.solr.search;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -14,7 +22,19 @@ import org.apache.solr.common.SolrDocumentList;
 
 public class SimpleSolrSearch {
 
+	/*
+	 * Class fields
+	 */
+
+	private static final Logger logger = Logger.getLogger(SimpleSolrSearch.class);
+		
+		
+	/*
+	 * Instance fields
+	 */
+
 	private SolrServer solrServer;
+	private SolrQuery solrQuery;
 	
 	private final int MAX_PER_PAGE = 10;
 
@@ -25,6 +45,7 @@ public class SimpleSolrSearch {
 	
 	public SimpleSolrSearch(String serverURL) {
 		this.solrServer = new HttpSolrServer(serverURL);
+		this.solrQuery = new SolrQuery();
 	}
 	
 	
@@ -32,16 +53,19 @@ public class SimpleSolrSearch {
 	 * Instance methods
 	 */
 	
-	public String search(String queryText) 
-			throws SolrServerException {
-		String xmlString = null;
-		SolrQuery solrQuery = new SolrQuery();
-		//solrQuery.addFilterQuery("pubdate:[1900-01-01T00:00:00Z TO " + endDate + "]");
-		solrQuery.setQuery(queryText);
-
+	public void setQueryText(String queryText) {
+		this.solrQuery.setQuery(queryText);
+	}
+	
+	public void addFilterQuery(String filterText) {
+		this.solrQuery.addFilterQuery(filterText);
+	}
+	
+	public String search() 
+			throws SolrServerException, URISyntaxException, UnsupportedEncodingException {
 		QueryResponse queryResponse = solrServer.query(solrQuery);
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
-		xmlString = solrDocumentListToXML(solrDocumentList);
+		String xmlString = solrDocumentListToXML(solrDocumentList);
 		
 		return xmlString;
 	}
@@ -96,10 +120,11 @@ public class SimpleSolrSearch {
 		String queryText = args[0];
 		
 		try {
-			String xmlString = simpleSolrSearch.search(queryText);
+			simpleSolrSearch.setQueryText(queryText);
+			String xmlString = simpleSolrSearch.search();
 			System.out.println(xmlString);
 		}
-		catch (SolrServerException e) {
+		catch (SolrServerException | URISyntaxException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}

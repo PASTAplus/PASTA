@@ -30,13 +30,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -45,6 +48,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.lternet.pasta.metadatafactory.DummyUriInfo;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.ucsb.nceas.utilities.IOUtil;
@@ -821,11 +825,13 @@ public class DataPackageManagerResourceTest {
    */
   @Test
   public void testSearchDataPackages() {
+	Map<String, String> query = Collections.singletonMap("user", testUser);
+	UriInfo uriInfo = new edu.lternet.pasta.metadatafactory.DummyUriInfo(query);
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String queryString = SOLR_QUERY;
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.searchDataPackages(httpHeaders, queryString);
+    Response response = dataPackageManagerResource.searchDataPackages(httpHeaders, uriInfo);
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     

@@ -6490,11 +6490,11 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * @return a Response, which if successful, contains a resultset XML
 	 *         document
 	 */
-	@PUT
+	@GET
 	@Path("/search/eml")
 	@Produces("application/xml")
 	public Response searchDataPackages(@Context HttpHeaders headers,
-			String pathQuery) {
+			                           @Context UriInfo uriInfo) {
 		AuthToken authToken = null;
 		String resourceId = null;
 		String entryText = null;
@@ -6518,7 +6518,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			resultsetXML = dataPackageManager.searchDataPackages(pathQuery,
+			resultsetXML = dataPackageManager.searchDataPackages(uriInfo,
 					userId, authToken);
 
 			if (resultsetXML != null) {

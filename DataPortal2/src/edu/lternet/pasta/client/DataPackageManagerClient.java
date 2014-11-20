@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1387,23 +1388,18 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String searchDataPackages(String pathQuery) throws Exception {
-		String contentType = "text/plain";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut httpPut = new HttpPut(BASE_URL + "/search/eml");
+		String escapedQuery = pathQuery.replace(" ", "+");
+		HttpGet httpGet = new HttpGet(BASE_URL + "/search/eml?" + escapedQuery);
 		String resultSetXML = null;
 
 		// Set header content
 		if (this.token != null) {
-			httpPut.setHeader("Cookie", "auth-token=" + this.token);
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
 		}
-		httpPut.setHeader("Content-Type", contentType);
-
-		// Set the request entity
-		HttpEntity stringEntity = new StringEntity(pathQuery);
-		httpPut.setEntity(stringEntity);
 
 		try {
-			HttpResponse httpResponse = httpClient.execute(httpPut);
+			HttpResponse httpResponse = httpClient.execute(httpGet);
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			String entityString = EntityUtils.toString(httpEntity);

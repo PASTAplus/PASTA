@@ -20,6 +20,8 @@
 
 package edu.lternet.pasta.metadatamanager;
 
+import javax.ws.rs.core.UriInfo;
+
 import edu.lternet.pasta.common.EmlPackageId;
 
 /**
@@ -35,7 +37,7 @@ public interface MetadataCatalog
 
     public String deleteEmlDocument(EmlPackageId epid);
 
-    public String query(String xmlQuery);
+    public String query(UriInfo uriInfo);
 
     public String updateEmlDocument(EmlPackageId epid, String emlDocument);
 

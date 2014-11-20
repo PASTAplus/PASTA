@@ -65,7 +65,6 @@ public class SolrAdvancedSearch extends Search  {
   private final String dateField;
   private final String startDate;
   private final String endDate;
-  private final String globalOperator = "UNION";
   private int INDENT_LEVEL = 2;
   private boolean isDatesContainedChecked;
   private String namedTimescale;
@@ -82,8 +81,12 @@ public class SolrAdvancedSearch extends Search  {
   private String eastBound;
   private String westBound;
   private String locationName;
-  
-  private String queryString = "";
+ 
+  private final String DEFAULT_Q_STRING = "id:*";
+  private final String DEFAULT_FQ_STRING = "";
+  private String queryString;
+  private String qString;
+  private String fqString;
   private TermsList termsList;
 
   // Controlled vocabulary settings
@@ -151,6 +154,8 @@ public class SolrAdvancedSearch extends Search  {
     this.hasAll = isRelatedSpecificChecked;
     
     this.termsList = new TermsList();
+    this.qString = DEFAULT_Q_STRING;
+    this.fqString = DEFAULT_FQ_STRING;
   }
 
   
@@ -216,7 +221,27 @@ public class SolrAdvancedSearch extends Search  {
 
 			queryTerms = queryTerms.trim();
 			String subjectQuery = String.format("%s:%s", field, queryTerms);
-			this.queryString = subjectQuery;
+			updateQString(subjectQuery);
+		}
+	}
+	
+	
+	private void updateQString(String qText) {
+		if (this.qString.equals(DEFAULT_Q_STRING)) {
+			this.qString = qText;
+		}
+		else {
+			this.qString = String.format("%s %s", this.qString, qText);
+		}
+	}
+
+
+	private void updateFQString(String fqText) {
+		if (this.fqString.equals(DEFAULT_FQ_STRING)) {
+			this.fqString = fqText;
+		}
+		else {
+			this.fqString = String.format("%s %s", this.fqString, fqText);
 		}
 	}
 
@@ -231,7 +256,7 @@ public class SolrAdvancedSearch extends Search  {
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
       String authorQuery = String.format("author:%s", value);
-      this.queryString = String.format("%s %s", this.queryString.trim(), authorQuery);
+      updateQString(authorQuery);
     }
 
     value = this.creatorOrganization;
@@ -239,7 +264,7 @@ public class SolrAdvancedSearch extends Search  {
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
       String organizationQuery = String.format("organization:%s", value);
-      this.queryString = String.format("%s %s", this.queryString.trim(), organizationQuery);
+      updateQString(organizationQuery);
     }
     
   }
@@ -252,7 +277,7 @@ public class SolrAdvancedSearch extends Search  {
     if ((locationName != null) && (!(locationName.equals("")))) {
       termsList.addTerm(locationName);
       String locationQuery = String.format("geographicdescription:%s", locationName);
-      this.queryString = String.format("%s %s", this.queryString.trim(), locationQuery);
+      updateQString(locationQuery);
     }
   }
   
@@ -262,7 +287,7 @@ public class SolrAdvancedSearch extends Search  {
    * coordinates. Includes logic to handle queries across the international
    * date line.
    */
-  private void buildQuerySpatial(String northValue, String southValue, 
+  private void buildQueryFilterSpatial(String northValue, String southValue, 
                                  String eastValue, String westValue,
                                  boolean boundaryContained) {
     boolean crosses;
@@ -478,7 +503,7 @@ public class SolrAdvancedSearch extends Search  {
    * Two kinds of temporal searches are supported. The first is on a named
    * time scale. The second is on a specific start date and/or end date.
    */
-  private void buildQueryTemporalCriteria(String dateField,
+  private void buildQueryFilterTemporal(String dateField,
                                           String startDate,
                                           String endDate,
                                           boolean isDatesContainedChecked,
@@ -495,7 +520,7 @@ public class SolrAdvancedSearch extends Search  {
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
       termsList.addTerm(namedTimescale);
       String timescaleQuery = String.format("timescale:%s", namedTimescale);
-      this.queryString = String.format("%s %s", this.queryString.trim(), timescaleQuery);
+      updateQString(timescaleQuery);
     }
     
     if ((startDate == null) || (startDate.equals(""))) {
@@ -522,12 +547,12 @@ public class SolrAdvancedSearch extends Search  {
 
       if (dateField.equals("ALL") || dateField.equals("COLLECTION")) {
     	  String singleDateQuery = String.format("singledate:[%s TO %s]", startDate, endDate);
-          this.queryString = String.format("%s %s", this.queryString.trim(), singleDateQuery);
+    	  updateFQString(singleDateQuery);
       }
       
       if (dateField.equals("ALL") || dateField.equals("PUBLICATION")) {
     	  String pubDateQuery = String.format("pubdate:[%s TO %s]", startDate, endDate);
-          this.queryString = String.format("%s %s", this.queryString.trim(), pubDateQuery);
+    	  updateFQString(pubDateQuery);
       }
       
     }
@@ -646,7 +671,7 @@ public class SolrAdvancedSearch extends Search  {
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
       String taxonQuery = String.format("taxonomic:%s", value);
-      this.queryString = String.format("%s %s", this.queryString.trim(), taxonQuery);
+      updateQString(taxonQuery);
     }
   }
   
@@ -657,13 +682,12 @@ public class SolrAdvancedSearch extends Search  {
    * by searching for a packageId attribute that starts with "knb-lter-xyz"
    * where "xyz" is the three-letter site acronym.
    */
-	private void buildSiteFilter(TermsList termsList) {
+	private void buildQueryFilterSite(TermsList termsList) {
 		String attributeValue = "";
 		String siteQuery = "packageid:(";
 
 		if (this.siteValues != null) {
-			this.queryString = String.format("%s %s", this.queryString.trim(),
-					siteQuery);
+			updateFQString(siteQuery); 
 
 			for (int i = 0; i < siteValues.length; i++) {
 				String site = siteValues[i];
@@ -675,11 +699,12 @@ public class SolrAdvancedSearch extends Search  {
 						termsList.addTerm(siteName);
 					}
 					siteQuery = String.format("%s*", attributeValue);
-					this.queryString = String.format("%s %s",
-							this.queryString.trim(), siteQuery);
+					if ((i + 1) == siteValues.length) { 
+						siteQuery = String.format("%s)", siteQuery); 
+					}
+					updateFQString(siteQuery);
 				}
 			}
-			this.queryString = String.format("%s)", this.queryString.trim());
 		}
 	}
 
@@ -726,12 +751,12 @@ public class SolrAdvancedSearch extends Search  {
 		buildQueryAuthor(this.termsList); 
 		buildQueryTaxon(this.termsList);
 		buildQueryGeographicDescription(this.locationName, this.termsList);
-		buildQueryTemporalCriteria(this.dateField, this.startDate,
+		buildQueryFilterTemporal(this.dateField, this.startDate,
 		   this.endDate, this.isDatesContainedChecked, this.namedTimescale,
 		   this.namedTimescaleQueryType, this.termsList);
-		buildSiteFilter(this.termsList);
-		
-		queryString = queryString.trim();
+		buildQueryFilterSite(this.termsList);
+	
+		queryString = String.format("%s %s", this.qString.trim(), this.fqString.trim());
 
 		/*
 		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,
