@@ -6398,9 +6398,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
-	 * <strong>Search Data Packages</strong> operation, specifying the Metacat
-	 * <em>path query</em> XML used for querying data packages in the message
-	 * body.
+	 * <strong>Search Data Packages</strong> operation, specifying the Solr
+	 * query as query parameters in the URL.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -6410,11 +6409,9 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <th><b>Sample Request</b></th>
 	 * </tr>
 	 * <tr>
-	 * <td align=center>Metacat "path query" XML used for searching the metadata
-	 * catalog</td>
-	 * <td align=center><code>application/xml</code></td>
-	 * <td><code>curl -i -X PUT -H "Content-Type: application/xml"
-	 *     --data-binary @pathQuery.xml https://pasta.lternet.edu/package/search/eml</code>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td><code>curl -i -X GET https://pasta.lternet.edu/package/search/eml?q=LTER</code>
 	 * </td>
 	 * </tr>
 	 * </table>

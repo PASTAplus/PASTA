@@ -6,4 +6,4 @@ SET AUTH_TOKEN_UCARROLL=dWlkPXVjYXJyb2xsLG89TFRFUixkYz1lY29pbmZvcm1hdGljcyxkYz1v
 SET AUTH_TOKEN_DCOSTA=dWlkPWRjb3N0YSxvPUxURVIsZGM9ZWNvaW5mb3JtYXRpY3MsZGM9b3JnKmh0dHBzOi8vcGFzdGEubHRlcm5ldC5lZHUvYXV0aGVudGljYXRpb24qMjAwMDAwMDAwMCphdXRoZW50aWNhdGVk
 
 ECHO DP-6: Search Data Packages
-curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -X PUT -H "Content-Type: text/plain" -T test\data\solrQuery.txt %SERVICE_HOST%/package/search/eml
+curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -X GET %SERVICE_HOST%/package/search/eml?q=LTER

@@ -585,7 +585,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			File levelOneEMLFile = levelZeroDataPackage.toLevelOne(emlFile,
 			    entityURIHashMap);
 			String emlDocument = FileUtils.readFileToString(levelOneEMLFile);
-			String metacatResult = null;
 			String solrResult = null;
 
 			/*
@@ -609,11 +608,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			}
 
 			/*
-			 * There was a problem inserting or updating to the Metadata Catalog. The
-			 * metadata (and hence the data package) can no longer be considered
-			 * valid.
+			 * Check whether there was a problem inserting or updating to the 
+			 * Solr metadata Catalog. (A non-null solrResult string means that an error
+			 * message was generated.) The metadata (and hence the data package) 
+			 * can no longer be considered valid.
 			 */
-			if (metacatResult == null) {
+			if (solrResult != null) {
 				isMetadataValid = false;
 				isDataPackageValid = false;
 			}
@@ -2324,12 +2324,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	
 	/**
 	 * Run a Metadata Catalog query operation. The returned String is a
-	 * PASTA-formatted resultset XML string. The resultset is filtered (by
-	 * Metacat) based on which metadata resources the user is authorized to read.
+	 * PASTA-formatted resultset XML string.
 	 * 
-	 * @param queryString
-	 *          The pathquery XML string to be passed to the Metadata Catalog
-	 *          service and then to Metacat
+	 * @param uriInfo  
+	 *          A JAX-RS UriInfo object from which the query parameters 
+	 *          can be accessed.
 	 * @param user
 	 *          The user name value
 	 * @param authToken

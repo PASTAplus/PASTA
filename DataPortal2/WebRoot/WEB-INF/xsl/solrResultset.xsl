@@ -64,7 +64,7 @@
       </table>
       </xsl:when>
       <xsl:otherwise>
-      <p>No matching data packages were found</p>
+      <p>No matching data packages were found.</p>
       </xsl:otherwise>
       </xsl:choose>
   </xsl:template>

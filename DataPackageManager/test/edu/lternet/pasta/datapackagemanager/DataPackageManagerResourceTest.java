@@ -825,10 +825,9 @@ public class DataPackageManagerResourceTest {
    */
   @Test
   public void testSearchDataPackages() {
-	Map<String, String> query = Collections.singletonMap("user", testUser);
-	UriInfo uriInfo = new edu.lternet.pasta.metadatafactory.DummyUriInfo(query);
+	Map<String, String> query = Collections.singletonMap("q", SOLR_QUERY);
+	UriInfo uriInfo = new edu.lternet.pasta.eventmanager.DummyUriInfo(query);
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
-    String queryString = SOLR_QUERY;
     
     // Test READ for OK status
     Response response = dataPackageManagerResource.searchDataPackages(httpHeaders, uriInfo);

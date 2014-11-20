@@ -1380,17 +1380,16 @@ public class DataPackageManagerClient extends PastaClient {
 	/**
 	 * Executes the 'searchDataPackages' web service method.
 	 * 
-	 * @param pathQuery
-	 *          an XML pathquery string (conforming to Metacat pathquery syntax)
-	 * @return an XML resultset document (conforming to Metacat pathquery syntax)
+	 * @param solrQuery
+	 *          a Solr query string
+	 * @return an XML resultset document
 	 * @see <a target="top"
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String searchDataPackages(String pathQuery) throws Exception {
+	public String searchDataPackages(String solrQuery) throws Exception {
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		String escapedQuery = pathQuery.replace(" ", "+");
-		HttpGet httpGet = new HttpGet(BASE_URL + "/search/eml?" + escapedQuery);
+		HttpGet httpGet = new HttpGet(BASE_URL + "/search/eml?" + solrQuery);
 		String resultSetXML = null;
 
 		// Set header content

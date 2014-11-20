@@ -31,9 +31,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 
 
 /**
-* Class that retrieves data package Level-1 metadata files. This replaces the
-* original implementation by which metadata was retrieved from Metacat via the
-* MetacatMetadataCatalog class.
+* Class that retrieves data package Level-1 metadata files.
 * 
 * @author dcosta
 * @created

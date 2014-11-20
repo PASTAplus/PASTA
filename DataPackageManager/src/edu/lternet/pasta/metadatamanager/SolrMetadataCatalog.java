@@ -1,8 +1,6 @@
 package edu.lternet.pasta.metadatamanager;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -96,12 +94,22 @@ public class SolrMetadataCatalog implements MetadataCatalog {
 							simpleSolrSearch.addFilterQuery(fq);
 						}
 					}
+					else if (key.equals("start")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		simpleSolrSearch.setStart(value);
+					}
+					else if (key.equals("rows")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		simpleSolrSearch.setRows(value);
+					}
 				}
 			}            
             
     		result = simpleSolrSearch.search();
     	}
-    	catch (SolrServerException | URISyntaxException | UnsupportedEncodingException e) {
+    	catch (SolrServerException e) {
     		e.printStackTrace();
     	}
     	

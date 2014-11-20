@@ -24,6 +24,8 @@
 
 package edu.lternet.pasta.portal.search;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import org.apache.commons.lang3.text.StrTokenizer;
@@ -57,7 +59,13 @@ public class SimpleSearch extends Search {
   public static String buildSolrQuery(String userInput) {
 	  String solrQuery = null;
       
-	  solrQuery = String.format("q=%s&fq=-scope:ecotrends", userInput);
+	  try {
+	    String encodedUserInput = URLEncoder.encode(userInput, "UTF-8");
+	    solrQuery = String.format("q=%s&fq=-scope:ecotrends&start=0&rows=200", encodedUserInput);
+	  }
+	  catch (UnsupportedEncodingException e) {
+		  
+	  }
 	  
 	  return solrQuery;
   }

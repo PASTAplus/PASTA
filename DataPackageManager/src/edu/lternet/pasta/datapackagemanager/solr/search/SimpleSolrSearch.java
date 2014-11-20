@@ -1,16 +1,11 @@
 package edu.lternet.pasta.datapackagemanager.solr.search;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -53,16 +48,14 @@ public class SimpleSolrSearch {
 	 * Instance methods
 	 */
 	
-	public void setQueryText(String queryText) {
-		this.solrQuery.setQuery(queryText);
-	}
-	
 	public void addFilterQuery(String filterText) {
 		this.solrQuery.addFilterQuery(filterText);
+		System.out.println("fq=" + filterText);
 	}
 	
+	
 	public String search() 
-			throws SolrServerException, URISyntaxException, UnsupportedEncodingException {
+			throws SolrServerException {
 		QueryResponse queryResponse = solrServer.query(solrQuery);
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
 		String xmlString = solrDocumentListToXML(solrDocumentList);
@@ -70,6 +63,35 @@ public class SimpleSolrSearch {
 		return xmlString;
 	}
 	
+	
+	public void setQueryText(String queryText) {
+		this.solrQuery.setQuery(queryText);
+		System.out.println("q=" + queryText);
+	}
+	
+	
+	public void setRows(String rowsStr) {
+		try {
+		    Integer rows = new Integer(rowsStr);
+		    this.solrQuery.setRows(rows);
+		    System.out.println("rows=" + rowsStr);
+		}
+		catch (NumberFormatException e) {
+			logger.warn(String.format("Unable to parse specified 'rows' value: %s", rowsStr));
+		}
+	}
+	
+	
+	public void setStart(String startStr) {
+		try {
+		    Integer start = new Integer(startStr);
+		    this.solrQuery.setStart(start);
+		    System.out.println("start=" + startStr);
+		}
+		catch (NumberFormatException e) {
+			logger.warn(String.format("Unable to parse specified 'start' value: %s", startStr));
+		}
+	}
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
@@ -124,7 +146,7 @@ public class SimpleSolrSearch {
 			String xmlString = simpleSolrSearch.search();
 			System.out.println(xmlString);
 		}
-		catch (SolrServerException | URISyntaxException | UnsupportedEncodingException e) {
+		catch (SolrServerException e) {
 			e.printStackTrace();
 		}
 	}
