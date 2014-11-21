@@ -24,6 +24,8 @@
 
 package edu.lternet.pasta.portal.search;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,8 +84,6 @@ public class SolrAdvancedSearch extends Search  {
   private String westBound;
   private String locationName;
  
-  private final String DEFAULT_Q_STRING = "id:*";
-  private final String DEFAULT_FQ_STRING = "";
   private String queryString;
   private String qString;
   private String fqString;
@@ -154,8 +154,8 @@ public class SolrAdvancedSearch extends Search  {
     this.hasAll = isRelatedSpecificChecked;
     
     this.termsList = new TermsList();
-    this.qString = DEFAULT_Q_STRING;
-    this.fqString = DEFAULT_FQ_STRING;
+    this.qString = "";
+    this.fqString = String.format("fq=%s", DEFAULT_FQ_STRING);
   }
 
   
@@ -172,7 +172,8 @@ public class SolrAdvancedSearch extends Search  {
    * A full subject query searches the title, abstract, and keyword sections of
    * the document. Individual searches on these sections is also supported.
    */
-	private void buildQuerySubject(TermsList termsList) {
+	private void buildQuerySubject(TermsList termsList) 
+		 throws UnsupportedEncodingException {
 		List<String> terms;
 		String field = "subject";
 		String queryTerms = "";
@@ -220,6 +221,7 @@ public class SolrAdvancedSearch extends Search  {
 			}
 
 			queryTerms = queryTerms.trim();
+			queryTerms = URLEncoder.encode(queryTerms, "UTF-8");
 			String subjectQuery = String.format("%s:%s", field, queryTerms);
 			updateQString(subjectQuery);
 		}
@@ -237,12 +239,7 @@ public class SolrAdvancedSearch extends Search  {
 
 
 	private void updateFQString(String fqText) {
-		if (this.fqString.equals(DEFAULT_FQ_STRING)) {
-			this.fqString = fqText;
-		}
-		else {
-			this.fqString = String.format("%s %s", this.fqString, fqText);
-		}
+		this.fqString = String.format("%s&fq=%s", this.fqString, fqText);
 	}
 
 
@@ -756,7 +753,9 @@ public class SolrAdvancedSearch extends Search  {
 		   this.namedTimescaleQueryType, this.termsList);
 		buildQueryFilterSite(this.termsList);
 	
-		queryString = String.format("%s %s", this.qString.trim(), this.fqString.trim());
+		queryString = String.format("q=%s&%s",
+				                    this.qString.trim(), 
+				                    this.fqString.trim());
 
 		/*
 		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,

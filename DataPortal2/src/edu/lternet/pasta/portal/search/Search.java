@@ -13,6 +13,14 @@ import java.util.List;
 public class Search {
 	
 	/*
+	 * Class variables
+	 */
+	
+	  protected final static String DEFAULT_Q_STRING = "*:*";
+	  protected final static String DEFAULT_FQ_STRING = "-scope:ecotrends";
+	  protected final static int DEFAULT_START = 0;
+	  protected final static int DEFAULT_ROWS = 200;
+	/*
 	 * Class methods
 	 */
 
