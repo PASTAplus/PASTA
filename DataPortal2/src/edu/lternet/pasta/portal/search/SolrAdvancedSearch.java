@@ -154,7 +154,7 @@ public class SolrAdvancedSearch extends Search  {
     this.hasAll = isRelatedSpecificChecked;
     
     this.termsList = new TermsList();
-    this.qString = "";
+    this.qString = DEFAULT_Q_STRING;
     this.fqString = String.format("fq=%s", DEFAULT_FQ_STRING);
   }
 
@@ -233,7 +233,7 @@ public class SolrAdvancedSearch extends Search  {
 			this.qString = qText;
 		}
 		else {
-			this.qString = String.format("%s %s", this.qString, qText);
+			this.qString = String.format("%s+%s", this.qString, qText);
 		}
 	}
 
@@ -247,12 +247,14 @@ public class SolrAdvancedSearch extends Search  {
    * An author query will search the creator/individualName/surName field, the
    * creator/organizationName field, or an intersection of both fields.
    */
-  private void buildQueryAuthor(TermsList termsList) {
+  private void buildQueryAuthor(TermsList termsList) 
+  		throws UnsupportedEncodingException {
     String value = this.creatorSurname;
 
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String authorQuery = String.format("author:%s", value);
+      String encodedValue = URLEncoder.encode(value, "UTF-8");
+      String authorQuery = String.format("author:%s", encodedValue);
       updateQString(authorQuery);
     }
 
@@ -270,10 +272,12 @@ public class SolrAdvancedSearch extends Search  {
   /**
    * Builds query group for a search on a specific named location.
    */
-  private void buildQueryGeographicDescription(String locationName, TermsList termsList) {
+  private void buildQueryGeographicDescription(String locationName, TermsList termsList) 
+  		throws UnsupportedEncodingException {
     if ((locationName != null) && (!(locationName.equals("")))) {
       termsList.addTerm(locationName);
-      String locationQuery = String.format("geographicdescription:%s", locationName);
+      String encodedValue = URLEncoder.encode(locationName, "UTF-8");
+      String locationQuery = String.format("geographicdescription:%s", encodedValue);
       updateQString(locationQuery);
     }
   }
@@ -507,7 +511,8 @@ public class SolrAdvancedSearch extends Search  {
                                           String namedTimescale, 
                                           String namedTimescaleQueryType,
                                           TermsList termsList
-                                         ) {
+                                         ) 
+  		throws UnsupportedEncodingException {
 	  boolean endDateSpecified = false;
 	  boolean startDateSpecified = false;
 	  
@@ -516,7 +521,8 @@ public class SolrAdvancedSearch extends Search  {
      */
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
       termsList.addTerm(namedTimescale);
-      String timescaleQuery = String.format("timescale:%s", namedTimescale);
+      String encodedValue = URLEncoder.encode(namedTimescale, "UTF-8");
+      String timescaleQuery = String.format("timescale:%s", encodedValue);
       updateQString(timescaleQuery);
     }
     
@@ -541,53 +547,34 @@ public class SolrAdvancedSearch extends Search  {
     // If a start date or an end date was specified, search temporal coverage
     //
     if (startDateSpecified || endDateSpecified) {
+    	String temporalFilter = null;
+    	String collectionFilter = null;
+    	String pubDateFilter = null;
 
       if (dateField.equals("ALL") || dateField.equals("COLLECTION")) {
-    	  String singleDateQuery = String.format("singledate:[%s TO %s]", startDate, endDate);
-    	  updateFQString(singleDateQuery);
+    	  String singleDateQuery = String.format("singledate:[%s+TO+%s]", startDate, endDate);
+    	  String startDateQuery = String.format("begindate:[*+TO+%s]", endDate);
+    	  String endDateQuery = String.format("enddate:[%s+TO+NOW]", startDate);
+    	  collectionFilter = String.format("(%s+OR+(%s+AND+%s))", singleDateQuery, startDateQuery, endDateQuery);
       }
       
       if (dateField.equals("ALL") || dateField.equals("PUBLICATION")) {
-    	  String pubDateQuery = String.format("pubdate:[%s TO %s]", startDate, endDate);
-    	  updateFQString(pubDateQuery);
+    	  pubDateFilter = String.format("pubdate:[%s+TO+%s]", startDate, endDate);
       }
       
-    }
-
-    /*
-    
-    // If an end date was specified, search for temporal coverage and/or a
-    // pubDate with 'beginDate' less than or equal to the end date.
-    //
-    if ((endDate != null) && (!(endDate.equals("")))) {
-      indent = getIndent(INDENT_LEVEL * 4);
-      qgDatesEnd = new AdvancedSearchQueryGroup("UNION", indent);
-      indent = getIndent(INDENT_LEVEL * 5);
-      searchMode = "less-than-equals";
-
-      if (dateField.equals("ALL") || dateField.equals("COLLECTION")) {
-        xDate = isDatesContainedChecked ? "endDate" : "beginDate";
-        emlField = "temporalCoverage/rangeOfDates/" + xDate + "/calendarDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         endDate, indent);
-        qgDatesEnd.addQueryTerm(qt);        
-
-        emlField = "temporalCoverage/singleDateTime/calendarDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         endDate, indent);
-        qgDatesEnd.addQueryTerm(qt);
+      if (dateField.equals("ALL")) {
+    	  temporalFilter = String.format("(%s+OR+%s)", pubDateFilter, collectionFilter);
+      }
+      else if (dateField.equals("COLLECTION")) {
+    	  temporalFilter = collectionFilter;
+      }
+      else if (dateField.equals("PUBLICATION")) {
+    	  temporalFilter = pubDateFilter;
       }
       
-      if (dateField.equals("ALL") || dateField.equals("PUBLICATION")) {
-        emlField = "dataset/pubDate";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         endDate, indent);
-        qgDatesEnd.addQueryTerm(qt);        
-      }      
-
-      qgDates.addQueryGroup(qgDatesEnd);
+      updateFQString(temporalFilter);   
     }
-    */
+
   }
   
   
@@ -662,12 +649,14 @@ public class SolrAdvancedSearch extends Search  {
    * A taxon query searches the taxonRankValue field,
    * matching the field if the user-specified value is contained in the field.
    */
-  private void buildQueryTaxon(TermsList termsList) {
+  private void buildQueryTaxon(TermsList termsList) 
+  		throws UnsupportedEncodingException {
     final String value = this.taxon;
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String taxonQuery = String.format("taxonomic:%s", value);
+      String encodedValue = URLEncoder.encode(value, "UTF-8");
+      String taxonQuery = String.format("taxonomic:%s", encodedValue);
       updateQString(taxonQuery);
     }
   }
@@ -684,8 +673,6 @@ public class SolrAdvancedSearch extends Search  {
 		String siteQuery = "packageid:(";
 
 		if (this.siteValues != null) {
-			updateFQString(siteQuery); 
-
 			for (int i = 0; i < siteValues.length; i++) {
 				String site = siteValues[i];
 				LTERSite lterSite = new LTERSite(site);
@@ -695,13 +682,14 @@ public class SolrAdvancedSearch extends Search  {
 					if ((siteName != null) && (!siteName.equals(""))) {
 						termsList.addTerm(siteName);
 					}
-					siteQuery = String.format("%s*", attributeValue);
-					if ((i + 1) == siteValues.length) { 
+					siteQuery = String.format("%s+%s*", siteQuery, attributeValue);
+					if ((i + 1) == siteValues.length) { // tack on the closing parenthesis
 						siteQuery = String.format("%s)", siteQuery); 
 					}
-					updateFQString(siteQuery);
 				}
 			}
+			
+			updateFQString(siteQuery);
 		}
 	}
 

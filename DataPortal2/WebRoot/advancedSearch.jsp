@@ -525,6 +525,7 @@
 															    <label class="labelBold" for="group">End Date:</label>
 															    <input name="endDate" placeholder="YYYY-MM-DD" type="date" />
 															  </td>
+															  <!--
 															  <td class="spacerwd"></td>
 															  <td>
 															    <ul class="checklistLG">
@@ -536,6 +537,7 @@
 																    </li>
 															    </ul>
 															  </td>
+															    -->
 														  </tr>
 														  <tr>
 															  <td>
