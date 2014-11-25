@@ -288,180 +288,48 @@ public class SolrAdvancedSearch extends Search  {
    * coordinates. Includes logic to handle queries across the international
    * date line.
    */
-  private void buildQueryFilterSpatial(String northValue, String southValue, 
-                                 String eastValue, String westValue,
-                                 boolean boundaryContained) {
-    boolean crosses;
-    AdvancedSearchQueryGroup datelineGroup = null;
-    String emlField;
-    AdvancedSearchQueryGroup leftOfDateline = null;
-    final String operator = "INTERSECT";
-    String indent = getIndent(INDENT_LEVEL * 2);
-    AdvancedSearchQueryGroup qgSpatial;
-    AdvancedSearchQueryTerm qt;
-    AdvancedSearchQueryGroup rightOfDateline = null;
-    String searchMode;
+	private void buildQueryFilterSpatial(String northValue, String southValue,
+			String eastValue, String westValue, boolean boundaryContained) 
+		throws UnsupportedEncodingException {
+		boolean crosses;
+		final String shapeOperation = boundaryContained ? "IsWithin" : "Intersects";
 
-    qgSpatial = new AdvancedSearchQueryGroup(operator, indent);
-    indent = getIndent(INDENT_LEVEL * 3);
-    
-    northValue = validateGeographicCoordinate(northValue, -90.0F, 90.0F, "90.0");
-    southValue = validateGeographicCoordinate(southValue, -90.0F, 90.0F, "-90.0");
-    eastValue = validateGeographicCoordinate(eastValue, -180.0F, 180.0F, "180.0");
-    westValue = validateGeographicCoordinate(westValue, -180.0F, 180.0F, "-180.0");
+		northValue = validateGeographicCoordinate(northValue, -90.0F, 90.0F, "90.0");
+		southValue = validateGeographicCoordinate(southValue, -90.0F, 90.0F, "-90.0");
+		eastValue = validateGeographicCoordinate(eastValue, -180.0F, 180.0F, "180.0");
+		westValue = validateGeographicCoordinate(westValue, -180.0F, 180.0F, "-180.0");
 
-    /* Check that all four coordinates has values before attempting spatial
-     * search.
-     */
-    if ((northValue != null) && 
-        (!(northValue.equals(""))) &&
-        (southValue != null) && 
-        (!(southValue.equals(""))) &&
-        (eastValue != null) && 
-        (!(eastValue.equals(""))) &&
-        (westValue != null) && 
-        (!(westValue.equals("")))
-       ) {
-      
-      if (Integer.valueOf(boundsChangedCount) == 1) {
-        return;
-      }
-      
-      /*
-       * Check whether the east/west coordinates cross over the international
-       * dateline. If the search crosses the dateline, special handling will
-       * be needed in forming the query.
-       */
-      crosses = crossesInternationalDateline(eastValue, westValue);
-      
-      if (crosses) {
-        datelineGroup = new AdvancedSearchQueryGroup("UNION", indent);
-        indent = getIndent(INDENT_LEVEL * 4);
-        leftOfDateline = new AdvancedSearchQueryGroup("INTERSECT", indent);
-        rightOfDateline = new AdvancedSearchQueryGroup("INTERSECT", indent);
-        datelineGroup.addQueryGroup(leftOfDateline);
-        datelineGroup.addQueryGroup(rightOfDateline);
-      }
+		/*
+		 * Check that all four coordinates has values before attempting spatial
+		 * search.
+		 */
+		if ((northValue != null) && (!(northValue.equals("")))
+				&& (southValue != null) && (!(southValue.equals("")))
+				&& (eastValue != null) && (!(eastValue.equals("")))
+				&& (westValue != null) && (!(westValue.equals("")))
+			) {
 
-      /*
-       * If the user selects the boundaryContained checkbox, use the following
-       * logical expression. N, S, E, and W are the boundaries of the bounding
-       * box, while N', S', E', and W' are the boundaries specified in a given
-       * EML document:
-       *              (N' <= N) && (S' >= S) && (E' <= E) && (W' >= W)
-       */
-      if (boundaryContained) {
+			if (Integer.valueOf(boundsChangedCount) == 1) {
+				return;
+			}
 
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
-        searchMode = "less-than-equals";
-        qt=new AdvancedSearchQueryTerm(searchMode,caseSensitive,emlField, 
-                                       northValue, indent);
-        qgSpatial.addQueryTerm(qt);        
+			/*
+			 * Check whether the east/west coordinates cross over the
+			 * international dateline. If the search crosses the dateline,
+			 * special handling will be needed in forming the query.
+			 */
+			crosses = crossesInternationalDateline(eastValue, westValue);
 
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
-        searchMode = "greater-than-equals";
-        qt=new AdvancedSearchQueryTerm(searchMode,caseSensitive,emlField, 
-                                       southValue, indent);
-        qgSpatial.addQueryTerm(qt);        
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
-        searchMode = "less-than-equals";
-        
-        if (crosses) {
-          indent = getIndent(INDENT_LEVEL * 5);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           "180.0", indent);
-          leftOfDateline.addQueryTerm(qt);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           eastValue, indent);
-          rightOfDateline.addQueryTerm(qt);
-        }
-        else {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           eastValue, indent);
-          qgSpatial.addQueryTerm(qt);
-        }
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
-        searchMode = "greater-than-equals";
-        
-        if (crosses) {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           westValue, indent);
-          leftOfDateline.addQueryTerm(qt);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           "-180.0", indent);
-          rightOfDateline.addQueryTerm(qt);
-        }
-        else {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           westValue, indent);
-          qgSpatial.addQueryTerm(qt);        
-        }
-      }
-     /*
-      * Else, if the user does not select the boundaryContained checkbox, use 
-      * the following logical expression. N, S, E, and W are the boundaries of 
-      * the bounding box, while N', S', E', and W' are the boundaries specified 
-      * in a given EML document:
-      *              (N' > S) && (S' < N) && (E' > W) && (W' < E)
-      */
-      else {     
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
-        searchMode = "less-than";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         northValue, indent);
-        qgSpatial.addQueryTerm(qt);        
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
-        searchMode = "greater-than";
-        qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                         southValue, indent);
-        qgSpatial.addQueryTerm(qt);        
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
-        searchMode = "less-than";
-        
-        if (crosses) {
-          indent = getIndent(INDENT_LEVEL * 5);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           "180.0", indent);
-          leftOfDateline.addQueryTerm(qt);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           eastValue, indent);
-          rightOfDateline.addQueryTerm(qt);
-        }
-        else {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           eastValue, indent);
-          qgSpatial.addQueryTerm(qt);   
-        }
-
-        emlField = "dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
-        searchMode = "greater-than";
-        
-        if (crosses) {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           westValue, indent);
-          leftOfDateline.addQueryTerm(qt);
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           "-180.0", indent);
-          rightOfDateline.addQueryTerm(qt);
-        }
-        else {
-          qt = new AdvancedSearchQueryTerm(searchMode, caseSensitive, emlField, 
-                                           westValue, indent);
-          qgSpatial.addQueryTerm(qt);
-        }
-      }
-
-      if (crosses) {
-        qgSpatial.addQueryGroup(datelineGroup);
-      }
-
-    }
-  }
+			if (crosses) {
+				// Not sure yet how to manage international date-line queries in Solr
+			}
+			
+			String spatialFilter = String.format("coordinates:\"%s(%s %s %s %s)\"", 
+					                             shapeOperation, westValue, southValue, eastValue, northValue);
+			String encodedSpatialFilter = URLEncoder.encode(spatialFilter, "UTF-8");
+			updateFQString(encodedSpatialFilter);
+		}
+	}
   
 
   /*
@@ -670,7 +538,7 @@ public class SolrAdvancedSearch extends Search  {
    */
 	private void buildQueryFilterSite(TermsList termsList) {
 		String attributeValue = "";
-		String siteQuery = "packageid:(";
+		String siteQuery = "scope:(";
 
 		if (this.siteValues != null) {
 			for (int i = 0; i < siteValues.length; i++) {
@@ -682,7 +550,7 @@ public class SolrAdvancedSearch extends Search  {
 					if ((siteName != null) && (!siteName.equals(""))) {
 						termsList.addTerm(siteName);
 					}
-					siteQuery = String.format("%s+%s*", siteQuery, attributeValue);
+					siteQuery = String.format("%s+%s", siteQuery, attributeValue);
 					if ((i + 1) == siteValues.length) { // tack on the closing parenthesis
 						siteQuery = String.format("%s)", siteQuery); 
 					}
@@ -740,15 +608,12 @@ public class SolrAdvancedSearch extends Search  {
 		   this.endDate, this.isDatesContainedChecked, this.namedTimescale,
 		   this.namedTimescaleQueryType, this.termsList);
 		buildQueryFilterSite(this.termsList);
+		buildQueryFilterSpatial(this.northBound, this.southBound, this.eastBound,
+				 this.westBound, this.isBoundaryContainedChecked);
 	
 		queryString = String.format("q=%s&%s",
 				                    this.qString.trim(), 
 				                    this.fqString.trim());
-
-		/*
-		 * buildQuerySpatial(this.northBound, this.southBound, this.eastBound,
-		 * this.westBound, this.isBoundaryContainedChecked);
-		 */
 
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 		logger.warn(String.format("queryString:\n%s", queryString));
