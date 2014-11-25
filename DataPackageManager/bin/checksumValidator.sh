@@ -11,7 +11,7 @@ JAVA_ROOT=/home/pasta/local/java
 TOMCAT=/home/pasta/local/apache-tomcat
 DATAPACKAGEMANAGER=/home/pasta/git/NIS/DataPackageManager
 CHECKSUM_DIR=/home/pasta/local/checksum
-DATE=$(date +"%Y-%m-%d_%H:%M:%S")
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
 
 cd $DATAPACKAGEMANAGER
 
