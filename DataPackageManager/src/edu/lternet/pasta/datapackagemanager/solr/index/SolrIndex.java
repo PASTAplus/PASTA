@@ -102,7 +102,12 @@ public class SolrIndex {
 			String abstractText = dataPackage.getAbstractText();
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
-
+			
+			String westCoord = dataPackage.getWestBoundingCoordinate();
+			String southCoord = dataPackage.getSouthBoundingCoordinate();
+			String eastCoord = dataPackage.getEastBoundingCoordinate();
+			String northCoord = dataPackage.getNorthBoundingCoordinate();
+			
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
 			solrInputDocument.setField("packageid", packageId);
@@ -167,6 +172,23 @@ public class SolrIndex {
 			if (taxonomicCoverageText != null) {
 				solrInputDocument.setField("taxonomic", taxonomicCoverageText);
 			}
+			
+			if (isValidDouble(eastCoord) &&
+				isValidDouble(westCoord) &&
+				isValidDouble(northCoord) &&
+				isValidDouble(southCoord)
+			   ) {
+				/*
+				 * A rectangle is indexed with four points to represent the corners. 
+				 * These points should be represented in MinX , MinY , MaxX , MaxY order.
+				 * 
+				 * For example:
+				 * 
+				 *   <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>				
+				 */
+				String value = String.format("%s %s %s %s", westCoord, southCoord, eastCoord, northCoord);
+				solrInputDocument.setField("coordinates", value);
+			}
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
@@ -178,6 +200,28 @@ public class SolrIndex {
 		}
     	
     	return result;
+    }
+    
+    
+    private boolean isEmpty(String str) {
+    	return (str == null || str.equals(""));
+    }
+    
+    
+    private boolean isValidDouble(String str) {
+    	boolean isValid = false;
+    	
+    	if (!isEmpty(str)) {
+    		try {
+    			Double dbl = new Double(str);
+    			isValid = true;
+    		}
+    		catch (NumberFormatException e) {
+    			
+    		}
+    	}
+    	
+    	return isValid;
     }
 
 }

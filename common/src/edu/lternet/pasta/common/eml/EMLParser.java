@@ -66,6 +66,10 @@ public class EMLParser {
   public static final String SINGLE_DATE_TIME_PATH = "//eml/dataset/coverage/temporalCoverage/singleDateTime/calendarDate";
   public static final String BEGIN_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/beginDate/calendarDate";
   public static final String END_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/endDate/calendarDate";
+  public static final String WEST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
+  public static final String SOUTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
+  public static final String EAST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
+  public static final String NORTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String KEYWORD_PATH = "//keyword";
@@ -183,6 +187,34 @@ public class EMLParser {
         if (abstractNode != null) {
           String abstractText = abstractNode.getTextContent().trim();
           this.dataPackage.setAbstractText(abstractText);
+        }
+
+        /*
+         * Parse the spatial bounding coordinates
+         */
+        
+        Node eastNode = xpathapi.selectSingleNode(document, EAST_PATH);
+        if (eastNode != null) {
+          String coord = eastNode.getTextContent().trim();
+          this.dataPackage.setEastBoundingCoordinate(coord);
+        }
+
+        Node westNode = xpathapi.selectSingleNode(document, WEST_PATH);
+        if (westNode != null) {
+          String coord = westNode.getTextContent().trim();
+          this.dataPackage.setWestBoundingCoordinate(coord);
+        }
+
+        Node northNode = xpathapi.selectSingleNode(document, NORTH_PATH);
+        if (northNode != null) {
+          String coord = northNode.getTextContent().trim();
+          this.dataPackage.setNorthBoundingCoordinate(coord);
+        }
+
+        Node southNode = xpathapi.selectSingleNode(document, SOUTH_PATH);
+        if (southNode != null) {
+          String coord = southNode.getTextContent().trim();
+          this.dataPackage.setSouthBoundingCoordinate(coord);
         }
 
         // Parse geographicDescription node

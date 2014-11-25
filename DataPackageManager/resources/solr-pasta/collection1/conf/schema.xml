@@ -138,6 +138,13 @@
     <field name="begindate" type="tdate" indexed="true" stored="true" multiValued="false"/>
     <field name="enddate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 
+    <!-- Bounding coordinates. A rectangle is indexed with four points to represent the corners. 
+         These points should be represented in MinX , MinY , MaxX , MaxY order. For example:
+
+                <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
+    -->
+    <field name="coordinates" type="location_rpt" indexed="true" stored="true" multiValued="true"/>
+
    <!-- 'site' is the LTER site, which is always a three-letter site code such as 'BNZ' -->
    <field name="site" type="string" indexed="true" stored="true" multiValued="false"/>
 

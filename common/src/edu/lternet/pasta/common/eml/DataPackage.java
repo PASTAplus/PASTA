@@ -64,6 +64,12 @@ public class DataPackage {
   String beginDate = null;
   String endDate = null;
   
+  // Spatial coordinate fields
+  String westBoundingCoordinate = null;
+  String southBoundingCoordinate = null;
+  String eastBoundingCoordinate = null;
+  String northBoundingCoordinate = null;
+  
   /*
    * Constructors
    */
@@ -212,6 +218,46 @@ public class DataPackage {
 			  
   public ArrayList<String> getTitles() {
     return titles;
+  }
+  
+  
+  public String getEastBoundingCoordinate() {
+	  return eastBoundingCoordinate;
+  }
+  
+  
+  public String getNorthBoundingCoordinate() {
+	  return northBoundingCoordinate;
+  }
+  
+  
+  public String getSouthBoundingCoordinate() {
+	  return southBoundingCoordinate;
+  }
+  
+  
+  public String getWestBoundingCoordinate() {
+	  return westBoundingCoordinate;
+  }
+  
+  
+  public void setEastBoundingCoordinate(String coord) {
+	  this.eastBoundingCoordinate = coord;
+  }
+  
+  
+  public void setNorthBoundingCoordinate(String coord) {
+	  this.northBoundingCoordinate = coord;
+  }
+  
+  
+  public void setSouthBoundingCoordinate(String coord) {
+	  this.southBoundingCoordinate = coord;
+  }
+  
+  
+  public void setWestBoundingCoordinate(String coord) {
+	  this.westBoundingCoordinate = coord;
   }
   
   
