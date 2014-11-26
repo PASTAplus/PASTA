@@ -178,16 +178,23 @@ public class SolrIndex {
 				isValidDouble(northCoord) &&
 				isValidDouble(southCoord)
 			   ) {
-				/*
-				 * A rectangle is indexed with four points to represent the corners. 
-				 * These points should be represented in MinX , MinY , MaxX , MaxY order.
-				 * 
-				 * For example:
-				 * 
-				 *   <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>				
-				 */
-				String value = String.format("%s %s %s %s", westCoord, southCoord, eastCoord, northCoord);
-				solrInputDocument.setField("coordinates", value);
+				// Only index when north coord >= south coord.
+				// However, weat can be greater than east at the International
+				// Date Line.
+				if (isGreaterThanOrEqualToCoord(northCoord, southCoord)) {
+					/*
+					 * A rectangle is indexed with four points to represent the
+					 * corners. These points should be represented in MinX,
+					 * MinY, MaxX, MaxY order.
+					 * 
+					 * For example:
+					 * 
+					 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
+					 */
+					String value = String.format("%s %s %s %s", westCoord,
+							southCoord, eastCoord, northCoord);
+					solrInputDocument.setField("coordinates", value);
+				}
 			}
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
@@ -203,11 +210,27 @@ public class SolrIndex {
     }
     
     
+    /*
+     * Is this an empty string?
+     */
     private boolean isEmpty(String str) {
     	return (str == null || str.equals(""));
     }
     
     
+    /*
+     * Is the first coordinate greater than or equal to the second?
+     */
+    private boolean isGreaterThanOrEqualToCoord(String str1, String str2) {
+    	Double coord1 = new Double(str1);
+    	Double coord2 = new Double(str2);
+    	return (coord1 >= coord2);
+    }
+    
+    
+    /*
+     * Can a valid Double be created from this string?
+     */
     private boolean isValidDouble(String str) {
     	boolean isValid = false;
     	
@@ -217,7 +240,7 @@ public class SolrIndex {
     			isValid = true;
     		}
     		catch (NumberFormatException e) {
-    			
+    			// No action. Simply return false.
     		}
     	}
     	
