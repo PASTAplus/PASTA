@@ -183,6 +183,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       siteValues,
       subjectField,
       subjectValue,
+      isIncludeEcotrendsChecked,
+      isIncludeLandsat5Checked,
       isDatesContainedChecked,
       isSpecificChecked,
       isRelatedChecked,

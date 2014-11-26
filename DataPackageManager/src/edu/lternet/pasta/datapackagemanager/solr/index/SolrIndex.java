@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -19,6 +20,17 @@ import edu.lternet.pasta.common.eml.ResponsibleParty;
 
 public class SolrIndex {
 
+	  /*
+	   * Class fields
+	   */
+
+	private static final Logger logger = Logger.getLogger(SolrIndex.class);
+	
+	
+	/*
+	 * Instance fields
+	 */
+  
 	private final String DATE_GRANULARITY = "DAY";
 	private SolrServer solrServer = null;
 	
@@ -194,6 +206,13 @@ public class SolrIndex {
 					String value = String.format("%s %s %s %s", westCoord,
 							southCoord, eastCoord, northCoord);
 					solrInputDocument.setField("coordinates", value);
+				}
+				else {
+					logger.warn(
+							String.format(
+									"Unable to index geospatial coordinates for %s because north " +
+							        "coord (%s) is less than south coord (%s)",
+									packageId, northCoord, southCoord));
 				}
 			}
 

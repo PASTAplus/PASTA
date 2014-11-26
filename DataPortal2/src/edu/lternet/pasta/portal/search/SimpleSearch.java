@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 
 /**
  * The SimpleSearch class supports query operations common to the simple
@@ -54,25 +55,24 @@ public class SimpleSearch extends Search {
    * @param isSiteQuery  true if we are querying by site name, else false
    * @return the PathQuery XML string
    */
-  public static String buildSolrQuery(String userInput) {
-	  String solrQuery = null;
-	  String qString = "";
-      
-	  try {
-		  if (userInput == null || userInput.equals("")) {
-			  qString = DEFAULT_Q_STRING;
-		  }
-		  else {
-	        qString = URLEncoder.encode(userInput, "UTF-8");
-	        solrQuery = String.format("q=%s&fq=%s&start=%d&rows=%d", 
-	    		                      qString, DEFAULT_FQ_STRING, DEFAULT_START, DEFAULT_ROWS);
-		  }
-	  }
-	  catch (UnsupportedEncodingException e) {
-		  
-	  }
-	  
-	  return solrQuery;
-  }
+	public static String buildSolrQuery(String userInput) {
+		String solrQuery = null;
+		String qString = DEFAULT_Q_STRING;
+
+		if (userInput != null && !userInput.equals("")) {
+			try {
+				String escapedInput = ClientUtils.escapeQueryChars(userInput);
+				qString = URLEncoder.encode(escapedInput, "UTF-8");
+				solrQuery = String.format("q=%s&fq=%s&fq=%s&start=%d&rows=%d",
+						qString, ECOTRENDS_FILTER, LANDSAT_FILTER,
+						DEFAULT_START, DEFAULT_ROWS);
+			}
+			catch (UnsupportedEncodingException e) {
+
+			}
+		}
+
+		return solrQuery;
+	}
   
 }

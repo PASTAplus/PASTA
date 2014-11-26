@@ -17,13 +17,16 @@ public class Search {
 	 */
 	
 	  protected final static String DEFAULT_Q_STRING = "*:*";
-	  protected final static String DEFAULT_FQ_STRING = "-scope:ecotrends";
+	  protected final static String ECOTRENDS_FILTER = "-scope:ecotrends";
+	  protected final static String LANDSAT_FILTER = "-scope:lter-landsat*";
 	  protected final static int DEFAULT_START = 0;
 	  protected final static int DEFAULT_ROWS = 200;
+	  
+	  
 	/*
 	 * Class methods
 	 */
-
+	  
 	  /**
 	   * Return a list of indexed paths for use in either simple search,
 	   * browse search, or subject-based advanced search. The exact contents

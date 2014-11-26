@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.common.ISO8601Utility;
@@ -61,19 +62,19 @@ public class SolrAdvancedSearch extends Search  {
   /*
    * Form parameters
    */
-  private String caseSensitive;
   private final String creatorOrganization;
   private final String creatorSurname;
   private final String dateField;
   private final String startDate;
   private final String endDate;
-  private int INDENT_LEVEL = 2;
   private boolean isDatesContainedChecked;
   private String namedTimescale;
   private String namedTimescaleQueryType;
   private String[] siteValues = null;
   private String subjectField;
   private String subjectValue;
+  private boolean includeEcotrends;
+  private boolean includeLandsat5;
   private String taxon;
   
   private boolean isBoundaryContainedChecked;
@@ -114,6 +115,8 @@ public class SolrAdvancedSearch extends Search  {
       String[] siteValues,
       String subjectField,
       String subjectValue,
+      boolean isIncludeEcotrendsChecked,
+      boolean isIncludeLandsat5Checked,
       boolean isDatesContainedChecked,
       boolean isSpecificChecked,
       boolean isRelatedChecked,
@@ -137,6 +140,8 @@ public class SolrAdvancedSearch extends Search  {
     this.siteValues = siteValues;
     this.subjectField = subjectField;
     this.subjectValue = subjectValue;
+    this.includeEcotrends = isIncludeEcotrendsChecked;
+    this.includeLandsat5 = isIncludeLandsat5Checked;
     this.taxon = taxon;
     
     this.isBoundaryContainedChecked = isBoundaryContainedChecked;
@@ -155,7 +160,27 @@ public class SolrAdvancedSearch extends Search  {
     
     this.termsList = new TermsList();
     this.qString = DEFAULT_Q_STRING;
-    this.fqString = String.format("fq=%s", DEFAULT_FQ_STRING);
+    this.fqString = initializeFilterQuery(includeEcotrends, includeLandsat5);
+  }
+  
+  
+  /*
+   * Instance methods
+   */
+  
+  /*
+   * Composes the filter query string for advanced search as determined by whether
+   * the user has chosen to include optional content for Ecotrends or Landsat5.
+   */
+  private String initializeFilterQuery(boolean includeEcotrends, boolean includeLandsat5) {
+	  StringBuilder sb = new StringBuilder("");
+	  if (!includeEcotrends) { sb.append(String.format("fq=%s", ECOTRENDS_FILTER)); }
+	  if (!includeLandsat5) { 
+		  String prefix = includeEcotrends ? "" : "&";
+		  sb.append(String.format("%sfq=%s", prefix, LANDSAT_FILTER)); 
+	  }
+	  String filterQuery = sb.toString();
+	  return filterQuery;
   }
 
   
@@ -221,8 +246,9 @@ public class SolrAdvancedSearch extends Search  {
 			}
 
 			queryTerms = queryTerms.trim();
-			queryTerms = URLEncoder.encode(queryTerms, "UTF-8");
-			String subjectQuery = String.format("%s:%s", field, queryTerms);
+			String escapedTerms = ClientUtils.escapeQueryChars(queryTerms);
+			String encodedTerms = URLEncoder.encode(escapedTerms, "UTF-8");
+			String subjectQuery = String.format("%s:%s", field, encodedTerms);
 			updateQString(subjectQuery);
 		}
 	}
@@ -253,7 +279,8 @@ public class SolrAdvancedSearch extends Search  {
 
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String encodedValue = URLEncoder.encode(value, "UTF-8");
+      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String authorQuery = String.format("author:%s", encodedValue);
       updateQString(authorQuery);
     }
@@ -262,7 +289,9 @@ public class SolrAdvancedSearch extends Search  {
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String organizationQuery = String.format("organization:%s", value);
+      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
+      String organizationQuery = String.format("organization:%s", encodedValue);
       updateQString(organizationQuery);
     }
     
@@ -276,7 +305,8 @@ public class SolrAdvancedSearch extends Search  {
   		throws UnsupportedEncodingException {
     if ((locationName != null) && (!(locationName.equals("")))) {
       termsList.addTerm(locationName);
-      String encodedValue = URLEncoder.encode(locationName, "UTF-8");
+      String escapedValue = ClientUtils.escapeQueryChars(locationName);
+      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String locationQuery = String.format("geographicdescription:%s", encodedValue);
       updateQString(locationQuery);
     }
@@ -389,7 +419,8 @@ public class SolrAdvancedSearch extends Search  {
      */
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
       termsList.addTerm(namedTimescale);
-      String encodedValue = URLEncoder.encode(namedTimescale, "UTF-8");
+      String escapedValue = ClientUtils.escapeQueryChars(namedTimescale);
+      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String timescaleQuery = String.format("timescale:%s", encodedValue);
       updateQString(timescaleQuery);
     }
@@ -523,7 +554,8 @@ public class SolrAdvancedSearch extends Search  {
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String encodedValue = URLEncoder.encode(value, "UTF-8");
+      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String taxonQuery = String.format("taxonomic:%s", encodedValue);
       updateQString(taxonQuery);
     }
