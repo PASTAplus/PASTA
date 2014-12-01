@@ -47,29 +47,46 @@ public class SimpleSearch extends Search {
 
 	  
   /**
-   * Builds a PathQuery XML string for submission to the DataPackageManager
-   * and then to Metacat.
+   * Builds a query for submission to the DataPackageManager
+   * and then to Solr.
    * 
    * @param userInput    The terms entered by the user (e.g. "climate change")
    * @param termsList    List of terms used in the search, which may include terms other
-   * @param isSiteQuery  true if we are querying by site name, else false
-   * @return the PathQuery XML string
+   * @param isSiteQuery  true if we are querying by site name, else false.
+   * 
+   *                     When true, the user input is being sent from the browse crawler
+   *                     and its value will be a site acronym like "KNZ".
+   *                     
+   *                     When false, the user input is being sent from the search form
+   *                     and will be anything that the end user has typed in the search box,
+   *                     or, it may be a controlled vocabulary term sent from the browse
+   *                     crawler. 
+   * @return the Solr query string, including any filter queries, to be sent to Solr
+   *         for processing
    */
-	public static String buildSolrQuery(String userInput) {
+	public static String buildSolrQuery(String userInput, boolean isSiteQuery) {
 		String solrQuery = null;
 		String qString = DEFAULT_Q_STRING;
+		String siteFilter = "";
 
 		if (userInput != null && !userInput.equals("")) {
 			try {
-				String escapedInput = ClientUtils.escapeQueryChars(userInput);
-				qString = URLEncoder.encode(escapedInput, "UTF-8");
-				solrQuery = String.format("q=%s&fq=%s&fq=%s&start=%d&rows=%d",
-						qString, ECOTRENDS_FILTER, LANDSAT_FILTER,
-						DEFAULT_START, DEFAULT_ROWS);
+				if (isSiteQuery) {
+					siteFilter = String.format("scope:(knb-lter-%s)", userInput.toLowerCase());
+				}
+				else {
+					String escapedInput = ClientUtils.escapeQueryChars(userInput);
+					qString = URLEncoder.encode(escapedInput, "UTF-8");
+				}
 			}
 			catch (UnsupportedEncodingException e) {
 
 			}
+			
+			solrQuery = String.format(
+					"q=%s&fq=%s&fq=%s&fq=%s&start=%d&rows=%d",
+					qString, siteFilter, ECOTRENDS_FILTER,
+					LANDSAT_FILTER, DEFAULT_START, DEFAULT_ROWS);
 		}
 
 		return solrQuery;

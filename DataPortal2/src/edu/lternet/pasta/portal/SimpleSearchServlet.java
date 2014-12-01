@@ -120,7 +120,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String userInput = (String) request.getParameter("terms");
 
 		try {
-			String queryText = SimpleSearch.buildSolrQuery(userInput);
+			String queryText = SimpleSearch.buildSolrQuery(userInput, false);
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);

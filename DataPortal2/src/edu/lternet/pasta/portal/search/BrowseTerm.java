@@ -103,18 +103,17 @@ public class BrowseTerm {
    */
   private String composeQueryString() {
     boolean isSiteQuery = isLTERSite();
-    TermsList termsList = new TermsList();
     String searchValue = null;
     
     if (isSiteQuery) { 
-    	searchValue = String.format("knb-lter-%s", this.value.toLowerCase()); 
+    	searchValue = this.value.toLowerCase();
     } 
     else {
-    	searchValue = String.format("\"%s\"", this.value);
+    	searchValue = this.value;
     }
     
-    String queryString = SimpleSearch.buildSolrQuery(searchValue);
-
+    String queryString = SimpleSearch.buildSolrQuery(searchValue, isLTERSite());
+    
     return queryString;
   }
   
