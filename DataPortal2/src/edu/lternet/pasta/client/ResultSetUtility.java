@@ -29,6 +29,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.portal.search.Search;
+
 
 /**
  * @author servilla
@@ -51,9 +53,17 @@ public class ResultSetUtility {
    * Instance variables
    */
 
-  String resultSet = null;
-  boolean includeEcotrends = false;
-  boolean includeLandsat5 = false;
+  private String resultSet = null;
+  private boolean includeEcotrends = false;
+  private boolean includeLandsat5 = false;
+  /*
+   * For now we can avoid the need for paging by setting the number of
+   * documents displayed per page to the maximum number of rows that
+   * will be return by Solr.
+   */
+  private final int DEFAULT_DOCS_PER_PAGE = Search.DEFAULT_ROWS;
+  private Integer docsPerPage = new Integer(DEFAULT_DOCS_PER_PAGE);
+  
 
   /*
    * Constructors
@@ -83,14 +93,25 @@ public class ResultSetUtility {
    */
   
   
-  	/**
-  	 * Sets the value of the includeEcotrends instance variable.
-  	 * 
-  	 * @param include 
-  	 * 			true if EcoTrends data packages should be searched, else false
-  	 */
+	/**
+	 * Sets the value of the includeEcotrends instance variable.
+	 * 
+	 * @param include 
+	 * 			true if EcoTrends data packages should be searched, else false
+	 */
 	public void setIncludeEcotrends(boolean include) {
 		this.includeEcotrends = include;
+	}
+
+
+  	/**
+  	 * Sets the value of the docsPerPage instance variable.
+  	 * 
+  	 * @param n
+  	 * 			the desired number of documents displayed per page
+  	 */
+	public void setDocsPerPage(int n) {
+		this.docsPerPage = new Integer(n);
 	}
 
 
@@ -115,6 +136,9 @@ public class ResultSetUtility {
 	 */
 	public String xmlToHtmlTable(String xslPath) throws ParseException {
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		
+		// Pass the docsPerPage value as a parameter to the XSLT
+		parameterMap.put("docsPerPage", this.docsPerPage.toString());
 
 		// Pass the includeEcotrends value as a parameter to the XSLT
 		if (this.includeEcotrends) {

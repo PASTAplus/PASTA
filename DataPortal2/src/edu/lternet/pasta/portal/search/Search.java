@@ -20,7 +20,7 @@ public class Search {
 	  protected final static String ECOTRENDS_FILTER = "-scope:ecotrends";
 	  protected final static String LANDSAT_FILTER = "-scope:lter-landsat*";
 	  protected final static int DEFAULT_START = 0;
-	  protected final static int DEFAULT_ROWS = 200;
+	  public final static int DEFAULT_ROWS = 200;
 	  
 	  
 	/*

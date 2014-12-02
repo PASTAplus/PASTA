@@ -1,7 +1,5 @@
 package edu.lternet.pasta.datapackagemanager.solr.search;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -31,8 +29,6 @@ public class SimpleSolrSearch {
 	private SolrServer solrServer;
 	private SolrQuery solrQuery;
 	
-	private final int MAX_PER_PAGE = 10;
-
 
 	/*
 	 * Constructors
@@ -96,8 +92,7 @@ public class SimpleSolrSearch {
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
 		int numFound = (int) solrDocumentList.getNumFound();
-		int displayCount = Math.min(numFound, MAX_PER_PAGE);
-		String firstLine = String.format("<resultset numFound='%d' displayCount='%d'>\n", numFound, displayCount);
+		String firstLine = String.format("<resultset numFound='%d'>\n", numFound);
 		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {

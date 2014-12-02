@@ -28,26 +28,35 @@
 
   <xsl:output method="html"/>
 
-  <xsl:variable name="documentCount">
-      <xsl:value-of select="number(/resultset/@numFound)"/>
-  </xsl:variable>
+  <xsl:param name="docsPerPage"></xsl:param>
 
-  <xsl:variable name="displayCount">
-      <xsl:value-of select="number(/resultset/@displayCount)"/>
+  <xsl:variable name="numFound">
+      <xsl:value-of select="number(/resultset/@numFound)"/>
   </xsl:variable>
 
   <xsl:variable name="packageWord">
       <xsl:choose>
-        <xsl:when test="($documentCount > 1)">packages</xsl:when>
+        <xsl:when test="($numFound > 1)">packages</xsl:when>
         <xsl:otherwise>package</xsl:otherwise>
+      </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="displayCount">
+      <xsl:choose>
+        <xsl:when test="($numFound > $docsPerPage)">
+        	<xsl:value-of select="$docsPerPage"></xsl:value-of>
+        </xsl:when>
+        <xsl:otherwise>
+        	<xsl:value-of select="$numFound"></xsl:value-of>
+        </xsl:otherwise>
       </xsl:choose>
   </xsl:variable>
 
   <xsl:template match="/">
 
       <xsl:choose>
-      <xsl:when test="($documentCount > 0)">
-      <p>Displaying 1-<xsl:value-of select="$displayCount"/> of <xsl:value-of select="$documentCount"/> matching data <xsl:value-of select="$packageWord"/></p>
+      <xsl:when test="($numFound > 0)">
+      <p>Displaying 1-<xsl:value-of select="$displayCount"/> of <xsl:value-of select="$numFound"/> matching data <xsl:value-of select="$packageWord"/></p>
 
       <table width="100%">
         <tbody>
