@@ -43,7 +43,7 @@
 
   <xsl:variable name="displayCount">
       <xsl:choose>
-        <xsl:when test="($numFound > $docsPerPage)">
+        <xsl:when test="($numFound > number($docsPerPage))">
         	<xsl:value-of select="$docsPerPage"></xsl:value-of>
         </xsl:when>
         <xsl:otherwise>
