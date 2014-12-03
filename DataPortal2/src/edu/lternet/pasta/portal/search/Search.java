@@ -19,6 +19,7 @@ public class Search {
 	  protected final static String DEFAULT_Q_STRING = "*:*";
 	  protected final static String ECOTRENDS_FILTER = "-scope:ecotrends";
 	  protected final static String LANDSAT_FILTER = "-scope:lter-landsat*";
+	  protected final static String DEFAULT_FIELDS = "packageid,title,author,organization,pubdate";
 	  protected final static int DEFAULT_START = 0;
 	  public final static int DEFAULT_ROWS = 200;
 	  

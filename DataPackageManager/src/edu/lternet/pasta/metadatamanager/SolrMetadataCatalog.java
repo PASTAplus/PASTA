@@ -88,6 +88,11 @@ public class SolrMetadataCatalog implements MetadataCatalog {
 						String value = values.get(0);
 			    		simpleSolrSearch.setQueryText(value);
 					}
+					else if (key.equals("fl")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		simpleSolrSearch.setFields(value);
+					}
 					else if (key.equals("fq")) {
 						List<String> values = queryParams.get(key);
 						for (String fq : values) {

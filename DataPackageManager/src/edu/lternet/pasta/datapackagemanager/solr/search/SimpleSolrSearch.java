@@ -60,6 +60,12 @@ public class SimpleSolrSearch {
 	}
 	
 	
+	public void setFields(String fields) {
+		this.solrQuery.setFields(fields);
+		System.out.println("fl=" + fields);
+	}
+	
+	
 	public void setQueryText(String queryText) {
 		this.solrQuery.setQuery(queryText);
 		System.out.println("q=" + queryText);
