@@ -109,6 +109,30 @@ public class SolrMetadataCatalog implements MetadataCatalog {
 						String value = values.get(0);
 			    		simpleSolrSearch.setRows(value);
 					}
+					else if (key.equals("sort")) {
+						List<String> values = queryParams.get(key);
+						for (String value : values) {
+							String[] tokens = value.split(",");
+						
+							if (tokens != null && tokens.length == 2) {
+								String field = tokens[0];
+								String order = tokens[1];
+								simpleSolrSearch.addSort(field, order);
+							}
+					    }
+					}
+					else if (key.equalsIgnoreCase("debug")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		if (value != null && value.equals("true")) {
+			    			simpleSolrSearch.setDebug(true);
+			    		}
+					}
+					else if (key.equalsIgnoreCase("defType")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		simpleSolrSearch.setDefType(value);
+					}
 				}
 			}            
             

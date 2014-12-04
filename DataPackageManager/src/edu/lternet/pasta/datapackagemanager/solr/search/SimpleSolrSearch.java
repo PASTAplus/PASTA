@@ -3,9 +3,11 @@ package edu.lternet.pasta.datapackagemanager.solr.search;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -50,13 +52,38 @@ public class SimpleSolrSearch {
 	}
 	
 	
+	public void addSort(String field, String orderStr) {
+		SolrQuery.ORDER order = SolrQuery.ORDER.desc;
+		if (orderStr.equals("asc")) {
+			order = SolrQuery.ORDER.asc;
+		}
+		
+		this.solrQuery.addSort(field, order);
+		System.out.println(String.format("sort=%s,%s", field, orderStr));
+	}
+	
+	
 	public String search() 
 			throws SolrServerException {
 		QueryResponse queryResponse = solrServer.query(solrQuery);
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
 		String xmlString = solrDocumentListToXML(solrDocumentList);
+		Map<String,Object> debugMap = queryResponse.getDebugMap();
+		if (debugMap != null) System.out.println(debugMap.toString());
 		
 		return xmlString;
+	}
+	
+	
+	public void setDebug(boolean debug) {
+		this.solrQuery.set("debug", debug);
+		System.out.println("debug=" + debug);
+	}
+	
+	
+	public void setDefType(String defType) {
+		this.solrQuery.setParam("defType", defType);
+		System.out.println("defType=" + defType);
 	}
 	
 	

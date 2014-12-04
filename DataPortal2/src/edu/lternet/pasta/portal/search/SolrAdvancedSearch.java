@@ -643,11 +643,12 @@ public class SolrAdvancedSearch extends Search  {
 		buildQueryFilterSpatial(this.northBound, this.southBound, this.eastBound,
 				 this.westBound, this.isBoundaryContainedChecked);
 	
-		queryString = String.format("q=%s&%s&start=%d&rows=%d&fl=%s",
-				                    this.qString.trim(), 
-				                    this.fqString.trim(),
-				                    DEFAULT_START, DEFAULT_ROWS, DEFAULT_FIELDS
-				                    );
+		queryString = String.format(
+				"defType=%s&q=%s&%s&start=%d&rows=%d&fl=%s&sort=%s&sort=%s&debug=%s",
+				DEFAULT_DEFTYPE, this.qString.trim(), this.fqString.trim(),
+				DEFAULT_START, DEFAULT_ROWS, DEFAULT_FIELDS,
+				SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG
+		);
 
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 		logger.warn(String.format("queryString:\n%s", queryString));
