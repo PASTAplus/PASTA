@@ -61,10 +61,10 @@
       <table width="100%">
         <tbody>
           <tr>
-            <th class="nis" width="15%">Package Id</th>
             <th class="nis" width="50%">Title</th>
-            <th class="nis" width="20%">Creators</th>
+            <th class="nis" width="25%">Creators</th>
             <th class="nis" width="10%">Publication Date</th>
+            <th class="nis" width="15%">Package Id</th>
           </tr>
           <xsl:for-each select="/resultset/document">
             <xsl:apply-templates select="."/>
@@ -83,19 +83,22 @@
 	<xsl:variable name="pid" select="./packageId"/>
 	
     <tr>
-      <td class="nis" align="center">
+      <td class="nis" align="left">
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
-        <xsl:value-of select="$pid"/>
+        <xsl:value-of select="title"/>
         </a>
       </td>
-      <td class="nis" align="left">
-        <xsl:value-of select="title"/>
-      </td>
       <td class="nis" align="center">
+        <xsl:apply-templates select="organizations"/>
         <xsl:apply-templates select="authors"/>
       </td>
       <td class="nis" align="center">
         <xsl:value-of select="pubDate"/>
+      </td>
+      <td class="nis" align="center">
+        <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
+        <xsl:value-of select="$pid"/>
+        </a>
       </td>
     </tr>
     
@@ -103,6 +106,12 @@
 
   <xsl:template match="authors">
     <xsl:for-each select="author">
+      <xsl:value-of select="." /><br/>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="organizations">
+    <xsl:for-each select="organization">
       <xsl:value-of select="." /><br/>
     </xsl:for-each>
   </xsl:template>

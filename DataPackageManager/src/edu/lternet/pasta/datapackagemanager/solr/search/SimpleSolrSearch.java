@@ -146,13 +146,24 @@ public class SimpleSolrSearch {
 			
 			sb.append("    <authors>\n");
 			Collection<Object> authors = solrDocument.getFieldValues("author");
-			if (authors != null) {
+			if (authors != null && authors.size() > 0) {
 				for (Object author : authors) {
 					String authorStr = (String) author;
 					sb.append(String.format("      <author>%s</author>\n", authorStr));
 				}
 			}
 			sb.append("    </authors>\n");
+			
+			sb.append("    <organizations>\n");
+			Collection<Object> organizations = solrDocument.getFieldValues("organization");
+			if (organizations != null && organizations.size() > 0) {
+				for (Object organization : organizations) {
+					String organizationStr = (String) organization;
+					sb.append(String.format("      <organization>%s</organization>\n", organizationStr));
+				}
+			}
+			sb.append("    </organizations>\n");
+			
 			
 		    sb.append("  </document>\n");
 		}
