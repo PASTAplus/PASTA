@@ -55,6 +55,7 @@ public class DataPackage {
   ArrayList<String> titles = null;
   String site = null;
   String abstractText = null;
+  String fundingText = null;
   String geographicDescriptionText = null;
   String taxonomicCoverageText = null;
 
@@ -176,6 +177,11 @@ public class DataPackage {
   }
 
   
+	public String getFundingText() {
+		return fundingText;
+	}
+
+
   public ArrayList<String> getKeywords() {
 	return keywords;
   }
@@ -316,6 +322,11 @@ public class DataPackage {
 		  this.endDate = endDate;
 	  }
 		
+	  
+		public void setFundingText(String fundingText) {
+			this.fundingText = fundingText;
+		}
+
 	  
 		public void setGeographicDescriptionText(String geographicDescriptionText) {
 			this.geographicDescriptionText = geographicDescriptionText;

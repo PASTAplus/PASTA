@@ -112,6 +112,7 @@ public class SolrIndex {
 			List<String> timescales = dataPackage.getTimescales();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
+			String fundingText = dataPackage.getFundingText();
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 			
@@ -175,6 +176,10 @@ public class SolrIndex {
 
 			if (abstractText != null) {
 				solrInputDocument.setField("abstract", abstractText);
+			}
+
+			if (fundingText != null) {
+				solrInputDocument.setField("funding", fundingText);
 			}
 
 			if (geographicDescriptionText != null) {

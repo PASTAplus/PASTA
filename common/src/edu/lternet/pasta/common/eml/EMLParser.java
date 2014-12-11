@@ -72,6 +72,7 @@ public class EMLParser {
   public static final String NORTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
+  public static final String FUNDING_PATH = "//dataset/project/funding";
   public static final String KEYWORD_PATH = "//keyword";
   public static final String TAXONOMIC_COVERAGE_PATH = "//dataset/coverage/taxonomicCoverage";
   public static final String GEOGRAPHIC_DESCRIPTION_PATH = "//dataset/coverage/geographicCoverage/geographicDescription";
@@ -187,6 +188,13 @@ public class EMLParser {
         if (abstractNode != null) {
           String abstractText = abstractNode.getTextContent().trim();
           this.dataPackage.setAbstractText(abstractText);
+        }
+
+        // Parse the funding text
+        Node fundingNode = xpathapi.selectSingleNode(document, FUNDING_PATH);
+        if (fundingNode != null) {
+          String fundingText = fundingNode.getTextContent().trim();
+          this.dataPackage.setFundingText(fundingText);
         }
 
         /*
