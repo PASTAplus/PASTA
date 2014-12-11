@@ -73,6 +73,7 @@ public class EMLParser {
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String FUNDING_PATH = "//dataset/project/funding";
+  public static final String METHODS_PATH = "//dataset/methods";
   public static final String KEYWORD_PATH = "//keyword";
   public static final String TAXONOMIC_COVERAGE_PATH = "//dataset/coverage/taxonomicCoverage";
   public static final String GEOGRAPHIC_DESCRIPTION_PATH = "//dataset/coverage/geographicCoverage/geographicDescription";
@@ -188,6 +189,13 @@ public class EMLParser {
         if (abstractNode != null) {
           String abstractText = abstractNode.getTextContent().trim();
           this.dataPackage.setAbstractText(abstractText);
+        }
+
+        // Parse the methods text
+        Node methodsNode = xpathapi.selectSingleNode(document, METHODS_PATH);
+        if (methodsNode != null) {
+          String methodsText = methodsNode.getTextContent().trim();
+          this.dataPackage.setMethodsText(methodsText);
         }
 
         // Parse the funding text

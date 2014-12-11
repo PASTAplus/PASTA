@@ -55,6 +55,7 @@ public class DataPackage {
   ArrayList<String> titles = null;
   String site = null;
   String abstractText = null;
+  String methodsText = null;
   String fundingText = null;
   String geographicDescriptionText = null;
   String taxonomicCoverageText = null;
@@ -189,6 +190,11 @@ public class DataPackage {
 	  
 	public String getGeographicDescriptionText() {
 		return geographicDescriptionText;
+	}
+
+
+	public String getMethodsText() {
+		return methodsText;
 	}
 
 
@@ -333,6 +339,11 @@ public class DataPackage {
 		}
 
 		
+		public void setMethodsText(String methodsText) {
+			this.methodsText = methodsText;
+		}
+
+	  
   public void setPackageId(String packageId) {
     this.packageId = packageId;
     

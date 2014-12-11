@@ -113,6 +113,7 @@ public class SolrIndex {
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
 			String fundingText = dataPackage.getFundingText();
+			String methodsText = dataPackage.getMethodsText();
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 			
@@ -180,6 +181,10 @@ public class SolrIndex {
 
 			if (fundingText != null) {
 				solrInputDocument.setField("funding", fundingText);
+			}
+
+			if (methodsText != null) {
+				solrInputDocument.setField("methods", methodsText);
 			}
 
 			if (geographicDescriptionText != null) {
