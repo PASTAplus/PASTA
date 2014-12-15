@@ -666,9 +666,11 @@
     </listener>
     <listener event="firstSearcher" class="solr.QuerySenderListener">
       <arr name="queries">
+        <!--
         <lst>
           <str name="q">static firstSearcher warming in solrconfig.xml</str>
         </lst>
+        -->
       </arr>
     </listener>
 
