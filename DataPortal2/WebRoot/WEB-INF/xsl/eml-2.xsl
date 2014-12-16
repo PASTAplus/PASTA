@@ -2394,7 +2394,7 @@
               <!--  this is the simple label-only version, instead of the form button. -->
               <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text>
             </td>
-            <td class="{secondColStyle}">
+            <td class="{$secondColStyle}">
               <strong><xsl:value-of select="./entityName"/></strong>
             </td>
           </tr>
@@ -2403,7 +2403,7 @@
               <!--  this is the simple label-only version, instead of the form button. -->
               Description<xsl:text>:</xsl:text>
             </td>
-            <td class="{secondColStyle}">
+            <td class="{$secondColStyle}">
               <xsl:value-of select="./entityDescription"/>
             </td>
           </tr>
@@ -2414,13 +2414,13 @@
           <td class="{$firstColStyle}">
             <xsl:value-of select="$showtype"/> Name<xsl:text>:</xsl:text><br></br>
           </td>
-          <td class="{secondColStyle}">
+          <td class="{$secondColStyle}">
             <strong><xsl:value-of select="./entityName"/></strong><br></br>
           </td>
         </tr>
         <tr>
           <td class="{$firstColStyle}">Description<xsl:text>:</xsl:text><br></br></td>
-          <td class="{secondColStyle}"><xsl:value-of select="./entityDescription"/></td>
+          <td class="{$secondColStyle}"><xsl:value-of select="./entityDescription"/></td>
         </tr>
       </xsl:otherwise>
     </xsl:choose>
@@ -2930,7 +2930,7 @@
         <tr>
           <td class="{$firstColStyle}">Altitude Minimum:</td>
           <td class="{$secondColStyle}"><xsl:value-of select="altitudeMinimum"/></td>
-          <td class="{$firstColStyle}">Altitude Maximum:</td>
+          <td class="$firstColStyle}">Altitude Maximum:</td>
           <td class="{$secondColStyle}"><xsl:value-of select="altitudeMaximum"/></td>
         </tr>
       </xsl:otherwise>
