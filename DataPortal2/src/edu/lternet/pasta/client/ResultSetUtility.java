@@ -61,8 +61,8 @@ public class ResultSetUtility {
    * documents displayed per page to the maximum number of rows that
    * will be return by Solr.
    */
-  private final int DEFAULT_DOCS_PER_PAGE = Search.DEFAULT_ROWS;
-  private Integer docsPerPage = new Integer(DEFAULT_DOCS_PER_PAGE);
+  private final int DEFAULT_ROWS_PER_PAGE = Search.DEFAULT_ROWS;
+  private int rowsPerPage = DEFAULT_ROWS_PER_PAGE;
   
 
   /*
@@ -110,8 +110,8 @@ public class ResultSetUtility {
   	 * @param n
   	 * 			the desired number of documents displayed per page
   	 */
-	public void setDocsPerPage(int n) {
-		this.docsPerPage = new Integer(n);
+	public void setRowsPerPage(int n) {
+		this.rowsPerPage = new Integer(n);
 	}
 
 
@@ -138,7 +138,7 @@ public class ResultSetUtility {
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
 		
 		// Pass the docsPerPage value as a parameter to the XSLT
-		parameterMap.put("docsPerPage", this.docsPerPage.toString());
+		parameterMap.put("rows", new Integer(this.rowsPerPage).toString());
 
 		// Pass the includeEcotrends value as a parameter to the XSLT
 		if (this.includeEcotrends) {

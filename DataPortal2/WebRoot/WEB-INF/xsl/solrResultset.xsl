@@ -28,7 +28,7 @@
 
   <xsl:output method="html"/>
 
-  <xsl:param name="docsPerPage"></xsl:param>
+  <xsl:param name="rows"></xsl:param>
 
   <xsl:variable name="numFound">
       <xsl:value-of select="number(/resultset/@numFound)"/>
@@ -43,8 +43,8 @@
 
   <xsl:variable name="displayCount">
       <xsl:choose>
-        <xsl:when test="($numFound > number($docsPerPage))">
-        	<xsl:value-of select="$docsPerPage"></xsl:value-of>
+        <xsl:when test="($numFound > number($rows))">
+        	<xsl:value-of select="$rows"></xsl:value-of>
         </xsl:when>
         <xsl:otherwise>
         	<xsl:value-of select="$numFound"></xsl:value-of>

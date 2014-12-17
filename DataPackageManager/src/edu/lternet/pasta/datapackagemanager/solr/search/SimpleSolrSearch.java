@@ -28,6 +28,7 @@ public class SimpleSolrSearch {
 	 * Instance fields
 	 */
 
+	private Integer rows = null;
 	private SolrServer solrServer;
 	private SolrQuery solrQuery;
 	
@@ -101,7 +102,7 @@ public class SimpleSolrSearch {
 	
 	public void setRows(String rowsStr) {
 		try {
-		    Integer rows = new Integer(rowsStr);
+		    this.rows = new Integer(rowsStr);
 		    this.solrQuery.setRows(rows);
 		    System.out.println("rows=" + rowsStr);
 		}
@@ -124,8 +125,10 @@ public class SimpleSolrSearch {
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
-		int numFound = (int) solrDocumentList.getNumFound();
-		String firstLine = String.format("<resultset numFound='%d'>\n", numFound);
+		long numFound = solrDocumentList.getNumFound();
+		long start = solrDocumentList.getStart();
+		
+		String firstLine = String.format("<resultset numFound='%d' start='%d' rows='%d'>\n", numFound, start, rows);
 		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {
@@ -179,9 +182,11 @@ public class SimpleSolrSearch {
 		String solrUrl = "http://localhost:8983/solr/collection1";
 		SimpleSolrSearch simpleSolrSearch =  new SimpleSolrSearch(solrUrl);
 		String queryText = args[0];
+		String rowsStr = args[1];
 		
 		try {
 			simpleSolrSearch.setQueryText(queryText);
+			simpleSolrSearch.setRows(rowsStr);
 			String xmlString = simpleSolrSearch.search();
 			System.out.println(xmlString);
 		}
