@@ -84,9 +84,9 @@ public class SimpleSearch extends Search {
 			}
 			
 			solrQuery = String.format(
-					"defType=%s&q=%s&fq=%s&fq=%s&fq=%s&start=%d&rows=%d&fl=%s&sort=%s&sort=%s&debug=%s",
+					"defType=%s&q=%s&fq=%s&fq=%s&fq=%s&fl=%s&sort=%s&sort=%s&debug=%s",
 					DEFAULT_DEFTYPE, qString, siteFilter, ECOTRENDS_FILTER,
-					LANDSAT_FILTER, DEFAULT_START, DEFAULT_ROWS, DEFAULT_FIELDS, 
+					LANDSAT_FILTER, DEFAULT_FIELDS, 
 					SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG);
 		}
 

@@ -56,7 +56,6 @@
 
       <xsl:choose>
       <xsl:when test="($numFound > 0)">
-      <p>Displaying 1-<xsl:value-of select="$displayCount"/> of <xsl:value-of select="$numFound"/> matching data <xsl:value-of select="$packageWord"/></p>
 
       <table width="100%">
         <tbody>

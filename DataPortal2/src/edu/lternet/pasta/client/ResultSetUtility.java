@@ -24,11 +24,31 @@
 
 package edu.lternet.pasta.client;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.apache.xpath.CachedXPathAPI;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.Entity;
+import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Entity.EntityType;
+import edu.lternet.pasta.portal.search.PageControl;
 import edu.lternet.pasta.portal.search.Search;
 
 
@@ -56,13 +76,12 @@ public class ResultSetUtility {
   private String resultSet = null;
   private boolean includeEcotrends = false;
   private boolean includeLandsat5 = false;
-  /*
-   * For now we can avoid the need for paging by setting the number of
-   * documents displayed per page to the maximum number of rows that
-   * will be return by Solr.
-   */
-  private final int DEFAULT_ROWS_PER_PAGE = Search.DEFAULT_ROWS;
-  private int rowsPerPage = DEFAULT_ROWS_PER_PAGE;
+  private int rows = Search.DEFAULT_ROWS;
+  private Integer numFound = 0;
+  private Integer start = 0;
+  private PageControl pageControl = null;
+  private String pageBodyHTML = "";
+  private String pageHeaderHTML = "";
   
 
   /*
@@ -77,14 +96,17 @@ public class ResultSetUtility {
    * 
    * @throws ParseException
    */
-  public ResultSetUtility(String resultSet) throws ParseException {
+  public ResultSetUtility(String xml) throws ParseException {
 
-    if (resultSet == null || resultSet.isEmpty()) {
+    if (xml == null || xml.isEmpty()) {
       throw new ParseException("Result Set is empty", 0);
     }
 
-    this.resultSet = resultSet;
-
+    this.resultSet = xml;
+    parseResultSet(xml);
+    pageControl = new PageControl(numFound, start, rows);
+    pageHeaderHTML = pageControl.composePageHeader();
+    pageBodyHTML = pageControl.composePageBody();
   }
 
   
@@ -93,7 +115,56 @@ public class ResultSetUtility {
    */
   
   
-	/**
+  	private void parseResultSet(String xml) { 	        	  
+  		if (xml != null) {
+  			InputStream inputStream = null;
+  			try {
+  				inputStream = IOUtils.toInputStream(xml, "UTF-8");
+  				DocumentBuilder documentBuilder = 
+  	              DocumentBuilderFactory.newInstance().newDocumentBuilder();
+  				CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+  				Document document = null;
+  				document = documentBuilder.parse(inputStream);
+  	      
+  				if (document != null) {
+  	        
+  					Node numFoundNode = null;
+  					numFoundNode = xpathapi.selectSingleNode(document, "//resultset/@numFound");
+
+  					if (numFoundNode != null) {
+  						String numFoundStr = numFoundNode.getNodeValue();
+  						this.numFound = new Integer(numFoundStr);
+  					}
+  					
+  					Node startNode = null;
+  					startNode = xpathapi.selectSingleNode(document, "//resultset/@start");
+
+  					if (startNode != null) {
+  						String startStr = startNode.getNodeValue();
+  						this.start = new Integer(startStr);
+  					}
+  					
+  				}
+  			}
+  			catch (Exception e) {
+  		        logger.error("Error parsing search result set: " + e.getMessage());
+  			}
+  			finally {
+  				if (inputStream != null) {
+  					try {
+  						inputStream.close();
+  					}
+  					catch (IOException e) {
+  						;
+  					}
+  				}
+  			}
+  		}
+  	}
+  	        
+
+  	/**
 	 * Sets the value of the includeEcotrends instance variable.
 	 * 
 	 * @param include 
@@ -111,7 +182,7 @@ public class ResultSetUtility {
   	 * 			the desired number of documents displayed per page
   	 */
 	public void setRowsPerPage(int n) {
-		this.rowsPerPage = new Integer(n);
+		this.rows = new Integer(n);
 	}
 
 
@@ -138,7 +209,7 @@ public class ResultSetUtility {
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
 		
 		// Pass the docsPerPage value as a parameter to the XSLT
-		parameterMap.put("rows", new Integer(this.rowsPerPage).toString());
+		parameterMap.put("rows", new Integer(this.rows).toString());
 
 		// Pass the includeEcotrends value as a parameter to the XSLT
 		if (this.includeEcotrends) {
@@ -152,6 +223,8 @@ public class ResultSetUtility {
 
 		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
 				parameterMap);
+		
+		html = String.format("%s%s%s<br/>%s", pageHeaderHTML, pageBodyHTML, html, pageBodyHTML);
 		return html;
 	}
 

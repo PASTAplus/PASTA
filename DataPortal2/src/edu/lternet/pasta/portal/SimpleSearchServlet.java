@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.ResultSetUtility;
+import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.search.SimpleSearch;
 
 public class SimpleSearchServlet extends DataPortalServlet {
@@ -90,9 +91,36 @@ public class SimpleSearchServlet extends DataPortalServlet {
    */
   public void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+		String html = null;
+		String xml = null;
+		HttpSession httpSession = request.getSession();
+		
+		String queryText = (String) httpSession.getAttribute("queryText");
+		String start = (String) request.getParameter("start");
+		String rows = (String) request.getParameter("rows");
+		
+		String uid = (String) httpSession.getAttribute("uid");
+		if (uid == null || uid.isEmpty()) uid = "public";
 
-    doPost(request, response);
+		if (queryText != null) {
+		
+		try {
+			queryText = String.format("%s&start=%s&rows=%s", queryText, start, rows);
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+			xml = dpmClient.searchDataPackages(queryText);
+			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
 
+		request.setAttribute("searchresult", html);
+		RequestDispatcher requestDispatcher = request
+				.getRequestDispatcher(forward);
+		requestDispatcher.forward(request, response);
+		
+		}
   }
 
   /**
@@ -114,13 +142,16 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String html = null;
 		String xml = null;
 		HttpSession httpSession = request.getSession();
+		
 		String uid = (String) httpSession.getAttribute("uid");
-		if (uid == null || uid.isEmpty())
-			uid = "public";
+		if (uid == null || uid.isEmpty()) uid = "public";
+		
 		String userInput = (String) request.getParameter("terms");
 
 		try {
 			String queryText = SimpleSearch.buildSolrQuery(userInput, false);
+			httpSession.setAttribute("queryText", queryText);
+			queryText = String.format("%s&start=%d&rows=%d", queryText, 0, Search.DEFAULT_ROWS);
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
