@@ -644,15 +644,15 @@ public class SolrAdvancedSearch extends Search  {
 				 this.westBound, this.isBoundaryContainedChecked);
 	
 		queryString = String.format(
-				"defType=%s&q=%s&%s&start=%d&rows=%d&fl=%s&sort=%s&sort=%s&debug=%s",
+				"defType=%s&q=%s&%s&fl=%s&sort=%s&sort=%s&debug=%s",
 				DEFAULT_DEFTYPE, this.qString.trim(), this.fqString.trim(),
-				DEFAULT_START, DEFAULT_ROWS, DEFAULT_FIELDS,
-				SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG
+				DEFAULT_FIELDS, SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG
 		);
 
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 		logger.warn(String.format("queryString:\n%s", queryString));
-		String resultsetXML = dpmClient.searchDataPackages(queryString);
+		String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, DEFAULT_START, DEFAULT_ROWS);
+		String resultsetXML = dpmClient.searchDataPackages(extendedQueryString);
 
 		return resultsetXML;
 	}
@@ -672,6 +672,11 @@ public class SolrAdvancedSearch extends Search  {
     }
     
     return indent.toString();
+  }
+  
+  
+  public String getQueryString() {
+	  return queryString;
   }
   
   

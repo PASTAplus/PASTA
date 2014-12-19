@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
 
 import org.apache.commons.io.FileUtils;
 
@@ -36,6 +37,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.client.ResultSetUtility;
 
 
 /**
@@ -141,8 +143,6 @@ public class BrowseTerm {
     String cacheString = null;
     String searchResults = readSearchResults();
     StringBuffer stringBuffer = new StringBuffer("");
-    int lastIndex = 0;
-    final String findStr = "<document>";
     int indent = calculateIndent();
     
     for (int i = 0; i < indent; i++) {
@@ -156,19 +156,24 @@ public class BrowseTerm {
     stringBuffer.append("<value>" + value + "</value>\n");
 
     if (searchResults != null) {
-      /* Count the number of matching documents */
-      this.matchCount = 0;
-      while (lastIndex != -1) {
-        lastIndex = searchResults.indexOf(findStr, lastIndex);     
-        if (lastIndex != -1) {
-          lastIndex += findStr.length();
-          this.matchCount++;
-        }
-      }
+        /* Count the number of matching documents */
+        this.matchCount = 0;
+
+        try {
+    		ResultSetUtility resultSetUtility = new ResultSetUtility(searchResults);
+    		Integer numFound = resultSetUtility.getNumFound();
+    		this.matchCount = numFound;
+    	}
+    	catch (ParseException e) {
+    		logger.error(String.format("Error parsing search results: %s", e.getMessage()));
+    		e.printStackTrace();
+    	}
+    	      
       for (int i = 0; i < indent + 4; i++) {
       	stringBuffer.append(" ");
       }
-      stringBuffer.append("<matchCount>" + this.matchCount + "</matchCount>\n");
+      
+      stringBuffer.append(String.format("<matchCount>%d</matchCount>\n", this.matchCount));
     }
     
     for (int i = 0; i < indent; i++) {
@@ -304,6 +309,11 @@ public class BrowseTerm {
    */
   private String fileName () {
     return value.replace(' ', '_');
+  }
+  
+  
+  public String getQueryString() {
+	  return queryString;
   }
   
   

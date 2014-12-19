@@ -89,10 +89,10 @@ public class ResultSetUtility {
    */
 
   /**
-   * Constructs a new QualityReportUtility object from the quality report XML.
+   * Constructs a new ResultSetUtility object from search results XML.
    * 
-   * @param qr
-   *          The quality report XML as a String object.
+   * @param xml
+   *          The search results XML as a String object.
    * 
    * @throws ParseException
    */
@@ -113,6 +113,11 @@ public class ResultSetUtility {
   /*
    * Methods
    */
+  
+  
+  	public Integer getNumFound() {
+  		return numFound;
+  	}
   
   
   	private void parseResultSet(String xml) { 	        	  
@@ -195,8 +200,8 @@ public class ResultSetUtility {
 	public void setIncludeLandsat5(boolean include) {
 		this.includeLandsat5 = include;
 	}
-
-
+	
+	
 	/**
 	 * Transforms Metacat search results XML to an HTML table.
 	 * 

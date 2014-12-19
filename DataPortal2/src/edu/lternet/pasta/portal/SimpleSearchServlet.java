@@ -94,8 +94,17 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String html = null;
 		String xml = null;
 		HttpSession httpSession = request.getSession();
+		String queryText = null;
 		
-		String queryText = (String) httpSession.getAttribute("queryText");
+		String q = (String) request.getParameter("q");
+		if (q == null || q.equals("")) {
+			// if no q param was passed, look for query stored in the session
+			queryText = (String) httpSession.getAttribute("queryText");
+		}
+		else {
+			queryText = q;
+		}
+		
 		String start = (String) request.getParameter("start");
 		String rows = (String) request.getParameter("rows");
 		
@@ -103,24 +112,24 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		if (uid == null || uid.isEmpty()) uid = "public";
 
 		if (queryText != null) {
-		
-		try {
-			queryText = String.format("%s&start=%s&rows=%s", queryText, start, rows);
-			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-			xml = dpmClient.searchDataPackages(queryText);
-			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-		}
-		catch (Exception e) {
-			handleDataPortalError(logger, e);
+			try {
+				queryText = String.format("%s&start=%s&rows=%s", queryText,
+						start, rows);
+				DataPackageManagerClient dpmClient = new DataPackageManagerClient(
+						uid);
+				xml = dpmClient.searchDataPackages(queryText);
+				ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+				html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			}
+			catch (Exception e) {
+				handleDataPortalError(logger, e);
+			}
+
+			request.setAttribute("searchresult", html);
 		}
 
-		request.setAttribute("searchresult", html);
-		RequestDispatcher requestDispatcher = request
-				.getRequestDispatcher(forward);
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
-		
-		}
   }
 
   /**

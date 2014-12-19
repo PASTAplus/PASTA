@@ -155,6 +155,9 @@ public class BrowseServlet extends DataPortalServlet {
       if (termsList != null) {
         termsListHTML = termsList.toHTML();
       }
+      
+      String queryText = browseTerm.getQueryString();
+      httpSession.setAttribute("queryText", queryText);
 
       ResultSetUtility resultSetUtility = new ResultSetUtility(xml);  
       html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";     

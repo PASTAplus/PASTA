@@ -201,6 +201,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 
 		try {
 			xml = solrAdvancedSearch.executeSearch(uid);
+			String queryText = solrAdvancedSearch.getQueryString();
+			httpSession.setAttribute("queryText", queryText);
 
 			termsList = solrAdvancedSearch.getTermsList();
 			if (termsList != null) {

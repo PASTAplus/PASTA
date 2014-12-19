@@ -16,6 +16,7 @@ public class PageControl {
 	int numFound;	
 	int rowsPerPage;
 	int start;
+	int pageRange = 5; // View +/- pages from the current page
 	
 	/*
 	 * Constructor
@@ -57,16 +58,22 @@ public class PageControl {
 	
 	public String composePageHeader() {
 		String html = "";
-		String plural = numFound > 1 ? "s" : "";
-		
-		int lo = ((currentPage - 1) * rowsPerPage) + 1;
-		int hi = lo + rowsPerPage - 1;
-		if (hi > numFound) hi = numFound;
-		StringBuilder sb = new StringBuilder("<p>");
-		sb.append(String.format("Displaying %d-%d of %d matching data package%s", lo, hi, numFound, plural));
-		sb.append("</p>");
+
+		if (numFound > 0) {
+			String plural = numFound > 1 ? "s" : "";
+			int lo = ((currentPage - 1) * rowsPerPage) + 1;
+			int hi = lo + rowsPerPage - 1;
+			if (hi > numFound)
+				hi = numFound;
+			StringBuilder sb = new StringBuilder("<p>");
+			sb.append(String.format(
+					"Displaying %d-%d of %d matching data package%s", lo, hi,
+					numFound, plural));
+			sb.append("</p>");
 
 		html = sb.toString();
+		}
+		
 		return html;
 	}
 	
@@ -99,6 +106,7 @@ public class PageControl {
 		}
 		
 		for (int i = 1; i <= max; i++) {
+			if (isWithinPageRange(i)) {
 			String aStartTag = null;
 			String aEndTag = null;
 			if (i == currentPage) {
@@ -111,6 +119,7 @@ public class PageControl {
 				aEndTag = "</a>";
 			}
 			sb.append(String.format("%s%d%s ", aStartTag, i, aEndTag));
+			}
 		}
 		
 		if (currentPage < max) {
@@ -172,6 +181,30 @@ public class PageControl {
 		if (numFound % rowsPerPage > 0) highestPage++;
 		
 		return highestPage;
+	}
+	
+	
+	/*
+	 * Does the current page fall within the display range?
+	 */
+	private boolean isWithinPageRange(int pageNumber) {
+		boolean withinRange = false;
+		int pageFulcrum = currentPage;  // center page display around the page fulcrum
+		int max = highestPage();
+		
+		if (currentPage < (pageRange + 1)) {
+			pageFulcrum = (pageRange + 1);
+		}
+		else if ((currentPage + pageRange) > max) {
+			pageFulcrum = max - pageRange;
+		}
+		
+		
+		if (Math.abs(pageNumber - pageFulcrum) <= pageRange) {
+			withinRange = true;
+		}
+		
+		return withinRange;
 	}
 
 	
