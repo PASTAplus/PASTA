@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -49,7 +48,6 @@ public class SimpleSolrSearch {
 	
 	public void addFilterQuery(String filterText) {
 		this.solrQuery.addFilterQuery(filterText);
-		System.out.println("fq=" + filterText);
 	}
 	
 	
@@ -60,7 +58,6 @@ public class SimpleSolrSearch {
 		}
 		
 		this.solrQuery.addSort(field, order);
-		System.out.println(String.format("sort=%s,%s", field, orderStr));
 	}
 	
 	
@@ -78,25 +75,21 @@ public class SimpleSolrSearch {
 	
 	public void setDebug(boolean debug) {
 		this.solrQuery.set("debug", debug);
-		System.out.println("debug=" + debug);
 	}
 	
 	
 	public void setDefType(String defType) {
 		this.solrQuery.setParam("defType", defType);
-		System.out.println("defType=" + defType);
 	}
 	
 	
 	public void setFields(String fields) {
 		this.solrQuery.setFields(fields);
-		System.out.println("fl=" + fields);
 	}
 	
 	
 	public void setQueryText(String queryText) {
 		this.solrQuery.setQuery(queryText);
-		System.out.println("q=" + queryText);
 	}
 	
 	
@@ -104,7 +97,6 @@ public class SimpleSolrSearch {
 		try {
 		    this.rows = new Integer(rowsStr);
 		    this.solrQuery.setRows(rows);
-		    System.out.println("rows=" + rowsStr);
 		}
 		catch (NumberFormatException e) {
 			logger.warn(String.format("Unable to parse specified 'rows' value: %s", rowsStr));
@@ -116,7 +108,6 @@ public class SimpleSolrSearch {
 		try {
 		    Integer start = new Integer(startStr);
 		    this.solrQuery.setStart(start);
-		    System.out.println("start=" + startStr);
 		}
 		catch (NumberFormatException e) {
 			logger.warn(String.format("Unable to parse specified 'start' value: %s", startStr));

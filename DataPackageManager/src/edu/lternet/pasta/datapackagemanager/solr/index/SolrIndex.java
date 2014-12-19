@@ -74,7 +74,7 @@ public class SolrIndex {
 
 		UpdateResponse updateResponse = solrServer.deleteById(ids);
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
-		System.out.println(String.format("Delete of document id %s; delete status %d", id, status));
+		logger.info(String.format("Delete of document id %s; delete status %d", id, status));
 	}
 	
 	
@@ -228,7 +228,7 @@ public class SolrIndex {
 
 			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
-			System.out.println(String.format(
+			logger.info(String.format(
 					"Add of id %s; update status %d", id, status));
 		}
 		else {
