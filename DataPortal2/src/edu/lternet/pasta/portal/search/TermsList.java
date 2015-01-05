@@ -75,6 +75,16 @@ public class TermsList {
   
   
   /**
+   * Returns the size of the terms list
+   * 
+   * @return  the size value
+   */
+  public int size() {
+	  return terms.size();
+  }
+
+
+  /**
    * Returns an HTML string for presentation of the terms list
    */
   public String toHTML() {
@@ -92,5 +102,5 @@ public class TermsList {
     
     return termsListHTML;
   }
-
+  
 }

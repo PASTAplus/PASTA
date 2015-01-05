@@ -128,7 +128,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
       throws ServletException, IOException {
     
     String forward = "./searchResult.jsp";
-    String html = null;
+    String html = "";
     TermsList termsList = null;
     String termsListHTML= "";
     String xml = null;
@@ -205,14 +205,14 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			httpSession.setAttribute("queryText", queryText);
 
 			termsList = solrAdvancedSearch.getTermsList();
-			if (termsList != null) {
+			if ((termsList != null) && (termsList.size() > 0)) {
 				termsListHTML = termsList.toHTML();
+				html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
 			}
 
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
 			resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
 			resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
-			html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
 			html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
