@@ -188,6 +188,7 @@
         <exclude name="**/.#*"/>
       </webinf>
       <fileset dir="${web.dir}">
+	  	<include name="**/robots.txt"/>
         <include name="**/*.js"/>
         <include name="**/*.jsp"/>
         <include name="**/*.html"/>
