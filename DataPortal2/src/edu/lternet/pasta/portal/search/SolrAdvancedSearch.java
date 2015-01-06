@@ -221,7 +221,6 @@ public class SolrAdvancedSearch extends Search  {
 				TreeSet<String> webTerms = ControlledVocabularyClient
 						.webServiceSearchValues(term, hasExact, hasNarrow,
 								hasRelated, hasNarrowRelated, hasAll);
-				webTerms = optimizeTermList(webTerms);
 
 				for (String webValue : webTerms) {
 					derivedTerms.add(webValue);
@@ -658,108 +657,23 @@ public class SolrAdvancedSearch extends Search  {
 	}
 
 
-  /**
-   * Returns a string of spaces that corresponds to the current indent level.
-   * 
-   * @param indentLevel   The number of spaces to be indented.
-   * @return              A string containing indentLevel number of spaces.
-   */
-  private String getIndent(final int indentLevel) {
-    StringBuffer indent = new StringBuffer(12);
-    
-    for (int i = 0; i < indentLevel; i++) {
-      indent.append(" ");
-    }
-    
-    return indent.toString();
-  }
-  
-  
-  public String getQueryString() {
-	  return queryString;
-  }
-  
-  
-  /*
-   * Accessor method for the termsList instance variable.
-   * 
-   * @return  termsList, a TermsList object
-   */
-  public TermsList getTermsList() {
-    return termsList;
-  }
-  
-  
-  /**
-   * Given a query type value, return the corresponding Metacat
-   * searchmode string.
-   * 
-   * @param queryType  A string value indicating the query type:
-   *                     "0" --> "contains"
-   *                     "1" --> "equals"
-   *                     "2" --> "starts-with"
-   *                     "3" --> "ends-with"
-   * @return A string, the Metacat search mode value.
-   */ 
-  private String metacatSearchMode(final String queryType) {   
-    if (queryType == null) return "contains";
-    if (queryType.equals("0")) return "contains";
-    if (queryType.equals("1")) return "equals";
-    if (queryType.equals("2")) return "starts-with";
-    if (queryType.equals("3")) return "ends-with";
-    return "contains";  
-  }
-  
-  
-  /*
-   * Optimize the set of search terms returned from the controlled
-   * vocabulary web service by removing terms that are already
-   * covered by substring terms. For example, "fishes" can be
-   * removed if "fish" is already present.
-   * 
-   * An exception to this rule is if the substring term is short
-   * enough for using "exact" instead of "contains" (i.e. less than
-   * or equal to AdvancedSearchQueryGroup.EXACT_SEARCH_MAXIMUM_LENGTH).
-   */
-  private TreeSet<String> optimizeTermList(TreeSet<String> webValues) {
-    TreeSet<String> optimizedWebValues = new TreeSet<String>();
-    
-    for (String value1 : webValues) {
-      if (value1 != null) {
-        boolean keepThisValue = true;
-        for (String value2 : webValues) {
-          if ((!value1.equalsIgnoreCase(value2)) &&
-              (value2.length() > 
-               AdvancedSearchQueryGroup.EXACT_SEARCH_MAXIMUM_LENGTH)
-             ) {
-            if (value1.contains(value2)) {
-              keepThisValue = false; // covered by a substring term
-            }
-          }
-        }
-        
-        /*
-         * This is a workaround for a Metacat bug #5443
-         * 
-         * http://bugzilla.ecoinformatics.org/show_bug.cgi?id=5443
-         * 
-         * Metacat structured pathquery is bugged. It does not support
-         * searchmode of 'equals' or 'matches-exactly' the way it should.
-         * So we need to filter out any terms that are two characters
-         * or less in length because they match too many documents on
-         * a 'contains' search.
-         */
-        if (value1.length() <= 3) {
-          keepThisValue = false;
-        }
-      
-        if (keepThisValue) {
-          optimizedWebValues.add(value1);
-        }
-      }
-    }
-    
-    return optimizedWebValues;
-  }
-  
+	/**
+	 * Accessor method for the queryString instance variable.
+	 * 
+	 * @return queryString
+	 */
+	public String getQueryString() {
+		return queryString;
+	}
+
+
+	/**
+	 * Accessor method for the termsList instance variable.
+	 * 
+	 * @return termsList, a TermsList object
+	 */
+	public TermsList getTermsList() {
+		return termsList;
+	}
+
 }

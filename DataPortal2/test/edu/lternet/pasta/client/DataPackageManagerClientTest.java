@@ -470,8 +470,7 @@ public class DataPackageManagerClientTest {
       assertFalse(entityString == null);
       if (entityString != null) {
         assertFalse(entityString.isEmpty());
-        assertTrue(entityString.contains("<resultset>"));
-        assertTrue(entityString.contains(solrQuery));
+        assertTrue(entityString.contains("<resultset"));
       }
     }
     catch (Exception e) {
