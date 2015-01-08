@@ -2930,7 +2930,7 @@
         <tr>
           <td class="{$firstColStyle}">Altitude Minimum:</td>
           <td class="{$secondColStyle}"><xsl:value-of select="altitudeMinimum"/></td>
-          <td class="$firstColStyle}">Altitude Maximum:</td>
+          <td class="${firstColStyle}">Altitude Maximum:</td>
           <td class="{$secondColStyle}"><xsl:value-of select="altitudeMaximum"/></td>
         </tr>
       </xsl:otherwise>
