@@ -161,6 +161,7 @@ public class BrowseServlet extends DataPortalServlet {
 
       ResultSetUtility resultSetUtility = new ResultSetUtility(xml);  
       html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";     
+      httpSession.setAttribute("termsListHTML", html);
       html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
       RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);

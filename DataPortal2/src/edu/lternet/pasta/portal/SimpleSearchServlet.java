@@ -100,6 +100,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		if (q == null || q.equals("")) {
 			// if no q param was passed, look for query stored in the session
 			queryText = (String) httpSession.getAttribute("queryText");
+			html = (String) httpSession.getAttribute("termsListHTML");
 		}
 		else {
 			queryText = q;
@@ -119,7 +120,8 @@ public class SimpleSearchServlet extends DataPortalServlet {
 						uid);
 				xml = dpmClient.searchDataPackages(queryText);
 				ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-				html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+				if (html == null) html = "";
+				html = html + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			}
 			catch (Exception e) {
 				handleDataPortalError(logger, e);
@@ -158,13 +160,15 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String userInput = (String) request.getParameter("terms");
 
 		try {
+			html = "<p> Terms used in this search: <b>" + userInput + "</b></p>\n";
+		    httpSession.setAttribute("termsListHTML", html);
 			String queryText = SimpleSearch.buildSolrQuery(userInput, false);
 			httpSession.setAttribute("queryText", queryText);
 			queryText = String.format("%s&start=%d&rows=%d", queryText, 0, Search.DEFAULT_ROWS);
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			html = html + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 		}
 		catch (Exception e) {
 			handleDataPortalError(logger, e);

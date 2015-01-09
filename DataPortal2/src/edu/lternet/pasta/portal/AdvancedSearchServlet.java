@@ -208,6 +208,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			if ((termsList != null) && (termsList.size() > 0)) {
 				termsListHTML = termsList.toHTML();
 				html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
+				httpSession.setAttribute("termsListHTML", html);
 			}
 
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
