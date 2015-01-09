@@ -114,6 +114,12 @@ public class BrowseTerm {
     	searchValue = this.value;
     }
     
+    if (searchValue != null) {
+    	if (searchValue.contains(" ") && (!searchValue.startsWith("\""))) {
+    		searchValue = String.format("\"%s\"", searchValue);
+    	}
+    }
+    
     String queryString = SimpleSearch.buildSolrQuery(searchValue, isLTERSite());
     
     return queryString;
