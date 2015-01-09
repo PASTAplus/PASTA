@@ -75,7 +75,7 @@ public class SimpleSearch extends Search {
 					siteFilter = String.format("scope:(knb-lter-%s)", userInput.toLowerCase());
 				}
 				else {
-					String escapedInput = ClientUtils.escapeQueryChars(userInput);
+					String escapedInput = Search.escapeQueryChars(userInput);
 					qString = URLEncoder.encode(escapedInput, "UTF-8");
 				}
 			}

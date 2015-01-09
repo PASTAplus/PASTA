@@ -3,6 +3,8 @@ package edu.lternet.pasta.portal.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
+
 /**
  * The Search class contains methods that are common to all search classes,
  * such as SimpleSearch and AdvancedSearch.
@@ -31,6 +33,23 @@ public class Search {
 	/*
 	 * Class methods
 	 */
+	  
+	  /**
+	   * Calls the ClientUtils.escapeQueryChars method but does some
+	   * post-processing by removing escaped spaces and double-quotes. 
+	   * This helps support phrase queries such as "coral reef".
+	   * 
+	   * @param queryString   The query string
+	   * @return escapedString, The escaped query string
+	   */
+	  public static String escapeQueryChars(String queryString) {
+		  String escapedString = ClientUtils.escapeQueryChars(queryString);
+		  if (escapedString != null) {
+			  escapedString = escapedString.replace("\\ ", " "); // don't escape spaces
+			  escapedString = escapedString.replace("\\\"", "\""); // don't escape double quotes
+		  }
+		  return escapedString;
+	  }
 	  
 	  /**
 	   * Return a list of indexed paths for use in either simple search,
@@ -70,21 +89,25 @@ public class Search {
 	  }
 
 	
-	  /**
-	   * Adds a string to a list of terms. An auxiliary method to the
-	   * parseTermsAdvanced() method.
-	   * 
-	   * @param terms list of term strings.
-	   * @param term  the new string to add to the list, but only if
-	   *              it isn't an empty string.
-	   */
-	  private static void addTerm(List<String> terms, final StringBuffer term) {
-	    final String s = term.toString().trim();
-	      
-	    if (s.length() > 0) {
-	      terms.add(s);
-	    }
-	  }
+	/**
+	 * Adds a string to a list of terms. An auxiliary method to the
+	 * parseTermsAdvanced() method.
+	 * 
+	 * @param terms
+	 *            list of term strings.
+	 * @param term
+	 *            the new string to add to the list, but only if it isn't an
+	 *            empty string.
+	 */
+	private static void addTerm(List<String> terms, final String term) {
+		if (term != null) {
+			final String s = term.trim();
+
+			if (s.length() > 0) {
+				terms.add(s);
+			}
+		}
+	}
 	  
 	  
 	/**
@@ -99,7 +122,7 @@ public class Search {
 	protected static List<String> parseTerms(String value) {
 		char c;
 		StringBuffer currentTerm = new StringBuffer();
-		boolean keepSpaces = false;
+		boolean keepWhitespace = false;
 		final int stringLength;
 		List<String> terms = new ArrayList<String>();
 
@@ -113,22 +136,23 @@ public class Search {
 				/* Termination of a quote-enclosed term. Add the current term to
 				 * list and start a new term.
 				 */
-				if (keepSpaces) {
-					addTerm(terms, currentTerm);
+				if (keepWhitespace) {
+					String phraseTerm = String.format("\"%s\"", currentTerm.toString());
+					addTerm(terms, phraseTerm);
 					currentTerm = new StringBuffer();
 				}
 
-				keepSpaces = !(keepSpaces); // Toggle keepSpaces
+				keepWhitespace = !(keepWhitespace); // Toggle keepWhitespace
 			}
 			else
-				if (c == ' ') {
-					// If we are inside a quote-enclosed term, append the space.
-					if (keepSpaces) {
+				if (Character.isWhitespace(c)) {
+					// If we are inside a quote-enclosed term, append the whitespace char.
+					if (keepWhitespace) {
 						currentTerm.append(c);
 					}
 					// Else, add the current term to the list and start a new term.
 					else {
-						addTerm(terms, currentTerm);
+						addTerm(terms, currentTerm.toString());
 						currentTerm = new StringBuffer();
 					}
 				}
@@ -139,7 +163,7 @@ public class Search {
 		}
 
 		// Add the final term to the list.
-		addTerm(terms, currentTerm);
+		addTerm(terms, currentTerm.toString());
 
 		return terms;
 	}

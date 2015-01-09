@@ -245,7 +245,7 @@ public class SolrAdvancedSearch extends Search  {
 			}
 
 			queryTerms = queryTerms.trim();
-			String escapedTerms = ClientUtils.escapeQueryChars(queryTerms);
+			String escapedTerms = Search.escapeQueryChars(queryTerms);
 			String encodedTerms = URLEncoder.encode(escapedTerms, "UTF-8");
 			String subjectQuery = String.format("%s:%s", field, encodedTerms);
 			updateQString(subjectQuery);
@@ -278,7 +278,7 @@ public class SolrAdvancedSearch extends Search  {
 
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String escapedValue = Search.escapeQueryChars(value);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String authorQuery = String.format("author:%s", encodedValue);
       updateQString(authorQuery);
@@ -288,7 +288,7 @@ public class SolrAdvancedSearch extends Search  {
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String escapedValue = Search.escapeQueryChars(value);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String organizationQuery = String.format("organization:%s", encodedValue);
       updateQString(organizationQuery);
@@ -304,7 +304,7 @@ public class SolrAdvancedSearch extends Search  {
   		throws UnsupportedEncodingException {
     if ((locationName != null) && (!(locationName.equals("")))) {
       termsList.addTerm(locationName);
-      String escapedValue = ClientUtils.escapeQueryChars(locationName);
+      String escapedValue = Search.escapeQueryChars(locationName);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String locationQuery = String.format("geographicdescription:%s", encodedValue);
       updateQString(locationQuery);
@@ -418,7 +418,7 @@ public class SolrAdvancedSearch extends Search  {
      */
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
       termsList.addTerm(namedTimescale);
-      String escapedValue = ClientUtils.escapeQueryChars(namedTimescale);
+      String escapedValue = Search.escapeQueryChars(namedTimescale);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String timescaleQuery = String.format("timescale:%s", encodedValue);
       updateQString(timescaleQuery);
@@ -553,7 +553,7 @@ public class SolrAdvancedSearch extends Search  {
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = ClientUtils.escapeQueryChars(value);
+      String escapedValue = Search.escapeQueryChars(value);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String taxonQuery = String.format("taxonomic:%s", encodedValue);
       updateQString(taxonQuery);
