@@ -26,6 +26,7 @@ package edu.lternet.pasta.portal.search;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -64,12 +65,19 @@ public class SimpleSearch extends Search {
    * @return the Solr query string, including any filter queries, to be sent to Solr
    *         for processing
    */
-	public static String buildSolrQuery(String userInput, boolean isSiteQuery) {
+	public String buildSolrQuery(String userInput, boolean isSiteQuery) {
 		String solrQuery = null;
 		String qString = DEFAULT_Q_STRING;
 		String siteFilter = "";
+		List<String> terms;
 
 		if (userInput != null && !userInput.equals("")) {
+			terms = parseTerms(userInput);
+			
+			for (String term : terms) {
+				termsList.addTerm(term);
+			}
+			
 			try {
 				if (isSiteQuery) {
 					siteFilter = String.format("scope:(knb-lter-%s)", userInput.toLowerCase());

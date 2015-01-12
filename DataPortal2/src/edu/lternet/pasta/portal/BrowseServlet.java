@@ -158,11 +158,10 @@ public class BrowseServlet extends DataPortalServlet {
       
       String queryText = browseTerm.getQueryString();
       httpSession.setAttribute("queryText", queryText);
+      httpSession.setAttribute("termsListHTML", termsListHTML);
 
       ResultSetUtility resultSetUtility = new ResultSetUtility(xml);  
-      html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";     
-      httpSession.setAttribute("termsListHTML", html);
-      html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+      html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
       RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
       requestDispatcher.forward(request, response);

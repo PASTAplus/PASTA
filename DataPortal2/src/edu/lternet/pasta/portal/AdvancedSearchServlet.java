@@ -207,14 +207,13 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			termsList = solrAdvancedSearch.getTermsList();
 			if ((termsList != null) && (termsList.size() > 0)) {
 				termsListHTML = termsList.toHTML();
-				html = "<p> Terms used in this search: " + termsListHTML + "</p>\n";
-				httpSession.setAttribute("termsListHTML", html);
+				httpSession.setAttribute("termsListHTML", termsListHTML);
 			}
 
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
 			resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
 			resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
-			html += resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 			requestDispatcher.forward(request, response);

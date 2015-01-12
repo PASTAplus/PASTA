@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.common.ISO8601Utility;
@@ -88,7 +87,6 @@ public class SolrAdvancedSearch extends Search  {
   private String queryString;
   private String qString;
   private String fqString;
-  private TermsList termsList;
 
   // Controlled vocabulary settings
   private boolean hasExact = false;
@@ -129,7 +127,8 @@ public class SolrAdvancedSearch extends Search  {
       String eastBound,
       String westBound,
       String locationName
-                       ) { 
+                       ) {
+	super();
     this.creatorOrganization = creatorOrganization;
     this.creatorSurname = creatorSurname;
     this.dateField = dateField;
@@ -158,7 +157,6 @@ public class SolrAdvancedSearch extends Search  {
     this.hasNarrowRelated = isSpecificChecked && isRelatedChecked && !isRelatedSpecificChecked;
     this.hasAll = isRelatedSpecificChecked;
     
-    this.termsList = new TermsList();
     this.qString = DEFAULT_Q_STRING;
     this.fqString = initializeFilterQuery(includeEcotrends, includeLandsat5);
   }

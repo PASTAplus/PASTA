@@ -30,6 +30,21 @@ public class Search {
 	  protected final static String DEFAULT_DEBUG = "false";
 	  
 	  
+	  /*
+	   * Instance variables
+	   */
+	  
+	  protected TermsList termsList;
+	  
+	  
+	  /*
+	   * Constructors
+	   */
+	  
+	  public Search () {
+		  this.termsList = new TermsList();
+	  }
+	  
 	/*
 	 * Class methods
 	 */
@@ -167,10 +182,19 @@ public class Search {
 
 		return terms;
 	}
-
+	
 	
 	/*
 	 * Instance methods
 	 */
 	
+	/**
+	 * Accessor method for termsList
+	 * 
+	 * @return termsList
+	 */
+	public TermsList getTermsList() {
+		return termsList;
+	}
+
 }

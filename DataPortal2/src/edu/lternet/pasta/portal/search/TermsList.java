@@ -90,15 +90,15 @@ public class TermsList {
   public String toHTML() {
     String termsListHTML = null;
     StringBuilder stringBuilder = new StringBuilder("");
-    
+    stringBuilder.append("<p> Terms used in this search: ");
     for (String term : terms) {
       stringBuilder.append("<b>" + term + "</b>, ");
     }
-    
     termsListHTML = stringBuilder.toString();
     if (termsListHTML.length() > 2) {
       termsListHTML = termsListHTML.substring(0, termsListHTML.length() - 2);
     }
+    termsListHTML += "</p>\n";   
     
     return termsListHTML;
   }

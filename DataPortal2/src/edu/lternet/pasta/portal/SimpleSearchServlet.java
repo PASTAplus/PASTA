@@ -39,6 +39,7 @@ import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.search.SimpleSearch;
+import edu.lternet.pasta.portal.search.TermsList;
 
 public class SimpleSearchServlet extends DataPortalServlet {
 
@@ -160,15 +161,17 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String userInput = (String) request.getParameter("terms");
 
 		try {
-			html = "<p> Terms used in this search: <b>" + userInput + "</b></p>\n";
-		    httpSession.setAttribute("termsListHTML", html);
-			String queryText = SimpleSearch.buildSolrQuery(userInput, false);
+			SimpleSearch simpleSearch = new SimpleSearch();
+			String queryText = simpleSearch.buildSolrQuery(userInput, false);
+			TermsList termsList = simpleSearch.getTermsList();
+			String termsListHTML = termsList.toHTML();
+		    httpSession.setAttribute("termsListHTML", termsListHTML);
 			httpSession.setAttribute("queryText", queryText);
 			queryText = String.format("%s&start=%d&rows=%d", queryText, 0, Search.DEFAULT_ROWS);
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-			html = html + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 		}
 		catch (Exception e) {
 			handleDataPortalError(logger, e);

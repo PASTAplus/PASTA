@@ -63,6 +63,7 @@ public class BrowseTerm {
   private String queryString = null;
   private TermsList termsList;
   private final String value;    // Text value of this browse term, e.g. "percent carbon"
+  private String displayValue;
 
   // The term ID in the LTER Controlled Vocabulary
   private String termId = null;  
@@ -79,10 +80,15 @@ public class BrowseTerm {
   public BrowseTerm(String value) {
     String fileSeparator = System.getProperty("file.separator");
     this.value = value;
+    this.displayValue = value;
+    if (isLTERSite()) {
+        LTERSite lterSite = new LTERSite(value);
+        displayValue = lterSite.getSiteName();
+    }   
     this.browseTermPath = BrowseSearch.browseCacheDir + fileSeparator + fileName() + ".term";
     this.queryString = composeQueryString();
     this.termsList = new TermsList();
-    termsList.addTerm(value);
+    termsList.addTerm(displayValue);
   }
 
 
@@ -120,7 +126,8 @@ public class BrowseTerm {
     	}
     }
     
-    String queryString = SimpleSearch.buildSolrQuery(searchValue, isLTERSite());
+    SimpleSearch simpleSearch = new SimpleSearch();
+    String queryString = simpleSearch.buildSolrQuery(searchValue, isLTERSite());
     
     return queryString;
   }
@@ -276,12 +283,6 @@ public class BrowseTerm {
   public String toHTML() {
     String htmlString;
     StringBuffer stringBuffer = new StringBuffer("");
-    String displayValue = value;
-    
-    if (isLTERSite()) {
-        LTERSite lterSite = new LTERSite(value);
-        displayValue = lterSite.getSiteName();
-    }
     
     if (matchCount > 0) {
       String encodedValue = value;     
