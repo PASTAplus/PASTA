@@ -203,7 +203,7 @@ public class ResultSetUtility {
 	
 	
 	/**
-	 * Transforms Metacat search results XML to an HTML table.
+	 * Transforms Solr search results XML to an HTML table.
 	 * 
 	 * @param xslPath
 	 *            The path to the search results-set stylesheet.
