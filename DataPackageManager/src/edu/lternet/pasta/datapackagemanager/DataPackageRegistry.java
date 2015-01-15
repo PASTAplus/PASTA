@@ -42,6 +42,7 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
+import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -1813,6 +1814,62 @@ public class DataPackageRegistry {
         while (rs.next()) {
           String revision = rs.getString("revision");
           revisionList.add(revision);
+        }
+      }
+      catch(ClassNotFoundException e) {
+        logger.error("ClassNotFoundException: " + e.getMessage());
+        throw(e);
+      }
+      catch(SQLException e) {
+        logger.error("SQLException: " + e.getMessage());
+        throw(e);
+      }
+      finally {
+        if (stmt != null) stmt.close();
+        returnConnection(connection);
+      }
+    }
+    else {
+      String message = "One or more of the scope or identifier values is null";
+      throw new IllegalArgumentException(message);
+    }
+    
+    return revisionList;
+  }
+
+	
+	/**
+	 * Lists all prior revisions for a data package, regardless of whether
+	 * the data package has been deleted or not.
+	 *  
+	 * @param emlPackageId   the EML package identifier object
+	 * @return  an array list of integer values in ascending order representing
+	 *          all known prior revisions to the current data package revision
+	 */
+	public ArrayList<Integer> listPriorRevisions(EmlPackageId emlPackageId)
+          throws ClassNotFoundException, SQLException, IllegalArgumentException {
+    ArrayList<Integer> revisionList = new ArrayList<Integer>();
+    String scope = emlPackageId.getScope();
+    Integer identifier = emlPackageId.getIdentifier();
+    
+    if (scope != null && identifier != null) {
+      Connection connection = null;
+      String selectString = 
+        "SELECT revision FROM " + RESOURCE_REGISTRY +
+        "  WHERE resource_type='dataPackage'" +
+        "  AND scope='" + scope + 
+        "' AND identifier='" + identifier + "'" +
+        "  ORDER BY revision";
+      Statement stmt = null;
+    
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();             
+        ResultSet rs = stmt.executeQuery(selectString);
+      
+        while (rs.next()) {
+          int revision = rs.getInt("revision");
+          revisionList.add(new Integer(revision));
         }
       }
       catch(ClassNotFoundException e) {

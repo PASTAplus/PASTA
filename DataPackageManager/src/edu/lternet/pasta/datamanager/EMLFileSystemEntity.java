@@ -49,6 +49,7 @@ public class EMLFileSystemEntity extends EMLEntity {
    */
   
   private String baseDir = null;  /* Top-level directory for this entity */
+  private String checksum = null;
   private boolean evaluateMode = false;
   
   
@@ -74,7 +75,7 @@ public class EMLFileSystemEntity extends EMLEntity {
 
 
   /**
-   * Constructs an EMLFileSystemEntity object based on a know base
+   * Constructs an EMLFileSystemEntity object based on a known base
    * directory, the EmlPackageId and the entityId. We use this constructor
    * when the base directory has been previously stored in the Data Package 
    * Registry, so it is typically used when reading an existing data entity.
@@ -146,6 +147,14 @@ public class EMLFileSystemEntity extends EMLEntity {
 	  
 	  return exists;
 	}
+	
+	
+	/**
+	 * Get the checksum value for this data entity
+	 */
+	public String getChecksum() {
+		return checksum;
+	}
 
 	
   /**
@@ -190,6 +199,17 @@ public class EMLFileSystemEntity extends EMLEntity {
 	  
 	  return entityFile;
 	}
+	
+	
+	/**
+	 * Returns the resource location value for this file system entity, as
+	 * stored in the baseDir instance variable.
+	 * 
+	 * @return  baseDir, the resource location value
+	 */
+	public String getResourceLocation() {
+		return baseDir;
+	}
 
 	
   /**
@@ -199,6 +219,16 @@ public class EMLFileSystemEntity extends EMLEntity {
    */
   public boolean isEvaluateMode() {
     return evaluateMode;
+  }
+  
+  
+  /**
+   * Sets the checksum value for this data entity.
+   * 
+   * @param checksum  the checksum value
+   */
+  public void setChecksum(String checksum) {
+	  this.checksum = checksum;
   }
 
   
