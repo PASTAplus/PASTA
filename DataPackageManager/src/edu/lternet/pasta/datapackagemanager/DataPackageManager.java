@@ -739,10 +739,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Register a DOI for the data package
 				 */
 				if (doiScanner != null) {
-					ArrayList<Resource> resourceList = dataPackageRegistry.listDataPackageResources(packageId);
+					// DOIs should be created only for publicly accessible resources
+					boolean publicOnly = true;
+					ArrayList<Resource> resourceList = 
+							dataPackageRegistry.listDataPackageResources(packageId, publicOnly);
 					if (resourceList != null) {
 						for (Resource resource : resourceList) {
-							if (resource.getResourceType().equals("dataPackage")) {
+							if (resource.getResourceType().equals("dataPackage") &&
+								resource.getDoi() == null
+							   ) {
 								try {
 									doiScanner.processOneResource(resource);
 								}

@@ -37,6 +37,7 @@ public class Resource {
 	 * Instance variables
 	 */
 
+	private String doi = null;
 	private String resourceId = null;
 	private String resourceLocation = null;
 	private String resourceType = null;
@@ -59,6 +60,13 @@ public class Resource {
 	/*
 	 * Instance methods
 	 */
+	
+	/*
+	 * Set doi value
+	 */
+	public void setDoi(String doi) {
+		this.doi = doi;
+	}
 
 	/**
 	 * Set resource identifier.
@@ -103,6 +111,13 @@ public class Resource {
 	 */
 	public void setDateCreate(String dateCreated) {
 		this.dateCreated = dateCreated;
+	}
+	
+	/**
+	 * Get doi value.
+	 */
+	public String getDoi() {
+		return this.doi;
 	}
 	
 	/**
