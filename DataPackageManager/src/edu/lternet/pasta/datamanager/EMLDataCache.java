@@ -284,7 +284,6 @@ public class EMLDataCache {
         connection = getConnection();
         stmt = connection.createStatement();
         rowCount = stmt.executeUpdate(deleteString);
-        connection.commit();
         success = (rowCount > 0);
         logger.debug("deleteString: " + deleteString);
         logger.debug("Number of rows deleted: " + rowCount);
@@ -331,7 +330,6 @@ public class EMLDataCache {
         connection = getConnection();
         stmt = connection.createStatement();
         rowCount = stmt.executeUpdate(deleteString);
-        connection.commit();
         logger.debug("deleteString: " + deleteString);
         logger.debug("Number of rows deleted: " + rowCount);
         if (stmt != null) stmt.close();
@@ -379,7 +377,6 @@ public class EMLDataCache {
         connection = getConnection();
         stmt = connection.createStatement();
         rowCount = stmt.executeUpdate(deleteString);
-        connection.commit();
         logger.debug("deleteString: " + deleteString);
         logger.debug("Number of rows deleted: " + rowCount);
         if (stmt != null) stmt.close();
