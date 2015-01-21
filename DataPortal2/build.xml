@@ -74,7 +74,7 @@
         <include name="**/esapi-2.0.1.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
-        <include name="**/postgresql-8.4-702.jdbc4.jar"/>
+        <include name="**/postgresql-9.3-1102.jdbc41.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/saxon9">
         <include name="**/saxon9he.jar"/>
