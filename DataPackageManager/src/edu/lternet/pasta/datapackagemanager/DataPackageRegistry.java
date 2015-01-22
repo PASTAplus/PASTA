@@ -1684,6 +1684,58 @@ public class DataPackageRegistry {
 
 	  
 	  /**
+	   * Lists all data package revisions known to PASTA, including active and deleted.
+	   * 
+	   * @return A list of packageId strings corresponding to the list of
+	   *         data packages.
+	   *        
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
+	  public ArrayList<String> listAllDataPackageRevisions()
+	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	    ArrayList<String> packageIdList = new ArrayList<String>();
+
+	    Connection connection = null;
+	    String selectString = 
+	    	"SELECT DISTINCT scope, identifier, revision" +
+	        "  FROM " + RESOURCE_REGISTRY +
+	        "  WHERE resource_type='dataPackage'" +
+	        "  ORDER BY scope, identifier, revision";
+	    Statement stmt = null;
+
+	    try {
+	      connection = getConnection();
+	      stmt = connection.createStatement();
+	      ResultSet rs = stmt.executeQuery(selectString);
+
+	      while (rs.next()) {
+	        String scope = rs.getString("scope");
+	        int identifier = rs.getInt("identifier");
+	        int revision = rs.getInt("revision");
+	        String packageId = scope + "." + identifier + "." + revision;
+	        packageIdList.add(packageId);
+	      }
+	    }
+	    catch (ClassNotFoundException e) {
+	      logger.error("ClassNotFoundException: " + e.getMessage());
+	      throw (e);
+	    }
+	    catch (SQLException e) {
+	      logger.error("SQLException: " + e.getMessage());
+	      throw (e);
+	    }
+	    finally {
+	      if (stmt != null) stmt.close();
+	      returnConnection(connection);
+	    }
+
+	    return packageIdList;
+	  }
+
+	  
+	  /**
 	   * Lists all data entities for a given data package.
 	   * 
 	   * @param scope        the data package scope value

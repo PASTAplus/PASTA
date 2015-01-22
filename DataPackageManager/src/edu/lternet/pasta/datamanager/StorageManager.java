@@ -25,11 +25,14 @@
 package edu.lternet.pasta.datamanager;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -41,6 +44,7 @@ import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.doi.ConfigurationException;
 import edu.lternet.pasta.doi.Resource;
 import edu.ucsb.nceas.utilities.Options;
+
 
 /**
  * Class to optimize the data storage for a given revision of
@@ -70,6 +74,40 @@ public class StorageManager {
 	 * Class methods
 	 */
 	
+	/*
+	 * Get all data package revisions known to exist in PASTA (including deleted).
+	 */
+	private static List<EmlPackageId> getAllDataPackageRevisions(DataPackageRegistry dataPackageRegistry) 
+			throws ClassNotFoundException, SQLException {
+			List<EmlPackageId> allDataPackageRevisions = new ArrayList<EmlPackageId>();
+			
+			ArrayList<String> packageIdList = dataPackageRegistry.listAllDataPackageRevisions();
+
+			for (String packageId : packageIdList) {
+				if (packageId != null && packageId.contains(".")) {
+					String[] elements = packageId.split("\\.");
+				    if (elements.length != 3) {
+				        String msg = 
+				        	String.format(
+				        		"The packageId '%s' does not conform to the " +
+				        	    "standard format <scope>.<identifier>.<revision>", 
+				        	    packageId);	
+				        throw new IllegalArgumentException(msg);
+				    }
+				    else {
+				        String scope = elements[0];
+				        Integer identifier = new Integer(elements[1]);
+				        Integer revision = new Integer(elements[2]);
+				        EmlPackageId emlPackageId = 
+				        	new EmlPackageId(scope, identifier, revision);
+				        allDataPackageRevisions.add(emlPackageId);
+					}
+				}
+			}
+			
+			return allDataPackageRevisions;
+		}
+
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 * 
@@ -96,19 +134,30 @@ public class StorageManager {
 	}
 	
 	
+	/**
+	 * The main program has two modes of operation. If 3 arguments are passed, it
+	 * operates on a single data package of the specified scope, identifier, and
+	 * revision. Or, if zero arguments are passed, it operates on all the data
+	 * package in PASTA.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Options options = ConfigurationListener.getOptions();
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
 		
+		/*
+		 * If the program is passed three arguments, then optimize data storage
+		 * for a specific scope, identifier, and revision.
+		 */
 		if (args.length == 3) {
 			String scope = args[0];
 			Integer identifier = new Integer(args[1]);
 			Integer revision = new Integer(args[2]);
-
-			if (options == null) {
-				ConfigurationListener configurationListener = new ConfigurationListener();
-				configurationListener.initialize(dirPath);
-				options = ConfigurationListener.getOptions();
-			}
 
 			try {
 				DataPackageRegistry dataPackageRegistry = loadOptions(options);
@@ -121,6 +170,19 @@ public class StorageManager {
 				logger.error("main method failed with error: " + e.getMessage());
 			}
 		}
+		/*
+		 * If the program is passed 0 arguments, then optimize data storage
+		 * for all data packages in PASTA, active and deleted.
+		 */
+		else if (args.length == 0) {
+			try {
+				DataPackageRegistry dataPackageRegistry = loadOptions(options);
+				optimizeAllPastaData(dataPackageRegistry);
+			}
+			catch (Exception e) {
+				logger.error("main method failed with error: " + e.getMessage());
+			}
+		}
 		else {
 			logger.error("Specify the scope, identifier, and revision arguments");
 		}
@@ -128,10 +190,52 @@ public class StorageManager {
 	}
 
 	
+	/**
+	 * Static method to optimize storage for all data entities of all
+	 * data packages, whether active or deleted, in PASTA.
+	 */
+	public static void optimizeAllPastaData(DataPackageRegistry dataPackageRegistry) {		
+		try {
+			List<EmlPackageId> emlPackageIds = getAllDataPackageRevisions(dataPackageRegistry);
+
+			for (EmlPackageId emlPackageId : emlPackageIds) {
+				EmlPackageIdFormat epif = new EmlPackageIdFormat();
+				String packageId = epif.format(emlPackageId);
+				
+				try {
+					StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
+					storageManager.optimizeStorage();
+				}
+				catch (Exception e) {
+					logger.error(
+							String.format("Exception optimizing data storage for data package %s: %s",
+									      packageId,
+									      e.getMessage()
+									     )
+								);
+				}
+			}
+		}
+		catch (Exception e) {
+			logger.error(String.format("Error optimizing data storage: %s", e.getMessage()));
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/*
 	 * Constructors
 	 */
 	
+	/**
+	 * Constructs a StorageManager object which is responsible for optimizing data
+	 * storage on a specific revision of a single data package.
+	 * 
+	 * @param dataPackageRegistry 
+	 *     a DataPackageRegistry object for reading from the resource registry
+	 * @param emlPackageId        
+	 *     the package id of the data package whose data storage is to be optimized
+	 */
 	public StorageManager(DataPackageRegistry dataPackageRegistry, EmlPackageId emlPackageId) {
 		this.emlPackageId = emlPackageId;
 		this.dataPackageRegistry = dataPackageRegistry;
@@ -198,9 +302,7 @@ public class StorageManager {
 							    			                   packageId, entityId);
 							    	System.err.println(msg);
 									// Delete the data entity for this revision from the disk
-							    	/*
 									fse.deleteEntity();
-									*/
 									
 									// Create a hard link from the path of the data entity for this revision
 					                // to the path of the data entity for the prior revision.
@@ -217,7 +319,7 @@ public class StorageManager {
 							    	String createLinkMsg = String.format("Creating hard link from %s to %s",
 			    			                   filePathStr, previousFilePathStr);
 							    	System.err.println(createLinkMsg);
-							    	/*
+
 								    try {
 								    	Path returnPath = Files.createLink(path, previousPath);
 								    	if (returnPath != null) {
@@ -226,11 +328,10 @@ public class StorageManager {
 								    	}
 								    }
 								    catch (IOException e) {
-								    	String msg = String.format("Error creating hard link from %s to %s",
-								    			                   filePathStr, previousFilePathStr);
+								    	msg = String.format("Error creating hard link from %s to %s",
+								    			            filePathStr, previousFilePathStr);
 								    	System.err.println(msg);
 								    }							    								
-								    */
 								}							
 							}
 						}
