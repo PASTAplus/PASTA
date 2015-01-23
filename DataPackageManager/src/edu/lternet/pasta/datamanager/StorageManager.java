@@ -26,6 +26,7 @@ package edu.lternet.pasta.datamanager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -248,7 +249,13 @@ public class StorageManager {
 	 * Instance methods
 	 */
 	
-	public void optimizeStorage() {
+	/**
+	 * Optimizes data storage for the data entities of a specific 
+	 * revision of a data package.
+	 * 
+	 * @throws Exception
+	 */
+	public void optimizeStorage() throws Exception {
 		String scope = emlPackageId.getScope();
 		Integer identifier = emlPackageId.getIdentifier();
 		Integer revision = emlPackageId.getRevision();
@@ -269,70 +276,131 @@ public class StorageManager {
 				for (EMLFileSystemEntity fse : fileSystemEntities) {
 					EmlPackageId priorEmlPackageId = new EmlPackageId(scope, identifier, priorRevision);
 					String resourceLocation = fse.getResourceLocation();
-					
-					// For each data entity for the prior revision
-					boolean hasBeenOptimized = false;					
-					ArrayList<EMLFileSystemEntity> priorFileSystemEntities = getFileSystemEntities(priorEmlPackageId);
-					for (EMLFileSystemEntity pfse : priorFileSystemEntities) {
-						// If we haven't yet optimized this date entity by linking it to a prior revision's data entity
-						if (!hasBeenOptimized) {
 
-							String checksum = fse.getChecksum();
-							String priorChecksum = pfse.getChecksum();
-						
-							// If the sha1_checksum of the data entity for this revision EQUALS
-							// the sha1_checksum of the data entity for the prior revision,
-							// and if the data entity file for the prior revision can be verified 
-							// to exist on disk with the given checksum value
-							if (checksum != null &&
-								checksum.equals(priorChecksum) &&
-								(verifyChecksum(pfse, priorChecksum))
-							   ) {
-						 					
-								// If the resource_location value of the data entity for this revision EQUALS
-				                // the resource_location value of the data entity for the prior revision
-				                // (i.e. the data entities reside on the same disk)
-								String priorResourceLocation = pfse.getResourceLocation();
-								
-								if (resourceLocation != null &&
-								    resourceLocation.equals(priorResourceLocation)) {
-									
-									String entityId = fse.getEntityId();
-							    	String msg = String.format("Deleting entity for storage optimization: %s %s",
-							    			                   packageId, entityId);
-							    	System.err.println(msg);
-									// Delete the data entity for this revision from the disk
-									fse.deleteEntity();
-									
-									// Create a hard link from the path of the data entity for this revision
-					                // to the path of the data entity for the prior revision.
-									FileSystem fileSystem = FileSystems.getDefault();
+					/*
+					 * If we haven't yet optimized this date entity by linking 
+					 * it to a prior revision's data entity
+					 */
+					if (!fse.isOptimized()) {
+						ArrayList<EMLFileSystemEntity> priorFileSystemEntities = getFileSystemEntities(priorEmlPackageId);
 
-									File entityFile = fse.getEntityFile();
-									String filePathStr = entityFile.getAbsolutePath();
-									Path path = fileSystem.getPath(filePathStr);
+						/*
+						 * For each data entity for the prior revision
+						 */
+						for (EMLFileSystemEntity pfse : priorFileSystemEntities) {
+							
+							/*
+							 * If we haven't yet optimized this date entity by
+							 * linking it to one of this prior revision's data
+							 * entities
+							 */
+							if (!fse.isOptimized()) {
+								String checksum = fse.getChecksum();
+								String priorChecksum = pfse.getChecksum();
 
-									File previousEntityFile = pfse.getEntityFile();
-									String previousFilePathStr = previousEntityFile.getAbsolutePath();
-								    Path previousPath = fileSystem.getPath(previousFilePathStr);
+								/*
+								 * If the sha1_checksum of the data entity for
+								 * this revision EQUALS the sha1_checksum of the
+								 * data entity for the prior revision, and if
+								 * the data entity file for the prior revision
+								 * can be verified to exist on disk with the
+								 * given checksum value
+								 */
+								if (checksum != null && 
+									checksum.equals(priorChecksum) && 
+									(verifyChecksum(pfse, priorChecksum))
+								   ) {
+
+									/*
+									 * If the resource_location value of the
+									 * data entity for this revision EQUALS the
+									 * resource_location value of the data
+									 * entity for the prior revision (i.e. the
+									 * data entities reside on the same disk)
+									 */
+									String priorResourceLocation = pfse.getResourceLocation();
+
+									if (resourceLocation != null && 
+										resourceLocation.equals(priorResourceLocation)
+									   ) {
+
+										String entityId = fse.getEntityId();
+										String msg = 
+												String.format(
+														"Deleting entity for storage optimization: %s %s",
+														packageId, entityId);
+										logger.info(msg);
 										
-							    	String createLinkMsg = String.format("Creating hard link from %s to %s",
-			    			                   filePathStr, previousFilePathStr);
-							    	System.err.println(createLinkMsg);
+										/*
+										 * Delete the data entity for this revision from the disk.
+										 * This is where we reduce the amount of data stored on disk.
+										 */
+										fse.deleteEntity();
 
-								    try {
-								    	Path returnPath = Files.createLink(path, previousPath);
-								    	if (returnPath != null) {
-								    		// We are done with optimizing this data entity
-								    		hasBeenOptimized = true;
-								    	}
-								    }
-								    catch (IOException e) {
-								    	msg = String.format("Error creating hard link from %s to %s",
-								    			            filePathStr, previousFilePathStr);
-								    	System.err.println(msg);
-								    }							    								
-								}							
+										/*
+										 * Create a hard link from the path of the data entity for 
+										 * this revision to the path of the data entity for the
+										 * prior revision.
+										 */
+										FileSystem fileSystem = FileSystems.getDefault();
+
+										File entityFile = fse.getEntityFile();
+										String filePathStr = entityFile.getAbsolutePath();
+										Path path = fileSystem.getPath(filePathStr);
+
+										File previousEntityFile = pfse.getEntityFile();
+										String previousFilePathStr = previousEntityFile.getAbsolutePath();
+										Path previousPath = fileSystem.getPath(previousFilePathStr);
+
+										String createLinkMsg = 
+												String.format("Creating hard link from %s to %s",
+																filePathStr,previousFilePathStr);
+										logger.info(createLinkMsg);
+
+										try {
+											Path returnPath = Files.createLink(path, previousPath);
+											if (returnPath != null) {
+												// We are done optimizing this data entity
+												fse.setOptimized(true);
+											}
+										}
+										catch (FileAlreadyExistsException e) {
+											// this is okay, just issue a warning
+											msg = String.format(
+													"Failed to create hard link from %s to %s: %s",
+													filePathStr, previousFilePathStr, e.getMessage());
+											logger.warn(msg);
+										}
+										catch (Exception e) {
+											msg = String.format(
+													"Error creating hard link from %s to %s: %s",
+													filePathStr, previousFilePathStr, e.getMessage());
+											logger.error(msg);
+											/*
+											 * The hard link failed and the file does not exist because
+											 * we deleted it, so we need to recover the data by copying 
+											 * the file back to the path from which it was deleted.
+											 */
+											try {
+												msg = String.format(
+														"Recovering deleted data file by copying from %s to %s",
+														previousFilePathStr, filePathStr);
+												logger.warn(msg);
+												Files.copy(previousPath, path);
+											}
+											catch (FileAlreadyExistsException ex) {
+												// this is okay, we have the data file so no action needed
+											}
+											catch (Exception ex) {
+												msg = String.format(
+															"Error copying file from %s to %s: %s",
+															previousFilePathStr, filePathStr, e.getMessage());
+												logger.error(msg);
+												throw(e);
+											}
+										}
+									}
+								}
 							}
 						}
 					}

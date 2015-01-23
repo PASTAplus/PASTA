@@ -52,6 +52,13 @@ public class EMLFileSystemEntity extends EMLEntity {
   private String checksum = null;
   private boolean evaluateMode = false;
   
+  /*
+   * Indicates whether data storage for this file system entity been optimized.
+   * By default, we assume that it has not until we run the data storage optimization
+   * logic on it (see the StorageManager class).
+   */
+  private boolean optimized = false;     
+  
   
   /*
    * Constructors
@@ -223,6 +230,16 @@ public class EMLFileSystemEntity extends EMLEntity {
   
   
   /**
+   * Retrieves the optimized boolean value.
+   * 
+   * @return optimized, true if data storage for this entity has been optimized
+   */
+  public boolean isOptimized() {
+	  return optimized;
+  }
+  
+  
+  /**
    * Sets the checksum value for this data entity.
    * 
    * @param checksum  the checksum value
@@ -239,6 +256,18 @@ public class EMLFileSystemEntity extends EMLEntity {
    */
   public void setEvaluateMode(boolean evaluateMode) {
     this.evaluateMode = evaluateMode;
+  }
+
+  
+  /**
+   * Sets the optimized boolean value.
+   * 
+   * @param wasOptimized, the boolean value to set. Typically we would only
+   *                   set this to true and only after the optimization logic
+   *                   was successfully executed on this entity.
+   */
+  public void setOptimized(boolean wasOptimized) {
+    this.optimized = wasOptimized;
   }
 
 }
