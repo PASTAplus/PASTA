@@ -25,7 +25,6 @@
 package edu.lternet.pasta.datamanager;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -109,6 +108,7 @@ public class StorageManager {
 			return allDataPackageRevisions;
 		}
 
+	
 	/**
 	 * Loads Data Manager options from a configuration file.
 	 * 
@@ -194,6 +194,9 @@ public class StorageManager {
 	/**
 	 * Static method to optimize storage for all data entities of all
 	 * data packages, whether active or deleted, in PASTA.
+	 * 
+	 * @param dataPackageRegistry
+	 *     a DataPackageRegistry object for reading from the resource registry
 	 */
 	public static void optimizeAllPastaData(DataPackageRegistry dataPackageRegistry) {		
 		try {
@@ -251,7 +254,9 @@ public class StorageManager {
 	
 	/**
 	 * Optimizes data storage for the data entities of a specific 
-	 * revision of a data package.
+	 * revision of a data package. The data package revision was determined 
+	 * when the StorageManager object was constructed, so no arguments
+	 * need to be passed.
 	 * 
 	 * @throws Exception
 	 */
