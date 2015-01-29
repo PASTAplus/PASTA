@@ -416,15 +416,17 @@ public class StorageManager {
 	
 	
 	/*
-	 * Return an array list of EMLFileSystemEntity objects for this data package revision.
+	 * Return an array list of EMLFileSystemEntity objects for the specified data package revision.
 	 */
 	private ArrayList<EMLFileSystemEntity> getFileSystemEntities(EmlPackageId emlPackageId) {
 		ArrayList<EMLFileSystemEntity> fileSystemEntities = new ArrayList<EMLFileSystemEntity>();
+		EmlPackageIdFormat epif = new EmlPackageIdFormat();
+		String packageId = epif.format(emlPackageId);
 		
 		try {
 			boolean publicOnly = false;
 			ArrayList<Resource> dataPackageResources = 
-					dataPackageRegistry.listDataPackageResources(this.packageId, publicOnly);
+					dataPackageRegistry.listDataPackageResources(packageId, publicOnly);
 			for (Resource resource : dataPackageResources) {
 				String resourceType = resource.getResourceType();
 				if (resourceType != null && resourceType.equals("data")) {
