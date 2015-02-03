@@ -46,7 +46,7 @@
   else if (pageName.equals("dataPackageEvaluate") ||
            pageName.equals("harvester") ||
            pageName.equals("harvestReport") ||
-           pageName.equals("dataPackageDelete") ||
+           //pageName.equals("dataPackageDelete") ||
            pageName.equals("eventSubscribe") ||
            pageName.equals("provenanceViewer") ||
            pageName.equals("dataPackageAudit") ||
@@ -96,7 +96,7 @@
 					<!-- <li><a href="dataPackageEvaluate.jsp">Evaluate Data Packages</a></li> -->
 					<li><a href="harvester.jsp">Evaluate/Upload Data Packages</a></li>
 					<li><a href="harvestReport.jsp">View Evaluate/Upload Results</a></li>
-					<li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li>
+					<!--  <li><a href="dataPackageDelete.jsp">Delete Data Packages</a></li> -->
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Events:</p>
