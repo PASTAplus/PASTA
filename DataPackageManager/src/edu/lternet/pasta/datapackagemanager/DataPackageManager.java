@@ -61,6 +61,7 @@ import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
+import edu.lternet.pasta.datamanager.StorageManager;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.doi.DOIException;
@@ -739,10 +740,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Register a DOI for the data package
 				 */
 				if (doiScanner != null) {
-					ArrayList<Resource> resourceList = dataPackageRegistry.listDataPackageResources(packageId);
+					// DOIs should be created only for publicly accessible resources
+					boolean publicOnly = true;
+					ArrayList<Resource> resourceList = 
+							dataPackageRegistry.listDataPackageResources(packageId, publicOnly);
 					if (resourceList != null) {
 						for (Resource resource : resourceList) {
-							if (resource.getResourceType().equals("dataPackage")) {
+							if (resource.getResourceType().equals("dataPackage") &&
+								resource.getDoi() == null
+							   ) {
 								try {
 									doiScanner.processOneResource(resource);
 								}
@@ -753,6 +759,22 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 							}
 						}
 					}
+				}
+				
+				/*
+				 * Optimize data storage for the data package
+				 */
+				try {
+					StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
+					storageManager.optimizeStorage();
+				}
+				catch (Exception e) {
+					logger.error(
+							String.format("Exception optimizing data storage for data package %s: %s",
+									      packageId,
+									      e.getMessage()
+									     )
+								);
 				}
 
 				/*

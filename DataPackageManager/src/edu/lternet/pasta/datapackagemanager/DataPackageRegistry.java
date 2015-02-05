@@ -42,6 +42,7 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
+import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -1682,10 +1683,70 @@ public class DataPackageRegistry {
 	  }
 
 	  
- /**
-   * 
-   * @param scope
-   */
+	  /**
+	   * Lists all data package revisions known to PASTA, including active and deleted.
+	   * 
+	   * @return A list of packageId strings corresponding to the list of
+	   *         data packages.
+	   *        
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
+	  public ArrayList<String> listAllDataPackageRevisions()
+	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	    ArrayList<String> packageIdList = new ArrayList<String>();
+
+	    Connection connection = null;
+	    String selectString = 
+	    	"SELECT DISTINCT scope, identifier, revision" +
+	        "  FROM " + RESOURCE_REGISTRY +
+	        "  WHERE resource_type='dataPackage'" +
+	        "  ORDER BY scope, identifier, revision";
+	    Statement stmt = null;
+
+	    try {
+	      connection = getConnection();
+	      stmt = connection.createStatement();
+	      ResultSet rs = stmt.executeQuery(selectString);
+
+	      while (rs.next()) {
+	        String scope = rs.getString("scope");
+	        int identifier = rs.getInt("identifier");
+	        int revision = rs.getInt("revision");
+	        String packageId = scope + "." + identifier + "." + revision;
+	        packageIdList.add(packageId);
+	      }
+	    }
+	    catch (ClassNotFoundException e) {
+	      logger.error("ClassNotFoundException: " + e.getMessage());
+	      throw (e);
+	    }
+	    catch (SQLException e) {
+	      logger.error("SQLException: " + e.getMessage());
+	      throw (e);
+	    }
+	    finally {
+	      if (stmt != null) stmt.close();
+	      returnConnection(connection);
+	    }
+
+	    return packageIdList;
+	  }
+
+	  
+	  /**
+	   * Lists all data entities for a given data package.
+	   * 
+	   * @param scope        the data package scope value
+	   * @param identifier   the data package identifier value
+	   * @param revison      the data package revision value
+	   * @return A list of entity id strings corresponding to the list of
+	   *         data entities for the specified data package.
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
   public ArrayList<String> listDataEntities(String scope, Integer identifier, Integer revision)
     throws ClassNotFoundException, SQLException, IllegalArgumentException {
       ArrayList<String> entityList = new ArrayList<String>();
@@ -1698,7 +1759,6 @@ public class DataPackageRegistry {
           "' AND identifier='" + identifier + 
           "' AND revision='" + revision +
           "' AND entity_id IS NOT NULL" +
-          "  AND date_deactivated IS NULL" +
           "  ORDER BY date_created";
       
         Statement stmt = null;
@@ -1831,6 +1891,79 @@ public class DataPackageRegistry {
     else {
       String message = "One or more of the scope or identifier values is null";
       throw new IllegalArgumentException(message);
+    }
+    
+    return revisionList;
+  }
+
+	
+	/**
+	 * Lists all prior revisions for a data package.
+	 *  
+	 * @param emlPackageId   the EML package identifier object
+	 * @return  an array list of integer values in ascending order representing
+	 *          all known prior revisions to the current data package revision
+	 */
+	public ArrayList<Integer> listPriorRevisions(EmlPackageId emlPackageId)
+          throws ClassNotFoundException, SQLException, IllegalArgumentException {
+    ArrayList<Integer> priorRevisionList = new ArrayList<Integer>();
+    String scope = emlPackageId.getScope();
+    Integer identifier = emlPackageId.getIdentifier();
+    Integer revision = emlPackageId.getRevision();
+    boolean foundThisRevision = false;
+    
+    if (scope != null && 
+    	identifier != null && 
+    	revision != null
+       ) {
+      Connection connection = null;
+      String selectString = 
+        "SELECT revision FROM " + RESOURCE_REGISTRY +
+        "  WHERE resource_type='dataPackage'" +
+        "  AND scope='" + scope + 
+        "' AND identifier='" + identifier + "'" +
+        "  ORDER BY revision";
+      Statement stmt = null;
+    
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();             
+        ResultSet rs = stmt.executeQuery(selectString);
+      
+        while (rs.next()) {
+          int rev = rs.getInt("revision");
+          // test for prior revision
+          if (rev < revision) {
+          	priorRevisionList.add(new Integer(rev));
+          }
+          else if (rev == revision) {
+        	  // We found this revision, so it's okay to return the prior revisions
+        	  foundThisRevision = true;
+          }
+        }
+      }
+      catch(ClassNotFoundException e) {
+        logger.error("ClassNotFoundException: " + e.getMessage());
+        throw(e);
+      }
+      catch(SQLException e) {
+        logger.error("SQLException: " + e.getMessage());
+        throw(e);
+      }
+      finally {
+        if (stmt != null) stmt.close();
+        returnConnection(connection);
+      }
+    }
+    else {
+      String message = "One or more of the scope or identifier values is null";
+      throw new IllegalArgumentException(message);
+    }
+    
+    ArrayList<Integer> revisionList = null;
+    // Unless we found this revision, we'll return null
+    if (foundThisRevision) {
+    	revisionList = priorRevisionList;
     }
     
     return revisionList;
@@ -2176,14 +2309,17 @@ public class DataPackageRegistry {
 
 	
 	/**
-	 * Returns an array list of resources that are publicly accessible for
-	 * a particular data package. We expect the list to contain zero or one Resource
-	 * objects for a given package_id.
+	 * Returns an array list of resources that are accessible for a 
+	 * particular data package. We expect the list to contain zero or one Resource
+	 * objects for a given package id.
 	 * 
+	 * @param  packageId the data package identifier
+	 * @param  publicOnly  include only publicly accessible resources
 	 * @return Array list of resources
 	 * @throws SQLException
 	 */
-	public ArrayList<Resource> listDataPackageResources(String packageId) throws SQLException {
+	public ArrayList<Resource> listDataPackageResources(String packageId, boolean publicOnly) 
+				throws SQLException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
 
@@ -2195,12 +2331,11 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, date_created " + 
+		String queryString = 
+			"SELECT resource_id, resource_type, scope, identifier, revision, " +
+		    " date_created, doi, resource_location, entity_id, sha1_checksum " + 
 		    "FROM datapackagemanager.resource_registry " +
-		    "WHERE resource_type='dataPackage' " +
-		    "  AND package_id='" + packageId + "'" +
-		    "  AND doi IS NULL " +
-		    "  AND date_deactivated IS NULL;";
+		    "WHERE package_id='" + packageId + "'";
 
 		Statement stat = null;
 
@@ -2218,12 +2353,19 @@ public class DataPackageRegistry {
 
 				resourceId = result.getString("resource_id");
 
-				if (this.isPublicAccessible(resourceId)) {
-
+				if (!publicOnly || this.isPublicAccessible(resourceId)) {
+					String resourceType = result.getString("resource_type");
 					resource.setResourceId(resourceId);
-					resource.setResourceType(result.getString("resource_type"));
+					resource.setResourceType(resourceType);
 					resource.setDateCreate(result.getString("date_created"));
 					resource.setPackageId(packageId);
+					resource.setDoi(result.getString("doi"));
+					
+					if (resourceType != null && resourceType.equals("data")) {
+						resource.setResourceLocation(result.getString("resource_location"));
+						resource.setEntityId(result.getString("entity_id"));
+						resource.setSha1Checksum(result.getString("sha1_checksum"));
+					}
 
 					resourceList.add(resource);
 

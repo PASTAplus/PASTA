@@ -29,6 +29,11 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +53,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.lternet.pasta.metadatafactory.DummyUriInfo;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.ucsb.nceas.utilities.IOUtil;
@@ -70,6 +74,7 @@ public class DataPackageManagerResourceTest {
   private static DataPackageManagerResource dataPackageManagerResource;
   private static DataPackageManager dataPackageManager;
   private static final String dirPath = "WebRoot/WEB-INF/conf";
+  private static boolean isWindowsPlatform = false;
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   private static final String testUserAcl = "uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org";
   private static Options options = null;
@@ -137,6 +142,12 @@ public class DataPackageManagerResourceTest {
     configurationListener = new ConfigurationListener();
     configurationListener.initialize(dirPath);
     options = ConfigurationListener.getOptions();
+    
+    String platformName = System.getProperty("os.name");
+    System.err.println(String.format("os.name property: %s", platformName));
+    if (platformName.startsWith("Windows")) {
+    	isWindowsPlatform = true;
+    }
     
     if (options == null) {
       fail("Failed to load DataPackageManager properties file");
@@ -248,6 +259,7 @@ public class DataPackageManagerResourceTest {
 	  testReadDataPackageReport();
 	  testReadDataPackageReportAcl();
 	  testUpdateDataPackage();
+	  testStorageManager();
 	  testDeleteDataPackage();
   }
   
@@ -846,6 +858,63 @@ public class DataPackageManagerResourceTest {
     
 
   /**
+   * Test that the StorageManager has optimized the data
+   * storage for two data entities with the same checksum value.
+   * For this test we can use the original revision value and
+   * the update revision value because we know that they have
+   * the same data entity.
+   */
+  private void testStorageManager() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);   
+	FileSystem fileSystem = FileSystems.getDefault();
+
+    Response response = dataPackageManagerResource.readDataEntity(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);   
+    File revisionDataEntity = (File) response.getEntity(); // Check the message body
+    assertNotNull(revisionDataEntity);
+	String revisionFilePathStr = revisionDataEntity.getAbsolutePath();
+	Path revisionPath = fileSystem.getPath(revisionFilePathStr);
+	System.err.println(String.format("revisionPath: %s", revisionFilePathStr));
+	
+    response = dataPackageManagerResource.readDataEntity(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString(), testEntityId);
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);     
+    File updateRevisionDataEntity = (File) response.getEntity(); // Check the message body
+    assertNotNull(updateRevisionDataEntity);
+	String updateRevisionFilePathStr = updateRevisionDataEntity.getAbsolutePath();
+	Path updateRevisionPath = fileSystem.getPath(updateRevisionFilePathStr);
+	System.err.println(String.format("updateRevisionPath: %s", updateRevisionFilePathStr));
+	
+	try {
+		// Get the unique file key (i.e. inode) for the revision's data entity
+		BasicFileAttributes revisionAttributes = Files.readAttributes(revisionPath, BasicFileAttributes.class);
+		Object revisionKey = revisionAttributes.fileKey();
+		// Get the unique file key (i.e. inode) for the updated revision's data entity
+		BasicFileAttributes updateRevisionAttributes = Files.readAttributes(updateRevisionPath, BasicFileAttributes.class);
+		Object updateRevisionKey = updateRevisionAttributes.fileKey();
+		
+		/*
+		 * The fileKey() method returns null on the Windows platform, so
+		 * this test really only works on Unix/Linux platform.
+		 */
+		if (isWindowsPlatform) {
+			assertTrue((revisionKey == null) && (updateRevisionKey == null));
+		}
+		else {
+			assertTrue(revisionKey != null);
+			assertTrue(updateRevisionKey != null);
+			assertTrue(revisionKey.equals(updateRevisionKey));
+		}
+	}
+	catch (IOException e) {
+		e.printStackTrace();
+	}
+
+  }
+    
+
+  /**
    * Test the status and message body of the Update Data Package use case
    */
   private void testUpdateDataPackage() {
@@ -878,13 +947,13 @@ public class DataPackageManagerResourceTest {
       assertTrue(entityString.contains(testEntityId));
     }
 
-    /* Test for Conflict state on a second UPDATE of the same data package */
+    /* 
+     * Test for Conflict state on a second UPDATE of the same data package 
+     */
     response = dataPackageManagerResource.updateDataPackage(httpHeaders, testScope, testIdentifier, testEmlFile);
     statusCode = response.getStatus();
     assertEquals(202, statusCode);
-
-    // Check the message body
-    entityString = (String) response.getEntity();
+    entityString = (String) response.getEntity(); // Check the message body
     assertTrue(entityString.length() == utcString.length());
     this.transaction = entityString;
     waitForPasta();

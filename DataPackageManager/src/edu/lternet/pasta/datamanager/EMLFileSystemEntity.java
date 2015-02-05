@@ -49,7 +49,15 @@ public class EMLFileSystemEntity extends EMLEntity {
    */
   
   private String baseDir = null;  /* Top-level directory for this entity */
+  private String checksum = null;
   private boolean evaluateMode = false;
+  
+  /*
+   * Indicates whether data storage for this file system entity been optimized.
+   * By default, we assume that it has not until we run the data storage optimization
+   * logic on it (see the StorageManager class).
+   */
+  private boolean optimized = false;     
   
   
   /*
@@ -74,7 +82,7 @@ public class EMLFileSystemEntity extends EMLEntity {
 
 
   /**
-   * Constructs an EMLFileSystemEntity object based on a know base
+   * Constructs an EMLFileSystemEntity object based on a known base
    * directory, the EmlPackageId and the entityId. We use this constructor
    * when the base directory has been previously stored in the Data Package 
    * Registry, so it is typically used when reading an existing data entity.
@@ -146,6 +154,14 @@ public class EMLFileSystemEntity extends EMLEntity {
 	  
 	  return exists;
 	}
+	
+	
+	/**
+	 * Get the checksum value for this data entity
+	 */
+	public String getChecksum() {
+		return checksum;
+	}
 
 	
   /**
@@ -190,6 +206,17 @@ public class EMLFileSystemEntity extends EMLEntity {
 	  
 	  return entityFile;
 	}
+	
+	
+	/**
+	 * Returns the resource location value for this file system entity, as
+	 * stored in the baseDir instance variable.
+	 * 
+	 * @return  baseDir, the resource location value
+	 */
+	public String getResourceLocation() {
+		return baseDir;
+	}
 
 	
   /**
@@ -200,6 +227,26 @@ public class EMLFileSystemEntity extends EMLEntity {
   public boolean isEvaluateMode() {
     return evaluateMode;
   }
+  
+  
+  /**
+   * Retrieves the optimized boolean value.
+   * 
+   * @return optimized, true if data storage for this entity has been optimized
+   */
+  public boolean isOptimized() {
+	  return optimized;
+  }
+  
+  
+  /**
+   * Sets the checksum value for this data entity.
+   * 
+   * @param checksum  the checksum value
+   */
+  public void setChecksum(String checksum) {
+	  this.checksum = checksum;
+  }
 
   
   /**
@@ -209,6 +256,18 @@ public class EMLFileSystemEntity extends EMLEntity {
    */
   public void setEvaluateMode(boolean evaluateMode) {
     this.evaluateMode = evaluateMode;
+  }
+
+  
+  /**
+   * Sets the optimized boolean value.
+   * 
+   * @param wasOptimized, the boolean value to set. Typically we would only
+   *                   set this to true and only after the optimization logic
+   *                   was successfully executed on this entity.
+   */
+  public void setOptimized(boolean wasOptimized) {
+    this.optimized = wasOptimized;
   }
 
 }
