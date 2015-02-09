@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datamanager;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
@@ -51,6 +52,7 @@ public class EMLFileSystemEntity extends EMLEntity {
   private String baseDir = null;  /* Top-level directory for this entity */
   private String checksum = null;
   private boolean evaluateMode = false;
+  private final String TMP_FILE_EXTENSION = "tmp";  // used in data storage optimization
   
   /*
    * Indicates whether data storage for this file system entity been optimized.
@@ -133,6 +135,25 @@ public class EMLFileSystemEntity extends EMLEntity {
 		  if (dirFile != null && dirFile.exists()) {
 		    dirFile.delete();
 		  }
+		}
+		
+		return success;
+	}
+	
+	
+	/**
+	 * Deletes the entity when it has a temporary file name.
+	 * This is used during storage optimization.
+	 */
+	public boolean deleteTmpEntity() {
+		boolean success = false;
+		File entityFile = getEntityFile();
+		
+		if (entityFile != null) {
+			String entityFilePath = entityFile.getAbsolutePath();
+			String tmpFilePath = String.format("%s.%s", entityFilePath, TMP_FILE_EXTENSION);
+			File tmpFile = new File(tmpFilePath);
+			success = tmpFile.delete();
 		}
 		
 		return success;
@@ -239,6 +260,45 @@ public class EMLFileSystemEntity extends EMLEntity {
   }
   
   
+	/**
+	 * Renames the entity to a temporary file name.
+	 */
+	public boolean renameEntityToTmp() {
+		boolean success = false;
+		File entityFile = getEntityFile();
+		
+		if (entityFile != null) {
+			String entityFilePath = entityFile.getAbsolutePath();
+			String tmpFilePath = String.format("%s.%s", entityFilePath, TMP_FILE_EXTENSION);
+			File tmpFile = new File(tmpFilePath);
+			success = entityFile.renameTo(tmpFile);
+		}
+		
+		return success;
+	}
+	
+	
+	/**
+	 * Renames the entity to a temporary file name.
+	 */
+	public boolean renameTmpToEntity() throws FileAlreadyExistsException {
+		boolean success = false;
+		File entityFile = getEntityFile();
+		
+		if (entityFile != null) {
+			String entityFilePath = entityFile.getAbsolutePath();
+			if (entityFile.exists()) {
+				throw new FileAlreadyExistsException(entityFilePath);
+			}
+			String tmpFilePath = String.format("%s.%s", entityFilePath, TMP_FILE_EXTENSION);
+			File tmpFile = new File(tmpFilePath);
+			success = tmpFile.renameTo(entityFile);
+		}
+		
+		return success;
+	}
+	
+	
   /**
    * Sets the checksum value for this data entity.
    * 

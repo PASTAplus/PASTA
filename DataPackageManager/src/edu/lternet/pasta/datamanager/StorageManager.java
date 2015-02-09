@@ -283,7 +283,7 @@ public class StorageManager {
 					String resourceLocation = fse.getResourceLocation();
 
 					/*
-					 * If we haven't yet optimized this date entity by linking 
+					 * If we haven't yet optimized this data entity by linking 
 					 * it to a prior revision's data entity
 					 */
 					if (!fse.isOptimized()) {
@@ -295,7 +295,7 @@ public class StorageManager {
 						for (EMLFileSystemEntity pfse : priorFileSystemEntities) {
 							
 							/*
-							 * If we haven't yet optimized this date entity by
+							 * If we haven't yet optimized this data entity by
 							 * linking it to one of this prior revision's data
 							 * entities
 							 */
@@ -332,76 +332,88 @@ public class StorageManager {
 										String entityId = fse.getEntityId();
 										String msg = 
 												String.format(
-														"Deleting entity for storage optimization: %s %s",
+														"Performing storage optimization on entity: %s %s",
 														packageId, entityId);
 										logger.info(msg);
 										
 										/*
-										 * Delete the data entity for this revision from the disk.
-										 * This is where we reduce the amount of data stored on disk.
+										 * Rename the data entity to a temporary file name. If
+										 * the hard link is successfully created, we will delete
+										 * the temporary file, else we will rename it back to the
+										 * original file name.
 										 */
-										fse.deleteEntity();
-
+										boolean wasRenamed = fse.renameEntityToTmp();
+										
 										/*
-										 * Create a hard link from the path of the data entity for 
-										 * this revision to the path of the data entity for the
-										 * prior revision.
+										 * If the rename succeeded, proceed with optimization
 										 */
-										FileSystem fileSystem = FileSystems.getDefault();
+										if (wasRenamed) {
 
-										File entityFile = fse.getEntityFile();
-										String filePathStr = entityFile.getAbsolutePath();
-										Path path = fileSystem.getPath(filePathStr);
+											/*
+											 * Create a hard link from the path of the data entity for 
+											 * this revision to the path of the data entity for the
+											 * prior revision.
+											 */
+											FileSystem fileSystem = FileSystems.getDefault();
 
-										File previousEntityFile = pfse.getEntityFile();
-										String previousFilePathStr = previousEntityFile.getAbsolutePath();
-										Path previousPath = fileSystem.getPath(previousFilePathStr);
+											File entityFile = fse.getEntityFile();
+											String filePathStr = entityFile.getAbsolutePath();
+											Path path = fileSystem.getPath(filePathStr);
 
-										String createLinkMsg = 
+											File previousEntityFile = pfse.getEntityFile();
+											String previousFilePathStr = previousEntityFile.getAbsolutePath();
+											Path previousPath = fileSystem.getPath(previousFilePathStr);
+
+											String createLinkMsg = 
 												String.format("Creating hard link from %s to %s",
 																filePathStr,previousFilePathStr);
-										logger.info(createLinkMsg);
+											logger.info(createLinkMsg);
 
-										try {
-											Path returnPath = Files.createLink(path, previousPath);
-											if (returnPath != null) {
-												// We are done optimizing this data entity
-												fse.setOptimized(true);
-											}
-										}
-										catch (FileAlreadyExistsException e) {
-											// this is okay, just issue a warning
-											msg = String.format(
-													"Failed to create hard link from %s to %s: %s",
-													filePathStr, previousFilePathStr, e.getMessage());
-											logger.warn(msg);
-										}
-										catch (Exception e) {
-											msg = String.format(
-													"Error creating hard link from %s to %s: %s",
-													filePathStr, previousFilePathStr, e.getMessage());
-											logger.error(msg);
-											/*
-											 * The hard link failed and the file does not exist because
-											 * we deleted it, so we need to recover the data by copying 
-											 * the file back to the path from which it was deleted.
-											 */
 											try {
+												Path returnPath = Files.createLink(path, previousPath);
+												if (returnPath != null) {
+													// This is where we reduce the amount of data stored on disk.
+													boolean tmpWasDeleted = fse.deleteTmpEntity();
+													if (tmpWasDeleted) {
+														// We are done optimizing this data entity
+														fse.setOptimized(true);
+													}
+												}
+											}
+											catch (FileAlreadyExistsException e) {
+												// this is okay, just issue a warning
 												msg = String.format(
-														"Recovering deleted data file by copying from %s to %s",
-														previousFilePathStr, filePathStr);
+														"Failed to create hard link from %s to %s: %s",
+														filePathStr, previousFilePathStr, e.getMessage());
 												logger.warn(msg);
-												Files.copy(previousPath, path);
 											}
-											catch (FileAlreadyExistsException ex) {
-												// this is okay, we have the data file so no action needed
-											}
-											catch (Exception ex) {
+											catch (Exception e) {
 												msg = String.format(
-															"Error copying file from %s to %s: %s",
-															previousFilePathStr, filePathStr, e.getMessage());
+														"Error creating hard link from %s to %s: %s",
+														filePathStr, previousFilePathStr, e.getMessage());
 												logger.error(msg);
-												throw(e);
+												/*
+												 * The hard link failed and the data file does not exist because
+												 * we renamed it, so we need to recover the data file by renaming
+												 * the temporary data file back to its original name.
+												 */
+												try {
+													msg = String.format(
+															"Recovering data file by renaming from %s.tmp to %s",
+															filePathStr, filePathStr);
+													logger.warn(msg);
+													boolean wasRestored = fse.renameTmpToEntity();
+													if (!wasRestored) {
+														throw new Exception("Error occurred: " + msg);
+													}
+												}
+												catch (FileAlreadyExistsException ex) {
+													// this is okay, we have the data file so no action needed
+												}
+												catch (Exception ex) {
+													logger.error(e.getMessage());
+													throw(e);
+												}
 											}
 										}
 									}
