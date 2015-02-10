@@ -1,6 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet"%>
 <%@ page import="edu.lternet.pasta.portal.HarvestReport"%>
+<%@ page import="edu.lternet.pasta.portal.HarvestReportServlet"%>
 
 <%
   final String pageTitle = "View Evaluate/Upload Results";
@@ -43,6 +44,7 @@
   }
 
   String harvestReportList = harvestReport.composeHarvestReports(uid, harvestReportID);
+  long daysToLive = HarvestReportServlet.harvesterReportDaysToLive;
 %>
 
 <!DOCTYPE html>
@@ -102,7 +104,7 @@
 			<%=warningMessage%>
 
 			<form id="harvestReport" action="./harvestReport" method="post" name="harvestReport" >
-			  <label>Select the <b>Evaluate</b> or <b>Upload</b> results to view:</label>
+			  <label>Select the <b>Evaluate</b> or <b>Upload</b> results to view (results are stored for <%= daysToLive %> days):</label>
 				<select class="select-width-auto" name="reportId" size="1" onchange="submitform()" >
 				  <%= harvestReportList %>
 			  </select>					
