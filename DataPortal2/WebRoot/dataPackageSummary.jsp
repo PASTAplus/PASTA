@@ -16,9 +16,16 @@
   String pastaDataObjectIdentifier = (String) request.getAttribute("pastaDataObjectIdentifier");
   String provenanceHTML = (String) request.getAttribute("provenanceHTML");
   String codeGenerationHTML = (String) request.getAttribute("codeGenerationHTML");
+  String spatialCoverageHTML = (String) request.getAttribute("spatialCoverageHTML");
+  String googleMapHTML = (String) request.getAttribute("googleMapHTML");
+  Double northCoord = (Double) request.getAttribute("northCoord");
+  Double southCoord = (Double) request.getAttribute("southCoord");
+  Double eastCoord = (Double) request.getAttribute("eastCoord");
+  Double westCoord = (Double) request.getAttribute("westCoord");
 
   String uid = (String) session.getAttribute("uid");
   boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
+  boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
 %>
 
@@ -49,6 +56,20 @@
 <script src="js/jquery.mobilemenu68b368b3.js?ver=1" type="text/javascript"></script>
 <script src="js/isotope68b368b3.js?ver=1" type="text/javascript"></script>
 <script src="js/mediaelement-and-player.min68b368b3.js?ver=1" type="text/javascript"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script src="./js/map_functions.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/keydragzoom/src/keydragzoom.js" type="text/javascript"></script>
+<c:set var="showSpatial" value="<%= showSpatial %>"/>
+<c:choose>
+	<c:when test="${showSpatial}">
+		<script type="text/javascript">
+			window.onload = function () {
+  				initialize_summary_map(<%=northCoord%>, <%=southCoord%>, <%=eastCoord%>, <%=westCoord%>);
+			}
+		</script>
+	</c:when>
+</c:choose>
 
 <!-- Mobile Device CSS -->
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
@@ -103,6 +124,27 @@
 										</div>
 										<div class="table-cell">
 											<%= publicationDateHTML %>
+										</div>											
+									</div>
+								</c:when>
+							</c:choose>
+
+							<c:choose>
+								<c:when test="${showSpatial}">
+									<div class="table-row">										
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Spatial Coverage:</label>
+										</div>
+										<div class="table-cell">
+											<%= spatialCoverageHTML %>
+										</div>											
+									</div>
+									<div class="table-row">										
+										<div class="table-cell text-align-right">
+											<label class="labelBold"></label>
+										</div>
+										<div class="table-cell">
+											<%= googleMapHTML %>
 										</div>											
 									</div>
 								</c:when>
@@ -184,7 +226,7 @@
 									</div>
 							</c:if>
 									
-								</div>
+								</div> <!-- end display table -->
 							</div>
 						</div>
 					</div>

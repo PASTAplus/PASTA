@@ -22,38 +22,60 @@
   *
   */
 
-function initialize() {
-		
-  var mapOptions = {
-    center: new google.maps.LatLng(0, -106.67648),
-    zoom: 0,
-    mapTypeId: google.maps.MapTypeId.HYBRID,
-    mapTypeControl: true,
-    panControl: true,
-    scaleControl: true,
-    streetViewControl: false,
-    zoomControl: true
-  };
+function initialize() {	
+	var mapOptions = {
+			center: new google.maps.LatLng(0, -106.67648),
+			zoom: 0,
+			mapTypeId: google.maps.MapTypeId.HYBRID,
+			mapTypeControl: true,
+			panControl: true,
+			scaleControl: true,
+			streetViewControl: false,
+			zoomControl: true
+	};
   
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         
-  // Add map listener for map moves
-  google.maps.event.addListener(map, "bounds_changed", function() {
-    var bounds = map.getBounds();
-    var northeast = bounds.getNorthEast();
-    var southwest = bounds.getSouthWest();
+	// Add map listener for map moves
+	google.maps.event.addListener(map, "bounds_changed", function() {
+		var bounds = map.getBounds();
+		var northeast = bounds.getNorthEast();
+		var southwest = bounds.getSouthWest();
 		
-    // Set form values of the map extent
-    document.advancedSearchForm.northBound.value = northeast.lat();
-    document.advancedSearchForm.eastBound.value = northeast.lng();
-    document.advancedSearchForm.southBound.value = southwest.lat();
-    document.advancedSearchForm.westBound.value = southwest.lng();
-
-    // Set to "1" for initial map load
-    boundsChangedCount++;
-    document.advancedSearchForm.boundsChangedCount.value = boundsChangedCount;
+		// Set form values of the map extent
+		document.advancedSearchForm.northBound.value = northeast.lat();
+		document.advancedSearchForm.eastBound.value = northeast.lng();
+		document.advancedSearchForm.southBound.value = southwest.lat();
+		document.advancedSearchForm.westBound.value = southwest.lng();
     
-  });
+		if (boundsChangedCount == 0) {
+			document.advancedSearchForm.northBound.value = 90.0;
+			document.advancedSearchForm.southBound.value = -90.0;
+		}
+
+		// Set to "1" for initial map load
+		boundsChangedCount++;
+		document.advancedSearchForm.boundsChangedCount.value = boundsChangedCount;
+	});
   
-  map.enableKeyDragZoom();
+	map.enableKeyDragZoom();
+}
+
+
+function initialize_summary_map(north, south, east, west) {
+	var lat = (north + south)  / 2.0;
+	var lng = (west + east) / 2.0;
+
+	var mapOptions = {
+			center : new google.maps.LatLng(lat, lng),
+			zoom : 9,
+			mapTypeId : google.maps.MapTypeId.TERRAIN,
+			mapTypeControl : true,
+			panControl : false,
+			scaleControl : true,
+			streetViewControl : false,
+			zoomControl : true
+	};
+
+	var map = new google.maps.Map(document.getElementById("map-canvas-summary"), mapOptions);
 }

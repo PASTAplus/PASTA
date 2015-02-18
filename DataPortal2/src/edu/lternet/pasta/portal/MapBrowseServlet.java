@@ -150,6 +150,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String titleHTML = "";
 		String creatorsHTML = "";
 		String publicationDateHTML = "";
+		String spatialCoverageHTML = "";
+		String googleMapHTML = "";
 		String packageIdHTML = "";
 		String resourcesHTML = "";
 		String citationHTML = "";
@@ -205,6 +207,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 				StringBuilder titleHTMLBuilder = new StringBuilder();
 				StringBuilder creatorsHTMLBuilder = new StringBuilder();
 				StringBuilder publicationDateHTMLBuilder = new StringBuilder();
+				StringBuilder spatialCoverageHTMLBuilder = new StringBuilder();
+				StringBuilder googleMapHTMLBuilder = new StringBuilder();
 				StringBuilder packageIdHTMLBuilder = new StringBuilder();
 				StringBuilder resourcesHTMLBuilder = new StringBuilder();
 				StringBuilder citationHTMLBuilder = new StringBuilder();
@@ -335,6 +339,32 @@ public class MapBrowseServlet extends DataPortalServlet {
 					}
 
 					map = dpmClient.readDataPackage(scope, id, revision);
+					
+					String north = emlObject.getNorthBoundingCoordinate();
+					String west = emlObject.getWestBoundingCoordinate();
+					String east = emlObject.getEastBoundingCoordinate();
+					String south = emlObject.getSouthBoundingCoordinate();
+					if (north != null && south != null && east != null && west != null) {
+						Double northCoord = new Double(north);
+						Double southCoord = new Double(south);
+						Double eastCoord = new Double(east);
+						Double westCoord = new Double(west);
+						request.setAttribute("northCoord", northCoord);
+						request.setAttribute("southCoord", southCoord);
+						request.setAttribute("eastCoord", eastCoord);
+						request.setAttribute("westCoord", westCoord);
+						String spatial = String.format("North: %s; South: %s; East: %s; West: %s",
+								                        northCoord, southCoord, eastCoord, westCoord);
+						spatialCoverageHTMLBuilder.append("<ul class=\"no-list-style\">\n");
+						spatialCoverageHTMLBuilder.append(String.format("  <li>%s</li>", spatial));						
+						spatialCoverageHTMLBuilder.append("</ul>\n");
+						spatialCoverageHTML = spatialCoverageHTMLBuilder.toString();
+						googleMapHTMLBuilder.append("<ul class=\"no-list-style\">\n");
+						googleMapHTMLBuilder.append("  <li><div id='map-canvas-summary'></div></li>");						
+						googleMapHTMLBuilder.append("  <li> </li>");						
+						googleMapHTMLBuilder.append("</ul>\n");
+						googleMapHTML = googleMapHTMLBuilder.toString();
+					}
 
 				}
 				catch (Exception e) {
@@ -603,6 +633,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("dataPackagePublicationDateHTML",
 				publicationDateHTML);
+		request.setAttribute("spatialCoverageHTML", spatialCoverageHTML);
+		request.setAttribute("googleMapHTML", googleMapHTML);
 		request.setAttribute("dataPackageIdHTML", packageIdHTML);
 		request.setAttribute("dataPackageResourcesHTML", resourcesHTML);
 		request.setAttribute("dataPackageCitationHTML", citationHTML);
