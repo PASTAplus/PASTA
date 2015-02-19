@@ -184,5 +184,26 @@ public class EmlObject {
 		StringBuffer abs = new StringBuffer("");	
 		return abs.toString();	
 	}
+	
+	
+	/*
+	 * Access methods for the bounding coordinates
+	 */
+	
+	public String getNorthBoundingCoordinate() {
+		return this.dataPackage.getNorthBoundingCoordinate();
+	}
+	
+	public String getSouthBoundingCoordinate() {
+		return this.dataPackage.getSouthBoundingCoordinate();
+	}
+	
+	public String getEastBoundingCoordinate() {
+		return this.dataPackage.getEastBoundingCoordinate();
+	}
+	
+	public String getWestBoundingCoordinate() {
+		return this.dataPackage.getWestBoundingCoordinate();
+	}
 
 }

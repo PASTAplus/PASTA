@@ -2887,6 +2887,15 @@ p.cite cite {
   margin: 0 auto; 
   width: 400px; 
   height: 250px;
+  border: 2px solid #5990bd;
+}
+
+#map-canvas-summary {
+  margin: 0 auto; 
+  width: 400px; 
+  height: 250px;
+  border: 2px solid #5990bd;
+  float: left;
 }
 
 th.nis {
