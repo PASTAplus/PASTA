@@ -22,6 +22,9 @@
   *
   */
 
+/*
+ * Initialize the Google map on the Advanced Search page
+ */
 function initialize() {	
 	var mapOptions = {
 			center: new google.maps.LatLng(0, -106.67648),
@@ -62,20 +65,37 @@ function initialize() {
 }
 
 
+/*
+ * Initialize the Google map on the Data Package Summary page
+ */
 function initialize_summary_map(north, south, east, west) {
 	var lat = (north + south)  / 2.0;
 	var lng = (west + east) / 2.0;
 
-	var mapOptions = {
+    var mapOptions = {
 			center : new google.maps.LatLng(lat, lng),
-			zoom : 9,
+			zoom : 12,
 			mapTypeId : google.maps.MapTypeId.TERRAIN,
 			mapTypeControl : true,
 			panControl : false,
+			navigationControl : true,
 			scaleControl : true,
 			streetViewControl : false,
-			zoomControl : true
+			zoomControl : true,
+			zoomControlOptions : {
+				style : google.maps.ZoomControlStyle.SMALL
+			}
 	};
 
 	var map = new google.maps.Map(document.getElementById("map-canvas-summary"), mapOptions);
+    var bounds = new google.maps.LatLngBounds();
+    var nwLatLng = new google.maps.LatLng(north, west);
+    var neLatLng = new google.maps.LatLng(north, east);
+    var swLatLng = new google.maps.LatLng(south, west);
+    var seLatLng = new google.maps.LatLng(south, east);
+    bounds.extend(nwLatLng);
+    bounds.extend(neLatLng);
+    bounds.extend(swLatLng);
+    bounds.extend(seLatLng);
+    map.fitBounds(bounds);
 }
