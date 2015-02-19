@@ -222,7 +222,7 @@ public class EMLDataPackageTest {
   @Test 
   public void testNumberOfEntities() {
     long actual = emlDataPackage.numberOfEntities();
-    long expected = 1;
+    long expected = 2;
     assertEquals("Wrong number of entities found", expected, actual);
   }
 

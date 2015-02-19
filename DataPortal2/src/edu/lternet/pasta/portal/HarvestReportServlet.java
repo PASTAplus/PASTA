@@ -25,6 +25,8 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,6 +45,9 @@ public class HarvestReportServlet extends DataPortalServlet  {
    */
 
   private static String harvesterPath = null;
+  private static long harvesterReportTTL;  // harvester report time to live in milliseconds
+  public static long harvesterReportDaysToLive; // harvester report time to live in days
+  private static long harvesterReportDaysToLiveDefault = 180; // default harvester report time to live in days
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.portal.HarvestReportServlet.class);
   private static final long serialVersionUID = 1L;
@@ -146,15 +151,56 @@ public class HarvestReportServlet extends DataPortalServlet  {
 	}
  
   
-  /**
-   * Initialization of the servlet. <br>
-   * 
-   * @throws ServletException
-   *           if an error occurs
-   */
-  public void init() throws ServletException {
-    Configuration options = ConfigurationListener.getOptions();
-    harvesterPath = options.getString("harvester.path");
-  }
+	/*
+	 * Converts days to milliseconds.
+	 */
+	private long daysToMilliseconds(long days) {
+		return days * 24 * 60 * 60 * 1000;
+	}
+
+
+  	/*
+  	 * Spawns off a thread to execute the harvest report manager
+  	 * to purge old harvest reports at start-up.
+  	 */
+  	private void executeHarvesterReportManager() {
+  		HarvestReportManager harvestReportManager = new HarvestReportManager(harvesterPath, harvesterReportTTL);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		executorService.execute(harvestReportManager);
+		executorService.shutdown();
+  	}
+  
+  
+	/**
+	 * Initialization of the servlet. <br>
+	 * 
+	 * @throws ServletException
+	 *             if an error occurs
+	 */
+	public void init() throws ServletException {
+		Configuration options = ConfigurationListener.getOptions();
+		harvesterPath = options.getString("harvester.path");
+
+		/*
+		 * Purge old harvest reports
+		 */
+
+		/*
+		 * Use default TTL value if the property was not specified or is 0 or
+		 * less
+		 */
+		try {
+			harvesterReportDaysToLive = options.getLong("harvester.report.daysToLive");
+			if (harvesterReportDaysToLive <= 0) {
+				harvesterReportDaysToLive = harvesterReportDaysToLiveDefault;
+			}
+		}
+		catch (java.util.NoSuchElementException e) {
+			harvesterReportDaysToLive = harvesterReportDaysToLiveDefault;
+		}
+
+		harvesterReportTTL = daysToMilliseconds(harvesterReportDaysToLive);
+		executeHarvesterReportManager();
+	}
 
 }

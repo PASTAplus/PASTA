@@ -91,6 +91,8 @@ public class DataPackageManagerResourceTest {
   private static Integer testUpdateRevision = null;
   private static String testEntityId = null;
   private static String testEntityName = null;
+  private static String testEntityId2 = null;   // a second test entity
+  private static String testEntityName2 = null; // a second test entity
   
   private static final String ACL_START_TEXT = "<access:access";
   private static final String ACL_END_TEXT = "</access:access>";
@@ -176,6 +178,14 @@ public class DataPackageManagerResourceTest {
       testEntityName = options.getOption("datapackagemanager.test.entity.name");
       if (testEntityName == null) {
         fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.name'");
+      }
+      testEntityId2 = options.getOption("datapackagemanager.test.entity2.id");
+      if (testEntityId2 == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity2.id'");
+      }
+      testEntityName2 = options.getOption("datapackagemanager.test.entity2.name");
+      if (testEntityName2 == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity2.name'");
       }
       testPath = options.getOption("datapackagemanager.test.path");
       if (testPath == null) {
@@ -886,25 +896,58 @@ public class DataPackageManagerResourceTest {
 	Path updateRevisionPath = fileSystem.getPath(updateRevisionFilePathStr);
 	System.err.println(String.format("updateRevisionPath: %s", updateRevisionFilePathStr));
 	
+    response = dataPackageManagerResource.readDataEntity(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId2);
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);   
+    File revisionDataEntity2 = (File) response.getEntity(); // Check the message body
+    assertNotNull(revisionDataEntity);
+	String revisionFilePathStr2 = revisionDataEntity2.getAbsolutePath();
+	Path revisionPath2 = fileSystem.getPath(revisionFilePathStr2);
+	System.err.println(String.format("revisionPath2: %s", revisionFilePathStr2));
+	
+    response = dataPackageManagerResource.readDataEntity(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString(), testEntityId2);
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);     
+    File updateRevisionDataEntity2 = (File) response.getEntity(); // Check the message body
+    assertNotNull(updateRevisionDataEntity2);
+	String updateRevisionFilePathStr2 = updateRevisionDataEntity2.getAbsolutePath();
+	Path updateRevisionPath2 = fileSystem.getPath(updateRevisionFilePathStr2);
+	System.err.println(String.format("updateRevisionPath2: %s", updateRevisionFilePathStr2));
+	
 	try {
-		// Get the unique file key (i.e. inode) for the revision's data entity
+		// Get the unique file keys (i.e. inodes) for the revision's data entities
 		BasicFileAttributes revisionAttributes = Files.readAttributes(revisionPath, BasicFileAttributes.class);
 		Object revisionKey = revisionAttributes.fileKey();
-		// Get the unique file key (i.e. inode) for the updated revision's data entity
+		BasicFileAttributes revisionAttributes2 = Files.readAttributes(revisionPath2, BasicFileAttributes.class);
+		Object revisionKey2 = revisionAttributes2.fileKey();
+
+		// Get the unique file keys (i.e. inodes) for the updated revision's data entities
 		BasicFileAttributes updateRevisionAttributes = Files.readAttributes(updateRevisionPath, BasicFileAttributes.class);
 		Object updateRevisionKey = updateRevisionAttributes.fileKey();
+		BasicFileAttributes updateRevisionAttributes2 = Files.readAttributes(updateRevisionPath2, BasicFileAttributes.class);
+		Object updateRevisionKey2 = updateRevisionAttributes2.fileKey();
 		
 		/*
 		 * The fileKey() method returns null on the Windows platform, so
 		 * this test really only works on Unix/Linux platform.
 		 */
 		if (isWindowsPlatform) {
-			assertTrue((revisionKey == null) && (updateRevisionKey == null));
+			assertTrue(
+					   (revisionKey == null) && 
+					   (updateRevisionKey == null) &&
+					   (revisionKey2 == null) && 
+					   (updateRevisionKey2 == null)
+					   );
 		}
 		else {
 			assertTrue(revisionKey != null);
 			assertTrue(updateRevisionKey != null);
+			assertTrue(revisionKey2 != null);
+			assertTrue(updateRevisionKey2 != null);
 			assertTrue(revisionKey.equals(updateRevisionKey));
+			assertTrue(revisionKey2.equals(updateRevisionKey2));
+			assertFalse(revisionKey.equals(updateRevisionKey2));
+			assertFalse(revisionKey2.equals(updateRevisionKey));
 		}
 	}
 	catch (IOException e) {
