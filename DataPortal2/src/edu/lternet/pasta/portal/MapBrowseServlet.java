@@ -353,7 +353,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 						request.setAttribute("southCoord", southCoord);
 						request.setAttribute("eastCoord", eastCoord);
 						request.setAttribute("westCoord", westCoord);
-						String spatial = String.format("North: %s; South: %s; East: %s; West: %s",
+						String spatial = String.format("N: %s,  S: %s,  E: %s,  W: %s",
 								                        northCoord, southCoord, eastCoord, westCoord);
 						spatialCoverageHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 						spatialCoverageHTMLBuilder.append(String.format("  <li>%s</li>", spatial));						
@@ -361,7 +361,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 						spatialCoverageHTML = spatialCoverageHTMLBuilder.toString();
 						googleMapHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 						googleMapHTMLBuilder.append("  <li><div id='map-canvas-summary'></div></li>");						
-						googleMapHTMLBuilder.append("  <li> </li>");						
 						googleMapHTMLBuilder.append("</ul>\n");
 						googleMapHTML = googleMapHTMLBuilder.toString();
 					}
