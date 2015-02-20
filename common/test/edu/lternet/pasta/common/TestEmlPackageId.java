@@ -51,7 +51,7 @@ public class TestEmlPackageId {
         @Test
         public void testGetIllegalCharactersWithIllegalCharacters() {
             String test = "aa.$#@(%$)bbb_--c";
-            assertEquals(9, EmlPackageId.getIllegalCharacters(test).size());
+            assertEquals(8, EmlPackageId.getIllegalCharacters(test).size());
         }
         
         @Test
