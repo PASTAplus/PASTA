@@ -27,27 +27,17 @@ package edu.lternet.pasta.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import edu.lternet.pasta.common.XmlUtility;
-import edu.lternet.pasta.common.eml.DataPackage;
-import edu.lternet.pasta.common.eml.Entity;
-import edu.lternet.pasta.common.eml.ResponsibleParty;
-import edu.lternet.pasta.common.eml.Entity.EntityType;
 import edu.lternet.pasta.portal.search.PageControl;
 import edu.lternet.pasta.portal.search.Search;
 
@@ -56,8 +46,8 @@ import edu.lternet.pasta.portal.search.Search;
  * @author servilla
  * @since Apr 6, 2012
  * 
- *        The QualtyReportUtility class provides utility methods for managing
- *        PASTA quality reports, including converting from xml to html.
+ *        The ResultSetUtility class parses XML search results and
+ *        renders them as HTML.
  * 
  */
 public class ResultSetUtility {
