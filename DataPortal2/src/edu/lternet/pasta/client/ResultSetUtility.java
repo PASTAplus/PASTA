@@ -74,8 +74,6 @@ public class ResultSetUtility {
    */
 
   private String resultSet = null;
-  private boolean includeEcotrends = false;
-  private boolean includeLandsat5 = false;
   private int rows = Search.DEFAULT_ROWS;
   private Integer numFound = 0;
   private Integer start = 0;
@@ -170,17 +168,6 @@ public class ResultSetUtility {
   	        
 
   	/**
-	 * Sets the value of the includeEcotrends instance variable.
-	 * 
-	 * @param include 
-	 * 			true if EcoTrends data packages should be searched, else false
-	 */
-	public void setIncludeEcotrends(boolean include) {
-		this.includeEcotrends = include;
-	}
-
-
-  	/**
   	 * Sets the value of the docsPerPage instance variable.
   	 * 
   	 * @param n
@@ -191,17 +178,6 @@ public class ResultSetUtility {
 	}
 
 
-  	/**
-  	 * Sets the value of the includeLandsat5 instance variable.
-  	 * 
-  	 * @param include 
-  	 * 			true if Landsat5 data packages should be searched, else false
-  	 */
-	public void setIncludeLandsat5(boolean include) {
-		this.includeLandsat5 = include;
-	}
-	
-	
 	/**
 	 * Transforms Solr search results XML to an HTML table.
 	 * 
@@ -215,16 +191,6 @@ public class ResultSetUtility {
 		
 		// Pass the docsPerPage value as a parameter to the XSLT
 		parameterMap.put("rows", new Integer(this.rows).toString());
-
-		// Pass the includeEcotrends value as a parameter to the XSLT
-		if (this.includeEcotrends) {
-			parameterMap.put("includeEcotrends", "true");
-		}
-
-		// Pass the includeLandsat5 value as a parameter to the XSLT
-		if (this.includeLandsat5) {
-			parameterMap.put("includeLandsat5", "true");
-		}
 
 		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
 				parameterMap);
