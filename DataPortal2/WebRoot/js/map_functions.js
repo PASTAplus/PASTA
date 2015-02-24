@@ -92,4 +92,11 @@ function initialize_summary_map(north, south, east, west) {
     bounds.extend(swLatLng);
     bounds.extend(seLatLng);
     map.fitBounds(bounds);
+    
+    if ((north == south) && (east == west)) {
+    	var nwMarker = new google.maps.Marker({position: nwLatLng, map: map, title: nwLatLng.toString() });
+    }
+    else {
+    	var rect = new google.maps.Rectangle({ map: map, bounds: bounds, strokeWeight: 0.5, strokeColor: 'black', strokeOpacity: 1, fillColor: 'yellow', fillOpacity: 0.30 });
+    }
 }
