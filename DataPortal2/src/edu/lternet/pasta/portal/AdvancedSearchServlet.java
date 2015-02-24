@@ -211,8 +211,6 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			}
 
 			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-			resultSetUtility.setIncludeEcotrends(isIncludeEcotrendsChecked);
-			resultSetUtility.setIncludeLandsat5(isIncludeLandsat5Checked);
 			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
