@@ -76,15 +76,9 @@ function initialize_summary_map(north, south, east, west) {
 			center : new google.maps.LatLng(lat, lng),
 			zoom : 12,
 			mapTypeId : google.maps.MapTypeId.TERRAIN,
-			mapTypeControl : true,
-			panControl : false,
-			navigationControl : true,
-			scaleControl : true,
-			streetViewControl : false,
-			zoomControl : true,
-			zoomControlOptions : {
-				style : google.maps.ZoomControlStyle.SMALL
-			}
+            disableDefaultUI: true,
+            navigationControlOptions: { style: google.maps.NavigationControlStyle.SMALL },
+            keyboardShortcuts: true
 	};
 
 	var map = new google.maps.Map(document.getElementById("map-canvas-summary"), mapOptions);
@@ -98,4 +92,11 @@ function initialize_summary_map(north, south, east, west) {
     bounds.extend(swLatLng);
     bounds.extend(seLatLng);
     map.fitBounds(bounds);
+    
+    if ((north == south) && (east == west)) {
+    	var nwMarker = new google.maps.Marker({position: nwLatLng, map: map, title: nwLatLng.toString() });
+    }
+    else {
+    	var rect = new google.maps.Rectangle({ map: map, bounds: bounds, strokeWeight: 0.5, strokeColor: 'black', strokeOpacity: 1, fillColor: 'yellow', fillOpacity: 0.30 });
+    }
 }
