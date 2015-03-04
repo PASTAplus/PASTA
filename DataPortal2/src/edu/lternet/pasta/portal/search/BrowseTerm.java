@@ -230,9 +230,7 @@ public class BrowseTerm {
   
   
   /**
-   * Runs the query for a browse search, simple search, or advanced
-   * search. Stores the search results in a "resultSet" session attribute as a 
-   * ResultSet object.
+   * Runs the query for a browse search.
    * 
    * @return resultsetXML  XML search results from the Data Package Manager web service
    */

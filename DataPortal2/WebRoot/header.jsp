@@ -31,7 +31,8 @@
                                        );
   if (pageName.equals("browse") ||
            pageName.equals("packageIdentifier") ||
-           pageName.equals("advancedSearch")
+           pageName.equals("advancedSearch") ||
+           pageName.equals("savedData")
           ) {
     dataClass = currentClass;
   }
@@ -84,8 +85,12 @@
 					<li><a href="scopebrowse">Package Identifier</a> </li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
-					Search Data Using:</p>
+					Search Data:</p>
 					<li><a href="advancedSearch.jsp">Advanced Search</a> </li>
+					<p class="smallmenu pull-left nis-navigation-submenu">
+					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
+					View Data:</p>
+					<li><a href="savedDataServlet">Saved Data</a> </li>
 				</ul>
 				</li>
 				<li<%= toolsClass %>><a href="#">Tools</a>

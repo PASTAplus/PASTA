@@ -28,8 +28,10 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.portal.ConfigurationListener;
 import edu.lternet.pasta.portal.database.DatabaseClient;
+import edu.lternet.pasta.portal.search.Search;
 
 
 /**
@@ -38,7 +40,7 @@ import edu.lternet.pasta.portal.database.DatabaseClient;
  * @author dcosta
  * 
  */
-public class SavedData {
+public class SavedData extends Search {
 
 	/*
 	 * Class fields
@@ -79,34 +81,87 @@ public class SavedData {
      */
 	public static void main(String[] args) {
 		String uid = "ucarroll";
-		String scope = "knb-lter-nin";
+		String scope1 = "knb-lter-nin";
 		Integer identifier1 = new Integer(1);
-		Integer identifier2 = new Integer(2);
+		String scope2 = "knb-lter-sbc";
+		Integer identifier2 = new Integer(28);
 		Integer revision = new Integer(1);
+		String savedDataXML = null;
 
 		ConfigurationListener.configure();
 		SavedData savedData = new SavedData(uid);
 
-		savedData.addDocid(scope, identifier1, revision);
-		savedData.addDocid(scope, identifier2, revision);
+		savedData.addDocid(scope1, identifier1, revision);
+		savedData.addDocid(scope2, identifier2, revision);
 		List<String> dataStore = savedData.fetchDataStore();
-		savedData.removeDocid(scope, identifier2);
+		try {
+			savedDataXML = savedData.getSavedData();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		//savedData.removeDocid(scope2, identifier2);
 		dataStore = savedData.fetchDataStore();
-		savedData.removeAllDataPackages();
+		//savedData.removeAllDataPackages();
 	}
 
 	
 	/*
 	 * Instance methods
 	 */
+	
+	
+	public String getSavedData() throws Exception {
+		String savedData = null;
+		ArrayList<String> dataStore = fetchDataStore();
+		
+		if (dataStore.size() > 0) {
+			String queryString = composeQueryString(dataStore);
+			
+			if (queryString != null) {
+				DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+				logger.warn(String.format("queryString:\n%s", queryString));
+				String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, DEFAULT_START, DEFAULT_ROWS);
+				String resultsetXML = dpmClient.searchDataPackages(extendedQueryString);
+				savedData = resultsetXML;
+			}
+		}
+		
+		return savedData;
+	}
+	
+	
+	private String composeQueryString(ArrayList<String> dataStore) {
+		String queryString = null;
+		StringBuilder queryBuilder = new StringBuilder("id:(");
 
+		if (dataStore != null) {
+			String plus = "";
+			for (String docid : dataStore) {
+				queryBuilder.append(String.format("%s%s", plus, docid));
+				plus = "+";
+			}
+		    queryBuilder.append(")");	
+		
+		    String qString = queryBuilder.toString().trim();
+		    queryString = String.format(
+				"defType=%s&q=%s&fl=%s&sort=%s&debug=%s",
+				DEFAULT_DEFTYPE, qString, DEFAULT_FIELDS, 
+				PACKAGEID_SORT, DEFAULT_DEBUG
+		    );
+		}
+		
+		return queryString;
+	}
+
+	
 	/**
 	 * Fetches the full list of saved data packages for this user.
 	 * 
 	 * @return a list of docid strings, where each string is a value 
 	 *         such as "knb-lter-nin.1"
 	 */
-	public List<String> fetchDataStore() {
+	public ArrayList<String> fetchDataStore() {
 		ArrayList<String> docids = new ArrayList<String>();
 		
 		Connection conn = databaseClient.getConnection();		
