@@ -262,6 +262,44 @@ public class SavedData extends Search {
 
 
 	/**
+	 * Boolean to determine whether the specified docid has been saved for this user.
+	 * 
+	 * @param scope         the scope of the data package to check
+	 * @param identifer     the identifier value of the data package to check
+	 * @return   true if the user has already saved the data package, else false
+	 */
+	public boolean hasDocid(String scope, Integer identifier) {
+		boolean hasDocid = false;
+		Connection conn = databaseClient.getConnection();
+		
+		if (conn != null && uid != null) {
+			String SQL_QUERY = ("SELECT scope, identifier FROM " + TABLE_NAME + 
+						        " WHERE user_id=? AND scope=? AND identifier=?");
+			logger.debug("SQL_QUERY: " + SQL_QUERY);
+
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(SQL_QUERY);
+				pstmt.setString(1, uid);
+				pstmt.setString(2, scope);
+				pstmt.setInt(3, identifier);
+				ResultSet rs = pstmt.executeQuery();
+				while (rs.next()) {
+					hasDocid = true;
+					break;
+				}
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+			}
+
+			logger.debug("hasDocid: " + hasDocid);
+		}
+		
+		return hasDocid;
+	}
+
+
+	/**
 	 * Remove all data packages (i.e. all docids) from the saved data for this user.
 	 */
 	public void removeAllDataPackages() {

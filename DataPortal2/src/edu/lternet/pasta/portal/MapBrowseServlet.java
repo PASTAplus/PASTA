@@ -48,6 +48,7 @@ import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet;
+import edu.lternet.pasta.portal.user.SavedData;
 
 
 public class MapBrowseServlet extends DataPortalServlet {
@@ -159,11 +160,17 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String codeGenerationHTML = "";
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
+		boolean showSaved = false;
+		boolean isSaved = false;
 
 		String uid = (String) httpSession.getAttribute("uid");
 
-		if (uid == null || uid.isEmpty())
+		if (uid == null || uid.isEmpty()) {
 			uid = "public";
+		}
+		else {
+			showSaved = true;
+		}
 
 		Integer id = null;
 		boolean isPackageId = false;
@@ -263,6 +270,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 					emlString = dpmClient.readMetadata(scope, id, revision);
 					emlObject = new EmlObject(emlString);
 					titles = emlObject.getTitles();
+					
+					if (showSaved) {
+						SavedData savedData = new SavedData(uid);
+						Integer identifierInt = new Integer(identifier);
+						isSaved = savedData.hasDocid(scope, identifierInt);
+					}
 
 					if (titles != null) {
 						titleHTMLBuilder
@@ -551,17 +564,31 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("<li>&nbsp;</li>\n");
 
 				resourcesHTMLBuilder.append("<li>\n");
-				resourcesHTMLBuilder.append("<div class=\"zip\">");
-				resourcesHTMLBuilder
-						.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">");
-				resourcesHTMLBuilder
-						.append("<input type=\"hidden\" name=\"packageid\" value=\""
-								+ packageId + "\" />");
-				resourcesHTMLBuilder
-						.append("<input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" />");
-				resourcesHTMLBuilder.append("</form>");
-				resourcesHTMLBuilder.append("</div>");
+				resourcesHTMLBuilder.append("<div class=\"zip\">\n");				
+				resourcesHTMLBuilder.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">\n");
+				resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" >\n");
+				resourcesHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" >\n");
+				resourcesHTMLBuilder.append("</form>\n");
+				resourcesHTMLBuilder.append("</div>\n");
 				resourcesHTMLBuilder.append("</li>\n");
+
+				if (showSaved) {
+					String operation = isSaved ? "unsave" : "save";
+					String display = isSaved ? "Delete From Saved" : "Save";
+					resourcesHTMLBuilder.append("<li>\n");
+					resourcesHTMLBuilder.append("<div>\n");				
+					resourcesHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"scope\"  value=\""+ scope + "\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"identifier\" value=\""+ identifier + "\" >\n");
+					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"revision\"  value=\""+ revision + "\" >\n");
+					resourcesHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
+					resourcesHTMLBuilder.append("</form>\n");		
+					resourcesHTMLBuilder.append("</div>\n");
+					resourcesHTMLBuilder.append("</li>\n");
+				}
 
 				resourcesHTMLBuilder.append("<li>\n");
 				resourcesHTMLBuilder

@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.AuditManagerClient;
 import edu.lternet.pasta.client.ReportUtility;
 import edu.lternet.pasta.client.ResultSetUtility;
+import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.portal.search.BrowseTerm;
 import edu.lternet.pasta.portal.search.TermsList;
 import edu.lternet.pasta.portal.user.SavedData;
@@ -104,12 +106,10 @@ public class SavedDataServlet extends DataPortalServlet {
    * @throws IOException
    *           if an error occurred
    */
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-
-    doPost(request, response);
-
-  }
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doPost(request, response);
+	}
 
   
   /**
@@ -128,12 +128,8 @@ public class SavedDataServlet extends DataPortalServlet {
    */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String forward = "./savedData.jsp";
-		String html = null;
-		TermsList termsList = null;
-		String termsListHTML = "";
-		String xml = null;
 		HttpSession httpSession = request.getSession();
+		String forward = (String) request.getParameter("forward");
 		
 		String uid = (String) httpSession.getAttribute("uid");
 		if (uid == null || uid.isEmpty()) {
@@ -144,20 +140,49 @@ public class SavedDataServlet extends DataPortalServlet {
 		if (uid.equals("public")) {
 			message = LOGIN_WARNING;
 			forward = "./login.jsp";
+			request.setAttribute("message", message);
+			request.setAttribute("from", "savedDataServlet");
 		}
 		else {
+			String operation = (String) request.getParameter("operation");
 			SavedData savedData = new SavedData(uid);
-			response.setContentType("text/html");
-
-			try {
-				xml = savedData.getSavedData();
-				httpSession.setAttribute("termsListHTML", termsListHTML);
-				ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-				html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-				request.setAttribute("searchresult", html);
+			
+			if (operation != null) {
+				String packageId = (String) request.getParameter("packageId");
+				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+				EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
+				String scope = emlPackageId.getScope();
+				Integer identifier = emlPackageId.getIdentifier();
+				Integer revision = emlPackageId.getRevision();
+				
+				if (operation.equals("save")) {
+					savedData.addDocid(scope, identifier, revision);
+				}
+				else if (operation.equals("unsave")) {
+					savedData.removeDocid(scope, identifier);
+				}
 			}
-			catch (Exception e) {
-				handleDataPortalError(logger, e);
+			else {
+				forward = "./savedData.jsp";
+				String html = "<p>There are no saved data packages.</p>";
+				String termsListHTML = "";
+				String xml = null;
+				response.setContentType("text/html");
+				try {
+					xml = savedData.getSavedData();
+					if (xml != null) {
+						httpSession.setAttribute("termsListHTML", termsListHTML);
+						ResultSetUtility resultSetUtility = new ResultSetUtility(
+								xml);
+						html = termsListHTML
+								+ resultSetUtility
+										.xmlToHtmlTable(cwd + xslpath);
+					}
+					request.setAttribute("searchresult", html);
+				}
+				catch (Exception e) {
+					handleDataPortalError(logger, e);
+				}
 			}
 		}
 
