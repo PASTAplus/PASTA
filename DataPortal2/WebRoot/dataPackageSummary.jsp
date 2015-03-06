@@ -18,6 +18,7 @@
   String codeGenerationHTML = (String) request.getAttribute("codeGenerationHTML");
   String spatialCoverageHTML = (String) request.getAttribute("spatialCoverageHTML");
   String googleMapHTML = (String) request.getAttribute("googleMapHTML");
+  String savedDataHTML = (String) request.getAttribute("savedDataHTML");
   Double northCoord = (Double) request.getAttribute("northCoord");
   Double southCoord = (Double) request.getAttribute("southCoord");
   Double eastCoord = (Double) request.getAttribute("eastCoord");
@@ -27,6 +28,7 @@
   boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
   boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
+  boolean showSavedData = !(savedDataHTML == null || savedDataHTML.isEmpty());
 %>
 
 <!DOCTYPE html>
@@ -60,6 +62,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script src="./js/map_functions.js" type="text/javascript"></script>
 <script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/keydragzoom/src/keydragzoom.js" type="text/javascript"></script>
+
 <c:set var="showSpatial" value="<%= showSpatial %>"/>
 <c:choose>
 	<c:when test="${showSpatial}">
@@ -216,8 +219,8 @@
 										</div>											
 									</div>
 
-							<c:set var="showCodeGen" value="<%= showCodeGeneration %>"/>
-							<c:if test="${showCodeGen}">
+							<c:set var="showCodeGeneration" value="<%= showCodeGeneration %>"/>
+							<c:if test="${showCodeGeneration}">
 									<div class="table-row">										
 										<div class="table-cell text-align-right">
 											<label class="labelBold">Code Generation:</label>
@@ -225,6 +228,20 @@
 										<div class="table-cell">
 											<ul class="no-list-style">
 												<li><%= codeGenerationHTML %></li>
+											</ul>
+										</div>											
+									</div>
+							</c:if>
+									
+							<c:set var="showSavedData" value="<%= showSavedData %>"/>
+							<c:if test="${showSavedData}">
+									<div class="table-row">										
+										<div class="table-cell text-align-right">
+											<!--<label class="labelBold"></label>-->
+										</div>
+										<div class="table-cell">
+											<ul class="no-list-style">
+												<li><%= savedDataHTML %></li>
 											</ul>
 										</div>											
 									</div>

@@ -160,6 +160,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String codeGenerationHTML = "";
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
+		String savedDataHTML = "";
 		boolean showSaved = false;
 		boolean isSaved = false;
 
@@ -221,6 +222,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				StringBuilder citationHTMLBuilder = new StringBuilder();
 				StringBuilder provenanceHTMLBuilder = new StringBuilder();
 				StringBuilder codeGenerationHTMLBuilder = new StringBuilder();
+				StringBuilder savedDataHTMLBuilder = new StringBuilder();
 
 				String packageId = null;
 
@@ -564,7 +566,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("<li>&nbsp;</li>\n");
 
 				resourcesHTMLBuilder.append("<li>\n");
-				resourcesHTMLBuilder.append("<div class=\"zip\">\n");				
+				resourcesHTMLBuilder.append("<div>\n");				
 				resourcesHTMLBuilder.append("<form id=\"archive\" name=\"archiveform\" method=\"post\" action=\"./archiveDownload\"	target=\"_top\">\n");
 				resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\"" + packageId + "\" >\n");
 				resourcesHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"archive\" value=\"Download Zip Archive\" >\n");
@@ -572,23 +574,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("</div>\n");
 				resourcesHTMLBuilder.append("</li>\n");
 
-				if (showSaved) {
-					String operation = isSaved ? "unsave" : "save";
-					String display = isSaved ? "Delete From Saved" : "Save";
-					resourcesHTMLBuilder.append("<li>\n");
-					resourcesHTMLBuilder.append("<div>\n");				
-					resourcesHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"scope\"  value=\""+ scope + "\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"identifier\" value=\""+ identifier + "\" >\n");
-					resourcesHTMLBuilder.append("  <input type=\"hidden\" name=\"revision\"  value=\""+ revision + "\" >\n");
-					resourcesHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
-					resourcesHTMLBuilder.append("</form>\n");		
-					resourcesHTMLBuilder.append("</div>\n");
-					resourcesHTMLBuilder.append("</li>\n");
-				}
 
 				resourcesHTMLBuilder.append("<li>\n");
 				resourcesHTMLBuilder
@@ -599,6 +584,28 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				resourcesHTMLBuilder.append("</ul>\n");
 				resourcesHTML = resourcesHTMLBuilder.toString();
+
+				if (showSaved) {
+					//savedDataHTMLBuilder.append("<ul class=\"no-list-style\">\n");
+					String operation = isSaved ? "unsave" : "save";
+					String display = isSaved ? "Delete From Saved" : "Save";
+					//savedDataHTMLBuilder.append("<li>\n");
+					savedDataHTMLBuilder.append("<div>\n");
+					savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"scope\"  value=\""+ scope + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"identifier\" value=\""+ identifier + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"revision\"  value=\""+ revision + "\" >\n");
+					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
+					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\"View Saved\" >\n");
+					savedDataHTMLBuilder.append("</form>\n");		
+					savedDataHTMLBuilder.append("</div>\n");
+					//savedDataHTMLBuilder.append("</li>\n");
+					//savedDataHTMLBuilder.append("</ul>\n");
+					savedDataHTML = savedDataHTMLBuilder.toString();
+				}
 
 				if (doiId != null) {
 					digitalObjectIdentifier = doiId;
@@ -669,8 +676,9 @@ public class MapBrowseServlet extends DataPortalServlet {
 				pastaDataObjectIdentifier);
 		request.setAttribute("provenanceHTML", provenanceHTML);
 		request.setAttribute("codeGenerationHTML", codeGenerationHTML);
-		RequestDispatcher requestDispatcher = request
-				.getRequestDispatcher(forward);
+		request.setAttribute("savedDataHTML", savedDataHTML);
+
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 	}
 

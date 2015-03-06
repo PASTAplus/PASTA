@@ -129,6 +129,7 @@ public class SavedDataServlet extends DataPortalServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession httpSession = request.getSession();
+		String submit = (String) request.getParameter("savedData");
 		String forward = (String) request.getParameter("forward");
 		
 		String uid = (String) httpSession.getAttribute("uid");
@@ -147,7 +148,28 @@ public class SavedDataServlet extends DataPortalServlet {
 			String operation = (String) request.getParameter("operation");
 			SavedData savedData = new SavedData(uid);
 			
-			if (operation != null) {
+			if ((operation == null) || 
+			    ((submit != null) && 
+			     (submit.equals("View Saved")))) {
+				forward = "./savedData.jsp";
+				String html = "<p>There are no saved data packages.</p>";
+				String termsListHTML = "";
+				String xml = null;
+				response.setContentType("text/html");
+				try {
+					xml = savedData.getSavedData();
+					if (xml != null) {
+						httpSession.setAttribute("termsListHTML", termsListHTML);
+						ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+						html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+					}
+					request.setAttribute("searchresult", html);
+				}
+				catch (Exception e) {
+					handleDataPortalError(logger, e);
+				}
+			}
+			else if (operation != null) {
 				String packageId = (String) request.getParameter("packageId");
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 				EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
@@ -160,28 +182,6 @@ public class SavedDataServlet extends DataPortalServlet {
 				}
 				else if (operation.equals("unsave")) {
 					savedData.removeDocid(scope, identifier);
-				}
-			}
-			else {
-				forward = "./savedData.jsp";
-				String html = "<p>There are no saved data packages.</p>";
-				String termsListHTML = "";
-				String xml = null;
-				response.setContentType("text/html");
-				try {
-					xml = savedData.getSavedData();
-					if (xml != null) {
-						httpSession.setAttribute("termsListHTML", termsListHTML);
-						ResultSetUtility resultSetUtility = new ResultSetUtility(
-								xml);
-						html = termsListHTML
-								+ resultSetUtility
-										.xmlToHtmlTable(cwd + xslpath);
-					}
-					request.setAttribute("searchresult", html);
-				}
-				catch (Exception e) {
-					handleDataPortalError(logger, e);
 				}
 			}
 		}
