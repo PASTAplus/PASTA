@@ -29,6 +29,7 @@
   <xsl:output method="html"/>
 
   <xsl:param name="rows"></xsl:param>
+  <xsl:param name="savedData"></xsl:param>
 
   <xsl:variable name="numFound">
       <xsl:value-of select="number(/resultset/@numFound)"/>
@@ -51,6 +52,8 @@
         </xsl:otherwise>
       </xsl:choose>
   </xsl:variable>
+  
+  <xsl:variable name="isSavedData" select="boolean($savedData = 'true')"></xsl:variable>
 
   <xsl:template match="/">
 
@@ -98,6 +101,16 @@
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
+			<xsl:if test="$isSavedData">
+				<br/>
+        		<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+					<input type="hidden" name="operation" value="unsave"></input>
+					<input type="hidden" name="packageId" value="{$pid}"></input>
+					<input type="hidden" name="forward" value="savedData.jsp"></input>
+		    		<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
+		    		<a href="#" onclick='document.getElementById("{$pid}").submit()'>(Remove)</a>
+				</form>
+			</xsl:if>
       </td>
     </tr>
     

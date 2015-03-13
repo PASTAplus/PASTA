@@ -70,6 +70,7 @@ public class ResultSetUtility {
   private PageControl pageControl = null;
   private String pageBodyHTML = "";
   private String pageHeaderHTML = "";
+  private boolean savedData = false;
   
 
   /*
@@ -168,6 +169,17 @@ public class ResultSetUtility {
 	}
 
 
+  	/**
+  	 * Sets the value of the savedData instance variable.
+  	 * 
+  	 * @param isSavedData
+  	 * 			true if the results being displayed are saved data, else false
+  	 */
+	public void setSavedData(boolean isSavedData) {
+		this.savedData = isSavedData;
+	}
+
+
 	/**
 	 * Transforms Solr search results XML to an HTML table.
 	 * 
@@ -181,6 +193,7 @@ public class ResultSetUtility {
 		
 		// Pass the docsPerPage value as a parameter to the XSLT
 		parameterMap.put("rows", new Integer(this.rows).toString());
+		parameterMap.put("savedData", new Boolean(this.savedData).toString());
 
 		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
 				parameterMap);

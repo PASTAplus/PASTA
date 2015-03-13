@@ -89,7 +89,7 @@
 					<li><a href="advancedSearch.jsp">Advanced Search</a> </li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
-					View Data:</p>
+					View Saved Data:</p>
 					<li><a href="savedDataServlet">Saved Data Packages</a> </li>
 				</ul>
 				</li>

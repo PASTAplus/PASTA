@@ -545,6 +545,21 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				}
 
+				if (showSaved && !isSaved) {
+					String operation = "save";
+					String display = "Save";
+					savedDataHTMLBuilder.append("<div>\n");
+					savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\""+ packageId + "\" >\n");
+					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
+					savedDataHTMLBuilder.append("</form>\n");		
+					savedDataHTMLBuilder.append("</div>\n");
+					savedDataHTML = savedDataHTMLBuilder.toString();
+				}
+
 				packageIdHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 				packageIdHTMLBuilder.append(packageIdListItem);
 				packageIdHTMLBuilder.append(previous);
@@ -585,27 +600,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("</ul>\n");
 				resourcesHTML = resourcesHTMLBuilder.toString();
 
-				if (showSaved) {
-					//savedDataHTMLBuilder.append("<ul class=\"no-list-style\">\n");
-					String operation = isSaved ? "unsave" : "save";
-					String display = isSaved ? "Delete From Saved" : "Save";
-					//savedDataHTMLBuilder.append("<li>\n");
-					savedDataHTMLBuilder.append("<div>\n");
-					savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"scope\"  value=\""+ scope + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"identifier\" value=\""+ identifier + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"revision\"  value=\""+ revision + "\" >\n");
-					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
-					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\"View Saved\" >\n");
-					savedDataHTMLBuilder.append("</form>\n");		
-					savedDataHTMLBuilder.append("</div>\n");
-					//savedDataHTMLBuilder.append("</li>\n");
-					//savedDataHTMLBuilder.append("</ul>\n");
-					savedDataHTML = savedDataHTMLBuilder.toString();
-				}
 
 				if (doiId != null) {
 					digitalObjectIdentifier = doiId;
