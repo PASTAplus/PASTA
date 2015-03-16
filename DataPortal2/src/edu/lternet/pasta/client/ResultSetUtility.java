@@ -58,6 +58,8 @@ public class ResultSetUtility {
 
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.ResultSetUtility.class);
+  
+  private static final boolean DEFAULT_SAVED_DATA = false;
 
   /*
    * Instance variables
@@ -70,13 +72,38 @@ public class ResultSetUtility {
   private PageControl pageControl = null;
   private String pageBodyHTML = "";
   private String pageHeaderHTML = "";
-  private boolean savedData = false;
+  private boolean savedData;
   
 
   /*
    * Constructors
    */
 
+  /**
+   * Constructs a new ResultSetUtility object from search results XML,
+   * specifying whether the search results represent saved data packages
+   * or regular search results.
+   * 
+   * @param xml
+   *          The search results XML as a String object.
+   * 
+   * @throws ParseException
+   */
+  public ResultSetUtility(String xml, boolean savedData) throws ParseException {
+
+    if (xml == null || xml.isEmpty()) {
+      throw new ParseException("Result Set is empty", 0);
+    }
+
+    this.resultSet = xml;
+    this.savedData = savedData;
+    parseResultSet(xml);
+    pageControl = new PageControl(numFound, start, rows, savedData);
+    pageHeaderHTML = pageControl.composePageHeader();
+    pageBodyHTML = pageControl.composePageBody();
+  }
+
+  
   /**
    * Constructs a new ResultSetUtility object from search results XML.
    * 
@@ -86,16 +113,7 @@ public class ResultSetUtility {
    * @throws ParseException
    */
   public ResultSetUtility(String xml) throws ParseException {
-
-    if (xml == null || xml.isEmpty()) {
-      throw new ParseException("Result Set is empty", 0);
-    }
-
-    this.resultSet = xml;
-    parseResultSet(xml);
-    pageControl = new PageControl(numFound, start, rows);
-    pageHeaderHTML = pageControl.composePageHeader();
-    pageBodyHTML = pageControl.composePageBody();
+	  this(xml, DEFAULT_SAVED_DATA);
   }
 
   
@@ -166,17 +184,6 @@ public class ResultSetUtility {
   	 */
 	public void setRowsPerPage(int n) {
 		this.rows = new Integer(n);
-	}
-
-
-  	/**
-  	 * Sets the value of the savedData instance variable.
-  	 * 
-  	 * @param isSavedData
-  	 * 			true if the results being displayed are saved data, else false
-  	 */
-	public void setSavedData(boolean isSavedData) {
-		this.savedData = isSavedData;
 	}
 
 

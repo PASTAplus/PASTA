@@ -35,11 +35,13 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
+import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.ReportUtility;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.portal.search.BrowseTerm;
+import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.search.TermsList;
 import edu.lternet.pasta.portal.user.SavedData;
 
@@ -130,6 +132,9 @@ public class SavedDataServlet extends DataPortalServlet {
 			throws ServletException, IOException {
 		HttpSession httpSession = request.getSession();
 		String forward = (String) request.getParameter("forward");
+		String startStr = (String) request.getParameter("start");
+		String rowsStr = (String) request.getParameter("rows");
+
 		if (forward == null) forward = "savedData.jsp";
 		
 		String uid = (String) httpSession.getAttribute("uid");
@@ -145,10 +150,13 @@ public class SavedDataServlet extends DataPortalServlet {
 			request.setAttribute("from", "savedDataServlet");
 		}
 		else {
-			String operation = (String) request.getParameter("operation");
+			String operation = (String) request.getParameter("operation"); // "save" or "unsave"
 			String packageId = (String) request.getParameter("packageId");
 			SavedData savedData = new SavedData(uid);
 			
+			/*
+			 * First, execute any operations that change the state of the saved data
+			 */
 			if (operation != null && packageId != null) {
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 				EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
@@ -164,18 +172,22 @@ public class SavedDataServlet extends DataPortalServlet {
 				}
 			}
 			
+			/*
+			 * If we are forwarding to the saved data page, update the HTML
+			 * to be displayed
+			 */
 			if (forward != null && forward.equals("savedData.jsp")) {
 				String html = "<p>There are no saved data packages.</p>";
 				String termsListHTML = "";
 				String xml = null;
 				response.setContentType("text/html");
 				try {
-					xml = savedData.getSavedData();
+					xml = savedData.getSavedData(startStr, rowsStr);
 					if (xml != null) {
 						httpSession.setAttribute("termsListHTML", termsListHTML);
-						ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
-						resultSetUtility.setSavedData(true);
-						html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+						boolean isSavedData = true;
+						ResultSetUtility resultSetUtility = new ResultSetUtility(xml, isSavedData);
+						html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 					}
 					request.setAttribute("searchresult", html);
 				}

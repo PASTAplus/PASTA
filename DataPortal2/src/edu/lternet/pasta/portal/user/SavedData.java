@@ -95,7 +95,7 @@ public class SavedData extends Search {
 		savedData.addDocid(scope2, identifier2, revision);
 		List<String> dataStore = savedData.fetchDataStore();
 		try {
-			savedDataXML = savedData.getSavedData();
+			savedDataXML = savedData.getSavedData("0", "10");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -111,9 +111,24 @@ public class SavedData extends Search {
 	 */
 	
 	
-	public String getSavedData() throws Exception {
+	public String getSavedData(String startStr, String rowsStr) throws Exception {
 		String savedData = null;
 		ArrayList<String> dataStore = fetchDataStore();
+		Integer start, rows;
+		
+		if (startStr == null) {
+			start = DEFAULT_START;
+		}
+		else {
+			start = new Integer(startStr);
+		}
+		
+		if (rowsStr == null) {
+			rows = DEFAULT_ROWS;
+		}
+		else {
+			rows = new Integer(rowsStr);
+		}
 		
 		if (dataStore.size() > 0) {
 			String queryString = composeQueryString(dataStore);
@@ -121,7 +136,7 @@ public class SavedData extends Search {
 			if (queryString != null) {
 				DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 				logger.warn(String.format("queryString:\n%s", queryString));
-				String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, DEFAULT_START, DEFAULT_ROWS);
+				String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, start, rows);
 				String resultsetXML = dpmClient.searchDataPackages(extendedQueryString);
 				savedData = resultsetXML;
 			}
