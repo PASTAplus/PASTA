@@ -89,8 +89,8 @@
 					<li><a href="advancedSearch.jsp">Advanced Search</a> </li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
-					View Saved Data:</p>
-					<li><a href="savedDataServlet">Saved Data Packages</a> </li>
+					Store Data:</p>
+					<li><a href="savedDataServlet">Data Shelf</a> </li>
 				</ul>
 				</li>
 				<li<%= toolsClass %>><a href="#">Tools</a>

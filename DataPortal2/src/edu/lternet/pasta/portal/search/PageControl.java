@@ -26,17 +26,17 @@ public class PageControl {
 	int rowsPerPage;     // The number of search results displayed per page
 	int start;           // The start record
 	int pageRange = 5;   // View +/- pageRange pages from the current page
-	boolean savedData;   // true if displaying saved data packages, else false
+	boolean isSavedDataPage; // true if displaying saved data packages, else false
 	
 	
 	/*
 	 * Constructor
 	 */
 	
-	public PageControl(int numFound, int start, int rowsPerPage, boolean savedData) {
+	public PageControl(int numFound, int start, int rowsPerPage, boolean isSavedDataPage) {
 		this.numFound = numFound;
 		this.rowsPerPage = rowsPerPage;
-		this.savedData = savedData;
+		this.isSavedDataPage = isSavedDataPage;
 		setStart(start);
 	}
 	
@@ -57,9 +57,9 @@ public class PageControl {
 		int numberFound = new Integer(args[0]);
 		int rowsPerPage = new Integer(args[1]);
 		int start = new Integer(args[2]);
-		boolean savedData = false;
+		boolean isSavedDataPage = false;
 		
-		PageControl pageControl = new PageControl(numberFound, start, rowsPerPage, savedData);
+		PageControl pageControl = new PageControl(numberFound, start, rowsPerPage, isSavedDataPage);
 		String html = pageControl.composePageBody();
 		System.out.println(html);
 	}
@@ -70,7 +70,7 @@ public class PageControl {
 	 */
 	
 	private String composeStartTag(int linkStart) {
-		String servletName = this.savedData ? "savedDataServlet" : "simpleSearch";
+		String servletName = this.isSavedDataPage ? "savedDataServlet" : "simpleSearch";
 		String href = String.format("%s?start=%d&rows=%d", servletName, linkStart, rowsPerPage);
 		String aStartTag = String.format("<a class='searchsubcat' href='%s'>", href);
 		return aStartTag;		

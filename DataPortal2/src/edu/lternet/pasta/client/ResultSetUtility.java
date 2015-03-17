@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
 
 import edu.lternet.pasta.portal.search.PageControl;
 import edu.lternet.pasta.portal.search.Search;
+import edu.lternet.pasta.portal.user.SavedData;
 
 
 /**
@@ -59,8 +60,6 @@ public class ResultSetUtility {
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.client.ResultSetUtility.class);
   
-  private static final boolean DEFAULT_SAVED_DATA = false;
-
   /*
    * Instance variables
    */
@@ -72,7 +71,9 @@ public class ResultSetUtility {
   private PageControl pageControl = null;
   private String pageBodyHTML = "";
   private String pageHeaderHTML = "";
-  private boolean savedData;
+  private SavedData savedData = null;
+  private boolean isSavedDataPage;
+  private boolean showSavedData = true;
   
 
   /*
@@ -89,7 +90,7 @@ public class ResultSetUtility {
    * 
    * @throws ParseException
    */
-  public ResultSetUtility(String xml, boolean savedData) throws ParseException {
+  public ResultSetUtility(String xml, SavedData savedData, boolean isSavedDataPage) throws ParseException {
 
     if (xml == null || xml.isEmpty()) {
       throw new ParseException("Result Set is empty", 0);
@@ -97,8 +98,9 @@ public class ResultSetUtility {
 
     this.resultSet = xml;
     this.savedData = savedData;
+    this.isSavedDataPage = isSavedDataPage;
     parseResultSet(xml);
-    pageControl = new PageControl(numFound, start, rows, savedData);
+    pageControl = new PageControl(numFound, start, rows, isSavedDataPage);
     pageHeaderHTML = pageControl.composePageHeader();
     pageBodyHTML = pageControl.composePageBody();
   }
@@ -113,7 +115,8 @@ public class ResultSetUtility {
    * @throws ParseException
    */
   public ResultSetUtility(String xml) throws ParseException {
-	  this(xml, DEFAULT_SAVED_DATA);
+	  this(xml, null, false);
+	  this.showSavedData = false;
   }
 
   
@@ -198,9 +201,18 @@ public class ResultSetUtility {
 	public String xmlToHtmlTable(String xslPath) throws ParseException {
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
 		
+		String savedDataList = "";
+		
+		if (savedData != null) {
+			savedDataList = savedData.getSavedDataList();
+		}
+		
 		// Pass the docsPerPage value as a parameter to the XSLT
+		parameterMap.put("start", start.toString());
 		parameterMap.put("rows", new Integer(this.rows).toString());
-		parameterMap.put("savedData", new Boolean(this.savedData).toString());
+		parameterMap.put("isSavedDataPage", new Boolean(this.isSavedDataPage).toString());
+		parameterMap.put("savedDataList", savedDataList);
+		parameterMap.put("showSavedData", new Boolean(this.showSavedData).toString());
 
 		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
 				parameterMap);

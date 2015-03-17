@@ -182,11 +182,11 @@ public class SavedDataServlet extends DataPortalServlet {
 				String xml = null;
 				response.setContentType("text/html");
 				try {
-					xml = savedData.getSavedData(startStr, rowsStr);
+					xml = savedData.getSavedDataXML(startStr, rowsStr);
 					if (xml != null) {
 						httpSession.setAttribute("termsListHTML", termsListHTML);
-						boolean isSavedData = true;
-						ResultSetUtility resultSetUtility = new ResultSetUtility(xml, isSavedData);
+						boolean isSavedDataPage = true;
+						ResultSetUtility resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
 						html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 					}
 					request.setAttribute("searchresult", html);

@@ -94,8 +94,10 @@ public class SavedData extends Search {
 		savedData.addDocid(scope1, identifier1, revision);
 		savedData.addDocid(scope2, identifier2, revision);
 		List<String> dataStore = savedData.fetchDataStore();
+		String savedDataList = savedData.getSavedDataList();
+		System.out.println(String.format("Saved data list: %s", savedDataList));
 		try {
-			savedDataXML = savedData.getSavedData("0", "10");
+			savedDataXML = savedData.getSavedDataXML("0", "10");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -111,7 +113,15 @@ public class SavedData extends Search {
 	 */
 	
 	
-	public String getSavedData(String startStr, String rowsStr) throws Exception {
+	/*
+	 * Gets a subset of the data packages saved by a particular user and returns
+	 * it as XML-formatted search results. The subset returned depends on the
+	 * start position and number of items (i.e. rows) to be returned.
+	 * 
+	 * @param  startStr   The start position, e.g. "0"
+	 * @param  rowsStr    The number of rows to return, e.g. "10"
+	 */
+	public String getSavedDataXML(String startStr, String rowsStr) throws Exception {
 		String savedData = null;
 		ArrayList<String> dataStore = fetchDataStore();
 		Integer start, rows;
@@ -143,6 +153,28 @@ public class SavedData extends Search {
 		}
 		
 		return savedData;
+	}
+	
+	
+	/*
+	 * Gets the list of all data packages saved by a particular user and returns
+	 * it as a comma-separated list.
+	 */
+	public String getSavedDataList() {
+		String savedDataList = null;
+		StringBuilder listBuilder = new StringBuilder("");
+		ArrayList<String> dataStore = fetchDataStore();
+		
+		for (String docid : dataStore) {
+			listBuilder.append(String.format("%s,", docid));
+		}
+		
+		savedDataList = listBuilder.toString();
+		if (savedDataList.length() > 0) {
+			//savedDataList = savedDataList.substring(0, savedDataList.length() - 1); // trim off trailing ','
+		}
+		
+		return savedDataList;
 	}
 	
 	

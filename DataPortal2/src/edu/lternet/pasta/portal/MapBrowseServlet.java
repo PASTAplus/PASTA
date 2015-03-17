@@ -547,7 +547,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				if (showSaved && !isSaved) {
 					String operation = "save";
-					String display = "Save";
+					String display = "Add to shelf";
 					savedDataHTMLBuilder.append("<div>\n");
 					savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
 					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");

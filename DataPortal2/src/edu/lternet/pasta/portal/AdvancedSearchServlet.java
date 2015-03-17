@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.portal.search.SolrAdvancedSearch;
 import edu.lternet.pasta.portal.search.TermsList;
+import edu.lternet.pasta.portal.user.SavedData;
 
 
 public class AdvancedSearchServlet extends DataPortalServlet {
@@ -137,8 +138,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     
     String uid = (String) httpSession.getAttribute("uid");
     
-    if (uid == null || uid.isEmpty())
-      uid = "public";
+    if (uid == null || uid.isEmpty()) uid = "public";
     
     String boundaryContained = request.getParameter("boundaryContained");
     String boundsChangedCount = request.getParameter("boundsChangedCount");
@@ -210,7 +210,15 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 				httpSession.setAttribute("termsListHTML", termsListHTML);
 			}
 
-			ResultSetUtility resultSetUtility = new ResultSetUtility(xml);
+			ResultSetUtility resultSetUtility = null;
+			if (uid.equals("public")) {
+				resultSetUtility = new ResultSetUtility(xml);
+			}
+			else {
+				boolean isSavedDataPage = false;
+				SavedData savedData = new SavedData(uid);
+				resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+			}
 			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);

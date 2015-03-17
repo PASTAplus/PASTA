@@ -126,6 +126,7 @@ public class SimpleSolrSearch {
 			sb.append("  <document>\n");
 			
 			String yearStr = "";
+			String docid = (String) solrDocument.getFieldValue("id");
 			String packageId = (String) solrDocument.getFieldValue("packageid");
 			Date pubDate = (Date) solrDocument.getFieldValue("pubdate");
 			SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
@@ -134,6 +135,7 @@ public class SimpleSolrSearch {
 			}
 			String title = (String) solrDocument.getFirstValue("title");
 			
+			sb.append(String.format("    <docid>%s</docid>\n", docid));
 			sb.append(String.format("    <packageId>%s</packageId>\n", packageId));
 			sb.append(String.format("    <pubDate>%s</pubDate>\n", yearStr));
 			sb.append(String.format("    <title>%s</title>\n", title));

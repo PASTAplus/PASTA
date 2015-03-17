@@ -28,8 +28,11 @@
 
   <xsl:output method="html"/>
 
+  <xsl:param name="start"></xsl:param>
   <xsl:param name="rows"></xsl:param>
-  <xsl:param name="savedData"></xsl:param>
+  <xsl:param name="isSavedDataPage"></xsl:param>
+  <xsl:param name="savedDataList"></xsl:param>
+  <xsl:param name="showSavedData"></xsl:param>
 
   <xsl:variable name="numFound">
       <xsl:value-of select="number(/resultset/@numFound)"/>
@@ -53,7 +56,8 @@
       </xsl:choose>
   </xsl:variable>
   
-  <xsl:variable name="isSavedData" select="boolean($savedData = 'true')"></xsl:variable>
+  <xsl:variable name="savedDataPage" select="boolean($isSavedDataPage = 'true')"></xsl:variable>
+  <xsl:variable name="showSaved" select="boolean($showSavedData = 'true')"></xsl:variable>
 
   <xsl:template match="/">
 
@@ -82,6 +86,7 @@
 
   <xsl:template match="document">
   
+	<xsl:variable name="docid" select="./docid"/>
 	<xsl:variable name="pid" select="./packageId"/>
 	
     <tr>
@@ -101,15 +106,47 @@
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
-			<xsl:if test="$isSavedData">
+			<xsl:if test="$showSaved">
 				<br/>
-        		<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
-					<input type="hidden" name="operation" value="unsave"></input>
-					<input type="hidden" name="packageId" value="{$pid}"></input>
-					<input type="hidden" name="forward" value="savedData.jsp"></input>
-		    		<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
-		    		<a href="#" onclick='document.getElementById("{$pid}").submit()'>(Remove)</a>
-				</form>
+				<xsl:choose>
+					<xsl:when test="$savedDataPage">
+        				<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+							<input type="hidden" name="operation" value="unsave"></input>
+							<input type="hidden" name="packageId" value="{$pid}"></input>
+							<input type="hidden" name="forward" value="savedData.jsp"></input>
+		    				<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
+		    				<a href="#" onclick='document.getElementById("{$pid}").submit()'>Remove</a>
+						</form>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name="docidPlusComma" select="concat($docid, ',')"></xsl:variable>
+						<xsl:variable name="containsDocid" select="boolean(contains($savedDataList, $docidPlusComma))"></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="$containsDocid">
+       							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+									<input type="hidden" name="operation" value="unsave"></input>
+									<input type="hidden" name="packageId" value="{$pid}"></input>
+									<input type="hidden" name="forward" value="simpleSearch"></input>
+									<input type="hidden" name="start" value="{$start}"></input>
+									<input type="hidden" name="rows" value="{$rows}"></input>
+		    						<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
+		    						On shelf <a href="#" onclick='document.getElementById("{$pid}").submit()'>(Remove)</a>
+								</form>
+							</xsl:when>
+							<xsl:otherwise>
+       							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+									<input type="hidden" name="operation" value="save"></input>
+									<input type="hidden" name="packageId" value="{$pid}"></input>
+									<input type="hidden" name="forward" value="simpleSearch"></input>
+									<input type="hidden" name="start" value="{$start}"></input>
+									<input type="hidden" name="rows" value="{$rows}"></input>
+		    						<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Save"></input> -->
+		    						<a href="#" onclick='document.getElementById("{$pid}").submit()'>Add to shelf</a>
+								</form>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:if>
       </td>
     </tr>

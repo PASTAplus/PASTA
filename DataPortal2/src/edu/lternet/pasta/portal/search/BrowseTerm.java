@@ -234,7 +234,7 @@ public class BrowseTerm {
    * 
    * @return resultsetXML  XML search results from the Data Package Manager web service
    */
-  private String runQuery() {
+  public String runQuery() {
     String uid = "public";         // All browse-based searches are by public user
     String resultsetXML = null;
     

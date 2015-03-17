@@ -43,6 +43,7 @@ import edu.lternet.pasta.portal.search.BrowseGroup;
 import edu.lternet.pasta.portal.search.BrowseTerm;
 import edu.lternet.pasta.portal.search.BrowseSearch;
 import edu.lternet.pasta.portal.search.TermsList;
+import edu.lternet.pasta.portal.user.SavedData;
 
 
 public class BrowseServlet extends DataPortalServlet {
@@ -149,7 +150,7 @@ public class BrowseServlet extends DataPortalServlet {
     response.setContentType("text/html");
     
     try {
-      xml = browseTerm.readSearchResults();
+      xml = browseTerm.runQuery();
       
       termsList = browseTerm.getTermsList();
       if (termsList != null) {
@@ -160,7 +161,16 @@ public class BrowseServlet extends DataPortalServlet {
       httpSession.setAttribute("queryText", queryText);
       httpSession.setAttribute("termsListHTML", termsListHTML);
 
-      ResultSetUtility resultSetUtility = new ResultSetUtility(xml);  
+	  ResultSetUtility resultSetUtility = null;
+	  if (uid.equals("public")) {
+		resultSetUtility = new ResultSetUtility(xml);
+	  }
+	  else {
+		boolean isSavedDataPage = false;
+		SavedData savedData = new SavedData(uid);
+		resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+	  }
+	  
       html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
       RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
