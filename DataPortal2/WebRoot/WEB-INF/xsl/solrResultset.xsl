@@ -67,10 +67,21 @@
       <table width="100%">
         <tbody>
           <tr>
-            <th class="nis" width="50%">Title</th>
-            <th class="nis" width="25%">Creators</th>
-            <th class="nis" width="10%">Publication Date</th>
-            <th class="nis" width="15%">Package Id</th>
+			<xsl:choose> 
+				<xsl:when test="$showSaved">
+            		<th class="nis" width="47%">Title</th>
+            		<th class="nis" width="20%">Creators</th>
+            		<th class="nis" width="10%">Publication Date</th>
+            		<th class="nis" width="15%">Package Id</th>
+           			<th class="nis" width="8%"></th>
+         		</xsl:when>
+				<xsl:otherwise>
+         			<th class="nis" width="50%">Title</th>
+        	 		<th class="nis" width="25%">Creators</th>
+       	     		<th class="nis" width="10%">Publication Date</th>
+            		<th class="nis" width="15%">Package Id</th>
+             	</xsl:otherwise>
+            </xsl:choose>
           </tr>
           <xsl:for-each select="/resultset/document">
             <xsl:apply-templates select="."/>
@@ -106,16 +117,17 @@
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
         <xsl:value-of select="$pid"/>
         </a>
-			<xsl:if test="$showSaved">
-				<br/>
+	  </td>
+	  <xsl:if test="$showSaved">
+			<td class="nis" align="center">
 				<xsl:choose>
 					<xsl:when test="$savedDataPage">
+		    			<small><em>On shelf</em></small><br/>
+		    			<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from data shelf" src="images/minus_blue_small.png" title="Remove from data shelf"></img></a>
         				<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
 							<input type="hidden" name="operation" value="unsave"></input>
 							<input type="hidden" name="packageId" value="{$pid}"></input>
 							<input type="hidden" name="forward" value="savedData.jsp"></input>
-		    				<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
-		    				<a href="#" onclick='document.getElementById("{$pid}").submit()'>Remove</a>
 						</form>
 					</xsl:when>
 					<xsl:otherwise>
@@ -123,14 +135,14 @@
 						<xsl:variable name="containsDocid" select="boolean(contains($savedDataList, $docidPlusComma))"></xsl:variable>
 						<xsl:choose>
 							<xsl:when test="$containsDocid">
+		    					<small><em>On shelf</em></small><br/>
+								<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from data shelf" src="images/minus_blue_small.png" title="Remove from data shelf"></img></a>
        							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
 									<input type="hidden" name="operation" value="unsave"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
 									<input type="hidden" name="forward" value="simpleSearch"></input>
 									<input type="hidden" name="start" value="{$start}"></input>
 									<input type="hidden" name="rows" value="{$rows}"></input>
-		    						<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Remove"></input> -->
-		    						On shelf <a href="#" onclick='document.getElementById("{$pid}").submit()'>(Remove)</a>
 								</form>
 							</xsl:when>
 							<xsl:otherwise>
@@ -140,15 +152,15 @@
 									<input type="hidden" name="forward" value="simpleSearch"></input>
 									<input type="hidden" name="start" value="{$start}"></input>
 									<input type="hidden" name="rows" value="{$rows}"></input>
+									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to data shelf" src="images/plus_blue_small.png" title="Add to data shelf"></img></a>
 		    						<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Save"></input> -->
-		    						<a href="#" onclick='document.getElementById("{$pid}").submit()'>Add to shelf</a>
 								</form>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:if>
-      </td>
+      	</td>
+		</xsl:if>
     </tr>
     
   </xsl:template>
