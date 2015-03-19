@@ -73,7 +73,7 @@
             		<th class="nis" width="20%">Creators</th>
             		<th class="nis" width="10%">Publication Date</th>
             		<th class="nis" width="15%">Package Id</th>
-           			<th class="nis" width="8%"></th>
+           			<th class="nis" width="8%"><img alt="Data Shelf" src="images/data_shelf.png" title="Data Shelf"></img></th>
          		</xsl:when>
 				<xsl:otherwise>
          			<th class="nis" width="50%">Title</th>
@@ -153,7 +153,6 @@
 									<input type="hidden" name="start" value="{$start}"></input>
 									<input type="hidden" name="rows" value="{$rows}"></input>
 									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to data shelf" src="images/plus_blue_small.png" title="Add to data shelf"></img></a>
-		    						<!-- <input class="btn btn-info btn-default" type="submit" name="savedData" value="Save"></input> -->
 								</form>
 							</xsl:otherwise>
 						</xsl:choose>

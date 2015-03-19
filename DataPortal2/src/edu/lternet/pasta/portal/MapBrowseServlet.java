@@ -279,13 +279,32 @@ public class MapBrowseServlet extends DataPortalServlet {
 						isSaved = savedData.hasDocid(scope, identifierInt);
 					}
 
+					if (showSaved) {
+						String operation = isSaved ? "unsave" : "save";
+						String display = isSaved ? "Remove from data shelf" : "Add to data shelf";
+						String imgName = isSaved ? "minus_blue_small.png" : "plus_blue_small.png";
+						String header = isSaved ? "  (<em>On data shelf</em>" : "";
+						String footer = isSaved ? ")" : "";
+						
+						savedDataHTMLBuilder.append(header);
+						savedDataHTMLBuilder.append(" <a href=\"#\" onclick='document.getElementById(\"savedData\").submit()'><sup><img alt=\"" + display + "\" src=\"images/" + imgName + "\" title=\"" + display + "\"></sup></img></a>");
+						savedDataHTMLBuilder.append(footer);
+						savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
+						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
+						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\""+ packageId + "\" >\n");
+						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+						// savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
+						savedDataHTMLBuilder.append("</form>\n");		
+						savedDataHTML = savedDataHTMLBuilder.toString();
+					}
+
 					if (titles != null) {
 						titleHTMLBuilder
 								.append("<ul class=\"no-list-style\">\n");
 
 						for (Title title : titles) {
-							String listItem = "<li>" + title.getTitle()
-									+ "</li>\n";
+							String listItem = "<li>" + title.getTitle() + "</li>\n";
 							titleHTMLBuilder.append(listItem);
 						}
 
@@ -510,7 +529,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 								pastaDataObjectIdentifier = dpmClient
 										.getPastaPackageUri(scope, id, revision);
 
-								packageIdListItem = "<li>" + packageId
+								packageIdListItem = "<li>" + packageId  + savedDataHTML
 										+ "</li>\n";
 
 								if (predecessor != null) {
@@ -543,21 +562,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 							}
 
-				}
-
-				if (showSaved && !isSaved) {
-					String operation = "save";
-					String display = "Add to shelf";
-					savedDataHTMLBuilder.append("<div>\n");
-					savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\""+ packageId + "\" >\n");
-					savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
-					savedDataHTMLBuilder.append("  <input class=\"btn btn-info btn-default\" type=\"submit\" name=\"savedData\" value=\""+ display + "\" >\n");
-					savedDataHTMLBuilder.append("</form>\n");		
-					savedDataHTMLBuilder.append("</div>\n");
-					savedDataHTML = savedDataHTMLBuilder.toString();
 				}
 
 				packageIdHTMLBuilder.append("<ul class=\"no-list-style\">\n");

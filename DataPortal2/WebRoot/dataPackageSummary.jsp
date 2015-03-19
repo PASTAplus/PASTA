@@ -166,20 +166,6 @@
 										</div>											
 									</div>
 
-							<c:set var="showSavedData" value="<%= showSavedData %>"/>
-							<c:if test="${showSavedData}">
-									<div class="table-row">										
-										<div class="table-cell text-align-right">
-											<!--<label class="labelBold"></label>-->
-										</div>
-										<div class="table-cell">
-											<ul class="no-list-style">
-												<li><%= savedDataHTML %></li>
-											</ul>
-										</div>											
-									</div>
-							</c:if>
-									
 									<div class="table-row">										
 										<div class="table-cell text-align-right">
 											<label class="labelBold">Resources:</label>
