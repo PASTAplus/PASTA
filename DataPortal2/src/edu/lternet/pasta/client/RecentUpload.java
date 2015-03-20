@@ -25,6 +25,7 @@
 package edu.lternet.pasta.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
@@ -35,10 +36,15 @@ public class RecentUpload {
 	enum Service { INSERT, UPDATE };
 	
 	
-	// Class fields
+	/*
+	 *  Class fields
+	 */
+	static HashMap<String, String> knownTitles = new HashMap<String, String>();
 	
 	
-	// Instance fields	
+	/*
+	 *  Instance fields	
+	 */
 	String uploadDate;
 	Service service;
 	String title;
@@ -48,7 +54,9 @@ public class RecentUpload {
 	String revision;
 	
 	
-	// Constructors
+	/*
+	 *  Constructors
+	 */
 	
 	public RecentUpload(DataPackageManagerClient dpmClient, String uploadDate, String serviceMethod, String url) {
 		this.uploadDate = uploadDate;
@@ -64,9 +72,39 @@ public class RecentUpload {
 		this.scope = parseScope(url);
 		this.identifier = parseIdentifier(url);
 		this.revision = parseRevision(url);
-		this.title = parseTitle(dpmClient);
+
+		String packageId = String.format("%s.%s.%s", this.scope, this.identifier, this.revision);
+
+		String knownTitle = RecentUpload.getKnownTitle(packageId);
+		if (knownTitle == null) {
+			this.title = parseTitle(dpmClient);
+			RecentUpload.addKnownTitle(packageId, title);
+		}
+		else {
+			this.title = knownTitle;
+		}
+		
 	}
 	
+	
+	/*
+	 * Class methods
+	 */
+	
+	private static void addKnownTitle(String packageId, String title) {
+		knownTitles.put(packageId, title);
+	}
+	
+	
+	private static String getKnownTitle(String packageId) {
+		return knownTitles.get(packageId);
+	}
+	
+	
+	
+	/*
+	 * Instance methods
+	 */
 	
 	private String parseTitle(DataPackageManagerClient dpmClient) {
 		String title = "";
