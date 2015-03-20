@@ -15,7 +15,7 @@ dbMaxConnections=10
 pasta.service.acr=service.xml
 web.service.version=AuditManager-0.1
 welcome.page=../doc/welcome.html
-api.document=../doc/edu.lternet.pasta.auditmanager.AuditServiceResource.html
+api.document=../doc/edu.lternet.pasta.auditmanager.AuditManagerResource.html
 tutorial.document=../doc/tutorial.html
 demo.directory=../demo
 
