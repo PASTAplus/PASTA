@@ -73,7 +73,7 @@
             		<th class="nis" width="20%">Creators</th>
             		<th class="nis" width="10%">Publication Date</th>
             		<th class="nis" width="15%">Package Id</th>
-           			<th class="nis" width="8%"><img alt="Data Shelf" src="images/data_shelf.png" title="Data Shelf"></img></th>
+           			<th class="nis" width="8%"><a href="savedDataServlet"><img alt="Data Shelf" src="images/data_shelf.png" title="Data Shelf"></img></a></th>
          		</xsl:when>
 				<xsl:otherwise>
          			<th class="nis" width="50%">Title</th>
