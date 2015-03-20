@@ -242,9 +242,15 @@
 		</div>
 	</div>
 
-	<jsp:include page="footer.jsp" />
 
-</div>
+	<jsp:include page="footer.jsp" />
+	
+  <c:set var="showSavedData" value="<%= showSavedData %>"/>
+  <c:if test="${showSavedData}">
+    <%= savedDataHTML %> 
+  </c:if>
+	
+  </div>
 
 </body>
 

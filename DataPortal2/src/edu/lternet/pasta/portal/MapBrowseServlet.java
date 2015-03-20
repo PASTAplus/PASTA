@@ -161,6 +161,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
 		String savedDataHTML = "";
+		String savedDataForm = "";
 		boolean showSaved = false;
 		boolean isSaved = false;
 
@@ -223,6 +224,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				StringBuilder provenanceHTMLBuilder = new StringBuilder();
 				StringBuilder codeGenerationHTMLBuilder = new StringBuilder();
 				StringBuilder savedDataHTMLBuilder = new StringBuilder();
+				StringBuilder savedDataFormBuilder = new StringBuilder();
 
 				String packageId = null;
 
@@ -283,19 +285,22 @@ public class MapBrowseServlet extends DataPortalServlet {
 						String operation = isSaved ? "unsave" : "save";
 						String display = isSaved ? "Remove from data shelf" : "Add to data shelf";
 						String imgName = isSaved ? "minus_blue_small.png" : "plus_blue_small.png";
-						String header = isSaved ? "  (On <a  class='searchsubcat' href='savedDataServlet'>Data Shelf</a>)" : "";				
-						savedDataHTMLBuilder.append(header);
 						
-						if (!isSaved) {
-						savedDataHTMLBuilder.append(" <a href=\"#\" onclick='document.getElementById(\"savedData\").submit()'><sup><img alt=\"" + display + "\" src=\"images/" + imgName + "\" title=\"" + display + "\"></sup></img></a>");
-						savedDataHTMLBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\""+ packageId + "\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
-						savedDataHTMLBuilder.append("</form>\n");		
-						savedDataHTML = savedDataHTMLBuilder.toString();
+						if (isSaved) {
+							savedDataHTMLBuilder.append("&nbsp;&nbsp;<small>(<em>On</em> <a  class='searchsubcat' href='savedDataServlet'>Data Shelf</a>)</small>");
 						}
+						else {
+							savedDataHTMLBuilder.append(" <a href=\"#\" onclick='document.getElementById(\"savedData\").submit()'><sup><img alt=\"" + display + "\" src=\"images/" + imgName + "\" title=\"" + display + "\"></sup></img></a>");
+							savedDataFormBuilder.append("<form id=\"savedData\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+							savedDataFormBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
+							savedDataFormBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
+							savedDataFormBuilder.append("  <input type=\"hidden\" name=\"packageid\" value=\""+ packageId + "\" >\n");
+							savedDataFormBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+							savedDataFormBuilder.append("</form>\n");		
+						}
+						
+						savedDataHTML = savedDataHTMLBuilder.toString();
+						savedDataForm = savedDataFormBuilder.toString();
 					}
 
 					if (titles != null) {
@@ -673,7 +678,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				pastaDataObjectIdentifier);
 		request.setAttribute("provenanceHTML", provenanceHTML);
 		request.setAttribute("codeGenerationHTML", codeGenerationHTML);
-		request.setAttribute("savedDataHTML", savedDataHTML);
+		request.setAttribute("savedDataHTML", savedDataForm);
 
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
