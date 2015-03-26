@@ -92,9 +92,16 @@ public class PageControl {
 			if (hi > numFound)
 				hi = numFound;
 			StringBuilder sb = new StringBuilder("<p>");
-			sb.append(String.format(
+			if (this.isSavedDataPage) {
+				sb.append(String.format(
+						"Displaying %d-%d of %d data package%s on data shelf", lo, hi,
+						numFound, plural));
+			}
+			else {
+				sb.append(String.format(
 					"Displaying %d-%d of %d matching data package%s", lo, hi,
 					numFound, plural));
+			}
 			sb.append("</p>");
 
 		html = sb.toString();
