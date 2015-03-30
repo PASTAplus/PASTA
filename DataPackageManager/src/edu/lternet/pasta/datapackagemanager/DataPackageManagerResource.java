@@ -29,6 +29,10 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -65,6 +69,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -75,7 +80,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.ucsb.nceas.utilities.Options;
-
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.FileUtility;
@@ -236,6 +240,9 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 
 	public static final String AUTH_TOKEN = "auth-token";
+	private static final long BIG_DATA_SIZE = 100L;
+	private static final String DATA_SERVER_CONTEXT = "http://localhost:8080/dataserver/data";
+
 
 	private static Logger logger = Logger
 			.getLogger(DataPackageManagerResource.class);
@@ -256,6 +263,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * Instance fields
 	 */
 
+	private String tmpDir = null;
 	private String versionHeader = null;
 	private String versionNumber = null;
 
@@ -271,6 +279,11 @@ public class DataPackageManagerResource extends PastaWebService {
 	public DataPackageManagerResource() {
 		versionHeader = ConfigurationListener.getVersionHeader();
 		versionNumber = ConfigurationListener.getVersionNumber();
+		
+		Options options = ConfigurationListener.getOptions();
+		if (options != null) {
+			this.tmpDir = options.getOption("datapackagemanager.tmpDir");
+		}
 	}
 
 
@@ -2714,16 +2727,20 @@ public class DataPackageManagerResource extends PastaWebService {
 				entryText = String.format("%s: %s; %s: %s; %s", "Entity Name",
 						entityName, "Object Name", objectName, entryText);
 
-				responseBuilder = Response.ok(file, dataFormat);
-
-				if (objectName != null) {
-					responseBuilder.header("Content-Disposition",
-							"attachment; filename=" + objectName);
+				if (size < BIG_DATA_SIZE) {
+					responseBuilder = Response.ok(file, dataFormat);
+					responseBuilder.header("Content-Length", size.toString());
+					
+					if (objectName != null) {
+						responseBuilder.header("Content-Disposition", "attachment; filename=" + objectName);
+					}
+				}
+				else {
+					boolean createLink = true;
+					responseBuilder = getRedirect(file, objectName, size, createLink);
 				}
 
-				responseBuilder.header("Content-Length", size.toString());
 				response = responseBuilder.build();
-
 			}
 			else {
 				ResourceNotFoundException e = new ResourceNotFoundException(
@@ -2761,6 +2778,75 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 
+	}
+	
+	
+	private ResponseBuilder getRedirect(File file, String filename, long size, boolean createLink) 
+			throws Exception {
+		String dataToken = null;
+		
+		/*
+		 * createLink will be true for data entities but false for archive zip files.
+		 */
+		if (createLink) {
+			long nowTime = new Date().getTime();
+			String md5Hex = DigestUtils.md5Hex(filename);
+			dataToken = String.format("%d-%s", nowTime, md5Hex);
+			createDataFileLink(file, dataToken);
+		}
+		else {
+			dataToken = filename;  // for archives, use the transaction name
+		}
+		
+		String locationStr = String.format("%s?dataToken=%s&size=%d&objectName=%s", 
+				DATA_SERVER_CONTEXT, dataToken, size, filename);
+		URI location = new URI(locationStr);
+		ResponseBuilder responseBuilder = Response.temporaryRedirect(location);
+		logger.warn("Redirecting to: " + locationStr);
+		return responseBuilder;
+	}
+	
+	
+	/*
+	 * Create a symbolic link to the file in the temporary data dir
+	 */
+	private void createDataFileLink(File entityFile, String dataToken) 
+			throws Exception {
+		String msg = null;
+		
+		/*
+		 * Create a link from the path of the data entity for 
+		 * this revision to the path of the data entity for the
+		 * prior revision.
+		 */
+		String dataTokenPathStr = String.format("%s/%s", this.tmpDir, dataToken);
+		FileSystem fileSystem = FileSystems.getDefault();
+
+		String entityPathStr = entityFile.getAbsolutePath();
+		java.nio.file.Path entityPath = fileSystem.getPath(entityPathStr);
+		java.nio.file.Path dataTokenPath = fileSystem.getPath(dataTokenPathStr);
+		String createLinkMsg = 
+			String.format("Creating link from %s to %s", dataTokenPathStr, entityPathStr);
+		logger.warn(createLinkMsg);
+
+		try {
+			java.nio.file.Path returnPath = Files.createLink(dataTokenPath, entityPath);
+		}
+		catch (FileAlreadyExistsException e) {
+			// this is okay, just issue a warning
+			msg = String.format(
+					"Failed to create link from %s to %s: %s",
+					dataTokenPathStr, entityPathStr, e.getMessage());
+			logger.warn(msg);
+		}
+		catch (Exception e) {
+			msg = String.format(
+					"Error creating link from %s to %s: %s",
+					dataTokenPathStr, entityPathStr, e.getMessage());
+			logger.error(msg);
+			throw(e);
+		}
+		
 	}
 
 
@@ -4028,15 +4114,23 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		try {
 
-			DataPackageManager dpm = new DataPackageManager();
-			File file = dpm.getDataPackageArchiveFile(transaction);
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			File file = dataPackageManager.getDataPackageArchiveFile(transaction);
+			String filename = String.format("%s.zip", transaction);
 
 			if (file != null && file.exists()) {
 				Long size = FileUtils.sizeOf(file);
-				responseBuilder = Response.ok(file, "application/zip");
-				responseBuilder.header("Content-Disposition",
-						"attachment; filename=" + transaction + ".zip");
-				responseBuilder.header("Content-Length", size.toString());
+				
+				if (size < BIG_DATA_SIZE) {
+					responseBuilder = Response.ok(file, "application/zip");
+					responseBuilder.header("Content-Disposition", "attachment; filename=" + filename);
+					responseBuilder.header("Content-Length", size.toString());
+				}
+				else {
+					boolean createLink = false;
+					responseBuilder = getRedirect(file, filename, size, createLink);
+				}
+				
 				response = responseBuilder.build();
 			}
 			else {

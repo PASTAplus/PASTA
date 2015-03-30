@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="dataserver">
+  <property file="build.properties"/>
+
+  <property name="webapp.name" value="dataserver"/>
+
+  <!-- Import standard build file -->
+  <import file="../ant-util/simple.xml"/>
+
+  <!-- Copy shared libraries into the local lib directory -->
+  <target name="prepare" depends="prepare-common">
+  	
+  	 <!-- Make a data directory that holds data files for data downloads -->
+  	 <mkdir dir="/home/pasta/local/tmp/data"/>
+  	
+     <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+          filtering="no">
+       <fileset dir="${shared.lib.dir}/apache-logging">
+        <include name="**/log4j-1.2.13.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+</project>
