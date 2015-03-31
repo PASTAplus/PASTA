@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -240,8 +241,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 
 	public static final String AUTH_TOKEN = "auth-token";
-	private static final long BIG_DATA_SIZE = 100L;
-	private static final String DATA_SERVER_CONTEXT = "http://localhost:8080/dataserver/data";
+	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
 
 
 	private static Logger logger = Logger
@@ -263,6 +263,12 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * Instance fields
 	 */
 
+	private String dataServerContext = null;
+	/*
+	 * Data files of this size or larger will be served by the 'dataserver' 
+	 * web app which lives in a separate context.
+	 */
+	private long sizeThreshold;
 	private String tmpDir = null;
 	private String versionHeader = null;
 	private String versionNumber = null;
@@ -282,6 +288,20 @@ public class DataPackageManagerResource extends PastaWebService {
 		
 		Options options = ConfigurationListener.getOptions();
 		if (options != null) {
+			this.dataServerContext = options.getOption("datapackagemanager.dataserver.context");
+			String sizeThresholdOption = options.getOption("datapackagemanager.dataserver.sizeThreshold");
+			if (sizeThresholdOption == null || sizeThresholdOption.equals("")) {
+				this.sizeThreshold = SIZE_THRESHOLD_DEFAULT;
+			}
+			else {
+				try {
+					this.sizeThreshold = new Long(sizeThresholdOption);
+				}
+				catch (IllegalFormatException e) {
+					logger.warn("Unable to parse sizeThreshold from datapackagemanager.properties file. Using default value.");
+					this.sizeThreshold = SIZE_THRESHOLD_DEFAULT;
+				}
+			}
 			this.tmpDir = options.getOption("datapackagemanager.tmpDir");
 		}
 	}
@@ -2727,7 +2747,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				entryText = String.format("%s: %s; %s: %s; %s", "Entity Name",
 						entityName, "Object Name", objectName, entryText);
 
-				if (size < BIG_DATA_SIZE) {
+				if (size < this.sizeThreshold) {
 					responseBuilder = Response.ok(file, dataFormat);
 					responseBuilder.header("Content-Length", size.toString());
 					
@@ -2799,7 +2819,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 		
 		String locationStr = String.format("%s?dataToken=%s&size=%d&objectName=%s", 
-				DATA_SERVER_CONTEXT, dataToken, size, filename);
+				this.dataServerContext, dataToken, size, filename);
 		URI location = new URI(locationStr);
 		ResponseBuilder responseBuilder = Response.temporaryRedirect(location);
 		logger.warn("Redirecting to: " + locationStr);
@@ -4121,7 +4141,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			if (file != null && file.exists()) {
 				Long size = FileUtils.sizeOf(file);
 				
-				if (size < BIG_DATA_SIZE) {
+				if (size < this.sizeThreshold) {
 					responseBuilder = Response.ok(file, "application/zip");
 					responseBuilder.header("Content-Disposition", "attachment; filename=" + filename);
 					responseBuilder.header("Content-Length", size.toString());

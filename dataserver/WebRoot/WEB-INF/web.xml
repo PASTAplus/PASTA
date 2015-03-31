@@ -5,4 +5,7 @@
     <param-name>CONFIG_DIR</param-name>
     <param-value>WEB-INF/conf</param-value>
   </context-param>
+  <listener>
+    <listener-class>edu.lternet.pasta.datapackagemanager.dataserver.ConfigurationListener</listener-class>
+  </listener>
 </web-app>

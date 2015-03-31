@@ -2,6 +2,7 @@
 <project basedir="." default="deploy" name="dataserver">
   <property file="build.properties"/>
 
+  <property name="datapackagemanager.dir" value="../DataPackageManager"/>
   <property name="webapp.name" value="dataserver"/>
 
   <!-- Import standard build file -->
@@ -10,15 +11,37 @@
   <!-- Copy shared libraries into the local lib directory -->
   <target name="prepare" depends="prepare-common">
   	
-  	 <!-- Make a data directory that holds data files for data downloads -->
-  	 <mkdir dir="/home/pasta/local/tmp/data"/>
+  	<!-- The data server is really an extension of the Data Package Manager but
+  	     it lives in a different web context. It needs one of the properties
+  	     of the Data Package Manager ('datapackagemanager.tmpDir') so it will
+  	     know where to find the data links and archive files that were put
+  	     there by the Data Package Manager.
+  	-->
+    <copy todir="${conf.dir}" preservelastmodified="true" verbose="true"
+         filtering="no">
+      <fileset dir="${datapackagemanager.dir}/${conf.dir}">
+       <include name="datapackagemanager.properties"/>
+     </fileset>
+    </copy>
+
+    <!-- Make a data directory that holds data files for data downloads -->
+    <mkdir dir="/home/pasta/local/tmp"/>
   	
-     <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+    <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
-       <fileset dir="${shared.lib.dir}/apache-logging">
+      <fileset dir="${shared.lib.dir}/apache-commons">
+        <include name="**/commons-configuration-1.8.jar"/>
+        <include name="**/commons-logging-1.1.1.jar"/>
+        <include name="**/commons-lang-2.6.jar"/>
+        <include name="**/commons-lang3-3.1.jar"/>
+        <include name="**/commons-io-2.1.jar"/>
+        <include name="**/commons-fileupload-1.2.2.jar"/>
+        <include name="**/commons-codec-1.7.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-logging">
         <include name="**/log4j-1.2.13.jar"/>
       </fileset>
     </copy>
-  </target>
+ </target>
 
 </project>

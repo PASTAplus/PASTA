@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datapackagemanager.dataserver;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,7 +37,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
+
 
 @WebServlet("/data") 
 public class DataServerServlet extends HttpServlet {
@@ -46,6 +49,7 @@ public class DataServerServlet extends HttpServlet {
 	 */
 
 	private static Logger logger = Logger.getLogger(DataServerServlet.class);
+	private static final long serialVersionUID = 1L;
 	
 	
 	/*
@@ -73,13 +77,23 @@ public class DataServerServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
     		throws ServletException, IOException {
-    	final String TMP_DATA_PATH = "/home/pasta/local/tmp";
     	String dataToken = request.getParameter("dataToken");
     	String size = request.getParameter("size");
     	String objectName= request.getParameter("objectName");
     	
+    	/*
+    	 * Find out which directory the temporary data files are being
+    	 * placed in by the Data Package Manager
+    	 */
+    	PropertiesConfiguration options = ConfigurationListener.getOptions();
+    	String tmpDir = options.getString("datapackagemanager.tmpDir");
+    	
+    	if (tmpDir == null || tmpDir.equals("")) {
+    		throw new ServletException("datapackagemanager.tmpDir property value was not specified.");
+    	}
+    	
     	// reads input file from an absolute path
-        String filePath = String.format("%s/%s", TMP_DATA_PATH, dataToken);
+        String filePath = String.format("%s/%s", tmpDir, dataToken);
         File downloadFile = new File(filePath);
         FileInputStream inStream = new FileInputStream(downloadFile);
          
