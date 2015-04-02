@@ -28,7 +28,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +44,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -53,7 +51,6 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;

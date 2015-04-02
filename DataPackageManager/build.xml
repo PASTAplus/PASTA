@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="deploy" name="DataPackageManager">
 	<property file="build.properties"/>
+	<property file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"/>
 
 	<property name="webapp.name" value="package"/>
 
