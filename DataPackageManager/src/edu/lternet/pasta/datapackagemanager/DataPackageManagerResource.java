@@ -2821,7 +2821,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		String locationStr = String.format("%s?dataToken=%s&size=%d&objectName=%s", 
 				this.dataServerContext, dataToken, size, filename);
 		URI location = new URI(locationStr);
-		ResponseBuilder responseBuilder = Response.temporaryRedirect(location);
+		ResponseBuilder responseBuilder = Response.seeOther(location);
 		logger.warn("Redirecting to: " + locationStr);
 		return responseBuilder;
 	}
