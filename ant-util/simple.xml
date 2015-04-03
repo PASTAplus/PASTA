@@ -83,6 +83,13 @@
       <fileset dir="${classes.dir}" includes="**/*"/>
     </delete>
   </target>
+	
+  <!-- This prepare target will be overridden by a project's specific 
+       prepare target in its build.xml. This dummy prepare target is 
+       only included here to prevent an error from appearing in the
+       IDE due to other targets in this file (such as the compile
+       target) depending on the existence of a prepare target. -->
+  <target name="prepare"></target>
 
   <target name="prepare-common"
           description="Prepares the common code">
@@ -272,6 +279,10 @@
     <copy todir="${web.doc.dir}">
       <fileset dir="${api.dir}"/>
     </copy>
+  </target>
+	
+  <target name="diagnostics">
+  	<echoproperties />
   </target>
 
 </project>
