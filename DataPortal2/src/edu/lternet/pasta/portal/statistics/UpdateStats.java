@@ -102,6 +102,7 @@ public class UpdateStats {
 		List<RecentUpload> recentUploadsList = new ArrayList<RecentUpload>();
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient("public");
 		StringBuilder sb = new StringBuilder();
+		TreeSet<String> docids = new TreeSet<String>();
 		
 		sb.append("SELECT scope, identifier, revision, date_created FROM ");
 		sb.append(RESOURCE_REGISTRY);
@@ -110,8 +111,6 @@ public class UpdateStats {
 		sb.append("   date_created > '" + fromTime + "'\n");
 		sb.append("ORDER BY date_created DESC;");
 		String sqlQuery = sb.toString();
-
-		HashMap<String, Long> pkgMap;
 
 		try {
 			conn = getConnection(dbUrl, dbUser, dbPassword);
@@ -138,10 +137,14 @@ public class UpdateStats {
 								recentUploadsList.add(recentInsert);
 							}
 							else if ((tokens.length > 1) && (serviceMethod.equals("updateDataPackage"))) {
-								RecentUpload recentUpdate = 
+								String docid = String.format("%s.%s", scope, identifier.toString());
+								if (!docid.contains(docid)) {
+									RecentUpload recentUpdate = 
 										new RecentUpload(dpmClient, uploadDate, serviceMethod, 
 										                 scope, identifier.toString(), revision.toString());
-								recentUploadsList.add(recentUpdate);
+									recentUploadsList.add(recentUpdate);
+									docids.add(docid);
+								}
 							}
 						}
 					}
