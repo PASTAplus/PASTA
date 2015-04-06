@@ -138,7 +138,7 @@ public class UpdateStats {
 							}
 							else if ((tokens.length > 1) && (serviceMethod.equals("updateDataPackage"))) {
 								String docid = String.format("%s.%s", scope, identifier.toString());
-								if (!docid.contains(docid)) {
+								if (!docids.contains(docid)) {
 									RecentUpload recentUpdate = 
 										new RecentUpload(dpmClient, uploadDate, serviceMethod, 
 										                 scope, identifier.toString(), revision.toString());
