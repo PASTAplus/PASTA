@@ -58,6 +58,15 @@ public class RecentUpload {
 	 *  Constructors
 	 */
 	
+	/**
+	 * Constructor to create a RecentUpload object.
+	 * 
+	 * @param dpmClient      the DataPackageManager client
+	 * @param uploadDate     the upload date
+	 * @param serviceMethod  one of "createDataPackage" or "updateDataPackage"
+	 * @param url            the resource ID value, from which the scope, identifier
+	 *                       and revision values can be extracted
+	 */
 	public RecentUpload(DataPackageManagerClient dpmClient, String uploadDate, String serviceMethod, String url) {
 		this.uploadDate = uploadDate;
 
@@ -72,6 +81,47 @@ public class RecentUpload {
 		this.scope = parseScope(url);
 		this.identifier = parseIdentifier(url);
 		this.revision = parseRevision(url);
+
+		String packageId = String.format("%s.%s.%s", this.scope, this.identifier, this.revision);
+
+		String knownTitle = RecentUpload.getKnownTitle(packageId);
+		if (knownTitle == null) {
+			this.title = parseTitle(dpmClient);
+			RecentUpload.addKnownTitle(packageId, title);
+		}
+		else {
+			this.title = knownTitle;
+		}
+		
+	}
+	
+	
+	/**
+	 * This alternate constructor is used by the UpdateStats class.
+	 * Development of the UpdateStats class was motivated by a need to avoid 
+	 * querying the Audit Manager due to severe performance problems.
+	 * 
+	 * @param dpmClient      the DataPackageManager client
+	 * @param uploadDate     the upload date
+	 * @param serviceMethod  one of "createDataPackage" or "updateDataPackage"
+	 * @param scope          the data package scope value
+	 * @param identifier     the data package identifier value
+	 * @param revision       the data package revision value
+	 */
+	public RecentUpload(DataPackageManagerClient dpmClient, String uploadDate, String serviceMethod, 
+			            String scope, String identifier, String revision) {
+		this.uploadDate = uploadDate;
+
+		if (serviceMethod.equals("createDataPackage")) {
+			this.service = Service.INSERT;
+		}
+		else if (serviceMethod.equals("updateDataPackage")) {
+			this.service = Service.UPDATE;
+		}
+
+		this.scope = scope;
+		this.identifier = identifier;
+		this.revision = revision;
 
 		String packageId = String.format("%s.%s.%s", this.scope, this.identifier, this.revision);
 

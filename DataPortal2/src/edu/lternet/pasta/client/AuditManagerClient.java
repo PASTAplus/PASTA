@@ -51,6 +51,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.portal.statistics.UpdateStats;
 
 
 /**
@@ -174,7 +175,8 @@ public class AuditManagerClient extends PastaClient {
 	  List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
 	  try {
 		     AuditManagerClient auditManagerClient = new AuditManagerClient("public");
-		     recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
+		     //recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
+		     recentUploads = auditManagerClient.recentUploadsQuickfix(serviceMethod, numberOfDays, limit);
 		  }
 		  catch (Exception e) {
 			  logger.error("Error refreshing recent uploads: " + e.getMessage());
@@ -344,6 +346,24 @@ public class AuditManagerClient extends PastaClient {
 	}
 	
 	
+	  /**
+	   * Gets a list of recent uploads to PASTA.
+	   * 
+	   * @return a list of RecentUpload objects
+	   * @throws PastaEventException
+	   */
+		private List<RecentUpload> recentUploadsQuickfix(String serviceMethod, Integer numberOfDays, Integer limit) 
+				throws Exception {
+			List<RecentUpload> recentUploadsList = null;
+			String fromTime = composeFromTime(numberOfDays);
+			UpdateStats updateStats = new UpdateStats();
+			
+			recentUploadsList = updateStats.getRecentUploads(serviceMethod, fromTime, limit);
+	
+			return recentUploadsList;
+		}
+		
+		
 	/*
 	 * Parses the recent uploads audit records XML returned by the Audit Manager.
 	 * Converts it to a list of RecentUpload objects.
