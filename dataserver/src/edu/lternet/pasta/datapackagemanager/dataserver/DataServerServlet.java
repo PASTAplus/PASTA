@@ -132,7 +132,12 @@ public class DataServerServlet extends HttpServlet {
         /*
          * Delete the temporary data file after it was downloaded
          */
-        downloadFile.delete();
+        try {
+        	downloadFile.delete();
+        }
+        catch (SecurityException e) {
+        	logger.warn(String.format("Error deleting temporary data file: %s", e.getMessage()));
+        }
     }
 	
 }

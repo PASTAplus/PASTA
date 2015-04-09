@@ -73,6 +73,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -2850,7 +2851,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		logger.warn(createLinkMsg);
 
 		try {
-			java.nio.file.Path returnPath = Files.createLink(dataTokenPath, entityPath);
+			if (SystemUtils.IS_OS_WINDOWS) {
+				Files.createLink(dataTokenPath, entityPath);
+			}
+			else {
+				Files.createSymbolicLink(dataTokenPath, entityPath);
+			}
 		}
 		catch (FileAlreadyExistsException e) {
 			// this is okay, just issue a warning
