@@ -122,14 +122,13 @@ public class DynamicContentServlet extends HttpServlet {
 		DataPackageSurvey dps = new DataPackageSurvey();
 		long sleepTime = 3000L;
 		
-        // Sleep to allow audit record to be logged prior to beginning the refresh
+        /* Sleep to allow audit record to be logged prior to beginning the refresh
         try {
 			Thread.sleep(sleepTime);
 		}
 		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         
 		logger.info("Refreshing recent data package inserts and updates.");
 		dps.refreshSurveyResults();
