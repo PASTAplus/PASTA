@@ -188,11 +188,11 @@ public class AuditManagerClient extends PastaClient {
   
   /*
    * Boolean to determine whether the cache of recent uploads is due to be
-   * refreshed. Returns true is the current time is more than 12 hours
-   * past the last refresh time.
+   * refreshed. Returns true is the current time has advanced
+   * past the last refresh time plus a time-to-live period.
    */
   private static boolean shouldRefresh(long lastRefreshTime) {
-	  double hours = 0.25;
+	  int hours = 24;
 	  boolean shouldRefresh = false;
 	  final long refreshInterval = (long) (hours * 60 * 60 * 1000);
 	  Date now = new Date();
