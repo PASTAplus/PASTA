@@ -171,25 +171,27 @@ public class AuditManagerClient extends PastaClient {
    * list of RecentUpload objects if the cache is empty or if it's time
    * to refresh the cache.
    */
-  private static List<RecentUpload> getRecentUploads(String serviceMethod, Integer numberOfDays, Integer limit) {
-	  List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
-	  String uploadType = serviceMethod.equals("createDataPackage") ? "inserts" : "updates";
+	private static List<RecentUpload> getRecentUploads(String serviceMethod,
+			Integer numberOfDays, Integer limit) {
+		List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
+		String uploadType = serviceMethod.equals("createDataPackage") ? "inserts" : "updates";
 
-	  logger.warn(String.format("Start refresh of recent %s", uploadType));
+		logger.info(String.format("Start refresh of recent %s", uploadType));
 
-	  try {
-		     AuditManagerClient auditManagerClient = new AuditManagerClient("public");
-		     //recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
-		     recentUploads = auditManagerClient.recentUploadsQuickfix(serviceMethod, numberOfDays, limit);
-	  }
-	  catch (Exception e) {
-			  logger.error("Error refreshing recent uploads: " + e.getMessage());
-	  }
+		try {
+			AuditManagerClient auditManagerClient = new AuditManagerClient("public");
+			// recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
+			recentUploads = auditManagerClient.recentUploadsQuickfix(
+					serviceMethod, numberOfDays, limit);
+		}
+		catch (Exception e) {
+			logger.error("Error refreshing recent uploads: " + e.getMessage());
+		}
 
-	  logger.warn(String.format("Finish refresh of recent %s", uploadType));
-	  
-	  return recentUploads;	  
-  }
+		logger.info(String.format("Finish refresh of recent %s", uploadType));
+
+		return recentUploads;
+	}
   
   
   /*
