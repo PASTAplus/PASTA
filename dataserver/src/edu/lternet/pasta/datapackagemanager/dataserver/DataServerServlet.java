@@ -100,13 +100,15 @@ public class DataServerServlet extends HttpServlet {
     		if (tmpDir == null || tmpDir.equals("")) {
     			throw new ServletException("datapackagemanager.tmpDir property value was not specified.");
     		}
+    		
+    		logger.info(String.format("Downloading: dataToken: %s; size: %s; objectName: %s", 
+    				                  dataToken, size, objectName)); 
     	
     		try { 
     			// reads input file from an absolute path
     			String filePath = String.format("%s/%s", tmpDir, dataToken);
     			File downloadFile = new File(filePath);
-    			FileInputStream inStream = new FileInputStream(downloadFile);
-         
+    			FileInputStream inStream = new FileInputStream(downloadFile);     
     			ServletContext context = getServletContext();
          
     			// gets MIME type of the file
@@ -119,8 +121,15 @@ public class DataServerServlet extends HttpServlet {
          
     			// modifies response
     			response.setContentType(mimeType);
-    			response.setContentLength(new Integer(size));
-         
+
+        		long length = Long.parseLong(size);
+    			if (length <= Integer.MAX_VALUE) {
+    				response.setContentLength((int) length);
+        		} 
+    			else {
+        		  response.addHeader("Content-Length", Long.toString(length));
+        		}    		
+        		
     			// forces download
     			String headerKey = "Content-Disposition";
     			String headerValue = String.format("attachment; filename=\"%s\"", objectName);
@@ -150,9 +159,13 @@ public class DataServerServlet extends HttpServlet {
     			}
     		}
     		catch (FileNotFoundException e) {
+    			logger.error(e.getMessage());
+    			e.printStackTrace();
     			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
     		}
     		catch (IOException e) {
+    			logger.error(e.getMessage());
+    			e.printStackTrace();
     			throw new ServletException(e.getMessage());
     		}
     	}

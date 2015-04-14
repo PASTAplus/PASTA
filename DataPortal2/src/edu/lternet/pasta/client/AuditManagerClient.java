@@ -173,14 +173,20 @@ public class AuditManagerClient extends PastaClient {
    */
   private static List<RecentUpload> getRecentUploads(String serviceMethod, Integer numberOfDays, Integer limit) {
 	  List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
+	  String uploadType = serviceMethod.equals("createDataPackage") ? "inserts" : "updates";
+
+	  logger.warn(String.format("Start refresh of recent %s", uploadType));
+
 	  try {
 		     AuditManagerClient auditManagerClient = new AuditManagerClient("public");
 		     //recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
 		     recentUploads = auditManagerClient.recentUploadsQuickfix(serviceMethod, numberOfDays, limit);
-		  }
-		  catch (Exception e) {
+	  }
+	  catch (Exception e) {
 			  logger.error("Error refreshing recent uploads: " + e.getMessage());
-		  }
+	  }
+
+	  logger.warn(String.format("Finish refresh of recent %s", uploadType));
 	  
 	  return recentUploads;	  
   }
