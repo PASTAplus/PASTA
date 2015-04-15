@@ -177,7 +177,7 @@ public class SavedDataServlet extends DataPortalServlet {
 			 * to be displayed
 			 */
 			if (forward != null && forward.equals("savedData.jsp")) {
-				String html = "<p>There are no saved data packages.</p>";
+				String html = "<p>There are no data packages on your data shelf.</p>";
 				String termsListHTML = "";
 				String xml = null;
 				response.setContentType("text/html");

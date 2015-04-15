@@ -69,11 +69,11 @@
           <tr>
 			<xsl:choose> 
 				<xsl:when test="$showSaved">
-            		<th class="nis" width="47%">Title</th>
+            		<th class="nis" width="45%">Title</th>
             		<th class="nis" width="20%">Creators</th>
             		<th class="nis" width="10%">Publication Date</th>
             		<th class="nis" width="15%">Package Id</th>
-           			<th class="nis" width="8%"><a href="savedDataServlet"><img alt="Data Shelf" src="images/data_shelf.png" title="Data Shelf"></img></a></th>
+           			<th class="nis" width="10%"><a href="savedDataServlet"><img alt="Your Data Shelf" src="images/data_shelf.png" title="Your Data Shelf" width="60" height="60"></img></a></th>
          		</xsl:when>
 				<xsl:otherwise>
          			<th class="nis" width="50%">Title</th>
@@ -90,7 +90,14 @@
       </table>
       </xsl:when>
       <xsl:otherwise>
-      <p>No matching data packages were found.</p>
+      	<xsl:choose>
+			<xsl:when test="$savedDataPage">
+      			<p>There are no data packages on your data shelf.</p>
+      		</xsl:when>
+      		<xsl:otherwise>
+      			<p>No matching data packages were found.</p>
+      		</xsl:otherwise>
+      	</xsl:choose>
       </xsl:otherwise>
       </xsl:choose>
   </xsl:template>
@@ -123,7 +130,7 @@
 				<xsl:choose>
 					<xsl:when test="$savedDataPage">
 		    			<small><em>On shelf</em></small><br/>
-		    			<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from data shelf" src="images/minus_blue_small.png" title="Remove from data shelf"></img></a>
+		    			<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
         				<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
 							<input type="hidden" name="operation" value="unsave"></input>
 							<input type="hidden" name="packageId" value="{$pid}"></input>
@@ -136,7 +143,7 @@
 						<xsl:choose>
 							<xsl:when test="$containsDocid">
 		    					<small><em>On shelf</em></small><br/>
-								<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from data shelf" src="images/minus_blue_small.png" title="Remove from data shelf"></img></a>
+								<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
        							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
 									<input type="hidden" name="operation" value="unsave"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
@@ -152,7 +159,7 @@
 									<input type="hidden" name="forward" value="simpleSearch"></input>
 									<input type="hidden" name="start" value="{$start}"></input>
 									<input type="hidden" name="rows" value="{$rows}"></input>
-									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to data shelf" src="images/plus_blue_small.png" title="Add to data shelf"></img></a>
+									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to your data shelf" src="images/plus_blue_small.png" title="Add to your data shelf"></img></a>
 								</form>
 							</xsl:otherwise>
 						</xsl:choose>

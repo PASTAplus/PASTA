@@ -90,7 +90,7 @@
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
 					Store Data:</p>
-					<li><a href="savedDataServlet">Data Shelf</a> </li>
+					<li><a href="savedDataServlet">Your Data Shelf</a> </li>
 				</ul>
 				</li>
 				<li<%= toolsClass %>><a href="#">Tools</a>

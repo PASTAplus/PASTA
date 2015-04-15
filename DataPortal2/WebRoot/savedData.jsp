@@ -2,7 +2,7 @@
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 
 <%
-  final String pageTitle = "Data Shelf";
+  final String pageTitle = "Your Data Shelf";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -69,7 +69,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Data Shelf</h2>
+								<h2>Your Data Shelf</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>

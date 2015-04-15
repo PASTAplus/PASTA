@@ -94,7 +94,7 @@ public class PageControl {
 			StringBuilder sb = new StringBuilder("<p>");
 			if (this.isSavedDataPage) {
 				sb.append(String.format(
-						"Displaying %d-%d of %d data package%s on data shelf", lo, hi,
+						"Displaying %d-%d of %d data package%s on your data shelf", lo, hi,
 						numFound, plural));
 			}
 			else {
