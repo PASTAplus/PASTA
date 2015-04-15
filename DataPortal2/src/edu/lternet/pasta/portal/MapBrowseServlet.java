@@ -283,11 +283,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 					if (showSaved) {
 						String operation = isSaved ? "unsave" : "save";
-						String display = isSaved ? "Remove from data shelf" : "Add to data shelf";
+						String display = isSaved ? "Remove from your data shelf" : "Add to your data shelf";
 						String imgName = isSaved ? "minus_blue_small.png" : "plus_blue_small.png";
 						
 						if (isSaved) {
-							savedDataHTMLBuilder.append("&nbsp;&nbsp;<small>(<em>On</em> <a  class='searchsubcat' href='savedDataServlet'>Data Shelf</a>)</small>");
+							savedDataHTMLBuilder.append("&nbsp;&nbsp;<small>(<em>On</em> <a  class='searchsubcat' href='savedDataServlet'>Your Data Shelf</a>)</small>");
 						}
 						else {
 							savedDataHTMLBuilder.append(" <a href=\"#\" onclick='document.getElementById(\"savedData\").submit()'><sup><img alt=\"" + display + "\" src=\"images/" + imgName + "\" title=\"" + display + "\"></sup></img></a>");
