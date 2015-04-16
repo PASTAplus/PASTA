@@ -129,9 +129,9 @@
 			<td class="nis" align="center">
 				<xsl:choose>
 					<xsl:when test="$savedDataPage">
-		    			<small><em>On shelf</em></small><br/>
-		    			<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
-        				<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+        				<form id="{$pid}" class="form-no-margin" name="savedDataForm" method="post" action="./savedDataServlet" >
+		    				<small><em>On shelf</em></small><br/>
+		    				<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
 							<input type="hidden" name="operation" value="unsave"></input>
 							<input type="hidden" name="packageId" value="{$pid}"></input>
 							<input type="hidden" name="forward" value="savedData.jsp"></input>
@@ -142,9 +142,9 @@
 						<xsl:variable name="containsDocid" select="boolean(contains($savedDataList, $docidPlusComma))"></xsl:variable>
 						<xsl:choose>
 							<xsl:when test="$containsDocid">
-		    					<small><em>On shelf</em></small><br/>
-								<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
-       							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+       							<form id="{$pid}" class="form-no-margin" name="savedDataForm" method="post" action="./savedDataServlet" >
+		    						<small><em>On shelf</em></small><br/>
+									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Remove from your data shelf" src="images/minus_blue_small.png" title="Remove from your data shelf"></img></a>
 									<input type="hidden" name="operation" value="unsave"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
 									<input type="hidden" name="forward" value="simpleSearch"></input>
@@ -153,13 +153,13 @@
 								</form>
 							</xsl:when>
 							<xsl:otherwise>
-       							<form id="{$pid}" name="savedDataForm" method="post" action="./savedDataServlet" >
+       							<form id="{$pid}" class="form-no-margin" name="savedDataForm" method="post" action="./savedDataServlet" >
+									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to your data shelf" src="images/plus_blue_small.png" title="Add to your data shelf"></img></a>
 									<input type="hidden" name="operation" value="save"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
 									<input type="hidden" name="forward" value="simpleSearch"></input>
 									<input type="hidden" name="start" value="{$start}"></input>
 									<input type="hidden" name="rows" value="{$rows}"></input>
-									<a href="#" onclick='document.getElementById("{$pid}").submit()'><img alt="Add to your data shelf" src="images/plus_blue_small.png" title="Add to your data shelf"></img></a>
 								</form>
 							</xsl:otherwise>
 						</xsl:choose>

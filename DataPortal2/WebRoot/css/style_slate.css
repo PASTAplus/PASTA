@@ -2981,6 +2981,11 @@ dd + dt {
 	display: none;
 }
 
+
+.form-no-margin {
+	margin: 0 0 0 0;
+}
+
 /*
  * Styling for the quality report table
  */

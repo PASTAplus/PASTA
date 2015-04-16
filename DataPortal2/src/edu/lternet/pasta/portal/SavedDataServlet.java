@@ -34,15 +34,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.client.AuditManagerClient;
-import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.ReportUtility;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.portal.search.BrowseTerm;
-import edu.lternet.pasta.portal.search.Search;
-import edu.lternet.pasta.portal.search.TermsList;
 import edu.lternet.pasta.portal.user.SavedData;
 
 
