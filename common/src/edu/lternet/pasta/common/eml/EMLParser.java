@@ -72,6 +72,7 @@ public class EMLParser {
   public static final String NORTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
+  public static final String DATA_SOURCE_PATH = "//dataset/methods/methodStep/dataSource/distribution/online/url";
   public static final String FUNDING_PATH = "//dataset/project/funding";
   public static final String METHODS_PATH = "//dataset/methods";
   public static final String KEYWORD_PATH = "//keyword";
@@ -255,6 +256,16 @@ public class EMLParser {
             ResponsibleParty rp = new ResponsibleParty("creator");
             parseResponsibleParty(creatorNode, rp);
             dataPackage.addCreator(rp);
+          }
+        }
+
+        // Parse the dataSource URLs
+        NodeList dataSourceNodeList = xpathapi.selectNodeList(document, DATA_SOURCE_PATH);
+        if (dataSourceNodeList != null) {
+          for (int i =0; i < dataSourceNodeList.getLength(); i++) {
+            Node dataSourceNode = dataSourceNodeList.item(i);
+            String dataSource = dataSourceNode.getTextContent();
+            dataPackage.addDataSource(dataSource);
           }
         }
 

@@ -35,6 +35,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.transform.TransformerException;
 import javax.ws.rs.core.MediaType;
@@ -1220,6 +1222,70 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+	/**
+	 * List the data sources URLs for the specified data package, that is,
+	 * the list of data package identifiers representing the data 
+	 * sources from which this data package is derived
+	 * 
+	 * @param scope
+	 *          the scope value
+	 * @param identifier
+	 *          the identifier value
+	 * @param revision
+	 *          the revision value
+	 * @param user
+	 *          the user name
+	 * @return a newline-separated list of data entity resource identifiers
+	 */
+	public String listDataSources(String scope, Integer identifier, Integer revision, AuthToken authToken) 
+			throws Exception {
+		String dataSourcesString = null;
+		StringBuilder stringBuilder = new StringBuilder("");
+		DataPackageManager dpm = null;
+		EMLParser emlParser = new EMLParser();
+		ArrayList<String> dataSources = null;
+		String userId = authToken.getUserId();
+
+		try {
+			dpm = new DataPackageManager();
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}
+
+		String xml = dpm.readMetadata(scope, identifier, revision.toString(), userId, authToken);
+
+		if (xml != null) {
+			try {
+				InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+				edu.lternet.pasta.common.eml.DataPackage dataPackage = emlParser.parseDocument(inputStream);
+
+				if (dataPackage != null) {
+					dataSources = dataPackage.getDataSources();
+				}
+			}
+			catch (Exception e) {
+				logger.error("Error parsing EML metacdata: " + e.getMessage());
+			}
+		}
+
+		// Only include data source URLs that match the PASTA identifier pattern
+		final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
+		Pattern pattern = Pattern.compile(patternString);
+		for (String dataSource : dataSources) {
+			Matcher matcher = pattern.matcher(dataSource);
+			if (matcher.matches()) {
+				stringBuilder.append(dataSource + "\n");
+			}
+		}
+
+		dataSourcesString = stringBuilder.toString();
+		return dataSourcesString;
+	}
+
+
 	/**
 	 * List the identifier values for data packages with the specified scope that
 	 * are readable by the specified user.

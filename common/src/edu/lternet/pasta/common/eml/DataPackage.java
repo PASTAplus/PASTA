@@ -49,6 +49,7 @@ public class DataPackage {
   
   String packageId = null;
   ArrayList<ResponsibleParty> creatorList = null;
+  ArrayList<String> dataSources = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> keywords = null;
   ArrayList<String> timescales = null;
@@ -83,6 +84,7 @@ public class DataPackage {
   
   DataPackage() {
     this.creatorList = new ArrayList<ResponsibleParty>();
+    this.dataSources = new ArrayList<String>();
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
     this.timescales = new ArrayList<String>();
@@ -108,6 +110,14 @@ public class DataPackage {
 	  if ((responsibleParty != null) && (!hasCreator(responsibleParty))) {
 		  creatorList.add(responsibleParty);
 	  }
+  }
+  
+  
+  /**
+   * Add a new data source for this data package.
+   */
+  public void addDataSource(String dataSource) {
+	dataSources.add(dataSource);
   }
   
   
@@ -168,6 +178,11 @@ public class DataPackage {
   }
 
   
+  public ArrayList<String> getDataSources() {
+	return dataSources;
+  }
+
+	  
   public String getEndDate() {
 	return endDate;
   }
