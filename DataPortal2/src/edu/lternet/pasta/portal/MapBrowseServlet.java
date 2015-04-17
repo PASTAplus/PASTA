@@ -26,6 +26,8 @@ package edu.lternet.pasta.portal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -629,7 +631,26 @@ public class MapBrowseServlet extends DataPortalServlet {
 						.append("Generate <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid="
 								+ packageId
 								+ "\">provenance metadata</a> for use within your derived data package\n");
-				provenanceHTML = provenanceHTMLBuilder.toString();
+							
+				String dataSourcesStr = dpmClient.listDataSources(scope, id, revision);
+				
+				if (dataSourcesStr != null &&
+                    dataSourcesStr.length() > 0) {
+					String[] dataSources = dataSourcesStr.split("\n");
+					if (dataSources.length > 0) {
+						String dataSource = dataSources[0];
+						if (dataSource != null && dataSource.length() > 0) {
+							provenanceHTMLBuilder.append("<br/>This data package was derived from the following sources:<br/>");
+							for (String uri : dataSources) {
+								String mapbrowseURL = mapbrowseURL(uri);
+								String line = String.format("    %s<br/>", mapbrowseURL);
+								provenanceHTMLBuilder.append(line);
+							}
+						}
+					}
+				}
+				
+				provenanceHTML = provenanceHTMLBuilder.toString();				
 
 				/*
 				 * Add code generation section only if this data package has at
@@ -682,6 +703,33 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
+	}
+	
+	
+	/*
+	 * Compose a relative URL to the mapbrowse servlet given a metadata resource identifier
+	 * as input.
+	 * 		Example input:  "https://pasta.lternet.edu/package/metadata/eml/lter-landsat/7/1"
+	 * 		Example output: "mapbrowse?scope=lter-landsat&identifier=7&revision=1"
+	 */
+	private String mapbrowseURL(String uri) {
+		String url = null;
+		
+		if (uri != null) {
+			final String patternString = "^.*/package/metadata/eml/(\\S+)/(\\d+)/(\\d+)$";
+			Pattern pattern = Pattern.compile(patternString);
+			Matcher matcher = pattern.matcher(uri);
+			if (matcher.matches()) {
+				String scope = matcher.group(1);
+				String identifier = matcher.group(2);
+				String revision = matcher.group(3);
+				String displayURL = String.format("%s.%s.%s", scope, identifier, revision);
+				String href = String.format("mapbrowse?scope=%s&identifier=%s&revision=%s", scope, identifier, revision);
+				url = String.format("<a class=\"searchsubcat\" href=\"%s\">%s</a>", href, displayURL);
+			}
+		}
+		
+		return url;
 	}
 
 

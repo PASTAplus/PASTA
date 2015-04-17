@@ -541,6 +541,7 @@ public class DataPackageManagerClient extends PastaClient {
 		
 	}
 
+
 	/**
 	 * Executes the 'listDataEntities' web service method.
 	 * 
@@ -704,6 +705,51 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 	}
 
+	
+	/**
+	 * Executes the 'listDataSources' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1" or "newest"
+	 * @return a newline-separated list of data package metadata identifiers,
+	 *         possibly empty
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listDataSources(String scope, Integer identifier,
+	    String revision) throws Exception {
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/sources/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entityString;
+	}
+
+	
 	/**
 	 * Executes the 'listDeletedDataPackages' web service method.
 	 * 
