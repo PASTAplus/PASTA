@@ -12,9 +12,9 @@
 # that server. This script defines settings that can be applied across 
 # all servers.
 
-# Tomcat variables and aliases
+# Tomcat variables for the Tomcat 2 server
 
-. /home/pasta/git/NIS/shell/env.sh
+. /home/pasta/git/NIS/shell/env_2.sh
 
-# Startup Tomcat using the default '$TOMCAT/bin/startup.sh'
-/home/pasta/local/apache-tomcat/bin/startup.sh
+# Shutdown Tomcat 2 using the default '$TOMCAT2/bin/shutdown.sh'
+/home/pasta/local/apache-tomcat-2/bin/shutdown.sh
