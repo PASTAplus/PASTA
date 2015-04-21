@@ -627,11 +627,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 								+ "\">How to cite this data package</a>\n");
 				citationHTML = citationHTMLBuilder.toString();
 
-				provenanceHTMLBuilder
-						.append("Generate <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid="
-								+ packageId
-								+ "\">provenance metadata</a> for use within your derived data package\n");
-							
 				String dataSourcesStr = dpmClient.listDataSources(scope, id, revision);
 				
 				if (dataSourcesStr != null &&
@@ -640,16 +635,25 @@ public class MapBrowseServlet extends DataPortalServlet {
 					if (dataSources.length > 0) {
 						String dataSource = dataSources[0];
 						if (dataSource != null && dataSource.length() > 0) {
-							provenanceHTMLBuilder.append("<br/>This data package was derived from the following sources:<br/>");
+							provenanceHTMLBuilder.append("This data package was derived from the following sources:<br/>");
+							provenanceHTMLBuilder.append("<ol>\n");
 							for (String uri : dataSources) {
 								String mapbrowseURL = mapbrowseURL(uri);
-								String line = String.format("    %s<br/>", mapbrowseURL);
-								provenanceHTMLBuilder.append(line);
+								String listItem = String.format("<li>%s</li>", mapbrowseURL);
+								provenanceHTMLBuilder.append(listItem);
 							}
+							provenanceHTMLBuilder.append("</ol>\n");
+							provenanceHTMLBuilder.append("<br/>");
 						}
 					}
 				}
 				
+				provenanceHTMLBuilder.append(
+						String.format(
+				"Generate <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=%s\">" +
+				"provenance metadata</a> for use within your derived data package", 
+				packageId));
+					
 				provenanceHTML = provenanceHTMLBuilder.toString();				
 
 				/*
