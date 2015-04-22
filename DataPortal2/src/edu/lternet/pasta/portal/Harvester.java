@@ -387,19 +387,29 @@ public class Harvester implements Runnable {
               FileUtils.writeStringToFile(qualityReportFile, qualityReportStr, append);
             }
           }
-          catch (Exception e) {
-            serviceMessage = String.format("Harvester error for packageId '%s': %s",
-            		packageId, e.getMessage());
-            logger.error(serviceMessage);
-            e.printStackTrace();
-            String fileName = isQualityReport(serviceMessage) ? 
-                              "qualityReport.xml" : "serviceMessage.txt";
-            String serviceMessagePath = packageIdPath + "/" + fileName;
-            File serviceMessageFile = new File(serviceMessagePath);
-            boolean append = true;
-            FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
-          }
-        }
+		  catch (Exception e) {
+				String fileName = null;
+				String eMessage = e.getMessage();
+
+				if (isQualityReport(eMessage)) {
+					serviceMessage = eMessage;
+					fileName = "qualityReport.xml";
+				}
+				else {
+					serviceMessage = String.format(
+							"Error uploading packageId '%s': %s",
+							packageId, eMessage);
+					fileName = "serviceMessage.txt";
+					logger.error(serviceMessage);
+					e.printStackTrace();
+				}
+
+				String serviceMessagePath = packageIdPath + "/" + fileName;
+				File serviceMessageFile = new File(serviceMessagePath);
+				boolean append = true;
+				FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
+		  }
+		}
         else {
           serviceMessage = PACKAGEID_PARSING_ERROR;
           logger.error(serviceMessage);
