@@ -48,6 +48,8 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -3010,11 +3012,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-		if (!SystemUtils.IS_OS_WINDOWS) {
-			cleanTemporaryDir();
-		}
-
+		cleanTemporaryDir();
+		
 		response = stampHeader(response);
 		return response;
 
@@ -8478,18 +8477,25 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean recursive = false;
 
 			Collection<File> files = FileUtils.listFiles(tmpDir, ext, recursive);
+			final String patternString = "^(\\d+)[-\\.].+$";
+			Pattern pattern = Pattern.compile(patternString);
 
 			for (File file : files) {
 				if (file != null && file.exists()) {
-					lastModified = file.lastModified();
-					// Remove file if older than the ttl
-					if (lastModified + this.ttl <= time) {
-						try {
-							FileUtils.forceDelete(file);
-						}
-						catch (IOException e) {
-							logger.error(e.getMessage());
-							e.printStackTrace();
+					String filename = file.getName();
+					Matcher matcher = pattern.matcher(filename);
+					if (matcher.matches()) {
+						String dateString = matcher.group(1);
+						lastModified = Long.parseLong(dateString);
+						// Remove file if older than the ttl
+						if (lastModified + this.ttl <= time) {
+							try {
+								FileUtils.forceDelete(file);
+							}
+							catch (IOException e) {
+								logger.error(e.getMessage());
+								e.printStackTrace();
+							}
 						}
 					}
 				}
