@@ -73,6 +73,8 @@ welcome.page=/home/pasta/local/apache-tomcat/webapps/package/WEB-INF/doc/welcome
 datapackagemanager.context=package
 datapackagemanager.reportDir=/home/pasta/local/report
 datapackagemanager.tmpDir=/home/pasta/local/tmp
+# the time-to-live for temporary files in the tmpDir directory, in milliseconds
+datapackagemanager.tmpDir.ttl=3600000
 datapackagemanager.dataserver.context=https://package.lternet.edu:8444/dataserver/data
 datapackagemanager.dataserver.sizeThreshold=1024000
 datapackagemanager.metadataDir=/home/pasta/local/metadata
