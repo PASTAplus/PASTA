@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -34,6 +35,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.IllegalFormatException;
@@ -46,6 +48,8 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -243,6 +247,9 @@ public class DataPackageManagerResource extends PastaWebService {
 
 	public static final String AUTH_TOKEN = "auth-token";
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
+	
+	// time-to-live default for tempoary data files, in milliseconds
+	private static final long TTL_DEFAULT = 3600000L;  
 
 
 	private static Logger logger = Logger
@@ -270,6 +277,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * web app which lives in a separate context.
 	 */
 	private long sizeThreshold;
+	private long ttl;  // time to live for temporary data files, in milliseconds
 	private String tmpDir = null;
 	private String versionHeader = null;
 	private String versionNumber = null;
@@ -303,7 +311,22 @@ public class DataPackageManagerResource extends PastaWebService {
 					this.sizeThreshold = SIZE_THRESHOLD_DEFAULT;
 				}
 			}
+			
 			this.tmpDir = options.getOption("datapackagemanager.tmpDir");
+			
+			String ttlOption = options.getOption("datapackagemanager.dataserver.tmpDir.ttl");
+			if (ttlOption == null || ttlOption.equals("")) {
+				this.ttl = TTL_DEFAULT;
+			}
+			else {
+				try {
+					this.ttl = new Long(ttlOption);
+				}
+				catch (IllegalFormatException e) {
+					logger.warn("Unable to parse 'datapackagemanager.dataserver.tmpDir.ttl' from datapackagemanager.properties file. Using default value.");
+					this.ttl = TTL_DEFAULT;
+				}
+			}
 		}
 	}
 
@@ -2989,6 +3012,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		cleanTemporaryDir();
+		
 		response = stampHeader(response);
 		return response;
 
@@ -3018,6 +3043,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		ResponseBuilder responseBuilder = Response.temporaryRedirect(location);
 		logger.warn("Redirecting to: " + locationStr);
 		return responseBuilder;
+	}
+	
+	
+	private void cleanTemporaryDir() {
+		Cleaner cleaner = new Cleaner(this.tmpDir, this.ttl);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		executorService.execute(cleaner);
+		executorService.shutdown();
 	}
 	
 	
@@ -4394,6 +4427,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		cleanTemporaryDir();
 
 		response = stampHeader(response);
 		return response;
@@ -8401,6 +8435,73 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		}
 
+	}
+
+	
+	/**
+	 * Thread framework for cleaning the temporary data/archive directory of old files.
+	 * 
+	 * @author dcosta
+	 * @since  April 24, 2015
+	 * 
+	 */
+	class Cleaner implements Runnable {
+		String tmpDir = null;
+		long ttl = -1L;
+
+		public Cleaner(String tmpDir, long ttl) {
+			this.tmpDir = tmpDir;
+			this.ttl = ttl;
+		}
+
+		
+		public void run() {
+			if (this.ttl > -1L) {
+				doClean();
+			}
+		}
+		
+		
+		/**
+		 * Removes any file that is older than the specified time-to-live
+		 * (ttl).
+		 * 
+		 * @param ttl
+		 *            The time-to-live value in milliseconds.
+		 */
+		public void doClean() {
+			File tmpDir = new File(this.tmpDir);
+			String[] ext = null; // null will cause files with all file extensions to be deleted
+			Long time = new Date().getTime();
+			Long lastModified = null;
+			boolean recursive = false;
+
+			Collection<File> files = FileUtils.listFiles(tmpDir, ext, recursive);
+			final String patternString = "^(\\d+)[-\\.].+$";
+			Pattern pattern = Pattern.compile(patternString);
+
+			for (File file : files) {
+				if (file != null && file.exists()) {
+					String filename = file.getName();
+					Matcher matcher = pattern.matcher(filename);
+					if (matcher.matches()) {
+						String dateString = matcher.group(1);
+						lastModified = Long.parseLong(dateString);
+						// Remove file if older than the ttl
+						if (lastModified + this.ttl <= time) {
+							try {
+								FileUtils.forceDelete(file);
+							}
+							catch (IOException e) {
+								logger.error(e.getMessage());
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
+		
 	}
 
 }
