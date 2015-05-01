@@ -2883,6 +2883,16 @@ p.cite cite {
 	width: 81px;
 }
 
+#dataone-img {
+	height: 19px;
+	width: 80px;
+}
+
+#re3data-img {
+	height: 25px;
+	width: 83px;
+}
+
 #map-canvas {
   margin: 0 auto; 
   width: 400px; 

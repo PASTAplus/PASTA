@@ -164,6 +164,18 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 				</div>
 			</div>
 		</div>
+    	<div class="row-fluid">
+			<div class="span12">
+				<div class="container">
+					<span class="row-fluid separator_border"></span>
+						<sub>Proud member of&nbsp;</sub>
+						<a href="https://www.dataone.org/"><img id="dataone-img" alt="DataONE logo" src="images/DataONE_LOGO.jpg" title="DataONE logo"></a>
+						<sub>&nbsp;and a proud affiliate of&nbsp;</sub>
+						<a href="https://www.re3data.org/"><img id="re3data-img" alt="re3data logo" src="images/re3data_Logo_CMYK_72dpi.png" title="re3data logo"></a>
+					<span class="row-fluid separator_border"></span>
+				</div>
+			</div>
+		</div>
 	</div>
   <!-- /Divider -->
 		
