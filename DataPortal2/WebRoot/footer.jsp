@@ -164,6 +164,16 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 				</div>
 			</div>
 		</div>
+    	<div class="row-fluid">
+			<div class="span12">
+				<div class="container nis-logos-div">
+						LTER is proud to be affiliated with the following organizations:
+						<a href="https://www.dataone.org/"><img id="dataone-img" class="nis-logos-img" alt="DataONE logo" src="images/DataONE_LOGO.jpg" title="DataONE logo"></a>
+						<a href="https://www.incommon.org/"><img id="incommon-participant-img" class="nis-logos-img" alt="InCommon Participant logo" src="images/InC_Participant.png" title="InCommon Participant logo"></a>
+						<a href="https://www.re3data.org/"><img id="re3data-img" alt="re3data logo" class="nis-logos-img" src="images/re3data_Logo_CMYK_72dpi.png" title="re3data logo"></a>
+				</div>
+			</div>
+		</div>
 	</div>
   <!-- /Divider -->
 		
