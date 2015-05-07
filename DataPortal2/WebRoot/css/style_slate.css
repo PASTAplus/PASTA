@@ -2884,19 +2884,25 @@ p.cite cite {
 }
 
 #dataone-img {
-	/* Original dimensions of DataONE_Logo.jpg are 95 X 400 */
+	/* Original dimensions of DataONE_Logo.jpg are 95 X 400 (H X W) */
 	height: 20px;
 	width: 84px;
 }
 
+#esip-img {
+	/* Original dimensions of ESIP-logo.jpg are 1041 X 1812 (H X W) */
+	height: 48px;
+	width: 84px;
+}
+
 #incommon-participant-img {
-	/* Original dimensions of InC_Participant.png are 558 X 558 */
+	/* Original dimensions of InC_Participant.png are 558 X 558 (H X W) */
 	height: 63px;
 	width: 63px;
 }
 
 #re3data-img {
-	/* Original dimensions of re3data_Logo_CMYK_72dpi.png are 163 X 555 */
+	/* Original dimensions of re3data_Logo_CMYK_72dpi.png are 163 X 555 (H X W) */
 	height: 25px;
 	width: 84px;
 }
