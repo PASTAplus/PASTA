@@ -86,7 +86,8 @@ public class PageControl {
 		String html = "";
 
 		if (numFound > 0) {
-			String plural = numFound > 1 ? "s" : "";
+			String plural = numFound != 1 ? "s" : "";
+			String verb = numFound != 1 ? "are" : "is";
 			int lo = ((currentPage - 1) * rowsPerPage) + 1;
 			int hi = lo + rowsPerPage - 1;
 			if (hi > numFound)
@@ -94,8 +95,7 @@ public class PageControl {
 			StringBuilder sb = new StringBuilder("<p>");
 			if (this.isSavedDataPage) {
 				sb.append(String.format(
-						"Displaying %d-%d of %d data package%s on your data shelf", lo, hi,
-						numFound, plural));
+						"<span><big><span id='dataShelfNumFound'>%d</span> data package(s) on your data shelf</big></span>", numFound));
 			}
 			else {
 				sb.append(String.format(

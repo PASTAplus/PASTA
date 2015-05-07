@@ -41,7 +41,7 @@
 <!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
 <link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css">
 
-<!-- JS -->
+<!-- JS 
 <script src="js/jqueryba3a.js?ver=1.7.2" type="text/javascript"></script>
 <script src="bootstrap/js/bootstrap68b368b3.js?ver=1" type="text/javascript"></script>
 <script src="js/jquery.easing.1.368b368b3.js?ver=1" type="text/javascript"></script>
@@ -50,7 +50,9 @@
 <script src="js/jquery.pixel68b368b3.js?ver=1" type="text/javascript"></script>
 <script src="js/jquery.mobilemenu68b368b3.js?ver=1" type="text/javascript"></script>
 <script src="js/isotope68b368b3.js?ver=1" type="text/javascript"></script>
-<script src="js/mediaelement-and-player.min68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/mediaelement-and-player.min68b368b3.js?ver=1" type="text/javascript"></script>-->
+<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/data-shelf-ajax.js" type="text/javascript"></script>
 
 <!-- Mobile Device CSS -->
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
