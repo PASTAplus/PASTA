@@ -69,7 +69,7 @@
 		<script type="text/javascript">
 			window.onload = function () {
   				initialize_summary_map(<%=northCoord%>, <%=southCoord%>, <%=eastCoord%>, <%=westCoord%>);
-			}
+			};
 		</script>
 	</c:when>
 </c:choose>
