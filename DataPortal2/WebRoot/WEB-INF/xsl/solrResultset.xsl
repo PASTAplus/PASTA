@@ -133,7 +133,7 @@
 							<input type="hidden" name="operation" value="unsave"></input>
 							<input type="hidden" name="packageId" value="{$pid}"></input>
 							<input type="hidden" name="forward" value="savedData.jsp"></input>
-                            <input type="image" name="submit" src="images/minus_blue_small.png" alt="Remove from your data shel" />	
+                            <input type="image" name="submit" src="images/minus_blue_small.png" alt="Remove from your data shelf" title="Remove from your data shelf"/>	
 		    				<div><small><em>On shelf</em></small><br/></div>
 						</form>
 					</xsl:when>
@@ -146,7 +146,7 @@
 									<input type="hidden" name="operation" value="unsave"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
 									<input type="hidden" name="forward" value="simpleSearch"></input>
-                                    <input type="image" name="submit" src="images/minus_blue_small.png" alt="Remove from your data shelf" />
+                                    <input type="image" name="submit" src="images/minus_blue_small.png" alt="Remove from your data shelf" title="Remove from your data shelf"/>
 		    						<div><small><em>On shelf</em></small><br/></div>
 								</form>
 							</xsl:when>
@@ -155,7 +155,7 @@
 									<input type="hidden" name="operation" value="save"></input>
 									<input type="hidden" name="packageId" value="{$pid}"></input>
 									<input type="hidden" name="forward" value="simpleSearch"></input>
-                                    <input type="image" name="submit" src="images/plus_blue_small.png" alt="Add to your data shelf" />	
+                                    <input type="image" name="submit" src="images/plus_blue_small.png" alt="Add to your data shelf" title="Add to your data shelf"/>	
 		    						<div></div>
                                 </form>
 							</xsl:otherwise>
