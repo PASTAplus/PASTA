@@ -289,7 +289,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 						savedDataHTMLBuilder.append("<form id=\"savedData\" class=\"form-no-margin\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"mapbrowse\" >\n");
+						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"image\" name=\"submit\" src=\"images/" + imgName +  "\" alt=\"" + display + "\" title=\"" + display + "\">");	
 						savedDataHTMLBuilder.append("</form>\n");		
 						savedDataHTML = savedDataHTMLBuilder.toString();

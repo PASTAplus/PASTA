@@ -191,8 +191,10 @@ public class SavedDataServlet extends DataPortalServlet {
 			}
 		}
 
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-		requestDispatcher.forward(request, response);
+		if (forward != null & !forward.equals("")) {
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+			requestDispatcher.forward(request, response);
+		}
 	}
 
 
