@@ -191,8 +191,18 @@ public class SavedDataServlet extends DataPortalServlet {
 			}
 		}
 
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
-		requestDispatcher.forward(request, response);
+		/*
+		 * Forward to login.jsp or savedData.jsp, but not to other values because
+		 * they use AJAX and we don't want a page refresh
+		 */
+		if (forward != null && 
+		    !forward.equals("") && 
+		    !forward.equals("savedData") &&
+		    !forward.equals("simpleSearch")
+		   ) {
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
+			requestDispatcher.forward(request, response);
+		}
 	}
 
 
