@@ -122,7 +122,7 @@
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Support:</p>
-				  <li><a href="help.jsp">How Do I...</a></li>
+				  <!-- <li><a href="help.jsp">How Do I...</a></li> -->
 				  <li><a href="contact.jsp">Contact Us</a></li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
