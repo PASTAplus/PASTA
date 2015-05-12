@@ -23,12 +23,14 @@ $(document).ready(function() {
 			divElement.html("<small><em>On shelf</em></small><br/>");
 		}
 		else {
-			if (forwardValue == "savedData.jsp") {
+			// if this is the saved data page, hide the table row for the unsaved data package
+			if (forwardValue == "savedData") {
 				$(this).parent().parent().hide();
 				var numFound = $("#dataShelfNumFound").html();
 				numFound = numFound - 1;
 				$("#dataShelfNumFound").html(numFound);
 			}
+			// otherwise change the form button from a minus to a plus
 			else {
 				operationInput.attr("value", "save");
 				submitInput.attr("src", "images/plus_blue_small.png");

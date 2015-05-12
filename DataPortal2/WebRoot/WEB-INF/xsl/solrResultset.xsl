@@ -132,7 +132,7 @@
         				<form id="{$pid}" class="form-no-margin" name="savedDataForm" method="post" action="savedDataServlet" >
 							<input type="hidden" name="operation" value="unsave"></input>
 							<input type="hidden" name="packageId" value="{$pid}"></input>
-							<input type="hidden" name="forward" value="savedData.jsp"></input>
+							<input type="hidden" name="forward" value="savedData"></input>
                             <input type="image" name="submit" src="images/minus_blue_small.png" alt="Remove from your data shelf" title="Remove from your data shelf"/>	
 		    				<div><small><em>On shelf</em></small><br/></div>
 						</form>
