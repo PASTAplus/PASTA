@@ -286,11 +286,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 						String display = isSaved ? "Remove from your data shelf" : "Add to your data shelf";
 						String imgName = isSaved ? "minus_blue_small.png" : "plus_blue_small.png";
 						
-						savedDataHTMLBuilder.append("<form id=\"savedData\" class=\"form-no-margin\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
+						savedDataHTMLBuilder.append("<form style=\"display:inline-block\" id=\"savedData\" class=\"form-no-margin\" name=\"savedDataForm\" method=\"post\" action=\"./savedDataServlet\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"operation\" value=\""+ operation + "\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"packageId\" value=\""+ packageId + "\" >\n");
 						savedDataHTMLBuilder.append("  <input type=\"hidden\" name=\"forward\" value=\"\" >\n");
-						savedDataHTMLBuilder.append("  <input type=\"image\" name=\"submit\" src=\"images/" + imgName +  "\" alt=\"" + display + "\" title=\"" + display + "\">");	
+						savedDataHTMLBuilder.append("  <sup><input type=\"image\" name=\"submit\" src=\"images/" + imgName +  "\" alt=\"" + display + "\" title=\"" + display + "\"></sup>");	
 						savedDataHTMLBuilder.append("</form>\n");		
 						savedDataHTML = savedDataHTMLBuilder.toString();
 					}
@@ -526,13 +526,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 										.getPastaPackageUri(scope, id, revision);
 
 								packageIdListItem = 
-										"<li>" + 
-								        "<table><tr>" +
-										          "<td>" + packageId  +    "</td>" +
-								                  "<td>&nbsp;</td>" +
-								                  "<td>" + savedDataHTML + "</td>" +
-										"</tr></table>" +
-								        "</li>\n";
+										"<li>" + packageId  + "&nbsp;&nbsp;" + savedDataHTML + "</li>\n";
 
 								if (predecessor != null) {
 									previous = "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope="
