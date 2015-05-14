@@ -26,6 +26,7 @@ package edu.lternet.pasta.portal;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.AuditManagerClient;
@@ -45,7 +46,31 @@ public class DataPackageSurvey {
 
 	Integer numberOfDays = new Integer(100);
 	
-  
+	
+	/*
+	 * Class methods
+	 */
+	
+	
+	/**
+	 * Used in the footer.jsp to add HTML space padding to the title when needed
+	 * to avoid formatting issues with Recently Added and Recently Updated
+	 * display.
+	 * 
+	 * @param  the data package title
+	 * @param  the minimum length of the title
+	 * @return the space padding string needed to meet the minimum length,
+	 *         a sequence of HTML &nbsp; characters
+	 */
+	public static String spacePadding(String title, int minLength) {
+		String spacePadding = "";
+		if (title.length() < minLength) {
+			spacePadding = StringUtils.repeat("&nbsp;", (minLength - title.length()));
+		}
+		return spacePadding;
+	}
+
+	
 	/*
 	 * Instance methods
 	 */
