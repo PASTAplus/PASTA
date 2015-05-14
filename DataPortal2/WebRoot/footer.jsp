@@ -60,29 +60,35 @@ String date3 = "";
 String date4 = "";
 
 String iconLink = "<a href='./mapbrowse?scope=%s&identifier=%s'><span class='post_icon'></span></a>";
-String titleLink = "<a href='./mapbrowse?scope=%s&identifier=%s'>%s</a>";
+String titleLink = "<a href='./mapbrowse?scope=%s&identifier=%s'>%s</a>%s";
+String spacePadding = "";
+int minLength = 70;
 
 if (recentScope1 != null && !recentScope1.equals("")) {
   icon1 = String.format(iconLink, recentScope1,  recentIdentifier1);
-  title1 = String.format(titleLink, recentScope1, recentIdentifier1, recentTitle1);
+  spacePadding = DataPackageSurvey.spacePadding(recentTitle1, minLength);
+  title1 = String.format(titleLink, recentScope1, recentIdentifier1, recentTitle1, spacePadding);
   date1 = recentDate1;
 }
 
 if (recentScope2 != null && !recentScope2.equals("")) {
   icon2 = String.format(iconLink, recentScope2,  recentIdentifier2);
-  title2 = String.format(titleLink, recentScope2, recentIdentifier2, recentTitle2);
+  spacePadding = DataPackageSurvey.spacePadding(recentTitle2, minLength);
+  title2 = String.format(titleLink, recentScope2, recentIdentifier2, recentTitle2, spacePadding);
   date2 = recentDate2;
 }
 
 if (recentScope3 != null && !recentScope3.equals("")) {
   icon3 = String.format(iconLink, recentScope3, recentIdentifier3);
-  title3 = String.format(titleLink, recentScope3, recentIdentifier3, recentTitle3);
+  spacePadding = DataPackageSurvey.spacePadding(recentTitle3, minLength);
+  title3 = String.format(titleLink, recentScope3, recentIdentifier3, recentTitle3, spacePadding);
   date3 = recentDate3;
 }
 
 if (recentScope4 != null && !recentScope4.equals("")) {
   icon4 = String.format(iconLink, recentScope4,  recentIdentifier4);
-  title4 = String.format(titleLink, recentScope4,  recentIdentifier4, recentTitle4);
+  spacePadding = DataPackageSurvey.spacePadding(recentTitle4, minLength);
+  title4 = String.format(titleLink, recentScope4,  recentIdentifier4, recentTitle4, spacePadding);
   date4 = recentDate4;
 }
 
@@ -101,22 +107,22 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 				<div class="span12">
 					<div class="container">
 						<div class="row-fluid">
-							<div class="span4">
+							<div class="span5">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
 										<h2 class="widget-title">Recently Added</h2>
 									</div>
 									<dl>
 										<dt><%= icon1 %></dt>
-										<dd class="without_avatar"><%= date1 %><%= title1 %></dd>
+										<dd class="without_avatar"><%= date1 %><br/><%= title1 %></dd>
 									</dl>
 									<dl>
 										<dt><%= icon2 %></dt>
-										<dd class="without_avatar"><%= date2 %><%= title2 %></dd>
+										<dd class="without_avatar"><%= date2 %><br/><%= title2 %></dd>
 									</dl>
 								</div>
 							</div>
-							<div class="span6">
+							<div class="span5">
 								<div class="widget widget_recent_posts">
 									<div class="footer_title">
 										<h2 class="widget-title">Recently Updated</h2>
