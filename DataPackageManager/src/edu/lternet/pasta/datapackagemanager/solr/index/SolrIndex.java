@@ -147,11 +147,28 @@ public class SolrIndex {
 				solrInputDocument.setField("singledate", singleDateTimestamp);
 			}
 
+			/*
+			 *  Index the "title" and "titles" fields. The former is multi-valued and the
+			 *  latter is single value. Only single value fields (in this case, "titles")
+			 *  can be sorted in search results, and it must be a string field rather
+			 *  than a text field.
+			 */
+			StringBuilder titlesBuilder = new StringBuilder("");
+			boolean hasTitle = false;
 			for (String title : titles) {
-				// Note how we use addField() for multivalued fields
+				// Note how we use addField() for multi-valued fields
 				solrInputDocument.addField("title", title);
+				titlesBuilder.append(title);
+				if (hasTitle) {
+					titlesBuilder.append("\n");
+				}
+				hasTitle = true;
 			}
-			
+			if (hasTitle) {
+				String titlesStr = titlesBuilder.toString();
+				solrInputDocument.setField("titles", titlesStr);
+			}
+					
 			for (String keyword : keywords) {
 				solrInputDocument.addField("keyword", keyword);
 			}
@@ -160,15 +177,52 @@ public class SolrIndex {
 				solrInputDocument.addField("timescale", timescale);
 			}
 			
+			/*
+			 *  Index the "author", "organization", and "responsibleParties" fields. 
+			 *  The first two are multi-valued while "responsibleParties" is single value. 
+			 *  Only single value fields can be sorted in search results, and it must
+			 *  be a string field rather than a text field.
+			 */
+			StringBuilder authorBuilder = new StringBuilder("");
+			StringBuilder organizationBuilder = new StringBuilder("");
+			boolean hasAuthor = false;
+			boolean hasOrganization = false;
 			for (ResponsibleParty responsibleParty : responsibleParties) {
 				if (responsibleParty.isPerson()) {
+					if (hasAuthor) authorBuilder.append("\n");
 					String author = responsibleParty.getCreatorName();
 					solrInputDocument.addField("author", author);
+					hasAuthor = true;
+					authorBuilder.append(author);
 				}
 				if (responsibleParty.isOrganization()) {
+					if (hasOrganization) organizationBuilder.append("\n");
 					String organization = responsibleParty.getOrganizationName();
 					solrInputDocument.addField("organization", organization);
+					hasOrganization = true;
+					organizationBuilder.append(organization);
 				}
+			}
+			String partiesStr = null;
+			if (hasAuthor && hasOrganization) {
+				/*
+				 * Note that organizations come ahead of authors in the
+				 * responsibleParties string. This is to keep sorting
+				 * of search results based on the "responsibleParties" field
+				 * in Solr consistent with how the XSLT displays 
+				 * the search results in the Data Portal.
+				 */
+				partiesStr = String.format("%s\n%s", organizationBuilder.toString(), authorBuilder.toString()); 
+			}
+			else if (hasAuthor) {
+				partiesStr = authorBuilder.toString();
+			}
+			else if (hasOrganization) {
+				partiesStr = organizationBuilder.toString();
+			}
+			
+			if (partiesStr != null) {
+				solrInputDocument.setField("responsibleParties", partiesStr);
 			}
 			
 			if (site != null) {
