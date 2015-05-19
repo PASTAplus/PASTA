@@ -191,10 +191,11 @@ public class SavedData extends Search {
 		    queryBuilder.append(")");	
 		
 		    String qString = queryBuilder.toString().trim();
+		    String sortString = String.format("%s,%s", PACKAGEID_SORT, SORT_ORDER_ASC);
 		    queryString = String.format(
 				"defType=%s&q=%s&fl=%s&sort=%s&debug=%s",
 				DEFAULT_DEFTYPE, qString, DEFAULT_FIELDS, 
-				PACKAGEID_SORT, DEFAULT_DEBUG
+				sortString, DEFAULT_DEBUG
 		    );
 		}
 		

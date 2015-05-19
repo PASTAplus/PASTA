@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 
 /**
  * The SimpleSearch class supports query operations common to the simple
@@ -92,10 +91,10 @@ public class SimpleSearch extends Search {
 			}
 			
 			solrQuery = String.format(
-					"defType=%s&q=%s&fq=%s&fq=%s&fq=%s&fl=%s&sort=%s&sort=%s&debug=%s",
+					"defType=%s&q=%s&fq=%s&fq=%s&fq=%s&fl=%s&sort=%s&debug=%s",
 					DEFAULT_DEFTYPE, qString, siteFilter, ECOTRENDS_FILTER,
 					LANDSAT_FILTER, DEFAULT_FIELDS, 
-					SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG);
+					DEFAULT_SORT, DEFAULT_DEBUG);
 		}
 
 		return solrQuery;

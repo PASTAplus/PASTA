@@ -25,9 +25,18 @@ public class Search {
 	  protected final static String DEFAULT_FIELDS = "id,packageid,title,author,organization,pubdate";
 	  protected final static int DEFAULT_START = 0;
 	  public final static int DEFAULT_ROWS = 10;
-	  protected final static String SCORE_SORT = "score,desc";
-	  protected final static String PACKAGEID_SORT = "packageid,asc";
 	  protected final static String DEFAULT_DEBUG = "false";
+	  
+	  // Sort values
+	  public final static String CREATORS_SORT = "responsibleParties";
+	  public final static String PACKAGEID_SORT = "packageid";
+	  public final static String PUBDATE_SORT = "pubdate";
+	  public final static String SCORE_SORT = "score";
+	  public final static String TITLES_SORT = "titles";
+	  public final static String SORT_ORDER_ASC = "asc";
+	  public final static String SORT_ORDER_DESC = "desc";
+	  public final static String DEFAULT_SORT_ORDER = SORT_ORDER_DESC;
+	  public final static String DEFAULT_SORT = String.format("%s,%s", SCORE_SORT, SORT_ORDER_DESC);
 	  
 	  
 	  /*
@@ -44,6 +53,7 @@ public class Search {
 	  public Search () {
 		  this.termsList = new TermsList();
 	  }
+	  
 	  
 	/*
 	 * Class methods
@@ -66,44 +76,7 @@ public class Search {
 		  return escapedString;
 	  }
 	  
-	  /**
-	   * Return a list of indexed paths for use in either simple search,
-	   * browse search, or subject-based advanced search. The exact contents
-	   * of the list returned varies depending on whether we want to include
-	   * EML fields for abstracts, keywords, packageIds, and/or titles.
-	   * 
-	   * @param abstracts   true if we want to search EML abstract fields
-	   * @param keywords    true if we want to search EML keyword fields
-	   * @param packageIds  true if we want to search EML packageId fields
-	   * @param titles      true if we want to search EML title fields
-	   * @return a list of indexed fields
-	   */
-	  protected static List<String> getIndexedPaths(boolean abstracts, boolean keywords, 
-			                                  boolean packageIds, boolean titles) {
-		  List<String> indexedPaths = new ArrayList<String>();
-		  
-		  if (abstracts) {
-			  indexedPaths.add("dataset/abstract");
-			  indexedPaths.add("dataset/abstract/para");
-			  indexedPaths.add("dataset/abstract/section/para");
-		  }
-		  
-		  if (keywords) {
-			  indexedPaths.add("keyword");
-		  }
-		  
-		  if (packageIds) {
-			  indexedPaths.add("@packageId");
-		  }
-		  
-		  if (titles) {
-			  indexedPaths.add("dataset/title");
-		  }
-		  
-		  return indexedPaths;		  
-	  }
 
-	
 	/**
 	 * Adds a string to a list of terms. An auxiliary method to the
 	 * parseTermsAdvanced() method.

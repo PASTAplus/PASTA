@@ -641,9 +641,9 @@ public class SolrAdvancedSearch extends Search  {
 				 this.westBound, this.isBoundaryContainedChecked);
 	
 		queryString = String.format(
-				"defType=%s&q=%s&%s&fl=%s&sort=%s&sort=%s&debug=%s",
+				"defType=%s&q=%s&%s&fl=%s&sort=%s&debug=%s",
 				DEFAULT_DEFTYPE, this.qString.trim(), this.fqString.trim(),
-				DEFAULT_FIELDS, SCORE_SORT, PACKAGEID_SORT, DEFAULT_DEBUG
+				DEFAULT_FIELDS, DEFAULT_SORT, DEFAULT_DEBUG
 		);
 
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
