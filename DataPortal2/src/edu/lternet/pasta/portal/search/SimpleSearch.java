@@ -79,7 +79,7 @@ public class SimpleSearch extends Search {
 			
 			try {
 				if (isSiteQuery) {
-					siteFilter = String.format("scope:(knb-lter-%s)", userInput.toLowerCase());
+					siteFilter = String.format("&fq=scope:(knb-lter-%s)", userInput.toLowerCase());
 				}
 				else {
 					String escapedInput = Search.escapeQueryChars(userInput);
@@ -91,10 +91,9 @@ public class SimpleSearch extends Search {
 			}
 			
 			solrQuery = String.format(
-					"defType=%s&q=%s&fq=%s&fq=%s&fq=%s&fl=%s&sort=%s&debug=%s",
+					"defType=%s&q=%s%s&fq=%s&fq=%s&fl=%s&debug=%s",
 					DEFAULT_DEFTYPE, qString, siteFilter, ECOTRENDS_FILTER,
-					LANDSAT_FILTER, DEFAULT_FIELDS, 
-					DEFAULT_SORT, DEFAULT_DEBUG);
+					LANDSAT_FILTER, DEFAULT_FIELDS, DEFAULT_DEBUG);
 		}
 
 		return solrQuery;
