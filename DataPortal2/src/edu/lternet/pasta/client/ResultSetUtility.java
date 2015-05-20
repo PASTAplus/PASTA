@@ -74,6 +74,7 @@ public class ResultSetUtility {
   private SavedData savedData = null;
   private boolean isSavedDataPage;
   private boolean showSavedData = true;
+  private String sort = null;
   
 
   /*
@@ -90,17 +91,18 @@ public class ResultSetUtility {
    * 
    * @throws ParseException
    */
-  public ResultSetUtility(String xml, SavedData savedData, boolean isSavedDataPage) throws ParseException {
+  public ResultSetUtility(String xml, String sort, SavedData savedData, boolean isSavedDataPage) throws ParseException {
 
     if (xml == null || xml.isEmpty()) {
       throw new ParseException("Result Set is empty", 0);
     }
 
     this.resultSet = xml;
+    this.sort = sort;
     this.savedData = savedData;
     this.isSavedDataPage = isSavedDataPage;
     parseResultSet(xml);
-    pageControl = new PageControl(numFound, start, rows, isSavedDataPage);
+    pageControl = new PageControl(numFound, start, rows, sort, isSavedDataPage);
     pageHeaderHTML = pageControl.composePageHeader();
     pageBodyHTML = pageControl.composePageBody();
   }
@@ -114,8 +116,8 @@ public class ResultSetUtility {
    * 
    * @throws ParseException
    */
-  public ResultSetUtility(String xml) throws ParseException {
-	  this(xml, null, false);
+  public ResultSetUtility(String xml, String sort) throws ParseException {
+	  this(xml, sort, null, false);
 	  this.showSavedData = false;
   }
 
@@ -199,25 +201,97 @@ public class ResultSetUtility {
 	 * @return The HTML table as a String object.
 	 */
 	public String xmlToHtmlTable(String xslPath) throws ParseException {
+		String html = "";
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
 		
-		String savedDataList = "";
+		if (rows > 0) {
+			String tableHeaderHTML = composeTableHeaderHTML(this.showSavedData);
 		
-		if (savedData != null) {
-			savedDataList = savedData.getSavedDataList();
-		}
+			String savedDataList = "";	
+			if (savedData != null) {
+				savedDataList = savedData.getSavedDataList();
+			}
 		
-		// Pass the docsPerPage value as a parameter to the XSLT
-		parameterMap.put("start", start.toString());
-		parameterMap.put("rows", new Integer(this.rows).toString());
-		parameterMap.put("isSavedDataPage", new Boolean(this.isSavedDataPage).toString());
-		parameterMap.put("savedDataList", savedDataList);
-		parameterMap.put("showSavedData", new Boolean(this.showSavedData).toString());
+			// Pass the docsPerPage value as a parameter to the XSLT
+			parameterMap.put("start", start.toString());
+			parameterMap.put("rows", new Integer(this.rows).toString());
+			parameterMap.put("isSavedDataPage", new Boolean(this.isSavedDataPage).toString());
+			parameterMap.put("savedDataList", savedDataList);
+			parameterMap.put("showSavedData", new Boolean(this.showSavedData).toString());
 
-		String html = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
+			String tableRowsHTML = XSLTUtility.xmlToHtml(this.resultSet, xslPath,
 				parameterMap);
 		
-		html = String.format("%s%s%s<br/>%s", pageHeaderHTML, pageBodyHTML, html, pageBodyHTML);
+			String tableFooterHTML = composeTableFooterHTML();
+
+			html = String.format("%s%s%s%s%s<br/>%s", 
+				pageHeaderHTML, pageBodyHTML, 
+				tableHeaderHTML, tableRowsHTML, tableFooterHTML, 
+				pageBodyHTML);
+		}
+		else {
+			html = composeNoMatchesHTML(isSavedDataPage);
+		}
+
+		return html;
+	}
+	
+	
+	private String composeTableHeaderHTML(boolean showSavedData) {
+		StringBuilder html = new StringBuilder("\n");
+		html.append("<table width=\"100%\">\n");
+		html.append("    <tbody>\n");
+		html.append("        <tr>\n");
+		
+		String titleSort = pageControl.getTitleSort();
+		String creatorsSort = pageControl.getCreatorsSort();
+		String pubDateSort = pageControl.getPubDateSort();
+		String packageIdSort = pageControl.getPackageIdSort();
+		
+		String servlet = isSavedDataPage ? "savedDataServlet" : "simpleSearch";
+		
+		if (showSavedData) {
+			html.append("            <th class=\"nis\" width=\"45%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + titleSort + "'>Title</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"20%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + creatorsSort + "'>Creators</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"10%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + pubDateSort + "'>Publication Date</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"15%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + packageIdSort + "'>Package Id</a></th>\n");
+    		String dataShelfStartTag = isSavedDataPage ? "" : "<a href='savedDataServlet'>";
+    		String dataShelfEndTag =   isSavedDataPage ? "" : "</a>";
+    		html.append("            <th class=\"nis\" width=\"10%\">" + dataShelfStartTag + "<img alt='Your Data Shelf' src='images/data_shelf.png' title='Your Data Shelf' width='60' height='60'></img>" + dataShelfEndTag + "</th>\n");
+		}
+		else {
+			html.append("            <th class=\"nis\" width=\"50%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + titleSort + "'>Title</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"25%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + creatorsSort + "'>Creators</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"10%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + pubDateSort + "'>Publication Date</a></th>\n");
+    		html.append("            <th class=\"nis\" width=\"15%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + packageIdSort + "'>Package Id</a></th>\n");
+		}
+		
+		html.append("        </tr>\n");
+
+		String htmlStr = html.toString();
+		return htmlStr;
+	}
+
+	
+	private String composeTableFooterHTML() {
+		StringBuilder html = new StringBuilder("\n");
+		html.append("    </tbody>\n");
+		html.append("</table>\n");	
+		
+		return html.toString();
+	}
+
+	
+	private String composeNoMatchesHTML(boolean isSavedDataPage) {
+		String html = "";
+		
+		if (isSavedDataPage) {
+			html = "<p>There are no data packages on your data shelf.</p>";
+		}
+		else {
+			html = "<p>No matching data packages were found.</p>";
+		}
+		
 		return html;
 	}
 

@@ -641,15 +641,15 @@ public class SolrAdvancedSearch extends Search  {
 				 this.westBound, this.isBoundaryContainedChecked);
 	
 		queryString = String.format(
-				"defType=%s&q=%s&%s&fl=%s&sort=%s&debug=%s",
+				"defType=%s&q=%s&%s&fl=%s&debug=%s",
 				DEFAULT_DEFTYPE, this.qString.trim(), this.fqString.trim(),
-				DEFAULT_FIELDS, DEFAULT_SORT, DEFAULT_DEBUG
+				DEFAULT_FIELDS, DEFAULT_DEBUG
 		);
 
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-		logger.warn(String.format("queryString:\n%s", queryString));
-		String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, DEFAULT_START, DEFAULT_ROWS);
+		String extendedQueryString = String.format("%s&start=%d&rows=%d&sort=%s", queryString, DEFAULT_START, DEFAULT_ROWS, DEFAULT_SORT);
 		String resultsetXML = dpmClient.searchDataPackages(extendedQueryString);
+		logger.warn(String.format("query:\n%s", extendedQueryString));
 
 		return resultsetXML;
 	}

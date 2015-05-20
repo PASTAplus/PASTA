@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.user.SavedData;
 
 
@@ -128,6 +129,11 @@ public class SavedDataServlet extends DataPortalServlet {
 		String forward = (String) request.getParameter("forward");
 		String startStr = (String) request.getParameter("start");
 		String rowsStr = (String) request.getParameter("rows");
+		String sort = (String) request.getParameter("sort");
+		
+		if (sort == null || sort.equals("")) {
+			sort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+		}
 
 		if (forward == null) forward = "savedData.jsp";
 		
@@ -176,11 +182,11 @@ public class SavedDataServlet extends DataPortalServlet {
 				String xml = null;
 				response.setContentType("text/html");
 				try {
-					xml = savedData.getSavedDataXML(startStr, rowsStr);
+					xml = savedData.getSavedDataXML(startStr, rowsStr, sort);
 					if (xml != null) {
 						httpSession.setAttribute("termsListHTML", termsListHTML);
 						boolean isSavedDataPage = true;
-						ResultSetUtility resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+						ResultSetUtility resultSetUtility = new ResultSetUtility(xml, sort, savedData, isSavedDataPage);
 						html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 					}
 					request.setAttribute("searchresult", html);

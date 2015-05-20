@@ -32,7 +32,7 @@ public class Search {
 	  public final static String PACKAGEID_SORT = "packageid";
 	  public final static String PUBDATE_SORT = "pubdate";
 	  public final static String SCORE_SORT = "score";
-	  public final static String TITLES_SORT = "titles";
+	  public final static String TITLE_SORT = "titles";
 	  public final static String SORT_ORDER_ASC = "asc";
 	  public final static String SORT_ORDER_DESC = "desc";
 	  public final static String DEFAULT_SORT_ORDER = SORT_ORDER_DESC;

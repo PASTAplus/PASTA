@@ -97,7 +97,7 @@ public class SavedData extends Search {
 		String savedDataList = savedData.getSavedDataList();
 		System.out.println(String.format("Saved data list: %s", savedDataList));
 		try {
-			savedDataXML = savedData.getSavedDataXML("0", "10");
+			savedDataXML = savedData.getSavedDataXML("0", "10", null);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -120,8 +120,9 @@ public class SavedData extends Search {
 	 * 
 	 * @param  startStr   The start position, e.g. "0"
 	 * @param  rowsStr    The number of rows to return, e.g. "10"
+	 * @param  sort       The sort value, e.g. "title,asc"
 	 */
-	public String getSavedDataXML(String startStr, String rowsStr) throws Exception {
+	public String getSavedDataXML(String startStr, String rowsStr, String sort) throws Exception {
 		String savedData = null;
 		ArrayList<String> dataStore = fetchDataStore();
 		Integer start, rows;
@@ -140,13 +141,17 @@ public class SavedData extends Search {
 			rows = new Integer(rowsStr);
 		}
 		
+		if (sort == null) {
+			sort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+		}
+		
 		if (dataStore.size() > 0) {
 			String queryString = composeQueryString(dataStore);
 			
 			if (queryString != null) {
 				DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-				logger.warn(String.format("queryString:\n%s", queryString));
-				String extendedQueryString = String.format("%s&start=%d&rows=%d", queryString, start, rows);
+				String extendedQueryString = String.format("%s&start=%d&rows=%d&sort=%s", queryString, start, rows, sort);
+				logger.warn(String.format("query:\n%s", extendedQueryString));
 				String resultsetXML = dpmClient.searchDataPackages(extendedQueryString);
 				savedData = resultsetXML;
 			}
@@ -181,7 +186,7 @@ public class SavedData extends Search {
 	private String composeQueryString(ArrayList<String> dataStore) {
 		String queryString = null;
 		StringBuilder queryBuilder = new StringBuilder("id:(");
-
+		
 		if (dataStore != null) {
 			String plus = "";
 			for (String docid : dataStore) {
@@ -191,11 +196,9 @@ public class SavedData extends Search {
 		    queryBuilder.append(")");	
 		
 		    String qString = queryBuilder.toString().trim();
-		    String sortString = String.format("%s,%s", PACKAGEID_SORT, SORT_ORDER_ASC);
 		    queryString = String.format(
-				"defType=%s&q=%s&fl=%s&sort=%s&debug=%s",
-				DEFAULT_DEFTYPE, qString, DEFAULT_FIELDS, 
-				sortString, DEFAULT_DEBUG
+				"defType=%s&q=%s&fl=%s&debug=%s",
+				DEFAULT_DEFTYPE, qString, DEFAULT_FIELDS, DEFAULT_DEBUG
 		    );
 		}
 		

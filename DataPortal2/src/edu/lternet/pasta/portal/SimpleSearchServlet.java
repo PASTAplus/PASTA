@@ -119,7 +119,6 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String html = null;
 		String termsListHTML = "";
 		String htmlTable = "";
-		String xml = null;
 		HttpSession httpSession = request.getSession();
 		
 		String uid = (String) httpSession.getAttribute("uid");
@@ -149,7 +148,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			
 			if (queryText != null) {
 				queryText = String.format("%s&start=%s&rows=%s&sort=%s", queryText, start, rows, sort);
-				htmlTable = executeQuery(uid, queryText);
+				htmlTable = executeQuery(uid, queryText, sort);
 			}
 		}
 		else {
@@ -160,7 +159,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			httpSession.setAttribute("termsListHTML", termsListHTML);
 			httpSession.setAttribute("queryText", queryText);
 			queryText = String.format("%s&start=%d&rows=%d&sort=%s", queryText, 0, Search.DEFAULT_ROWS, sort);		
-			htmlTable = executeQuery(uid, queryText);
+			htmlTable = executeQuery(uid, queryText, sort);
 		}
 
 		if (termsListHTML == null) termsListHTML = "";
@@ -175,7 +174,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 	/*
 	 * Executes the query via the DataPackageManagerClient object
 	 */
-	private String executeQuery(String uid, String queryText)
+	private String executeQuery(String uid, String queryText, String sort)
 			throws ServletException {
 		String htmlTable = null;
 
@@ -184,12 +183,12 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			String xml = dpmClient.searchDataPackages(queryText);
 			ResultSetUtility resultSetUtility = null;
 			if (uid.equals("public")) {
-				resultSetUtility = new ResultSetUtility(xml);
+				resultSetUtility = new ResultSetUtility(xml, sort);
 			}
 			else {
 				boolean isSavedDataPage = false;
 				SavedData savedData = new SavedData(uid);
-				resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+				resultSetUtility = new ResultSetUtility(xml, sort, savedData, isSavedDataPage);
 			}
 			htmlTable = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 		}
