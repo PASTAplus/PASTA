@@ -1,1 +1,1 @@
-Test instance: hi there! goodbye!
+Test instance: hi there! good-bye!
