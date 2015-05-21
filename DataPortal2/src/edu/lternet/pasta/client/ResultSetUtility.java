@@ -249,21 +249,22 @@ public class ResultSetUtility {
 		String packageIdSort = pageControl.getPackageIdSort();
 		
 		String servlet = isSavedDataPage ? "savedDataServlet" : "simpleSearch";
+		String titleWidth = showSavedData ? "45%" : "50%";
+		String creatorsWidth = showSavedData ? "20%" : "25%";
+		String pubDateWidth = "10%";
+		String packageIdWidth = "15%";
+		String dataShelfWidth = "10%";
 		
+		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Title</a></th>\n", titleWidth, servlet, titleSort));
+		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Creators</a></th>\n", creatorsWidth, servlet, creatorsSort));
+		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Publication Date</a></th>\n", pubDateWidth, servlet, pubDateSort));
+		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Package Id</a></th>\n", packageIdWidth, servlet, packageIdSort));
+
+		// Display this table column only if we're displaying the data shelf for a logged-in user
 		if (showSavedData) {
-			html.append("            <th class=\"nis\" width=\"45%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + titleSort + "'>Title</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"20%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + creatorsSort + "'>Creators</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"10%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + pubDateSort + "'>Publication Date</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"15%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + packageIdSort + "'>Package Id</a></th>\n");
     		String dataShelfStartTag = isSavedDataPage ? "" : "<a href='savedDataServlet'>";
     		String dataShelfEndTag =   isSavedDataPage ? "" : "</a>";
-    		html.append("            <th class=\"nis\" width=\"10%\">" + dataShelfStartTag + "<img alt='Your Data Shelf' src='images/data_shelf.png' title='Your Data Shelf' width='60' height='60'></img>" + dataShelfEndTag + "</th>\n");
-		}
-		else {
-			html.append("            <th class=\"nis\" width=\"50%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + titleSort + "'>Title</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"25%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + creatorsSort + "'>Creators</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"10%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + pubDateSort + "'>Publication Date</a></th>\n");
-    		html.append("            <th class=\"nis\" width=\"15%\"><a class='searchsubcat' href='" + servlet + "?start=0&rows=10&sort=" + packageIdSort + "'>Package Id</a></th>\n");
+    		html.append(String.format("            <th class=\"nis\" width=\"%s\">%s<img alt='Your Data Shelf' src='images/data_shelf.png' title='Your Data Shelf' width='60' height='60'></img>%s</th>\n", dataShelfWidth, dataShelfStartTag, dataShelfEndTag));
 		}
 		
 		html.append("        </tr>\n");
