@@ -82,15 +82,11 @@ function initialize_summary_map(north, south, east, west) {
 	};
 
 	var map = new google.maps.Map(document.getElementById("map-canvas-summary"), mapOptions);
-    var bounds = new google.maps.LatLngBounds();
     var nwLatLng = new google.maps.LatLng(north, west);
     var neLatLng = new google.maps.LatLng(north, east);
     var swLatLng = new google.maps.LatLng(south, west);
     var seLatLng = new google.maps.LatLng(south, east);
-    bounds.extend(nwLatLng);
-    bounds.extend(neLatLng);
-    bounds.extend(swLatLng);
-    bounds.extend(seLatLng);
+    var bounds = new google.maps.LatLngBounds(swLatLng, neLatLng);
     map.fitBounds(bounds);
     
     if ((north == south) && (east == west)) {
