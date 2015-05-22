@@ -27,15 +27,23 @@ public class PageControl {
 	int start;           // The start record
 	int pageRange = 5;   // View +/- pageRange pages from the current page
 	boolean isSavedDataPage; // true if displaying saved data packages, else false
+	String sort = null;
 	
+	String titleSort = null;
+	String creatorsSort = null;
+	String pubDateSort = null;
+	String packageIdSort = null;
 	
+
 	/*
 	 * Constructor
 	 */
 	
-	public PageControl(int numFound, int start, int rowsPerPage, boolean isSavedDataPage) {
+	public PageControl(int numFound, int start, int rowsPerPage, String sort, boolean isSavedDataPage) {
 		this.numFound = numFound;
 		this.rowsPerPage = rowsPerPage;
+		this.sort = sort;
+		initSortValues(sort);
 		this.isSavedDataPage = isSavedDataPage;
 		setStart(start);
 	}
@@ -58,8 +66,9 @@ public class PageControl {
 		int rowsPerPage = new Integer(args[1]);
 		int start = new Integer(args[2]);
 		boolean isSavedDataPage = false;
+		String sort = Search.DEFAULT_SORT;
 		
-		PageControl pageControl = new PageControl(numberFound, start, rowsPerPage, isSavedDataPage);
+		PageControl pageControl = new PageControl(numberFound, start, rowsPerPage, sort, isSavedDataPage);
 		String html = pageControl.composePageBody();
 		System.out.println(html);
 	}
@@ -71,7 +80,7 @@ public class PageControl {
 	
 	private String composeStartTag(int linkStart) {
 		String servletName = this.isSavedDataPage ? "savedDataServlet" : "simpleSearch";
-		String href = String.format("%s?start=%d&rows=%d", servletName, linkStart, rowsPerPage);
+		String href = String.format("%s?start=%d&rows=%d&sort=%s", servletName, linkStart, rowsPerPage, sort);
 		String aStartTag = String.format("<a class='searchsubcat' href='%s'>", href);
 		return aStartTag;		
 	}
@@ -225,6 +234,26 @@ public class PageControl {
 	}
 	
 	
+	public String getTitleSort() {
+		return titleSort;
+	}
+	
+	
+	public String getCreatorsSort() {
+		return creatorsSort;
+	}
+	
+	
+	public String getPubDateSort() {
+		return pubDateSort;
+	}
+	
+	
+	public String getPackageIdSort() {
+		return packageIdSort;
+	}
+	
+	
 	/**
 	 * Calculates the highest page value based on the numFound
 	 * and rowsPerPage values.
@@ -238,6 +267,27 @@ public class PageControl {
 		if (numFound % rowsPerPage > 0) highestPage++;
 		
 		return highestPage;
+	}
+	
+	
+	private void initSortValues(String sort) {
+		titleSort = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_ASC);
+		creatorsSort = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_ASC);
+		pubDateSort = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_ASC);
+		packageIdSort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+		
+		if (sort.equals(titleSort)) {
+			titleSort = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_DESC);
+		}
+		else if (sort.equals(creatorsSort)) {
+			creatorsSort = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_DESC);
+		}
+		else if (sort.equals(pubDateSort)) {
+			pubDateSort = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_DESC);
+		}
+		else if (sort.equals(packageIdSort)) {
+			packageIdSort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_DESC);
+		}
 	}
 	
 	

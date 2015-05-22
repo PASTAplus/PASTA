@@ -31,7 +31,6 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 
 import org.apache.commons.io.FileUtils;
-
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
@@ -173,7 +172,7 @@ public class BrowseTerm {
         this.matchCount = 0;
 
         try {
-    		ResultSetUtility resultSetUtility = new ResultSetUtility(searchResults);
+    		ResultSetUtility resultSetUtility = new ResultSetUtility(searchResults, Search.DEFAULT_SORT);
     		Integer numFound = resultSetUtility.getNumFound();
     		this.matchCount = numFound;
     	}
@@ -240,7 +239,9 @@ public class BrowseTerm {
     
     try {  
       DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-      resultsetXML = dpmClient.searchDataPackages(this.queryString);    
+      String extendedQueryString = String.format("%s&start=%d&rows=%d&sort=%s", 
+    		  this.queryString, Search.DEFAULT_START, Search.DEFAULT_ROWS, Search.DEFAULT_SORT);		
+      resultsetXML = dpmClient.searchDataPackages(extendedQueryString);    
     } 
     catch (PastaAuthenticationException e) {
       logger.error(e.getMessage());

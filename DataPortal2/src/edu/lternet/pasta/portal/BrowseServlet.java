@@ -42,6 +42,7 @@ import edu.lternet.pasta.client.ResultSetUtility;
 import edu.lternet.pasta.portal.search.BrowseGroup;
 import edu.lternet.pasta.portal.search.BrowseTerm;
 import edu.lternet.pasta.portal.search.BrowseSearch;
+import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.search.TermsList;
 import edu.lternet.pasta.portal.user.SavedData;
 
@@ -163,12 +164,12 @@ public class BrowseServlet extends DataPortalServlet {
 
 	  ResultSetUtility resultSetUtility = null;
 	  if (uid.equals("public")) {
-		resultSetUtility = new ResultSetUtility(xml);
+		resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT);
 	  }
 	  else {
 		boolean isSavedDataPage = false;
 		SavedData savedData = new SavedData(uid);
-		resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+		resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT, savedData, isSavedDataPage);
 	  }
 	  
       html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);

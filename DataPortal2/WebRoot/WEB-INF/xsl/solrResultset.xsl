@@ -34,6 +34,11 @@
   <xsl:param name="savedDataList"></xsl:param>
   <xsl:param name="showSavedData"></xsl:param>
 
+  <xsl:param name="titleSort"></xsl:param>
+  <xsl:param name="creatorsSort"></xsl:param>
+  <xsl:param name="pubDateSort"></xsl:param>
+  <xsl:param name="packageIdSort"></xsl:param>
+  
   <xsl:variable name="numFound">
       <xsl:value-of select="number(/resultset/@numFound)"/>
   </xsl:variable>
@@ -60,46 +65,9 @@
   <xsl:variable name="showSaved" select="boolean($showSavedData = 'true')"></xsl:variable>
 
   <xsl:template match="/">
-
-      <xsl:choose>
-      <xsl:when test="($numFound > 0)">
-
-      <table width="100%">
-        <tbody>
-          <tr>
-			<xsl:choose> 
-				<xsl:when test="$showSaved">
-            		<th class="nis" width="45%">Title</th>
-            		<th class="nis" width="20%">Creators</th>
-            		<th class="nis" width="10%">Publication Date</th>
-            		<th class="nis" width="15%">Package Id</th>
-           			<th class="nis" width="10%"><a href="savedDataServlet"><img alt="Your Data Shelf" src="images/data_shelf.png" title="Your Data Shelf" width="60" height="60"></img></a></th>
-         		</xsl:when>
-				<xsl:otherwise>
-         			<th class="nis" width="50%">Title</th>
-        	 		<th class="nis" width="25%">Creators</th>
-       	     		<th class="nis" width="10%">Publication Date</th>
-            		<th class="nis" width="15%">Package Id</th>
-             	</xsl:otherwise>
-            </xsl:choose>
-          </tr>
-          <xsl:for-each select="/resultset/document">
-            <xsl:apply-templates select="."/>
-          </xsl:for-each>
-        </tbody>
-      </table>
-      </xsl:when>
-      <xsl:otherwise>
-      	<xsl:choose>
-			<xsl:when test="$savedDataPage">
-      			<p>There are no data packages on your data shelf.</p>
-      		</xsl:when>
-      		<xsl:otherwise>
-      			<p>No matching data packages were found.</p>
-      		</xsl:otherwise>
-      	</xsl:choose>
-      </xsl:otherwise>
-      </xsl:choose>
+  	<xsl:for-each select="/resultset/document">
+		<xsl:apply-templates select="."/>
+	</xsl:for-each>
   </xsl:template>
 
   <xsl:template match="document">

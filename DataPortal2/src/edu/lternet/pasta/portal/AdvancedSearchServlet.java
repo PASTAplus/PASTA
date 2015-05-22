@@ -35,6 +35,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.ResultSetUtility;
+import edu.lternet.pasta.portal.search.Search;
 import edu.lternet.pasta.portal.search.SolrAdvancedSearch;
 import edu.lternet.pasta.portal.search.TermsList;
 import edu.lternet.pasta.portal.user.SavedData;
@@ -212,12 +213,12 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 
 			ResultSetUtility resultSetUtility = null;
 			if (uid.equals("public")) {
-				resultSetUtility = new ResultSetUtility(xml);
+				resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT);
 			}
 			else {
 				boolean isSavedDataPage = false;
 				SavedData savedData = new SavedData(uid);
-				resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
+				resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT, savedData, isSavedDataPage);
 			}
 			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);

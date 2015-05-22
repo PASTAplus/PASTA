@@ -117,7 +117,8 @@ public class SimpleSearchServlet extends DataPortalServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String html = null;
-		String xml = null;
+		String termsListHTML = "";
+		String htmlTable = "";
 		HttpSession httpSession = request.getSession();
 		
 		String uid = (String) httpSession.getAttribute("uid");
@@ -126,6 +127,11 @@ public class SimpleSearchServlet extends DataPortalServlet {
 		String userInput = (String) request.getParameter("terms");
 		String start = (String) request.getParameter("start");
 		String rows = (String) request.getParameter("rows");
+		String sort = (String) request.getParameter("sort");
+		
+		if (sort == null || sort.equals("")) {
+			sort = Search.DEFAULT_SORT;
+		}
 		
 		if (userInput == null || userInput.equals("")) {
 			String queryText = null;
@@ -134,66 +140,63 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			if (q == null || q.equals("")) {
 				// if no q param was passed, look for query stored in the session
 				queryText = (String) httpSession.getAttribute("queryText");
-				html = (String) httpSession.getAttribute("termsListHTML");
+				termsListHTML = (String) httpSession.getAttribute("termsListHTML");
 			}
 			else {
 				queryText = q;
 			}
 			
 			if (queryText != null) {
-				try {
-					queryText = String.format("%s&start=%s&rows=%s", queryText, start, rows);
-					DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-					xml = dpmClient.searchDataPackages(queryText);
-					ResultSetUtility resultSetUtility = null;
-					if (uid.equals("public")) {
-						resultSetUtility = new ResultSetUtility(xml);
-					}
-					else {
-						boolean isSavedDataPage = false;
-						SavedData savedData = new SavedData(uid);
-						resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
-					}
-					if (html == null) html = "";
-					html = html + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-				}
-				catch (Exception e) {
-					handleDataPortalError(logger, e);
-				}
-
-				request.setAttribute("searchresult", html);
+				queryText = String.format("%s&start=%s&rows=%s&sort=%s", queryText, start, rows, sort);
+				htmlTable = executeQuery(uid, queryText, sort);
 			}
 		}
 		else {
-			try {
-				SimpleSearch simpleSearch = new SimpleSearch();
-				String queryText = simpleSearch.buildSolrQuery(userInput, false);
-				TermsList termsList = simpleSearch.getTermsList();
-				String termsListHTML = termsList.toHTML();
-				httpSession.setAttribute("termsListHTML", termsListHTML);
-				httpSession.setAttribute("queryText", queryText);
-				queryText = String.format("%s&start=%d&rows=%d", queryText, 0, Search.DEFAULT_ROWS);
-				DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-				xml = dpmClient.searchDataPackages(queryText);
-				ResultSetUtility resultSetUtility = null;
-				if (uid.equals("public")) {
-					resultSetUtility = new ResultSetUtility(xml);
-				}
-				else {
-					boolean isSavedDataPage = false;
-					SavedData savedData = new SavedData(uid);
-					resultSetUtility = new ResultSetUtility(xml, savedData, isSavedDataPage);
-				}
-				html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
-			}
-			catch (Exception e) {
-				handleDataPortalError(logger, e);
-			}
+			SimpleSearch simpleSearch = new SimpleSearch();
+			String queryText = simpleSearch.buildSolrQuery(userInput, false);
+			TermsList termsList = simpleSearch.getTermsList();
+			termsListHTML = termsList.toHTML();
+			httpSession.setAttribute("termsListHTML", termsListHTML);
+			httpSession.setAttribute("queryText", queryText);
+			queryText = String.format("%s&start=%d&rows=%d&sort=%s", queryText, 0, Search.DEFAULT_ROWS, sort);		
+			htmlTable = executeQuery(uid, queryText, sort);
 		}
 
+		if (termsListHTML == null) termsListHTML = "";
+		html = termsListHTML + htmlTable;
+		
 		request.setAttribute("searchresult", html);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
+	}
+	
+	
+	/*
+	 * Executes the query via the DataPackageManagerClient object
+	 */
+	private String executeQuery(String uid, String queryText, String sort)
+			throws ServletException {
+		String htmlTable = null;
+
+		try {
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+			String xml = dpmClient.searchDataPackages(queryText);
+			ResultSetUtility resultSetUtility = null;
+			if (uid.equals("public")) {
+				resultSetUtility = new ResultSetUtility(xml, sort);
+			}
+			else {
+				boolean isSavedDataPage = false;
+				SavedData savedData = new SavedData(uid);
+				resultSetUtility = new ResultSetUtility(xml, sort, savedData, isSavedDataPage);
+			}
+			htmlTable = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+		}
+		catch (Exception e) {
+			handleDataPortalError(logger, e);
+		}
+		
+		return htmlTable;
 	}
 
 
