@@ -157,7 +157,7 @@ public class SolrIndex {
 			boolean hasTitle = false;
 			for (String title : titles) {
 				// Note how we use addField() for multi-valued fields
-				solrInputDocument.addField("title", title);
+				solrInputDocument.addField("title", title.trim());
 				titlesBuilder.append(title);
 				if (hasTitle) {
 					titlesBuilder.append("\n");
