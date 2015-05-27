@@ -156,9 +156,10 @@ public class SolrIndex {
 			StringBuilder titlesBuilder = new StringBuilder("");
 			boolean hasTitle = false;
 			for (String title : titles) {
+				String normalizedTitle = normalizeText(title);
 				// Note how we use addField() for multi-valued fields
-				solrInputDocument.addField("title", title.trim());
-				titlesBuilder.append(title.trim());
+				solrInputDocument.addField("title", normalizedTitle);
+				titlesBuilder.append(normalizedTitle);
 				if (hasTitle) {
 					titlesBuilder.append("\n");
 				}
@@ -328,6 +329,33 @@ public class SolrIndex {
     	}
     	
     	return isValid;
+    }
+    
+    
+    /*
+     * Normalize text to strip off leading whitespace and character entities.
+     * Called recursively for cases where there may be more than one
+     * leading character entity.
+     */
+    private static String normalizeText(String text) {
+    	String normalized = text;
+    	
+    	if (normalized != null) {
+    		normalized = normalized.trim();
+    		if (normalized.startsWith("&#x")) {
+    			normalized = normalized.substring(5);
+    			normalized = normalizeText(normalized);
+    		}
+    	}
+    	
+    	return normalized;
+    }
+    
+    
+    public static void main(String[] args) {
+    	String unnormalized = args[0];
+    	String normalized = normalizeText(unnormalized);
+    	System.out.println(String.format("Original: %s; Normalized: %s", unnormalized, normalized));
     }
 
 }
