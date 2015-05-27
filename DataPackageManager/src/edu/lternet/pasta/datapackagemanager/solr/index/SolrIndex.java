@@ -343,8 +343,11 @@ public class SolrIndex {
     	if (normalized != null) {
     		normalized = normalized.trim();
     		if (normalized.startsWith("&#x")) {
-    			normalized = normalized.substring(5);
-    			normalized = normalizeText(normalized);
+    			int beginPosition = normalized.indexOf(";") + 1;
+    			if (beginPosition > 0) {
+        			normalized = normalized.substring(beginPosition);
+        			normalized = normalizeText(normalized);
+    			}
     		}
     	}
     	
