@@ -72,6 +72,9 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
+				<form id="mapsearach" action="./mapSearchServlet" method="post" name="mapSearchServlet">
+					  <input class="btn btn-info btn-default" name="submit" type="submit" value="View Map of Search Results" />
+			    </form>
 			          <%=searchResult%>
 						  </div>
 		 		    </div>
