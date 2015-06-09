@@ -6905,6 +6905,202 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List Recent Uploads</strong> operation, optionally specifying the upload type ("insert" or "update") and a maximum limit as query parameters in the URL.
+	 * (See example below.)
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td><code>curl -i -X GET "https://pasta.lternet.edu/package/uploads/eml?type=update&limit=5"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of recent data package inserts or updates</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * <pre>
+           &lt;dataPackageUploads&gt;
+             &lt;dataPackageUpload&gt;
+               &lt;packageId&gt;knb-lter-nwk.1504.1&lt;/packageId&gt;
+               &lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+               &lt;identifier&gt;1504&lt;/identifier&gt;
+               &lt;revision&gt;1&lt;/revision&gt;
+               &lt;serviceMethod&gt;createDataPackage&lt;/serviceMethod&gt;
+               &lt;uploadDate&gt;2015-06-09&lt;/uploadDate&gt;
+             &lt;/dataPackageUpload&gt;
+             &lt;dataPackageUpload&gt;
+               &lt;packageId&gt;lter-landsat-ledaps.7.1&lt;/packageId&gt;
+               &lt;scope&gt;lter-landsat-ledaps&lt;/scope&gt;
+               &lt;identifier&gt;7&lt;/identifier&gt;
+               &lt;revision&gt;1&lt;/revision&gt;
+               &lt;serviceMethod&gt;createDataPackage&lt;/serviceMethod&gt;
+               &lt;uploadDate&gt;2015-04-16&lt;/uploadDate&gt;
+             &lt;/dataPackageUpload&gt;
+             &lt;dataPackageUpload&gt;
+               &lt;packageId&gt;knb-lter-nwk.1490.1&lt;/packageId&gt;
+               &lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+               &lt;identifier&gt;1490&lt;/identifier&gt;
+               &lt;revision&gt;1&lt;/revision&gt;
+               &lt;serviceMethod&gt;createDataPackage&lt;/serviceMethod&gt;
+               &lt;uploadDate&gt;2015-04-13&lt;/uploadDate&gt;
+           &lt;/dataPackageUpload&gt;
+         &lt;/dataPackageUploads&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param type   optional query parameter to determine which type
+	 *               of recent data package uploads to return; 
+	 *               recognized values are "type=insert" or "type=update".
+	 * @param limit  optional query parameter used to limit the number
+	 *               of recent data packages uploads returned in the list, 
+	 *               e.g. "limit=3".
+	 * 
+	 * @return a Response, which if successful, contains a resultset XML
+	 *         document
+	 */
+@GET
+	@Path("/uploads/eml")
+	@Produces("application/xml")
+	public Response listRecentUploads(@Context HttpHeaders headers,
+			                           @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listRecentUploads";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+            QueryString queryString = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            String type = "insert";
+            String xml = "";
+            int limit = 10;
+            
+			if (queryParams != null) {
+				for (String key : queryParams.keySet()) {
+					if (key.equalsIgnoreCase("limit")) {
+						List<String> values = queryParams.get(key);
+						String value = values.get(0);
+			    		limit = Integer.parseInt(value);
+					}
+					else if (key.equals("type")) {
+						List<String> values = queryParams.get(key);
+						type = values.get(0);
+						if ((type != null) && (type.startsWith("update"))) {
+							type = "update";
+						}
+					}
+				}
+			}
+
+			if (type.equals("insert")) {
+				xml = DataPackageUploadManager.getRecentInserts(limit);
+			}
+			else {
+				xml = DataPackageUploadManager.getRecentUpdates(limit);
+			}
+
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
 	 * <strong>Update Data Package</strong> operation, specifying the scope and
 	 * identifier of the data package to be updated in the URI, along with the
 	 * EML document describing the data package to be created in the request

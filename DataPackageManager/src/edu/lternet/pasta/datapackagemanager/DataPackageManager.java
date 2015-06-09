@@ -32,7 +32,9 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -53,6 +55,7 @@ import org.ecoinformatics.datamanager.download.DownloadHandler;
 import org.ecoinformatics.datamanager.parser.DataPackage;
 import org.ecoinformatics.datamanager.quality.QualityReport;
 
+import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.ResourceDeletedException;
@@ -682,6 +685,24 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix,
 			    mayOverwrite);
+			
+			/*
+			 * Add a DataPackageUpload object to the DataPackageUploadManager to update
+			 * its list of recent inserts and recent updates.
+			 */
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = new Date();
+			String today = sdf.format(date);
+			DataPackageUpload dpu = null;
+			if (isUpdate) {
+				dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision);
+				DataPackageUploadManager.addRecentUpdate(dpu);
+			}
+			else {
+				dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision);
+				DataPackageUploadManager.addRecentInsert(dpu);
+			}
+			DataPackageUploadManager.printUploads(3);
 		}
 
 		/*

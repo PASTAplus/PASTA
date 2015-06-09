@@ -78,7 +78,7 @@ public class DataPackageManagerResourceTest {
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   private static final String testUserAcl = "uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org";
   private static Options options = null;
-  private static final int PASTA_SLEEP_TIME = 15000;
+  private static final int PASTA_SLEEP_TIME = 30000;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
   private static String testPath = null;
