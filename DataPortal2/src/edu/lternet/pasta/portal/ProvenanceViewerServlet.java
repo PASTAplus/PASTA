@@ -38,6 +38,7 @@ import org.owasp.esapi.codecs.XMLEntityCodec;
 
 import edu.lternet.pasta.client.ProvenanceFactoryClient;
 import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.common.XmlUtility;
 
 public class ProvenanceViewerServlet extends DataPortalServlet {
 
@@ -114,7 +115,7 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 			if (packageId != null) {
 				ProvenanceFactoryClient pfc = new ProvenanceFactoryClient(uid);
 				message = pfc.getProvenanceByPid(packageId);
-				message = this.xmlEncode(message);
+				message = XmlUtility.xmlEncode(message);
 				request.setAttribute("message", message);
 				request.setAttribute("packageid", packageId);
 				RequestDispatcher requestDispatcher = 
@@ -139,36 +140,7 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	 *           if an error occurs
 	 */
 	public void init() throws ServletException {
-
 		PropertiesConfiguration options = ConfigurationListener.getOptions();
-
 	}
 	
-  private String xmlEncode(String rawXml) {
-
-    String encodedXml = null;
-
-    if (rawXml == null) {
-      encodedXml = "";
-    } else {
-
-      // Encodings for XML
-      XMLEntityCodec xmlEntityCodec = new XMLEntityCodec();
-      char[] immune = new char[0];
-
-      StringBuffer xml = new StringBuffer();
-
-      for (int a = 0; a < rawXml.length(); a++) {
-        xml.append(xmlEntityCodec.encodeCharacter(immune, rawXml.charAt(a)));
-      }
-      
-      encodedXml = xml.toString();
-
-    }
-      
-      return encodedXml;
-      
-    }
-
-
 }
