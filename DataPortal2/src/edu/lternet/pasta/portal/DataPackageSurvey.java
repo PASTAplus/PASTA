@@ -125,7 +125,7 @@ public class DataPackageSurvey {
 				RecentUpload recentUpload = recentUploads.get(i);
 				int j = (i * 4);
 				surveyResults[j+0] = recentUpload.getScope();
-				surveyResults[j+1] = recentUpload.getIdentifier();
+				surveyResults[j+1] = recentUpload.getIdentifier().toString();
 				surveyResults[j+2] = recentUpload.getTitle();
 				surveyResults[j+3] = recentUpload.getUploadDate();
 			}

@@ -94,8 +94,6 @@ public class DataPackageUploadManager {
 				recentUpdates.add(updates.get(i));
 			}
 		}
-		
-		printUploads(limit);
 	}
 	
 

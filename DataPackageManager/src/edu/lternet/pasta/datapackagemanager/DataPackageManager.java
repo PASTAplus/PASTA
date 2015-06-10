@@ -702,7 +702,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision);
 				DataPackageUploadManager.addRecentInsert(dpu);
 			}
-			DataPackageUploadManager.printUploads(3);
 		}
 
 		/*
