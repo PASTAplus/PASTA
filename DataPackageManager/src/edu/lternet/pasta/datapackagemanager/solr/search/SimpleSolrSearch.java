@@ -161,6 +161,17 @@ public class SimpleSolrSearch {
 			sb.append("    </organizations>\n");
 			
 			
+			sb.append("    <spatialCoverage>\n");
+			Collection<Object> spatialCoverage = solrDocument.getFieldValues("coordinates");
+			if (spatialCoverage != null && spatialCoverage.size() > 0) {
+				for (Object coordinates : spatialCoverage) {
+					String coordinatesStr = (String) coordinates;
+					sb.append(String.format("      <coordinates>%s</coordinates>\n", coordinatesStr));
+				}
+			}
+			sb.append("    </spatialCoverage>\n");
+			
+			
 		    sb.append("  </document>\n");
 		}
 		

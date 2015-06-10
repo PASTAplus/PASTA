@@ -133,7 +133,7 @@ public class BrowseServlet extends DataPortalServlet {
    */
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {   
-    String forward = "./simpleSearch.jsp";
+    String forward = "./searchResult.jsp";
     String html = null;
     TermsList termsList = null;
     String termsListHTML= "";
