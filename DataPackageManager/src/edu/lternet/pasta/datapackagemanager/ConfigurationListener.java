@@ -197,9 +197,6 @@ public class ConfigurationListener implements ServletContextListener {
       if (eventSubscriptionDocument == null || eventSubscriptionDocument.equals("")) {
         throw new IllegalStateException("Error loading eml-subscription.xsd file.");
       }
-      
-      
-      
     } 
     catch (IOException e) {
       String errorMessage = "IOException loading properties file at '" + propertiesPath + "': " + e.getMessage();

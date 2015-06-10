@@ -787,6 +787,43 @@ public class DataPackageManagerClient extends PastaClient {
 
 	
 	/**
+	 * Executes the 'listRecentUploads' web service method.
+	 * 
+	 * @return an XML string representing a list of recent data package
+	 *         inserts or updates, up to the specified limit
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String listRecentUploads(String serviceMethod, int limit) throws Exception {
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String type = serviceMethod.equalsIgnoreCase("createDataPackage") ? "insert" : "update";
+		String url = String.format("%s/uploads/eml?type=%s&limit=%d", BASE_URL, type, limit);
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entityString;
+	}
+
+	
+	/**
 	 * Executes the 'listServiceMethods' web service method.
 	 * 
 	 * @return a newline-separated list of service method names representing all the

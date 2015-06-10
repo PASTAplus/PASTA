@@ -25,16 +25,11 @@
 package edu.lternet.pasta.client;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -44,14 +39,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-
-import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.portal.statistics.UpdateStats;
 
 
 /**
@@ -179,10 +166,12 @@ public class AuditManagerClient extends PastaClient {
 		logger.info(String.format("Start refresh of recent %s", uploadType));
 
 		try {
-			AuditManagerClient auditManagerClient = new AuditManagerClient("public");
+			DataPackageManagerClient dpmc = new DataPackageManagerClient("public");
 			// recentUploads = auditManagerClient.recentUploads(serviceMethod, numberOfDays, limit);
-			recentUploads = auditManagerClient.recentUploadsQuickfix(
-					serviceMethod, numberOfDays, limit);
+			String recentUploadsXML = dpmc.listRecentUploads(serviceMethod, limit);
+			if ((recentUploadsXML != null) && (!recentUploadsXML.equals(""))) {
+				recentUploads = parseRecentUploadsXML(dpmc, recentUploadsXML);
+			}
 		}
 		catch (Exception e) {
 			logger.error("Error refreshing recent uploads: " + e.getMessage());
@@ -192,15 +181,58 @@ public class AuditManagerClient extends PastaClient {
 
 		return recentUploads;
 	}
-  
-  
+	
+	
+	private static List<RecentUpload> parseRecentUploadsXML(DataPackageManagerClient dpmc, String xml) {
+		List<RecentUpload> recentUploads = new ArrayList<RecentUpload>();
+		String[] lines = xml.split("\n");
+		StringBuilder sb = new StringBuilder("");
+		
+		for (String line : lines) {
+			line = line + "\n";
+			if (line.contains("<dataPackageUpload>")) {
+				sb = new StringBuilder(line);
+			}
+			else if (line.contains("</dataPackageUpload>")) {
+				sb.append(line);
+				String dataPackageXML = sb.toString();
+				String uploadDate = parseElement(dataPackageXML, "uploadDate");
+				String serviceMethod = parseElement(dataPackageXML, "serviceMethod");
+				String scope = parseElement(dataPackageXML, "scope");
+				Integer identifier = new Integer(parseElement(dataPackageXML, "identifier"));
+				Integer revision = new Integer(parseElement(dataPackageXML, "revision"));
+				RecentUpload recentUpload = new RecentUpload(dpmc, uploadDate, serviceMethod, scope, identifier, revision);
+				recentUploads.add(recentUpload);
+			}
+			else {
+				sb.append(line);
+			}
+		}		
+		
+		return recentUploads;
+	}
+	
+	
+	private static String parseElement(String xml, String elementName) {
+		String elementText = "";
+
+		String startTag = String.format("<%s>", elementName);
+		String endTag = String.format("</%s>", elementName);
+		int start = xml.indexOf(startTag) + startTag.length();
+		int end = xml.indexOf(endTag);
+		elementText = xml.substring(start, end);
+
+		return elementText;
+	}
+		  
+
   /*
    * Boolean to determine whether the cache of recent uploads is due to be
    * refreshed. Returns true is the current time has advanced
    * past the last refresh time plus a time-to-live period.
    */
   private static boolean shouldRefresh(long lastRefreshTime) {
-	  int hours = 24;
+	  int hours = 1;
 	  boolean shouldRefresh = false;
 	  final long refreshInterval = (long) (hours * 60 * 60 * 1000);
 	  Date now = new Date();
@@ -300,7 +332,7 @@ public class AuditManagerClient extends PastaClient {
    * 
    * @return a list of RecentUpload objects
    * @throws PastaEventException
-   */
+   *
 	private List<RecentUpload> recentUploads(String serviceMethod, Integer numberOfDays, Integer limit) throws 
 	        PastaAuthenticationException, PastaConfigurationException, PastaEventException {
 		List<RecentUpload> recentUploadsList = new ArrayList<RecentUpload>();
@@ -351,7 +383,7 @@ public class AuditManagerClient extends PastaClient {
 		}
 		
 		return recentUploadsList;
-	}
+	}*/
 	
 	
 	  /**
@@ -359,23 +391,37 @@ public class AuditManagerClient extends PastaClient {
 	   * 
 	   * @return a list of RecentUpload objects
 	   * @throws PastaEventException
-	   */
-		private List<RecentUpload> recentUploadsQuickfix(String serviceMethod, Integer numberOfDays, Integer limit) 
+	   *
+		private List<RecentUpload> recentUploads(String serviceMethod, Integer numberOfDays, Integer limit) 
 				throws Exception {
 			List<RecentUpload> recentUploadsList = null;
 			String fromTime = composeFromTime(numberOfDays);
-			UpdateStats updateStats = new UpdateStats();
 			
-			recentUploadsList = updateStats.getRecentUploads(serviceMethod, fromTime, limit);
+			recentUploadsList = getRecentUploads(serviceMethod, fromTime, limit);
 	
 			return recentUploadsList;
-		}
+		}*/
 		
 		
+		/**
+		 * Gets a list of recent uploads, either inserts or updates.
+		 * 
+		 * @param serviceMethod  one of "createDataPackage" or "updateDataPackage"
+		 * @param fromTime       the cut-off date for how far back we want to query, e.g. '2015-01-01'
+		 * @param limit          a limit on the number of uploads to return, e.g. 2
+		 *
+		public List<RecentUpload> getRecentUploads(String serviceMethod, String fromTime, Integer limit) 
+				throws Exception {
+			List<RecentUpload> recentUploadsList = new ArrayList<RecentUpload>();
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient("public");
+			return recentUploadsList;
+		}*/
+
+
 	/*
 	 * Parses the recent uploads audit records XML returned by the Audit Manager.
 	 * Converts it to a list of RecentUpload objects.
-	 */
+	 *
 	private List<RecentUpload> parseRecentUploads(String xmlString)
 	        throws PastaAuthenticationException, PastaConfigurationException, PastaEventException {
 		int insertCount = 0;
@@ -383,7 +429,7 @@ public class AuditManagerClient extends PastaClient {
 		/*
 		 * We only want to display public documents as recent uploads. The list of recent
 		 * uploads is stored as a class variable, not as a session variable.
-		 */
+		 *
 		DataPackageManagerClient dpmClient = new DataPackageManagerClient("public");
 		List<RecentUpload> recent = new ArrayList<RecentUpload>();
 		
@@ -424,7 +470,7 @@ public class AuditManagerClient extends PastaClient {
 				/*
 				 * Add the data package to the list of recent uploads only if the user 
 				 * is authorized to read it.
-				 */
+				 *
 				boolean isAuthorized = dpmClient.isAuthorized(resourceId);
 				if (isAuthorized) {
 					if ((serviceMethod.equals("createDataPackage")) || 
@@ -437,7 +483,7 @@ public class AuditManagerClient extends PastaClient {
 							/*
 							 * Add the data package to the list only if we have a title
 							 * to display.
-							 */
+							 *
 							if (title != null && !title.equals("")) {
 								recent.add(recentUpload);
 								if (serviceMethod.equals("createDataPackage")) {
@@ -454,7 +500,7 @@ public class AuditManagerClient extends PastaClient {
 							 * been deleted or replaced by a higher revision, so
 							 * we want to exclude it from the list of recent
 							 * uploads.
-							 */
+							 *
 						}
 					}
 				}
@@ -467,7 +513,7 @@ public class AuditManagerClient extends PastaClient {
 		}
 		
 		return recent;
-	}
+	}*/
 	
 	
   /**
