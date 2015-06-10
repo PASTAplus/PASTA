@@ -35,6 +35,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -42,6 +43,7 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
+import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
@@ -1272,6 +1274,74 @@ public class DataPackageRegistry {
     
     return checksum;
   }
+  
+  
+	/**
+	 * Gets a list of recent uploads, either inserts or updates.
+	 * 
+	 * @param serviceMethod  one of "createDataPackage" or "updateDataPackage"
+	 * @param fromTime       the cut-off date for how far back we want to query, e.g. '2015-01-01'
+	 * @param limit          a limit on the number of uploads to return, e.g. 2
+	 */
+	public ArrayList<DataPackageUpload> getUploads(String serviceMethod, String fromTime, Integer limit) 
+			throws Exception {
+		Connection conn = null;
+		ArrayList<DataPackageUpload> uploadsList = new ArrayList<DataPackageUpload>();
+		StringBuilder sb = new StringBuilder();
+		TreeSet<String> docids = new TreeSet<String>();
+		
+		sb.append("SELECT scope, identifier, revision, date_created FROM ");
+		sb.append(RESOURCE_REGISTRY);
+		sb.append(" WHERE resource_type='dataPackage' AND ");
+		sb.append("   date_deactivated IS NULL AND ");
+		sb.append("   date_created > '" + fromTime + "'\n");
+		sb.append("ORDER BY date_created DESC;");
+		String sqlQuery = sb.toString();
+
+		try {
+			conn = getConnection();
+
+			if (conn != null) {
+				Statement stmnt = conn.createStatement();
+				ResultSet rs = stmnt.executeQuery(sqlQuery);
+
+				while (rs.next()) {
+					String scope = rs.getString(1);
+					Integer identifier = rs.getInt(2);
+					Integer revision = rs.getInt(3);
+					java.sql.Date dateCreated = rs.getDate(4);
+					String uploadDate = dateCreated.toString();
+					
+					ArrayList<String> revisions = listDataPackageRevisions(scope, identifier);
+					if (revisions != null) {
+						if ((revisions.size() == 1) && (serviceMethod.equals("createDataPackage"))) {
+							DataPackageUpload upload = 
+								new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
+							uploadsList.add(upload);
+						}
+						else if ((revisions.size() > 1) && (serviceMethod.equals("updateDataPackage"))) {
+							String docid = String.format("%s.%d", scope, identifier);
+							if (!docids.contains(docid)) {
+								DataPackageUpload upload = 
+									new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
+								uploadsList.add(upload);
+								docids.add(docid);
+							}
+						}
+					}
+					if (uploadsList.size() >= limit) {
+						break;
+					}
+				}
+			}
+		}
+		finally {
+			returnConnection(conn);
+		}
+
+		return uploadsList;
+	}
+
   
   
   /**
