@@ -26,6 +26,7 @@ public class DataPackageUploadManager {
 
 	private static ArrayList<DataPackageUpload> recentInserts = null;
 	private static ArrayList<DataPackageUpload> recentUpdates = null;
+	public static final int ARRAY_LIMIT = 5;
 	
 	
 	/*
@@ -66,7 +67,6 @@ public class DataPackageUploadManager {
 	private static void initialize() throws Exception {
 		loadOptions();
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-		int limit = 10;
 		final int DELTA_DAYS = 60;
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -80,7 +80,7 @@ public class DataPackageUploadManager {
 		if (recentInserts == null) {
 			logger.warn("Initializing recent inserts.");
 			recentInserts = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> inserts = dpr.getUploads("createDataPackage", fromDate, limit);
+			ArrayList<DataPackageUpload> inserts = dpr.getUploads("createDataPackage", fromDate, ARRAY_LIMIT);
 			for (int i = inserts.size() - 1; i >= 0; i--) {
 				recentInserts.add(inserts.get(i));
 			}
@@ -89,7 +89,7 @@ public class DataPackageUploadManager {
 		if (recentUpdates == null)  {
 			logger.warn("Initializing recent updates.");
 			recentUpdates = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> updates = dpr.getUploads("updateDataPackage", fromDate, limit);
+			ArrayList<DataPackageUpload> updates = dpr.getUploads("updateDataPackage", fromDate, ARRAY_LIMIT);
 			for (int i = updates.size() - 1; i >= 0; i--) {
 				recentUpdates.add(updates.get(i));
 			}
@@ -168,7 +168,23 @@ public class DataPackageUploadManager {
 	public static void addRecentInsert(DataPackageUpload dataPackageUpload) throws Exception {
 		if (recentInserts == null) { initialize(); }
 		
+		System.out.println("Old recent inserts list:");
+		printUploads(ARRAY_LIMIT, true);
 		recentInserts.add(dataPackageUpload);
+		
+		if (recentInserts.size() > ARRAY_LIMIT) {
+			ArrayList<DataPackageUpload> newRecentInserts = new ArrayList<DataPackageUpload>();
+			
+			// bypass index 0 so we can replace it with the new data package update
+			for (int i = 1; i < recentInserts.size(); i++) {
+				DataPackageUpload dpu = recentInserts.get(i);
+				newRecentInserts.add(dpu);
+			}
+			recentInserts = newRecentInserts;
+		}
+
+		System.out.println("New recent inserts list:");
+		printUploads(ARRAY_LIMIT, true);
 	}
 	
 	
@@ -181,12 +197,29 @@ public class DataPackageUploadManager {
 	public static void addRecentUpdate(DataPackageUpload dataPackageUpload) throws Exception {
 		if (recentUpdates == null) { initialize(); }
 			
+		System.out.println("Old recent updates list:");
+		printUploads(ARRAY_LIMIT, false);
 		recentUpdates.add(dataPackageUpload);
+		
+		if (recentUpdates.size() > ARRAY_LIMIT) {
+			ArrayList<DataPackageUpload> newRecentUpdates = new ArrayList<DataPackageUpload>();
+			
+			// bypass index 0 so we can replace it with the new data package update
+			for (int i = 1; i < recentUpdates.size(); i++) {
+				DataPackageUpload dpu = recentUpdates.get(i);
+				newRecentUpdates.add(dpu);
+			}
+			recentUpdates = newRecentUpdates;
+		}
+
+		System.out.println("New recent updates list:");
+		printUploads(ARRAY_LIMIT, false);
 	}
 	
 	
 	public static void main(String[] args) {
-		printUploads(5);
+		printUploads(ARRAY_LIMIT, true);
+		printUploads(ARRAY_LIMIT, false);
 	}
 	
 	
@@ -197,12 +230,16 @@ public class DataPackageUploadManager {
 	 * @param limit      The maximum number of recent inserts/updates
 	 *                   to output.
 	 */
-	public static void printUploads(int limit) {
+	public static void printUploads(int limit, boolean isInserts) {
 		try {
-			String recentInsertsStr = getRecentInserts(limit);
-			System.out.println("\nRecent Inserts:\n" + recentInsertsStr);
-			String recentUpdatesStr = getRecentUpdates(limit);
-			System.out.println("\nRecent Updates:\n" + recentUpdatesStr);
+			if (isInserts) {
+				String recentInsertsStr = getRecentInserts(limit);
+				System.out.println("\nRecent Inserts:\n" + recentInsertsStr);
+			}
+			else {
+				String recentUpdatesStr = getRecentUpdates(limit);
+				System.out.println("\nRecent Updates:\n" + recentUpdatesStr);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

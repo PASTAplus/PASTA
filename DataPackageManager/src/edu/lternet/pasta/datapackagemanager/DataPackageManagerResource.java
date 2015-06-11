@@ -7045,19 +7045,24 @@ public class DataPackageManagerResource extends PastaWebService {
             Map<String, List<String>> queryParams = queryString.getParams();
             String type = "insert";
             String xml = "";
-            int limit = 10;
+            int limit = DataPackageUploadManager.ARRAY_LIMIT;
             
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
 					if (key.equalsIgnoreCase("limit")) {
 						List<String> values = queryParams.get(key);
 						String value = values.get(0);
-			    		limit = Integer.parseInt(value);
+						try {
+							limit = Integer.parseInt(value);
+						}
+						catch (NumberFormatException e) {
+							; // no action needed, just keep the default value
+						}
 					}
 					else if (key.equals("type")) {
 						List<String> values = queryParams.get(key);
-						type = values.get(0);
-						if ((type != null) && (type.startsWith("update"))) {
+						String typeParam = values.get(0);
+						if ((typeParam != null) && (typeParam.startsWith("update"))) {
 							type = "update";
 						}
 					}
