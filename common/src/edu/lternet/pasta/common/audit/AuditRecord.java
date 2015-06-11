@@ -11,6 +11,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.owasp.esapi.codecs.XMLEntityCodec;
 
 import edu.lternet.pasta.common.ISO8601Utility;
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
 import edu.lternet.pasta.common.security.token.AuthToken;
 
@@ -231,7 +232,7 @@ public class AuditRecord {
   public void setEntryText(String s) {
     String text = "";
     if (s != null && !s.equalsIgnoreCase("null")) {
-      text = xmlEncode(s);
+      text = XmlUtility.xmlEncode(s);
     }
     this.entryText = text;
   }
@@ -383,27 +384,4 @@ public class AuditRecord {
     return groups;
   }
   
-  
-  private String xmlEncode(String rawXml) {
-    String encodedXml = null;
-
-    if (rawXml == null) {
-      encodedXml = "";
-    }
-    else {
-      // Encodings for XML
-      XMLEntityCodec xmlEntityCodec = new XMLEntityCodec();
-      char[] immune = new char[0];
-      StringBuffer xml = new StringBuffer();
-
-      for (int a = 0; a < rawXml.length(); a++) {
-        xml.append(xmlEntityCodec.encodeCharacter(immune, rawXml.charAt(a)));
-      }
-      
-      encodedXml = xml.toString();
-    }
-
-    return encodedXml;
-  }
-
 }
