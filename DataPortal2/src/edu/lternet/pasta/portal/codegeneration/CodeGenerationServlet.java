@@ -248,28 +248,4 @@ public class CodeGenerationServlet extends DataPortalServlet {
 	public void init() throws ServletException {
 	}
 
-
-	private String xmlEncode(String rawXml) {
-		String encodedXml = null;
-
-		if (rawXml == null) {
-			encodedXml = "";
-		}
-		else {
-			// Encodings for XML
-			XMLEntityCodec xmlEntityCodec = new XMLEntityCodec();
-			char[] immune = new char[0];
-			StringBuffer xml = new StringBuffer();
-
-			for (int a = 0; a < rawXml.length(); a++) {
-				xml.append(xmlEntityCodec.encodeCharacter(immune,
-						rawXml.charAt(a)));
-			}
-
-			encodedXml = xml.toString();
-		}
-		
-		return encodedXml;
-	}
-
 }

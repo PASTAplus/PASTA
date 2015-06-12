@@ -226,9 +226,6 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			requestDispatcher.forward(request, response);
 		}
 		catch (Exception e) {
-			String htmlMessage = 
-					"<p class=\"warning\">" + e.getMessage() + "</p>\n";
-			request.setAttribute("searchresult", htmlMessage);
 			handleDataPortalError(logger, e);
 		}
   }
