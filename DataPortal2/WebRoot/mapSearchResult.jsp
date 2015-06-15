@@ -9,8 +9,12 @@
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
 
+  String termsListHTML = (String) session.getAttribute("termsListHTML");
   String mapSearchResults = (String) request.getAttribute("mapSearchResults");
 
+  if (termsListHTML == null)
+    termsListHTML = "";
+    
   if (mapSearchResults == null)
     mapSearchResults = "";
 
@@ -142,6 +146,7 @@ var documents = <%=mapSearchResults%>
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
+								<%= termsListHTML %>
    								<div>
          							<div id="map_canvas" style="height: 600px; width: 940px;"></div>
      							</div>
