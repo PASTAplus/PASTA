@@ -371,8 +371,10 @@ public class EzidRegistrar {
 		logger.info("registerDataCiteMetadata: " + this.dataCiteMetadata.getLocationUrl() + "\n" + entityString);
 
 		// Test for DOI collision or DOI registration failure
-		if (statusCode == HttpStatus.SC_BAD_REQUEST
-		    && entityString.contains("identifier already exists")) {
+		if ((statusCode == HttpStatus.SC_BAD_REQUEST) && 
+			(entityString != null) && 
+			(entityString.contains("identifier already exists"))
+		   ) {
 			String gripe = "identifier already exists";
 			throw new EzidException(gripe);
 		} else if (statusCode != HttpStatus.SC_CREATED) {
