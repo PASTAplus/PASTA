@@ -48,6 +48,8 @@
 	<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" >
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+    <script src="js/oms.min.js"></script> // Overlapping marker spidifier
+
 <script>
 
 var map;
@@ -63,9 +65,19 @@ function initialize() {
          zoomControl: true, scaleControl: true, streetViewControl: false, overviewMapControl: false
      };
      map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+     
+     var oms = new OverlappingMarkerSpiderfier(map); // spiderfied it here
+     var infoWindow = new google.maps.InfoWindow();
+     oms.addListener('click', function(marker, event) {
+        infoWindow.setContent(marker.desc);
+        infoWindow.open(map, marker);
+     });
+     oms.addListener('spiderfy', function(markers) {
+        infoWindow.close();
+     });
 
-     var markers = createMarkers();
-     var mcOptions = {gridSize: 60, maxZoom: 15};
+     var markers = createMarkers(oms);
+     var mcOptions = {gridSize: 10, maxZoom: 15};
      markerclusterer = new MarkerClusterer(map, markers, mcOptions);
      
 	// Enable, and adjust, the following lines to change gridSize according to zoom level     
@@ -80,7 +92,7 @@ function initialize() {
  }
 
 
-function createMarkers() {
+function createMarkers(oms) {
     data = [];
     var i;
       for (i = 0; i < documents.length; i++) {
@@ -99,12 +111,13 @@ function createMarkers() {
             title:    documents[i].title,
             position: position, 
             objInfo:  info
-          });
+         });
           
-          google.maps.event.addListener(marker, 'click', function() {
+         google.maps.event.addListener(marker, 'click', function() {
           													showInfoWindow(this);
           													});
-          data.push(marker);
+         data.push(marker);
+         oms.addMarker(marker);
       }
       
       return data;
