@@ -67,14 +67,18 @@ function initialize() {
      map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
      
      var oms = new OverlappingMarkerSpiderfier(map); // spiderfied it here
+     
+     
      var infoWindow = new google.maps.InfoWindow();
+
      oms.addListener('click', function(marker, event) {
-        infoWindow.setContent(marker.desc);
+        infoWindow.setContent('<div style="width: 300px; height: 100px; border:2px solid; padding: 2px;"><span style="font-family: Trebuchet MS; font-size:10pt; color: maroon">' + marker.objInfo + '</span></div>');
         infoWindow.open(map, marker);
      });
      oms.addListener('spiderfy', function(markers) {
         infoWindow.close();
      });
+     
 
      var markers = createMarkers(oms);
      var mcOptions = {gridSize: 10, maxZoom: 15};
@@ -113,9 +117,9 @@ function createMarkers(oms) {
             objInfo:  info
          });
           
-         google.maps.event.addListener(marker, 'click', function() {
+         /*google.maps.event.addListener(marker, 'click', function() {
           													showInfoWindow(this);
-          													});
+          													});*/
          data.push(marker);
          oms.addMarker(marker);
       }
