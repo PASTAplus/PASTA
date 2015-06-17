@@ -66,8 +66,7 @@ function initialize() {
      };
      map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
      
-     var oms = new OverlappingMarkerSpiderfier(map); // spiderfied it here
-     
+     var oms = new OverlappingMarkerSpiderfier(map, {keepSpiderfied: true});
      
      var infoWindow = new google.maps.InfoWindow();
 
@@ -79,7 +78,6 @@ function initialize() {
         infoWindow.close();
      });
      
-
      var markers = createMarkers(oms);
      var mcOptions = {gridSize: 10, maxZoom: 15};
      markerclusterer = new MarkerClusterer(map, markers, mcOptions);
