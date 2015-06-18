@@ -26,6 +26,8 @@ package edu.lternet.pasta.portal.search;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,8 +38,6 @@ import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import edu.lternet.pasta.common.XmlUtility;
 
 
 /**
@@ -135,6 +135,7 @@ public class MapResultSetUtility {
   					NodeList dataPackageNodeList = xpathapi.selectNodeList(document, "//resultset/document");
   			        
   					if (dataPackageNodeList != null) {
+  						Set<String> coordinatesSet = new TreeSet<String>();
   						for (int i = 0; i < dataPackageNodeList.getLength(); i++) {
   							Node dataPackageNode = dataPackageNodeList.item(i);
   							
@@ -156,9 +157,13 @@ public class MapResultSetUtility {
   										if (j == 1) break;
   										Node coordinatesNode = coordinatesNodeList.item(j);
   										String coordinates = coordinatesNode.getTextContent();
-  										locationField = composeLocationField(coordinates);
+  										boolean useOffset = false;
+  										locationField = composeLocationField(coordinates, coordinatesSet, useOffset);
   										if (locationField == null) {
   											continue;
+  										}
+  										else {
+  											coordinatesSet.add(locationField);
   										}
   									}
   								}
@@ -299,7 +304,7 @@ public class MapResultSetUtility {
   	 *     "-124.3983126 43.625394 -121.3531372 45.5751826"
   	 *      W bound      S bound   E bound      N bound
   	 */
-  	private String composeLocationField(String coordinates) {
+  	private String composeLocationField(String coordinates, Set<String> coordinatesSet, boolean useOffset) {
   		String field = null;
   		double lat = 0;
   		double lon = 0;
@@ -311,7 +316,7 @@ public class MapResultSetUtility {
   				String sStr = tokens[1];
   				String eStr = tokens[2];
   				String nStr = tokens[3];
-				try {
+				try {			
 					if (wStr.equals(eStr)) {
 						lon = Double.parseDouble(wStr);
 					}
@@ -320,6 +325,7 @@ public class MapResultSetUtility {
 						double eLon = Double.parseDouble(eStr);
 						lon = avg(wLon, eLon);
 					}
+					
 					if (sStr.equals(nStr)) {
 						lat = Double.parseDouble(sStr);
 					}
@@ -333,8 +339,26 @@ public class MapResultSetUtility {
 					e.printStackTrace();
 					return null;
 				}
+				
+				/*
+				 * If we need to use an offset, tweak the values a little bit
+				 * to make them unique
+				 */
+				if (useOffset) {
+		            lat = lat + (Math.random() - 0.5) / 1500;
+		            lon = lon + (Math.random() - 0.5) / 1500;
+				}
 
 				field = String.format("'location': {'latitude':%f, 'longitude': %f}", lat, lon);
+				
+		  		/*
+		  		 * Ensure that we have a unique pair of coordinates. If we don't, call
+		  		 * this method recursively using an offset.
+		  		 */
+		  		if (coordinatesSet.contains(field)) {
+		  			useOffset = true;
+		  			field = composeLocationField(coordinates, coordinatesSet, useOffset);
+		  		}
   			}
   		}
   		
