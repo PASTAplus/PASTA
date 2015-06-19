@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<subscription type="eml">
-   <packageId>example.12</packageId>
-   <url>http://foo?bar&amp;blah</url>
-   <accessControlRule>NA</accessControlRule>
-</subscription>
