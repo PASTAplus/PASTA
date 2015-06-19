@@ -1,1 +1,0 @@
-Download more cultures from: https://github.com/jquery/globalize/tree/master/lib/cultures
