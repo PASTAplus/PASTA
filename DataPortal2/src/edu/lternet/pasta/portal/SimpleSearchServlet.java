@@ -152,9 +152,9 @@ public class SimpleSearchServlet extends DataPortalServlet {
 				queryText = String.format("%s&start=%s&rows=%s&sort=%s", queryText, start, rows, sort);
 				resultSetUtility = executeQuery(uid, queryText, sort);
 				if (resultSetUtility != null) {
-					htmlTable = resultSetUtility.getHTMLTable();
 					mapButtonHTML = resultSetUtility.getMapButtonHTML();
 					relevanceHTML = resultSetUtility.getRelevanceHTML();
+					htmlTable = resultSetUtility.getHTMLTable();
 				}
 			}
 		}
@@ -169,6 +169,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			resultSetUtility = executeQuery(uid, queryText, sort);
 			if (resultSetUtility != null) {
 				mapButtonHTML = resultSetUtility.getMapButtonHTML();
+				relevanceHTML = resultSetUtility.getRelevanceHTML();
 				htmlTable = resultSetUtility.getHTMLTable();
 			}
 		}

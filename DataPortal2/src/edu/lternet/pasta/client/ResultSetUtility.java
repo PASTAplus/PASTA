@@ -280,18 +280,23 @@ public class ResultSetUtility {
 	
 	private String composeRelevanceHTML() {
 		String html = "";
+		StringBuilder sb = new StringBuilder();
+		String disabled = "disabled";
 		
-		if ((this.numFound > 1) && (!this.sort.equals(Search.DEFAULT_SORT))) {
-			String servlet = "./simpleSearch";
-			String relevanceSort = pageControl.getRelevanceSort();
-			String relevanceURL = String.format("%s?start=0&rows=10&sort=%s", servlet, relevanceSort); 
-			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("  <form id=\"relevance\" action=\"%s\" method=\"post\" name=\"relevance\">", relevanceURL));
-			sb.append("    <input class=\"btn btn-info btn-default\" name=\"submit\" type=\"submit\" value=\"Reset Sort Order (most relevant first)\" />");
-		    sb.append("  </form>\n");
-			html = sb.toString();
+		if (this.numFound < 2) {
+			return html;
 		}
-
+		else if (!this.sort.equals(Search.DEFAULT_SORT)) {
+			disabled = "";
+		}
+		
+		String servlet = "./simpleSearch";
+		String relevanceSort = pageControl.getRelevanceSort();
+		String relevanceURL = String.format("%s?start=0&rows=10&sort=%s", servlet, relevanceSort); 
+		sb.append(String.format("  <form id=\"relevance\" action=\"%s\" method=\"post\" name=\"relevance\">", relevanceURL));
+		sb.append(String.format("    <input class=\"btn btn-info btn-default\" name=\"submit\" type=\"submit\" value=\"Reset Sort Order (most relevant first)\" %s />", disabled));
+	    sb.append("  </form>\n");
+		html = sb.toString();
 		return html;
 	}
 	

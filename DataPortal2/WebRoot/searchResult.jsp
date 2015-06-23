@@ -89,6 +89,7 @@
 			<td>			
 				<%=mapButtonHTML%>
 			</td>
+			<td>&nbsp;</td>
 			<td>
 				<%=relevanceHTML%>
 			</td>
