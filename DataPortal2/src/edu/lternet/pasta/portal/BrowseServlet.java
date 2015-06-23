@@ -172,7 +172,9 @@ public class BrowseServlet extends DataPortalServlet {
 		resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT, savedData, isSavedDataPage);
 	  }
 	  
-      html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+	  String mapButtonHTML = resultSetUtility.getMapButtonHTML();
+	  request.setAttribute("mapButtonHTML", mapButtonHTML);
+      html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
       request.setAttribute("searchresult", html);
       RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
       requestDispatcher.forward(request, response);
