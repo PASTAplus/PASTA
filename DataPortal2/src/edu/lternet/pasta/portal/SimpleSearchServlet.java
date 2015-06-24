@@ -169,7 +169,7 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			resultSetUtility = executeQuery(uid, queryText, sort);
 			if (resultSetUtility != null) {
 				mapButtonHTML = resultSetUtility.getMapButtonHTML();
-				relevanceHTML = resultSetUtility.getRelevanceHTML();
+				//relevanceHTML = resultSetUtility.getRelevanceHTML();
 				htmlTable = resultSetUtility.getHTMLTable();
 			}
 		}
