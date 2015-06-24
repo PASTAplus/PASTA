@@ -223,8 +223,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			
 			String mapButtonHTML = resultSetUtility.getMapButtonHTML();
 			request.setAttribute("mapButtonHTML", mapButtonHTML);
-			String relevanceHTML = resultSetUtility.getRelevanceHTML();
-			request.setAttribute("relevanceHTML", relevanceHTML);
+			//String relevanceHTML = resultSetUtility.getRelevanceHTML();
+			//request.setAttribute("relevanceHTML", relevanceHTML);
 			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
