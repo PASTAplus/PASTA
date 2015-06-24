@@ -9,6 +9,18 @@
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
 
+  String termsListHTML = (String) session.getAttribute("termsListHTML");
+  if (termsListHTML == null)
+    termsListHTML = "";
+
+  String mapButtonHTML = (String) request.getAttribute("mapButtonHTML");
+  if (mapButtonHTML == null)
+    mapButtonHTML = "";
+
+  String relevanceHTML = (String) request.getAttribute("relevanceHTML");
+  if (relevanceHTML == null)
+    relevanceHTML = "";
+
   String searchResult = (String) request.getAttribute("searchresult");
 
   if (searchResult == null)
@@ -72,10 +84,22 @@
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-				<form id="mapsearach" action="./mapSearchServlet" method="post" name="mapSearchServlet">
-					  <input class="btn btn-info btn-default" name="submit" type="submit" value="View Map of Search Results" />
-			    </form>
-			          <%=searchResult%>
+	<table>
+		<tr>
+			<td>			
+				<%=mapButtonHTML%>
+			</td>
+			<td>&nbsp;</td>
+			<td>
+				<%=relevanceHTML%>
+			</td>
+		</tr>
+	</table>
+			    
+			    <%=termsListHTML%>
+			          
+			    <%=searchResult%>
+			    
 						  </div>
 		 		    </div>
 				  </div>

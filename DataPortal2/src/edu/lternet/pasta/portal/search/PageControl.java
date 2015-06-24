@@ -1,5 +1,6 @@
 package edu.lternet.pasta.portal.search;
 
+
 /**
  * The PageControl class manages paging of search results returned
  * by a Solr search. It generates HTML that can be displayed in the
@@ -33,6 +34,7 @@ public class PageControl {
 	String creatorsSort = null;
 	String pubDateSort = null;
 	String packageIdSort = null;
+	String relevanceSort = null;
 	
 
 	/*
@@ -78,6 +80,30 @@ public class PageControl {
 	 * Intance methods
 	 */
 	
+	
+	/*
+	public String composeDropDown() {
+		String html = "";
+		String titleSort = getTitleSort();
+		String creatorsSort = getCreatorsSort();
+		String pubDateSort = getPubDateSort();
+		String packageIdSort = getPackageIdSort();
+		String relevanceSort = getRelevanceSort();
+		
+		StringBuilder sb = new StringBuilder("<select class=\"select-width-auto\" id=\"sortBy\" name=\"sortBy\" onchange=\"processSortBy(this)\">\n");
+		sb.append(String.format("  <option value=\"%s\">%s</option>\n", "relevance", "relevance"));
+		sb.append(String.format("  <option value=\"%s\">%s</option>\n", "creators", "creators"));
+		sb.append(String.format("  <option value=\"%s\">%s</option>\n", "packageId", "package identifier"));
+		sb.append(String.format("  <option value=\"%s\">%s</option>\n", "pubDate", "publication date"));
+		sb.append(String.format("  <option value=\"%s\">%s</option>\n", "title", "title"));
+		sb.append("</select>\n");
+		
+		html = sb.toString();
+		
+		return html;
+	} */
+	
+	
 	private String composeStartTag(int linkStart) {
 		String servletName = this.isSavedDataPage ? "savedDataServlet" : "simpleSearch";
 		String href = String.format("%s?start=%d&rows=%d&sort=%s", servletName, linkStart, rowsPerPage, sort);
@@ -96,7 +122,7 @@ public class PageControl {
 
 		if (numFound > 0) {
 			String plural = numFound != 1 ? "s" : "";
-			String verb = numFound != 1 ? "are" : "is";
+			//String verb = numFound != 1 ? "are" : "is";
 			int lo = ((currentPage - 1) * rowsPerPage) + 1;
 			int hi = lo + rowsPerPage - 1;
 			if (hi > numFound)
@@ -254,6 +280,11 @@ public class PageControl {
 	}
 	
 	
+	public String getRelevanceSort() {
+		return relevanceSort;
+	}
+	
+	
 	/**
 	 * Calculates the highest page value based on the numFound
 	 * and rowsPerPage values.
@@ -275,6 +306,7 @@ public class PageControl {
 		creatorsSort = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_ASC);
 		pubDateSort = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_ASC);
 		packageIdSort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+		relevanceSort = Search.DEFAULT_SORT;
 		
 		if (sort.equals(titleSort)) {
 			titleSort = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_DESC);

@@ -220,7 +220,12 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 				SavedData savedData = new SavedData(uid);
 				resultSetUtility = new ResultSetUtility(xml, Search.DEFAULT_SORT, savedData, isSavedDataPage);
 			}
-			html = termsListHTML + resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			
+			String mapButtonHTML = resultSetUtility.getMapButtonHTML();
+			request.setAttribute("mapButtonHTML", mapButtonHTML);
+			String relevanceHTML = resultSetUtility.getRelevanceHTML();
+			request.setAttribute("relevanceHTML", relevanceHTML);
+			html = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 			request.setAttribute("searchresult", html);
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 			requestDispatcher.forward(request, response);

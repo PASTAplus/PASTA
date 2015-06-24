@@ -71,10 +71,13 @@ public class ResultSetUtility {
   private PageControl pageControl = null;
   private String pageBodyHTML = "";
   private String pageHeaderHTML = "";
+  private String mapButtonHTML = "";
+  private String relevanceHTML = "";
   private SavedData savedData = null;
   private boolean isSavedDataPage;
   private boolean showSavedData = true;
   private String sort = null;
+  private String htmlTable = null;
   
 
   /*
@@ -105,6 +108,8 @@ public class ResultSetUtility {
     pageControl = new PageControl(numFound, start, rows, sort, isSavedDataPage);
     pageHeaderHTML = pageControl.composePageHeader();
     pageBodyHTML = pageControl.composePageBody();
+    mapButtonHTML = composeMapButtonHTML();
+    relevanceHTML = composeRelevanceHTML();
   }
 
   
@@ -127,11 +132,26 @@ public class ResultSetUtility {
    */
   
   
-  	public Integer getNumFound() {
-  		return numFound;
+  	public String getHTMLTable() {
+  		return htmlTable;
   	}
   
   
+  	public Integer getNumFound() {
+  		return numFound;
+  	}
+  	
+  	
+  	public String getMapButtonHTML () {
+  		return mapButtonHTML;
+  	}
+  	
+  	
+ 	public String getRelevanceHTML () {
+  		return relevanceHTML;
+  	}
+  	
+  	
   	private void parseResultSet(String xml) { 	        	  
   		if (xml != null) {
   			InputStream inputStream = null;
@@ -204,7 +224,7 @@ public class ResultSetUtility {
 		String html = "";
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
 		
-		if (rows > 0) {
+		if (numFound > 0) {
 			String tableHeaderHTML = composeTableHeaderHTML(this.showSavedData);
 		
 			String savedDataList = "";	
@@ -223,16 +243,60 @@ public class ResultSetUtility {
 				parameterMap);
 		
 			String tableFooterHTML = composeTableFooterHTML();
-
-			html = String.format("%s%s%s%s%s<br/>%s", 
-				pageHeaderHTML, pageBodyHTML, 
-				tableHeaderHTML, tableRowsHTML, tableFooterHTML, 
-				pageBodyHTML);
+			   
+			StringBuilder sb = new StringBuilder("");
+			sb.append(pageHeaderHTML);
+			sb.append(pageBodyHTML);
+			sb.append(tableHeaderHTML);
+			sb.append(tableRowsHTML);
+			sb.append(tableFooterHTML);
+			sb.append(pageBodyHTML);
+			html = sb.toString();
 		}
 		else {
 			html = composeNoMatchesHTML(isSavedDataPage);
 		}
 
+		htmlTable = html;
+		return html;
+	}
+	
+	
+	private String composeMapButtonHTML() {
+		String html = "";
+		
+		if (this.numFound > 0) {
+			String servlet = "./mapSearchServlet";
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("  <form id=\"mapsearch\" action=\"%s\" method=\"post\" name=\"mapsearch\">", servlet));
+			sb.append("    <input class=\"btn btn-info btn-default\" name=\"submit\" type=\"submit\" value=\"View Map of Search Results\" />");
+		    sb.append("  </form>\n");
+			html = sb.toString();
+		}
+
+		return html;
+	}
+	
+	
+	private String composeRelevanceHTML() {
+		String html = "";
+		StringBuilder sb = new StringBuilder();
+		String disabled = "disabled";
+		
+		if (this.numFound < 2) {
+			return html;
+		}
+		else if (!this.sort.equals(Search.DEFAULT_SORT)) {
+			disabled = "";
+		}
+		
+		String servlet = "./simpleSearch";
+		String relevanceSort = pageControl.getRelevanceSort();
+		String relevanceURL = String.format("%s?start=0&rows=10&sort=%s", servlet, relevanceSort); 
+		sb.append(String.format("  <form id=\"relevance\" action=\"%s\" method=\"post\" name=\"relevance\">", relevanceURL));
+		sb.append(String.format("    <input class=\"btn btn-info btn-default\" name=\"submit\" type=\"submit\" value=\"Reset Sort Order (most relevant first)\" %s />", disabled));
+	    sb.append("  </form>\n");
+		html = sb.toString();
 		return html;
 	}
 	
@@ -255,10 +319,21 @@ public class ResultSetUtility {
 		String packageIdWidth = "15%";
 		String dataShelfWidth = "10%";
 		
-		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Title</a></th>\n", titleWidth, servlet, titleSort));
-		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Creators</a></th>\n", creatorsWidth, servlet, creatorsSort));
-		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Publication Date</a></th>\n", pubDateWidth, servlet, pubDateSort));
-		html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Package Id</a></th>\n", packageIdWidth, servlet, packageIdSort));
+		/*
+		 * Only provide column-sort links if there's more than one data package
+		 */
+		if (numFound > 1) {
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Title</a></th>\n", titleWidth, servlet, titleSort));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Creators</a></th>\n", creatorsWidth, servlet, creatorsSort));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Publication Date</a></th>\n", pubDateWidth, servlet, pubDateSort));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Package Id</a></th>\n", packageIdWidth, servlet, packageIdSort));
+		}
+		else {
+			html.append(String.format("            <th class=\"nis\" width=\"%s\">Title</th>\n", titleWidth));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\">Creators</th>\n", creatorsWidth));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\">Publication Date</th>\n", pubDateWidth));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\">Package Id</th>\n", packageIdWidth));
+		}
 
 		// Display this table column only if we're displaying the data shelf for a logged-in user
 		if (showSavedData) {

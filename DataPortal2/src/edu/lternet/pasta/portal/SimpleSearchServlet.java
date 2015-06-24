@@ -116,10 +116,12 @@ public class SimpleSearchServlet extends DataPortalServlet {
    */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String html = null;
 		String termsListHTML = "";
 		String htmlTable = "";
+		String mapButtonHTML = "";
+		String relevanceHTML = "";
 		HttpSession httpSession = request.getSession();
+		ResultSetUtility resultSetUtility = null;
 		
 		String uid = (String) httpSession.getAttribute("uid");
 		if (uid == null || uid.isEmpty()) uid = "public";
@@ -148,7 +150,12 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			
 			if (queryText != null) {
 				queryText = String.format("%s&start=%s&rows=%s&sort=%s", queryText, start, rows, sort);
-				htmlTable = executeQuery(uid, queryText, sort);
+				resultSetUtility = executeQuery(uid, queryText, sort);
+				if (resultSetUtility != null) {
+					mapButtonHTML = resultSetUtility.getMapButtonHTML();
+					relevanceHTML = resultSetUtility.getRelevanceHTML();
+					htmlTable = resultSetUtility.getHTMLTable();
+				}
 			}
 		}
 		else {
@@ -159,13 +166,17 @@ public class SimpleSearchServlet extends DataPortalServlet {
 			httpSession.setAttribute("termsListHTML", termsListHTML);
 			httpSession.setAttribute("queryText", queryText);
 			queryText = String.format("%s&start=%d&rows=%d&sort=%s", queryText, 0, Search.DEFAULT_ROWS, sort);		
-			htmlTable = executeQuery(uid, queryText, sort);
+			resultSetUtility = executeQuery(uid, queryText, sort);
+			if (resultSetUtility != null) {
+				mapButtonHTML = resultSetUtility.getMapButtonHTML();
+				relevanceHTML = resultSetUtility.getRelevanceHTML();
+				htmlTable = resultSetUtility.getHTMLTable();
+			}
 		}
 
-		if (termsListHTML == null) termsListHTML = "";
-		html = termsListHTML + htmlTable;
-		
-		request.setAttribute("searchresult", html);
+		request.setAttribute("mapButtonHTML", mapButtonHTML);
+		request.setAttribute("relevanceHTML", relevanceHTML);
+		request.setAttribute("searchresult", htmlTable);
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
 	}
@@ -174,14 +185,13 @@ public class SimpleSearchServlet extends DataPortalServlet {
 	/*
 	 * Executes the query via the DataPackageManagerClient object
 	 */
-	private String executeQuery(String uid, String queryText, String sort)
+	private ResultSetUtility executeQuery(String uid, String queryText, String sort)
 			throws ServletException {
-		String htmlTable = null;
+		ResultSetUtility resultSetUtility = null;
 
 		try {
 			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
 			String xml = dpmClient.searchDataPackages(queryText);
-			ResultSetUtility resultSetUtility = null;
 			if (uid.equals("public")) {
 				resultSetUtility = new ResultSetUtility(xml, sort);
 			}
@@ -190,13 +200,14 @@ public class SimpleSearchServlet extends DataPortalServlet {
 				SavedData savedData = new SavedData(uid);
 				resultSetUtility = new ResultSetUtility(xml, sort, savedData, isSavedDataPage);
 			}
-			htmlTable = resultSetUtility.xmlToHtmlTable(cwd + xslpath);
+			
+			resultSetUtility.xmlToHtmlTable(cwd + xslpath);
 		}
 		catch (Exception e) {
 			handleDataPortalError(logger, e);
 		}
 		
-		return htmlTable;
+		return resultSetUtility;
 	}
 
 

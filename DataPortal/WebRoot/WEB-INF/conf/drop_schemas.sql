@@ -1,1 +1,0 @@
-DROP SCHEMA authtoken CASCADE;
