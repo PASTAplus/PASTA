@@ -177,12 +177,15 @@ public class EmlObject {
 		
 	}
 	
-	/*
-	 * This method is not complete.
+	/**
+	 * Returns the abstract text string from the EML document.
+	 * 
+	 * @return abstract text
 	 */
-	private String getAbstract() {
-		StringBuffer abs = new StringBuffer("");	
-		return abs.toString();	
+	public String getAbstractText() {
+		String abstractText = this.dataPackage.getAbstractText();
+		
+		return abstractText;
 	}
 	
 	

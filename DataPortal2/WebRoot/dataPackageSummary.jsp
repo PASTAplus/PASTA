@@ -8,6 +8,7 @@
 
   String titleHTML = (String) request.getAttribute("dataPackageTitleHTML");
   String creatorsHTML = (String) request.getAttribute("dataPackageCreatorsHTML");
+  String abstractHTML = (String) request.getAttribute("abstractHTML");
   String publicationDateHTML = (String) request.getAttribute("dataPackagePublicationDateHTML");
   String packageIdHTML = (String) request.getAttribute("dataPackageIdHTML");
   String resourcesHTML = (String) request.getAttribute("dataPackageResourcesHTML");
@@ -25,6 +26,7 @@
   Double westCoord = (Double) request.getAttribute("westCoord");
 
   String uid = (String) session.getAttribute("uid");
+  boolean showAbstract = !(abstractHTML == null || abstractHTML.isEmpty());
   boolean showPubDate = !(publicationDateHTML == null || publicationDateHTML.isEmpty());
   boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
@@ -130,6 +132,20 @@
 										<div class="table-cell">
 											<%= publicationDateHTML %>
 										</div>											
+									</div>
+								</c:when>
+							</c:choose>
+
+							<c:set var="showAbstract" value="<%= showAbstract %>"/>
+							<c:choose>
+								<c:when test="${showAbstract}">
+									<div class="table-row">										
+										<div class="table-cell text-align-right">
+											<label class="labelBold">Abstract:</label>
+										</div>
+										<div class="table-cell">
+											<%= abstractHTML %>
+										</div>
 									</div>
 								</c:when>
 							</c:choose>

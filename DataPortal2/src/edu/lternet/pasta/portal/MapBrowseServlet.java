@@ -152,6 +152,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		HttpSession httpSession = request.getSession();
 		String titleHTML = "";
 		String creatorsHTML = "";
+		String abstractHTML = "";
 		String publicationDateHTML = "";
 		String spatialCoverageHTML = "";
 		String googleMapHTML = "";
@@ -216,6 +217,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			if (isPackageId) {
 				StringBuilder titleHTMLBuilder = new StringBuilder();
 				StringBuilder creatorsHTMLBuilder = new StringBuilder();
+				StringBuilder abstractHTMLBuilder = new StringBuilder();
 				StringBuilder publicationDateHTMLBuilder = new StringBuilder();
 				StringBuilder spatialCoverageHTMLBuilder = new StringBuilder();
 				StringBuilder googleMapHTMLBuilder = new StringBuilder();
@@ -354,6 +356,15 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 						creatorsHTMLBuilder.append("</ul>\n");
 						creatorsHTML = creatorsHTMLBuilder.toString();
+					}
+					
+					String abstractText = emlObject.getAbstractText();
+
+					if (abstractText != null) {
+						abstractHTMLBuilder.append("<ul class=\"no-list-style\">\n");
+						abstractHTMLBuilder.append("<li>" + abstractText + "</li>");
+						abstractHTMLBuilder.append("</ul>");
+						abstractHTML = abstractHTMLBuilder.toString();
 					}
 
 					String pubDate = emlObject.getPubDate();
@@ -681,6 +692,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
+		request.setAttribute("abstractHTML", abstractHTML);
 		request.setAttribute("dataPackagePublicationDateHTML",
 				publicationDateHTML);
 		request.setAttribute("spatialCoverageHTML", spatialCoverageHTML);
