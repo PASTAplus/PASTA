@@ -144,7 +144,11 @@
 											<label class="labelBold">Abstract:</label>
 										</div>
 										<div class="table-cell">
-											<%= abstractHTML %>
+											<ul class="no-list-style">
+												<li>
+													<textarea style="margin-bottom:5px;box-shadow:none;background-color:transparent;" readonly cols="100" rows="4"><%= abstractHTML %></textarea>
+												</li>
+											</ul>
 										</div>
 									</div>
 								</c:when>

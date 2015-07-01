@@ -361,9 +361,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 					String abstractText = emlObject.getAbstractText();
 
 					if (abstractText != null) {
-						abstractHTMLBuilder.append("<ul class=\"no-list-style\">\n");
-						abstractHTMLBuilder.append("<li>" + abstractText + "</li>");
-						abstractHTMLBuilder.append("</ul>");
+						abstractHTMLBuilder.append(abstractText);
 						abstractHTML = abstractHTMLBuilder.toString();
 					}
 
