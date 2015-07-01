@@ -26,7 +26,8 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
 <!-- jqWidgets CSS for jqxTree widget -->
-<link rel="stylesheet"        href="./js/jqwidgets/styles/jqx.base.css" type="text/css" />
+<link rel="stylesheet" href="./js/jqwidgets/styles/jqx.base.css"  type="text/css" />
+<link rel="stylesheet" href="./js/jqwidgets/styles/jqx.energyblue.css" type="text/css" />
 
 <!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
 <link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css">
@@ -57,12 +58,16 @@
     <script type="text/javascript">
         $(document).ready(function () {
             // Create jqxTree
-            $('#jqxTree').jqxTree({ height: '600px'});
+            $('#jqxTree').jqxTree(
+            { height: '600px', 
+              theme: 'energyblue',
+              toggleMode: 'click'
+            });
+            
             $('#jqxTree').bind('select', function (event) {
                 var htmlElement = event.args.element;
                 var item = $('#jqxTree').jqxTree('getItem', htmlElement);
-                //alert(item.label);
-            });
+             });
         });
     </script>
 
