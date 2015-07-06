@@ -21,6 +21,10 @@
       <param-name>proxyTo</param-name>
       <param-value>http://package.lternet.edu:8080/package</param-value>
     </init-param>
+    <init-param>
+      <param-name>idleTimeout</param-name>
+      <param-value>300000</param-value>
+    </init-param>
     <load-on-startup>1</load-on-startup>
 	<async-supported>true</async-supported>
   </servlet>
@@ -34,6 +38,10 @@
     <init-param>
       <param-name>proxyTo</param-name>
       <param-value>http://audit.lternet.edu:8080/audit</param-value>
+    </init-param>
+    <init-param>
+      <param-name>idleTimeout</param-name>
+      <param-value>300000</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
 	<async-supported>true</async-supported>
