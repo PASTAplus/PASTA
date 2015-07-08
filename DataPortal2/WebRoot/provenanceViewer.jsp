@@ -22,19 +22,10 @@
   }
 */
   
-  String message = (String) request.getAttribute("message");
-  String type = (String) request.getAttribute("type");
+  String provenanceXML = (String) request.getAttribute("provenanceXML");
   String packageid = (String) request.getAttribute("packageid");
-
-  if (type == null) {
-    type = "";
-  }
-          
-	boolean showProvenance = false;	
-	if (message != null && !type.equals("warning")) {
-		showProvenance = true;
-	}
-			
+  boolean showProvenance = ((provenanceXML != null) && (packageid != null));
+  
 %>
 
 <!DOCTYPE html>
@@ -105,7 +96,7 @@
 										</div>
 									</div>
 									<p></p>
-									<pre><%= message %></pre>							
+									<pre><%= provenanceXML %></pre>							
 								</c:when>
 								
 								<c:otherwise>

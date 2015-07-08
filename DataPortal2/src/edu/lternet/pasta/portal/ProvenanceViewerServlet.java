@@ -34,7 +34,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import org.owasp.esapi.codecs.XMLEntityCodec;
 
 import edu.lternet.pasta.client.ProvenanceFactoryClient;
 import edu.lternet.pasta.common.UserErrorException;
@@ -109,14 +108,13 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 			String uid = (String) httpSession.getAttribute("uid");
 			if (uid == null || uid.isEmpty())
 				uid = "public";
-			String message = null;
 			String packageId = request.getParameter("packageid");
 
 			if (packageId != null) {
-				ProvenanceFactoryClient pfc = new ProvenanceFactoryClient(uid);
-				message = pfc.getProvenanceByPid(packageId);
-				message = XmlUtility.xmlEncode(message);
-				request.setAttribute("message", message);
+				ProvenanceFactoryClient provenanceFactoryClient = new ProvenanceFactoryClient(uid);
+				String provenanceXML = provenanceFactoryClient.getProvenanceByPid(packageId);
+				String encodedProvenanceXML = XmlUtility.xmlEncode(provenanceXML);
+				request.setAttribute("provenanceXML", encodedProvenanceXML);
 				request.setAttribute("packageid", packageId);
 				RequestDispatcher requestDispatcher = 
 						request.getRequestDispatcher(forward);
