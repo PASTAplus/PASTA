@@ -23,6 +23,7 @@
 */
   
   String provenanceXML = (String) request.getAttribute("provenanceXML");
+  String provenanceHTML = (String) request.getAttribute("provenanceHTML");
   String packageid = (String) request.getAttribute("packageid");
   boolean showProvenance = ((provenanceXML != null) && (packageid != null));
   
@@ -87,21 +88,39 @@
 							<c:choose>
 							
 								<c:when test="${showProv}">
-									<div class="display-table">										
-										<div class="table-row">										
-											<div class="table-cell">
-												<label class="labelBold">Package Identifier:</label>
-											</div>											
-											<div class="table-cell"><%= packageid %></div>											
-										</div>
+								<p>A data package derived from <strong><%= packageid %></strong> 
+								   as one of its source data packages should add the 
+								   <strong>&lt;methodStep&gt;</strong> element shown below
+								   within the <strong>&lt;methods&gt;</strong> element of the 
+								   derived data package.</p>
+								<br/>
+								<div class="tabbable">
+									<ul class="nav nav-tabs">
+										<li class="active">
+										  <a data-toggle="tab" href="#htmlTab">Provenance Metadata HTML</a> 
+										</li>
+										<li>
+										  <a data-toggle="tab" href="#xmlTab">Provenance Metadata XML</a>
+										</li>
+									</ul>	
+								</div>
+												
+								<div class="tab-content">
+								
+									<div id="htmlTab" class="tab-pane active">
+										<%= provenanceHTML %>
 									</div>
-									<p></p>
-									<pre><%= provenanceXML %></pre>							
+									
+									<div id="xmlTab"class="tab-pane">
+										<pre><%= provenanceXML %></pre>
+									</div>
+								</div>
+										    
 								</c:when>
 								
 								<c:otherwise>
 
-								<p>View provenance metadata of a data package using the package identifier.</p>
+								<p>Enter the package identifier of the source data package whose metadata you wish to embed in your derived data package:</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
 						        <div class="display-table">
@@ -117,7 +136,7 @@
 											</div>
 											<div class="table-row">
 												<div class="table-cell">
-												  <input class="btn btn-info btn-default" name="view" type="submit" value="View" />
+												  <input class="btn btn-info btn-default" name="view" type="submit" value="Generate Metadata" />
 												  <input class="btn btn-info btn-default" name="reset" type="reset" value="Clear" />
 												</div>
 											</div>

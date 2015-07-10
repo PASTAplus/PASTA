@@ -25,6 +25,7 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -36,6 +37,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.ProvenanceFactoryClient;
+import edu.lternet.pasta.client.XSLTUtility;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.XmlUtility;
 
@@ -49,6 +51,9 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	    .getLogger(edu.lternet.pasta.portal.ProvenanceViewerServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static final String forward = "./provenanceViewer.jsp";
+	private static String cwd = null;
+	private static String xslPath = "/WEB-INF/xsl/provenance.xsl";
+
 
 	/*
 	 * Constructors
@@ -113,7 +118,9 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 			if (packageId != null) {
 				ProvenanceFactoryClient provenanceFactoryClient = new ProvenanceFactoryClient(uid);
 				String provenanceXML = provenanceFactoryClient.getProvenanceByPid(packageId);
+				String provenanceHTML = transformToHTML(provenanceXML);
 				String encodedProvenanceXML = XmlUtility.xmlEncode(provenanceXML);
+				request.setAttribute("provenanceHTML", provenanceHTML);
 				request.setAttribute("provenanceXML", encodedProvenanceXML);
 				request.setAttribute("packageid", packageId);
 				RequestDispatcher requestDispatcher = 
@@ -129,6 +136,16 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 			handleDataPortalError(logger, e);
 		}
 	}
+	
+	
+	private String transformToHTML(String xml) {
+		String provenanceHTML = "";
+		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		
+		provenanceHTML = XSLTUtility.xmlToHtml(xml, cwd + xslPath, parameterMap);
+
+		return provenanceHTML;
+	}
 
 
 	/**
@@ -139,6 +156,8 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	 */
 	public void init() throws ServletException {
 		PropertiesConfiguration options = ConfigurationListener.getOptions();
+	    cwd = options.getString("system.cwd");
 	}
 	
 }
+	
