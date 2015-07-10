@@ -35,13 +35,13 @@
   </xsl:template>
 
   <xsl:template match="methodStep">
-    <h2>Method Step</h2>
+    <h1>Method Step</h1>
 	<xsl:apply-templates select="description"/>
 	<xsl:apply-templates select="dataSource"/>
   </xsl:template>
 
   <xsl:template match="description">
-    <h3>Description</h3>
+    <h2>Description</h2>
 	<xsl:apply-templates select="para" />
   </xsl:template>
 
@@ -50,7 +50,7 @@
   </xsl:template>
 
   <xsl:template match="dataSource">
-    <h3>Data Source</h3>
+    <h2>Data Source</h2>
   	<xsl:for-each select="title">
 	   <xsl:apply-templates select="." />
   	</xsl:for-each>
@@ -69,10 +69,8 @@
     <table>
     <tr>
       <th align="left">Title</th>
-      <th></th>
     </tr>
     <tr>
-      <td></td>
       <td><xsl:value-of select="."/></td>
     </tr>
     </table>
@@ -96,14 +94,14 @@
 
   <xsl:template match="onlineDescription">
     <tr>
-      <td align="right">Online Description:</td>
+      <td class="labelBold nis-provenance-label">Online Description:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="url">
     <tr>
-      <td align="right">URL:</td>
+      <td class="labelBold nis-provenance-label">URL:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
@@ -182,28 +180,28 @@
 
   <xsl:template match="individualName">
     <tr>
-      <td align="right">Individual Name:</td>
+      <td class="labelBold nis-provenance-label">Individual Name:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="organizationName">
     <tr>
-      <td align="right">Organization Name:</td>
+      <td class="labelBold nis-provenance-label">Organization Name:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="positionName">
     <tr>
-      <td align="right">Position Name:</td>
+      <td class="labelBold nis-provenance-label">Position Name:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="address">
     <tr>
-      <td align="right" valign="top">Address:</td>
+      <td class="labelBold nis-provenance-label">Address:</td>
       <td>
         <xsl:for-each select="./deliveryPoint">
           <xsl:value-of select="."/>
@@ -230,7 +228,7 @@
 
   <xsl:template match="phone">
     <tr>
-      <td align="right"> Phone - <xsl:choose>
+      <td class="labelBold nis-provenance-label"> Phone - <xsl:choose>
           <xsl:when test="./@phonetype"> (<xsl:value-of select="./@phonetype"/>): </xsl:when>
           <xsl:otherwise> (voice): </xsl:otherwise>
         </xsl:choose>
@@ -241,21 +239,21 @@
 
   <xsl:template match="electronicMailAddress">
     <tr>
-      <td align="right">Email:</td>
+      <td class="labelBold nis-provenance-label">Email:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="onlineUrl">
     <tr>
-      <td align="right">Online URL:</td>
+      <td class="labelBold nis-provenance-label">Online URL:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
 
   <xsl:template match="userId">
     <tr>
-      <td align="right">User Id:</td>
+      <td class="labelBold nis-provenance-label">User Id:</td>
       <td><xsl:value-of select="."/></td>
     </tr>
   </xsl:template>
