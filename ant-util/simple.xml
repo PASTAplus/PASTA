@@ -156,7 +156,8 @@
       <formatter type="brief" usefile="false"/>
       <formatter type="xml"/>
       <classpath refid="test.classpath"/>
-      <batchtest fork="yes" todir="${test.data.dir}">
+      <test name="${testcase}" todir="${test.data.dir}" if="testcase"/>
+      <batchtest fork="yes" todir="${test.data.dir}" unless="testcase">
         <fileset dir="test">
           <include name="**/*Test*.java"/>
         </fileset>

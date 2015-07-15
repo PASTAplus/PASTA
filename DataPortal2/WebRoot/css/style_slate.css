@@ -2739,7 +2739,7 @@ ul, ol {
     -moz-border-radius:         10px; /* end ie5win hack */
 }
  
-th {
+th, .tablehead {
     text-align:                 left;
     font-weight:                700;
 } 
