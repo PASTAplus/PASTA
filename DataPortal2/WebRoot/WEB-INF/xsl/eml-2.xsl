@@ -2358,6 +2358,7 @@
     <xsl:for-each select=".">
       <xsl:call-template name="method">
         <xsl:with-param name="methodfirstColStyle" select="$firstColStyle"/>
+	    <xsl:with-param name="methodsubHeaderStyle" select="$subHeaderStyle"/>
       </xsl:call-template>
     </xsl:for-each>
   </xsl:template>
@@ -3100,7 +3101,10 @@
   <xsl:template match="timeScaleCitation">
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: timeScaleCitation</xsl:text></xsl:message></xsl:if>
     <!-- Using citation module here -->
-     <xsl:call-template name="citation"></xsl:call-template>
+     <xsl:call-template name="citation">
+       <xsl:with-param name="citationfirstColStyle" select="$firstColStyle"/>
+       <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
+     </xsl:call-template>
   </xsl:template>
 
   <!-- ***************  T A X O N O M I C   C O V E R A G E  *************** -->
@@ -5476,6 +5480,7 @@
           <td>
             <xsl:call-template name="citation">
               <xsl:with-param name="citationfirstColStyle" select="$nondomainfirstColStyle"/>
+              <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
             </xsl:call-template>
           </td>
         </tr>
@@ -6672,7 +6677,7 @@
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationarticle</xsl:text></xsl:message></xsl:if>
     <tr>
-      <td class="{$citationsubHeaderStyle}" colspan="2"><xsl:text>ARTICLE:</xsl:text></td>
+      <td class="{$citationsubHeaderStyle}" colspan="2"><xsl:text>Article:</xsl:text></td>
     </tr>
     <tr>
       <td class="{$citationfirstColStyle}">Journal:</td>
@@ -6727,7 +6732,7 @@
     <xsl:param name="notshow" />
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationbook</xsl:text></xsl:message></xsl:if>
     <xsl:if test="$notshow =''">
-          <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>BOOK:</xsl:text></td></tr>
+          <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Book:</xsl:text></td></tr>
         </xsl:if>
         <tr><td class="{$citationfirstColStyle}">
             Publisher:</td><td>
@@ -6783,7 +6788,7 @@
       <xsl:param name="citationfirstColStyle"/>
       <xsl:param name="citationsubHeaderStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationchapter</xsl:text></xsl:message></xsl:if>
-     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>CHAPTER:</xsl:text></td></tr>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Chapter:</xsl:text></td></tr>
         <xsl:if test="chapterNumber and normalize-space(chapterNumber)!=''">
            <tr><td class="{$citationfirstColStyle}">
             Chapter Number:</td><td class="{$secondColStyle}">
@@ -6828,7 +6833,7 @@
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationmanuscript</xsl:text></xsl:message></xsl:if>
-     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MANUSCRIPT:</xsl:text></td></tr>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Manuscript:</xsl:text></td></tr>
        <tr><td class="{$citationfirstColStyle}">
             Institution:
             </td>
@@ -6855,7 +6860,7 @@
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationreport</xsl:text></xsl:message></xsl:if>
-     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>REPORT:</xsl:text></td></tr>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Report:</xsl:text></td></tr>
        <xsl:if test="reportNumber and normalize-space(reportNumber)!=''">
           <tr><td class="{$citationfirstColStyle}">
             Report Number:</td><td class="{$secondColStyle}">
@@ -6889,7 +6894,7 @@
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationthesis</xsl:text></xsl:message></xsl:if>
-     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>THESIS:</xsl:text></td></tr>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Thesis:</xsl:text></td></tr>
         <tr><td class="{$citationfirstColStyle}">
         Degree:</td><td class="{$secondColStyle}">
         <xsl:value-of select="degree"/></td></tr>
@@ -6915,7 +6920,7 @@
      <xsl:param name="citationfirstColStyle"/>
      <xsl:param name="citationsubHeaderStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationconferenceProceedings</xsl:text></xsl:message></xsl:if>
-     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>CONFERENCE PROCEEDINGS:</xsl:text></td></tr>
+     <tr><td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Conference Proceedings:</xsl:text></td></tr>
       <xsl:if test="conferenceName and normalize-space(conferenceName)!=''">
          <tr><td class="{$citationfirstColStyle}">
          Conference Name:</td><td class="{$secondColStyle}">
@@ -6951,7 +6956,7 @@
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationpersonalCommunication</xsl:text></xsl:message></xsl:if>
     <tr>
-      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>PERSONAL COMMUNICATION:</xsl:text></td>
+      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Personal Communication:</xsl:text></td>
     </tr>
     <xsl:if test="publisher and normalize-space(publisher)!=''">
       <tr>
@@ -7002,7 +7007,7 @@
     <xsl:param name="citationsubHeaderStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: citationmap</xsl:text></xsl:message></xsl:if>
     <tr>
-      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>MAP:</xsl:text></td>
+      <td colspan="2" class="{$citationsubHeaderStyle}"><xsl:text>Map:</xsl:text></td>
     </tr>
     <xsl:if test="publisher and normalize-space(publisher)!=''">
       <tr>
@@ -8396,7 +8401,8 @@
                             </td>
                             <td>
                              <xsl:call-template name="citation">
-                                  <xsl:with-param name="citationfirstColStyle" select="projectfirstColStyle"/>
+                                  <xsl:with-param name="citationfirstColStyle" select="$projectfirstColStyle"/>
+                                  <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
                              </xsl:call-template>
                            </td>
                        </tr>
@@ -8411,7 +8417,8 @@
           </td>
           <td>
               <xsl:call-template name="citation">
-                   <xsl:with-param name="citationfirstColStyle" select="projectfirstColStyle"/>
+                   <xsl:with-param name="citationfirstColStyle" select="$projectfirstColStyle"/>
+                   <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
                </xsl:call-template>
           </td>
         </tr>
@@ -8446,7 +8453,10 @@
           Design Citation:
           </td>
           <td >
-             <xsl:call-template name="citation"/>
+             <xsl:call-template name="citation">
+               <xsl:with-param name="citationfirstColStyle" select="$projectfirstColStyle"/>
+               <xsl:with-param name="citationsubHeaderStyle" select="$subHeaderStyle"/>
+             </xsl:call-template>
          </td>
        </tr>
       </xsl:for-each>
@@ -8586,9 +8596,6 @@
       <xsl:for-each select="citation">
         <tr>
           <td class="{$protocolfirstColStyle}">Citation:</td>
-          <td class="{$secondColStyle}">&#160;</td>
-        </tr>
-        <tr>
           <td colspan="2">
             <xsl:call-template name="citation">
               <xsl:with-param name="citationfirstColStyle" select="$protocolfirstColStyle"/>
@@ -8664,7 +8671,7 @@
     <xsl:param name="ressubHeaderStyle"/>
     <xsl:param name="creator">Data Package Creator(s):</xsl:param>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: resource</xsl:text></xsl:message></xsl:if>
-    <!--
+    
       <xsl:for-each select="alternateIdentifier">
         <xsl:call-template name="resourcealternateIdentifier">
           <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
@@ -8678,7 +8685,7 @@
       <xsl:for-each select="title">
         <xsl:call-template name="resourcetitle">
           <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
-          <xsl:with-param name="ressubHeaderStyle" select="$ressubHeaderStyle"/>
+          <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
         </xsl:call-template>
       </xsl:for-each>
        <xsl:for-each select="pubDate">
@@ -8733,7 +8740,7 @@
       <xsl:for-each select="abstract">
         <xsl:call-template name="resourceabstract" >
           <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
-          <xsl:with-param name="ressubHeaderStyle" select="$ressubHeaderStyle"/>
+          <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
         </xsl:call-template>
       </xsl:for-each>
       <xsl:if test="keywordSet">
@@ -8742,7 +8749,6 @@
       </xsl:if>
       <xsl:for-each select="keywordSet">
         <xsl:call-template name="resourcekeywordSet" >
-          <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
         </xsl:call-template>
       </xsl:for-each>
       <xsl:for-each select="additionalInfo">
@@ -8754,7 +8760,7 @@
       <xsl:for-each select="intellectualRights">
         <xsl:call-template name="resourceintellectualRights" >
           <xsl:with-param name="resfirstColStyle" select="$resfirstColStyle"/>
-          <xsl:with-param name="ressubHeaderStyle" select="$ressubHeaderStyle"/>
+          <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
         </xsl:call-template>
       </xsl:for-each>
       <xsl:for-each select="distribution">
@@ -8771,7 +8777,7 @@
           <xsl:with-param name="ressubHeaderStyle" select="$ressubHeaderStyle"/>
       </xsl:call-template>
     </xsl:for-each>
-    -->
+
   </xsl:template>
 
   <!-- style the alternate identifier elements -->
