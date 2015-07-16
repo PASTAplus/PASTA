@@ -84,15 +84,20 @@
 							<div class="span12">
 								<!-- Content -->
 
+							<p>Provenance metadata should be included in a derived data package to 
+							   document its sources. This can be accomplished by adding a separate 
+							   <strong>&lt;methodStep&gt;</strong> element in the derived data package 
+							   for each of the source data packages from which it is derived.</p>
+							
 							<c:set var="showProv" value="<%= showProvenance %>"/>						
 							<c:choose>
 							
 								<c:when test="${showProv}">
-								<p>A data package derived from <strong><%= packageid %></strong> 
-								   as one of its source data packages should add the 
-								   <strong>&lt;methodStep&gt;</strong> element shown below
-								   within the <strong>&lt;methods&gt;</strong> element of the 
-								   derived data package.</p>
+								
+								<p>A data package derived from <strong><%= packageid %></strong> as one of its 
+								   source data packages should include the <strong>&lt;methodStep&gt;</strong>
+								   element shown below as a sub-element within its 
+								   <strong>&lt;methods&gt;</strong> element.</p>
 								<br/>
 								<div class="tabbable">
 									<ul class="nav nav-tabs">
@@ -120,7 +125,7 @@
 								
 								<c:otherwise>
 
-								<p>Enter the package identifier of the source data package whose metadata you wish to embed in your derived data package:</p>
+								<p>Enter the package identifier of the source data package whose provenance metadata you wish to embed in your derived data package:</p>
 								<div class="section">
 									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
 						        <div class="display-table">
