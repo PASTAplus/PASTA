@@ -40,7 +40,7 @@ pasta.port=443
 pasta.uriHead=https://pasta.lternet.edu/package/
 
 # Data Package Management properties
-dataportal.desktopUrlHead=https://portal.lternet.edu/nis2/data
+dataportal.desktopUrlHead=https://portal.lternet.edu/nis/data
 browse.dir=/home/pasta/local/browse
 emlutility.xslpath=/WEB-INF/xsl/eml-2.xsl
 reportutility.xslpath=/WEB-INF/xsl/qualityReportFull.xsl
