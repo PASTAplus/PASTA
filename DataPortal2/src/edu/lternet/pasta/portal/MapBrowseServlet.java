@@ -217,7 +217,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 			if (isPackageId) {
 				StringBuilder titleHTMLBuilder = new StringBuilder();
 				StringBuilder creatorsHTMLBuilder = new StringBuilder();
-				StringBuilder abstractHTMLBuilder = new StringBuilder();
 				StringBuilder publicationDateHTMLBuilder = new StringBuilder();
 				StringBuilder spatialCoverageHTMLBuilder = new StringBuilder();
 				StringBuilder googleMapHTMLBuilder = new StringBuilder();
@@ -361,8 +360,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 					String abstractText = emlObject.getAbstractText();
 
 					if (abstractText != null) {
-						abstractHTMLBuilder.append(abstractText);
-						abstractHTML = abstractHTMLBuilder.toString();
+						abstractHTML = toSingleLine(abstractText);
 					}
 
 					String pubDate = emlObject.getPubDate();
@@ -733,6 +731,26 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 		
 		return url;
+	}
+	
+	
+	/*
+	 * Converts newline-separated text into a single line, so that we can display
+	 * abstract text in a <textarea> HTML element without using an XLST stylesheet. 
+	 * Without this conversion, the <textarea> displays the abstract in literal 
+	 * layout format.
+	 */
+	private String toSingleLine(String text) {
+		String singleLine = null;
+		StringBuilder sb = new StringBuilder();
+		
+		String[] lines = text.split("\n");
+		for (String line : lines) {
+			sb.append(String.format("%s ", line.trim()));
+		}
+		
+		singleLine = sb.toString().trim();
+		return singleLine;
 	}
 
 
