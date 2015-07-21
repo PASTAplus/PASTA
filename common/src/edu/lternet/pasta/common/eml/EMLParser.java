@@ -66,6 +66,7 @@ public class EMLParser {
   public static final String SINGLE_DATE_TIME_PATH = "//eml/dataset/coverage/temporalCoverage/singleDateTime/calendarDate";
   public static final String BEGIN_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/beginDate/calendarDate";
   public static final String END_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/endDate/calendarDate";
+  public static final String GEOGRAPHIC_COVERAGE_PATH = "//eml/dataset/coverage/geographicCoverage";
   public static final String WEST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
   public static final String SOUTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
   public static final String EAST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
@@ -204,6 +205,47 @@ public class EMLParser {
         if (fundingNode != null) {
           String fundingText = fundingNode.getTextContent().trim();
           this.dataPackage.setFundingText(fundingText);
+        }
+
+        // Parse the geographic coverage nodes
+        NodeList geoNodeList = xpathapi.selectNodeList(document, GEOGRAPHIC_COVERAGE_PATH);
+        for (int i = 0; i < geoNodeList.getLength(); i++) {
+            Node geoNode = geoNodeList.item(i);
+            NodeList geoChildNodes = geoNode.getChildNodes();
+            for (int j = 0; j < geoChildNodes.getLength(); j++) {
+            	Node geoChildNode = geoChildNodes.item(j);
+            	if (geoChildNode.getNodeName().equals("boundingCoordinates")) {
+            		String north = null;
+            		String south = null;
+            		String east = null;
+            		String west = null;
+
+            		Node northNode = xpathapi.selectSingleNode(geoChildNode, "northBoundingCoordinate");
+                    if (northNode != null) {
+                      north = northNode.getTextContent().trim();
+                    }
+
+                    Node southNode = xpathapi.selectSingleNode(geoChildNode, "southBoundingCoordinate");
+                    if (southNode != null) {
+                      south = southNode.getTextContent().trim();
+                    }
+
+                    Node eastNode = xpathapi.selectSingleNode(geoChildNode, "eastBoundingCoordinate");
+                    if (eastNode != null) {
+                      east = eastNode.getTextContent().trim();
+                    }
+
+                    Node westNode = xpathapi.selectSingleNode(geoChildNode, "westBoundingCoordinate");
+                    if (westNode != null) {
+                      west = westNode.getTextContent().trim();
+                    }
+                    
+                    this.dataPackage.addBoundingCoordinates(north, south, east, west);
+            	}
+            }
+            
+            String serializedCoordinates = this.dataPackage.jsonSerializeCoordinates();
+            System.out.println(serializedCoordinates);
         }
 
         /*

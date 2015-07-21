@@ -208,5 +208,9 @@ public class EmlObject {
 	public String getWestBoundingCoordinate() {
 		return this.dataPackage.getWestBoundingCoordinate();
 	}
+	
+	public String jsonSerializeCoordinates() {
+		return this.dataPackage.jsonSerializeCoordinates();
+	}
 
 }

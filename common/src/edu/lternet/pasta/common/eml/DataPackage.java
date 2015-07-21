@@ -73,6 +73,8 @@ public class DataPackage {
   String eastBoundingCoordinate = null;
   String northBoundingCoordinate = null;
   
+  ArrayList<BoundingCoordinates> coordinatesList = new ArrayList<BoundingCoordinates>();
+  
   /*
    * Constructors
    */
@@ -384,5 +386,45 @@ public class DataPackage {
 	public void setTaxonomicCoverageText(String taxonomicCoverageText) {
 		this.taxonomicCoverageText = taxonomicCoverageText;
 	}
-
+	
+	
+	public void addBoundingCoordinates(String north, String south, String east, String west) {
+		BoundingCoordinates boundingCoordinates = new BoundingCoordinates(north, south, east, west);
+		coordinatesList.add(boundingCoordinates);
+	}
+	
+	public String jsonSerializeCoordinates() {
+		String coordinates = null;
+		StringBuilder sb = new StringBuilder("[\n");
+		
+		for (int i = 0; i < coordinatesList.size(); i++) {
+			BoundingCoordinates boundingCoordinates = coordinatesList.get(i);
+			sb.append(String.format("  %s", boundingCoordinates.jsonSerialize()));
+			if ((i + 1) < coordinatesList.size()) { sb.append(","); }
+			sb.append("\n");
+		}
+		
+		sb.append("]\n");
+		
+		coordinates = sb.toString();
+		return coordinates;
+	}
+	
+	
+	class BoundingCoordinates {
+		private String north, south, east, west;
+		
+		BoundingCoordinates(String north, String south, String east, String west) {
+			this.north = north;
+			this.south = south;
+			this.east = east;
+			this.west = west;
+		}
+		
+		public String jsonSerialize() {
+			return String.format("{\"north\":\"%s\", \"south\":\"%s\", \"east\":\"%s\", \"west\":\"%s\"}", 
+					               north, south, east, west);
+		}
+	}
+	
 }

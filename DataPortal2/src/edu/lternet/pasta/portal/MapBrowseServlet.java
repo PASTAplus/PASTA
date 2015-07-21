@@ -381,6 +381,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 					String west = emlObject.getWestBoundingCoordinate();
 					String east = emlObject.getEastBoundingCoordinate();
 					String south = emlObject.getSouthBoundingCoordinate();
+					String jsonCoordinates = emlObject.jsonSerializeCoordinates();
+					request.setAttribute("jsonCoordinates", jsonCoordinates);
 					if (north != null && south != null && east != null && west != null) {
 						Double northCoord = new Double(north);
 						Double southCoord = new Double(south);
