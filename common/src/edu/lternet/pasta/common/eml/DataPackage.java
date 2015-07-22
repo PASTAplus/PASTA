@@ -393,6 +393,22 @@ public class DataPackage {
 		coordinatesList.add(boundingCoordinates);
 	}
 	
+	
+	public String stringSerializeCoordinates() {
+		String coordinates = null;
+		StringBuilder sb = new StringBuilder("");
+		
+		for (int i = 0; i < coordinatesList.size(); i++) {
+			BoundingCoordinates boundingCoordinates = coordinatesList.get(i);
+			sb.append(boundingCoordinates.stringSerialize());
+			if ((i + 1) < coordinatesList.size()) { sb.append(":"); }
+		}
+		
+		coordinates = sb.toString();
+		return coordinates;
+	}
+	
+	
 	public String jsonSerializeCoordinates() {
 		String coordinates = null;
 		StringBuilder sb = new StringBuilder("[\n");
@@ -424,6 +440,10 @@ public class DataPackage {
 		public String jsonSerialize() {
 			return String.format("{\"north\":\"%s\", \"south\":\"%s\", \"east\":\"%s\", \"west\":\"%s\"}", 
 					               north, south, east, west);
+		}
+
+		public String stringSerialize() {
+			return String.format("%s,%s,%s,%s", north, south, east, west);
 		}
 	}
 	

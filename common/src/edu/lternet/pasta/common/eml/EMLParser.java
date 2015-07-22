@@ -242,10 +242,7 @@ public class EMLParser {
                     
                     this.dataPackage.addBoundingCoordinates(north, south, east, west);
             	}
-            }
-            
-            String serializedCoordinates = this.dataPackage.jsonSerializeCoordinates();
-            System.out.println(serializedCoordinates);
+            }      
         }
 
         /*
