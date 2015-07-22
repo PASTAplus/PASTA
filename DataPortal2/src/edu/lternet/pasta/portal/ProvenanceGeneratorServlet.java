@@ -41,16 +41,16 @@ import edu.lternet.pasta.client.XSLTUtility;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.XmlUtility;
 
-public class ProvenanceViewerServlet extends DataPortalServlet {
+public class ProvenanceGeneratorServlet extends DataPortalServlet {
 
 	/*
 	 * Class variables
 	 */
 
 	private static final Logger logger = Logger
-	    .getLogger(edu.lternet.pasta.portal.ProvenanceViewerServlet.class);
+	    .getLogger(edu.lternet.pasta.portal.ProvenanceGeneratorServlet.class);
 	private static final long serialVersionUID = 1L;
-	private static final String forward = "./provenanceViewer.jsp";
+	private static final String forward = "./provenanceGenerator.jsp";
 	private static String cwd = null;
 	private static String xslPath = "/WEB-INF/xsl/provenance.xsl";
 
@@ -59,7 +59,7 @@ public class ProvenanceViewerServlet extends DataPortalServlet {
 	 * Constructors
 	 */
 
-	public ProvenanceViewerServlet() {
+	public ProvenanceGeneratorServlet() {
 		super();
 	}
 

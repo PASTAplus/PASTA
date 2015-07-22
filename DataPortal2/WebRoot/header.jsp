@@ -49,7 +49,7 @@
            pageName.equals("harvestReport") ||
            //pageName.equals("dataPackageDelete") ||
            pageName.equals("eventSubscribe") ||
-           pageName.equals("provenanceViewer") ||
+           pageName.equals("provenanceGenerator") ||
            pageName.equals("dataPackageAudit") ||
            pageName.equals("auditReport")
           ) {
@@ -109,7 +109,7 @@
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Provenance:</p>
-					<li><a href="provenanceViewer.jsp">Provenance Viewer</a></li>
+					<li><a href="provenanceGenerator.jsp">Provenance Generator</a></li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					<img alt="" src="images/mini_arrow.png" class="mini-arrow-margin" title="LTER : Network"> 
 					Reports:</p>

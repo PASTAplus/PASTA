@@ -655,7 +655,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 				provenanceHTMLBuilder.append(
 						String.format(
-				"Generate <a class=\"searchsubcat\" href=\"./provenanceViewer?packageid=%s\">" +
+				"Generate <a class=\"searchsubcat\" href=\"./provenanceGenerator?packageid=%s\">" +
 				"provenance metadata</a> for use within your derived data package", 
 				packageId));
 					
