@@ -68,7 +68,7 @@ function initialize() {
 /*
  * Initialize the Google map on the Data Package Summary page
  */
-function initialize_summary_map(north, south, east, west) {
+function initialize_summary_map(coordinatesArray, north, south, east, west) {
 	var lat = (north + south)  / 2.0;
 	var lng = (west + east) / 2.0;
 
@@ -82,15 +82,43 @@ function initialize_summary_map(north, south, east, west) {
 	};
 
 	var map = new google.maps.Map(document.getElementById("map-canvas-summary"), mapOptions);
-    var nwLatLng = new google.maps.LatLng(north, west);
-    var seLatLng = new google.maps.LatLng(south, east);
-    
-    if ((north == south) && (east == west)) {
-    	var nwMarker = new google.maps.Marker({position: nwLatLng, map: map, title: nwLatLng.toString() });
-    }
-    else {
-        var bounds = new google.maps.LatLngBounds(nwLatLng, seLatLng);
-        map.fitBounds(bounds);
-    	var rect = new google.maps.Rectangle({ map: map, bounds: bounds, strokeWeight: 0.5, strokeColor: 'black', strokeOpacity: 1, fillColor: 'yellow', fillOpacity: 0.30 });
+	var maxNorth = -999;
+	var minSouth = 999;
+	var maxEast = -999;
+	var minWest = 999;
+	
+	for (var i = 0; i < coordinatesArray.length; i++) {
+		var coord = coordinatesArray[i];
+		
+		var north = Number(coord.north);
+		maxNorth = Math.max(maxNorth, north);
+		
+		var south = Number(coord.south);
+		minSouth = Math.min(minSouth, south);
+		
+		var east = Number(coord.east);
+		maxEast = Math.max(maxEast, east);
+		
+		var west = Number(coord.west);
+		minWest = Math.min(minWest, west);
+		
+	    var nwLatLng = new google.maps.LatLng(north, west);
+	    var seLatLng = new google.maps.LatLng(south, east);
+
+	    if ((north == south) && (east == west)) {
+	    	var nwMarker = new google.maps.Marker({position: nwLatLng, map: map, title: nwLatLng.toString() });
+	    }
+	    else {
+	    	var bounds = new google.maps.LatLngBounds(nwLatLng, seLatLng);
+	    	var rect = new google.maps.Rectangle({ map: map, bounds: bounds, strokeWeight: 0.5, strokeColor: 'black', strokeOpacity: 1, fillColor: 'yellow', fillOpacity: 0.30 });
+	    	map.fitBounds(bounds);
+	    }
+	}
+
+    if ((maxNorth != minSouth) || (maxEast != minWest)) {
+    	var maxNwLatLng = new google.maps.LatLng(maxNorth, minWest);
+    	var maxSeLatLng = new google.maps.LatLng(minSouth, maxEast);
+    	var maxBounds = new google.maps.LatLngBounds(maxNwLatLng, maxSeLatLng);
+    	map.fitBounds(maxBounds);
     }
 }

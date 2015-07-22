@@ -20,6 +20,7 @@
   String spatialCoverageHTML = (String) request.getAttribute("spatialCoverageHTML");
   String googleMapHTML = (String) request.getAttribute("googleMapHTML");
   String savedDataHTML = (String) request.getAttribute("savedDataHTML");
+  String jsonCoordinates = (String) request.getAttribute("jsonCoordinates");
   Double northCoord = (Double) request.getAttribute("northCoord");
   Double southCoord = (Double) request.getAttribute("southCoord");
   Double eastCoord = (Double) request.getAttribute("eastCoord");
@@ -72,7 +73,12 @@
 	<c:when test="${showSpatial}">
 		<script type="text/javascript">
 			window.onload = function () {
-  				initialize_summary_map(<%=northCoord%>, <%=southCoord%>, <%=eastCoord%>, <%=westCoord%>);
+			    var coordinatesArray = <%= jsonCoordinates %>;
+			    var north = <%= northCoord %>;
+			    var south = <%= southCoord %>;
+			    var east = <%= eastCoord %>;
+			    var west = <%= westCoord %>;
+  				initialize_summary_map(coordinatesArray, north, south, east, west);
 			};
 		</script>
 	</c:when>
