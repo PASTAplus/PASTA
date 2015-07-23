@@ -26,16 +26,56 @@ package edu.lternet.pasta.datapackagemanager;
 
 import static org.junit.Assert.assertTrue;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class DataPackageManagerTest {
 
+	/*
+	 * Class fields
+	 */
+
+	private static ConfigurationListener configurationListener = null;
+	private static final String dirPath = "WebRoot/WEB-INF/conf";
+
+
+	/**
+	 * Initialize objects before any tests are run.
+	 */
+	@BeforeClass
+	public static void setUpClass() {
+		configurationListener = new ConfigurationListener();
+		configurationListener.initialize(dirPath);
+	}
+
+
   /**
-   * Test initialization of the test suite
+   * Test DataPackageManager.isPastaDataSource() method.
    */
-  @Test public void testInit() {
-    assertTrue(1 == 1);
+  @Test 
+  public void testIsPastaDataSource() {
+    final String valid1 = "https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    final String valid2 = "http://pasta.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    final String invalid1 = "https:/pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    final String invalid2 = "http://pasta.lternet.ed";
+    
+    assertTrue(String.format("Expected %s to validate", valid1), DataPackageManager.isPastaDataSource(valid1));
+    assertTrue(String.format("Expected %s to validate", valid2), DataPackageManager.isPastaDataSource(valid2));
+    assertTrue(String.format("Expected %s to invalidate", invalid1), !DataPackageManager.isPastaDataSource(invalid1));
+    assertTrue(String.format("Expected %s to invalidate", invalid2), !DataPackageManager.isPastaDataSource(invalid2));
+  }
+
+  /**
+   * Test DataPackageManager.pastaURLtoPackageId() method.
+   */
+  @Test 
+  public void testPastaURLtoPackageId() {
+    final String pastaURL = "https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    final String expectedPackageId = "knb-lter-hbr.58.5";
+    
+    String packageId = DataPackageManager.pastaURLtoPackageId(pastaURL);
+    assertTrue(String.format("Expected %s", expectedPackageId), expectedPackageId.equals(packageId));
   }
 
 }

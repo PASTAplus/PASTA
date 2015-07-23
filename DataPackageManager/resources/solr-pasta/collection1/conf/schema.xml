@@ -152,6 +152,10 @@
    <!-- 'site' is the LTER site, which is always a three-letter site code such as 'BNZ' -->
    <field name="site" type="string" indexed="true" stored="true" multiValued="false"/>
 
+   <!-- 'derivedFrom' is a list of PASTA identifier values that this data package is derived from,
+        for use in provenance-aware synthesis tracking -->
+   <field name="derivedFrom" type="string" indexed="true" stored="true" multiValued="true"/>
+
     <!-- 'text' is a catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  -->
     <field name="text" type="text_pasta" indexed="true" stored="false" multiValued="true"/>

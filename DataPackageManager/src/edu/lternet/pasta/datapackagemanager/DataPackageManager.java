@@ -40,9 +40,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.transform.TransformerException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -64,18 +64,17 @@ import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import edu.lternet.pasta.common.security.authorization.AccessMatrix;
+import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
-import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
-import edu.lternet.pasta.common.security.authorization.AccessMatrix;
-import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -95,7 +94,56 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	public enum ResourceType {
 		archive, data, dataPackage, metadata, report
 	}
+	
+	
+	/*
+	 * Class methods
+	 */
+	
+	  /**
+	   * Examine a data source URL to determine whether it originates from PASTA.
+	   * This is helpful in determining provenance.
+	   * 
+	   * @param dataSourceURL
+	   * @return true if the data source is hosted by PASTA, else false.
+	   */
+	  public static boolean isPastaDataSource(String dataSourceURL) {
+			final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
+			Pattern pattern = Pattern.compile(patternString);
+			Matcher matcher = pattern.matcher(dataSourceURL);
+			return (matcher.matches());
+	  }
+	  
+	  
+	/**
+	 * Converts a pastaURL string to a packageId string, or null if the pastaURL
+	 * does not match the recognized PASTA url pattern.
+	 * 
+	 * @param pastaURL  the pastaURL string, 
+	 *                  e.g. https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5
+	 * @return the packageId string, 
+	 *                  e.g. knb-lter-hbr.58.5
+	 */
+	public static String pastaURLtoPackageId(String pastaURL) {
+		String packageId = null;
 
+		if (pastaURL != null) {
+			final String patternString = "^.*/eml/(\\S+)/(\\d+)/(\\d+)$";
+			Pattern pattern = Pattern.compile(patternString);
+			Matcher matcher = pattern.matcher(pastaURL);
+			if (matcher.matches()) {
+				String scope = matcher.group(1);
+				String identifier = matcher.group(2);
+				String revision = matcher.group(3);
+				packageId = String.format("%s.%s.%s", scope, identifier,
+						revision);
+			}
+		}
+
+		return packageId;
+	}	  
+	  
+	
 	/*
 	 * Class fields
 	 */
@@ -1292,11 +1340,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		// Only include data source URLs that match the PASTA identifier pattern
-		final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
-		Pattern pattern = Pattern.compile(patternString);
 		for (String dataSource : dataSources) {
-			Matcher matcher = pattern.matcher(dataSource);
-			if (matcher.matches()) {
+			if (DataPackageManager.isPastaDataSource(dataSource)) {
 				stringBuilder.append(dataSource + "\n");
 			}
 		}

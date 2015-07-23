@@ -16,6 +16,7 @@ import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 
 
 public class SolrIndex {
@@ -278,6 +279,16 @@ public class SolrIndex {
 									"Unable to index geospatial coordinates for %s because north " +
 							        "coord (%s) is less than south coord (%s)",
 									packageId, northCoord, southCoord));
+				}
+			}
+			
+			/*
+			 * Add PASTA identifier values of source data packages to track provenance
+			 */
+			ArrayList<String> dataSources = dataPackage.getDataSources();
+			for (String dataSourceURL : dataSources) {
+				if (DataPackageManager.isPastaDataSource(dataSourceURL)) {
+					solrInputDocument.addField("derivedFrom", dataSourceURL);
 				}
 			}
 
