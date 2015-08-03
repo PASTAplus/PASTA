@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
-  final String pageTitle = "Provenance Viewer";
+  final String pageTitle = "Provenance Generator";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
@@ -13,7 +13,7 @@
   String uid = (String) session.getAttribute("uid");
 
   if (uid == null || uid.isEmpty()) {
-    request.setAttribute("from", "./provenanceViewer.jsp");
+    request.setAttribute("from", "./provenanceGenerator.jsp");
     String loginWarning = DataPortalServlet.getLoginWarning();
     request.setAttribute("message", loginWarning);
     RequestDispatcher requestDispatcher = request
@@ -75,7 +75,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>Provenance Viewer</h2>
+								<h2>Provenance Generator</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
@@ -127,7 +127,7 @@
 
 								<p>Enter the package identifier of the source data package whose provenance metadata you wish to embed in your derived data package:</p>
 								<div class="section">
-									<form id="provenanceviewer" action="provenanceViewer" method="post" name="provenanceviewer">
+									<form id="provenanceGenerator" action="provenanceGenerator" method="post" name="provenanceGenerator">
 						        <div class="display-table">
 											<div class="table-row">
 												<div class="table-cell">

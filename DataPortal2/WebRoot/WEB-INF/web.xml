@@ -150,10 +150,10 @@
     <servlet-class>edu.lternet.pasta.portal.MetadataPreviewerServlet</servlet-class>
   </servlet>
   <servlet>
-    <description>Provenance Viewer Servlet</description>
-    <display-name>ProvenanceViewerServlet</display-name>
-    <servlet-name>ProvenanceViewerServlet</servlet-name>
-    <servlet-class>edu.lternet.pasta.portal.ProvenanceViewerServlet</servlet-class>
+    <description>Provenance Generator Servlet</description>
+    <display-name>ProvenanceGeneratorServlet</display-name>
+    <servlet-name>ProvenanceGeneratorServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.ProvenanceGeneratorServlet</servlet-class>
   </servlet>
   <servlet>
     <description>Code Generation Servlet</description>
@@ -293,8 +293,8 @@
     <url-pattern>/metadataPreviewer</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>ProvenanceViewerServlet</servlet-name>
-    <url-pattern>/provenanceViewer</url-pattern>
+    <servlet-name>ProvenanceGeneratorServlet</servlet-name>
+    <url-pattern>/provenanceGenerator</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>CodeGenerationServlet</servlet-name>
