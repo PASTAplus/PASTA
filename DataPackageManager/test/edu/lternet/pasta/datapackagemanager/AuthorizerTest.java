@@ -215,7 +215,7 @@ public class AuthorizerTest {
     assertEquals("Error creating data package", 202, statusCode);
     
     try {
-      Thread.sleep(30000);  // Give PASTA a chance to create the data package
+      Thread.sleep(60000);  // Give PASTA a chance to create the data package
     }
     catch (Exception e) {
       e.printStackTrace();
