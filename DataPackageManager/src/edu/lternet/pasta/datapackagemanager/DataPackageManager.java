@@ -820,7 +820,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 								resource.getDoi() == null
 							   ) {
 								try {
-									doiScanner.processOneResource(resource);
+									String doi = doiScanner.processOneResource(resource);
+									if (doi != null) {
+										SolrMetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
+										solrCatalog.indexDoi(emlPackageId, doi);
+									}
 								}
 								catch (DOIException e) {
 									logger.error(e.getMessage());

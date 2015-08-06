@@ -2,7 +2,9 @@ package edu.lternet.pasta.datapackagemanager.solr.index;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
@@ -340,6 +342,47 @@ public class SolrIndex {
     	}
     	
     	return isValid;
+    }
+    
+    
+	/**
+	 * Indexes the DOI for a data package, updating the Solr document's
+	 * "doi" field using Solr's atomic update feature.
+	 * 
+	 * 
+	 * @param epid          the EML package id object
+	 * @param doi           the DOI (Digital Object Identifier) value to be indexed
+	 * @return result       Contains an error message if something went wrong, else null
+	 * @throws IOException
+	 * @throws SolrServerException
+	 */
+    public String indexDoi(EmlPackageId epid, String doi)  
+    		throws IOException, SolrServerException {
+    	String result = null;
+
+    	if (epid != null && doi != null) {
+			SolrInputDocument solrInputDocument = new SolrInputDocument();
+	    	String scope = epid.getScope();
+	    	String id = String.format("%s.%d", scope, epid.getIdentifier());
+		    Map<String,String> doiMap = new HashMap<String, String>();
+			doiMap.put("set", doi); // Use Solr's atomic update feature
+			solrInputDocument.setField("id", id);
+			solrInputDocument.setField("doi", doiMap);
+
+			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
+			int status = updateResponse.getStatus(); // Non-zero indicates failure
+			logger.info(String.format(
+					"Update of doi for id %s; update status %d", id, status));
+			if (status != 0 ) {
+				result = String.format("Solr indexing failed with error while updating doi for id %s", id);
+			}
+		}
+    	else {
+    		result = String.format(
+    				"Unable to index the doi value: the package id and the doi must be non-null.");
+    	}
+		
+		return result;
     }
     
     

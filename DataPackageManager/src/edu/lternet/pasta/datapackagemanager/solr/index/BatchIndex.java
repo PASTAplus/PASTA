@@ -13,6 +13,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageMetadata;
+import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 import edu.ucsb.nceas.utilities.Options;
 
 
@@ -26,6 +27,11 @@ import edu.ucsb.nceas.utilities.Options;
  */
 public class BatchIndex {
 	
+	private static String dbDriver = null;
+	private static String dbURL = null;
+	private static String dbUser = null;
+	private static String dbPassword = null;
+
 	private static final int COMMIT_FREQUENCY = 100;
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 
@@ -34,11 +40,16 @@ public class BatchIndex {
 		ConfigurationListener configurationListener = new ConfigurationListener();
 		configurationListener.initialize(dirPath);
 		Options options = ConfigurationListener.getOptions();
+		dbDriver = options.getOption("dbDriver");
+		dbURL = options.getOption("dbURL");
+		dbUser = options.getOption("dbUser");
+		dbPassword = options.getOption("dbPassword");
 		String solrUrl = options.getOption("datapackagemanager.metadatacatalog.solrUrl");
 		SolrIndex solrIndex = new SolrIndex(solrUrl);
 
 		try {
 			DataPackageManager dpm = new DataPackageManager();
+			DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 			List<EmlPackageId> emlPackageIds = getAllLatestEML(dpm);
 
 			int i = 1;
@@ -54,6 +65,13 @@ public class BatchIndex {
 
 				try {
 					solrIndex.indexEmlDocument(emlPackageId, emlDocument);
+					
+					String resourceId = getResourceId(dpr, emlPackageId);
+					String doi = dpr.getDoi(resourceId);
+					if (doi != null && !doi.equals("")) {
+						solrIndex.indexDoi(emlPackageId, doi);
+					}
+					
 					boolean commit = (i % COMMIT_FREQUENCY == 0);
 					
 					if (commit) {
@@ -78,6 +96,32 @@ public class BatchIndex {
 					.println("Exception constructing DataPackageManager object: "
 							+ e.getMessage());
 		}
+	}
+	
+	
+	private static String getResourceId(DataPackageRegistry dpr, EmlPackageId epid) {
+		String resourceId = null;
+		
+		if (dpr != null && epid != null) {
+			String scope = epid.getScope();
+			Integer identifier = epid.getIdentifier();
+			Integer revision = epid.getRevision();
+			
+			try {
+				ArrayList<String> resourceIds = dpr.getDataPackageResources(scope, identifier, revision);
+				for (String rid : resourceIds) {
+					if (rid.contains("/package/eml/")) {
+						// This is the dataPackage resource, which holds the DOI value for the data package
+						resourceId = rid;
+					}
+				}
+			}
+			catch (Exception e) {
+				;
+			}		
+		}
+		
+		return resourceId;
 	}
 	
 	

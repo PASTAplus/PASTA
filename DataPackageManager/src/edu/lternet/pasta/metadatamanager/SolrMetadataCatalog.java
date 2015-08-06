@@ -71,6 +71,23 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     }
 
     
+    public String indexDoi(EmlPackageId epid, String doi) {
+    	String result = null;
+    	SolrIndex solrIndex = new SolrIndex(solrUrl);
+    	
+    	try {
+    		result = solrIndex.indexDoi(epid, doi);
+    		solrIndex.commit(); // Always commit after individual document uploads
+    	}
+    	catch (IOException | SolrServerException e) {
+    		e.printStackTrace();
+    		result = e.getMessage();
+    	}
+    	
+    	return result;
+    }
+
+    
     public String query(UriInfo uriInfo) {
     	String result = null;
     	

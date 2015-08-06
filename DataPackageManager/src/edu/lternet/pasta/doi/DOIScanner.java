@@ -181,11 +181,12 @@ public class DOIScanner {
 	/**
 	 * Processes a single resource for DOI registration.
 	 * 
-	 * @param resource        the Resource to be registered
+	 * @param resource    the Resource to be registered
+	 * @return doi        the DOI value that was registered
 	 * 
 	 * @throws DOIException
 	 */
-	public void processOneResource(Resource resource) throws DOIException, ConfigurationException {
+	public String processOneResource(Resource resource) throws DOIException, ConfigurationException {
 
 		File emlFile = null;
 		EmlObject emlObject = null;
@@ -283,6 +284,8 @@ public class DOIScanner {
 				    + resource.getPackageId();
 				logger.error(gripe);
 			}
+			
+		return doi;
 	}
 
 	
