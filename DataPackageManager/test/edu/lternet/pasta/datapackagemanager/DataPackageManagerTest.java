@@ -66,16 +66,4 @@ public class DataPackageManagerTest {
     assertTrue(String.format("Expected %s to invalidate", invalid2), !DataPackageManager.isPastaDataSource(invalid2));
   }
 
-  /**
-   * Test DataPackageManager.pastaURLtoPackageId() method.
-   */
-  @Test 
-  public void testPastaURLtoPackageId() {
-    final String pastaURL = "https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
-    final String expectedPackageId = "knb-lter-hbr.58.5";
-    
-    String packageId = DataPackageManager.pastaURLtoPackageId(pastaURL);
-    assertTrue(String.format("Expected %s", expectedPackageId), expectedPackageId.equals(packageId));
-  }
-
 }

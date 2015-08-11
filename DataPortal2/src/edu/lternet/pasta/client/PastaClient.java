@@ -26,6 +26,8 @@ package edu.lternet.pasta.client;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.http.HttpStatus;
@@ -171,6 +173,35 @@ public class PastaClient {
   }
   
   
+	/**
+	 * Converts a pastaURL string to a packageId string, or null if the pastaURL
+	 * does not match the recognized PASTA url pattern.
+	 * 
+	 * @param pastaURL  the pastaURL string, 
+	 *                  e.g. https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5
+	 * @return the packageId string, 
+	 *                  e.g. knb-lter-hbr.58.5
+	 */
+	public static String pastaURLtoPackageId(String pastaURL) {
+		String packageId = null;
+
+		if (pastaURL != null) {
+			final String patternString = "^.*/eml/(\\S+)/(\\d+)/(\\d+)$";
+			Pattern pattern = Pattern.compile(patternString);
+			Matcher matcher = pattern.matcher(pastaURL);
+			if (matcher.matches()) {
+				String scope = matcher.group(1);
+				String identifier = matcher.group(2);
+				String revision = matcher.group(3);
+				packageId = String.format("%s.%s.%s", scope, identifier,
+						revision);
+			}
+		}
+
+		return packageId;
+	}	  
+	  
+	
   /*
    * Instance methods
    */

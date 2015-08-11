@@ -117,6 +117,7 @@
             trim(form.boundsChangedCount.value) == "1" &&
             trim(form.locationName.value) == "" &&
             trim(form.taxon.value) == "" &&
+            trim(form.identifier.value) == "" &&
             howManySelected(form.siteValues) == 0 &&
             trim(form.startDate.value) == "" &&
             trim(form.endDate.value) == "" &&
@@ -179,9 +180,9 @@
 										<li>
 										  <a data-toggle="tab" href="#tab7">Taxonomic</a> 
 										</li>
-										<!--   <li>
-										  <a data-toggle="tab" href="#tab5">Search Options</a> 
-										</li>-->
+										<li>
+										  <a data-toggle="tab" href="#tab5">Identifier</a> 
+										</li>
 									</ul>
 								  <form id="advancedSearchForm" action="./advancedSearch" method="post" name="advancedSearchForm" onsubmit="return submitRequest(this)">
 									  <div class="tab-content">
@@ -598,8 +599,38 @@
 										  </div>
 										  <!-- /#tab7 -->
 										
-										<!--  
 										  <div id="tab5" class="tab-pane  ">
+											  <div class="row-fluid text_bar_pattern themeple_sc">
+												  <div>
+														<table>
+															<tr>
+																<td><label class="labelBold">Identifier:</label></td>
+															</tr>
+															<tr>
+																<td><input name="identifier" type="text" /></td>
+															</tr>
+														</table>
+												  </div>
+												  <div class="row-fluid text_bar_pattern themeple_sc">
+												    <div class="span12">
+													    <span class="row-fluid separator_border"></span>
+												    </div>
+											    </div>
+										      <table>
+											      <tr>
+												      <td align="left">
+												        <input class="btn btn-large btn-info btn-default" name="submit" type="submit" value="Submit" />
+												        <input class="btn btn-large btn-info btn-default" name="reset" type="reset" value="Clear All" />
+												      </td>
+											      </tr>
+										      </table>
+											  </div>
+										  </div>
+										  <!-- /#tab5 -->
+										  
+										<!-- /#tab8 -->
+										<!--  
+										  <div id="tab8" class="tab-pane  ">
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 												  <div class="row-fluid text_bar_pattern themeple_sc">
 												    <table>
@@ -655,9 +686,8 @@
 										      </table>
 											  </div>
 										  </div>
-										  /#tab5 -->
-
-										
+										  /#tab8 -->
+							
 									  </div>
 							    </form>
 								</div>

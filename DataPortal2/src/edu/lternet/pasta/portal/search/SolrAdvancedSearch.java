@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
+import edu.lternet.pasta.client.PastaClient;
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.portal.search.LTERSite;
 
@@ -75,6 +76,7 @@ public class SolrAdvancedSearch extends Search  {
   private boolean includeEcotrends;
   private boolean includeLandsat5;
   private String taxon;
+  private String identifier;
   
   private boolean isBoundaryContainedChecked;
   private String boundsChangedCount;
@@ -120,6 +122,7 @@ public class SolrAdvancedSearch extends Search  {
       boolean isRelatedChecked,
       boolean isRelatedSpecificChecked,
       String taxon,
+      String identifier,
       boolean isBoundaryContainedChecked,
       String boundsChangedCount,
       String northBound,
@@ -142,6 +145,7 @@ public class SolrAdvancedSearch extends Search  {
     this.includeEcotrends = isIncludeEcotrendsChecked;
     this.includeLandsat5 = isIncludeLandsat5Checked;
     this.taxon = taxon;
+    this.identifier = identifier;
     
     this.isBoundaryContainedChecked = isBoundaryContainedChecked;
     this.boundsChangedCount = boundsChangedCount;
@@ -559,6 +563,39 @@ public class SolrAdvancedSearch extends Search  {
   }
   
 
+	/**
+	 * An identifier query searches the doi and packageid fields, matching the
+	 * field if the user-specified value is contained in the field.
+	 */
+	private void buildQueryIdentifier(TermsList termsList)
+			throws UnsupportedEncodingException {
+		String value = this.identifier;
+
+		if ((value != null) && (!(value.equals("")))) {
+
+			/*
+			 * If the user entered a PASTA identifier, convert it to a packageId
+			 * value so that it will match the Solr 'packageid' field. (We don't
+			 * index the PASTA identifier in Solr.)
+			 */
+			String packageId = PastaClient.pastaURLtoPackageId(value);
+			if (packageId != null) {
+				value = packageId;
+			}
+
+			termsList.addTerm(value);
+			String escapedValue = Search.escapeQueryChars(value);
+			String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
+			String doiQuery = String.format("doi:%s", encodedValue);
+			updateQString(doiQuery);
+			String packageIdQuery = String.format("packageid:%s", encodedValue);
+			updateQString(packageIdQuery);
+			String idQuery = String.format("id:%s", encodedValue);
+			updateQString(idQuery);
+		}
+	}
+
+
   /**
    * Build a site filter. If the AdvancedSearch's site value is non-null, add a
    * query group that limits the results to a particular LTER site. Do this
@@ -632,6 +669,7 @@ public class SolrAdvancedSearch extends Search  {
 		buildQuerySubject(this.termsList);
 		buildQueryAuthor(this.termsList); 
 		buildQueryTaxon(this.termsList);
+		buildQueryIdentifier(this.termsList);
 		buildQueryGeographicDescription(this.locationName, this.termsList);
 		buildQueryFilterTemporal(this.dateField, this.startDate,
 		   this.endDate, this.isDatesContainedChecked, this.namedTimescale,

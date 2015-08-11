@@ -14,8 +14,8 @@ db.MaxConnections=10
 # Junit properties
 dataportal.test.emlFileName=NoneSuchBugCount.xml
 dataportal.test.path=test/data
-dataportal.test.scope=knb-lter-xyz
-dataportal.test.identifier=1
+dataportal.test.scope=knb-lter-nwk
+dataportal.test.identifier=5030
 dataportal.test.revision=1
 dataportal.test.revision.update=2
 dataportal.test.entity.id=a9201a0755fc45ae514abb12469c03a0
