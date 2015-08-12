@@ -573,6 +573,8 @@ public class SolrAdvancedSearch extends Search  {
 
 		if ((value != null) && (!(value.equals("")))) {
 
+			termsList.addTerm(value);
+
 			/*
 			 * If the user entered a PASTA identifier, convert it to a packageId
 			 * value so that it will match the Solr 'packageid' field. (We don't
@@ -583,7 +585,6 @@ public class SolrAdvancedSearch extends Search  {
 				value = packageId;
 			}
 
-			termsList.addTerm(value);
 			String escapedValue = Search.escapeQueryChars(value);
 			String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
 			String doiQuery = String.format("doi:%s", encodedValue);

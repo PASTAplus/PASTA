@@ -603,7 +603,7 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 
 												  <div>
-												  Types of data package identifiers that you can search on include:
+												  Types of data package identifiers that you can search include:
 												  <ul>
 												  	<li>Digital Object Identifier (DOI), e.g., <strong>doi:10.6073/pasta/397e0bba0f8aeac013d01fc982a74ea8</strong></li>
 												  	<li>Package Identifier, e.g., <strong>knb-lter-and.2719.6</strong></li>
