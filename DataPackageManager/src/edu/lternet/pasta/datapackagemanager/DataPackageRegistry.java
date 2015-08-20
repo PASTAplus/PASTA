@@ -45,6 +45,7 @@ import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -81,6 +82,8 @@ public class DataPackageRegistry {
   private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
   private final String ACCESS_MATRIX = "datapackagemanager.ACCESS_MATRIX";
   private final String DATA_PACKAGE_MANAGER_SCHEMA = "datapackagemanager";
+  private final String PROVENANCE_TABLE = "PROVENANCE";
+  private final String PROVENANCE = "datapackagemanager.PROVENANCE";
   private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
   private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
  
@@ -1532,6 +1535,98 @@ public class DataPackageRegistry {
     return hasReource;
   }
   
+  
+    /**
+     * Inserts a provenance record into the provenance table of the
+     * data package registry.
+     * 
+     * @param derivedId
+     * @param sourceId
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws ProvenanceException
+     */
+	public void insertProvenance(String derivedId, String sourceId) 
+			throws ClassNotFoundException, SQLException, ProvenanceException {
+		Connection connection = null;
+		
+		if (derivedId == null || sourceId == null) {
+			throw new ProvenanceException("null package id");
+		}
+		
+		/*
+		 * Check whether the documented source data package exists in
+		 * PASTA. Flag an error if it doesn't.
+		 */
+		EmlPackageIdFormat epif = new EmlPackageIdFormat();
+		EmlPackageId epi = epif.parse(sourceId);
+		String sourceResourceId = 
+				DataPackageManager.composeResourceId(ResourceType.dataPackage, 
+						                             epi.getScope(),
+						                             epi.getIdentifier(), 
+						                             epi.getRevision(), 
+						                             null);
+		if (!hasResource(sourceResourceId)) {
+			throw new ProvenanceException(
+					String.format("The derived data package '%s' documents provenance "
+							    + "to a non-existent source data package '%s'",
+							      derivedId, sourceId));
+		}
+
+		/*
+		 * Since the combination of derivedId and sourceId is a primary key 
+		 * and must be unique, delete any existing provenance records for this 
+		 * pair of values.
+		 */
+		String deleteString = "DELETE FROM "  + PROVENANCE + "  WHERE derived_id=? AND source_id=?";
+		logger.debug("deleteString: " + deleteString);
+
+		try {
+			connection = getConnection();
+			PreparedStatement pstmt = connection.prepareStatement(deleteString);
+			pstmt.setString(1, derivedId);
+			pstmt.setString(2, sourceId);
+			pstmt.executeUpdate();
+			if (pstmt != null) { pstmt.close(); }
+		}
+		catch (SQLException e) {
+			logger.error(
+					String.format("Error deleting provenance record for derived id %s " +
+			                      "and source id %s", derivedId, sourceId));
+			logger.error("SQLException: " + e.getMessage());
+			throw(e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+
+		StringBuffer insertSQL = new StringBuffer("INSERT INTO " + PROVENANCE + "(");
+		insertSQL.append("derived_id, source_id) VALUES(?,?)");      
+		String insertString = insertSQL.toString();
+		logger.debug("insertString: " + insertString);
+
+		try {
+			connection = getConnection();
+			PreparedStatement pstmt = connection.prepareStatement(insertString);
+			pstmt.setString(1, derivedId);
+			pstmt.setString(2, sourceId);
+			pstmt.executeUpdate();
+			if (pstmt != null) {
+				pstmt.close();
+			}
+		}
+		catch (SQLException e) {
+			logger.error(
+					String.format("Error inserting provenance record for derived id %s " +
+			                      "and source id %s", derivedId, sourceId));
+			logger.error("SQLException: " + e.getMessage());
+			throw(e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+	}
+
 
   /**
    * Boolean to determine whether the Data Package Registry

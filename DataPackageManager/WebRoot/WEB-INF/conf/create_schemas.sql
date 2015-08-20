@@ -62,3 +62,12 @@ CREATE TABLE datapackagemanager.emlsubscription (
    revision           integer,
    url                text       not null
 );
+
+
+CREATE TABLE datapackagemanager.provenance (
+  DERIVED_ID TEXT NOT NULL,                                     -- packageId of derived data package
+  SOURCE_ID TEXT NOT NULL,                                      -- packageId of source data package
+  CONSTRAINT PK_PROVENANCE PRIMARY KEY (DERIVED_ID, SOURCE_ID)  -- two-column primary key
+);
+
+

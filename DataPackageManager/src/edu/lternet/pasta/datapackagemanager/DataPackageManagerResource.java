@@ -1674,6 +1674,191 @@ public class DataPackageManagerResource extends PastaWebService {
 
 	/**
 	 * 
+	 * <strong>List Data Descendants</strong> operation, specifying the scope,
+	 * identifier, and revision values to match in the URI.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/descendants/eml/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>A list of data package identifiers representing the descendant data
+	 * packages. A descendant data package is defined as a data package which
+	 * depends on this data package as one of its data sources.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * knb-lter-xyz.1.2
+	 * knb-lter-xyz.2.1
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal
+	 * identifier or revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to access a list
+	 * of the data entities</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package entities associated with the specified
+	 * packageId are found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *            The scope of the data package
+	 * @param identifier
+	 *            The identifier of the data package
+	 * @param revision
+	 *            The revision of the data package. A string that represents a
+	 *            whole number, or, the symbolic values "oldest" or "newest".
+	 * @return a Response, containing a newline separated list of data package
+	 *         identifiers representing the data sources from which the
+	 *         specified data package was derived
+	 */
+	@GET
+	@Path("/descendants/eml/{scope}/{identifier}/{revision}")
+	@Produces("text/plain")
+	public Response listDataDescendants(@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") String revision) {
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listDataDescendants";
+		Rule.Permission permission = Rule.Permission.read;
+		AuthToken authToken = null;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+
+			/*
+			 * Handle symbolic revisions such as "newest" and "oldest".
+			 */
+			if (revision != null) {
+				if (revision.equals("newest")) {
+					Integer newest = dataPackageManager.getNewestRevision(
+							scope, identifier);
+					if (newest != null) {
+						revision = newest.toString();
+					}
+				}
+				else
+					if (revision.equals("oldest")) {
+						Integer oldest = dataPackageManager.getOldestRevision(
+								scope, identifier);
+						if (oldest != null) {
+							revision = oldest.toString();
+						}
+					}
+			}
+
+			Integer revisionInt = new Integer(revision);
+			String dataSourcesList = dataPackageManager.listDataDescendants(scope,
+					identifier, revisionInt, authToken);
+
+			if (dataSourcesList != null) {
+				responseBuilder = Response.ok(dataSourcesList.trim());
+				response = responseBuilder.build();
+			}
+			else {
+				String message = "An unknown error occurred";
+				throw new Exception(message);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
+	 * 
 	 * <strong>List Data Sources</strong> operation, specifying the scope,
 	 * identifier, and revision values to match in the URI.
 	 * 
@@ -1711,8 +1896,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td>
 	 * 
 	 * <pre>
-	 * EntityOne
-	 * EntityTwo
+	 * knb-lter-xyz.1.2
+	 * knb-lter-xyz.2.1
 	 * </pre>
 	 * 
 	 * </td>

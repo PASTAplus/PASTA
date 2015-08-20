@@ -642,6 +642,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				isMetadataValid = false;
 				isDataPackageValid = false;
 			}
+			
+			/*
+			 * Insert any provenance records that may exist for this data package
+			 */
+			try {
+				ProvenanceIndex provenanceIndex = new ProvenanceIndex(dataPackageRegistry);
+				provenanceIndex.insertProvenanceRecords(packageId, emlDocument);
+			} 
+			catch (Exception e) {
+				rollbackDataEntities(scope, identifier, revision);
+				throw (e);
+			}
 		}
 
 		/*
@@ -1266,39 +1278,82 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * List the data descendant URLs for the specified data package, that is,
+	 * the list of data package identifiers representing the data 
+	 * packages that are derived from the specified source data package.
+	 * This is determined by searching the "derivedFrom" field of all data
+	 * packages in 
+	 * 
+	 * @param scope
+	 *          the scope value of the source data package
+	 * @param identifier
+	 *          the identifier value of the source data package
+	 * @param revision
+	 *          the revision value of the source data package
+	 * @param user
+	 *          the user name
+	 * @return a newline-separated list of data package resource identifiers
+	 */
+	public String listDataDescendants(String scope, Integer identifier, Integer revision, AuthToken authToken) 
+			throws Exception {
+		String dataDescendantsString = null;
+		StringBuilder stringBuilder = new StringBuilder("");
+		EMLParser emlParser = new EMLParser();
+		ArrayList<String> dataSources = null;
+		String userId = authToken.getUserId();
+
+		String xml = readMetadata(scope, identifier, revision.toString(), userId, authToken);
+
+		if (xml != null) {
+			try {
+				InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+				edu.lternet.pasta.common.eml.DataPackage dataPackage = emlParser.parseDocument(inputStream);
+
+				if (dataPackage != null) {
+					dataSources = dataPackage.getDataSources();
+				}
+			}
+			catch (Exception e) {
+				logger.error("Error parsing EML metacdata: " + e.getMessage());
+			}
+		}
+
+		// Only include data source URLs that match the PASTA identifier pattern
+		for (String dataSource : dataSources) {
+			if (DataPackageManager.isPastaDataSource(dataSource)) {
+				stringBuilder.append(dataSource + "\n");
+			}
+		}
+
+		dataDescendantsString = stringBuilder.toString();
+		return dataDescendantsString;
+	}
+
+
+	/**
 	 * List the data sources URLs for the specified data package, that is,
 	 * the list of data package identifiers representing the data 
 	 * sources from which this data package is derived
 	 * 
 	 * @param scope
-	 *          the scope value
+	 *          the scope value of the derived data package
 	 * @param identifier
-	 *          the identifier value
+	 *          the identifier value of the derived data package
 	 * @param revision
-	 *          the revision value
+	 *          the revision value of the derived data package
 	 * @param user
 	 *          the user name
-	 * @return a newline-separated list of data entity resource identifiers
+	 * @return a newline-separated list of data package resource identifiers
 	 */
 	public String listDataSources(String scope, Integer identifier, Integer revision, AuthToken authToken) 
 			throws Exception {
 		String dataSourcesString = null;
 		StringBuilder stringBuilder = new StringBuilder("");
-		DataPackageManager dpm = null;
 		EMLParser emlParser = new EMLParser();
 		ArrayList<String> dataSources = null;
 		String userId = authToken.getUserId();
 
-		try {
-			dpm = new DataPackageManager();
-		}
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			throw e;
-		}
-
-		String xml = dpm.readMetadata(scope, identifier, revision.toString(), userId, authToken);
+		String xml = readMetadata(scope, identifier, revision.toString(), userId, authToken);
 
 		if (xml != null) {
 			try {
