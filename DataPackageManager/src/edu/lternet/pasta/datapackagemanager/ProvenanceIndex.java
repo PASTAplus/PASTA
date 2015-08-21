@@ -74,6 +74,22 @@ public class ProvenanceIndex {
 	
 	
 	/**
+	 * Delete provenance records for the specified package identifier.
+	 * This is used to rollback a failed data package upload for a specific
+	 * revision of a data package.
+	 * 
+	 * @param  packageId  the package identifier including revision, e.g. 'knb-lter-nin.1.1'
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public void rollbackProvenanceRecords(String packageId) 
+			throws IOException, ClassNotFoundException, SQLException {
+		dpr.deleteProvenanceRecords(packageId);
+	}
+	
+	
+	/**
 	 * Inserts provenance records for an EML document.
 	 * 
 	 * @param derivedId     the EML package id object of the EML document

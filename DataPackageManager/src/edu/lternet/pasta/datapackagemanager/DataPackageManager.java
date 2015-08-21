@@ -646,11 +646,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * Insert any provenance records that may exist for this data package
 			 */
+			ProvenanceIndex provenanceIndex = new ProvenanceIndex(dataPackageRegistry);
 			try {
-				ProvenanceIndex provenanceIndex = new ProvenanceIndex(dataPackageRegistry);
 				provenanceIndex.insertProvenanceRecords(packageId, emlDocument);
 			} 
 			catch (Exception e) {
+				provenanceIndex.rollbackProvenanceRecords(packageId);
 				rollbackDataEntities(scope, identifier, revision);
 				throw (e);
 			}

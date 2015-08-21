@@ -575,6 +575,54 @@ public class DataPackageRegistry {
 	
 	
 	/**
+	 * Delete provenance records for a data package.
+	 * 
+	 * @param  packageId  the data package identifier, e.g. "knb-lter-nin.1.1"
+	 * @return true if successfully deleted, else false
+	 */
+	public boolean deleteProvenanceRecords(String packageId) 
+			throws ClassNotFoundException, SQLException {
+		boolean deleted = false;
+
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("DELETE FROM " + PROVENANCE + " WHERE derived_id=?");
+		String updateSQL = sqlBuilder.toString();
+
+		Connection conn = getConnection();
+
+		if (conn != null) {
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+				pstmt.setString(1, packageId); // Set packageId value
+				int nRecords = pstmt.executeUpdate();
+				pstmt.close();
+
+				// Should update one or more records in the resource registry
+				if (nRecords >= 1) {
+					logger.debug("deleteDataPackage() updated " + nRecords
+							+ " records.");
+					deleted = true;
+				}
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			}
+			finally {
+				returnConnection(conn);
+			}
+		}
+		else {
+			String message = "deleteDataPackage() failed due to connection error.";
+			SQLException e = new SQLException(message);
+			throw (e);
+		}
+
+		return deleted;
+	}
+
+	
+	/**
 	 * Delete the DOI field of the Data Package Manager resource registry
 	 * for the resource identified by the DOI.
 	 * 
@@ -1550,8 +1598,11 @@ public class DataPackageRegistry {
 			throws ClassNotFoundException, SQLException, ProvenanceException {
 		Connection connection = null;
 		
-		if (derivedId == null || sourceId == null) {
-			throw new ProvenanceException("null package id");
+		if (derivedId == null) {
+			throw new ProvenanceException("Provenance error: null package id for derived data package");
+		}
+		else if (sourceId == null) {
+			throw new ProvenanceException("Provenance error: null package id for source data package");
 		}
 		
 		/*
@@ -1568,8 +1619,8 @@ public class DataPackageRegistry {
 						                             null);
 		if (!hasResource(sourceResourceId)) {
 			throw new ProvenanceException(
-					String.format("The derived data package '%s' documents provenance "
-							    + "to a non-existent source data package '%s'",
+					String.format("The derived data package %s documents a dependency "
+							    + "on a non-existent source data package %s",
 							      derivedId, sourceId));
 		}
 
