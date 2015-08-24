@@ -80,8 +80,9 @@ public class StorageManager {
 	private static List<EmlPackageId> getAllDataPackageRevisions(DataPackageRegistry dataPackageRegistry) 
 			throws ClassNotFoundException, SQLException {
 			List<EmlPackageId> allDataPackageRevisions = new ArrayList<EmlPackageId>();
+			boolean includeInactive = true;
 			
-			ArrayList<String> packageIdList = dataPackageRegistry.listAllDataPackageRevisions();
+			ArrayList<String> packageIdList = dataPackageRegistry.listAllDataPackageRevisions(includeInactive);
 
 			for (String packageId : packageIdList) {
 				if (packageId != null && packageId.contains(".")) {

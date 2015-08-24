@@ -1902,6 +1902,7 @@ public class DataPackageRegistry {
 	  /**
 	   * Lists all data package revisions known to PASTA, including active and deleted.
 	   * 
+	   * @param  includeInactive  if true, include deleted revisions
 	   * @return A list of packageId strings corresponding to the list of
 	   *         data packages.
 	   *        
@@ -1909,7 +1910,7 @@ public class DataPackageRegistry {
 	   * @throws SQLException
 	   * @throws IllegalArgumentException
 	   */
-	  public ArrayList<String> listAllDataPackageRevisions()
+	  public ArrayList<String> listAllDataPackageRevisions(boolean includeInactive)
 	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
 	    ArrayList<String> packageIdList = new ArrayList<String>();
 
@@ -1917,8 +1918,9 @@ public class DataPackageRegistry {
 	    String selectString = 
 	    	"SELECT DISTINCT scope, identifier, revision" +
 	        "  FROM " + RESOURCE_REGISTRY +
-	        "  WHERE resource_type='dataPackage'" +
-	        "  ORDER BY scope, identifier, revision";
+	        "  WHERE resource_type='dataPackage'";	    
+	    if (!includeInactive) selectString += " AND date_deactivated IS NULL"; 
+	    selectString += "  ORDER BY scope, identifier, revision";
 	    Statement stmt = null;
 
 	    try {
