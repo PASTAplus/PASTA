@@ -1291,39 +1291,25 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the identifier value of the source data package
 	 * @param revision
 	 *          the revision value of the source data package
-	 * @param user
-	 *          the user name
+	 * @param authToken
+	 *          the authorization token object
 	 * @return a newline-separated list of data package resource identifiers
 	 */
 	public String listDataDescendants(String scope, Integer identifier, Integer revision, AuthToken authToken) 
 			throws Exception {
 		String dataDescendantsString = null;
 		StringBuilder stringBuilder = new StringBuilder("");
-		EMLParser emlParser = new EMLParser();
-		ArrayList<String> dataSources = null;
-		String userId = authToken.getUserId();
+		EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+		EmlPackageIdFormat epif = new EmlPackageIdFormat();
+		String sourceId = epif.format(epi);
 
-		String xml = readMetadata(scope, identifier, revision.toString(), userId, authToken);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		
+		ArrayList<String> dataSources = dataPackageRegistry.listDataDescendants(sourceId);
 
-		if (xml != null) {
-			try {
-				InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
-				edu.lternet.pasta.common.eml.DataPackage dataPackage = emlParser.parseDocument(inputStream);
-
-				if (dataPackage != null) {
-					dataSources = dataPackage.getDataSources();
-				}
-			}
-			catch (Exception e) {
-				logger.error("Error parsing EML metacdata: " + e.getMessage());
-			}
-		}
-
-		// Only include data source URLs that match the PASTA identifier pattern
-		for (String dataSource : dataSources) {
-			if (DataPackageManager.isPastaDataSource(dataSource)) {
-				stringBuilder.append(dataSource + "\n");
-			}
+		for (String dataPackage : dataSources) {
+			stringBuilder.append(dataPackage + "\n");
 		}
 
 		dataDescendantsString = stringBuilder.toString();

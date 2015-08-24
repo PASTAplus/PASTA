@@ -1952,6 +1952,59 @@ public class DataPackageRegistry {
 
 	  
 	  /**
+	   * Lists all data packages that have a dependency on the specified
+	   * data package, such that the specified data package is a source
+	   * data package for the returned list of derived data packages.
+	   * 
+	   * @param  sourceId - the packageId of the source data package
+	   * @return A list of packageId strings corresponding to the list of
+	   *         derived data packages associated with the specified source
+	   *         data packages. If no other data package depends on the
+	   *         specified data package, then the list is empty.
+	   *         
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
+	  public ArrayList<String> listDataDescendants(String sourceId)
+	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	    ArrayList<String> docidList = new ArrayList<String>();
+
+	    Connection connection = null;
+	    String selectString = 
+	    		String.format("SELECT DISTINCT derived_id FROM %s" +
+	                          "  WHERE source_id='%s' ORDER BY derived_id", 
+	                          PROVENANCE, sourceId);
+	    Statement stmt = null;
+
+	    try {
+	      connection = getConnection();
+	      stmt = connection.createStatement();
+	      ResultSet rs = stmt.executeQuery(selectString);
+
+	      while (rs.next()) {
+	        String derivedId = rs.getString("derived_id");
+	        docidList.add(derivedId);
+	      }
+	    }
+	    catch (ClassNotFoundException e) {
+	      logger.error("ClassNotFoundException: " + e.getMessage());
+	      throw (e);
+	    }
+	    catch (SQLException e) {
+	      logger.error("SQLException: " + e.getMessage());
+	      throw (e);
+	    }
+	    finally {
+	      if (stmt != null) stmt.close();
+	      returnConnection(connection);
+	    }
+
+	    return docidList;
+	  }
+
+	  
+	  /**
 	   * Lists all data entities for a given data package.
 	   * 
 	   * @param scope        the data package scope value
