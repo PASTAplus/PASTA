@@ -1688,7 +1688,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td align=center>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/descendants/eml/knb-lter-lno/1/1</code>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/descendants/eml/lter-landsat/7/1</code>
 	 * </td>
 	 * </tr>
 	 * </table>
@@ -1705,17 +1705,15 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The list request was successful</td>
-	 * <td align=center>A list of data package identifiers representing the descendant data
-	 * packages. A descendant data package is defined as a data package which
-	 * depends on this data package as one of its data sources.</td>
+	 * <td align=center>A list of data package metadata resource identifiers 
+	 * representing the descendant data packages. A descendant data package is 
+	 * defined as a data package which depends on the specified data package as 
+	 * one of its data sources.</td>
 	 * <td align=center><code>text/plain</code></td>
 	 * <td>
-	 * 
 	 * <pre>
-	 * knb-lter-xyz.1.2
-	 * knb-lter-xyz.2.1
+     *   https://pasta.lternet.edu/package/metadata/eml/lter-landsat-ledaps/7/1
 	 * </pre>
-	 * 
 	 * </td>
 	 * </tr>
 	 * <tr>
@@ -1873,7 +1871,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td align=center>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/sources/eml/knb-lter-lno/1/1</code>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/sources/eml/lter-landsat-ledaps/7/1</code>
 	 * </td>
 	 * </tr>
 	 * </table>
@@ -1890,16 +1888,13 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The list request was successful</td>
-	 * <td align=center>A list of data package identifiers representing the data sources
-	 * from which this data package was derived</td>
+	 * <td align=center>A list of PASTA metadata resource identifiers representing 
+	 * the data sources from which this data package was derived</td>
 	 * <td align=center><code>text/plain</code></td>
 	 * <td>
-	 * 
 	 * <pre>
-	 * knb-lter-xyz.1.2
-	 * knb-lter-xyz.2.1
-	 * </pre>
-	 * 
+     *   https://pasta.lternet.edu/package/metadata/eml/lter-landsat/7/1
+     * </pre>
 	 * </td>
 	 * </tr>
 	 * <tr>
@@ -1952,7 +1947,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *            The revision of the data package. A string that represents a
 	 *            whole number, or, the symbolic values "oldest" or "newest".
 	 * @return a Response, containing a newline separated list of data package
-	 *         identifiers representing the data sources from which the
+	 *         metadata resource identifiers representing the data sources from which the
 	 *         specified data package was derived
 	 */
 	@GET

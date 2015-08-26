@@ -640,9 +640,30 @@ public class MapBrowseServlet extends DataPortalServlet {
 					if (dataSources.length > 0) {
 						String dataSource = dataSources[0];
 						if (dataSource != null && dataSource.length() > 0) {
-							provenanceHTMLBuilder.append("This data package was derived from the following sources:<br/>");
+							provenanceHTMLBuilder.append("This data package is derived from the following sources:<br/>");
 							provenanceHTMLBuilder.append("<ol>\n");
 							for (String uri : dataSources) {
+								String mapbrowseURL = mapbrowseURL(uri);
+								String listItem = String.format("<li>%s</li>", mapbrowseURL);
+								provenanceHTMLBuilder.append(listItem);
+							}
+							provenanceHTMLBuilder.append("</ol>\n");
+							provenanceHTMLBuilder.append("<br/>");
+						}
+					}
+				}
+				
+				String dataDescendantsStr = dpmClient.listDataDescendants(scope, id, revision);
+				
+				if (dataDescendantsStr != null &&
+						dataDescendantsStr.length() > 0) {
+					String[] dataDescendants = dataDescendantsStr.split("\n");
+					if (dataDescendants.length > 0) {
+						String dataDescendant = dataDescendants[0];
+						if (dataDescendant != null && dataDescendant.length() > 0) {
+							provenanceHTMLBuilder.append("This data package is a source for the following derived data packages:<br/>");
+							provenanceHTMLBuilder.append("<ol>\n");
+							for (String uri : dataDescendants) {
 								String mapbrowseURL = mapbrowseURL(uri);
 								String listItem = String.format("<li>%s</li>", mapbrowseURL);
 								provenanceHTMLBuilder.append(listItem);

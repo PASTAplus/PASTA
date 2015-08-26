@@ -115,6 +115,37 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	  }
 	  
 	  
+	  /*
+	   * Composes a data package metadata resource identifier based on the PASTA URI
+	   * head value and a specific packageId value.
+	   */
+	  public static String packageIdToMetadataResourceId(String pastaUriHead, String packageId) {
+	    String resourceId = null;
+	    final String SLASH = "/";
+	    
+	    if (pastaUriHead != null) {
+	      EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+	      
+	      try {
+	        EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
+	        String scope = emlPackageId.getScope();
+	        Integer identifier = emlPackageId.getIdentifier();
+	        Integer revision = emlPackageId.getRevision();
+	      
+	        if (scope != null && identifier != null && revision != null) {        
+	          resourceId = pastaUriHead + "metadata" + SLASH + "eml" + SLASH + 
+	                       scope + SLASH + identifier + SLASH + revision;
+	        } 
+	      }
+	      catch (IllegalArgumentException e) {
+	        
+	      }
+	    }
+	    
+	    return resourceId;
+	  }
+
+	  
 	/*
 	 * Class fields
 	 */
@@ -1308,8 +1339,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
 		ArrayList<String> dataSources = dataPackageRegistry.listDataDescendants(sourceId);
 
-		for (String dataPackage : dataSources) {
-			stringBuilder.append(dataPackage + "\n");
+		for (String packageId : dataSources) {
+			String resourceId = packageIdToMetadataResourceId(pastaUriHead, packageId);
+			stringBuilder.append(resourceId + "\n");
 		}
 
 		dataDescendantsString = stringBuilder.toString();
