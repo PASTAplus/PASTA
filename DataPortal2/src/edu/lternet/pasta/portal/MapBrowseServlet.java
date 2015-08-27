@@ -382,28 +382,62 @@ public class MapBrowseServlet extends DataPortalServlet {
 					
 					request.setAttribute("jsonCoordinates", jsonCoordinates);
 					if (stringCoordinates != null && !stringCoordinates.equals("")) {
-						spatialCoverageHTMLBuilder.append("<ul class=\"no-list-style\">\n");
+
 						String[] coordinatesArray = stringCoordinates.split(":");
-						boolean firstCoordinates = true;
-						for (String coordinates : coordinatesArray) {
-							String[] nsew = coordinates.split(",");						
+						boolean useExpander = (coordinatesArray.length > 1) ? true : false;
+						
+						if (useExpander) {
+							spatialCoverageHTMLBuilder.append("<div id='jqxWidget'>\n");
+							spatialCoverageHTMLBuilder.append("    <div id='jqxExpander'>\n");
+							spatialCoverageHTMLBuilder.append("        <div>Geographic Coordinates</div>\n");
+							spatialCoverageHTMLBuilder.append("        <div>\n");
+							spatialCoverageHTMLBuilder.append("            <ul>\n");
+							boolean firstCoordinates = true;
+							
+							for (String coordinates : coordinatesArray) {
+								String[] nsew = coordinates.split(",");
+								Double northCoord = new Double(nsew[0]);
+								Double southCoord = new Double(nsew[1]);
+								Double eastCoord = new Double(nsew[2]);
+								Double westCoord = new Double(nsew[3]);
+								if (firstCoordinates) {
+									request.setAttribute("northCoord", northCoord);
+									request.setAttribute("southCoord", southCoord);
+									request.setAttribute("eastCoord", eastCoord);
+									request.setAttribute("westCoord", westCoord);
+								}
+								firstCoordinates = false;
+								String spatial = String.format("N: %s,  S: %s,  E: %s,  W: %s",
+								             northCoord, southCoord, eastCoord, westCoord);
+								spatialCoverageHTMLBuilder.append(
+										String.format("  <li>%s</li>\n", spatial));	
+							}
+							
+							spatialCoverageHTMLBuilder.append("            </ul>\n");
+							spatialCoverageHTMLBuilder.append("        </div>\n");
+							spatialCoverageHTMLBuilder.append("    </div>\n");
+							spatialCoverageHTMLBuilder.append("</div>\n");
+						}
+						else {
+							String[] nsew = coordinatesArray[0].split(",");						
 							Double northCoord = new Double(nsew[0]);
 							Double southCoord = new Double(nsew[1]);
 							Double eastCoord = new Double(nsew[2]);
 							Double westCoord = new Double(nsew[3]);
-							if (firstCoordinates) {
-								request.setAttribute("northCoord", northCoord);
-								request.setAttribute("southCoord", southCoord);
-								request.setAttribute("eastCoord", eastCoord);
-								request.setAttribute("westCoord", westCoord);
-							}
-							firstCoordinates = false;
-							String spatial = String.format("N: %s,  S: %s,  E: %s,  W: %s",
-								                        	northCoord, southCoord, eastCoord, westCoord);
-							spatialCoverageHTMLBuilder.append(String.format("  <li>%s</li>\n", spatial));	
+							request.setAttribute("northCoord", northCoord);
+							request.setAttribute("southCoord", southCoord);
+							request.setAttribute("eastCoord", eastCoord);
+							request.setAttribute("westCoord", westCoord);
+							final String spacer = "&nbsp;&nbsp;&nbsp;&nbsp;";
+							String spatial = String.format("N: %s%sS: %s%sE: %s%sW: %s",
+									          northCoord, spacer, southCoord, spacer, eastCoord, spacer, westCoord);
+							spatialCoverageHTMLBuilder.append(String.format("%s\n", spatial));
 						}
-						spatialCoverageHTMLBuilder.append("</ul>\n");
+						
+						
+						
 						spatialCoverageHTML = spatialCoverageHTMLBuilder.toString();
+
 						googleMapHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 						googleMapHTMLBuilder.append("  <li><div id='map-canvas-summary'></div></li>");						
 						googleMapHTMLBuilder.append("</ul>\n");

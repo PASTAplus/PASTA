@@ -2916,7 +2916,7 @@ p.cite cite {
 
 #map-canvas-summary {
   margin: 0 auto; 
-  width: 400px; 
+  width: 450px; 
   height: 250px;
   border: 2px solid #5990bd;
   float: left;
@@ -3023,6 +3023,10 @@ td.nis-provenance-label {
 	text-align: right;
 	vertical-align: top;
 	padding-right: 5px;
+}
+
+.nis-summary-label {
+	vertical-align: top;
 }
 
 /*

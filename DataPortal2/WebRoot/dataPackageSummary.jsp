@@ -48,6 +48,11 @@
 <!-- Google Fonts CSS -->
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css">
 
+<!-- jqWidgets CSS for jqxTree widget -->
+<link rel="stylesheet" href="./js/jqwidgets/styles/jqx.base.css"  type="text/css" />
+<link rel="stylesheet" href="./js/jqwidgets/styles/jqx.bootstrap.css" type="text/css" />
+<link rel="stylesheet" href="./js/jqwidgets/styles/jqx.energyblue.css" type="text/css" />
+
 <!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
 <link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css">
 
@@ -88,6 +93,21 @@
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
+<!-- jqWidgets JavaScript for jqxTree widget -->
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
+    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxexpander.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Create jqxExpander
+            $("#jqxExpander").jqxExpander(
+            	{ width: '454px', 
+            	  theme: 'bootstrap',
+            	  expanded: false
+            	});
+        });
+    </script>
+    
 </head>
 
 <body>
@@ -146,7 +166,7 @@
 							<c:choose>
 								<c:when test="${showAbstract}">
 									<div class="table-row">										
-										<div class="table-cell text-align-right">
+										<div class="table-cell text-align-right nis-summary-label">
 											<label class="labelBold">Abstract:</label>
 										</div>
 										<div class="table-cell">
@@ -162,26 +182,42 @@
 
 							<c:choose>
 								<c:when test="${showSpatial}">
-									<div class="table-row">										
-										<div class="table-cell text-align-right">
+								
+									<div class="table-row">
+																	
+										<div class="table-cell text-align-right nis-summary-label">
 											<label class="labelBold">Spatial Coverage:</label>
 										</div>
+																				
 										<div class="table-cell">
-											<%= spatialCoverageHTML %>
-										</div>											
+											<ul class="no-list-style" style="margin-top:2px">
+												<li>
+ 													<%= spatialCoverageHTML %>
+												</li>
+											</ul>
+										</div>
+										
 									</div>
-									<div class="table-row">										
+
+									<div class="table-row">	
+																		
 										<div class="table-cell text-align-right">
 											<label class="labelBold"></label>
 										</div>
+										
 										<div class="table-cell">
 											<%= googleMapHTML %>
-										</div>											
+										</div>			
+																		
 									</div>
-									<div class="table-row">										
-										<div class="table-cell">&nbsp;</div>											
-										<div class="table-cell">&nbsp;</div>											
+																		
+									<div class="table-row">									
+										<div class="table-cell text-align-right">
+											<label class="labelBold"></label>
+										</div>
+										<div class="table-cell"></div>								
 									</div>
+																		
 								</c:when>
 							</c:choose>
 
