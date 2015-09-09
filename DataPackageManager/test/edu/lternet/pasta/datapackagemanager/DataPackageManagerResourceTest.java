@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -847,7 +848,9 @@ public class DataPackageManagerResourceTest {
    */
   @Test
   public void testSearchDataPackages() {
-	Map<String, String> query = Collections.singletonMap("q", SOLR_QUERY);
+	HashMap<String, String> query = new HashMap<String, String>();	
+	query.put("q", SOLR_QUERY);
+	query.put("fl", "id,packageid,title,author,organization,pubdate,coordinates,doi,funding");
 	UriInfo uriInfo = new edu.lternet.pasta.eventmanager.DummyUriInfo(query);
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
@@ -862,7 +865,7 @@ public class DataPackageManagerResourceTest {
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains("<resultset"));
-      assertTrue(entityString.contains(SOLR_QUERY));
+      assertTrue(entityString.contains("packageid"));
     }
   }
     

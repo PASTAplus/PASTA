@@ -1,3 +1,27 @@
+/*
+ *
+ * $Date$
+ * $Author: dcosta $
+ * $Revision$
+ *
+ * Copyright 2011-2015 the University of New Mexico.
+ *
+ * This work was supported by National Science Foundation Cooperative
+ * Agreements #DEB-0832652 and #DEB-0936498.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ */
+
 package edu.lternet.pasta.datapackagemanager.solr.search;
 
 import java.text.SimpleDateFormat;
@@ -14,6 +38,14 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+/**
+ * The SimpleSolrSearch class executes a simple search by the Solr
+ * server via the SolrJ API. The search results are returned as an XML
+ * document.
+ * 
+ * @author dcosta
+ *
+ */
 public class SimpleSolrSearch {
 
 	/*
@@ -21,6 +53,8 @@ public class SimpleSolrSearch {
 	 */
 
 	private static final Logger logger = Logger.getLogger(SimpleSolrSearch.class);
+	private static String[] multivalueFields = 
+		{ "author", "coordinates",  "organization", "title" };
 		
 		
 	/*
@@ -61,6 +95,49 @@ public class SimpleSolrSearch {
 	}
 	
 	
+	/*
+	 * Did this Solr query include the specified field name in 
+	 * its "fl" (field list) parameter?
+	 */
+	private boolean hasField(String fieldName) {
+		boolean found = false;
+		
+		String[] fieldsArray = getFields();
+		if (fieldsArray != null) {
+			for (String token : fieldsArray) {
+				if (token.equals(fieldName)) {
+					found = true;
+					break;
+				}
+			}
+		}
+		
+		return found;
+	}
+	
+	
+	/*
+	 * Return an array of field names that were specified
+	 * by the query in its "fl" (field list) parameter.
+	 */
+	private String[] getFields() {
+		String[] fieldsArray = null;
+		
+		String fieldsStr = solrQuery.getFields();
+		if ((fieldsStr != null) && (fieldsStr.length() > 0)) {
+			fieldsArray = fieldsStr.split(",");
+		}
+		
+		return fieldsArray;
+	}
+	
+	
+	/**
+	 * Executes a Solr search.
+	 * 
+	 * @return an XML string containing the search results
+	 * @throws SolrServerException
+	 */
 	public String search() 
 			throws SolrServerException {
 		QueryResponse queryResponse = solrServer.query(solrQuery);
@@ -114,10 +191,12 @@ public class SimpleSolrSearch {
 		}
 	}
 	
+	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
 		long numFound = solrDocumentList.getNumFound();
 		long start = solrDocumentList.getStart();
+		String[] fieldsArray = getFields();
 		
 		String firstLine = String.format("<resultset numFound='%d' start='%d' rows='%d'>\n", numFound, start, rows);
 		StringBuilder sb = new StringBuilder(firstLine);
@@ -125,52 +204,85 @@ public class SimpleSolrSearch {
 		for (SolrDocument solrDocument : solrDocumentList) {
 			sb.append("  <document>\n");
 			
-			String yearStr = "";
-			String docid = (String) solrDocument.getFieldValue("id");
-			String packageId = (String) solrDocument.getFieldValue("packageid");
-			Date pubDate = (Date) solrDocument.getFieldValue("pubdate");
-			SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
-			if (pubDate != null) {
-			    yearStr = sdf.format(pubDate);
-			}
-			String title = (String) solrDocument.getFirstValue("title");
-			
-			sb.append(String.format("    <docid>%s</docid>\n", docid));
-			sb.append(String.format("    <packageId>%s</packageId>\n", packageId));
-			sb.append(String.format("    <pubDate>%s</pubDate>\n", yearStr));
-			sb.append(String.format("    <title>%s</title>\n", title));
-			
-			sb.append("    <authors>\n");
-			Collection<Object> authors = solrDocument.getFieldValues("author");
-			if (authors != null && authors.size() > 0) {
-				for (Object author : authors) {
-					String authorStr = (String) author;
-					sb.append(String.format("      <author>%s</author>\n", authorStr));
+			if (fieldsArray != null) {
+				
+				for (String fieldName : fieldsArray) {
+					
+					if (fieldName.equals("title")) {			
+						String title = (String) solrDocument.getFirstValue(fieldName);
+						sb.append(String.format("    <%s>%s</%s>\n",
+                                                     fieldName, title, fieldName));
+					}
+					else if (fieldName.equals("organization")) {
+						sb.append("    <organizations>\n");
+						Collection<Object> organizations = solrDocument.getFieldValues("organization");
+						if (organizations != null && organizations.size() > 0) {
+							for (Object organization : organizations) {
+								String organizationStr = (String) organization;
+								sb.append(String.format("      <organization>%s</organization>\n", organizationStr));
+							}
+						}
+						sb.append("    </organizations>\n");
+					}
+					else if (fieldName.equals("author")) {
+						sb.append("    <authors>\n");
+						Collection<Object> authors = solrDocument.getFieldValues("author");
+						if (authors != null && authors.size() > 0) {
+							for (Object author : authors) {
+								String authorStr = (String) author;
+								sb.append(String.format("      <author>%s</author>\n", authorStr));
+							}
+						}
+						sb.append("    </authors>\n");
+					}
+					else if (fieldName.equals("coordinates")) {
+						sb.append("    <spatialCoverage>\n");
+						Collection<Object> spatialCoverage = solrDocument.getFieldValues("coordinates");
+						if (spatialCoverage != null && spatialCoverage.size() > 0) {
+							for (Object coordinates : spatialCoverage) {
+								String coordinatesStr = (String) coordinates;
+								sb.append(String.format("      <coordinates>%s</coordinates>\n", coordinatesStr));
+							}
+						}
+						sb.append("    </spatialCoverage>\n");
+					}
+					else {					
+						String fieldValue = "";
+						if (fieldName.equals("pubdate")) {
+							Date pubDate = (Date) solrDocument.getFieldValue(fieldName);
+							SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+							if (pubDate != null) {
+								fieldValue = sdf.format(pubDate);
+							}
+						}
+						else {
+							fieldValue = (String) solrDocument.getFieldValue(fieldName);
+							if (fieldValue == null) fieldValue = "";
+						}
+						sb.append(String.format("    <%s>%s</%s>\n",
+				                                     fieldName, fieldValue, fieldName));
+
+						/*
+						 * Support the older format for search results.
+						 * 
+						 * These element names ("docid", "packageId", and "pubDate")
+						 * were never officially documented but some clients might rely 
+						 * on them. They should be deprecated. They have been
+						 * replaced with element names that exactly match their
+						 * corresponding Solr field names: "id", "packageid", and "pubdate".
+						 */
+						if (fieldName.equals("id")) {
+							sb.append(String.format("    <docid>%s</docid>\n", fieldValue));
+						}
+						else if (fieldName.equals("packageid")) {
+							sb.append(String.format("    <packageId>%s</packageId>\n", fieldValue));
+						}
+						else if (fieldName.equals("pubdate")) {
+							sb.append(String.format("    <pubDate>%s</pubDate>\n", fieldValue));
+						}
+					}
 				}
 			}
-			sb.append("    </authors>\n");
-			
-			sb.append("    <organizations>\n");
-			Collection<Object> organizations = solrDocument.getFieldValues("organization");
-			if (organizations != null && organizations.size() > 0) {
-				for (Object organization : organizations) {
-					String organizationStr = (String) organization;
-					sb.append(String.format("      <organization>%s</organization>\n", organizationStr));
-				}
-			}
-			sb.append("    </organizations>\n");
-			
-			
-			sb.append("    <spatialCoverage>\n");
-			Collection<Object> spatialCoverage = solrDocument.getFieldValues("coordinates");
-			if (spatialCoverage != null && spatialCoverage.size() > 0) {
-				for (Object coordinates : spatialCoverage) {
-					String coordinatesStr = (String) coordinates;
-					sb.append(String.format("      <coordinates>%s</coordinates>\n", coordinatesStr));
-				}
-			}
-			sb.append("    </spatialCoverage>\n");
-			
 			
 		    sb.append("  </document>\n");
 		}
@@ -198,4 +310,5 @@ public class SimpleSolrSearch {
 			e.printStackTrace();
 		}
 	}
+	
 }

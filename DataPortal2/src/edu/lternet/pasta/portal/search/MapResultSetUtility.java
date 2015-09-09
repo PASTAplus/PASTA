@@ -58,9 +58,9 @@ public class MapResultSetUtility {
   private static final Logger logger = Logger
       .getLogger(edu.lternet.pasta.portal.search.MapResultSetUtility.class);
   
-  public static final String PACKAGEID_PATH = "packageId";
+  public static final String PACKAGEID_PATH = "packageid";
   public static final String TITLE_PATH = "title";
-  public static final String PUBDATE_PATH = "pubDate";
+  public static final String PUBDATE_PATH = "pubdate";
   public static final String COORDINATES_PATH = "spatialCoverage/coordinates";
 
   

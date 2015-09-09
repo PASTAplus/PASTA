@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
   $Date$
-  $Author: mservilla	$
+  $Author: dcosta $
   $Revision$
   
-	Copyright 2011,2012 the University of New Mexico.
+	Copyright 2011-2015 the University of New Mexico.
 	
 	This work was supported by National Science Foundation Cooperative
 	Agreements #DEB-0832652 and #DEB-0936498.
@@ -72,8 +72,8 @@
 
   <xsl:template match="document">
   
-	<xsl:variable name="docid" select="./docid"/>
-	<xsl:variable name="pid" select="./packageId"/>
+	<xsl:variable name="docid" select="./id"/>
+	<xsl:variable name="pid" select="./packageid"/>
 	
     <tr>
       <td class="nis" align="left">
@@ -86,7 +86,7 @@
         <xsl:apply-templates select="authors"/>
       </td>
       <td class="nis" align="center">
-        <xsl:value-of select="pubDate"/>
+        <xsl:value-of select="pubdate"/>
       </td>
       <td class="nis" align="center">
         <a class="searchsubcat" href="./mapbrowse?packageid={$pid}">
