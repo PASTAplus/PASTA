@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -53,10 +54,52 @@ public class SimpleSolrSearch {
 	 */
 
 	private static final Logger logger = Logger.getLogger(SimpleSolrSearch.class);
-	private static String[] multivalueFields = 
-		{ "author", "coordinates",  "organization", "title" };
+	
+	private static final String[] ALL_FIELDS =
+		{ 
+			"abstract",
+			"begindate",
+			"doi",
+			"enddate",
+			"funding",
+			"geographicdescription",
+			"id",
+			"methods",
+			"packageid",
+			"pubdate",
+			"responsibleParties",
+			"scope",
+			"singledate",
+			"site",
+			"taxonomic",
+			"title",
 		
+			// multivalued fields
+			"author",
+			"coordinates",
+			"derivedFrom",
+			"keyword",
+			"organization",
+			"timescale"
+		};
+	
+	/*
+	 * Search results for multivalued fields need to be wrapped inside a parent element.
+	 * For example, "author" elements are wrapped inside an "authors" element.
+	 */
+	private static TreeMap<String, String> wrapperElements = null;
+	
+	static {
+		wrapperElements = new TreeMap<String, String>();
+		wrapperElements.put("author", "authors");
+		wrapperElements.put("coordinates", "spatialCoverage");
+		wrapperElements.put("derivedFrom", "sources");
+		wrapperElements.put("keyword", "keywords");
+		wrapperElements.put("organization", "organizations");
+		wrapperElements.put("timescale", "timescales");
+	}
 		
+	
 	/*
 	 * Instance fields
 	 */
@@ -96,39 +139,39 @@ public class SimpleSolrSearch {
 	
 	
 	/*
-	 * Did this Solr query include the specified field name in 
-	 * its "fl" (field list) parameter?
-	 */
-	private boolean hasField(String fieldName) {
-		boolean found = false;
-		
-		String[] fieldsArray = getFields();
-		if (fieldsArray != null) {
-			for (String token : fieldsArray) {
-				if (token.equals(fieldName)) {
-					found = true;
-					break;
-				}
-			}
-		}
-		
-		return found;
-	}
-	
-	
-	/*
 	 * Return an array of field names that were specified
 	 * by the query in its "fl" (field list) parameter.
 	 */
-	private String[] getFields() {
+	private String[] getFieldList() {
+		final String WILDCARD = "*";
 		String[] fieldsArray = null;
 		
 		String fieldsStr = solrQuery.getFields();
 		if ((fieldsStr != null) && (fieldsStr.length() > 0)) {
-			fieldsArray = fieldsStr.split(",");
+			if (fieldsStr.equals(WILDCARD)) {
+				fieldsArray = ALL_FIELDS;
+			}
+			else {
+				fieldsArray = fieldsStr.split(",");
+			}
 		}
 		
 		return fieldsArray;
+	}
+	
+	
+	private boolean isDateField(String fieldName) {
+		boolean isDate = false;
+		
+		if (fieldName != null) {
+			return (fieldName.equals("pubdate") ||
+					fieldName.equals("singledate") ||
+					fieldName.equals("begindate") ||
+					fieldName.equals("enddate")
+				   );
+		}
+		
+		return isDate;
 	}
 	
 	
@@ -194,73 +237,55 @@ public class SimpleSolrSearch {
 	
 	private String solrDocumentListToXML(SolrDocumentList solrDocumentList) {
 		String xmlString = "";
+		final String INDENT = "    ";
 		long numFound = solrDocumentList.getNumFound();
 		long start = solrDocumentList.getStart();
-		String[] fieldsArray = getFields();
+		String[] fieldsArray = getFieldList();
 		
 		String firstLine = String.format("<resultset numFound='%d' start='%d' rows='%d'>\n", numFound, start, rows);
 		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {
-			sb.append("  <document>\n");
+			sb.append(String.format("%s<document>\n", INDENT));
 			
 			if (fieldsArray != null) {
 				
 				for (String fieldName : fieldsArray) {
 					
+					String wrapperElement = wrapperElements.get(fieldName);
+					
 					if (fieldName.equals("title")) {			
-						String title = (String) solrDocument.getFirstValue(fieldName);
-						sb.append(String.format("    <%s>%s</%s>\n",
-                                                     fieldName, title, fieldName));
+						String title = (String) solrDocument.getFirstValue("title");
+						sb.append(String.format("%s%s<%s>%s</%s>\n",
+												INDENT, INDENT, fieldName, title, fieldName));
 					}
-					else if (fieldName.equals("organization")) {
-						sb.append("    <organizations>\n");
-						Collection<Object> organizations = solrDocument.getFieldValues("organization");
-						if (organizations != null && organizations.size() > 0) {
-							for (Object organization : organizations) {
-								String organizationStr = (String) organization;
-								sb.append(String.format("      <organization>%s</organization>\n", organizationStr));
+					else if (wrapperElement != null) {
+						sb.append(String.format("%s%s<%s>\n", INDENT, INDENT, wrapperElement));
+						Collection<Object> multiValues = solrDocument.getFieldValues(fieldName);
+						if (multiValues != null && multiValues.size() > 0) {
+							for (Object value : multiValues) {
+								String valueStr = (String) value;
+								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
+										                INDENT, INDENT, INDENT, fieldName, valueStr, fieldName));
 							}
 						}
-						sb.append("    </organizations>\n");
-					}
-					else if (fieldName.equals("author")) {
-						sb.append("    <authors>\n");
-						Collection<Object> authors = solrDocument.getFieldValues("author");
-						if (authors != null && authors.size() > 0) {
-							for (Object author : authors) {
-								String authorStr = (String) author;
-								sb.append(String.format("      <author>%s</author>\n", authorStr));
-							}
-						}
-						sb.append("    </authors>\n");
-					}
-					else if (fieldName.equals("coordinates")) {
-						sb.append("    <spatialCoverage>\n");
-						Collection<Object> spatialCoverage = solrDocument.getFieldValues("coordinates");
-						if (spatialCoverage != null && spatialCoverage.size() > 0) {
-							for (Object coordinates : spatialCoverage) {
-								String coordinatesStr = (String) coordinates;
-								sb.append(String.format("      <coordinates>%s</coordinates>\n", coordinatesStr));
-							}
-						}
-						sb.append("    </spatialCoverage>\n");
+						sb.append(String.format("%s%s</%s>\n", INDENT, INDENT, wrapperElement));
 					}
 					else {					
 						String fieldValue = "";
-						if (fieldName.equals("pubdate")) {
-							Date pubDate = (Date) solrDocument.getFieldValue(fieldName);
+						if (isDateField(fieldName)) {
+							Date dateValue = (Date) solrDocument.getFieldValue(fieldName);
 							SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
-							if (pubDate != null) {
-								fieldValue = sdf.format(pubDate);
+							if (dateValue != null) {
+								fieldValue = sdf.format(dateValue);
 							}
 						}
 						else {
 							fieldValue = (String) solrDocument.getFieldValue(fieldName);
 							if (fieldValue == null) fieldValue = "";
 						}
-						sb.append(String.format("    <%s>%s</%s>\n",
-				                                     fieldName, fieldValue, fieldName));
+						sb.append(String.format("%s%s<%s>%s</%s>\n",
+				                                INDENT, INDENT, fieldName, fieldValue, fieldName));
 
 						/*
 						 * Support the older format for search results.
@@ -272,19 +297,19 @@ public class SimpleSolrSearch {
 						 * corresponding Solr field names: "id", "packageid", and "pubdate".
 						 */
 						if (fieldName.equals("id")) {
-							sb.append(String.format("    <docid>%s</docid>\n", fieldValue));
+							sb.append(String.format("%s%s<docid>%s</docid>\n", INDENT, INDENT, fieldValue));
 						}
 						else if (fieldName.equals("packageid")) {
-							sb.append(String.format("    <packageId>%s</packageId>\n", fieldValue));
+							sb.append(String.format("%s%s<packageId>%s</packageId>\n", INDENT, INDENT, fieldValue));
 						}
 						else if (fieldName.equals("pubdate")) {
-							sb.append(String.format("    <pubDate>%s</pubDate>\n", fieldValue));
+							sb.append(String.format("%s%s<pubDate>%s</pubDate>\n", INDENT, INDENT, fieldValue));
 						}
 					}
 				}
 			}
 			
-		    sb.append("  </document>\n");
+		    sb.append(String.format("%s</document>\n", INDENT));
 		}
 		
 		sb.append("</resultset>\n");
