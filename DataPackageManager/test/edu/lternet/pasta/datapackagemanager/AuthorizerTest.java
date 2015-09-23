@@ -44,6 +44,7 @@ import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
+import edu.lternet.pasta.utility.PastaUtility;
 import edu.ucsb.nceas.utilities.Options;
 
 
@@ -72,6 +73,13 @@ public class AuthorizerTest {
   private static String testRevisionStr = null;
   private static String testEntityId = null;
   private static String testEntityName = null;
+	private static String testMaxIdleTimeStr = null;
+	private static Integer testMaxIdleTime = null;
+	private static String testIdleSleepTimeStr = null;
+	private static Integer testIdleSleepTime = null;
+	private static String testInitialSleepTimeStr = null;
+	private static Integer testInitialSleepTime = null;
+	private static String testPackageId = null;
   
   /*
    * Instance fields
@@ -140,8 +148,27 @@ public class AuthorizerTest {
         }
       }
       
+      testMaxIdleTimeStr = options.getOption("datapackagemanager.test.maxidletime");
+      if (testMaxIdleTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.maxidletime'");
+      }
+			
+      testIdleSleepTimeStr = options.getOption("datapackagemanager.test.idlesleeptime");
+      if (testIdleSleepTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.idlesleeptime'");
+      }
+			
+      testInitialSleepTimeStr = options.getOption("datapackagemanager.test.initialsleeptime");
+      if (testInitialSleepTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.initialsleeptime'");
+      }
+
       testIdentifier = new Integer(testIdentifierStr);
       testRevision = new Integer(testRevisionStr);
+      testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+		testMaxIdleTime = new Integer(testMaxIdleTimeStr);
+		testIdleSleepTime = new Integer(testIdleSleepTimeStr);
+		testInitialSleepTime = new Integer(testInitialSleepTimeStr);
 
       dataPackageManagerResource = new DataPackageManagerResource();
       try {
@@ -213,16 +240,23 @@ public class AuthorizerTest {
     Response response = dataPackageManagerResource.createDataPackage(httpHeadersOwner, testEmlFile);
     int statusCode = response.getStatus();
     assertEquals("Error creating data package", 202, statusCode);
-    
-    try {
-      Thread.sleep(60000);  // Give PASTA a chance to create the data package
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+	String transaction = (String) response.getEntity();
     
     try {
     
+    	// Ensure that the test data package has been successfully created
+    	PastaUtility.waitForPastaUpload(
+    			dataPackageManager,
+    			transaction,
+    			testInitialSleepTime,
+    		    testMaxIdleTime,
+    			testIdleSleepTime,
+    		    testPackageId,
+    			testScope,
+    			testIdentifier,
+    			testRevision
+              );
+        
     dataPackageResourceId = DataPackageManager.composeResourceId(
         ResourceType.dataPackage, testScope, testIdentifier, testRevision, testEntityId);
     dataEntityResourceId = DataPackageManager.composeResourceId(
@@ -302,6 +336,9 @@ public class AuthorizerTest {
     }
     catch (SQLException e) {
       fail("SQLException while making DataPackageRegistry object: " + e.getMessage());
+    }
+    catch (Exception e) {
+      fail("Exception: " + e.getMessage());
     }
   }
   

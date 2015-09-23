@@ -35,10 +35,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +54,7 @@ import org.junit.Test;
 
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.utility.PastaUtility;
 import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.Options;
 
@@ -79,7 +78,6 @@ public class DataPackageManagerResourceTest {
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   private static final String testUserAcl = "uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org";
   private static Options options = null;
-  private static final int PASTA_SLEEP_TIME = 60000;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
   private static String testPath = null;
@@ -94,6 +92,13 @@ public class DataPackageManagerResourceTest {
   private static String testEntityName = null;
   private static String testEntityId2 = null;   // a second test entity
   private static String testEntityName2 = null; // a second test entity
+	private static String testMaxIdleTimeStr = null;
+	private static Integer testMaxIdleTime = null;
+	private static String testIdleSleepTimeStr = null;
+	private static Integer testIdleSleepTime = null;
+	private static String testInitialSleepTimeStr = null;
+	private static Integer testInitialSleepTime = null;
+	private static String testPackageId = null;
   
   private static final String ACL_START_TEXT = "<access:access";
   private static final String ACL_END_TEXT = "</access:access>";
@@ -202,11 +207,30 @@ public class DataPackageManagerResourceTest {
         }
       }
       
+      testMaxIdleTimeStr = options.getOption("datapackagemanager.test.maxidletime");
+      if (testMaxIdleTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.maxidletime'");
+      }
+			
+      testIdleSleepTimeStr = options.getOption("datapackagemanager.test.idlesleeptime");
+      if (testIdleSleepTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.idlesleeptime'");
+      }
+			
+      testInitialSleepTimeStr = options.getOption("datapackagemanager.test.initialsleeptime");
+      if (testInitialSleepTimeStr == null) {
+    	  fail("No value found for DataPackageManager property 'datapackagemanager.test.initialsleeptime'");
+      }
+
       //testEmlFileLevelOne = new File(testPath, testEmlFileNameLevelOne);   
       //testEmlFileNoEntities = new File(testPath, testEmlFileNameNoEntities);   
       testIdentifier = new Integer(testIdentifierStr);
       testRevision = new Integer(testRevisionStr);
       testUpdateRevision = testRevision + 1;
+      testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+		testMaxIdleTime = new Integer(testMaxIdleTimeStr);
+		testIdleSleepTime = new Integer(testIdleSleepTimeStr);
+		testInitialSleepTime = new Integer(testInitialSleepTimeStr);
 
       dataPackageManagerResource = new DataPackageManagerResource();
       try {
@@ -291,7 +315,8 @@ public class DataPackageManagerResourceTest {
     // Check the message body
     String entityString = (String) response.getEntity();
     assertTrue(entityString.length() == utcString.length());   
-    waitForPasta();
+    this.transaction = entityString;
+    waitForPastaUpload(testRevision);
     
     // Test readDataPackage for OK status
     response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString());
@@ -315,7 +340,12 @@ public class DataPackageManagerResourceTest {
     entityString = (String) response.getEntity();
     assertTrue(entityString.length() == utcString.length());
     this.transaction = entityString;
-    waitForPasta();
+    try {
+    	Thread.sleep(10000);
+    }
+    catch (Exception e) {
+    	;
+    }
     testReadDataPackageError(testRevision.toString(), errorSnippet);
   }
   
@@ -387,7 +417,12 @@ public class DataPackageManagerResourceTest {
     String entityString = (String) response.getEntity();
     assertTrue(entityString.length() == utcString.length());
     this.transaction = entityString;
-    waitForPasta();
+    try {
+    	Thread.sleep(30000);
+    }
+    catch (Exception e) {
+    	;
+    }
     testReadEvaluateReport();
   }
   
@@ -539,7 +574,6 @@ public class DataPackageManagerResourceTest {
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      System.err.println(entityString);
       assertTrue(entityString.contains(errorSnippet));
     } 
   }
@@ -978,7 +1012,8 @@ public class DataPackageManagerResourceTest {
     // Check the message body
     String entityString = (String) response.getEntity();
     assertTrue(entityString.length() == utcString.length());
-    waitForPasta();
+    this.transaction = entityString;
+    waitForPastaUpload(testUpdateRevision);
 
     // Test readDataPackage for OK status
     response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString());
@@ -1002,7 +1037,12 @@ public class DataPackageManagerResourceTest {
     entityString = (String) response.getEntity(); // Check the message body
     assertTrue(entityString.length() == utcString.length());
     this.transaction = entityString;
-    waitForPasta();
+    try {
+    	Thread.sleep(10000);
+    }
+    catch (Exception e) {
+    	;
+    }
     testReadDataPackageError(testUpdateRevision.toString(), conflictError);
   }
 
@@ -1057,9 +1097,20 @@ public class DataPackageManagerResourceTest {
   }
   
   
-  private void waitForPasta() {
+  private void waitForPastaUpload(Integer revision) {
     try {
-      Thread.sleep(PASTA_SLEEP_TIME);  // Give PASTA a chance to create the data package
+    	// Ensure that the test data package has been successfully created
+    	PastaUtility.waitForPastaUpload(
+    			dataPackageManager,
+    			this.transaction,
+    			testInitialSleepTime,
+    		    testMaxIdleTime,
+    			testIdleSleepTime,
+    		    testPackageId,
+    			testScope,
+    			testIdentifier,
+    			revision
+              );
     }
     catch (Exception e) {
       e.printStackTrace();

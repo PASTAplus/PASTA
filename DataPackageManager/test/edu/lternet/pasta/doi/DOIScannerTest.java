@@ -46,6 +46,7 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageManagerResource;
 import edu.lternet.pasta.datapackagemanager.DataPackageManagerResourceTest;
 import edu.lternet.pasta.datapackagemanager.DummyCookieHttpHeaders;
+import edu.lternet.pasta.utility.PastaUtility;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -164,28 +165,32 @@ public class DOIScannerTest {
 			if (testPath == null) {
 				fail("No value found for DataPackageManager property 'datapackagemanager.test.path'");
 			}
+			
 			testMaxIdleTimeStr = options
 			    .getOption("datapackagemanager.test.maxidletime");
 			if (testMaxIdleTimeStr == null) {
 				fail("No value found for DataPackageManager property 'datapackagemanager.test.maxidletime'");
 			}
+			
 			testIdleSleepTimeStr = options
 			    .getOption("datapackagemanager.test.idlesleeptime");
 			if (testIdleSleepTimeStr == null) {
 				fail("No value found for DataPackageManager property 'datapackagemanager.test.idlesleeptime'");
 			}
+			
 			testInitialSleepTimeStr = options
 			    .getOption("datapackagemanager.test.initialsleeptime");
 			if (testInitialSleepTimeStr == null) {
 				fail("No value found for DataPackageManager property 'datapackagemanager.test.initialsleeptime'");
-			} else {
-				testEmlFileName = options
+			}
+				
+			testEmlFileName = options
 				    .getOption("datapackagemanager.test.emlFileName");
-				if (testEmlFileName == null) {
+			if (testEmlFileName == null) {
 					fail("No value found for DataPackageManager property 'datapackagemanager.test.emlFileName'");
-				} else {
-					testEmlFile = new File(testPath, testEmlFileName);
-				}
+			} else {
+				testEmlFile = new File(testPath, testEmlFileName);
+			}
 			}
 
 			testIdentifier = new Integer(testIdentifierStr);
@@ -222,7 +227,7 @@ public class DOIScannerTest {
 		      System.err.println("testPackageId: " + testPackageId);
 		      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);       
 		}
-	}
+	
 
 	/**
 	 * @throws java.lang.Exception
@@ -253,32 +258,17 @@ public class DOIScannerTest {
 		String transaction = (String) response.getEntity();
 
 		// Ensure that the test data package has been successfully created
-		if (transaction != null) {
-			Integer timeCounter = testInitialSleepTime;
-			Thread.sleep(testInitialSleepTime);
-			while (timeCounter <= testMaxIdleTime) {
-				try {
-					String error = dataPackageManager.readDataPackageError(transaction);
-					fail(error);
-				} catch (ResourceNotFoundException e) {
-					try {
-						String revisions = dataPackageManager.listDataPackageRevisions(
-						    testScope, testIdentifier);
-						break;
-					} catch (ResourceNotFoundException e1) {
-						timeCounter += testIdleSleepTime;
-						Thread.sleep(testIdleSleepTime);
-					}
-				}
-			}
-			if (timeCounter > testMaxIdleTime) {
-				fail("Time to create data package '" + testPackageId
-				    + "' exceeded max time of " + testMaxIdleTime / 1000 + " seconds!");
-			}
-		} else {
-			fail("Unknown error creating test data package: " + testPackageId);
-		}
-
+		PastaUtility.waitForPastaUpload(
+				dataPackageManager,
+				transaction,
+				testInitialSleepTime,
+			    testMaxIdleTime,
+				testIdleSleepTime,
+			    testPackageId,
+				testScope,
+				testIdentifier,
+				testRevision
+              );
 	}
 
 	/**
