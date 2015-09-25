@@ -21,6 +21,7 @@
   String googleMapHTML = (String) request.getAttribute("googleMapHTML");
   String savedDataHTML = (String) request.getAttribute("savedDataHTML");
   String jsonCoordinates = (String) request.getAttribute("jsonCoordinates");
+  Boolean expandCoordinates = (Boolean) request.getAttribute("expandCoordinates");
   Double northCoord = (Double) request.getAttribute("northCoord");
   Double southCoord = (Double) request.getAttribute("southCoord");
   Double eastCoord = (Double) request.getAttribute("eastCoord");
@@ -32,6 +33,10 @@
   boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
   boolean showSavedData = !(savedDataHTML == null || savedDataHTML.isEmpty());
+  String showCoordinates = "true";
+  if ((expandCoordinates != null) && !expandCoordinates) { 
+  	showCoordinates = "false";
+  }
 %>
 
 <!DOCTYPE html>
@@ -102,7 +107,7 @@
             $("#jqxExpander").jqxExpander(
             	{ width: '454px', 
             	  theme: 'bootstrap',
-            	  expanded: false
+            	  expanded: <%= showCoordinates %>
             	});
 
             // Configure/customize variables for "Show more" and "Show less"

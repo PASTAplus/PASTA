@@ -384,6 +384,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 					if (stringCoordinates != null && !stringCoordinates.equals("")) {
 
 						String[] coordinatesArray = stringCoordinates.split(":");
+						request.setAttribute("expandCoordinates", new Boolean((coordinatesArray.length <= 2)));
 						boolean useExpander = (coordinatesArray.length > 0) ? true : false;
 						
 						if (useExpander) {
