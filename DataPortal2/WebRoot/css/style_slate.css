@@ -16,12 +16,14 @@ select {
 	font-size: 12px;
 	color: #666666;
 }
+/*
 span {
 	font-family: 'Open Sans';
 	line-height: 18px;
 	font-size: 12px;
 	color: #666666;
 }
+*/
 body {
 	font-family: 'Open Sans';
 	line-height: 18px;
@@ -3106,3 +3108,14 @@ div.info {
 }
 
 /* End -- Tabular layout when the contents is NOT tabular data */
+
+
+/* Styles to support "Show more" and "Show less" in combination with jQuery code */
+.morecontent span {
+    display: none;
+}
+
+.morelink {
+    display: block;
+}   
+/* End -- Styles to support "Show more" and "Show less" in combination with jQuery code */
