@@ -384,8 +384,16 @@ public class MapBrowseServlet extends DataPortalServlet {
 					if (stringCoordinates != null && !stringCoordinates.equals("")) {
 
 						String[] coordinatesArray = stringCoordinates.split(":");
+
+						/*
+						 * If there are two or fewer sets of coordinates, then initially
+						 * show them expanded, otherwise show them collapsed (to save
+						 * screen space.)
+						 */
 						request.setAttribute("expandCoordinates", new Boolean((coordinatesArray.length <= 2)));
-						boolean useExpander = (coordinatesArray.length > 0) ? true : false;
+
+						// Only use the expander widget if there's more than one set of coordinates
+						boolean useExpander = (coordinatesArray.length > 1) ? true : false;
 						
 						if (useExpander) {
 							spatialCoverageHTMLBuilder.append("<div id='jqxWidget'>\n");
@@ -429,15 +437,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 							request.setAttribute("southCoord", southCoord);
 							request.setAttribute("eastCoord", eastCoord);
 							request.setAttribute("westCoord", westCoord);
-							final String spacer = "&nbsp;&nbsp;&nbsp;&nbsp;";
+							final String spacer = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							spatialCoverageHTMLBuilder.append("<div>\n");
 							String spatial = String.format("N: %s%sS: %s%sE: %s%sW: %s",
 									          northCoord, spacer, southCoord, spacer, eastCoord, spacer, westCoord);
 							spatialCoverageHTMLBuilder.append(String.format("%s\n", spatial));
 							spatialCoverageHTMLBuilder.append("</div>\n");
 						}
-						
-						
 						
 						spatialCoverageHTML = spatialCoverageHTMLBuilder.toString();
 
