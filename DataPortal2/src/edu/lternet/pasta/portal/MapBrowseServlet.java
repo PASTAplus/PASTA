@@ -384,14 +384,15 @@ public class MapBrowseServlet extends DataPortalServlet {
 					if (stringCoordinates != null && !stringCoordinates.equals("")) {
 
 						String[] coordinatesArray = stringCoordinates.split(":");
-						boolean useExpander = (coordinatesArray.length > 1) ? true : false;
+						request.setAttribute("expandCoordinates", new Boolean((coordinatesArray.length <= 2)));
+						boolean useExpander = (coordinatesArray.length > 0) ? true : false;
 						
 						if (useExpander) {
 							spatialCoverageHTMLBuilder.append("<div id='jqxWidget'>\n");
 							spatialCoverageHTMLBuilder.append("    <div id='jqxExpander'>\n");
 							spatialCoverageHTMLBuilder.append("        <div>Geographic Coordinates</div>\n");
 							spatialCoverageHTMLBuilder.append("        <div>\n");
-							spatialCoverageHTMLBuilder.append("            <ul>\n");
+							spatialCoverageHTMLBuilder.append("            <ul class=\"no-list-style\">\n");
 							boolean firstCoordinates = true;
 							
 							for (String coordinates : coordinatesArray) {
@@ -429,9 +430,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 							request.setAttribute("eastCoord", eastCoord);
 							request.setAttribute("westCoord", westCoord);
 							final String spacer = "&nbsp;&nbsp;&nbsp;&nbsp;";
+							spatialCoverageHTMLBuilder.append("<div>\n");
 							String spatial = String.format("N: %s%sS: %s%sE: %s%sW: %s",
 									          northCoord, spacer, southCoord, spacer, eastCoord, spacer, westCoord);
 							spatialCoverageHTMLBuilder.append(String.format("%s\n", spatial));
+							spatialCoverageHTMLBuilder.append("</div>\n");
 						}
 						
 						

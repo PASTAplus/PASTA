@@ -77,7 +77,7 @@
         <include name="**/postgresql-9.3-1102.jdbc41.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/saxon9">
-        <include name="**/saxon9he.jar"/>
+        <include name="**/Saxon-HE-9.5.1-8.jar"/>
       </fileset>
 	  <fileset dir="${shared.lib.dir}/solrj">
 		<include name="solr-solrj-4.10.1.jar"/>
