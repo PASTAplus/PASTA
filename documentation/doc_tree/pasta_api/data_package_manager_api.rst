@@ -42,3 +42,18 @@ web-service APIs:
           curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
           -H "Content-Type: application/xml" --data-binary @knb-lter-lno.1.1.xml \
           -X POST https://pasta.lternet.edu/package/eml
+
+*Browse and Discovery*
+----------------------
+
+
+*Listing*
+---------
+
+
+*Provenance*
+------------
+
+
+*Event*
+-------
