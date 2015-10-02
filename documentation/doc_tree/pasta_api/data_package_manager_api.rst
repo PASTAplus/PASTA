@@ -13,6 +13,8 @@ web-service APIs:
 *Upload and Evaluation*
 -----------------------
 
+Describes methods for uploading and evaluating data packages.
+
 .. function:: package.createDataPackage(EML) -> transaction identifier
 
      Creates a new PASTA data package by providing the EML document describing
@@ -46,14 +48,20 @@ web-service APIs:
 *Browse and Discovery*
 ----------------------
 
+Describes methods for browsing and discovering data packages.
 
 *Listing*
 ---------
+
+Describes methods for listing data packages.
 
 
 *Provenance*
 ------------
 
+Describes methods for tracking and generating provenance metadata.
 
 *Event*
 -------
+
+Describes methods for subscribing to and receiving data package event notifications.
