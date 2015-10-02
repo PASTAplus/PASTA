@@ -2,10 +2,16 @@
 ======================
 
 The Data Package Manager consists of five distinct sections of the PASTA
-web-service APIs.
+web-service APIs:
 
-*Upload and Evaluate*
----------------------
+#. *Upload* and *Evaluation* of data packages
+#. *Browse* and *Discovery* of data packages
+#. *Listing* data packages
+#. *Provenance* tracking and metadata
+#. Data package *Event* tracking
+
+*Upload and Evaluation*
+-----------------------
 
 .. function:: package.createDataPackage(EML) -> transaction identifier
 
