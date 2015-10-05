@@ -134,6 +134,7 @@ html_theme_options = {
   # 'github_repo': 'PASTA',
   'font_family': 'Helvetica Neue, Helvetica, Arial, sans-serif',
   'head_font_family': 'Helvetica Neue, Helvetica, Arial, sans-serif',
+  'page_width': '1024px',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
