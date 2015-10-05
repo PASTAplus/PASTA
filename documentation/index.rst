@@ -25,7 +25,7 @@ To assist the weary web traveler in deciding what category to peruse, a short sy
 
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 3
    
    /doc_tree/lter_nis/index
    /doc_tree/portal/index
