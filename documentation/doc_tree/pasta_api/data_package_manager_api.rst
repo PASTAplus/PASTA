@@ -50,6 +50,101 @@ Describes methods for uploading and evaluating data packages.
 
 Describes methods for browsing and discovering data packages.
 
+Search Data Packages
+^^^^^^^^^^^^^^^^^^^^
+
+     REST API: `GET : /search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
+
+     Searches data packages in PASTA using the specified Solr query as the query 
+     parameters in the URL. Search results are returned as XML. A detailed example 
+     of a Solr query and the search results XML it returns is shown below.
+     
+     :Example(s):
+        
+     1. Using :command:`curl` to query PASTA for all documents containing the term "vernberg".
+        In this example, all fields for matching documents are included in the search results
+        ("fl=*").
+        
+        (Note: *For brevity, only one document is displayed in the search results shown below 
+        and some of its content has been truncated.*)::
+     
+          curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
+          &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=*\
+          &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+
+          <resultset numFound='3' start='0' rows='10'>
+              <document>
+                  <abstract>This data package consists of Daily Water Sample Parameter,...</abstract>
+                  <begindate>1981</begindate>
+                  <doi>doi:10.6073/pasta/2b809c045fdd74a7cc12e8f31fc191eb</doi>
+                  <enddate>1993</enddate>
+                  <funding></funding>
+                  <geographicdescription>North Inlet encompasses about 2,630 hectares of tidal...</geographicdescription>
+                  <id>knb-lter-nin.8</id>
+                  <docid>knb-lter-nin.8</docid>
+                  <methods></methods>
+                  <packageid>knb-lter-nin.8.1</packageid>
+                  <pubdate>2013</pubdate>
+                  <responsibleParties>NIN&#x2d;LTER
+                      Vernberg, John
+                      Blood, Elizabeth
+                      Gardner, Robert
+                  </responsibleParties>
+                  <scope>knb-lter-nin</scope>
+                  <singledate></singledate>
+                  <site>nin</site>
+                  <taxonomic></taxonomic>
+                  <title>Suspended Sediment&#x2e; Daily Water Sample Parameter&#x2c; and Sediment...</title>
+                  <authors>
+                      <author>Vernberg, John</author>
+                      <author>Blood, Elizabeth</author>
+                      <author>Gardner, Robert</author>
+                  </authors>
+                  <spatialCoverage>
+                      <coordinates>-79.2936 33.1925 -79.1042 33.357</coordinates>
+                  </spatialCoverage>
+                  <sources>
+                  </sources>
+                  <keywords>
+                      <keyword>North Inlet Estuary</keyword>
+                      <keyword>Baruch Institute</keyword>
+                      <keyword>Georgetown, South Carolina</keyword>
+                      <keyword>sediment</keyword>
+                      <keyword>substances</keyword>
+                      <keyword>ecology</keyword>
+                      <keyword>community dynamics</keyword>
+                      <keyword>populations</keyword>
+                  </keywords>
+                  <organizations>
+                      <organization>NIN&#x2d;LTER</organization>
+                  </organizations>
+                  <timescales>
+                  </timescales>
+              </document>
+          </resultset>
+
+     2. Using :command:`curl` to query PASTA for all documents containing the term "vernberg"
+        and limiting the returned fields to the "packageid" and "doi" fields (fl=packageid,doi)::
+     
+          curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
+          &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=packageid,doi\
+          &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+
+          <resultset numFound='3' start='0' rows='10'>
+              <document>
+                  <packageid>knb-lter-nin.1.1</packageid>
+                  <doi>doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961</doi>
+              </document>
+              <document>
+                  <packageid>knb-lter-nin.5.1</packageid>
+                  <doi>doi:10.6073/pasta/3b69d867d7f6620bd2f47794804363d2</doi>
+              </document>
+              <document>
+                  <packageid>knb-lter-nin.8.1</packageid>
+                  <doi>doi:10.6073/pasta/2b809c045fdd74a7cc12e8f31fc191eb</doi>
+              </document>
+          </resultset>
+
 *Listing*
 ---------
 
