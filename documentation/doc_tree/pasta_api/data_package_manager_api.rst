@@ -15,7 +15,11 @@ web-service APIs:
 
 Describes methods for uploading and evaluating data packages.
 
-.. function:: package.createDataPackage(EML) -> transaction identifier
+
+   **Create Data Package**
+
+
+     REST API: `POST : /package/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/eml>`_
 
      Creates a new PASTA data package by providing the EML document describing
      the data package to be created in the request message body and returning a
@@ -25,16 +29,18 @@ Describes methods for uploading and evaluating data packages.
      *readDataPackage* to obtain the data package resource map if the operation
      completed successfully.
      
-     :Rest Verb/URL: POST /package/eml
-     :Request body: The EML document in XML format
-     :MIME Type: *application/xml*
-     :Response(s):
-     .. csv-table::
-        :header: "Code", "Explanation", "Body", "MIME Type"
+     .. This section is commented out but saved for future development
+     .. :Rest Verb/URL: POST /package/eml
+     .. :Request body: The EML document in XML format
+     .. :MIME Type: *application/xml*
+     .. :Response(s):
+     .. .. csv-table::
+     ..   :header: "Code", "Explanation", "Body", "MIME Type"
        
-        "**202** - Accepted", "The create data package request was accepted", "Transaction identifier", "*text/plain*"
-        "**401** - Unauthorized", "The user is not authorized to perform this operation.", "Error message", "*text/plain*"
-        "**405** - Method not allowed", "The specified HTTP method is not allowed for the requested resource", "Error message", "*text/plain*"
+     ..  "**202** - Accepted", "The create data package request was accepted", "Transaction identifier", "*text/plain*"
+     ..   "**401** - Unauthorized", "The user is not authorized to perform this operation.", "Error message", "*text/plain*"
+     ..   "**405** - Method not allowed", "The specified HTTP method is not allowed for the requested resource", "Error message", "*text/plain*"
+     .. End: This section is commented out but saved for future development
         
      :Example(s):
         
@@ -50,15 +56,29 @@ Describes methods for uploading and evaluating data packages.
 
 Describes methods for browsing and discovering data packages.
 
-Search Data Packages
-^^^^^^^^^^^^^^^^^^^^
+   **Search Data Packages**
 
-     REST API: `GET : /search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
+     REST API: `GET : /package/search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
 
      Searches data packages in PASTA using the specified Solr query as the query 
-     parameters in the URL. Search results are returned as XML. A detailed example 
-     of a Solr query and the search results XML it returns is shown below.
+     parameters in the URL. Search results are returned as XML. Detailed example 
+     of a Solr query and the search results XML it returns are shown below.
      
+     .. This section is commented out but saved for future development
+     .. :Rest Verb/URL: GET /package/search/eml
+     .. :Request body: None
+     .. :MIME Type: 
+     .. :Response(s):
+     .. .. csv-table::
+     ..    :header: "Code", "Explanation", "Body", "MIME Type"
+     ..   
+     ..    "**200** - OK", "The search was successful", "A resultset XML document containing the search results", "*application/xml*"
+     ..    "**400** - Bad Request", "The request message body contains an error, such as an improperly formatted path query string.", "Error message", "*text/plain*"
+     ..    "**401** - Unauthorized", "The user is not authorized to perform this operation.", "Error message", "*text/plain*"
+     ..    "**405** - Method not allowed", "The specified HTTP method is not allowed for the requested resource", "Error message", "*text/plain*"
+     ..    "**500** - Internal Server Error", "The server encountered an unexpected condition which prevented it from fulfilling the request", "Error message", "*text/plain*"
+     .. End: This section is commented out but saved for future development
+
      :Example(s):
         
      1. Using :command:`curl` to query PASTA for all documents containing the term "vernberg".
