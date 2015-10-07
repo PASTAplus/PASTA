@@ -21,6 +21,7 @@
   String googleMapHTML = (String) request.getAttribute("googleMapHTML");
   String savedDataHTML = (String) request.getAttribute("savedDataHTML");
   String jsonCoordinates = (String) request.getAttribute("jsonCoordinates");
+  Boolean expandCoordinates = (Boolean) request.getAttribute("expandCoordinates");
   Double northCoord = (Double) request.getAttribute("northCoord");
   Double southCoord = (Double) request.getAttribute("southCoord");
   Double eastCoord = (Double) request.getAttribute("eastCoord");
@@ -32,6 +33,10 @@
   boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
   boolean showSavedData = !(savedDataHTML == null || savedDataHTML.isEmpty());
+  String showCoordinates = "true";
+  if ((expandCoordinates != null) && !expandCoordinates) { 
+  	showCoordinates = "false";
+  }
 %>
 
 <!DOCTYPE html>
@@ -96,16 +101,47 @@
 <!-- jqWidgets JavaScript for jqxTree widget -->
     <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
     <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxexpander.js"></script>
-
     <script type="text/javascript">
         $(document).ready(function () {
             // Create jqxExpander
             $("#jqxExpander").jqxExpander(
             	{ width: '454px', 
             	  theme: 'bootstrap',
-            	  expanded: false
+            	  expanded: <%= showCoordinates %>
             	});
-        });
+
+            // Configure/customize variables for "Show more" and "Show less"
+    		var showChar = 220;  // How many characters are shown by default
+    		var ellipsestext = "...";
+    		var moretext = "Show more >";
+    		var lesstext = "< Show less";
+    
+    		$('.more').each(function() {
+        		var content = $(this).html();
+ 
+        		if (content.length > showChar) {
+            		var c = content.substr(0, showChar);
+            		var h = content.substr(showChar, content.length - showChar);
+            		var html = c + '<span class="moreellipses">' + ellipsestext + '&nbsp;</span><span class="morecontent"><span>' + 
+            		           h + '</span>&nbsp;&nbsp;<a href="" class="morelink searchsubcat">' + moretext + '</a></span>';
+            		$(this).html(html);
+        		}
+    		});
+ 
+    		$(".morelink").click(function() {
+        		if ($(this).hasClass("less")) {
+            		$(this).removeClass("less");
+            		$(this).html(moretext);
+        		} 
+        		else {
+            		$(this).addClass("less");
+            		$(this).html(lesstext);
+        		}
+        		$(this).parent().prev().toggle();
+        		$(this).prev().toggle();
+        		return false;
+    		});
+		});        
     </script>
     
 </head>
@@ -172,7 +208,7 @@
 										<div class="table-cell">
 											<ul class="no-list-style">
 												<li>
-													<textarea style="margin-bottom:5px;box-shadow:none;background-color:transparent;" readonly cols="100" rows="4"><%= abstractHTML %></textarea>
+													<div class="more"><%= abstractHTML %></div>
 												</li>
 											</ul>
 										</div>
@@ -190,13 +226,9 @@
 										</div>
 																				
 										<div class="table-cell">
-											<ul class="no-list-style" style="margin-top:2px">
-												<li>
- 													<%= spatialCoverageHTML %>
-												</li>
-											</ul>
-										</div>
-										
+											<%= googleMapHTML %>
+										</div>			
+																		
 									</div>
 
 									<div class="table-row">	
@@ -206,9 +238,13 @@
 										</div>
 										
 										<div class="table-cell">
-											<%= googleMapHTML %>
-										</div>			
-																		
+											<ul class="no-list-style" style="margin-top:2px">
+												<li>
+ 													<%= spatialCoverageHTML %>
+												</li>
+											</ul>
+										</div>
+										
 									</div>
 																		
 									<div class="table-row">									
