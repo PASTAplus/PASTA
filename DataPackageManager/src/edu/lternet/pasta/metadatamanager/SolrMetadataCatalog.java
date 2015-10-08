@@ -113,6 +113,20 @@ public class SolrMetadataCatalog implements MetadataCatalog {
 					else if (key.equals("fq")) {
 						List<String> values = queryParams.get(key);
 						for (String fq : values) {
+							/*
+							 * Turn filter query caching off for spatial, scope, and date filters.
+							 * Set the cost of spatial filtering to 100 to invoke it as a post filter.
+							 * (See "Solr in Action", section 7.3.2)
+							 */
+							if (fq.startsWith("coordinates:")) {
+								fq = "{!cache=false cost=100}" + fq;
+							}
+							else if (fq.startsWith("scope:")) {
+								fq = "{!cache=false cost=1}" + fq;
+							}
+							else if (fq.contains("date:")) {
+								fq = "{!cache=false cost=2}" + fq;
+							}
 							simpleSolrSearch.addFilterQuery(fq);
 						}
 					}
