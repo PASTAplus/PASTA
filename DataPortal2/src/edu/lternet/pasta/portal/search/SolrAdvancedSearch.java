@@ -247,7 +247,8 @@ public class SolrAdvancedSearch extends Search  {
 			}
 
 			queryTerms = queryTerms.trim();
-			String escapedTerms = Search.escapeQueryChars(queryTerms);
+			String parenthesizedValue = parenthesizeQueryValue(queryTerms);
+			String escapedTerms = Search.escapeQueryChars(parenthesizedValue);
 			String encodedTerms = URLEncoder.encode(escapedTerms, "UTF-8");
 			String subjectQuery = String.format("%s:%s", field, encodedTerms);
 			updateQString(subjectQuery);
@@ -277,20 +278,22 @@ public class SolrAdvancedSearch extends Search  {
   private void buildQueryAuthor(TermsList termsList) 
   		throws UnsupportedEncodingException {
     String value = this.creatorSurname;
+    String parenthesizedValue = parenthesizeQueryValue(value);
 
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = Search.escapeQueryChars(value);
+      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String authorQuery = String.format("author:%s", encodedValue);
       updateQString(authorQuery);
     }
 
     value = this.creatorOrganization;
+    parenthesizedValue = parenthesizeQueryValue(value);
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = Search.escapeQueryChars(value);
+      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String organizationQuery = String.format("organization:%s", encodedValue);
       updateQString(organizationQuery);
@@ -304,13 +307,15 @@ public class SolrAdvancedSearch extends Search  {
    */
   private void buildQueryGeographicDescription(String locationName, TermsList termsList) 
   		throws UnsupportedEncodingException {
-    if ((locationName != null) && (!(locationName.equals("")))) {
-      termsList.addTerm(locationName);
-      String escapedValue = Search.escapeQueryChars(locationName);
-      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
-      String locationQuery = String.format("geographicdescription:%s", encodedValue);
-      updateQString(locationQuery);
-    }
+		if ((locationName != null) && (!(locationName.equals("")))) {
+			String parenthesizedValue = parenthesizeQueryValue(locationName);
+			termsList.addTerm(locationName);
+			String escapedValue = Search.escapeQueryChars(parenthesizedValue);
+			String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
+			String locationQuery = String.format("geographicdescription:%s",
+					encodedValue);
+			updateQString(locationQuery);
+		}
   }
   
   
@@ -420,7 +425,8 @@ public class SolrAdvancedSearch extends Search  {
      */
     if ((namedTimescale != null) && (!(namedTimescale.equals("")))) {
       termsList.addTerm(namedTimescale);
-      String escapedValue = Search.escapeQueryChars(namedTimescale);
+      String parenthesizedValue = parenthesizeQueryValue(namedTimescale);
+      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String timescaleQuery = String.format("timescale:%s", encodedValue);
       updateQString(timescaleQuery);
@@ -555,7 +561,8 @@ public class SolrAdvancedSearch extends Search  {
       
     if ((value != null) && (!(value.equals("")))) {
       termsList.addTerm(value);
-      String escapedValue = Search.escapeQueryChars(value);
+      String parenthesizedValue = parenthesizeQueryValue(value);
+      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
       String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
       String taxonQuery = String.format("taxonomic:%s", encodedValue);
       updateQString(taxonQuery);
@@ -585,7 +592,8 @@ public class SolrAdvancedSearch extends Search  {
 				value = packageId;
 			}
 
-			String escapedValue = Search.escapeQueryChars(value);
+		    String parenthesizedValue = parenthesizeQueryValue(value);
+			String escapedValue = Search.escapeQueryChars(parenthesizedValue);
 			String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
 			String doiQuery = String.format("doi:%s", encodedValue);
 			updateQString(doiQuery);

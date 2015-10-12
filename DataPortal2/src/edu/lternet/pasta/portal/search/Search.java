@@ -72,6 +72,8 @@ public class Search {
 		  if (escapedString != null) {
 			  escapedString = escapedString.replace("\\ ", " "); // don't escape spaces
 			  escapedString = escapedString.replace("\\\"", "\""); // don't escape double quotes
+			  escapedString = escapedString.replace("\\(", "("); // don't escape parens
+			  escapedString = escapedString.replace("\\)", ")"); // don't escape parens
 		  }
 		  return escapedString;
 	  }
@@ -168,6 +170,24 @@ public class Search {
 	 */
 	public TermsList getTermsList() {
 		return termsList;
+	}
+
+	
+	/**
+	 * Wraps parens around a query value if it needs them.
+	 * 
+	 * For example, the two Solr queries below have different meanings:
+	 * 
+	 * author:jones bug     matches authors named "jones" or text containing "bug"
+	 *                      because the second term is matched against the default
+	 *                      field (df), which in our case is the text field
+	 * author:(jones bug)   matches authors named "jones" or authors named "bug"
+	 * 
+	 * @return termsList
+	 */
+	public String parenthesizeQueryValue(String value) {
+		String parenthesizedValue = value.contains(" ") ? String.format("(%s)", value) : value;
+		return parenthesizedValue;
 	}
 
 }
