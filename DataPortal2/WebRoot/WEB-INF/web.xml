@@ -156,6 +156,12 @@
     <servlet-class>edu.lternet.pasta.portal.ProvenanceGeneratorServlet</servlet-class>
   </servlet>
   <servlet>
+    <description>Provenance Graph Servlet</description>
+    <display-name>ProvenanceGraphServlet</display-name>
+    <servlet-name>ProvenanceGraphServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.ProvenanceGraphServlet</servlet-class>
+  </servlet>
+  <servlet>
     <description>Code Generation Servlet</description>
     <display-name>CodeGenerationServlet</display-name>
     <servlet-name>CodeGenerationServlet</servlet-name>
@@ -295,6 +301,10 @@
   <servlet-mapping>
     <servlet-name>ProvenanceGeneratorServlet</servlet-name>
     <url-pattern>/provenanceGenerator</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ProvenanceGraphServlet</servlet-name>
+    <url-pattern>/provenanceGraph</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>CodeGenerationServlet</servlet-name>
