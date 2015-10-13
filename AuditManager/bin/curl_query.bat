@@ -10,7 +10,8 @@ REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?
 REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?fromTime=2013-12-09&limit=x&serviceMethod=readMetadata"
 REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=3&fromTime=2013-12-09"
 REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=x&serviceMethod=readMetadata"
-curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=100&category=info&serviceMethod=createDataPackage&serviceMethod=uploadDataPackage&fromTime=2014-10-01
-curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=100&category=info&serviceMethod=updateDataPackage&serviceMethod=uploadDataPackage&fromTime=2014-10-01
+REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=100&category=info&serviceMethod=createDataPackage&serviceMethod=uploadDataPackage&fromTime=2014-10-01
+REM curl -i -b auth-token=%AUTH_TOKEN_UCARROLL% -G "%SERVICE_HOST%/audit/report?limit=100&category=info&serviceMethod=updateDataPackage&serviceMethod=uploadDataPackage&fromTime=2014-10-01
 
-curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:S@ltL@ke" -X GET "https://pasta.lternet.edu/audit/report?limit=100&category=info&serviceMethod=createDataPackage&serviceMethod=uploadDataPackage&fromTime=2014-10-01"
+REM curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:S@ltL@ke" -X GET "https://pasta.lternet.edu/audit/report?category=info&serviceMethod=createDataPackage&fromTime=2015-09-22"
+curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:S@ltL@ke" -X GET "https://pasta.lternet.edu/audit/report?category=info&user=uid=SBC,o=LTER,dc=ecoinformatics,dc=org&serviceMethod=createDataPackage&serviceMethod=updateDataPackage&fromTime=2012-09-01"

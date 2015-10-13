@@ -21,6 +21,7 @@
   String googleMapHTML = (String) request.getAttribute("googleMapHTML");
   String savedDataHTML = (String) request.getAttribute("savedDataHTML");
   String jsonCoordinates = (String) request.getAttribute("jsonCoordinates");
+  Boolean expandCoordinates = (Boolean) request.getAttribute("expandCoordinates");
   Double northCoord = (Double) request.getAttribute("northCoord");
   Double southCoord = (Double) request.getAttribute("southCoord");
   Double eastCoord = (Double) request.getAttribute("eastCoord");
@@ -32,6 +33,10 @@
   boolean showSpatial = !(spatialCoverageHTML == null || spatialCoverageHTML.isEmpty());
   boolean showCodeGeneration = !(codeGenerationHTML == null || codeGenerationHTML.isEmpty());
   boolean showSavedData = !(savedDataHTML == null || savedDataHTML.isEmpty());
+  String showCoordinates = "true";
+  if ((expandCoordinates != null) && !expandCoordinates) { 
+  	showCoordinates = "false";
+  }
 %>
 
 <!DOCTYPE html>
@@ -55,6 +60,10 @@
 
 <!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
 <link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css">
+
+<!-- Mobile Device CSS -->
+<link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+<link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- JS 
 <script src="js/jqueryba3a.js?ver=1.7.2" type="text/javascript"></script>
@@ -89,25 +98,6 @@
 	</c:when>
 </c:choose>
 
-<!-- Mobile Device CSS -->
-<link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
-<link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
-
-<!-- jqWidgets JavaScript for jqxTree widget -->
-    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
-    <script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxexpander.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // Create jqxExpander
-            $("#jqxExpander").jqxExpander(
-            	{ width: '454px', 
-            	  theme: 'bootstrap',
-            	  expanded: false
-            	});
-        });
-    </script>
-    
 </head>
 
 <body>
@@ -172,7 +162,7 @@
 										<div class="table-cell">
 											<ul class="no-list-style">
 												<li>
-													<textarea style="margin-bottom:5px;box-shadow:none;background-color:transparent;" readonly cols="100" rows="4"><%= abstractHTML %></textarea>
+													<div class="more"><%= abstractHTML %></div>
 												</li>
 											</ul>
 										</div>
@@ -190,13 +180,9 @@
 										</div>
 																				
 										<div class="table-cell">
-											<ul class="no-list-style" style="margin-top:2px">
-												<li>
- 													<%= spatialCoverageHTML %>
-												</li>
-											</ul>
-										</div>
-										
+											<%= googleMapHTML %>
+										</div>			
+																		
 									</div>
 
 									<div class="table-row">	
@@ -206,9 +192,13 @@
 										</div>
 										
 										<div class="table-cell">
-											<%= googleMapHTML %>
-										</div>			
-																		
+											<ul class="no-list-style" style="margin-top:2px">
+												<li>
+ 													<%= spatialCoverageHTML %>
+												</li>
+											</ul>
+										</div>
+										
 									</div>
 																		
 									<div class="table-row">									
@@ -310,10 +300,25 @@
 		</div>
 	</div>
 
-
 	<jsp:include page="footer.jsp" />
 		
   </div>
+  
+<!-- jqWidgets JavaScript for jqxTree widget -->
+<script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxcore.js"></script>
+<script type="text/javascript" src="./js/jqwidgets-ver3.2.1/jqxexpander.js"></script>
+<script>
+	// Create jqxExpander
+	$("#jqxExpander").jqxExpander(
+    					{ width: '454px', 
+    					  theme: 'bootstrap',
+    					  expanded: <%= showCoordinates %>
+            	        }
+    );
+</script>
+<!-- End jqWidgets JavaScript for jqxTree widget -->
+
+<script src="./js/more_less.js" type="text/javascript"></script>
 
 </body>
 

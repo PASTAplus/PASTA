@@ -31,3 +31,4 @@ common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
 */src/META-INF/persistence.xml
 */documents/javadoc
 /shell/env.sh
+/documentation/_build/*
