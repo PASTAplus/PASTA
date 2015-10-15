@@ -677,8 +677,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				String dataSourcesStr = dpmClient.listDataSources(scope, id, revision);
 				
+				String source = null;
+				String derived = null;
+				
 				if (dataSourcesStr != null &&
                     dataSourcesStr.length() > 0) {
+					derived = packageId;
 					String[] dataSources = dataSourcesStr.split("\n");
 					if (dataSources.length > 0) {
 						String dataSource = dataSources[0];
@@ -687,6 +691,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 							provenanceHTMLBuilder.append("<ol>\n");
 							for (String uri : dataSources) {
 								String mapbrowseURL = mapbrowseURL(uri);
+								if (source == null) { source = packageIdFromPastaId(uri); }
 								String listItem = String.format("<li>%s</li>", mapbrowseURL);
 								provenanceHTMLBuilder.append(listItem);
 							}
@@ -700,6 +705,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 				if (dataDescendantsStr != null &&
 						dataDescendantsStr.length() > 0) {
+					source = packageId;
 					String[] dataDescendants = dataDescendantsStr.split("\n");
 					if (dataDescendants.length > 0) {
 						String dataDescendant = dataDescendants[0];
@@ -708,6 +714,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 							provenanceHTMLBuilder.append("<ol>\n");
 							for (String uri : dataDescendants) {
 								String mapbrowseURL = mapbrowseURL(uri);
+								if (derived == null) { derived = packageIdFromPastaId(uri); }
 								String listItem = String.format("<li>%s</li>", mapbrowseURL);
 								provenanceHTMLBuilder.append(listItem);
 							}
@@ -717,6 +724,21 @@ public class MapBrowseServlet extends DataPortalServlet {
 					}
 				}
 				
+				/*
+				 * Provenance graph
+				 */
+				if ((source != null) && (derived != null)) {				
+					String graphString = 
+						String.format("View a <a class=\"searchsubcat\" href=\"./provenanceGraph?source=%s&derived=%s\">"
+									+ "provenance graph</a> of this data package",
+									source, derived);
+					provenanceHTMLBuilder.append(graphString);
+					provenanceHTMLBuilder.append("<br/><br/>");
+				}
+				
+				/*
+				 * Provenance metadata generator
+				 */
 				provenanceHTMLBuilder.append(
 						String.format(
 				"Generate <a class=\"searchsubcat\" href=\"./provenanceGenerator?packageid=%s\">" +
@@ -803,6 +825,31 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 		
 		return url;
+	}
+	
+	
+	/*
+	 * Extract the package id value from a metadata resource identifier
+	 * as input.
+	 * 		Example input:  "https://pasta.lternet.edu/package/metadata/eml/lter-landsat/7/1"
+	 * 		Example output: "lter-landsat.7.1"
+	 */
+	private String packageIdFromPastaId(String uri) {
+		String packageId = null;
+		
+		if (uri != null) {
+			final String patternString = "^.*/package/metadata/eml/(\\S+)/(\\d+)/(\\d+)$";
+			Pattern pattern = Pattern.compile(patternString);
+			Matcher matcher = pattern.matcher(uri);
+			if (matcher.matches()) {
+				String scope = matcher.group(1);
+				String identifier = matcher.group(2);
+				String revision = matcher.group(3);
+				packageId = String.format("%s.%s.%s", scope, identifier, revision);
+			}
+		}
+		
+		return packageId;
 	}
 	
 	

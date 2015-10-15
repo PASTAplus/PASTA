@@ -144,4 +144,22 @@ public class SubscribedUrl {
 
         return url.equals(su.url);
     }
+
+    
+    /**
+     * Returns a content-based hash code.
+     * 
+     * When you override equals(), you must always override hashCode() to 
+     * guarantee that equal objects have equal hash codes. Failing to do 
+     * this can cause subtle bugs in your programs.
+     * 
+     * @return a content-based hash code.
+     */
+    @Override
+    public int hashCode() {
+        int hash = (url == null ? 1 : url.hashCode());
+
+        return hash;
+    }
+
 }
