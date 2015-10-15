@@ -10637,13 +10637,11 @@
   <xsl:preserve-space elements="literalLayout"/>
   
   <!-- This module is for text module in eml2 document. It is a table and self contained-->
-  <!-- note: text type is mixed content, so template should be able to handle simple string content, too.
-       maybe, if only text children, then use mode=lowlevel? NEED A REAL XSLT PROGRAMMER! -->
   <xsl:template name="text">
     <xsl:param name="textfirstColStyle" />
     <xsl:param name="textsecondColStyle" />
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: text</xsl:text></xsl:message></xsl:if>
-    <xsl:if test="(section and normalize-space(section[1]) != '') or (para and normalize-space(para[1]) != '')">
+    <xsl:if test="(section and normalize-space(section[1]) != '') or (para and normalize-space(para[1]) != '') or (. != '')">
       <xsl:apply-templates mode="text">
         <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
         <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
@@ -10655,7 +10653,7 @@
     <xsl:param name="textfirstColStyle" />
     <xsl:param name="textsecondColStyle" />
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: abstracttext</xsl:text></xsl:message></xsl:if>
-    <xsl:if test="(section and normalize-space(section[1])!='') or (para and normalize-space(para[1])!='')">
+    <xsl:if test="(section and normalize-space(section[1]) != '') or (para and normalize-space(para[1]) != '') or (. != '')">
       <!-- was <xsl:apply-templates mode="text"> (mgb 7Jun2011) use mode="lowlevel" to make abstract use p for para -->
       <div class="abstract-text">
         <xsl:apply-templates mode="text">
