@@ -5206,6 +5206,18 @@
           </xsl:for-each>
         </xsl:if>
       </xsl:when>
+      <xsl:otherwise>
+        <tr>
+          <td colspan="2" align="center" class="{$stripes}">
+            <a>
+              <xsl:attribute name="href">
+                <xsl:value-of select="$docid"/>https://portal.lternet.edu/attributeDomainServer`&amp;displaymodule=attributedomain&amp;entitytype=<xsl:value-of select="$entitytype"/>&amp;entityindex=<xsl:value-of select="$entityindex"/>&amp;attributeindex=<xsl:value-of select="$attributeindex"/>
+              </xsl:attribute>
+              <b>Allowed values and definitions</b>
+            </a>
+          </td>
+        </tr>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
