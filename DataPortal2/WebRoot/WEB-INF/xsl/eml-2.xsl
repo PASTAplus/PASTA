@@ -5210,9 +5210,7 @@
         <tr>
           <td colspan="2" align="center" class="{$stripes}">
             <a>
-              <xsl:attribute name="href">
-                <xsl:value-of select="$docid"/>https://portal.lternet.edu/attributeDomainServer`&amp;displaymodule=attributedomain&amp;entitytype=<xsl:value-of select="$entitytype"/>&amp;entityindex=<xsl:value-of select="$entityindex"/>&amp;attributeindex=<xsl:value-of select="$attributeindex"/>
-              </xsl:attribute>
+              <xsl:attribute name="href">./metadataviewer?packageid=<xsl:value-of select="$docid"/>&amp;displaymodule=attributedomain&amp;entitytype=<xsl:value-of select="$entitytype"/>&amp;entityindex=<xsl:value-of select="$entityindex"/>&amp;attributeindex=<xsl:value-of select="$attributeindex"/></xsl:attribute>
               <b>Allowed values and definitions</b>
             </a>
           </td>
