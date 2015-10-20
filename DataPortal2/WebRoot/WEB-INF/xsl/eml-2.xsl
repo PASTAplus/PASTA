@@ -5209,10 +5209,9 @@
       <xsl:otherwise>
         <tr>
           <td colspan="2" align="center" class="{$stripes}">
-            <a>
-              <xsl:attribute name="href">./metadataviewer?packageid=<xsl:value-of select="$docid"/>&amp;displaymodule=attributedomain&amp;entitytype=<xsl:value-of select="$entitytype"/>&amp;entityindex=<xsl:value-of select="$entityindex"/>&amp;attributeindex=<xsl:value-of select="$attributeindex"/></xsl:attribute>
-              <b>Allowed values and definitions</b>
-            </a>
+          <xsl:call-template name="nonNumericDomain">
+              <xsl:with-param name="nondomainfirstColStyle" select="$firstColStyle"/>
+          </xsl:call-template>
           </td>
         </tr>
       </xsl:otherwise>
@@ -5385,6 +5384,8 @@
    <xsl:template name="nonNumericDomain">
      <xsl:param name="nondomainfirstColStyle"/>
      <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: nonNumericDomain</xsl:text></xsl:message></xsl:if>
+      <strong id="toggleNonNumericDomain" class="toggleButton"><button>+/-</button>Allowed Values and Definitions</strong>
+      <div class="collapsible">
      <table class="{$tabledefaultStyle}">
         <xsl:choose>
          <xsl:when test="references!=''">
@@ -5403,6 +5404,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </table>
+      </div>
   </xsl:template>
 
   <xsl:template name="nonNumericDomainCommon">
