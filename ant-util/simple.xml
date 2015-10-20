@@ -229,7 +229,7 @@
     <javadoc sourcepath="${src.dir}"
 	     classpathref="compile.classpath"
 	     destdir="${javadoc.dir}">
-      <link href="http://download.oracle.com/javase/6/docs/api/"/>
+      <link href="http://download.oracle.com/javase/8/docs/api/"/>
       <link href="http://jersey.java.net/nonav/apidocs/1.5/jersey/"/>
       <link href="${basedir}/${common.code.dir}/documents/javadoc/"/>
       <link href="http://www.unboundid.com/products/ldap-sdk/docs/javadoc"/>
