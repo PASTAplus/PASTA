@@ -186,12 +186,14 @@
     <xsl:call-template name="datasettitle">
       <xsl:with-param name="packageID" select="$packageID"/> 
     </xsl:call-template>
+
     <fieldset>
       <legend>Summary Information</legend>
       <xsl:call-template name="datasetpart">
         <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
       </xsl:call-template>
     </fieldset> 
+
     <button id="showAll">Show Details</button><button id="hideAll">Hide Details</button>
     <fieldset>
       <legend>Detailed Metadata</legend>
@@ -201,29 +203,29 @@
         <xsl:call-template name="entitypart"/>
       </div> <!-- end collapsible --> 
 
+      <xsl:if test="intellectualRights">
       <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Package Usage Rights</h3>
       <div class="collapsible">
         <!-- add in the intellectual rights info -->
         <table class="subGroup onehundred_percent">  
           <tr>
             <td>
-              <xsl:if test="intellectualRights">
                 <xsl:for-each select="intellectualRights">
                   <xsl:call-template name="resourceintellectualRights">
                     <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-              </xsl:if>
             </td>
           </tr>
         </table>
       </div> <!-- end collapsible -->
+      </xsl:if>
 
+      <xsl:if test="keywordSet">
       <h3 id="toggleKeywords" class="toggleButton"><button>+/-</button> Keywords</h3>
       <div class="collapsible">
         <!-- the keywords table. -->
-        <xsl:if test="keywordSet">
           <table class="{$tabledefaultStyle}"> 
             <tr>
               <th colspan="2">By Thesaurus:</th>
@@ -244,8 +246,8 @@
                     </tr>
                 </xsl:for-each>
           </table>
-        </xsl:if>
       </div> <!-- end collapsible -->
+      </xsl:if>
 
       <h3 id="toggleMethods" class="toggleButton"><button>+/-</button> Methods and Protocols</h3>
       <div class="collapsible">
@@ -255,6 +257,7 @@
           <xsl:with-param name="packageID" select="$packageID"/>
         </xsl:call-template>
       </div> <!-- end collapsible -->
+
       <h3 id="togglePeople" class="toggleButton"><button>+/-</button> People and Organizations</h3>
       <div class="collapsible">
         <!-- Organization/Personnel Information -->
@@ -282,24 +285,24 @@
         </xsl:call-template>
       </div> <!-- end collapsible -->
 
+      <xsl:if test="maintenance">
       <h3 id="toggleMaintenance" class="toggleButton"><button>+/-</button> Maintenance</h3>
       <div class="collapsible">
         <!-- add in the maintenance info -->
         <table class="subGroup onehundred_percent">  
           <tr>
             <td>
-              <xsl:if test="maintenance">
                 <xsl:for-each select="maintenance">
                   <xsl:call-template name="datasetmaintenance">
                     <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-              </xsl:if>
             </td>
           </tr>
         </table>
       </div> <!-- end collapsible -->
+      </xsl:if>
 
     </fieldset> 
     <!-- end Detailed Metadata -->
@@ -1892,13 +1895,6 @@
           <xsl:call-template name="datasetpurpose">
             <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
             <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:if>
-      <!-- put in the maintenance of the dataset-->
-      <xsl:if test="./maintenance">
-        <xsl:for-each select="./maintenance">
-          <xsl:call-template name="datasetmaintenance">
           </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
