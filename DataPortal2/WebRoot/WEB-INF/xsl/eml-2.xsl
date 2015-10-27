@@ -2279,6 +2279,7 @@
     <xsl:param name="resfirstColStyle"/>
     <xsl:param name="ressecondColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmaintenance</xsl:text></xsl:message></xsl:if>
+      <tr>
         <th colspan="2"><xsl:text>Maintenance:</xsl:text></th>
       </tr>
       <xsl:call-template name="mantenancedescription"/>
