@@ -117,11 +117,6 @@ public class EventManagerClient extends PASTAServiceClient {
    * Instance methods
    */
   
-  public void finalize() throws Throwable {
-    super.finalize();
-  }
-  
-  
   /**
    * Notify the Event Manager of a change to a data package.
    * 

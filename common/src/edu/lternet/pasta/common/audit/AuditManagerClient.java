@@ -97,11 +97,6 @@ public class AuditManagerClient implements Runnable {
   * Instance methods
   */
  
- public void finalize() throws Throwable {
-   super.finalize();
- }
- 
- 
  /**
   * Handle an HTTP status code that represents some form of exception
   * 
