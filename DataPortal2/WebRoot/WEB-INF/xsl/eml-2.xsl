@@ -186,41 +186,46 @@
     <xsl:call-template name="datasettitle">
       <xsl:with-param name="packageID" select="$packageID"/> 
     </xsl:call-template>
+
     <fieldset>
       <legend>Summary Information</legend>
       <xsl:call-template name="datasetpart">
         <xsl:with-param name="packageID" select="$packageID"></xsl:with-param>
       </xsl:call-template>
     </fieldset> 
+
     <button id="showAll">Show Details</button><button id="hideAll">Hide Details</button>
     <fieldset>
       <legend>Detailed Metadata</legend>
+
       <h3 id="toggleEntities" class="toggleButton"><button>+/-</button> Data Entities</h3>
       <div class="collapsible">
         <xsl:call-template name="entitypart"/>
       </div> <!-- end collapsible --> 
+
+      <xsl:if test="intellectualRights">
       <h3 id="toggleDataSetUsageRights" class="toggleButton"><button>+/-</button> Data Package Usage Rights</h3>
       <div class="collapsible">
         <!-- add in the intellectual rights info -->
         <table class="subGroup onehundred_percent">  
           <tr>
             <td>
-              <xsl:if test="intellectualRights">
                 <xsl:for-each select="intellectualRights">
                   <xsl:call-template name="resourceintellectualRights">
                     <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
                     <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
                   </xsl:call-template>
                 </xsl:for-each>
-              </xsl:if>
             </td>
           </tr>
         </table>
       </div> <!-- end collapsible -->
+      </xsl:if>
+
+      <xsl:if test="keywordSet">
       <h3 id="toggleKeywords" class="toggleButton"><button>+/-</button> Keywords</h3>
       <div class="collapsible">
         <!-- the keywords table. -->
-        <xsl:if test="keywordSet">
           <table class="{$tabledefaultStyle}"> 
             <tr>
               <th colspan="2">By Thesaurus:</th>
@@ -241,8 +246,9 @@
                     </tr>
                 </xsl:for-each>
           </table>
-        </xsl:if>
-      </div> <!-- end collapsible -->   
+      </div> <!-- end collapsible -->
+      </xsl:if>
+
       <h3 id="toggleMethods" class="toggleButton"><button>+/-</button> Methods and Protocols</h3>
       <div class="collapsible">
         <!-- mob added 2010-03-26  -->
@@ -251,6 +257,7 @@
           <xsl:with-param name="packageID" select="$packageID"/>
         </xsl:call-template>
       </div> <!-- end collapsible -->
+
       <h3 id="togglePeople" class="toggleButton"><button>+/-</button> People and Organizations</h3>
       <div class="collapsible">
         <!-- Organization/Personnel Information -->
@@ -269,6 +276,7 @@
           <xsl:with-param name="resourcetitle" select="$resourcetitle"/>
         </xsl:call-template>
       </xsl:if>
+
       <h3 id="toggleCoverage" class="toggleButton"><button>+/-</button> Temporal, Geographic and Taxonomic Coverage</h3>
       <div class="collapsible">
         <!-- mob added 2010-03-26  -->
@@ -276,7 +284,29 @@
           <xsl:with-param name="packageID" select="$packageID"/>
         </xsl:call-template>
       </div> <!-- end collapsible -->
-    </fieldset>
+
+      <xsl:if test="maintenance">
+      <h3 id="toggleMaintenance" class="toggleButton"><button>+/-</button> Maintenance</h3>
+      <div class="collapsible">
+        <!-- add in the maintenance info -->
+        <table class="subGroup onehundred_percent">  
+          <tr>
+            <td>
+                <xsl:for-each select="maintenance">
+                  <xsl:call-template name="datasetmaintenance">
+                    <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
+                    <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+            </td>
+          </tr>
+        </table>
+      </div> <!-- end collapsible -->
+      </xsl:if>
+
+    </fieldset> 
+    <!-- end Detailed Metadata -->
+
     <!-- <xsl:if test="$displaymodule='attribute'"> -->
     <xsl:if test="boolean(0)">
       <xsl:call-template name="attributepart"/>
@@ -1863,6 +1893,8 @@
       <xsl:if test="./purpose">
         <xsl:for-each select="./purpose">
           <xsl:call-template name="datasetpurpose">
+            <xsl:with-param name="resfirstColStyle" select="$firstColStyle"/>
+            <xsl:with-param name="ressecondColStyle" select="$secondColStyle"/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:if>
@@ -2225,28 +2257,26 @@
   </xsl:template>
 
   <xsl:template name="datasetpurpose">
-    <xsl:param name="packageID"></xsl:param>
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetpurpose</xsl:text></xsl:message></xsl:if>
-    <xsl:for-each select="purpose">
       <tr>
-        <td colspan="2"><xsl:text>Purpose:</xsl:text></td>
-      </tr>
-      <tr>
-        <td class="{$firstColStyle}">&#160;</td>
+        <td class="{$resfirstColStyle}"><xsl:text>Purpose:</xsl:text></td>
         <td>
           <xsl:call-template name="text">
-            <xsl:with-param name="textfirstColStyle" select="$firstColStyle"/>
+           <xsl:with-param name="textfirstColStyle" select="$resfirstColStyle"/>
+           <xsl:with-param name="textsecondColStyle" select="$ressecondColStyle"/>
           </xsl:call-template>
         </td>
       </tr>
-    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="datasetmaintenance">
+    <xsl:param name="resfirstColStyle"/>
+    <xsl:param name="ressecondColStyle"/>
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: datasetmaintenance</xsl:text></xsl:message></xsl:if>
-    <xsl:for-each select="maintenance">
       <tr>
-        <td colspan="2"><xsl:text>Maintenance:</xsl:text></td>
+        <th colspan="2"><xsl:text>Maintenance:</xsl:text></th>
       </tr>
       <xsl:call-template name="mantenancedescription"/>
       <tr>
@@ -2254,7 +2284,6 @@
         <td class="{$secondColStyle}" ><xsl:value-of select="maintenanceUpdateFrequency"/></td>
       </tr>
       <xsl:call-template name="datasetchangehistory"/>
-    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="mantenancedescription">
