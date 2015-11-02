@@ -10696,7 +10696,7 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: abstracttext</xsl:text></xsl:message></xsl:if>
     <xsl:if test="(section and normalize-space(section[1]) != '') or (para and normalize-space(para[1]) != '') or (. != '')">
       <!-- was <xsl:apply-templates mode="text"> (mgb 7Jun2011) use mode="lowlevel" to make abstract use p for para -->
-      <div class="abstract-text">
+      <div>
         <xsl:apply-templates mode="text">
           <xsl:with-param name="textfirstColStyle" select="$textfirstColStyle"/>
           <xsl:with-param name="textsecondColStyle" select="$textsecondColStyle" />
