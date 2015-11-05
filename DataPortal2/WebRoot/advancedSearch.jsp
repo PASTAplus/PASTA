@@ -2,6 +2,7 @@
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
+<%@ page import="edu.lternet.pasta.portal.search.AuthorSearch" %>
 
 <%
   final String pageTitle = "Advanced Search";
@@ -10,6 +11,10 @@
   final String indent = "              ";
   boolean includeNIN = true;      // include North Inlet in the options list
   String siteOptions = LTERSite.composeHTMLOptions(indent, includeNIN, null);
+  
+  AuthorSearch.updateAuthorsAndOrganizations();
+  String creatorOptions = AuthorSearch.composeAuthorNameOptions();
+  String organizationOptions = AuthorSearch.composeAuthorOrganizationOptions();
 %>
 
 <!DOCTYPE html>
@@ -112,7 +117,7 @@
         var canSearch = true;
 
         if (trim(form.subjectValue.value) == "" &&
-            trim(form.creatorSurname.value) == "" &&
+            trim(form.creatorName.value) == "" &&
             trim(form.creatorOrganization.value) == "" &&
             trim(form.boundsChangedCount.value) == "1" &&
             trim(form.locationName.value) == "" &&
@@ -122,8 +127,8 @@
             trim(form.startDate.value) == "" &&
             trim(form.endDate.value) == "" &&
             trim(form.namedTimescale.value) ==""
-           ) {              
-          //canSearch = confirm("Show *all* data in the catalog?\n(This may take some time!)");
+           )
+        {              
           alert("Please enter a value to search.");
           canSearch = false;
         }
@@ -458,14 +463,22 @@
 												  <div>
 													  <table>
 															<tr>
-																<td><label class="labelBold">Creator&#39;s Last Name:</label></td>
+																<td><label class="labelBold">Creator&#39;s Name:</label></td>
 											                    <td class="spacerwd"></td>
 																<td><label class="labelBold">Creator&#39;s Organization:</label></td>
 															</tr>
 															<tr>
-																<td><input name="creatorSurname" type="text" /></td>
+																<td>
+                              <select class="select-width-auto" name="creatorName">
+                                <%= creatorOptions %>
+                              </select>
+																</td>
 											                    <td class="spacerwd"></td>
-																<td><input name="creatorOrganization" type="text" /></td>
+																<td>
+                              <select class="select-width-auto" name="creatorOrganization">
+                                <%= organizationOptions %>
+                              </select>
+																</td>
 															</tr>
 															<tr>
 															</tr>

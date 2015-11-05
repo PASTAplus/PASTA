@@ -62,8 +62,9 @@ public class SolrAdvancedSearch extends Search  {
   /*
    * Form parameters
    */
+	
   private final String creatorOrganization;
-  private final String creatorSurname;
+  private final String creatorName;
   private final String dateField;
   private final String startDate;
   private final String endDate;
@@ -106,8 +107,8 @@ public class SolrAdvancedSearch extends Search  {
    * Constructor. Passes in a large set of form field parameters.
    */
   public SolrAdvancedSearch(
+	  String creatorName,
       String creatorOrganization,
-      String creatorSurname,
       String dateField,
       String startDate,
       String endDate,
@@ -132,8 +133,8 @@ public class SolrAdvancedSearch extends Search  {
       String locationName
                        ) {
 	super();
+    this.creatorName = creatorName;
     this.creatorOrganization = creatorOrganization;
-    this.creatorSurname = creatorSurname;
     this.dateField = dateField;
     this.startDate = startDate;
     this.endDate = endDate;
@@ -272,31 +273,35 @@ public class SolrAdvancedSearch extends Search  {
 
 
   /**
-   * An author query will search the creator/individualName/surName field, the
-   * creator/organizationName field, or an intersection of both fields.
+   * An author query will search on the creator name and/or creator organization.
    */
   private void buildQueryAuthor(TermsList termsList) 
   		throws UnsupportedEncodingException {
-    String value = this.creatorSurname;
-    String parenthesizedValue = parenthesizeQueryValue(value);
 
-    if ((value != null) && (!(value.equals("")))) {
-      termsList.addTerm(value);
-      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
-      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
-      String authorQuery = String.format("author:%s", encodedValue);
-      updateQString(authorQuery);
+    if (this.creatorName != null && !this.creatorName.equals("")) {
+    	termsList.addTerm(this.creatorName);
+    	String searchName = this.creatorName;
+    	if (creatorName.contains(".")) {
+    		String[] splitName = searchName.split("\\.");
+    		searchName = splitName[0];
+    	}
+		String authorQuery = String.format("author:\"%s\"", searchName);
+        //String escapedValue = Search.escapeQueryChars(authorQuery);
+        String encodedValue = URLEncoder.encode(authorQuery, "UTF-8");
+        updateQString(encodedValue);
     }
 
-    value = this.creatorOrganization;
-    parenthesizedValue = parenthesizeQueryValue(value);
-      
-    if ((value != null) && (!(value.equals("")))) {
-      termsList.addTerm(value);
-      String escapedValue = Search.escapeQueryChars(parenthesizedValue);
-      String encodedValue = URLEncoder.encode(escapedValue, "UTF-8");
-      String organizationQuery = String.format("organization:%s", encodedValue);
-      updateQString(organizationQuery);
+    if (this.creatorOrganization != null && !this.creatorOrganization.equals("")) {
+    	termsList.addTerm(this.creatorOrganization);
+    	String searchName = this.creatorOrganization;
+    	if (creatorOrganization.contains(".")) {
+    		String[] splitName = searchName.split("\\.");
+    		searchName = splitName[0];
+    	}
+		String organizationQuery = String.format("organization:\"%s\"", searchName);
+        //String escapedValue = Search.escapeQueryChars(organizationQuery);
+        String encodedValue = URLEncoder.encode(organizationQuery, "UTF-8");
+        updateQString(encodedValue);
     }
     
   }
@@ -625,7 +630,8 @@ public class SolrAdvancedSearch extends Search  {
 					if ((siteName != null) && (!siteName.equals(""))) {
 						termsList.addTerm(siteName);
 					}
-					siteQuery = String.format("%s+%s", siteQuery, attributeValue);
+				    String plusSign = (i > 0) ? "+" : "";
+					siteQuery = String.format("%s%s%s", siteQuery, plusSign, attributeValue);
 					if ((i + 1) == siteValues.length) { // tack on the closing parenthesis
 						siteQuery = String.format("%s)", siteQuery); 
 					}
