@@ -148,7 +148,7 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     String endDate = request.getParameter("endDate");
     String datesContained = request.getParameter("datesContained");
     String creatorOrganization = request.getParameter("creatorOrganization");
-    String creatorSurname = request.getParameter("creatorSurname");
+    String creatorName = request.getParameter("creatorName");
     String locationName = request.getParameter("locationName");
     String namedTimescale = request.getParameter("namedTimescale");
     String[] siteValues = request.getParameterValues("siteValues");
@@ -176,8 +176,8 @@ public class AdvancedSearchServlet extends DataPortalServlet {
     boolean isRelatedSpecificChecked = (relatedSpecific != null);
        
     SolrAdvancedSearch solrAdvancedSearch = new SolrAdvancedSearch(
+      creatorName,
       creatorOrganization,
-      creatorSurname,
       dateField,
       startDate,
       endDate,
