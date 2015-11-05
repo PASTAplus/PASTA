@@ -23,6 +23,7 @@
  */
 package edu.lternet.pasta.portal.search;
 
+import java.util.Date;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +56,7 @@ public class AuthorSearch extends Search {
 
 	private static String[] authors = { "" };
 	private static String[] organizations = { "" };
+	private static long lastRefreshTime = 0L;
 
 
     /**
@@ -159,21 +161,56 @@ public class AuthorSearch extends Search {
 	 * Solr query for each.
 	 */
 	public static void updateAuthorsAndOrganizations() {
-		try {
-			String authorQuery = buildAuthorQuery();
-			updateAuthors(authorQuery);
+		if (authors.length < 2 || 
+			organizations.length < 2 || 
+			shouldRefresh(lastRefreshTime)
+		   ) {
+			try {
+				logger.warn("Begin refreshing creator names cache.");
+				String authorQuery = buildAuthorQuery();
+				updateAuthors(authorQuery);
+				logger.warn("Finished refreshing creator names cache.");
 
-			String organizationQuery = buildOrganizationQuery();
-			updateOrganizations(organizationQuery);
-		}
-		catch (Exception e) {
-			logger.error("Error updating authors and organizations: "
-					+ e.getMessage());
-			e.printStackTrace();
+				logger.warn("Begin refreshing creator organizations cache.");
+				String organizationQuery = buildOrganizationQuery();
+				updateOrganizations(organizationQuery);
+				logger.warn("Finished refreshing creator organizations cache.");
+
+				Date now = new Date();
+				lastRefreshTime = now.getTime();
+			}
+			catch (Exception e) {
+				logger.error("Error updating creators and organizations: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 	
 	
+	/**
+	 * Boolean to determine whether the cache is due to be
+	 * refreshed. Returns true is the current time has advanced past the last
+	 * refresh time plus a time-to-live period.
+	 * 
+	 * @param  lastRefreshTime   the time when the cache was last refreshed
+	 */
+	private static boolean shouldRefresh(long lastRefreshTime) {
+		double hours = 0.5;
+		boolean shouldRefresh = false;
+		final long timeToLive = (long) (hours * 60 * 60 * 1000);
+		Date now = new Date();
+		long nowTime = now.getTime();
+		long refreshTime = lastRefreshTime + timeToLive;
+
+		if (refreshTime < nowTime) {
+			shouldRefresh = true;
+		}
+
+		return shouldRefresh;
+	}
+
+	  
 	/**
 	 * Updates the author name values by executing a Solr query.
 	 * 
