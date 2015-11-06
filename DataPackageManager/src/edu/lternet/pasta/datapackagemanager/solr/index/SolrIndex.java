@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
@@ -190,7 +191,8 @@ public class SolrIndex {
 			StringBuilder authorBuilder = new StringBuilder("");
 			StringBuilder organizationBuilder = new StringBuilder("");
 			boolean hasAuthor = false;
-			boolean hasOrganization = false;
+			boolean foundOrganization = false;
+			TreeSet<String> organizationSet = new TreeSet<String>();
 			for (ResponsibleParty responsibleParty : responsibleParties) {
 				if (responsibleParty.isPerson()) {
 					if (hasAuthor) authorBuilder.append("\n");
@@ -199,16 +201,22 @@ public class SolrIndex {
 					hasAuthor = true;
 					authorBuilder.append(author);
 				}
-				if (responsibleParty.isOrganization()) {
-					if (hasOrganization) organizationBuilder.append("\n");
+				if (responsibleParty.hasOrganization()) {
 					String organization = responsibleParty.getOrganizationName();
-					solrInputDocument.addField("organization", organization);
-					hasOrganization = true;
-					organizationBuilder.append(organization);
+					/*
+					 * Don't add duplicate organization values
+					 */
+					if (!organizationSet.contains(organization)) {
+						if (foundOrganization) organizationBuilder.append("\n");
+						organizationSet.add(organization);
+						solrInputDocument.addField("organization", organization);
+						foundOrganization = true;
+						organizationBuilder.append(organization);
+					}
 				}
 			}
 			String partiesStr = null;
-			if (hasAuthor && hasOrganization) {
+			if (hasAuthor && foundOrganization) {
 				/*
 				 * Note that organizations come ahead of authors in the
 				 * responsibleParties string. This is to keep sorting
@@ -221,7 +229,7 @@ public class SolrIndex {
 			else if (hasAuthor) {
 				partiesStr = authorBuilder.toString();
 			}
-			else if (hasOrganization) {
+			else if (foundOrganization) {
 				partiesStr = organizationBuilder.toString();
 			}
 			
