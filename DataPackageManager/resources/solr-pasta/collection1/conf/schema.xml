@@ -139,7 +139,7 @@
 
     <!-- tdate fields -->
     <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
-    <field name="singledate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="singledate" type="tdate" indexed="true" stored="true" multiValued="true"/>
     <field name="begindate" type="tdate" indexed="true" stored="true" multiValued="false"/>
     <field name="enddate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 

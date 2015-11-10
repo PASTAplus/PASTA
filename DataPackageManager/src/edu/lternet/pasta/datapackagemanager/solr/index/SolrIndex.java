@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -82,6 +83,34 @@ public class SolrIndex {
 	}
 	
 	
+	private String determineBeginDate(Set<String> beginDates) {
+		String lowestDate = ISO8601Utility.formatTimestamp("9999-12-31", DATE_GRANULARITY);
+		
+		for (String date : beginDates) {
+			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
+			if (timestamp.compareTo(lowestDate) < 0) {
+				lowestDate = date;
+			}
+		}
+		
+		return lowestDate;
+	}
+	
+	
+	private String determineEndDate(Set<String> endDates) {
+		String highestDate = ISO8601Utility.formatTimestamp("0000-01-01", DATE_GRANULARITY);
+		
+		for (String date : endDates) {
+			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
+			if (timestamp.compareTo(highestDate) > 0) {
+				highestDate = date;
+			}
+		}
+		
+		return highestDate;
+	}
+	
+	
 	/**
 	 * Indexes an EML document, adding it to the Solr repository.
 	 * 
@@ -108,12 +137,12 @@ public class SolrIndex {
 			
 			// Get content of several different date nodes
 			String pubDate = dataPackage.getPubDate();
-			String beginDate = dataPackage.getBeginDate();
-			String endDate = dataPackage.getEndDate();
-			String singleDate = dataPackage.getSingleDateTime();
+			Set<String> beginDates = dataPackage.getBeginDates();
+			Set<String> endDates = dataPackage.getEndDates();
+			Set<String> singleDateTimes = dataPackage.getSingleDateTimes();
+			Set<String> timescales = dataPackage.getAlternativeTimeScales();
 			
 			List<String> keywords = dataPackage.getKeywords();
-			List<String> timescales = dataPackage.getTimescales();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
 			String fundingText = dataPackage.getFundingText();
@@ -136,21 +165,33 @@ public class SolrIndex {
 				solrInputDocument.setField("pubdate", pubDateTimestamp);
 			}
 
-			String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
-			if (beginDateTimestamp != null) {
-				solrInputDocument.setField("begindate", beginDateTimestamp);
+			if (beginDates != null && beginDates.size() > 0) {
+				String beginDate = determineBeginDate(beginDates);
+				if (beginDate != null) {
+					String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
+					solrInputDocument.setField("begindate", beginDateTimestamp);
+				}
 			}
 
-			String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
-			if (endDateTimestamp != null) {
-				solrInputDocument.setField("enddate", endDateTimestamp);
+			if (endDates != null && endDates.size() > 0) {
+				String endDate = determineEndDate(endDates);
+				if (endDate != null) {
+					String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
+					solrInputDocument.setField("enddate", endDateTimestamp);
+				}
 			}
 
-			String singleDateTimestamp = ISO8601Utility.formatTimestamp(singleDate, DATE_GRANULARITY);
-			if (singleDateTimestamp != null) {
-				solrInputDocument.setField("singledate", singleDateTimestamp);
+			for (String singleDate : singleDateTimes) {
+				String singleDateTimestamp = ISO8601Utility.formatTimestamp(singleDate, DATE_GRANULARITY);
+				if (singleDateTimestamp != null) {
+					solrInputDocument.addField("singledate", singleDateTimestamp);
+				}
 			}
 
+			for (String timescale : timescales) {
+				solrInputDocument.addField("timescale", timescale);
+			}
+			
 			/*
 			 *  Index the "title" and "titles" fields. The former is multi-valued and the
 			 *  latter is single value. Only single value fields (in this case, "titles")
@@ -176,10 +217,6 @@ public class SolrIndex {
 					
 			for (String keyword : keywords) {
 				solrInputDocument.addField("keyword", keyword);
-			}
-			
-			for (String timescale : timescales) {
-				solrInputDocument.addField("timescale", timescale);
 			}
 			
 			/*
