@@ -258,6 +258,20 @@ public class ResponsibleParty {
   }
 
 
+  /**
+   * Determine whether this responsible party has an organization, even
+   * if it is not exclusively an organization element (for example, a creator element
+   * with both an <code><individualName></code> and an <code><organizationName></code>
+   * element contained within it). Note how this differs from the
+   * <code>isOrganization()</code> method.
+   * 
+   * @return   true if the responsible party has an organization, else false
+   */
+  public boolean hasOrganization() {
+	    return (organizationName != null && !organizationName.equals(""));
+  }
+
+
   public boolean isOrganization() {
     return (!isPerson() && organizationName != null && !organizationName.equals(""));
   }
