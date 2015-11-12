@@ -69,7 +69,6 @@ public class SimpleSolrSearch {
 			"pubdate",
 			"responsibleParties",
 			"scope",
-			"singledate",
 			"site",
 			"taxonomic",
 			"title",
@@ -80,6 +79,7 @@ public class SimpleSolrSearch {
 			"derivedFrom",
 			"keyword",
 			"organization",
+			"singledate",
 			"timescale"
 		};
 	
@@ -96,6 +96,7 @@ public class SimpleSolrSearch {
 		wrapperElements.put("derivedFrom", "sources");
 		wrapperElements.put("keyword", "keywords");
 		wrapperElements.put("organization", "organizations");
+		wrapperElements.put("singledate", "singledates");
 		wrapperElements.put("timescale", "timescales");
 	}
 		

@@ -127,8 +127,8 @@
     <field name="title" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="titles" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="keyword" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
-    <field name="author" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
-    <field name="organization" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <field name="author" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="organization" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="responsibleParties" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="abstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
     <field name="methods" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
@@ -139,7 +139,7 @@
 
     <!-- tdate fields -->
     <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
-    <field name="singledate" type="tdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="singledate" type="tdate" indexed="true" stored="true" multiValued="true"/>
     <field name="begindate" type="tdate" indexed="true" stored="true" multiValued="false"/>
     <field name="enddate" type="tdate" indexed="true" stored="true" multiValued="false"/>
 

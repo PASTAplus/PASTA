@@ -469,13 +469,13 @@
 															</tr>
 															<tr>
 																<td>
-                              <select class="select-width-auto" name="creatorName">
+                              <select class="select-width-fixed" name="creatorName">
                                 <%= creatorOptions %>
                               </select>
 																</td>
 											                    <td class="spacerwd"></td>
 																<td>
-                              <select class="select-width-auto" name="creatorOrganization">
+                              <select class="select-width-fixed" name="creatorOrganization">
                                 <%= organizationOptions %>
                               </select>
 																</td>
