@@ -265,7 +265,18 @@ public class SimpleSolrSearch {
 						Collection<Object> multiValues = solrDocument.getFieldValues(fieldName);
 						if (multiValues != null && multiValues.size() > 0) {
 							for (Object value : multiValues) {
-								String valueStr = (String) value;
+								String valueStr = null;
+								if (isDateField(fieldName)) {
+									Date dateValue = (Date) value;
+									SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+									if (dateValue != null) {
+										valueStr = sdf.format(dateValue);
+									}
+								}
+								else {
+									valueStr = (String) value;
+								}
+								
 								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
 										                INDENT, INDENT, INDENT, fieldName, valueStr, fieldName));
 							}
