@@ -18,6 +18,7 @@ import org.apache.solr.common.SolrInputDocument;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.DataPackage.BoundingCoordinates;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
@@ -150,10 +151,7 @@ public class SolrIndex {
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 			
-			String westCoord = dataPackage.getWestBoundingCoordinate();
-			String southCoord = dataPackage.getSouthBoundingCoordinate();
-			String eastCoord = dataPackage.getEastBoundingCoordinate();
-			String northCoord = dataPackage.getNorthBoundingCoordinate();
+			List<DataPackage.BoundingCoordinates> coordinatesList = dataPackage.getCoordinatesList();
 			
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
@@ -298,34 +296,41 @@ public class SolrIndex {
 				solrInputDocument.setField("taxonomic", taxonomicCoverageText);
 			}
 			
-			if (isValidDouble(eastCoord) &&
-				isValidDouble(westCoord) &&
-				isValidDouble(northCoord) &&
-				isValidDouble(southCoord)
-			   ) {
-				// Only index when north coord >= south coord.
-				// However, weat can be greater than east at the International
-				// Date Line.
-				if (isGreaterThanOrEqualToCoord(northCoord, southCoord)) {
-					/*
-					 * A rectangle is indexed with four points to represent the
-					 * corners. These points should be represented in MinX,
-					 * MinY, MaxX, MaxY order.
-					 * 
-					 * For example:
-					 * 
-					 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
-					 */
-					String value = String.format("%s %s %s %s", westCoord,
-							southCoord, eastCoord, northCoord);
-					solrInputDocument.setField("coordinates", value);
-				}
-				else {
-					logger.warn(
-							String.format(
+			for (BoundingCoordinates boundingCoordinates : coordinatesList) {
+				String west = boundingCoordinates.getWest();
+				String south = boundingCoordinates.getSouth();
+				String east = boundingCoordinates.getEast();
+				String north = boundingCoordinates.getNorth();
+
+				/*
+				 * Only index when north coord >= south coord.
+				 * However, west can be greater than east across the International
+				 * Date Line.
+				 */
+				if (isValidDouble(west) &&
+				isValidDouble(south) &&
+				isValidDouble(east) &&
+				isValidDouble(north)
+						) {
+					if (isGreaterThanOrEqualToCoord(north, south)) {
+						/*
+						 * A rectangle is indexed with four points to represent the
+						 * corners. These points should be represented in MinX,
+						 * MinY, MaxX, MaxY order.
+						 * 
+						 * For example:
+						 * 
+						 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
+						 */
+						String value = boundingCoordinates.solrSerialize();
+						solrInputDocument.addField("coordinates", value);
+					}
+					else {
+						logger.warn(String.format(
 									"Unable to index geospatial coordinates for %s because north " +
-							        "coord (%s) is less than south coord (%s)",
-									packageId, northCoord, southCoord));
+									"coord (%s) is less than south coord (%s)",
+									packageId, north, south));
+					}
 				}
 			}
 			

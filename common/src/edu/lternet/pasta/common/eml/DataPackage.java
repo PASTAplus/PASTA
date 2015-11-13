@@ -198,11 +198,16 @@ public class DataPackage {
   }
 		  
 		  
-  public ArrayList<ResponsibleParty> getCreatorList() {
-    return creatorList;
+  public ArrayList<BoundingCoordinates> getCoordinatesList() {
+    return coordinatesList;
   }
 
   
+  public ArrayList<ResponsibleParty> getCreatorList() {
+	    return creatorList;
+  }
+
+	  
   public ArrayList<String> getDataSources() {
 	return dataSources;
   }
@@ -268,46 +273,6 @@ public class DataPackage {
 
   public ArrayList<String> getTitles() {
     return titles;
-  }
-  
-  
-  public String getEastBoundingCoordinate() {
-	  return eastBoundingCoordinate;
-  }
-  
-  
-  public String getNorthBoundingCoordinate() {
-	  return northBoundingCoordinate;
-  }
-  
-  
-  public String getSouthBoundingCoordinate() {
-	  return southBoundingCoordinate;
-  }
-  
-  
-  public String getWestBoundingCoordinate() {
-	  return westBoundingCoordinate;
-  }
-  
-  
-  public void setEastBoundingCoordinate(String coord) {
-	  this.eastBoundingCoordinate = coord;
-  }
-  
-  
-  public void setNorthBoundingCoordinate(String coord) {
-	  this.northBoundingCoordinate = coord;
-  }
-  
-  
-  public void setSouthBoundingCoordinate(String coord) {
-	  this.southBoundingCoordinate = coord;
-  }
-  
-  
-  public void setWestBoundingCoordinate(String coord) {
-	  this.westBoundingCoordinate = coord;
   }
   
   
@@ -468,8 +433,27 @@ public class DataPackage {
 	}
 	
 	
-	class BoundingCoordinates {
+	public class BoundingCoordinates {
 		private String north, south, east, west;
+		
+		public String getNorth() {
+			return north;
+		}
+		
+		
+		public String getSouth() {
+			return south;
+		}
+		
+		
+		public String getEast() {
+			return east;
+		}
+		
+		
+		public String getWest() {
+			return west;
+		}
 		
 		BoundingCoordinates(String north, String south, String east, String west) {
 			this.north = north;
@@ -485,6 +469,10 @@ public class DataPackage {
 
 		public String stringSerialize() {
 			return String.format("%s,%s,%s,%s", north, south, east, west);
+		}
+
+		public String solrSerialize() {
+			return String.format("%s %s %s %s", west, south, east, north);
 		}
 	}
 	
