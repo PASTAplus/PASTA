@@ -25,6 +25,8 @@
 package edu.lternet.pasta.common.eml;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 
 import edu.lternet.pasta.common.eml.Entity.EntityType;
 
@@ -52,6 +54,7 @@ public class DataPackage {
   ArrayList<String> dataSources = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> keywords = null;
+  ArrayList<TemporalCoverage> temporalCoverageList;
   ArrayList<String> timescales = null;
   ArrayList<String> titles = null;
   String site = null;
@@ -89,6 +92,7 @@ public class DataPackage {
     this.dataSources = new ArrayList<String>();
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
+    this.temporalCoverageList = new ArrayList<TemporalCoverage>();
     this.timescales = new ArrayList<String>();
     this.titles = new ArrayList<String>();
   }
@@ -132,14 +136,6 @@ public class DataPackage {
   
   
   /**
-   * Add a new named time-scale value for this data package.
-   */
-  public void addTimeScale(String timeScale) {
-	timescales.add(timeScale);
-  }
-  
-  
-  /**
    * Finds the matching object name for a given entity in this data package
    * based on the entity's name. This is a convenience method.
    * 
@@ -170,25 +166,52 @@ public class DataPackage {
 	}
 
 
-  public String getBeginDate() {
-    return beginDate;
+  public Set<String> getBeginDates() {
+	  TreeSet<String> beginDates = new TreeSet<String>();
+	  
+	  for (TemporalCoverage temporalCoverage : temporalCoverageList) {
+		  if (temporalCoverage != null) {
+			  String beginDate = temporalCoverage.getBeginDate();
+			  if (beginDate != null) {
+				  beginDates.add(beginDate);
+			  }
+		  }
+	  }
+	  
+	  return beginDates;
   }
 		  
 		  
-  public ArrayList<ResponsibleParty> getCreatorList() {
-    return creatorList;
+  public Set<String> getEndDates() {
+	  TreeSet<String> endDates = new TreeSet<String>();
+	  
+	  for (TemporalCoverage temporalCoverage : temporalCoverageList) {
+		  if (temporalCoverage != null) {
+			  String endDate = temporalCoverage.getEndDate();
+			  if (endDate != null) {
+				  endDates.add(endDate);
+			  }
+		  }
+	  }
+	  
+	  return endDates;
+  }
+		  
+		  
+  public ArrayList<BoundingCoordinates> getCoordinatesList() {
+    return coordinatesList;
   }
 
   
+  public ArrayList<ResponsibleParty> getCreatorList() {
+	    return creatorList;
+  }
+
+	  
   public ArrayList<String> getDataSources() {
 	return dataSources;
   }
 
-	  
-  public String getEndDate() {
-	return endDate;
-  }
-	  
 	  
   public ArrayList<Entity> getEntityList() {
     return entityList;
@@ -230,9 +253,17 @@ public class DataPackage {
   }
   
   
-  public String getSingleDateTime() {
-	return singleDateTime;
-  }
+	public TreeSet<String> getSingleDateTimes() {
+		TreeSet<String> singleDateTimes = new TreeSet<String>();
+		for (TemporalCoverage temporalCoverage : temporalCoverageList) {
+			if (temporalCoverage != null) {
+				Set<String> temporalCoverageDateTimes = temporalCoverage.getSingleDateTimes();
+				singleDateTimes.addAll(temporalCoverageDateTimes);
+			}
+		}
+
+		return singleDateTimes;
+	}
 	  
 	  
   public String getTaxonomicCoverageText() {
@@ -240,53 +271,8 @@ public class DataPackage {
   }
 
 
-  public ArrayList<String> getTimescales() {
-	return timescales;
-  }
-
-			  
   public ArrayList<String> getTitles() {
     return titles;
-  }
-  
-  
-  public String getEastBoundingCoordinate() {
-	  return eastBoundingCoordinate;
-  }
-  
-  
-  public String getNorthBoundingCoordinate() {
-	  return northBoundingCoordinate;
-  }
-  
-  
-  public String getSouthBoundingCoordinate() {
-	  return southBoundingCoordinate;
-  }
-  
-  
-  public String getWestBoundingCoordinate() {
-	  return westBoundingCoordinate;
-  }
-  
-  
-  public void setEastBoundingCoordinate(String coord) {
-	  this.eastBoundingCoordinate = coord;
-  }
-  
-  
-  public void setNorthBoundingCoordinate(String coord) {
-	  this.northBoundingCoordinate = coord;
-  }
-  
-  
-  public void setSouthBoundingCoordinate(String coord) {
-	  this.southBoundingCoordinate = coord;
-  }
-  
-  
-  public void setWestBoundingCoordinate(String coord) {
-	  this.westBoundingCoordinate = coord;
   }
   
   
@@ -394,6 +380,26 @@ public class DataPackage {
 	}
 	
 	
+	public void addTemporalCoverage(TemporalCoverage temporalCoverage) {
+		if (temporalCoverage != null) {
+			temporalCoverageList.add(temporalCoverage);
+		}
+	}
+	
+	
+	public Set<String> getAlternativeTimeScales() {
+		Set<String> alternativeTimeScales = new TreeSet<String>();
+
+		for (TemporalCoverage temporalCoverage : temporalCoverageList) {
+			if (temporalCoverage != null) {
+				alternativeTimeScales.addAll(temporalCoverage.getAlternativeTimeScales());
+			}
+		}
+
+		return alternativeTimeScales;
+	}
+
+	
 	public String stringSerializeCoordinates() {
 		String coordinates = null;
 		StringBuilder sb = new StringBuilder("");
@@ -427,8 +433,27 @@ public class DataPackage {
 	}
 	
 	
-	class BoundingCoordinates {
+	public class BoundingCoordinates {
 		private String north, south, east, west;
+		
+		public String getNorth() {
+			return north;
+		}
+		
+		
+		public String getSouth() {
+			return south;
+		}
+		
+		
+		public String getEast() {
+			return east;
+		}
+		
+		
+		public String getWest() {
+			return west;
+		}
 		
 		BoundingCoordinates(String north, String south, String east, String west) {
 			this.north = north;
@@ -444,6 +469,10 @@ public class DataPackage {
 
 		public String stringSerialize() {
 			return String.format("%s,%s,%s,%s", north, south, east, west);
+		}
+
+		public String solrSerialize() {
+			return String.format("%s %s %s %s", west, south, east, north);
 		}
 	}
 	

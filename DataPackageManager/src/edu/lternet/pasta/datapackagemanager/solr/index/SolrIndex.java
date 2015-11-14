@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
@@ -16,6 +18,7 @@ import org.apache.solr.common.SolrInputDocument;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.DataPackage.BoundingCoordinates;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
@@ -81,6 +84,34 @@ public class SolrIndex {
 	}
 	
 	
+	private String determineBeginDate(Set<String> beginDates) {
+		String lowestDate = ISO8601Utility.formatTimestamp("9999-12-31", DATE_GRANULARITY);
+		
+		for (String date : beginDates) {
+			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
+			if (timestamp.compareTo(lowestDate) < 0) {
+				lowestDate = date;
+			}
+		}
+		
+		return lowestDate;
+	}
+	
+	
+	private String determineEndDate(Set<String> endDates) {
+		String highestDate = ISO8601Utility.formatTimestamp("0000-01-01", DATE_GRANULARITY);
+		
+		for (String date : endDates) {
+			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
+			if (timestamp.compareTo(highestDate) > 0) {
+				highestDate = date;
+			}
+		}
+		
+		return highestDate;
+	}
+	
+	
 	/**
 	 * Indexes an EML document, adding it to the Solr repository.
 	 * 
@@ -107,12 +138,12 @@ public class SolrIndex {
 			
 			// Get content of several different date nodes
 			String pubDate = dataPackage.getPubDate();
-			String beginDate = dataPackage.getBeginDate();
-			String endDate = dataPackage.getEndDate();
-			String singleDate = dataPackage.getSingleDateTime();
+			Set<String> beginDates = dataPackage.getBeginDates();
+			Set<String> endDates = dataPackage.getEndDates();
+			Set<String> singleDateTimes = dataPackage.getSingleDateTimes();
+			Set<String> timescales = dataPackage.getAlternativeTimeScales();
 			
 			List<String> keywords = dataPackage.getKeywords();
-			List<String> timescales = dataPackage.getTimescales();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
 			String fundingText = dataPackage.getFundingText();
@@ -120,10 +151,7 @@ public class SolrIndex {
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
 			String taxonomicCoverageText = dataPackage.getTaxonomicCoverageText();
 			
-			String westCoord = dataPackage.getWestBoundingCoordinate();
-			String southCoord = dataPackage.getSouthBoundingCoordinate();
-			String eastCoord = dataPackage.getEastBoundingCoordinate();
-			String northCoord = dataPackage.getNorthBoundingCoordinate();
+			List<DataPackage.BoundingCoordinates> coordinatesList = dataPackage.getCoordinatesList();
 			
 			SolrInputDocument solrInputDocument = new SolrInputDocument();
 			solrInputDocument.setField("id", id);
@@ -135,21 +163,33 @@ public class SolrIndex {
 				solrInputDocument.setField("pubdate", pubDateTimestamp);
 			}
 
-			String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
-			if (beginDateTimestamp != null) {
-				solrInputDocument.setField("begindate", beginDateTimestamp);
+			if (beginDates != null && beginDates.size() > 0) {
+				String beginDate = determineBeginDate(beginDates);
+				if (beginDate != null) {
+					String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
+					solrInputDocument.setField("begindate", beginDateTimestamp);
+				}
 			}
 
-			String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
-			if (endDateTimestamp != null) {
-				solrInputDocument.setField("enddate", endDateTimestamp);
+			if (endDates != null && endDates.size() > 0) {
+				String endDate = determineEndDate(endDates);
+				if (endDate != null) {
+					String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
+					solrInputDocument.setField("enddate", endDateTimestamp);
+				}
 			}
 
-			String singleDateTimestamp = ISO8601Utility.formatTimestamp(singleDate, DATE_GRANULARITY);
-			if (singleDateTimestamp != null) {
-				solrInputDocument.setField("singledate", singleDateTimestamp);
+			for (String singleDate : singleDateTimes) {
+				String singleDateTimestamp = ISO8601Utility.formatTimestamp(singleDate, DATE_GRANULARITY);
+				if (singleDateTimestamp != null) {
+					solrInputDocument.addField("singledate", singleDateTimestamp);
+				}
 			}
 
+			for (String timescale : timescales) {
+				solrInputDocument.addField("timescale", timescale);
+			}
+			
 			/*
 			 *  Index the "title" and "titles" fields. The former is multi-valued and the
 			 *  latter is single value. Only single value fields (in this case, "titles")
@@ -177,10 +217,6 @@ public class SolrIndex {
 				solrInputDocument.addField("keyword", keyword);
 			}
 			
-			for (String timescale : timescales) {
-				solrInputDocument.addField("timescale", timescale);
-			}
-			
 			/*
 			 *  Index the "author", "organization", and "responsibleParties" fields. 
 			 *  The first two are multi-valued while "responsibleParties" is single value. 
@@ -190,7 +226,8 @@ public class SolrIndex {
 			StringBuilder authorBuilder = new StringBuilder("");
 			StringBuilder organizationBuilder = new StringBuilder("");
 			boolean hasAuthor = false;
-			boolean hasOrganization = false;
+			boolean foundOrganization = false;
+			TreeSet<String> organizationSet = new TreeSet<String>();
 			for (ResponsibleParty responsibleParty : responsibleParties) {
 				if (responsibleParty.isPerson()) {
 					if (hasAuthor) authorBuilder.append("\n");
@@ -199,16 +236,22 @@ public class SolrIndex {
 					hasAuthor = true;
 					authorBuilder.append(author);
 				}
-				if (responsibleParty.isOrganization()) {
-					if (hasOrganization) organizationBuilder.append("\n");
+				if (responsibleParty.hasOrganization()) {
 					String organization = responsibleParty.getOrganizationName();
-					solrInputDocument.addField("organization", organization);
-					hasOrganization = true;
-					organizationBuilder.append(organization);
+					/*
+					 * Don't add duplicate organization values
+					 */
+					if (!organizationSet.contains(organization)) {
+						if (foundOrganization) organizationBuilder.append("\n");
+						organizationSet.add(organization);
+						solrInputDocument.addField("organization", organization);
+						foundOrganization = true;
+						organizationBuilder.append(organization);
+					}
 				}
 			}
 			String partiesStr = null;
-			if (hasAuthor && hasOrganization) {
+			if (hasAuthor && foundOrganization) {
 				/*
 				 * Note that organizations come ahead of authors in the
 				 * responsibleParties string. This is to keep sorting
@@ -221,7 +264,7 @@ public class SolrIndex {
 			else if (hasAuthor) {
 				partiesStr = authorBuilder.toString();
 			}
-			else if (hasOrganization) {
+			else if (foundOrganization) {
 				partiesStr = organizationBuilder.toString();
 			}
 			
@@ -253,34 +296,41 @@ public class SolrIndex {
 				solrInputDocument.setField("taxonomic", taxonomicCoverageText);
 			}
 			
-			if (isValidDouble(eastCoord) &&
-				isValidDouble(westCoord) &&
-				isValidDouble(northCoord) &&
-				isValidDouble(southCoord)
-			   ) {
-				// Only index when north coord >= south coord.
-				// However, weat can be greater than east at the International
-				// Date Line.
-				if (isGreaterThanOrEqualToCoord(northCoord, southCoord)) {
-					/*
-					 * A rectangle is indexed with four points to represent the
-					 * corners. These points should be represented in MinX,
-					 * MinY, MaxX, MaxY order.
-					 * 
-					 * For example:
-					 * 
-					 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
-					 */
-					String value = String.format("%s %s %s %s", westCoord,
-							southCoord, eastCoord, northCoord);
-					solrInputDocument.setField("coordinates", value);
-				}
-				else {
-					logger.warn(
-							String.format(
+			for (BoundingCoordinates boundingCoordinates : coordinatesList) {
+				String west = boundingCoordinates.getWest();
+				String south = boundingCoordinates.getSouth();
+				String east = boundingCoordinates.getEast();
+				String north = boundingCoordinates.getNorth();
+
+				/*
+				 * Only index when north coord >= south coord.
+				 * However, west can be greater than east across the International
+				 * Date Line.
+				 */
+				if (isValidDouble(west) &&
+				isValidDouble(south) &&
+				isValidDouble(east) &&
+				isValidDouble(north)
+						) {
+					if (isGreaterThanOrEqualToCoord(north, south)) {
+						/*
+						 * A rectangle is indexed with four points to represent the
+						 * corners. These points should be represented in MinX,
+						 * MinY, MaxX, MaxY order.
+						 * 
+						 * For example:
+						 * 
+						 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
+						 */
+						String value = boundingCoordinates.solrSerialize();
+						solrInputDocument.addField("coordinates", value);
+					}
+					else {
+						logger.warn(String.format(
 									"Unable to index geospatial coordinates for %s because north " +
-							        "coord (%s) is less than south coord (%s)",
-									packageId, northCoord, southCoord));
+									"coord (%s) is less than south coord (%s)",
+									packageId, north, south));
+					}
 				}
 			}
 			

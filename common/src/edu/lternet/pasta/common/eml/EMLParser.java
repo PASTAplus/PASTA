@@ -63,14 +63,11 @@ public class EMLParser {
   public static final String CREATOR_PATH = "//eml/dataset/creator";
   public static final String ENTITY_PATH_PARENT = "//dataset/";
   public static final String PUB_DATE_PATH = "//eml/dataset/pubDate";
+  public static final String TEMPORAL_COVERAGE_PATH = "//eml/dataset/coverage/temporalCoverage";
   public static final String SINGLE_DATE_TIME_PATH = "//eml/dataset/coverage/temporalCoverage/singleDateTime/calendarDate";
   public static final String BEGIN_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/beginDate/calendarDate";
   public static final String END_DATE_PATH = "//eml/dataset/coverage/temporalCoverage/rangeOfDates/endDate/calendarDate";
   public static final String GEOGRAPHIC_COVERAGE_PATH = "//eml/dataset/coverage/geographicCoverage";
-  public static final String WEST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/westBoundingCoordinate";
-  public static final String SOUTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/southBoundingCoordinate";
-  public static final String EAST_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/eastBoundingCoordinate";
-  public static final String NORTH_PATH = "//eml/dataset/coverage/geographicCoverage/boundingCoordinates/northBoundingCoordinate";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String DATA_SOURCE_PATH = "//methods/methodStep/dataSource/distribution/online/url";
@@ -245,34 +242,6 @@ public class EMLParser {
             }      
         }
 
-        /*
-         * Parse the spatial bounding coordinates
-         */
-        
-        Node eastNode = xpathapi.selectSingleNode(document, EAST_PATH);
-        if (eastNode != null) {
-          String coord = eastNode.getTextContent().trim();
-          this.dataPackage.setEastBoundingCoordinate(coord);
-        }
-
-        Node westNode = xpathapi.selectSingleNode(document, WEST_PATH);
-        if (westNode != null) {
-          String coord = westNode.getTextContent().trim();
-          this.dataPackage.setWestBoundingCoordinate(coord);
-        }
-
-        Node northNode = xpathapi.selectSingleNode(document, NORTH_PATH);
-        if (northNode != null) {
-          String coord = northNode.getTextContent().trim();
-          this.dataPackage.setNorthBoundingCoordinate(coord);
-        }
-
-        Node southNode = xpathapi.selectSingleNode(document, SOUTH_PATH);
-        if (southNode != null) {
-          String coord = southNode.getTextContent().trim();
-          this.dataPackage.setSouthBoundingCoordinate(coord);
-        }
-
         // Parse geographicDescription node
         Node geographicDescriptionNode = xpathapi.selectSingleNode(document, GEOGRAPHIC_DESCRIPTION_PATH);
         if (geographicDescriptionNode != null) {
@@ -318,14 +287,63 @@ public class EMLParser {
           }
         }
 
-        // Parse the namedTimeScale nodes
-        NodeList timeScaleNodeList = xpathapi.selectNodeList(document, NAMED_TIME_SCALE_PATH);
-        if (timeScaleNodeList != null) {
-          for (int i =0; i < timeScaleNodeList.getLength(); i++) {
-            Node timeScaleNode = timeScaleNodeList.item(i);
-            String timeScale = timeScaleNode.getTextContent();
-            dataPackage.addTimeScale(timeScale);
-          }
+        // Parse temporal coverage nodes
+        NodeList temporalNodeList = xpathapi.selectNodeList(document, TEMPORAL_COVERAGE_PATH);
+        for (int i = 0; i < temporalNodeList.getLength(); i++) {
+        	TemporalCoverage temporalCoverage = new TemporalCoverage();
+            Node temporalNode = temporalNodeList.item(i);
+            NodeList temporalChildNodes = temporalNode.getChildNodes();
+            for (int j = 0; j < temporalChildNodes.getLength(); j++) {
+            	Node temporalChildNode = temporalChildNodes.item(j);
+            	if (temporalChildNode.getNodeName().equals("rangeOfDates")) {
+
+            		Node beginDateNode = xpathapi.selectSingleNode(temporalChildNode, "beginDate");
+                    if (beginDateNode != null) {
+                    	Node calendarDateNode = xpathapi.selectSingleNode(beginDateNode, "calendarDate");
+                    	if (calendarDateNode != null) {
+                    		String calendarDate = calendarDateNode.getTextContent().trim();
+                    		temporalCoverage.setBeginDate(calendarDate);
+                    	}
+                    	else {
+                        	Node alternativeTimeScaleNode = xpathapi.selectSingleNode(beginDateNode, "alternativeTimeScale");
+                        	if (alternativeTimeScaleNode != null) {
+                        		temporalCoverage.addAlternativeTimeScale(xpathapi, alternativeTimeScaleNode);
+                        	}
+                    	}
+                    }
+
+            		Node endDateNode = xpathapi.selectSingleNode(temporalChildNode, "endDate");
+                    if (endDateNode != null) {
+                    	Node calendarDateNode = xpathapi.selectSingleNode(endDateNode, "calendarDate");
+                    	if (calendarDateNode != null) {
+                    		String calendarDate = calendarDateNode.getTextContent().trim();
+                    		temporalCoverage.setEndDate(calendarDate);
+                    	}
+                    	else {
+                        	Node alternativeTimeScaleNode = xpathapi.selectSingleNode(endDateNode, "alternativeTimeScale");
+                        	if (alternativeTimeScaleNode != null) {
+                        		temporalCoverage.addAlternativeTimeScale(xpathapi, alternativeTimeScaleNode);
+                        	}
+                    	}
+                    }
+            	}
+            	else if (temporalChildNode.getNodeName().equals("singleDateTime")) {
+            		Node singleDateTimeNode = temporalChildNode;
+                    Node calendarDateNode = xpathapi.selectSingleNode(singleDateTimeNode, "calendarDate");
+                    if (calendarDateNode != null) {
+                    	String calendarDate = calendarDateNode.getTextContent().trim();
+                    	temporalCoverage.addSingleDateTime(calendarDate);
+                    }
+                    else {
+                        Node alternativeTimeScaleNode = xpathapi.selectSingleNode(singleDateTimeNode, "alternativeTimeScale");
+                        if (alternativeTimeScaleNode != null) {
+                        	temporalCoverage.addAlternativeTimeScale(xpathapi, alternativeTimeScaleNode);
+                    	}
+                    }
+            	}
+            }
+            
+            dataPackage.addTemporalCoverage(temporalCoverage);
         }
 
         // Parse the pubDate node
@@ -333,27 +351,6 @@ public class EMLParser {
         if (pubDateNode != null) {
           String pubDate = pubDateNode.getTextContent();
           this.dataPackage.setPubDate(pubDate);
-        }
-
-        // Parse the singleDateTime node
-        Node singleDateTimeNode = xpathapi.selectSingleNode(document, SINGLE_DATE_TIME_PATH);
-        if (singleDateTimeNode != null) {
-          String singleDateTime = singleDateTimeNode.getTextContent();
-          this.dataPackage.setSingleDateTime(singleDateTime);
-        }
-
-        // Parse the beginDate node
-        Node beginDateNode = xpathapi.selectSingleNode(document, BEGIN_DATE_PATH);
-        if (beginDateNode != null) {
-          String beginDate = beginDateNode.getTextContent();
-          this.dataPackage.setBeginDate(beginDate);
-        }
-
-        // Parse the endDate node
-        Node endDateNode = xpathapi.selectSingleNode(document, END_DATE_PATH);
-        if (endDateNode != null) {
-          String endDate = endDateNode.getTextContent();
-          this.dataPackage.setEndDate(endDate);
         }
 
        for (int j = 0; j < ENTITY_TYPES.length; j++) {

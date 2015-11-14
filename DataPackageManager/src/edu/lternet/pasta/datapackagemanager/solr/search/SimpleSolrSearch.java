@@ -69,7 +69,6 @@ public class SimpleSolrSearch {
 			"pubdate",
 			"responsibleParties",
 			"scope",
-			"singledate",
 			"site",
 			"taxonomic",
 			"title",
@@ -80,6 +79,7 @@ public class SimpleSolrSearch {
 			"derivedFrom",
 			"keyword",
 			"organization",
+			"singledate",
 			"timescale"
 		};
 	
@@ -96,6 +96,7 @@ public class SimpleSolrSearch {
 		wrapperElements.put("derivedFrom", "sources");
 		wrapperElements.put("keyword", "keywords");
 		wrapperElements.put("organization", "organizations");
+		wrapperElements.put("singledate", "singledates");
 		wrapperElements.put("timescale", "timescales");
 	}
 		
@@ -264,7 +265,18 @@ public class SimpleSolrSearch {
 						Collection<Object> multiValues = solrDocument.getFieldValues(fieldName);
 						if (multiValues != null && multiValues.size() > 0) {
 							for (Object value : multiValues) {
-								String valueStr = (String) value;
+								String valueStr = null;
+								if (isDateField(fieldName)) {
+									Date dateValue = (Date) value;
+									SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+									if (dateValue != null) {
+										valueStr = sdf.format(dateValue);
+									}
+								}
+								else {
+									valueStr = (String) value;
+								}
+								
 								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
 										                INDENT, INDENT, INDENT, fieldName, valueStr, fieldName));
 							}
