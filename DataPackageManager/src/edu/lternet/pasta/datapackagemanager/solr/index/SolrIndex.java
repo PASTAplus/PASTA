@@ -88,8 +88,11 @@ public class SolrIndex {
 		String lowestDate = ISO8601Utility.formatTimestamp("9999-12-31", DATE_GRANULARITY);
 		
 		for (String date : beginDates) {
+			if (date != null && date.length() == 4) {
+				date += "-01-01";
+			}
 			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
-			if (timestamp.compareTo(lowestDate) < 0) {
+			if (timestamp!=null && (timestamp.compareTo(lowestDate) < 0)) {
 				lowestDate = date;
 			}
 		}
@@ -102,8 +105,11 @@ public class SolrIndex {
 		String highestDate = ISO8601Utility.formatTimestamp("0000-01-01", DATE_GRANULARITY);
 		
 		for (String date : endDates) {
+			if (date != null && date.length() == 4) {
+				date += "-12-31";
+			}
 			String timestamp = ISO8601Utility.formatTimestamp(date, DATE_GRANULARITY);
-			if (timestamp.compareTo(highestDate) > 0) {
+			if (timestamp != null && (timestamp.compareTo(highestDate) > 0)) {
 				highestDate = date;
 			}
 		}

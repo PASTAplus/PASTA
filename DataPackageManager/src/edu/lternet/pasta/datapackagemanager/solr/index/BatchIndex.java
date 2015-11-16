@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.lternet.pasta.common.EmlPackageId;
@@ -26,6 +27,13 @@ import edu.ucsb.nceas.utilities.Options;
  *
  */
 public class BatchIndex {
+	
+	  /*
+	   * Class fields
+	   */
+
+	private static final Logger logger = Logger.getLogger(BatchIndex.class);
+	
 	
 	private static String dbDriver = null;
 	private static String dbURL = null;
@@ -82,7 +90,8 @@ public class BatchIndex {
 					
 					i++;
 				}
-				catch (IOException | SolrServerException e) {
+				catch (Exception e) {
+					logger.error(String.format("Error indexing datapackage %s: %s", emlPackageId.toString(), e.getMessage()));
 					e.printStackTrace();
 					return;
 				}
@@ -92,9 +101,8 @@ public class BatchIndex {
 			solrIndex.commit();
 		}
 		catch (Exception e) {
-			System.err
-					.println("Exception constructing DataPackageManager object: "
-							+ e.getMessage());
+			logger.error("Exception getting all latest data packages: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	

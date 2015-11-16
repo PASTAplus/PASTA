@@ -268,7 +268,9 @@ public class SimpleSolrSearch {
 								String valueStr = null;
 								if (isDateField(fieldName)) {
 									Date dateValue = (Date) value;
-									SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+									dateValue = adjustDate(dateValue);
+									String formatPattern = bestDateFormat(fieldName);
+									SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
 									if (dateValue != null) {
 										valueStr = sdf.format(dateValue);
 									}
@@ -287,7 +289,9 @@ public class SimpleSolrSearch {
 						String fieldValue = "";
 						if (isDateField(fieldName)) {
 							Date dateValue = (Date) solrDocument.getFieldValue(fieldName);
-							SimpleDateFormat sdf = new SimpleDateFormat("YYYY");
+							dateValue = adjustDate(dateValue);
+							String formatPattern = bestDateFormat(fieldName);
+							SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
 							if (dateValue != null) {
 								fieldValue = sdf.format(dateValue);
 							}
@@ -328,6 +332,28 @@ public class SimpleSolrSearch {
 		xmlString = sb.toString();
 		
 		return xmlString;
+	}
+	
+	
+	private Date adjustDate(Date date) {
+		Date adjustedDate = null;
+		long twelveHours = (3600 * 1000 * 12);
+		
+		if (date != null) {
+			long adjustedTime = date.getTime() + twelveHours;
+			adjustedDate = new Date(adjustedTime);
+		}
+		
+		return adjustedDate;
+	}
+	
+	private String bestDateFormat(String fieldName) {
+		String bestDateFormat = "yyyy-MM-dd";
+		if (fieldName != null && fieldName.equalsIgnoreCase("pubdate")) {
+			bestDateFormat = "YYYY";
+		}
+		
+		return bestDateFormat;
 	}
 	
 	
