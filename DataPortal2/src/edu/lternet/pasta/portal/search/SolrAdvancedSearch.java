@@ -281,12 +281,8 @@ public class SolrAdvancedSearch extends Search  {
     if (this.creatorName != null && !this.creatorName.equals("")) {
     	termsList.addTerm(this.creatorName);
     	String searchName = this.creatorName;
-    	if (creatorName.contains(".")) {
-    		String[] splitName = searchName.split("\\.");
-    		searchName = splitName[0];
-    	}
-		String authorQuery = String.format("author:\"%s\"", searchName);
-        //String escapedValue = Search.escapeQueryChars(authorQuery);
+        String escapedSearchName = Search.escapeQueryChars(searchName);
+		String authorQuery = String.format("author:(%s)", escapedSearchName);
         String encodedValue = URLEncoder.encode(authorQuery, "UTF-8");
         updateQString(encodedValue);
     }
@@ -294,12 +290,8 @@ public class SolrAdvancedSearch extends Search  {
     if (this.creatorOrganization != null && !this.creatorOrganization.equals("")) {
     	termsList.addTerm(this.creatorOrganization);
     	String searchName = this.creatorOrganization;
-    	if (creatorOrganization.contains(".")) {
-    		String[] splitName = searchName.split("\\.");
-    		searchName = splitName[0];
-    	}
-		String organizationQuery = String.format("organization:\"%s\"", searchName);
-        //String escapedValue = Search.escapeQueryChars(organizationQuery);
+        String escapedSearchName = Search.escapeQueryChars(searchName);
+		String organizationQuery = String.format("organization:(%s)", escapedSearchName);
         String encodedValue = URLEncoder.encode(organizationQuery, "UTF-8");
         updateQString(encodedValue);
     }
