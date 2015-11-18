@@ -256,7 +256,7 @@ public class AuthorSearch extends Search {
 			for (String line : lines) {
 				Matcher matcher = pattern.matcher(line);
 				if (matcher.matches()) {
-					String fieldValue = matcher.group(1);
+					String fieldValue = matcher.group(1).trim();
 					valueSet.add(fieldValue);
 				}
 			}
