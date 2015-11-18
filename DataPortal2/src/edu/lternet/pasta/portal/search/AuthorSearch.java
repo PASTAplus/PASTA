@@ -259,7 +259,7 @@ public class AuthorSearch extends Search {
 				if (matcher.matches()) {
 					String capturedValue = matcher.group(1).trim();
 					String unescapedXML = StringEscapeUtils.unescapeXml(capturedValue);
-					String trimmedXML = unescapedXML.trim().replace("\r", "").replace("\n", "");
+					String trimmedXML = unescapedXML.replace("\r", " ").replace("\n", " ").replaceAll("\\s+", " ").trim();
 					String escapedXML = StringEscapeUtils.escapeXml(trimmedXML);
 					valueSet.add(escapedXML);
 				}
