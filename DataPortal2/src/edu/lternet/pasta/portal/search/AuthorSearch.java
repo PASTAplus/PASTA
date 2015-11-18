@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
@@ -256,8 +257,11 @@ public class AuthorSearch extends Search {
 			for (String line : lines) {
 				Matcher matcher = pattern.matcher(line);
 				if (matcher.matches()) {
-					String fieldValue = matcher.group(1).trim();
-					valueSet.add(fieldValue);
+					String capturedValue = matcher.group(1).trim();
+					String unescapedXML = StringEscapeUtils.unescapeXml(capturedValue);
+					String trimmedXML = unescapedXML.trim();
+					String escapedXML = StringEscapeUtils.escapeXml(trimmedXML);
+					valueSet.add(escapedXML);
 				}
 			}
 			
