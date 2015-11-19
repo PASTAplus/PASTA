@@ -304,6 +304,25 @@
       </div> <!-- end collapsible -->
       </xsl:if>
 
+      <xsl:if test="additionalInfo">
+      <h3 id="toggleAdditionalInfo" class="toggleButton"><button>+/-</button> Additional Info</h3>
+      <div class="collapsible">
+        <!-- add in the maintenance info -->
+        <table class="subGroup onehundred_percent">  
+          <tr>
+            <td>
+                <xsl:for-each select="additionalInfo">
+                  <xsl:call-template name="resourceadditionalInfo">
+                    <xsl:with-param name="ressubHeaderStyle" select="$secondColStyle"/>
+                    <xsl:with-param name="resfirstColStyle" select="$secondColStyle"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+            </td>
+          </tr>
+        </table>
+      </div> <!-- end collapsible -->
+      </xsl:if>
+
     </fieldset> 
     <!-- end Detailed Metadata -->
 

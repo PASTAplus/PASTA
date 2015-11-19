@@ -60,12 +60,12 @@
         <div class="section">
           <form id="metadataPreviewer" name="metadataPreviewer" method="post"
             action="./metadataPreviewer" enctype="multipart/form-data"
-            target="_blank">
-            <label for="packageid">File:</label>
+          >
+            <label  class="labelBold">EML File:</label>
             <input type="file" name="emlfile" accept="application/xml" required="required" />
             <div>
-            <input type="submit" name="upload" value="Preview" />
-            <input type="reset" name="reset" value="Clear" />
+            <input class="btn btn-info btn-default" type="submit" name="upload" value="Preview" />
+            <input  class="btn btn-info btn-default"type="reset" name="reset" value="Clear" />
             </div>
           </form>
         </div>
