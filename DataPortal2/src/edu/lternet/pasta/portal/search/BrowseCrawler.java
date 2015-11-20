@@ -81,26 +81,33 @@ public class BrowseCrawler {
    * Instance methods
    */
   
-  /**
-   * Crawls keyword terms in the LTER Controlled Vocabulary, querying each browse term.
-   */
-  public BrowseGroup crawlKeywordTerms() {
-    logger.info("Starting crawl of keywords in LTER Controlled Vocabulary.");
-    
-    BrowseGroup browseCache = BrowseGroup.generateKeywordCache();
-    ArrayList<BrowseTerm> browseTerms = new ArrayList<BrowseTerm>();
-    browseCache.getBrowseTerms(browseTerms);
-    logger.info(String.format("Found %d keyword terms", browseTerms.size()));   
-    for (BrowseTerm browseTerm : browseTerms) {
-      logger.info("Crawling term: " + browseTerm.getValue());
-      browseTerm.crawl();
-    }    
-    File browseCacheFile = new File(BrowseSearch.browseKeywordPath);
-    writeBrowseCache(browseCacheFile, browseCache);
-    logger.info(String.format("Finished keyword crawl: %d terms", browseTerms.size()));
-    
-    return browseCache;
-  }
+	/**
+	 * Crawls keyword terms in the LTER Controlled Vocabulary, querying each
+	 * browse term.
+	 */
+	public BrowseGroup crawlKeywordTerms() {
+		logger.info("Starting crawl of keywords in LTER Controlled Vocabulary.");
+
+		BrowseGroup browseCache = BrowseGroup.generateKeywordCache();
+
+		if (browseCache != null) {
+			ArrayList<BrowseTerm> browseTerms = new ArrayList<BrowseTerm>();
+			browseCache.getBrowseTerms(browseTerms);
+			logger.info(String.format("Found %d keyword terms", browseTerms.size()));
+			for (BrowseTerm browseTerm : browseTerms) {
+				logger.info("Crawling term: " + browseTerm.getValue());
+				browseTerm.crawl();
+			}
+			File browseCacheFile = new File(BrowseSearch.browseKeywordPath);
+			writeBrowseCache(browseCacheFile, browseCache);
+			logger.info(String.format("Finished keyword crawl: %d terms", browseTerms.size()));
+		}
+		else {
+			logger.error("An error occurred while attempting to generate the keyword cache.");
+		}
+
+		return browseCache;
+	}
 
   
   /**

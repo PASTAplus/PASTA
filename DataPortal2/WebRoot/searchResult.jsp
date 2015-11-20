@@ -26,7 +26,7 @@
   if (searchResult == null)
     searchResult = "";
 
-  String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
+  //String jqueryString = LTERTerms.getJQueryString(); // for auto-complete using JQuery
 %>
 
 <!DOCTYPE html>

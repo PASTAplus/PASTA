@@ -252,7 +252,7 @@ public class ControlledVocabularyClient {
    * @return  A string array holding the LTER Controlled Vocabulary list of
    *          preferred terms as returned by the web service.
    */
-  public static String[] webServicePreferredTerms() {
+  public static String[] webServicePreferredTerms() throws Exception {
     HttpGet httpGet = null;
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String[] preferredTerms = null;
@@ -273,9 +273,6 @@ public class ControlledVocabularyClient {
             PREFERRED_TERMS_ARRAY = preferredTerms;
           }
         }
-      }
-      catch (Exception e) {
-        e.printStackTrace();
       }
       finally {
   		closeHttpClient(httpClient);
@@ -354,7 +351,7 @@ public class ControlledVocabularyClient {
      * 
 	 * @return An XML document string of top terms.
 	 */
-	public static String webServiceFetchTopTerms() {
+	public static String webServiceFetchTopTerms() throws Exception {
 		HttpGet httpGet = null;
 	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String xmlString = null;
@@ -367,9 +364,6 @@ public class ControlledVocabularyClient {
 				HttpEntity httpEntity = httpResponse.getEntity();
 				xmlString = EntityUtils.toString(httpEntity).trim();
 			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
 		}
 		finally {
 			closeHttpClient(httpClient);

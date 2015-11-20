@@ -26,6 +26,8 @@ package edu.lternet.pasta.portal.search;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * Class that supports auto complete of LTER terms in a search
  * input dialog. 
@@ -35,6 +37,12 @@ import java.util.List;
  */
 public class LTERTerms {
  
+	/*
+	 * Class fields
+	 */
+
+	private static final Logger logger = Logger.getLogger(LTERTerms.class);
+
   /* 
    * For now we can hard-code the list. If we like this approach
    * to auto-complete, this array should be re-factored to be
@@ -678,45 +686,50 @@ public class LTERTerms {
   }
 
   
-  /**
-   * Returns a string holding a newline-separated list of
-   * terms for use by the JQUery autocomplete widget.
-   * 
-   *  <option value="CTD">
-   *  <option value="aboveground biomass">
-   *  <option value="aboveground production">
-   *  <option value="abundance">
-   * 
-   * This is used to support auto-complete in the search
-   * input box.
-   * 
-   * @return   a string of comma-separated terms for use
-   */
-  public static String getJQueryString() {
-    String jQueryString = null;
-    StringBuffer stringBuffer = new StringBuffer("");
-    List<String> termsList = null;
-    
-    String[] preferredTerms = ControlledVocabularyClient.webServicePreferredTerms();
-    
-    /*
-     * First try getting the list from the controlled vocabulary web service. If
-     * that fails, use the hard-coded list of preferred terms.
-     */
-    if ((preferredTerms != null) && (preferredTerms.length > 0)) {
-      termsList = Arrays.asList(preferredTerms);
-    }
-    else {
-      termsList = Arrays.asList(lterTerms);
-    }
-    
-    for (String s : termsList) {
-      stringBuffer.append("\"" + s + "\",");
-    }
-    
-    jQueryString = stringBuffer.toString();
-    jQueryString = jQueryString.substring(0, (jQueryString.length() - 1)); // trim off the trailing comma
-    return jQueryString;
-  }
+	/**
+	 * Returns a string holding a newline-separated list of terms for use by the
+	 * JQUery autocomplete widget.
+	 * 
+	 * <option value="CTD"> <option value="aboveground biomass"> <option
+	 * value="aboveground production"> <option value="abundance">
+	 * 
+	 * This is used to support auto-complete in the search input box.
+	 * 
+	 * @return a string of comma-separated terms for use
+	 */
+	public static String getJQueryString() {
+		String jQueryString = null;
+		StringBuffer stringBuffer = new StringBuffer("");
+		List<String> termsList = null;
+
+		try {
+			String[] preferredTerms = ControlledVocabularyClient.webServicePreferredTerms();
+
+			/*
+			 * First try getting the list from the controlled vocabulary web
+			 * service. If that fails, use the hard-coded list of preferred
+			 * terms.
+			 */
+			if ((preferredTerms != null) && (preferredTerms.length > 0)) {
+				termsList = Arrays.asList(preferredTerms);
+			}
+			else {
+				termsList = Arrays.asList(lterTerms);
+			}
+
+			for (String s : termsList) {
+				stringBuffer.append("\"" + s + "\",");
+			}
+
+			jQueryString = stringBuffer.toString();
+			jQueryString = jQueryString.substring(0, (jQueryString.length() - 1)); // trim off the trailing comma
+		}
+		catch (Exception e) {
+			logger.error("Unable to access preferred terms from vocabulary service");
+			e.printStackTrace();
+		}
+		
+		return jQueryString;
+	}
 
 }
