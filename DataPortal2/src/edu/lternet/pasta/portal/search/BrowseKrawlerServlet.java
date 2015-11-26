@@ -71,7 +71,9 @@ public class BrowseKrawlerServlet extends HttpServlet {
 		BrowseGroup browseCache = null;
 		
 		browseCache = browseCrawler.crawlKeywordTerms();
-		servletContext.setAttribute("browseKeywordHTML", browseCache.toHTML());
+		if (browseCache != null) {
+			servletContext.setAttribute("browseKeywordHTML", browseCache.toHTML());
+		}
 	}
 
 }

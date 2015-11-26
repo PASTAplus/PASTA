@@ -104,58 +104,63 @@ public class BrowseGroup {
    * Class methods
    */
   
-    public static BrowseGroup generateKeywordCache() {
-	  BrowseGroup controlledVocabulary = new BrowseGroup("Controlled Vocabulary");
-	  
-	  BrowseGroup lterSiteCache = generateLterSiteCache();
-	  controlledVocabulary.addBrowseGroup(lterSiteCache);
-	  
-	  String topTermsXML = ControlledVocabularyClient.webServiceFetchTopTerms();	  
-	    DocumentBuilderFactory documentBuilderFactory =
-	                                           DocumentBuilderFactory.newInstance(); 
-	    try {
-	    	DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-	    	InputStream inputStream = IOUtils.toInputStream(topTermsXML, "UTF-8");
-	    	Document document = documentBuilder.parse(inputStream);
-	    	Element documentElement = document.getDocumentElement();
-	    	NodeList documentNodeList = documentElement.getElementsByTagName("term");
-	      
-	      for (int i = 0; i < documentNodeList.getLength(); i++) {
-	    	  Node documentNode = documentNodeList.item(i);
-	        NodeList childNodes = documentNode.getChildNodes();
-	        String termId = null;
-	        String value = null;
-	        
-	        for (int j = 0; j < childNodes.getLength(); j++) {
-	        	
-	          Node childNode = childNodes.item(j);
-	          if (childNode instanceof Element) {
-	        	  Element childElement = (Element) childNode;
-	        	  if (childElement.getTagName().equals("term_id")) {
-	        		  Text text = (Text) childElement.getFirstChild();
-	        		  termId = text.getData().trim();    		  
-	        	  }
-	        	  else if (childElement.getTagName().equals("string")) {
-	        		  Text text = (Text) childElement.getFirstChild();
-	        		  value = text.getData().trim();    		  
-	        	  }
-	          }
-	        }
-	        
-	        BrowseGroup topTerm = new BrowseGroup(value);
-	        controlledVocabulary.addBrowseGroup(topTerm);
-	        topTerm.setTermId(termId);       
-	        topTerm.setHasMoreDown("1");
-	        topTerm.addFetchDownElements();   
-	      }
-	    }
-	    catch (Exception e) {
-	      logger.error("Exception:\n" + e.getMessage());
-	      e.printStackTrace();
-	    }
-	 
-	  return controlledVocabulary;
-  }
+	public static BrowseGroup generateKeywordCache() {
+		BrowseGroup controlledVocabulary = new BrowseGroup("Controlled Vocabulary");
+		BrowseGroup lterSiteCache = generateLterSiteCache();
+		controlledVocabulary.addBrowseGroup(lterSiteCache);
+
+		try {
+			String topTermsXML = ControlledVocabularyClient.webServiceFetchTopTerms();
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+			InputStream inputStream = IOUtils.toInputStream(topTermsXML, "UTF-8");
+			Document document = documentBuilder.parse(inputStream);
+			Element documentElement = document.getDocumentElement();
+			NodeList documentNodeList = documentElement.getElementsByTagName("term");
+
+			for (int i = 0; i < documentNodeList.getLength(); i++) {
+				Node documentNode = documentNodeList.item(i);
+				NodeList childNodes = documentNode.getChildNodes();
+				String termId = null;
+				String value = null;
+
+				for (int j = 0; j < childNodes.getLength(); j++) {
+
+					Node childNode = childNodes.item(j);
+					if (childNode instanceof Element) {
+						Element childElement = (Element) childNode;
+						if (childElement.getTagName().equals("term_id")) {
+							Text text = (Text) childElement.getFirstChild();
+							termId = text.getData().trim();
+						}
+						else
+							if (childElement.getTagName().equals("string")) {
+								Text text = (Text) childElement.getFirstChild();
+								value = text.getData().trim();
+							}
+					}
+				}
+
+				BrowseGroup topTerm = new BrowseGroup(value);
+				controlledVocabulary.addBrowseGroup(topTerm);
+				topTerm.setTermId(termId);
+				topTerm.setHasMoreDown("1");
+				topTerm.addFetchDownElements();
+			}
+		}
+		catch (Exception e) {
+			logger.error("Exception:\n" + e.getMessage());
+			e.printStackTrace();
+			/*
+			 * By returning null, we let callers know that there was a problem
+			 * refreshing the browse cache, so callers will know not to
+			 * overwrite the previous results.
+			 */
+			controlledVocabulary = null;
+		}
+
+		return controlledVocabulary;
+	}
     
     
 	private void addFetchDownElements() {
@@ -251,25 +256,32 @@ public class BrowseGroup {
 		String xmlString = null;
 		String htmlString = null;
 		File browseCacheFile = null;
-		
+
 		controlledVocabulary = generateKeywordCache();
-		xmlString = controlledVocabulary.toXML();
-		htmlString = controlledVocabulary.toHTML();
-		browseCacheFile = new File(String.format("%s/browseKeyword.xml", browseDir));
-		try {
-			FileUtils.writeStringToFile(browseCacheFile, xmlString);
+		
+		if (controlledVocabulary != null) {
+			xmlString = controlledVocabulary.toXML();
+			htmlString = controlledVocabulary.toHTML();
+			browseCacheFile = new File(String.format("%s/browseKeyword.xml",browseDir));
+			try {
+				FileUtils.writeStringToFile(browseCacheFile, xmlString);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			browseCacheFile = new File(String.format("%s/browseKeyword.html",
+					browseDir));
+			try {
+				FileUtils.writeStringToFile(browseCacheFile, htmlString);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			System.err.println("Generation of keyword browse cache and HTML completed.");
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}		
-		browseCacheFile = new File(String.format("%s/browseKeyword.html", browseDir));
-		try {
-			FileUtils.writeStringToFile(browseCacheFile, htmlString);
+		else {
+			System.err.println("Generation of keyword browse cache failed.");
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}		
-		System.out.println("Generation of keyword browse cache and HTML completed.");
 	}
 
 
