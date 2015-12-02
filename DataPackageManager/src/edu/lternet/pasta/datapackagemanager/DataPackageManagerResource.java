@@ -3753,7 +3753,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *            The entity identifier
 	 * @return a Response object containing a data entity DOI if found, else
 	 *         returns a 404 Not Found response
-	 */
+	 *
 
 	@GET
 	@Path("/data/doi/eml/{scope}/{identifier}/{revision}/{entityId}")
@@ -3841,6 +3841,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 	}
+	*/
 
 
 	/**
@@ -5654,7 +5655,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *            The revision of the data package
 	 * @return a Response object containing a report DOI if found, else returns
 	 *         a 404 Not Found response
-	 */
+	 *
 	@GET
 	@Path("/report/doi/eml/{scope}/{identifier}/{revision}")
 	@Produces("text/plain")
@@ -5740,6 +5741,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 	}
+	*/
 
 
 	/**
@@ -6671,7 +6673,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *            The revision of the data package
 	 * @return a Response object containing a metadata DOI if found, else
 	 *         returns a 404 Not Found response
-	 */
+	 *
 	@GET
 	@Path("/metadata/doi/eml/{scope}/{identifier}/{revision}")
 	@Produces("text/plain")
@@ -6757,7 +6759,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 	}
-
+    */
 
 	/**
 	 * <strong>Read Metadata Format</strong> operation, specifying the scope,
