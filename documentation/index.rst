@@ -3,10 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-*User/Developer Documentation*
-==============================
+User/Developer Documentation
+============================
 
-This website is the official documentation of the *LTER Network Information System* and, more specifically, the *Provenance Aware Synthesis Tracking Architecture* (PASTA). The site is divided into *five* primary categories designed to inform the user of different aspects of the LTER NIS and PASTA.
+This website is the official documentation of the *LTER Network Information System* and, more specifically, 
+the *Provenance Aware Synthesis Tracking Architecture* (PASTA). The site is divided into *five* primary 
+categories designed to inform the user of different aspects of the LTER NIS and PASTA.
 
 To assist the weary web traveler in deciding what category to peruse, a short synopsis of each section follows:
 
@@ -16,7 +18,7 @@ To assist the weary web traveler in deciding what category to peruse, a short sy
 
 #. **Documentation for Developers using the PASTA API:** Documentation for the PASTA API and general information and suggestions for software developers who would like to build an application that interacts with the PASTA API.
 
-#. **Documentation for PASTA Developers:** Design documentation of the PASTA framework for developers who plan on extending, fixing, refactoring the core components of PASTA and their associated web-services. Documentation for `DataONE`_'s Generic Member Node deployment and GMN's adapter for harvesting data from PASTA.
+#. **Documentation for PASTA Developers:** Design documentation of the PASTA framework for developers who plan on extending, fixing, or refactoring the core components of PASTA and their associated web-services. Documentation for `DataONE`_'s Generic Member Node deployment and GMN's adapter for harvesting data from PASTA.
 
 #. **General FAQ for the LTER NIS and PASTA:** A list of the most commonly asked questions and their answers about the LTER NIS and PASTA.
 

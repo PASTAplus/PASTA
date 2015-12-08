@@ -18,7 +18,7 @@ Describes methods for uploading and evaluating data packages.
 **Create Data Package**
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-  REST API: `POST : /package/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/eml>`_
+  REST API: `POST : https://pasta.lternet.edu/package/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/eml>`_
 
   Creates a new PASTA data package by providing the EML document describing
   the data package to be created in the request message body and returning a
@@ -47,8 +47,8 @@ Describes methods for uploading and evaluating data packages.
      ``knb-lter-lno.1.1.xml`` is the filesystem EML document in XML format::
   
        curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
-       -H "Content-Type: application/xml" --data-binary @knb-lter-lno.1.1.xml \
-       -X POST https://pasta.lternet.edu/package/eml
+         -H "Content-Type: application/xml" --data-binary @knb-lter-lno.1.1.xml \
+         -X POST https://pasta.lternet.edu/package/eml
 
 *Browse and Discovery*
 ----------------------
@@ -58,7 +58,7 @@ Describes methods for browsing and discovering data packages.
 **Search Data Packages**
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-  REST API: `GET : /package/search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
+  REST API: `GET : https://pasta.lternet.edu/package/search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
 
   Searches data packages in PASTA using the specified Solr query as the query 
   parameters in the URL. Search results are returned as XML. Detailed examples 
@@ -130,8 +130,8 @@ Describes methods for browsing and discovering data packages.
      and some of its content has been truncated.*)::
   
        curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
-       &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=*\
-       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+         &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=*\
+         &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
 
        <resultset numFound='3' start='0' rows='10'>
            <document>
@@ -188,8 +188,8 @@ Describes methods for browsing and discovering data packages.
      and limiting the returned fields to the "packageid" and "doi" fields (``fl=packageid,doi``)::
    
        curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
-       &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=packageid,doi\
-       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+         &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=packageid,doi\
+         &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
 
        <resultset numFound='3' start='0' rows='10'>
            <document>
@@ -214,8 +214,8 @@ Describes methods for browsing and discovering data packages.
      (Note: *For brevity, only two documents are displayed in the search results shown below.*)::
   
        curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
-       &q=keyword:sediment&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=keyword\
-       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+         &q=keyword:sediment&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=keyword\
+         &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
 
        <resultset numFound='71' start='0' rows='10'>
            <document>
