@@ -1,5 +1,6 @@
-*Documentation for Users of the LTER Data Portal*
-=================================================
+****************************
+LTER Data Portal Users Guide
+****************************
 
 The LTER Data Portal (https://portal.lternet.edu) is the *de facto* user interface to PASTA for both producers and consumers of LTER data products.
 

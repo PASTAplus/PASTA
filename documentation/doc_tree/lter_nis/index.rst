@@ -1,7 +1,8 @@
 .. About this site page
 
-*About the LTER Network Information System*
-===========================================
+*******************************
+LTER Network Information System
+*******************************
 
 The LTER Network Information System (NIS) can be modeled as a production line that facilitates data flow from producers to consumers. As such, organization of the Network Information System can be partitioned into three components: (1) data producers, (2) data warehouses, and (3) data consumers, all working together as part of an ecological research cooperative with the goal of improving the world through science knowledge and education.
 

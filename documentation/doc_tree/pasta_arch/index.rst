@@ -1,2 +1,3 @@
-*Documentation for PASTA Developers*
-====================================
+**********************
+PASTA Developers Guide
+**********************
