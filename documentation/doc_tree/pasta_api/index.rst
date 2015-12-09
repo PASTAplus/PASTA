@@ -1,5 +1,6 @@
-*Documentation for Developers using the PASTA API*
-==================================================
+*********
+PASTA API
+*********
 
 .. toctree::
    :hidden:

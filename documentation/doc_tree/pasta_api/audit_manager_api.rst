@@ -1,2 +1,2 @@
-*Audit Manager*
-===============
+Audit Manager API
+=================

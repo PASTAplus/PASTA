@@ -1,2 +1,3 @@
-*General FAQ for the LTER NIS and PASTA*
-========================================
+***********
+General FAQ
+***********

@@ -126,12 +126,12 @@ html_sidebars = {
 html_theme_options = {
   'logo': 'non_st_logo.png',
   #'logo_name': 'True',
-  #'description': 'Documentation for the LTER Network Information System and PASTA',
+  'description': 'Documentation for the LTER Network Information System',
   # The following two attributes were hardcoded into the file
   # /usr/local/lib/python2.7/site-packages/alabaster/about.html because these
   # settings were not affecting the change.
-  # 'github_user': 'lter', 
-  # 'github_repo': 'PASTA',
+  'github_user': 'lter', 
+  'github_repo': 'PASTA',
   'font_family': 'Helvetica Neue, Helvetica, Arial, sans-serif',
   'head_font_family': 'Helvetica Neue, Helvetica, Arial, sans-serif',
   'page_width': '1024px',
