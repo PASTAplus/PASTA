@@ -239,6 +239,7 @@ public class SolrAdvancedSearch extends Search  {
 				 * search term.
 				 */
 				if (webTerms.size() < 1) {
+					queryTerms += " " + term;
 					derivedTerms.add(term);
 				}
 
