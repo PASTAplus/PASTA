@@ -28,7 +28,7 @@ To assist the weary web traveler in deciding what category to peruse, a short sy
 
 .. toctree::
    :hidden:
-   :numbered: 4
+   :numbered: 3
    :maxdepth: 3
    
    LTER NIS </doc_tree/lter_nis/index>

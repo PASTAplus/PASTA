@@ -6,6 +6,7 @@ The Data Package Manager API consists of six groups of PASTA web services:
 #. :ref:`Upload and Evaluation <upload-and-evaluation>` of data packages
 #. :ref:`Browse and Discovery <browse-and-discovery>` of data packages
 #. :ref:`Listing <listing>` data packages
+#. :ref:`Accessing <accessing>` data package resources
 #. :ref:`Provenance <provenance>` tracking and metadata
 #. Data package :ref:`Event Notifications <event-notifications>`
 #. :ref:`Miscellaneous <miscellaneous>` data package services
@@ -61,14 +62,6 @@ Examples
        -X POST https://pasta.lternet.edu/package/eml
 
 .. _browse-and-discovery:
-
-*Create Data Package Archive*
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-REST API
-""""""""
-
-`POST : https://pasta.lternet.edu/package/archive/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#POST%20:%20/archive/eml/{scope}/{identifier}/{revision}>`_
 
 *Evaluate Data Package*
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -307,6 +300,85 @@ Listing
 Describes web service methods for listing data packages.
 
 
+*List Data Entities*
+^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/eml/{scope}/{identifier}/{revision}>`_
+
+*List Data Descendants*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/descendants/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/descendants/eml/{scope}/{identifier}/{revision}>`_
+
+*List Data Sources*
+^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/sources/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/sources/eml/{scope}/{identifier}/{revision}>`_
+
+*List Data Package Identifiers*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/eml/{scope} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/{scope}>`_
+
+*List Data Package Revisions*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/eml/{scope}/{identifier} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/{scope}/{identifier}>`_
+
+*List Data Package Scopes*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml>`_
+
+*List Deleted Data Packages*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/eml/deleted <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/deleted>`_
+
+*List Service Methods*
+^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/service-methods <https://pasta.lternet.edu/package/docs/api#GET%20:%20/service-methods>`_
+
+.. _accessing:
+
+Accessing Data Package Resources
+--------------------------------
+
+Describes web service methods for accessing data package resources such as data, metadata, and reports.
+
+*Read Data Entity*
+^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
 .. _provenance:
 
 Provenance
@@ -336,3 +408,17 @@ Miscellaneous Services
 
 Additional web service methods for working with data packages.
 
+*Create Data Package Archive*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/archive/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#POST%20:%20/archive/eml/{scope}/{identifier}/{revision}>`_
+
+*Is Authorized*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+REST API
+""""""""
+`GET : https://pasta.lternet.edu/package/authz <https://pasta.lternet.edu/package/docs/api#GET%20:%20/authz>`_
