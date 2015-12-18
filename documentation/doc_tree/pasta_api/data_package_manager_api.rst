@@ -21,11 +21,6 @@ Describes web service methods for uploading (creating or updating) and evaluatin
 *Create Data Package*
 ^^^^^^^^^^^^^^^^^^^^^
 
-REST API
-""""""""
-
-`POST : https://pasta.lternet.edu/package/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/eml>`_
-
 Description
 """""""""""
 
@@ -51,6 +46,11 @@ completed successfully.
 ..   "**405** - Method not allowed", "The specified HTTP method is not allowed for the requested resource", "Error message", "*text/plain*"
 .. End: This section is commented out but saved for future development
 
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/eml>`_
+
 Examples
 """"""""
   
@@ -66,6 +66,11 @@ Examples
 *Evaluate Data Package*
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+Evaluate Data Package operation, specifying the EML document describing the data package to be evaluated in the request message body, and returning a transaction identifier in the response message body as plain text; the transaction identifier may be used in a subsequent call to readDataPackageError to determine the operation status or to readEvaluateReport to obtain the evaluate quality report.
+
 REST API
 """"""""
 
@@ -73,6 +78,9 @@ REST API
 
 *Update Data Package*
 ^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
 
 REST API
 """"""""
@@ -86,11 +94,6 @@ Describes web service methods for browsing and discovering data packages.
 
 *Search Data Packages*
 ^^^^^^^^^^^^^^^^^^^^^^
-
-REST API
-""""""""
-
-`GET : https://pasta.lternet.edu/package/search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
 
 Description
 """""""""""
@@ -113,6 +116,11 @@ of Solr queries and their corresponding search results XML are shown below.
 ..    "**405** - Method not allowed", "The specified HTTP method is not allowed for the requested resource", "Error message", "*text/plain*"
 ..    "**500** - Internal Server Error", "The server encountered an unexpected condition which prevented it from fulfilling the request", "Error message", "*text/plain*"
 .. End: This section is commented out but saved for future development
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/search/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/search/eml>`_
 
 Solr Queries
 """"""""""""
@@ -303,6 +311,11 @@ Describes web service methods for listing data packages.
 *List Data Entities*
 ^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+List Data Entities operation, specifying the scope, identifier, and revision values to match in the URI.
+
 REST API
 """"""""
 
@@ -310,6 +323,11 @@ REST API
 
 *List Data Descendants*
 ^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Data Descendants operation, specifying the scope, identifier, and revision values to match in the URI.
 
 REST API
 """"""""
@@ -319,6 +337,11 @@ REST API
 *List Data Sources*
 ^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+List Data Sources operation, specifying the scope, identifier, and revision values to match in the URI.
+
 REST API
 """"""""
 
@@ -326,6 +349,11 @@ REST API
 
 *List Data Package Identifiers*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Data Package Identifiers operation, specifying the scope value to match in the URI.
 
 REST API
 """"""""
@@ -335,6 +363,11 @@ REST API
 *List Data Package Revisions*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+List Data Package Revisions operation, specifying the scope and identifier values to match in the URI. The request may be filtered by applying the modifiers "oldest" or "newest" to the "filter" query parameter.
+
 REST API
 """"""""
 
@@ -342,6 +375,11 @@ REST API
 
 *List Data Package Scopes*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Data Package Scopes operation, returning all scope values extant in the data package registry.
 
 REST API
 """"""""
@@ -351,6 +389,11 @@ REST API
 *List Deleted Data Packages*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+List Deleted Data Packages operation, returning all document identifiers (excluding revision values) that have been deleted from the data package registry.
+
 REST API
 """"""""
 
@@ -359,10 +402,28 @@ REST API
 *List Service Methods*
 ^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+List Service Methods operation, returning a simple list of web service methods supported by the Data Package Manager web service.
+
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/service-methods <https://pasta.lternet.edu/package/docs/api#GET%20:%20/service-methods>`_
+
+*List Recent Uploads*
+^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Recent Uploads operation, optionally specifying the upload type ("insert" or "update") and a maximum limit as query parameters in the URL. (See example below.)
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/uploads/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/uploads/eml>`_
 
 .. _accessing:
 
@@ -374,10 +435,235 @@ Describes web service methods for accessing data package resources such as data,
 *Read Data Entity*
 ^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+Read Data Entity operation, specifying the scope, identifier, revision, and entity identifier of the data entity to be read in the URI.
+
+Revision may be specified as "newest" or "oldest" to retrieve data from the newest or oldest revision, respectively.
+
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/data/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
+*Read Data Entity ACL*
+^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity ACL operation, specifying the scope, identifier, and revision of the data entity object whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data entity. Please note: only a very limited set of users are authorized to use this service method.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/acl/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/acl/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
+*Read Data Entity Checksum*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Checksum operation, specifying the scope, identifier, and revision of the data entity object whose checksum is to be read in the URI, returning a 40-character SHA-1 checksum value.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/checksum/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/checksum/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
+*Read Data Entity Name*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Name operation, specifying the scope, identifier, revision, and entity identifier of the data entity whose name is to be read in the URI.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/name/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/name/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
+*Read Data Package*
+^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package operation, specifying the scope, identifier, and revision of the data package to be read in the URI, returning a resource graph with reference URLs to each of the metadata, data, and quality report resources that comprise the data package.
+
+Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Package ACL*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package ACL operation, specifying the scope, identifier, and revision of the data package whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package. Please note: only a very limited set of users are authorized to use this service method.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/acl/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/acl/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Package Archive*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Archive operation, specifying the transaction identifier of the data package archive to be read in the URI, returning the data package archive as a binary object in the ZIP file format.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/archive/eml/{scope}/{identifier}/{revision}/{transaction} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/archive/eml/{scope}/{identifier}/{revision}/{transaction}>`_
+
+*Read Data Package DOI*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package DOI operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/doi/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/doi/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Package Error*
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Error operation, specifying the scope, identifier, revision, and transaction id of the data package error to be read in the URI, returning the error message as plain text.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/error/eml/{transaction} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/error/eml/{transaction}>`_
+
+*Read Data Package Report*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Report operation, specifying the scope, identifier, and revision of the data package quality report document to be read in the URI.
+
+If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation of the report. The default representation is XML.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/report/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Package Report ACL*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Report ACL operation, specifying the scope, identifier, and revision of the data package report whose access control list (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package report resource. Please note: only a very limited set of users are authorized to use this service method.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/report/acl/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/acl/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Package Report Checksum*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Report Checksum operation, specifying the scope, identifier, and revision of the data package report object whose checksum is to be read in the URI, returning a 40 character SHA-1 checksum value.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/report/checksum/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/checksum/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Evaluate Report*
+^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Evaluate Report operation, specifying the transaction identifier of the evaluate quality report document to be read in the URI.
+
+If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation of the report. The default representation is XML.
+
+See the Evaluate Data Package service method for information about how to obtain the transaction id.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/evaluate/report/eml/{transaction} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/evaluate/report/eml/{transaction}>`_
+
+*Read Metadata*
+^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata operation, specifying the scope, identifier, and revision of the EML document to be read in the URI.
+
+Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Metadata ACL*
+^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata ACL operation, specifying the scope, identifier, and revision of the data package metadata whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package metadata resource. Please note: only a very limited set of users are authorized to use this service method.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/acl/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/acl/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Metadata Checksum*
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata Checksum operation, specifying the scope, identifier, and revision of the metadata object whose checksum value is to be read in the URI, returning a 40 character SHA-1 checksum value.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/checksum/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/checksum/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Metadata Format*
+^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata Format operation, specifying the scope, identifier, and revision of the metadata to be read in the URI, returning the metadata format type, e.g. "eml://ecoinformatics.org/eml-2.1.1"
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/format/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/format/eml/{scope}/{identifier}/{revision}>`_
 
 .. _provenance:
 
@@ -388,6 +674,11 @@ Describes web service methods for tracking and generating provenance metadata.
 
 *Add Provenance Metadata*
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Add Provenance Metadata from Level-1 metadata in PASTA to an XML document containing a single methods element in the request message body.
 
 REST API
 """"""""
@@ -401,6 +692,86 @@ Event Notifications
 
 Describes web service methods for subscribing to and receiving data package event notifications.
 
+*Create Event Subscription*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Create Event Subscription creates a new event subscription.
+
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/event/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/event/eml>`_
+
+*Delete Event Subscription*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Delete Event Subscription deletes the event subscription with the specified ID from the subscription database. After "deletion," the subscription might still exist in the subscription database, but it will be inactive - it will not conflict with future creation requests, it cannot be read, and it will not be notified of events.
+
+REST API
+""""""""
+
+`DELETE : https://pasta.lternet.edu/package/event/eml/{subscriptionId} <https://pasta.lternet.edu/package/docs/api#DELETE%20:%20/event/eml/{subscriptionId}>`_
+
+*Execute Event Subscription*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Execute Event Subscription operation, specifying the ID of the event subscription whose URL is to be executed. Used to execute a particular subscription in the event manager, via an HTTP POST request. Upon notification, the event manager queries its database for the subscription matching the specified subscriptionId. POST requests are then made (asynchronously) to the matching subscription.
+
+The request headers must contain an authorization token. If the request is successful, an HTTP response with status code 200 'OK' is returned. If the request is unauthorized, based on the content of the authorization token and the current access control rule for event notification, status code 401 'Unauthorized' is returned. If the request contains an error, status code 400 'Bad Request' is returned, with a description of the encountered error.
+
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/event/eml/{subscriptionId} <https://pasta.lternet.edu/package/docs/api#POST%20:%20/event/eml/{subscriptionId}>`_
+
+*Query Event Subscriptions*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Query Event Subscriptions operation, returns a list of the subscriptions whose attributes match those specified in the query string. If a query string is omitted, all subscriptions in the subscription database will be returned for which the requesting user is authorized to read. If query parameters are included, they are used to filter that set of subscriptions based on their attributes.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/event/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/event/eml>`_
+
+*Get Event Subscription*
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Get Event Subscription returns the event subscription with the specified ID.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/event/eml/{subscriptionId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/event/eml/{subscriptionId}>`_
+
+*Get Event Subscription Schema*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Get Event Subscription Schema operation, returns the XML schema for event subscription creation request entities
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/event/eml/schema <https://pasta.lternet.edu/package/docs/api#GET%20:%20/event/eml/schema>`_
+
 .. _miscellaneous:
 
 Miscellaneous Services
@@ -411,6 +782,11 @@ Additional web service methods for working with data packages.
 *Create Data Package Archive*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+Create Data Package Archive (Zip) operation, specifying the scope, identifier, and revision of the data package to be Zipped in the URI, and returning a transaction identifier in the response message body as plain text; the transaction identifier may be used in a subsequent call to readDataPackageError to determine the operation status or to readDataPackageArchive to obtain the Zip archive.
+
 REST API
 """"""""
 
@@ -419,6 +795,11 @@ REST API
 *Is Authorized*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Description
+"""""""""""
+
+Is Authorized (to read resource) operation, determines whether the user as defined in the authentication token has permission to read the specified data package resource.
+
 REST API
 """"""""
-`GET : https://pasta.lternet.edu/package/authz <https://pasta.lternet.edu/package/docs/api#GET%20:%20/authz>`_
+`GET : https://pasta.lternet.edu/package/authz?resourceId={resource identifier} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/authz>`_
