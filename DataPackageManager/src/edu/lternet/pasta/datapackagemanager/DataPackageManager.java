@@ -1269,6 +1269,38 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * List the package ID values (including revisions) of all data packages that 
+	 * are active (not deleted) in the resource registry.
+	 * 
+	 * @return A newline-separated list of package ID strings corresponding 
+	 *         to the list of active (undeleted) data packages.
+	 */
+	public String listAllDataPackages() 
+			throws ClassNotFoundException, SQLException {
+		boolean includeInactive = false;
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String packageListString = null;
+		StringBuffer stringBuffer = new StringBuffer("");
+		ArrayList<String> packageList = 
+				dataPackageRegistry.listAllDataPackageRevisions(includeInactive);
+
+		// Throw a ResourceNotFoundException if the list is empty
+		if (packageList == null || packageList.size() == 0) {
+			String message = "No resources found\n\n";
+			throw new ResourceNotFoundException(message);
+		}
+
+		for (String dataPackage : packageList) {
+			stringBuffer.append(dataPackage + "\n");
+		}
+
+		packageListString = stringBuffer.toString();
+		return packageListString;
+	}
+
+	
+	/**
 	 * List the data entity resources for the specified data package that are
 	 * readable by the specified user.
 	 * 
