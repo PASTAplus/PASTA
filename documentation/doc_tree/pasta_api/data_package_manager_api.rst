@@ -26,10 +26,10 @@ Description
 
 Creates a new PASTA data package by providing the EML document describing
 the data package to be created in the request message body and returning a
-transaction identifier in the response message body as plain text; the
-transaction identifier may be used in a subsequent call to
-*readDataPackageError* to determine the operation status; see
-*readDataPackage* to obtain the data package resource map if the operation
+*transaction identifier* in the response message body as plain text; the
+*transaction identifier* may be used in a subsequent call to
+:ref:`Read Data Package Error <read-data-package-error>` to determine the operation status; see
+:ref:`Read Data Package<read-data-package>` to obtain the data package resource map if the operation
 completed successfully.
 
   
@@ -61,7 +61,7 @@ Examples
        -H "Content-Type: application/xml" --data-binary @knb-lter-lno.1.1.xml \
        -X POST https://pasta.lternet.edu/package/eml
 
-.. _browse-and-discovery:
+.. _evaluate-data-package:
 
 *Evaluate Data Package*
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -69,7 +69,11 @@ Examples
 Description
 """""""""""
 
-Evaluate Data Package operation, specifying the EML document describing the data package to be evaluated in the request message body, and returning a transaction identifier in the response message body as plain text; the transaction identifier may be used in a subsequent call to readDataPackageError to determine the operation status or to readEvaluateReport to obtain the evaluate quality report.
+Evaluate Data Package operation, specifying the EML document describing the data package to be evaluated 
+in the request message body, and returning a *transaction identifier* in the response message body as plain 
+text; the *transaction identifier* may be used in a subsequent call to 
+:ref:`Read Data Package Error <read-data-package-error>` to determine the 
+operation status or to :ref:`Read Evaluate Report <read-evaluate-report>` to obtain the evaluate quality report.
 
 REST API
 """"""""
@@ -82,10 +86,20 @@ REST API
 Description
 """""""""""
 
+Update Data Package operation, specifying the scope and identifier of the data package to be updated 
+in the URI, along with the EML document describing the data package to be created in the request message 
+body, and returning a *transaction identifier* in the response message body as plain text; the 
+*transaction identifier* may be used in a subsequent call to 
+:ref:`Read Data Package Error <read-data-package-error>`  to determine the operation status; 
+see :ref:`Read Data Package<read-data-package>` to obtain the data package resource map if 
+the operation completed successfully.
+
 REST API
 """"""""
 
 `PUT : https://pasta.lternet.edu/package/eml/{scope}/{identifier} <https://pasta.lternet.edu/package/docs/api#PUT%20:%20/eml/{scope}/{identifier}>`_
+
+.. _browse-and-discovery:
 
 Browse and Discovery
 --------------------
@@ -366,7 +380,8 @@ REST API
 Description
 """""""""""
 
-List Data Package Revisions operation, specifying the scope and identifier values to match in the URI. The request may be filtered by applying the modifiers "oldest" or "newest" to the "filter" query parameter.
+List Data Package Revisions operation, specifying the scope and identifier values to match in the URI. 
+The request may be filtered by applying the modifiers "oldest" or "newest" to the "filter" query parameter.
 
 REST API
 """"""""
@@ -392,7 +407,8 @@ REST API
 Description
 """""""""""
 
-List Deleted Data Packages operation, returning all document identifiers (excluding revision values) that have been deleted from the data package registry.
+List Deleted Data Packages operation, returning all document identifiers (excluding revision values) that 
+have been deleted from the data package registry.
 
 REST API
 """"""""
@@ -405,7 +421,8 @@ REST API
 Description
 """""""""""
 
-List Service Methods operation, returning a simple list of web service methods supported by the Data Package Manager web service.
+List Service Methods operation, returning a simple list of web service methods supported by the 
+Data Package Manager web service.
 
 REST API
 """"""""
@@ -418,7 +435,8 @@ REST API
 Description
 """""""""""
 
-List Recent Uploads operation, optionally specifying the upload type ("insert" or "update") and a maximum limit as query parameters in the URL. (See example below.)
+List Recent Uploads operation, optionally specifying the upload type ("insert" or "update") and a 
+maximum limit as query parameters in the URL. (See example below.)
 
 REST API
 """"""""
@@ -438,9 +456,11 @@ Describes web service methods for accessing data package resources such as data,
 Description
 """""""""""
 
-Read Data Entity operation, specifying the scope, identifier, revision, and entity identifier of the data entity to be read in the URI.
+Read Data Entity operation, specifying the scope, identifier, revision, and entity identifier of 
+the data entity to be read in the URI.
 
-Revision may be specified as "newest" or "oldest" to retrieve data from the newest or oldest revision, respectively.
+Revision may be specified as "newest" or "oldest" to retrieve data from the newest or oldest 
+revision, respectively.
 
 REST API
 """"""""
@@ -453,7 +473,9 @@ REST API
 Description
 """""""""""
 
-Read Data Entity ACL operation, specifying the scope, identifier, and revision of the data entity object whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data entity. Please note: only a very limited set of users are authorized to use this service method.
+Read Data Entity ACL operation, specifying the scope, identifier, and revision of the data entity object 
+whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL 
+for the data entity. Please note: only a very limited set of users are authorized to use this service method.
 
 REST API
 """"""""
@@ -466,7 +488,8 @@ REST API
 Description
 """""""""""
 
-Read Data Entity Checksum operation, specifying the scope, identifier, and revision of the data entity object whose checksum is to be read in the URI, returning a 40-character SHA-1 checksum value.
+Read Data Entity Checksum operation, specifying the scope, identifier, and revision of the data entity 
+object whose checksum is to be read in the URI, returning a 40-character SHA-1 checksum value.
 
 REST API
 """"""""
@@ -479,12 +502,15 @@ REST API
 Description
 """""""""""
 
-Read Data Entity Name operation, specifying the scope, identifier, revision, and entity identifier of the data entity whose name is to be read in the URI.
+Read Data Entity Name operation, specifying the scope, identifier, revision, and entity identifier of 
+the data entity whose name is to be read in the URI.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/name/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/name/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
+.. _read-data-package:
 
 *Read Data Package*
 ^^^^^^^^^^^^^^^^^^^
@@ -492,7 +518,9 @@ REST API
 Description
 """""""""""
 
-Read Data Package operation, specifying the scope, identifier, and revision of the data package to be read in the URI, returning a resource graph with reference URLs to each of the metadata, data, and quality report resources that comprise the data package.
+Read Data Package operation, specifying the scope, identifier, and revision of the data package to 
+be read in the URI, returning a resource graph with reference URLs to each of the metadata, data, 
+and quality report resources that comprise the data package.
 
 Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
 
@@ -507,12 +535,16 @@ REST API
 Description
 """""""""""
 
-Read Data Package ACL operation, specifying the scope, identifier, and revision of the data package whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package. Please note: only a very limited set of users are authorized to use this service method.
+Read Data Package ACL operation, specifying the scope, identifier, and revision of the data package 
+whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the 
+ACL for the data package. Please note: only a very limited set of users are authorized to use this service method.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/acl/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/acl/eml/{scope}/{identifier}/{revision}>`_
+
+.. _read-data-package-archive:
 
 *Read Data Package Archive*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -520,7 +552,8 @@ REST API
 Description
 """""""""""
 
-Read Data Package Archive operation, specifying the transaction identifier of the data package archive to be read in the URI, returning the data package archive as a binary object in the ZIP file format.
+Read Data Package Archive operation, specifying the *transaction identifier* of the data package archive 
+to be read in the URI, returning the data package archive as a binary object in the ZIP file format.
 
 REST API
 """"""""
@@ -533,12 +566,15 @@ REST API
 Description
 """""""""""
 
-Read Data Package DOI operation, specifying the scope, identifier, and revision of the data package DOI to be read in the URI, returning the canonical Digital Object Identifier.
+Read Data Package DOI operation, specifying the scope, identifier, and revision of the data package 
+DOI to be read in the URI, returning the canonical *Digital Object Identifier*.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/doi/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/doi/eml/{scope}/{identifier}/{revision}>`_
+
+.. _read-data-package-error:
 
 *Read Data Package Error*
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -546,7 +582,8 @@ REST API
 Description
 """""""""""
 
-Read Data Package Error operation, specifying the scope, identifier, revision, and transaction id of the data package error to be read in the URI, returning the error message as plain text.
+Read Data Package Error operation, specifying the scope, identifier, revision, and *transaction identifier*
+of the data package error to be read in the URI, returning the error message as plain text.
 
 REST API
 """"""""
@@ -559,9 +596,11 @@ REST API
 Description
 """""""""""
 
-Read Data Package Report operation, specifying the scope, identifier, and revision of the data package quality report document to be read in the URI.
+Read Data Package Report operation, specifying the scope, identifier, and revision of the data package 
+quality report document to be read in the URI.
 
-If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation of the report. The default representation is XML.
+If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation 
+of the report. The default representation is XML.
 
 REST API
 """"""""
@@ -574,7 +613,10 @@ REST API
 Description
 """""""""""
 
-Read Data Package Report ACL operation, specifying the scope, identifier, and revision of the data package report whose access control list (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package report resource. Please note: only a very limited set of users are authorized to use this service method.
+Read Data Package Report ACL operation, specifying the scope, identifier, and revision of the data 
+package report whose access control list (ACL) is to be read in the URI, returning an XML string 
+representing the ACL for the data package report resource. Please note: only a very limited set of 
+users are authorized to use this service method.
 
 REST API
 """"""""
@@ -587,12 +629,15 @@ REST API
 Description
 """""""""""
 
-Read Data Package Report Checksum operation, specifying the scope, identifier, and revision of the data package report object whose checksum is to be read in the URI, returning a 40 character SHA-1 checksum value.
+Read Data Package Report Checksum operation, specifying the scope, identifier, and revision of the 
+data package report object whose checksum is to be read in the URI, returning a 40 character SHA-1 checksum value.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/report/checksum/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/checksum/eml/{scope}/{identifier}/{revision}>`_
+
+.. _read-evaluate-report:
 
 *Read Evaluate Report*
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -600,11 +645,14 @@ REST API
 Description
 """""""""""
 
-Read Evaluate Report operation, specifying the transaction identifier of the evaluate quality report document to be read in the URI.
+Read Evaluate Report operation, specifying the *transaction identifier* of the evaluate quality report 
+document to be read in the URI.
 
-If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation of the report. The default representation is XML.
+If an HTTP Accept header with value 'text/html' is included in the request, returns an HTML representation 
+of the report. The default representation is XML.
 
-See the Evaluate Data Package service method for information about how to obtain the transaction id.
+See the :ref:`Evaluate Data Package <evaluate-data-package>` service method for information about how to 
+obtain the *transaction identifier*.
 
 REST API
 """"""""
@@ -632,7 +680,10 @@ REST API
 Description
 """""""""""
 
-Read Metadata ACL operation, specifying the scope, identifier, and revision of the data package metadata whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL for the data package metadata resource. Please note: only a very limited set of users are authorized to use this service method.
+Read Metadata ACL operation, specifying the scope, identifier, and revision of the data package metadata 
+whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL 
+for the data package metadata resource. Please note: only a very limited set of users are authorized to 
+use this service method.
 
 REST API
 """"""""
@@ -645,7 +696,8 @@ REST API
 Description
 """""""""""
 
-Read Metadata Checksum operation, specifying the scope, identifier, and revision of the metadata object whose checksum value is to be read in the URI, returning a 40 character SHA-1 checksum value.
+Read Metadata Checksum operation, specifying the scope, identifier, and revision of the metadata 
+object whose checksum value is to be read in the URI, returning a 40 character SHA-1 checksum value.
 
 REST API
 """"""""
@@ -658,7 +710,8 @@ REST API
 Description
 """""""""""
 
-Read Metadata Format operation, specifying the scope, identifier, and revision of the metadata to be read in the URI, returning the metadata format type, e.g. "eml://ecoinformatics.org/eml-2.1.1"
+Read Metadata Format operation, specifying the scope, identifier, and revision of the metadata to be 
+read in the URI, returning the metadata format type, e.g. "eml://ecoinformatics.org/eml-2.1.1"
 
 REST API
 """"""""
@@ -678,7 +731,8 @@ Describes web service methods for tracking and generating provenance metadata.
 Description
 """""""""""
 
-Add Provenance Metadata from Level-1 metadata in PASTA to an XML document containing a single methods element in the request message body.
+Add Provenance Metadata from Level-1 metadata in PASTA to an XML document containing a single methods 
+element in the request message body.
 
 REST API
 """"""""
@@ -711,7 +765,10 @@ REST API
 Description
 """""""""""
 
-Delete Event Subscription deletes the event subscription with the specified ID from the subscription database. After "deletion," the subscription might still exist in the subscription database, but it will be inactive - it will not conflict with future creation requests, it cannot be read, and it will not be notified of events.
+Delete Event Subscription deletes the event subscription with the specified ID from the subscription 
+database. After "deletion," the subscription might still exist in the subscription database, 
+but it will be inactive - it will not conflict with future creation requests, it cannot be read, 
+and it will not be notified of events.
 
 REST API
 """"""""
@@ -724,9 +781,16 @@ REST API
 Description
 """""""""""
 
-Execute Event Subscription operation, specifying the ID of the event subscription whose URL is to be executed. Used to execute a particular subscription in the event manager, via an HTTP POST request. Upon notification, the event manager queries its database for the subscription matching the specified subscriptionId. POST requests are then made (asynchronously) to the matching subscription.
+Execute Event Subscription operation, specifying the ID of the event subscription whose URL is to be executed. 
+Used to execute a particular subscription in the event manager, via an HTTP POST request. Upon notification, 
+the event manager queries its database for the subscription matching the specified *subscriptionId*. 
+POST requests are then made (asynchronously) to the matching subscription.
 
-The request headers must contain an authorization token. If the request is successful, an HTTP response with status code 200 'OK' is returned. If the request is unauthorized, based on the content of the authorization token and the current access control rule for event notification, status code 401 'Unauthorized' is returned. If the request contains an error, status code 400 'Bad Request' is returned, with a description of the encountered error.
+The request headers must contain an authorization token. If the request is successful, an HTTP response 
+with status code 200 'OK' is returned. If the request is unauthorized, based on the content of the 
+authorization token and the current access control rule for event notification, status code 401 
+'Unauthorized' is returned. If the request contains an error, status code 400 'Bad Request' is returned, 
+with a description of the encountered error.
 
 REST API
 """"""""
@@ -739,7 +803,10 @@ REST API
 Description
 """""""""""
 
-Query Event Subscriptions operation, returns a list of the subscriptions whose attributes match those specified in the query string. If a query string is omitted, all subscriptions in the subscription database will be returned for which the requesting user is authorized to read. If query parameters are included, they are used to filter that set of subscriptions based on their attributes.
+Query Event Subscriptions operation, returns a list of the subscriptions whose attributes match those 
+specified in the query string. If a query string is omitted, all subscriptions in the subscription 
+database will be returned for which the requesting user is authorized to read. If query parameters are 
+included, they are used to filter that set of subscriptions based on their attributes.
 
 REST API
 """"""""
@@ -765,7 +832,7 @@ REST API
 Description
 """""""""""
 
-Get Event Subscription Schema operation, returns the XML schema for event subscription creation request entities
+Get Event Subscription Schema operation, returns the XML schema for event subscription creation request entities.
 
 REST API
 """"""""
@@ -785,7 +852,11 @@ Additional web service methods for working with data packages.
 Description
 """""""""""
 
-Create Data Package Archive (Zip) operation, specifying the scope, identifier, and revision of the data package to be Zipped in the URI, and returning a transaction identifier in the response message body as plain text; the transaction identifier may be used in a subsequent call to readDataPackageError to determine the operation status or to readDataPackageArchive to obtain the Zip archive.
+Create Data Package Archive (Zip) operation, specifying the scope, identifier, and revision of the 
+data package to be Zipped in the URI, and returning a *transaction identifier* in the response message 
+body as plain text; the *transaction identifier* may be used in a subsequent call to 
+:ref:`Read Data Package Error <read-data-package-error>` to determine the operation status or 
+to :ref:`Read Data Package Archive <read-data-package-archive>` to obtain the Zip archive.
 
 REST API
 """"""""
@@ -798,7 +869,8 @@ REST API
 Description
 """""""""""
 
-Is Authorized (to read resource) operation, determines whether the user as defined in the authentication token has permission to read the specified data package resource.
+Is Authorized (to read resource) operation, determines whether the user as defined in the authentication 
+token has permission to read the specified data package resource.
 
 REST API
 """"""""
