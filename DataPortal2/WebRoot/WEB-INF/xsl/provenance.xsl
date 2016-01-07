@@ -29,9 +29,7 @@
   <xsl:output method="html"/>
 
   <xsl:template match="/">
- 	<xsl:for-each select="methods">
-		<xsl:apply-templates select="methodStep"/>
-    </xsl:for-each>
+	<xsl:apply-templates select="methodStep"/>
   </xsl:template>
 
   <xsl:template match="methodStep">

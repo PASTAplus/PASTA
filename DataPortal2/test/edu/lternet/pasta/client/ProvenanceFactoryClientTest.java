@@ -102,9 +102,9 @@ public class ProvenanceFactoryClientTest {
 			fail("User '" + uid + "' failed to authenticate.");
 		}
 
-
 	}
 
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -115,69 +115,67 @@ public class ProvenanceFactoryClientTest {
 
 		// Clean up "tokenstore" database and remove user.
 		try {
-		  tokenManager.deleteToken(uid);
+			tokenManager.deleteToken(uid);
 		}
 		catch (ClassNotFoundException | SQLException e) {
-		   // no-op since we don't want test to fail if token is not found
+			// no-op since we don't want test to fail if token is not found
 		}
 
 		uid = null;
 		password = null;
-		
+
 	}
+
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
 		try {
-	    provenanceFactoryClient = new ProvenanceFactoryClient(uid);
-    } catch (PastaAuthenticationException e) {
-	    e.printStackTrace();
-	    fail(e.getMessage());
-    } catch (PastaConfigurationException e) {
-	    e.printStackTrace();
-	    fail(e.getMessage());
-    }
-
+			provenanceFactoryClient = new ProvenanceFactoryClient(uid);
+		}
+		catch (PastaAuthenticationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+		catch (PastaConfigurationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@After
 	public void tearDown() throws Exception {
-		
 		provenanceFactoryClient = null;
-		
 	}
+
 
 	@Test
 	public void testGetProvenanceByPid() {
-		
 		String provenanceFragment = null;
 		String provenanceStatement = "This method step describes provenance-based metadata as specified in the LTER EML Best Practices.";
 
 		try {
-			
-			// Test for successful return of the provenance fragment for the pid.
-	    provenanceFragment = provenanceFactoryClient.getProvenanceByPid(pid);
-	    
-    } catch (Exception e) {
-	    e.printStackTrace();
-	    fail(e.getMessage());
-    }
-		
+			// Test for successful return of the provenance fragment for the packageId
+			provenanceFragment = provenanceFactoryClient.getProvenanceByPid(pid);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+
 		assertFalse(provenanceFragment == null);
-		
+
 		// Confirm that a provenance metadata fragment is returned.
 		if (provenanceFragment != null) {
 			assertFalse(provenanceFragment.isEmpty());
 			assertTrue(provenanceFragment.contains(provenanceStatement));
 		}
-				
 	}
 
 }

@@ -1110,6 +1110,167 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+	/**
+	 * <strong>Get Provenance Metadata</strong> operation, specifying the scope,
+	 * identifier, and revision of the parent data package whose provenance metadata is
+	 * to be generated and retrieved, returning an XML string representing a 
+	 * &lt;methodStep&gt; element that can be inserted into the &lt;methods&gt; 
+	 * section of a dependent data package.
+	 * 
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET https://pasta.lternet.edu/package/provenance/eml/knb-lter-lno/1/1</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * 
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <td align=center><b>Status</b></td>
+	 * <td align=center><b>Reason</b></td>
+	 * <td align=center><b>Message Body</b></td>
+	 * <td align=center><b>MIME type</b></td>
+	 * <td align=center><b>Sample Message Body</b></td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request was successful</td>
+	 * <td align=center>The modified XML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+	 * &lt;methods&gt;
+	 *   &lt;methodStep&gt;
+	 *     &lt;description&gt;
+	 *       &lt;para&gt;This method step describes provenance-based metadata...
+	 * .
+	 * .
+	 * .
+	 *   &lt;/methodStep&gt;
+	 * &lt;/methods&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request entity or query parameters cannot be
+	 * properly parsed</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is unauthorized to use the
+	 * Provenance Factory</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>417 Expectation Failed</td>
+	 * <td align=center>The request fails for an incorrect user expectation
+	 * (e.g., because the requesting user is not authorized to read an EML
+	 * document that is specified in the query parameter)</td>
+	 * <td align=center>
+	 * An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * </table>
+	 * 
+	 * 
+	 * @param headers
+	 *            the HTTP request headers containing the authorization token.
+	 * 
+	 * @param uriInfo
+	 *            contains the query string parameters.
+	 * 
+	 * @param eml
+	 *            the EML document to which provenance will be appended.
+	 * 
+	 * @return an appropriate HTTP response.
+	 */
+	@GET
+	@Path("/provenance/eml/{scope}/{identifier}/{revision}")
+	@Consumes(MediaType.APPLICATION_XML)
+	@Produces(value = { MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN })
+	public Response getProvenanceMetadata(
+			@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") String revision) {
+
+		AuthToken authToken = null;
+		String entryText = null;
+		String resourceId = null;
+		Response response = null;
+		final String serviceMethodName = "getProvenanceMetadata";
+		Rule.Permission permission = Rule.Permission.write;
+		String eml = null;
+
+		try {
+			authToken = AuthTokenFactory.makeAuthToken(headers.getCookies());
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the 'appendProvenance' service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			MetadataFactory metadataFactory = new MetadataFactory();
+			eml = metadataFactory.generateEML(scope, identifier, revision, authToken);
+			response = Response.ok(eml, MediaType.APPLICATION_XML).build();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeUnauthorized(e);
+		}
+		catch (XmlParsingException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeNotFound(e);
+		}
+		catch (WebApplicationException e) { // not necessary
+			entryText = e.getMessage();
+			response = e.getResponse();
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+
 	/*
 	 * The following methods have been migrated into the Data Package Manager
 	 * from the original Metadata Factory service.
@@ -1247,7 +1408,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 *            the EML document to which provenance will be appended.
 	 * 
 	 * @return an appropriate HTTP response.
-	 */
+	 *
 	@PUT
 	@Path("/provenance/eml")
 	@Consumes(MediaType.APPLICATION_XML)
@@ -1311,7 +1472,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 	}
-
+    */
 
 	/**
 	 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,

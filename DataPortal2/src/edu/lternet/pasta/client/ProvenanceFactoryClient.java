@@ -30,6 +30,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -79,69 +80,63 @@ public class ProvenanceFactoryClient extends PastaClient {
     this.BASE_URL = pastaUrl + "/package/provenance/eml";
 	}
 	
+	
 	/**
 	 * Returns the EML provenance metadata fragment as an XML string enclosed
 	 * by the <methods> element for the provided package identifier.
 	 * 
-	 * @param pid The packageId of the requested provenance fragment.
-	 * @return The EML provenance metadata fragment.
+	 * @param packageId The packageId of the parent data package whose provenance
+	 *                  metadata is being generated and returned.
+	 * @return an XML string containing the generated provenance metadata
 	 * @throws PastaEventException 
 	 */
-	public String getProvenanceByPid(String pid) throws Exception {
-		
+	public String getProvenanceByPid(String packageId) throws Exception {
 		String provenanceXml = null;
-    String contentType = "application/xml";
-		
-    Integer statusCode = null;
-    HttpEntity responseEntity = null;
+		Integer statusCode = null;
+		HttpEntity responseEntity = null;
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		HttpResponse response = null;
+		String urlFragment = packageId.replace('.', '/');
+		String provenanceURL = String.format("%s/%s", BASE_URL, urlFragment);
+		HttpGet httpGet = new HttpGet(provenanceURL);
 
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpResponse response = null;
-    HttpPut httpPut = new HttpPut(BASE_URL + "/?" + pid);
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
 
-    // Set header content
-    if (this.token != null) {
-      httpPut.setHeader("Cookie", "auth-token=" + this.token);
-    }
+		try {
+			response = httpClient.execute(httpGet);
+			statusCode = (Integer) response.getStatusLine().getStatusCode();
+			responseEntity = response.getEntity();
 
-    httpPut.setHeader("Content-Type", contentType);
+			if (responseEntity != null) {
+				provenanceXml = EntityUtils.toString(responseEntity);
+			}
+		}
+		catch (ClientProtocolException e) {
+			logger.error(e);
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			logger.error(e);
+			e.printStackTrace();
+		}
+		finally {
+			closeHttpClient(httpClient);
+		}
 
-    // Set the request entity
-    HttpEntity stringEntity = new StringEntity("<methods></methods>");
-    httpPut.setEntity(stringEntity);
-    
-    try {
-
-      response = httpClient.execute(httpPut);
-      statusCode = (Integer) response.getStatusLine().getStatusCode();
-      responseEntity = response.getEntity();
-
-      if (responseEntity != null) {
-        provenanceXml = EntityUtils.toString(responseEntity);
-      }
-
-    } catch (ClientProtocolException e) {
-      logger.error(e);
-      e.printStackTrace();
-    } catch (IOException e) {
-      logger.error(e);
-      e.printStackTrace();
-    } finally {
-		closeHttpClient(httpClient);
-    }
-
-    if (statusCode != HttpStatus.SC_OK) {
-
-      // Something went wrong; return message from the response entity
-      String gripe = "The MetadataFactory responded with response code '"
-          + statusCode.toString() + "' and message '" + provenanceXml + "'\n";
-      throw new PastaEventException(gripe);
-
-    }
+		if (statusCode != HttpStatus.SC_OK) {
+			// Something went wrong; return message from the response entity
+			String gripe = String.format(
+			    "The Metadata Factory responded with response code %d and message '%s'.\n", 
+				statusCode, provenanceXml);
+			throw new PastaEventException(gripe);
+		}
 
 		return provenanceXml;
-
 	}
+
 
 	/**
 	 * @param args
@@ -151,7 +146,7 @@ public class ProvenanceFactoryClient extends PastaClient {
     
     try {
       ProvenanceFactoryClient pfc = new ProvenanceFactoryClient("ucarroll");
-      String provenanceXml = pfc.getProvenanceByPid("knb-lter-lno.321.6");
+      String provenanceXml = pfc.getProvenanceByPid("lter-landsat.7.1");
       logger.info("Provenance XML: \n" + provenanceXml);
       
     } catch (PastaAuthenticationException e) {

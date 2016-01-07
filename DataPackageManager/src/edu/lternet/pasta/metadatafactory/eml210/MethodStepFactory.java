@@ -104,6 +104,45 @@ public final class MethodStepFactory {
         appendDescription(xml, entityNames, methodStep);
     }
 
+    
+    /**
+     * Appends {@code methodStep} elements to the provided XML document. These
+     * elements are appended to the {@code //methods} element.
+     *
+     * @param xml
+     *            the XML document to which elements will be appended.
+     *
+     * @param parent
+     *            the parent EML document from which provenance metatdata will
+     *            be obtained.
+     *
+     * @param entityNames
+     *            the list of entity names ({@code
+     *            /eml/dataset/dataTable/entityName}) to be included in
+     *            provenance metadata.
+     *
+     * @throws IllegalArgumentException
+     *             if any of the provided arguments are {@code null};
+     *
+     * @throws XmlParsingException
+     *             if the provided XML document does not have one and only one
+     *             {@code //methods} element; or if a provided entity name does
+     *             not exist in the provided parent EML.
+     */
+    public void appendMethodStepMetadata(Document xml,
+                       ParentEml parent,
+                       List<String> entityNames) {
+
+        checkArgs(xml, parent, entityNames);
+        Element methodStep = xml.getDocumentElement();
+        
+        // Do not change the order of these method invocations.
+        // They must satisfy the sequence order of the EML schema.
+        appendDataSource(xml, parent, methodStep);
+        appendDescription(xml, entityNames, methodStep);
+    }
+
+    
     private void checkArgs(Document doc, ParentEml parent, List<String> names) {
 
         if (doc == null) {

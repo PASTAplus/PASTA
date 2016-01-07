@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.metadatafactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -103,5 +104,31 @@ public final class MetadataFactory {
 
         return emlToModify;
     }
+
+
+	public String generateEML(String scope, Integer identifier, String revision,
+			                    AuthToken token)
+			throws Exception {
+		List<String> entityList = new ArrayList<String>();
+		String emlToModify = "<methodStep></methodStep>";
+		Document doc = XmlUtility.xmlStringToDoc(emlToModify);
+		String user = token.getUserId();
+		DataPackageManager dataPackageManager = new DataPackageManager();
+		String parentEmlStr = dataPackageManager.readMetadata(scope, identifier, revision, user, token);
+		if (parentEmlStr == null) {
+			String packageId = String.format("%s.%d.%s", scope, identifier, revision);
+			throw new ResourceNotFoundException(String.format(
+						"Data package %s could not be accessed.", packageId));
+		}
+        MethodStepFactory msf = new MethodStepFactory();
+        Document parentDoc = XmlUtility.xmlStringToDoc(parentEmlStr);
+        ParentEml parentEml = new ParentEml(parentDoc);
+		msf.appendMethodStepMetadata(doc, parentEml, entityList);
+		String modifiedEml = XmlUtility.nodeToXmlString(doc);
+		if (modifiedEml != null) 
+			modifiedEml = modifiedEml.replace("><methodStep>", ">\n<methodStep>");
+		
+		return modifiedEml;
+	}
 
 }
