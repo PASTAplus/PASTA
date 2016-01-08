@@ -26,13 +26,9 @@ package edu.lternet.pasta.metadatafactory;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -44,13 +40,11 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
-import edu.lternet.pasta.datapackagemanager.DataPackageManagerResource;
 import edu.lternet.pasta.datapackagemanager.DataPackageManagerResourceTest;
 import edu.ucsb.nceas.utilities.Options;
 
@@ -181,13 +175,11 @@ public class TestMetadataFactory {
   
     @Before
     public void init() {
-        String xml = "<eml id=\"1\"><dataset><methods/></dataset></eml>";
-        doc = XmlUtility.xmlStringToDoc(xml);
         factory = new MetadataFactory();
         token = UserCreds.getAuthToken();
     }
 
-    
+    /*
     @Test
     public void testAppendProvenance() throws Exception {
         String entityName = "DailyWaterSample-NIN-LTER-1978-1992";
@@ -206,12 +198,29 @@ public class TestMetadataFactory {
         assertTrue(xml.contains(entityName));
         assertFalse(xml.contains("name1"));
     }
+    */
 
     
     private Node getMethodStepNode(Document eml) throws Exception {
-      XPath x = XPathFactory.newInstance().newXPath();
-      String xpath = "//dataset/methods/methodStep";
-      return (Node) x.evaluate(xpath, eml, XPathConstants.NODE);
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      String pathStr = "//methodStep";
+      return (Node) xPath.evaluate(pathStr, eml, XPathConstants.NODE);
+    }
+
+    
+    @Test
+    public void testGenerateEML() throws Exception {
+        String scope = "knb-lter-nin";
+        Integer identifier = new Integer(1);
+        String revision = "1";
+        
+        String xml = factory.generateEML(scope, identifier, revision, token);
+
+        assertNotNull(xml);
+        doc = XmlUtility.xmlStringToDoc(xml);
+        Node node = getMethodStepNode(doc);
+        assertNotNull(node);
+        assertFalse(xml.contains("name1"));
     }
 
 }

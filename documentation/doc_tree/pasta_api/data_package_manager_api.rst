@@ -386,13 +386,13 @@ Provenance
 
 Describes web service methods for tracking and generating provenance metadata.
 
-*Add Provenance Metadata*
+*Get Provenance Metadata*
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 REST API
 """"""""
 
-`PUT : https://pasta.lternet.edu/package/provenance/eml <https://pasta.lternet.edu/package/docs/api#PUT%20:%20/provenance/eml>`_
+`GET : https://pasta.lternet.edu/package/provenance/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/provenance/eml/{scope}/{identifier}/{revision}>`_
 
 .. _event-notifications:
 

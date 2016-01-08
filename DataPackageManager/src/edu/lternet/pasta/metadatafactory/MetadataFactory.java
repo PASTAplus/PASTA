@@ -75,7 +75,7 @@ public final class MetadataFactory {
      *             only one {@code //dataset} element, or if it has more than
      *             one {@code //dataset/methods} element; or if a provided
      *             entity name does not exist in its associated parent EML.
-     */
+     *
     public Document make(Document emlToModify,
                          Map<EmlPackageId, List<String>> provenance,
                          AuthToken token) throws Exception {
@@ -104,8 +104,21 @@ public final class MetadataFactory {
 
         return emlToModify;
     }
+    */
 
 
+    /**
+     * Generates a single methodStep element containing provenance metadata for
+     * a data package.
+     * 
+     * @param scope          the data package scope value, e.g. "knb-lter-and"
+     * @param identifier     the data package identifier value, e.g. 1
+     * @param revision       the data package revision value, e.g. "1"
+     * @param token          the authentication token
+     * @return               an XML string containing the <methodStep> element
+     *                       holding the provenance metadata for this data package
+     * @throws Exception
+     */
 	public String generateEML(String scope, Integer identifier, String revision,
 			                    AuthToken token)
 			throws Exception {

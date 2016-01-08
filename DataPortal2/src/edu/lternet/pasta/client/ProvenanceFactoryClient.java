@@ -83,11 +83,12 @@ public class ProvenanceFactoryClient extends PastaClient {
 	
 	/**
 	 * Returns the EML provenance metadata fragment as an XML string enclosed
-	 * by the <methods> element for the provided package identifier.
+	 * by a <methodStep> element for the provided package identifier.
 	 * 
 	 * @param packageId The packageId of the parent data package whose provenance
 	 *                  metadata is being generated and returned.
-	 * @return an XML string containing the generated provenance metadata
+	 * @return an XML string containing the generated provenance metadata inside
+	 *         a <methodStep> element
 	 * @throws PastaEventException 
 	 */
 	public String getProvenanceByPid(String packageId) throws Exception {
@@ -142,26 +143,31 @@ public class ProvenanceFactoryClient extends PastaClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-    ConfigurationListener.configure();
-    
-    try {
-      ProvenanceFactoryClient pfc = new ProvenanceFactoryClient("ucarroll");
-      String provenanceXml = pfc.getProvenanceByPid("lter-landsat.7.1");
-      logger.info("Provenance XML: \n" + provenanceXml);
-      
-    } catch (PastaAuthenticationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PastaConfigurationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (PastaEventException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (Exception e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-    }
+		ConfigurationListener.configure();
+
+		try {
+			ProvenanceFactoryClient pfc = new ProvenanceFactoryClient(
+					"ucarroll");
+			String provenanceXml = pfc.getProvenanceByPid("lter-landsat.7.1");
+			logger.info("Provenance XML: \n" + provenanceXml);
+
+		}
+		catch (PastaAuthenticationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (PastaConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (PastaEventException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
