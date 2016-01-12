@@ -44,3 +44,15 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/audit/report <https://pasta.lternet.edu/audit/docs/api#GET%20:%20report>`_
+
+*Get Recent Uploads*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+Gets a list of zero or more audit records of either recently inserted or recently updated data packages, as specified in the request.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/audit/recent-uploads <https://pasta.lternet.edu/audit/docs/api#GET%20:%20recent-uploads>`_

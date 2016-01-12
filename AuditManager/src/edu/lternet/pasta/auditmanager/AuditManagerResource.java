@@ -223,8 +223,9 @@ public class AuditManagerResource extends PastaWebService
 
 
     /**
-     * Creates a new logged entry in the Audit Manager's logging database.
-     *
+	 * <strong>Create Audit Record</strong> operation, 
+	 * creates a new logged entry in the Audit Manager's logging database.
+	 * 
      * <h4>Request entity:</h4>
      *
      * <p>
@@ -329,8 +330,8 @@ public class AuditManagerResource extends PastaWebService
 
     
     /**
-     * Gets a single audit record based on the audit identifier value
-     * specified in the path.
+	 * <strong>Get Audit Record</strong> operation, retrieves a single audit record 
+	 * based on the audit identifier value specified in the path.
      *
      * <h4>Responses:</h4>
      *
@@ -422,8 +423,8 @@ public class AuditManagerResource extends PastaWebService
 
 
     /**
-     * Gets a list of zero or more audit records matching the query parameters
-     * as specified in the request.
+     * <strong>Get Audit Report</strong> operation, gets a list of zero or more 
+     * audit records matching the query parameters as specified in the request.
      *
      * <h4>Query Parameters:</h4>
      * <table border="1" cellspacing="0" celpadding="3">
@@ -579,8 +580,9 @@ public class AuditManagerResource extends PastaWebService
     
     
     /**
-     * Gets a list of zero or more audit records matching the query parameters
-     * as specified in the request.
+     * <strong>Get Recent Uploads</strong> operation, gets a list of zero or more audit 
+     * records of either recently inserted or recently updated data packages, as specified
+     * in the request.
      *
      * <h4>Query Parameters:</h4>
      * <table border="1" cellspacing="0" celpadding="3">
@@ -589,47 +591,12 @@ public class AuditManagerResource extends PastaWebService
      *     <td><b>Value Constraints</b></td>
      *   </tr>
      *   <tr>
-     *     <td>category</td>
-     *     <td>debug, info, error, warn</td>
-     *   </tr>
-     *   <tr>
-     *     <td>service</td>
-     *     <td>Any of the PASTA services.</td>
-     *   </tr>
-     *   <tr>
      *     <td>serviceMethod</td>
-     *     <td>Any of the PASTA service Resource class JAX-RS methods.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>user</td>
-     *     <td>Any user.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>group</td>
-     *     <td>Any group.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>authSystem</td>
-     *     <td>A valid auth system identifier.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>status</td>
-     *     <td>A valid HTTP Response Code.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>resourceId</td>
-     *     <td>A Resource Id.</td>
-     *   </tr>
-     *   <tr>
-     *     <td>time</td>
-     *     <td>An ISO8601 timestamp</td>
+     *     <td>Either of &quot;createDataPackage&quot; or &quot;updateDataPackage&quot;
+     *     </td>
      *   </tr>
      *   <tr>
      *     <td>fromTime</td>
-     *     <td>An ISO8601 timestamp</td>
-     *   </tr>
-     *   <tr>
-     *     <td>toTime</td>
      *     <td>An ISO8601 timestamp</td>
      *   </tr>
      *   <tr>
@@ -638,18 +605,17 @@ public class AuditManagerResource extends PastaWebService
      *   </tr>
      * </table>
      * <br/>
-     * The query parameters <code>fromTime</code> and optionally
-     * <code>toTime</code> should be used to indicate a time span. When
-     * <code>toTime</code> is absent, the report will consist of all matching
-     * records up to the current time. Either of these parameters may only be
-     * used once.
+     * The query parameter <code>serviceMethod</code> should have the value
+     * &quot;createDataPackage&quot; (to retrieve recent inserts) or &quot;updateDataPackage&quot;
+     * (to retrieve recent updates)
      * <br/>
-     * The query parameter <code>time</code> may not be used in conjunction
-     * with <code>fromTime</code>. All other parameters may be used multiple
-     * times.
+     * The query parameter <code>fromTime</code> is used to specify the
+     * date/time in the past that represents the oldest audit records that should be
+     * returned. Data packages uploaded prior to that time are not considered
+     * recent uploads and are thus filtered from the query results.
      * <br/>
      * The query parameter <code>limit</code> sets an upper limit on the number
-     * of audit records returned. For example, "limit=1000".
+     * of audit records returned. For example, "limit=3".
      *
      * <h4>Responses:</h4>
      *
