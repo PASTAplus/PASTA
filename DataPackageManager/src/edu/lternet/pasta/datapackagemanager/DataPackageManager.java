@@ -749,22 +749,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix,
 			    mayOverwrite);
 			
-			/*
-			 * Add a DataPackageUpload object to the DataPackageUploadManager to update
-			 * its list of recent inserts and recent updates.
-			 */
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			Date date = new Date();
-			String today = sdf.format(date);
-			DataPackageUpload dpu = null;
-			if (isUpdate) {
-				dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision);
-				DataPackageUploadManager.addRecentUpdate(dpu);
-			}
-			else {
-				dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision);
-				DataPackageUploadManager.addRecentInsert(dpu);
-			}
 		}
 
 		/*
@@ -808,6 +792,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				String dataPackageURI = composeResourceId(ResourceType.dataPackage,
 				    scope, identifier, revision, null);
+				
 				dataPackageRegistry.addDataPackageResource(dataPackageURI,
 				    ResourceType.dataPackage, resourceLocation, packageId, scope,
 				    identifier, revision, null, null, user, formatType, mayOverwrite);
@@ -820,7 +805,28 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				authorizer.storeAccessMatrix(dataPackageURI, datasetAccessMatrix,
 				    mayOverwrite);
-								
+				
+				/*
+				 * Add a DataPackageUpload object to the DataPackageUploadManager to update
+				 * its list of recent inserts and recent updates, but only if this is a
+				 * publicly accessible data package.
+				 */
+				boolean isPublic = dataPackageRegistry.isPublicAccessible(dataPackageURI);
+				if (isPublic) {
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					Date date = new Date();
+					String today = sdf.format(date);
+					DataPackageUpload dpu = null;
+					if (isUpdate) {
+						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision);
+						DataPackageUploadManager.addRecentUpdate(dpu);
+					}
+					else {
+						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision);
+						DataPackageUploadManager.addRecentInsert(dpu);
+					}
+				}
+
 				/*
 				 * Register a DOI for the data package
 				 */

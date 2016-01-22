@@ -1362,24 +1362,28 @@ public class DataPackageRegistry {
 					Integer revision = rs.getInt(3);
 					java.sql.Date dateCreated = rs.getDate(4);
 					String uploadDate = dateCreated.toString();
+					String resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope, identifier, revision, null);
+					boolean isPublic = isPublicAccessible(resourceId);
 					
-					ArrayList<String> revisions = listDataPackageRevisions(scope, identifier);
-					if (revisions != null) {
-						if ((revisions.size() == 1) && (serviceMethod.equals("createDataPackage"))) {
-							DataPackageUpload upload = 
-								new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
-							uploadsList.add(upload);
-						}
-						else if ((revisions.size() > 1) && (serviceMethod.equals("updateDataPackage"))) {
-							String docid = String.format("%s.%d", scope, identifier);
-							if (!docids.contains(docid)) {
-								DataPackageUpload upload = 
-									new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
+					// Include only publicly-accessible data packages
+					if (isPublic) {
+						ArrayList<String> revisions = listDataPackageRevisions(scope, identifier);
+						if (revisions != null) {
+							if ((revisions.size() == 1) && (serviceMethod.equals("createDataPackage"))) {
+								DataPackageUpload upload = new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
 								uploadsList.add(upload);
-								docids.add(docid);
+							}
+							else if ((revisions.size() > 1) && (serviceMethod.equals("updateDataPackage"))) {
+									String docid = String.format("%s.%d", scope, identifier);
+									if (!docids.contains(docid)) {
+										DataPackageUpload upload = new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
+										uploadsList.add(upload);
+										docids.add(docid);
+									}
 							}
 						}
 					}
+					
 					if (uploadsList.size() >= limit) {
 						break;
 					}
