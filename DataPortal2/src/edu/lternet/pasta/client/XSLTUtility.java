@@ -118,13 +118,18 @@ public class XSLTUtility {
 	 * Transforms an EML XML document to an HTML document using the Saxon XSLT
 	 * engine which can process XSLT 2.0.
 	 * 
+	 * @param xml
+	 *            The EML XML document to be transformed
 	 * @param xslPath
 	 *            The path to the quality report XSL stylesheet.
+	 * @param parameters
+	 *            The parameters and their associated values, passed
+	 *            to the XSLT processor in a map object
 	 * 
 	 * @return The HTML document as a String object.
 	 */
-	public static String xmlToHtmlSaxon(String xml, String xslPath,
-			HashMap<String, String> parameters) throws ParseException {
+	public static String xmlToHtmlSaxon(String xml, String xslPath, HashMap<String, String> parameters) 
+			throws ParseException {
 		String html = null;
 		File xsltFile = new File(xslPath);
 		StringReader stringReader = new StringReader(xml);

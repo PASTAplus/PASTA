@@ -550,6 +550,8 @@ public class AuditManagerResource extends PastaWebService
 				responseBuilder = Response.ok(xmlFile, MediaType.APPLICATION_XML);
 				responseBuilder.header("Content-Length", size.toString());
 				response = responseBuilder.build();
+				String logMessage = String.format("getAuditRecords service method finished processing: returning %d bytes", size);
+				logger.warn(logMessage);
 			}
 			else {
 				ResourceNotFoundException e = new ResourceNotFoundException(
