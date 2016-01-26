@@ -25,6 +25,10 @@
       <param-name>idleTimeout</param-name>
       <param-value>300000</param-value>
     </init-param>
+    <init-param>
+      <param-name>timeout</param-name>
+      <param-value>300000</param-value>
+    </init-param>
     <load-on-startup>1</load-on-startup>
 	<async-supported>true</async-supported>
   </servlet>
@@ -41,6 +45,10 @@
     </init-param>
     <init-param>
       <param-name>idleTimeout</param-name>
+      <param-value>300000</param-value>
+    </init-param>
+    <init-param>
+      <param-name>timeout</param-name>
       <param-value>300000</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
