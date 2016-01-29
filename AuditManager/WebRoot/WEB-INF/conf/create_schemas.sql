@@ -13,3 +13,7 @@ create table auditmanager.eventlog (
    groups varchar(512),
    authSystem varchar(128)
 );
+CREATE INDEX entrytime_idx ON auditmanager.eventlog ( entryTime );
+CREATE INDEX servicemethod_idx ON auditmanager.eventlog ( serviceMethod );
+CREATE INDEX resourceid_idx ON auditmanager.eventlog ( resourceId );
+CREATE INDEX userid_idx ON auditmanager.eventlog ( userid );
