@@ -290,8 +290,9 @@ public class AuditManager {
       String fieldName = getFieldName(key);
       
       if (fieldName.equals("resourceid")) {
-        stringBuffer.append(String.format("%s like '%s'", fieldName, value));
-      } else {
+        stringBuffer.append(String.format("%s like '%%%s%%'", fieldName, value));
+      } 
+      else {
         stringBuffer.append(String.format("%s='%s'", fieldName, value));
       }
       

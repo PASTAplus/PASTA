@@ -65,21 +65,26 @@ public class AuditManagerResourceTest {
 	 */
 
 	private static AuditManagerResource auditManagerResource;
+	private static final String testResourceId = "https://pasta-d.lternet.edu/package/data/eml/knb-lter-nwk";
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+	private static final Integer badAuditId = new Integer(-999);
 
 	/*
 	 * Instance fields
 	 */
 
 
+	
 	/*
 	 * Constructors
 	 */
 
+	
 	/*
 	 * Class methods
 	 */
 
+	
 	/**
 	 * Initialize objects before any tests are run.
 	 */
@@ -95,6 +100,9 @@ public class AuditManagerResourceTest {
 	 * Instance methods
 	 */
 
+	Integer auditId = null;
+
+	
 	/**
 	 * Initialize objects before each test is run.
 	 */
@@ -113,25 +121,11 @@ public class AuditManagerResourceTest {
 	}
 	
 	
-	
 	/**
-	 * Tests all service methods in the web service API.
+	 * Test the create service method and the get service method
 	 */
 	@Test
-	public void testServiceMethods() {
-		Integer auditId = testCreate();
-		Integer badAuditId = new Integer(-999);
-		testGetAuditRecord(auditId);
-		testGetAuditRecordBad(badAuditId);
-		testGetAuditRecords();
-	}
-
-
-	/**
-	 * Test the create() service method.
-	 */
-	private Integer testCreate() {
-		Integer auditId = null;
+	public void testCreateAndGet() {
 		try {
 			String auditEntry = readTestAuditEntry();
 			HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
@@ -151,28 +145,18 @@ public class AuditManagerResourceTest {
 				auditId = Integer.parseInt(uriPath.substring(uriPath.lastIndexOf('/') + 1));
 			}
 			catch (NumberFormatException e) {
-				fail("Failed to return valid audit entry ID value: "
-						+ uriPath);
+				fail("Failed to return valid audit entry ID value: " + uriPath);
 			}		
 		}
 		catch (IOException e) {
 			fail(e.getMessage());
 		}
 		
-		return auditId;
-	}
-
-
-	/**
-	 * Test the status and message body of the getAuditRecord() service method.
-	 */
-	private void testGetAuditRecord(Integer auditId) {
 		if (auditId == null) {
 			fail("Null auditId value");
 		}
 		else {
-			DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(
-					testUser);
+			DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 			// Test Evaluate for OK status
 			Response response = auditManagerResource.getAuditRecord(
@@ -195,9 +179,10 @@ public class AuditManagerResourceTest {
 	 * Test the status and message body of the getAuditRecord() service method
 	 * when a non-existent auditId is passed to it.
 	 */
-	private void testGetAuditRecordBad(Integer auditId) {
-		if (auditId == null) {
-			fail("Null auditId value");
+	@Test
+	public void testGetAuditRecordBad() {
+		if (badAuditId == null) {
+			fail("Null badAuditId value");
 		}
 		else {
 			DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(
@@ -205,7 +190,7 @@ public class AuditManagerResourceTest {
 
 			// Test Evaluate for OK status
 			Response response = auditManagerResource.getAuditRecord(
-					httpHeaders, auditId);
+					httpHeaders, badAuditId);
 			int statusCode = response.getStatus();
 			assertEquals(404, statusCode);
 		}
@@ -215,7 +200,39 @@ public class AuditManagerResourceTest {
 	/**
 	 * Test the status and message body of the getAuditRecords() service method.
 	 */
-	private void testGetAuditRecords() {
+	@Test
+	public void testGetAuditRecordsResourceId() {
+		Map<String, String> query = Collections.singletonMap("resourceId", testResourceId);
+		UriInfo uriInfo = new DummyUriInfo(query);
+		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+
+		// Test READ for OK status
+		Response response = auditManagerResource.getAuditRecords(httpHeaders,
+				uriInfo);
+		int statusCode = response.getStatus();
+		assertEquals(200, statusCode);
+
+		// Check the message body
+		File entityFile = (File) response.getEntity();
+		try {
+			String entityString = FileUtils.readFileToString(entityFile);
+			String auditReport = entityString.trim();
+			assertTrue(auditReport.length() > 1);
+			assertTrue(auditReport.startsWith("<auditReport>"));
+			assertTrue(auditReport.contains(String.format("<resourceId>%s", testResourceId)));
+			assertTrue(auditReport.endsWith("</auditReport>"));
+		}
+		catch (IOException e) {
+			fail("Error reading audit XML file");
+		}
+	}
+
+
+	/**
+	 * Test the status and message body of the getAuditRecords() service method.
+	 */
+	@Test
+	public void testGetAuditRecordsUser() {
 		Map<String, String> query = Collections.singletonMap("user", testUser);
 		UriInfo uriInfo = new DummyUriInfo(query);
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
