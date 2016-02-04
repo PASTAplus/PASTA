@@ -693,6 +693,59 @@ public class AuditManager {
 
   
   /**
+   * Returns a count of the number audit log records from the audit table (named "eventlog")
+   * matching the provided criteria.
+   * 
+   * @param queryParams    a map of query parameters and the values they should be matched to
+   * @return               an integer count value indicating the number of matching audit log records
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws IllegalArgumentException
+   */
+	public Integer getAuditRecordsCount(Map<String, List<String>> queryParams)
+			throws ClassNotFoundException, SQLException, IllegalArgumentException {
+		Integer matchCount = null;
+
+		if (queryParams != null) {
+			Connection connection = null;
+
+			String selectString = "SELECT count(*) FROM "
+					+ AUDIT_MANAGER_TABLE_QUALIFIED
+					+ composeWhereClause(queryParams);
+
+			logger.warn(selectString);
+
+			Statement stmt = null;
+
+			try {
+				connection = getConnection();
+				stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery(selectString);
+
+				while (rs.next()) {
+					matchCount = rs.getInt(1);
+				}
+			}
+			catch (ClassNotFoundException e) {
+				logger.error("ClassNotFoundException: " + e.getMessage());
+				throw (e);
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			}
+			finally {
+				if (stmt != null)
+					stmt.close();
+				returnConnection(connection);
+			}
+		}
+
+		return matchCount;
+	}
+ 
+
+  /**
    * Gets a list of audit log records from the audit table (named "eventlog")
    * matching the provided criteria.
    * 

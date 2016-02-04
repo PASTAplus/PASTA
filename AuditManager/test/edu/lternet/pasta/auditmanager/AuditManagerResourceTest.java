@@ -229,6 +229,27 @@ public class AuditManagerResourceTest {
 
 
 	/**
+	 * Test the status and message body of the getAuditRecordsCount() service method.
+	 */
+	@Test
+	public void testGetAuditRecordsResourceIdCount() {
+		Map<String, String> query = Collections.singletonMap("resourceId", testResourceId);
+		UriInfo uriInfo = new DummyUriInfo(query);
+		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+
+		// Test READ for OK status
+		Response response = auditManagerResource.getAuditRecordsCount(httpHeaders,uriInfo);
+		int statusCode = response.getStatus();
+		assertEquals(200, statusCode);
+
+		// Check the message body
+		String entityString = (String) response.getEntity();
+		String auditReport = entityString.trim();
+		assertTrue(auditReport.length() > 0);
+	}
+
+
+	/**
 	 * Test the status and message body of the getAuditRecords() service method.
 	 */
 	@Test
