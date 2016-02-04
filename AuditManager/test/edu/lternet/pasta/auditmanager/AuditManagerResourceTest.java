@@ -207,8 +207,7 @@ public class AuditManagerResourceTest {
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test READ for OK status
-		Response response = auditManagerResource.getAuditRecords(httpHeaders,
-				uriInfo);
+		Response response = auditManagerResource.getAuditReport(httpHeaders, uriInfo);
 		int statusCode = response.getStatus();
 		assertEquals(200, statusCode);
 
@@ -238,7 +237,7 @@ public class AuditManagerResourceTest {
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test READ for OK status
-		Response response = auditManagerResource.getAuditRecordsCount(httpHeaders,uriInfo);
+		Response response = auditManagerResource.getAuditCount(httpHeaders,uriInfo);
 		int statusCode = response.getStatus();
 		assertEquals(200, statusCode);
 
@@ -259,7 +258,7 @@ public class AuditManagerResourceTest {
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test READ for OK status
-		Response response = auditManagerResource.getAuditRecords(httpHeaders,
+		Response response = auditManagerResource.getAuditReport(httpHeaders,
 				uriInfo);
 		int statusCode = response.getStatus();
 		assertEquals(200, statusCode);

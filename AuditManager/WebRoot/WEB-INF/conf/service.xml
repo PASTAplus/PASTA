@@ -53,7 +53,7 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="getAuditRecords">
+    <pasta:service-method name="getAuditReport">
         <access
             system="https://pasta.lternet.edu"
             authSystem="https://pasta.lternet.edu/authentication"
@@ -69,7 +69,7 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="getAuditRecordsCount">
+    <pasta:service-method name="getAuditCount">
         <access
             system="https://pasta.lternet.edu"
             authSystem="https://pasta.lternet.edu/authentication"

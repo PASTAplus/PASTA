@@ -527,12 +527,12 @@ public class AuditManagerResource extends PastaWebService
      * </table>
      *
      * @param headers  the HTTP request headers containing the authorization token.
-     * @param uriInfo  the POST request's body, of XML representing a log entry.
+     * @param uriInfo  a UriInfo object containing the GET's query parameters
      * @return an appropriate HTTP response.
      */
     @GET
     @Path("report")
-    public Response getAuditRecords(@Context HttpHeaders headers,
+    public Response getAuditReport(@Context HttpHeaders headers,
                                     @Context UriInfo uriInfo) {
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
@@ -582,7 +582,7 @@ public class AuditManagerResource extends PastaWebService
     
     
     /**
-     * <strong>Get Audit Report Count</strong> operation, returns a count of the number 
+     * <strong>Get Audit Count</strong> operation, returns a count of the number 
      * audit log records from the audit table (named "eventlog") matching the provided 
      * criteria.
      *
@@ -644,7 +644,7 @@ public class AuditManagerResource extends PastaWebService
      * <br/>
      * The query parameters <code>fromTime</code> and optionally
      * <code>toTime</code> should be used to indicate a time span. When
-     * <code>toTime</code> is absent, the report will consist of all matching
+     * <code>toTime</code> is absent, the count will include of all matching
      * records up to the current time. Either of these parameters may only be
      * used once.
      * <br/>
@@ -687,13 +687,13 @@ public class AuditManagerResource extends PastaWebService
      * </table>
      *
      * @param headers  the HTTP request headers containing the authorization token.
-     * @param uriInfo  the POST request's body, of XML representing a log entry.
+     * @param uriInfo  a UriInfo object containing the GET's query parameters
      * @return an appropriate HTTP response.
      */
     @GET
-    @Path("report/count")
-    public Response getAuditRecordsCount(@Context HttpHeaders headers,
-                                         @Context UriInfo uriInfo) {
+    @Path("count")
+    public Response getAuditCount(@Context HttpHeaders headers,
+                                  @Context UriInfo uriInfo) {
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
 

@@ -34,16 +34,28 @@ REST API
 `GET : https://pasta.lternet.edu/audit/report/{oid} <https://pasta.lternet.edu/audit/docs/api#GET%20:%20report/{oid}>`_
 
 *Get Audit Report*
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 Description
 """""""""""
-Gets a list of zero or more audit records matching the query parameters as specified in the request.
+Gets an audit report, an XML list of zero or more audit records matching the query parameters as specified in the request.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/audit/report <https://pasta.lternet.edu/audit/docs/api#GET%20:%20report>`_
+
+*Get Audit Count*
+^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+Returns a count of the number of audit records matching the query parameters as specified in the request.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/audit/count <https://pasta.lternet.edu/audit/docs/api#GET%20:%20count>`_
 
 *Get Recent Uploads*
 ^^^^^^^^^^^^^^^^^^^^^^^
