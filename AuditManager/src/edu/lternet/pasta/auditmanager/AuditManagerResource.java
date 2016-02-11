@@ -452,8 +452,7 @@ public class AuditManagerResource extends PastaWebService
      *   </tr>
      *   <tr>
      *     <td>resourceId</td>
-     *     <td>A Resource Id.</td>
-     *   </tr>
+     *     <td>A PASTA resource identifier, e.g. https://pasta.lternet.edu/package/eml/knb-lter-and/2719/6, or a substring thereof (see below)</td>
      *   <tr>
      *     <td>fromTime</td>
      *     <td>An ISO8601 timestamp</td>
@@ -476,6 +475,12 @@ public class AuditManagerResource extends PastaWebService
      * <br/>
      * The query parameter <code>limit</code> sets an upper limit on the number
      * of audit records returned. For example, "limit=1000".
+     * <br/>
+     * The query parameter <code>resourceId</code> will match any audit log entry whose resourceId 
+     * value contains the specified string value. Thus, a query parameter of "resourceId=knb-lter-and" 
+     * will match any audit log entry whose resourceId value contains the substring "knb-lter-and",
+     * while a query parameter of "resourceId=knb-lter-and/2719/6" will match any audit log entry
+     * whose resourceId value contains the substring "knb-lter-and/2719/6". 
      *
      * <h4>Responses:</h4>
      *
@@ -604,7 +609,7 @@ public class AuditManagerResource extends PastaWebService
      *   </tr>
      *   <tr>
      *     <td>resourceId</td>
-     *     <td>A Resource Id.</td>
+     *     <td>A PASTA resource identifier, e.g. https://pasta.lternet.edu/package/eml/knb-lter-and/2719/6, or a substring thereof (see below)</td>
      *   </tr>
      *   <tr>
      *     <td>fromTime</td>
@@ -628,6 +633,12 @@ public class AuditManagerResource extends PastaWebService
      * <br/>
      * The query parameter <code>limit</code> sets an upper limit on the number
      * of audit records returned. For example, "limit=1000".
+     * <br/>
+     * The query parameter <code>resourceId</code> will match any audit log entry whose resourceId 
+     * value contains the specified string value. Thus, a query parameter of "resourceId=knb-lter-and" 
+     * will match any audit log entry whose resourceId value contains the substring "knb-lter-and",
+     * while a query parameter of "resourceId=knb-lter-and/2719/6" will match any audit log entry
+     * whose resourceId value contains the substring "knb-lter-and/2719/6". 
      *
      * <h4>Responses:</h4>
      *
