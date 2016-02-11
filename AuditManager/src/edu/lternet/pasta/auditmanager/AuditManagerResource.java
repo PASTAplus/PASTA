@@ -66,34 +66,31 @@ import edu.lternet.pasta.common.security.access.UnauthorizedException;
 /**
  * <p>
  * The Audit Manager web service allows services to <b>create</b>, and users to
- * <b>read</b> subscriptions to PASTA "logs".
+ * <b>read</b> PASTA audit records (also known as "audit logs").
  * </p>
  *
  * <p>
  * Please refer to the pasta-log-entry.xsd for more information as to the
- * content required to submit a log entry.
+ * content required to submit an audit log entry.
  * </p>
+ * 
  * <p>
- * A log entry will always consist of 5 requried attributes.
+ * An audit log entry will always consist of three required attributes:
  * <ul>
- * <li><b>timestamp</b>: roughly indicating the time of the log entry, in ISO
- * 8601 format.</li>
- * <li><b>event-text</b>: a brief explanation of the log entry.</li>
- * <li><b>service</b>: name of the originating service.</li>
- * <li><b>category</b>: the status level of severity.</li>
+ *   <li><b>timestamp</b>: roughly indicating the time of the log entry, in ISO8601 format</li>
+ *   <li><b>service</b>: name of the originating service</li>
+ *   <li><b>category</b>: the status level of severity</li>
  * </ul>
  * </p>
  *
  * <p>
- * Other optional attributes are of the following.
+ * Other optional attributes are of the following:
  * <ul>
- * <li><b>user-token</b>: the token of user pertaining to the log entry.</li>
- * <li><b>http-status-code</b>: the HTTP response status code from the event
- * related to the log entry.</li>
- * <li><b>service-method</b>: the originating service method pertaining to the
- * creation of the log entry</li>
- * <li><b>resource-id</b>: any available resource IDs related to events
- * surrounding this log entry</li>
+ *   <li><b>user-token</b>: the token of user pertaining to the log entry</li>
+ *   <li><b>http-status-code</b>: the HTTP response status code from the event related to the log entry</li>
+ *   <li><b>service-method</b>: the originating service method pertaining to the creation of the log entry</li>
+ *   <li><b>event-text</b>: a brief explanation of the log entry</li>
+ *   <li><b>resource-id</b>: any available resource IDs related to events surrounding this log entry</li>
  * </ul>
  * </p>
  *
@@ -107,11 +104,6 @@ public class AuditManagerResource extends PastaWebService
      * Class variables
      */
   
-  // The following provided query parameter keys are not understood by this web service:
-  // fromtime, responseStatus, totime.
-
-    // Query parameter for time at which entry was created (ISO 8601 format)
-    public static final String AT_TIME = "time";
     // Query parameter for range in time beginning at time (ISO 8601 format)
     public static final String FROM_TIME = "fromTime";
     // Query parameter for range in time ending at time (ISO 8601 format)
@@ -144,7 +136,6 @@ public class AuditManagerResource extends PastaWebService
 
     static {
         Set<String> set = new TreeSet<String>();
-        set.add(AT_TIME);
         set.add(TO_TIME);
         set.add(FROM_TIME);
         set.add(CATEGORY);
@@ -234,20 +225,19 @@ public class AuditManagerResource extends PastaWebService
      * </p>
      *
      * <pre>
-     *    &lt;log-entry timestamp=<em>timestamp</em>&gt;
+     *   &lt;log-entry timestamp=<em>timestamp</em>&gt;
      *       &lt;service&gt;<em>service</em>&lt;/service&gt;
+     *       &lt;category&gt;<em><code>error</code> | <code>warn</code> | <code>info</code> | <code>debug</code>&lt;/category&gt;
      *       &lt;event-text&gt;<em>event text</em>&lt;/event-text&gt;
-     *       &lt;category&gt;<em>error, warn, info, or debug&lt;/category&gt;
      *       &lt;user-token&gt;<em>user-token</em>&lt;/user-token&gt;
      *       &lt;http-status-code&gt;<em>HTTP response status code</em>&lt;/http-status-code&gt;
      *       &lt;service-method&gt;<em>Service Method</em>&lt;/service-method&gt;
      *       &lt;resource-id&gt;<em>Resource ID</em>&lt;/resource-id&gt;
-     *    &lt;/log-entry&gt;
+     *   &lt;/log-entry&gt;
      * </pre>
      *
-     * <p>
-     * The service, event-text, category elements and timestamp attribute are mandatory.
-     * </p>
+     * <p>The <code>service</code> and <code>category</code> elements, as well as the <code>timestamp</code> 
+     * attribute, are mandatory.</p>
      *
      * <h4>Responses:</h4>
      *
@@ -465,10 +455,6 @@ public class AuditManagerResource extends PastaWebService
      *     <td>A Resource Id.</td>
      *   </tr>
      *   <tr>
-     *     <td>time</td>
-     *     <td>An ISO8601 timestamp</td>
-     *   </tr>
-     *   <tr>
      *     <td>fromTime</td>
      *     <td>An ISO8601 timestamp</td>
      *   </tr>
@@ -487,10 +473,6 @@ public class AuditManagerResource extends PastaWebService
      * <code>toTime</code> is absent, the report will consist of all matching
      * records up to the current time. Either of these parameters may only be
      * used once.
-     * <br/>
-     * The query parameter <code>time</code> may not be used in conjunction
-     * with <code>fromTime</code>. All other parameters may be used multiple
-     * times.
      * <br/>
      * The query parameter <code>limit</code> sets an upper limit on the number
      * of audit records returned. For example, "limit=1000".
@@ -625,10 +607,6 @@ public class AuditManagerResource extends PastaWebService
      *     <td>A Resource Id.</td>
      *   </tr>
      *   <tr>
-     *     <td>time</td>
-     *     <td>An ISO8601 timestamp</td>
-     *   </tr>
-     *   <tr>
      *     <td>fromTime</td>
      *     <td>An ISO8601 timestamp</td>
      *   </tr>
@@ -647,10 +625,6 @@ public class AuditManagerResource extends PastaWebService
      * <code>toTime</code> is absent, the count will include of all matching
      * records up to the current time. Either of these parameters may only be
      * used once.
-     * <br/>
-     * The query parameter <code>time</code> may not be used in conjunction
-     * with <code>fromTime</code>. All other parameters may be used multiple
-     * times.
      * <br/>
      * The query parameter <code>limit</code> sets an upper limit on the number
      * of audit records returned. For example, "limit=1000".
