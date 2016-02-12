@@ -5,6 +5,7 @@
 .myeclipse
 .DS_Store
 .idea
+.tern-project
 */*.iml
 /out
 classes
