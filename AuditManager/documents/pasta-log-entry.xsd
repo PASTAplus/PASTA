@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="log-entry">
+  <xs:element name="auditRecord">
     <xs:complexType>
       <xs:sequence minOccurs="0">
-        <xs:element name="service" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="oid" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="entryTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
         <xs:element name="category" type="CategoryType" minOccurs="1" maxOccurs="1"/>
-        <xs:element name="event-text" type="xs:string" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="user-token" type="xs:string" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="http-status-code" type="xs:integer" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="service-method" type="xs:string" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="resource-id" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="service" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="serviceMethod" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="responseStatus" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="resourceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="groups" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="authSystem" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="entryText" type="xs:string" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:simpleType name="CategoryType">
