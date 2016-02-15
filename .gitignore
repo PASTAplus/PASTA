@@ -26,7 +26,7 @@ common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
 /DataPackageManager/test/data/NoneSuchBugCount.xml
 /DataPackageManager/WebRoot/xml/qualityReportTemplate.xml
 /DataPackageManager/WebRoot/WEB-INF/conf/ezidstage.jks
-/DataPortal/test/data/NoneSuchBugCount.xml
+/DataPortal2/test/data/NoneSuchBugCount.xml
 /utilities/bin
 */build.properties
 */src/META-INF/persistence.xml
