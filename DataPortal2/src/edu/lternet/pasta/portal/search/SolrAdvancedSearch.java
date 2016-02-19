@@ -204,7 +204,6 @@ public class SolrAdvancedSearch extends Search  {
 		 throws UnsupportedEncodingException {
 		List<String> terms;
 		String field = "subject";
-		String queryTerms = "";
 
 		if ((this.subjectValue != null) && (!(this.subjectValue.equals("")))) {
 			if (subjectField.equals("ABSTRACT")) {
@@ -219,40 +218,36 @@ public class SolrAdvancedSearch extends Search  {
 
 			terms = parseTerms(this.subjectValue);
 
+			TreeSet<String> derivedTerms = new TreeSet<String>();
+			
 			for (String term : terms) {
-				TreeSet<String> derivedTerms = new TreeSet<String>();
-				TreeSet<String> webTerms = ControlledVocabularyClient
-						.webServiceSearchValues(term, hasExact, hasNarrow,
-								hasRelated, hasNarrowRelated, hasAll);
+				derivedTerms.add(term);
+				
+				TreeSet<String> webTerms = 
+						ControlledVocabularyClient.webServiceSearchValues(
+								term, hasExact, hasNarrow, hasRelated, hasNarrowRelated, hasAll);
 
-				for (String webValue : webTerms) {
-					derivedTerms.add(webValue);
-					queryTerms += " " + webValue;
-				}
-
-				/*
-				 * Sometimes the original search term (e.g. "fishes") doesn't
-				 * need to be included in the set of search values because it is
-				 * covered by a substring term returned by the vocabulary web
-				 * service (e.g. "fish"). However, if the web service failed to
-				 * return any values, then we need to add back the original
-				 * search term.
-				 */
-				if (webTerms.size() < 1) {
-					queryTerms += " " + term;
-					derivedTerms.add(term);
-				}
-
-				for (String derivedTerm : derivedTerms) {
-					termsList.addTerm(derivedTerm);
+				for (String webTerm : webTerms) {
+					derivedTerms.add(webTerm);
 				}
 			}
 
-			queryTerms = queryTerms.trim();
-			String parenthesizedValue = parenthesizeQueryValue(queryTerms);
-			String escapedTerms = Search.escapeQueryChars(parenthesizedValue);
-			String encodedTerms = URLEncoder.encode(escapedTerms, "UTF-8");
-			String subjectQuery = String.format("%s:%s", field, encodedTerms);
+			String subjectQuery = "";
+			boolean firstTerm = true;
+			for (String derivedTerm : derivedTerms) {
+				termsList.addTerm(derivedTerm);
+				if (!firstTerm) {
+					subjectQuery += "%20OR%20";
+				}
+				else {
+					firstTerm = false;
+				}
+				String parenthesizedValue = parenthesizeQueryValue(derivedTerm);
+				String escapedTerms = Search.escapeQueryChars(parenthesizedValue);
+				String encodedTerms = URLEncoder.encode(escapedTerms, "UTF-8");
+				subjectQuery += String.format("%s:%s", field, encodedTerms);
+			}
+
 			updateQString(subjectQuery);
 		}
 	}
