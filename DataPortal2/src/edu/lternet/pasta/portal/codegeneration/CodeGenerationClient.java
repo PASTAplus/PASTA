@@ -35,6 +35,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.client.PastaClient;
+import edu.lternet.pasta.client.PastaConfigurationException;
+
 /**
  * @author dcosta
  * @since June 19, 2014
@@ -44,7 +48,7 @@ import org.apache.log4j.Logger;
  *        http://www.vcrlter.virginia.edu/webservice/PASTAprog
  * 
  */
-public class CodeGenerationClient {
+public class CodeGenerationClient extends PastaClient {
 
 	/*
 	 * The statistical file types supported by the VCR web service
@@ -82,7 +86,9 @@ public class CodeGenerationClient {
 	 * @param statisticalFileType   the statisical file type, an enumerated type
 	 * @param packageId  the package ID string  
 	 */
-	public CodeGenerationClient(StatisticalFileType statisticalFileType, String packageId) {
+	public CodeGenerationClient(StatisticalFileType statisticalFileType, String packageId)
+			throws PastaAuthenticationException, PastaConfigurationException {
+	    super("public");
 		if (statisticalFileType == null) {
 			throw new IllegalArgumentException("null statisticalFileType");
 		}
@@ -124,21 +130,8 @@ public class CodeGenerationClient {
 			break;
 		}
 		
-		this.url = String.format("%s/%s", BASE_URL, urlFilename);
-	}
-
-
-  	/*
-  	 * Closes the HTTP client
-  	 */
-	private void closeHttpClient(CloseableHttpClient httpClient) {
-		try {
-			httpClient.close();
-		}
-		catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
+		String baseUrlSuffix = pastaHost.contains("-s") ? "-S" : "";
+		this.url = String.format("%s%s/%s", BASE_URL, baseUrlSuffix, urlFilename);
 	}
 
 
