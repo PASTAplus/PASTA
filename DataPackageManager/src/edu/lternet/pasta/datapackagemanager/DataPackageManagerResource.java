@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -3378,8 +3379,9 @@ public class DataPackageManagerResource extends PastaWebService {
 			dataToken = filename;  // for archives, use the transaction name
 		}
 		
+		String encodedFilename = URLEncoder.encode(filename, "UTF-8");
 		String locationStr = String.format("%s?dataToken=%s&size=%d&objectName=%s", 
-				this.dataServerContext, dataToken, size, filename);
+				this.dataServerContext, dataToken, size, encodedFilename);
 		URI location = new URI(locationStr);
 		ResponseBuilder responseBuilder = Response.temporaryRedirect(location);
 		logger.warn("Redirecting to: " + locationStr);
