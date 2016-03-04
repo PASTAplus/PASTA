@@ -3827,6 +3827,188 @@ public class DataPackageManagerResource extends PastaWebService {
 
 	/**
 	 * 
+	 * <strong>Read Data Entity Size</strong> operation, specifying the
+	 * scope, identifier, and revision of the data entity object whose size
+	 * is to be read in the URI, returning an integer, the size value in bytes.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/data/size/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data entity size was successful</td>
+	 * <td align=center>The canonical Digital Object Identifier of the data
+	 * entity.</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td><code>7a39bd7694dc0473a6ae7a7d7520ff2e7a39bd76</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal
+	 * identifier or revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data
+	 * entity</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No size value associated with the specified data entity is
+	 * found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *            The scope of the data package
+	 * @param identifier
+	 *            The identifier of the data package
+	 * @param revision
+	 *            The revision of the data package
+	 * @param entityId
+	 *            The entity identifier
+	 * @return a Response object containing a data entity size value if found,
+	 *         else returns a 404 Not Found response
+	 */
+
+	@GET
+	@Path("/data/size/eml/{scope}/{identifier}/{revision}/{entityId}")
+	@Produces("text/plain")
+	public Response readDataEntitySize(@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") String revision,
+			@PathParam("entityId") String entityId) {
+		AuthToken authToken = null;
+		Long entitySize = null;
+		String entryText = null;
+		String resourceId = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "readDataEntitySize";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			resourceId = DataPackageManager.composeResourceId(
+					ResourceType.data, scope, identifier,
+					Integer.valueOf(revision), entityId);
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			entitySize = dataPackageManager.readResourceSize(resourceId,
+					authToken);
+
+			if (entitySize != null) {
+				entryText = entitySize.toString();
+				responseBuilder = Response.ok(entryText);
+				response = responseBuilder.build();
+			}
+			else {
+				Exception e = new Exception(
+						"Read resource checksum operation failed for unknown reason");
+				throw (e);
+			}
+
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (ResourceDeletedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (ResourceExistsException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
+	 * 
 	 * <strong>Read Data Entity DOI</strong> operation, specifying the scope,
 	 * identifier, and revision of the data entity DOI to be read in the URI,
 	 * returning the canonical Digital Object Identifier.

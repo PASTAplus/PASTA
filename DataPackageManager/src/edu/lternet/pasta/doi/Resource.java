@@ -22,6 +22,7 @@ package edu.lternet.pasta.doi;
 
 /**
  * @author servilla
+ * @author Duane Costa
  * @since Nov 9, 2012
  * 
  *        Bundles resource attribute information.
@@ -48,6 +49,7 @@ public class Resource {
 	private Integer revision = null;
 	private String entityId = null;
 	private String sha1Checksum = null;
+	private Long size = null;
 
 	/*
 	 * Constructors
@@ -216,6 +218,15 @@ public class Resource {
 	
 	public void setSha1Checksum(String checksum) {
 		this.sha1Checksum = checksum;
+	}
+		
+	public Long getSize() {
+		return size;
+	}
+
+	
+	public void setSize(Long size) {
+		this.size = size;
 	}
 		
 }

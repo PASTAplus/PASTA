@@ -1327,6 +1327,55 @@ public class DataPackageRegistry {
   }
   
   
+  /**
+   * Gets the resource size value for a given resourceId.
+   * 
+   * @param   resourceId   the resource identifier
+   * @return  the value of the 'resource_size' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+	public Long getResourceSize(String resourceId)
+			throws ClassNotFoundException, SQLException {
+		Long resourceSize = null;
+
+		Connection connection = null;
+		String selectString = 
+				  "SELECT resource_size FROM " + RESOURCE_REGISTRY + 
+				  "  WHERE resource_id='" + resourceId + "'";
+		logger.debug("selectString: " + selectString);
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				resourceSize = rs.getLong(1);
+			}
+
+			if (stmt != null)
+				stmt.close();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+
+		return resourceSize;
+	}
+
+  
 	/**
 	 * Gets a list of recent uploads, either inserts or updates.
 	 * 
@@ -2584,6 +2633,65 @@ public class DataPackageRegistry {
 
 	
 	/**
+	 * Returns an array list of resources that are lacking resource_size values in
+	 * the resource registry.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listSizelessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND resource_size IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setPackageId(packageId);
+				resource.setEntityId(entityId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
 	 * Returns an array list of resources that are accessible for a 
 	 * particular data package. We expect the list to contain zero or one Resource
 	 * objects for a given package id.
@@ -2608,7 +2716,7 @@ public class DataPackageRegistry {
 
 		String queryString = 
 			"SELECT resource_id, resource_type, scope, identifier, revision, " +
-		    " date_created, doi, resource_location, entity_id, sha1_checksum " + 
+		    " date_created, doi, resource_location, entity_id, sha1_checksum, resource_size " + 
 		    "FROM datapackagemanager.resource_registry " +
 		    "WHERE package_id='" + packageId + "'";
 
@@ -2640,6 +2748,7 @@ public class DataPackageRegistry {
 						resource.setResourceLocation(result.getString("resource_location"));
 						resource.setEntityId(result.getString("entity_id"));
 						resource.setSha1Checksum(result.getString("sha1_checksum"));
+						resource.setSize(result.getLong("resource_size"));
 					}
 
 					resourceList.add(resource);
@@ -2830,5 +2939,54 @@ public class DataPackageRegistry {
     }
 
   }
+
+
+	/**
+	 * Update the size of a resource to the resource registry.
+	 * 
+	 * @param resourceId
+	 *            The resource identifier of the resource to be updated
+	 * @param size
+	 *            The size in bytes of the resource
+	 * @throws SQLException
+	 */
+	public void updateResourceSize(String resourceId, long size)
+			throws ClassNotFoundException, SQLException {
+		Connection conn = null;
+
+		try {
+			conn = this.getConnection();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+
+		String queryString = String.format(
+				"UPDATE datapackagemanager.resource_registry " + 
+		        "SET resource_size=%d WHERE resource_id='%s'", 
+		        size, resourceId);
+
+		try {
+			Statement statement = conn.createStatement();
+			int rowCount = statement.executeUpdate(queryString);
+			if (rowCount != 1) {
+				String msg = String.format(
+					"When updating resource_size, expected 1 row updated, instead %d row(s) were updated.",
+					rowCount);
+				throw new SQLException(msg);
+			}
+		}
+		catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			conn.close();
+		}
+
+	}
 
 }

@@ -717,6 +717,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 						revision.toString(), entityId, authToken, user);
 				storeChecksum(entityURI, file);
 
+				// Store the size of the data entity resource
+				storeResourceSize(entityURI, file);
+
 				/*
 				 * Get the <access> XML block for this data entity and store the
 				 * entity's access control rules in the access_matrix table for this
@@ -2327,6 +2330,64 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns the size value (in bytes) for the given resource identifier if
+	 * it exists; otherwise, throw a ResourceNotFoundException.
+	 * 
+	 * @param resourceId
+	 * @param authToken
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public Long readResourceSize(String resourceId, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		Long resourceSize = null;
+		String user = authToken.getUserId();
+
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			/*
+			 * Check whether user is authorized to read the data package report
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
+			    Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User " + user
+				    + " does not have permission to read the size value for this resource: "
+				    + resourceId;
+				throw new UnauthorizedException(gripe);
+			}
+
+			resourceSize = dataPackageRegistry.getResourceSize(resourceId);
+
+			if (resourceSize == null) {
+				String gripe = "A size value does not exist for this resource: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}
+
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return resourceSize;
+
+	}
+
+	
+	/**
 	 * Returns the Digital Object Identifier for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
@@ -2511,6 +2572,31 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    dbDriver, dbURL, dbUser, dbPassword);
 			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
 			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Stores the size in bytes of a PASTA resource in the data package registry.
+	 * 
+	 * @param resourceId       the PASTA resource identifier string
+	 * @param file             the file resource whose resource_size is to be stored
+	 */
+	public void storeResourceSize(String resourceId, File file) {
+		try {
+			if (file != null && file.exists()) {
+				DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+					    dbDriver, dbURL, dbUser, dbPassword);
+				long fileLength = file.length();
+				dataPackageRegistry.updateResourceSize(resourceId, fileLength);
+			}
+			else {
+				throw new Exception("Unable to determine size of resource: " + resourceId);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
