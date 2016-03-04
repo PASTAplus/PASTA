@@ -505,10 +505,16 @@ public class MapBrowseServlet extends DataPortalServlet {
 								entityId = uriTokens[uriTokens.length - 1];
 
 								String entityName = null;
+								Long entitySize = null;
+								String entitySizeStr = "";
 
 								try {
 									entityName = dpmClient.readDataEntityName(
 											scope, id, revision, entityId);
+									entitySize = dpmClient.readDataEntitySize(scope, id, revision, entityId);
+									if (entitySize != null) {
+										entitySizeStr = String.format("&nbsp;&nbsp;<small><em>(%d bytes)</em></small>", entitySize);
+									}
 								}
 								catch (Exception e1) {
 									logger.error(e1.getMessage());
@@ -532,7 +538,10 @@ public class MapBrowseServlet extends DataPortalServlet {
 												+ "&entityid="
 												+ entityId
 												+ "\" target=\"_blank\">"
-												+ entityName + "</a></li>\n";
+												+ entityName 
+												+ "</a>" 
+												+ entitySizeStr
+												+ "</li>\n";
 									}
 									else {
 										data += "<li><a class=\"searchsubcat\" href=\"./dataviewer?packageid="
@@ -540,7 +549,10 @@ public class MapBrowseServlet extends DataPortalServlet {
 												+ "&entityid="
 												+ entityId
 												+ "\" target=\"_blank\">"
-												+ entityName + "</a></li>\n";
+												+ entityName 
+												+ "</a>" 
+												+ entitySizeStr
+												+ "</li>\n";
 									}
 								}
 								else {

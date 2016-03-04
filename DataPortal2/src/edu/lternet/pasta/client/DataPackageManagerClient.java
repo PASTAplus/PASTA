@@ -1042,6 +1042,70 @@ public class DataPackageManagerClient extends PastaClient {
 		return entityString;
 	}
 
+	
+	/**
+	 * Executes the 'readDataEntitySize' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @param entityId
+	 *          the entity identifier string, e.g. "NoneSuchBugCount"
+	 * @return the size of the data entity resource in bytes
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public Long readDataEntitySize(String scope, Integer identifier,
+	    String revision, String entityId) throws Exception {
+
+		// Re-encode "%" to its character reference value of %25 to mitigate
+		// an issue with the HttpGet call that performs the decoding - this is
+		// a kludge to deal with encoding nonsense.
+		entityId = entityId.replace("%", "%25");
+
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision,
+		    entityId);
+		String url = BASE_URL + "/data/size/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		Long entitySize = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			String entityString = EntityUtils.toString(httpEntity);
+			if (entityString != null) {				
+				try {
+					entitySize = new Long(entityString);
+				}
+				catch (NumberFormatException e) {
+					logger.error("Unable to determine entity size of entity: " + entityId);
+				}
+			}
+			ContentType contentType = ContentType.getOrDefault(httpEntity);
+			this.contentType = contentType.toString();
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} 
+		finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entitySize;
+	}
+
+	
 	/**
 	 * Executes the 'readDataPackage' web service method.
 	 * 
