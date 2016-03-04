@@ -512,6 +512,20 @@ REST API
 
 .. _read-data-package:
 
+*Read Data Entity Size*
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Size operation, specifying the scope, identifier, and revision of the data entity 
+object whose size is to be read in the URI, returning the size value (in bytes).
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/size/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/size/eml/{scope}/{identifier}/{revision}/{entityId}>`_
+
 *Read Data Package*
 ^^^^^^^^^^^^^^^^^^^
 
