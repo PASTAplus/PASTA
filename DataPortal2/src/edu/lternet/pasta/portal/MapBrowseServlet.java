@@ -53,6 +53,12 @@ import edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet;
 import edu.lternet.pasta.portal.user.SavedData;
 
 
+/**
+ * Class to compose HTML for display in the Data Package Summary page.
+ * 
+ * @author dcosta
+ *
+ */
 public class MapBrowseServlet extends DataPortalServlet {
 
 	/**
@@ -467,7 +473,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String packageIdListItem = null;
 				String metadata = null;
 				String report = null;
-				String data = null;
+				String data = "";
 				String doiId = null;
 
 				while (tokens.hasNext()) {
@@ -532,28 +538,15 @@ public class MapBrowseServlet extends DataPortalServlet {
 								}
 
 								if (isAuthorized) {
-									if (data == null) {
-										data = "<li><a class=\"searchsubcat\" href=\"./dataviewer?packageid="
-												+ packageId
-												+ "&entityid="
-												+ entityId
-												+ "\" target=\"_blank\">"
-												+ entityName 
-												+ "</a>" 
-												+ entitySizeStr
-												+ "</li>\n";
-									}
-									else {
-										data += "<li><a class=\"searchsubcat\" href=\"./dataviewer?packageid="
-												+ packageId
-												+ "&entityid="
-												+ entityId
-												+ "\" target=\"_blank\">"
-												+ entityName 
-												+ "</a>" 
-												+ entitySizeStr
-												+ "</li>\n";
-									}
+									data += "<li><a class=\"searchsubcat\" href=\"./dataviewer?packageid="
+											+ packageId
+											+ "&entityid="
+											+ entityId
+											+ "\" target=\"_blank\">"
+											+ entityName 
+											+ "</a>" 
+											+ entitySizeStr
+											+ "</li>\n";
 								}
 								else {
 									String hover = null;
@@ -563,23 +556,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 									else {
 										hover = "If this data entity is not linked, you may not have permission to access it.";
 									}
-									if (data == null) {
-										data = "<li>" + entityName
-												+ " [<span name=\"" + hover
-												+ "\" class=\"tooltip\">"
-												+ "<em>more info</em>"
-												+ "</span>]</li>\n";
-									}
-									else {
-										data += "<li>" + entityName
-												+ " [<span name=\"" + hover
-												+ "\" class=\"tooltip\">"
-												+ "<em>more info</em>"
-												+ "</span>]</li>\n";
-									}
-
+									data += "<li>" + entityName
+											+ " [<span name=\"" + hover
+											+ "\" class=\"tooltip\">"
+											+ "<em>more info</em>"
+											+ "</span>]</li>\n";
 								}
-
 							}
 							else {
 
