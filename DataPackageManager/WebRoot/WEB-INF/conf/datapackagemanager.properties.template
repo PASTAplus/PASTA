@@ -93,6 +93,7 @@ datapackagemanager.test.revision=1
 datapackagemanager.test.revision.newest=3
 datapackagemanager.test.entity.id=a9201a0755fc45ae514abb12469c03a0
 datapackagemanager.test.entity.name=NoneSuchBugCount
+datapackagemanager.test.entity.size=882
 datapackagemanager.test.entity2.id=8d2b8f34c7316b6035b48de2b9ecc1aa
 datapackagemanager.test.entity2.name=AnySuchBugCount
 datapackagemanager.test.maxidletime=30000

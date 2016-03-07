@@ -92,6 +92,7 @@ public class DataPackageManagerResourceTest {
   private static String testEntityName = null;
   private static String testEntityId2 = null;   // a second test entity
   private static String testEntityName2 = null; // a second test entity
+  private static String testEntitySize = null;
 	private static String testMaxIdleTimeStr = null;
 	private static Integer testMaxIdleTime = null;
 	private static String testIdleSleepTimeStr = null;
@@ -193,6 +194,10 @@ public class DataPackageManagerResourceTest {
       if (testEntityName2 == null) {
         fail("No value found for DataPackageManager property 'datapackagemanager.test.entity2.name'");
       }
+      testEntitySize = options.getOption("datapackagemanager.test.entity.size");
+      if (testEntitySize == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.test.entity.size'");
+      }
       testPath = options.getOption("datapackagemanager.test.path");
       if (testPath == null) {
         fail("No value found for DataPackageManager property 'datapackagemanager.test.path'");
@@ -290,6 +295,7 @@ public class DataPackageManagerResourceTest {
 	  testReadMetadataFormat();
 	  testReadDataEntity();
 	  testReadDataEntityName();
+	  testReadDataEntitySize();
 	  testReadDataEntityAcl();
 	  testReadDataPackageReport();
 	  testReadDataPackageReportAcl();
@@ -596,7 +602,7 @@ public class DataPackageManagerResourceTest {
     long fileSize = FileUtils.sizeOf(dataEntity);
     assertTrue(fileSize > 880L);
 
-    // Test for NOT FOUND status with a bogus package id
+    // Test for 404 NOT FOUND status with a bogus package id
     response = dataPackageManagerResource.readDataEntity(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
     assertEquals(404, response.getStatus());
   }
@@ -620,8 +626,32 @@ public class DataPackageManagerResourceTest {
       assertTrue(entityString.trim().equals(testEntityName));
     }
 
-    // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readDataEntity(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    // Test for 404 NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntityName(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Entity Name operation
+   */
+  private void testReadDataEntitySize() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataEntitySize(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().equals(testEntitySize));
+    }
+
+    // Test for 404 NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntitySize(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
     assertEquals(404, response.getStatus());
   }
     
