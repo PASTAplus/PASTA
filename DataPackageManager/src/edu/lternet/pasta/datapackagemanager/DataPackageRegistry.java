@@ -2170,9 +2170,10 @@ public class DataPackageRegistry {
 
 	
 	/**
+	 * Lists all revisions of the specified data package identifier.
 	 * 
-	 * @param scope
-	 * @param identifier
+	 * @param scope          the scope value, e.g. "knb-lter-and"
+	 * @param identifier     the identifier integer value
 	 */
 	public ArrayList<String> listDataPackageRevisions(String scope, Integer identifier)
           throws ClassNotFoundException, SQLException, IllegalArgumentException {
@@ -2185,7 +2186,6 @@ public class DataPackageRegistry {
         "  WHERE resource_type='dataPackage'" +
         "  AND scope='" + scope + 
         "' AND identifier='" + identifier + "'" +
-        "  AND date_deactivated IS NULL" +
         "  ORDER BY revision";
       Statement stmt = null;
     

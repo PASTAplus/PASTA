@@ -286,6 +286,9 @@ public class DataPackageManagerResourceTest {
 	  testCreateDataPackage();
 	  testListDataPackageScopes();
 	  testListDataPackageIdentifiers();
+	  testUpdateDataPackage();
+	  testStorageManager();
+	  testDeleteDataPackage();
 	  testListDataPackageRevisions();
 	  testListDataEntities();
 	  testReadDataPackage();
@@ -299,9 +302,6 @@ public class DataPackageManagerResourceTest {
 	  testReadDataEntityAcl();
 	  testReadDataPackageReport();
 	  testReadDataPackageReportAcl();
-	  testUpdateDataPackage();
-	  testStorageManager();
-	  testDeleteDataPackage();
   }
   
   
@@ -515,6 +515,7 @@ public class DataPackageManagerResourceTest {
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
       assertTrue(entityString.contains(testRevision.toString()));
+      assertTrue(entityString.contains(testUpdateRevision.toString()));
     }
   }
     

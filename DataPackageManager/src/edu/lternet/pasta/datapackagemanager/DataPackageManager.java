@@ -1776,14 +1776,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * If we have the data package but it was previously deleted (i.e.
 			 * de-activated)
-			 */
+			 * 
+			 * Note: This logic is no longer valid as of Ticket #912:
+			 *       https://trac.lternet.edu/trac/NIS/ticket/912
+			 *
 			boolean isDeactivatedDataPackage = dataPackageRegistry
 			    .isDeactivatedDataPackage(scope, identifier);
 			if (isDeactivatedDataPackage) {
 				String message = "Attempting to read a data entity that was previously deleted from PASTA: "
 				    + resourceId;
 				throw new ResourceDeletedException(message);
-			}
+			}*/
 
 			/*
 			 * Now that we know that the data package is in the registry, check
@@ -1881,7 +1884,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * If we have the data package but it was previously deleted (i.e.
 			 * de-activated)
-			 */
+			 * 
+			 * Note: This logic is no longer valid as of Ticket #912:
+			 *       https://trac.lternet.edu/trac/NIS/ticket/912
+			 *
+			 *
 			boolean isDeactivatedDataPackage = dataPackageRegistry
 			    .isDeactivatedDataPackage(scope, identifier);
 			if (isDeactivatedDataPackage) {
@@ -1889,6 +1896,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + dataPackageId;
 				throw new ResourceDeletedException(message);
 			}
+			*/
 
 			/*
 			 * Check whether user is authorized to read the data package
@@ -1998,7 +2006,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * If we have the data package but it was previously deleted (i.e.
 				 * de-activated)
-				 */
+				 * 
+				 * Note: This logic is no longer valid as of Ticket #912:
+				 *       https://trac.lternet.edu/trac/NIS/ticket/912
+				 *
+				 *
 				boolean isDeactivatedDataPackage = dataPackageRegistry
 				    .isDeactivatedDataPackage(scope, identifier);
 				if (isDeactivatedDataPackage) {
@@ -2006,6 +2018,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					    + "previously deleted from PASTA: " + reportId;
 					throw new ResourceDeletedException(message);
 				}
+				*/
 
 				/*
 				 * Check whether user is authorized to read the data package report
@@ -2085,7 +2098,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * If we have the data package but it was previously deleted (i.e.
 				 * de-activated)
-				 */
+				 * 
+				 * Note: This logic is no longer valid as of Ticket #912:
+				 *       https://trac.lternet.edu/trac/NIS/ticket/912
+				 *
 				boolean isDeactivatedDataPackage = dataPackageRegistry
 				    .isDeactivatedDataPackage(scope, identifier);
 				if (isDeactivatedDataPackage) {
@@ -2093,6 +2109,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					    + "previously deleted from PASTA: " + metadataId;
 					throw new ResourceDeletedException(message);
 				}
+				*/
 
 				/*
 				 * Check whether user is authorized to read the data package metadata
@@ -2171,7 +2188,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * If we have the data package but it was previously deleted (i.e.
 				 * de-activated)
-				 */
+				 * 
+				 * Note: This logic is no longer valid as of Ticket #912:
+				 *       https://trac.lternet.edu/trac/NIS/ticket/912
+				 *
+				 *
 				boolean isDeactivatedDataPackage = dataPackageRegistry
 				    .isDeactivatedDataPackage(scope, identifier);
 				if (isDeactivatedDataPackage) {
@@ -2179,6 +2200,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					    + "previously deleted from PASTA: " + metadataId;
 					throw new ResourceDeletedException(message);
 				}
+				*/
 
 				/*
 				 * Check whether user is authorized to read the data package metadata
