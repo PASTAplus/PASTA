@@ -295,8 +295,13 @@ public class DOIScanner {
 	 * has been obsoleted. Resources that meet these criteria are made
 	 * "unavailable" through EZID.
 	 * 
+	 * Note: This method, and calls to this method, have been commented-out 
+	 *       because this logic is no longer considered valid as of Ticket #912:
+	 *       
+	 *       https://trac.lternet.edu/trac/NIS/ticket/912
+	 * 
 	 * @throws DOIException
-	 */
+	 *
 	public void doScanToObsolete() throws DOIException {
 
 		ArrayList<String> doiList = null;
@@ -336,6 +341,7 @@ public class DOIScanner {
 		}
 
 	}
+	*/
 	
 	/**
 	 * Explicitly set whether DOI testing is enabled.

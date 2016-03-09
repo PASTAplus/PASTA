@@ -54,7 +54,15 @@ public class DOIServlet extends HttpServlet {
 		try {
 			DOIScanner doiScanner = new DOIScanner();
 			doiScanner.doScanToRegister();
+			
+			/*
+			 * 
+			 * Note: This logic is no longer valid as of Ticket #912:
+			 *       https://trac.lternet.edu/trac/NIS/ticket/912
+			 *
 			doiScanner.doScanToObsolete();
+			 */
+			
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();

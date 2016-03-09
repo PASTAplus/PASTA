@@ -327,13 +327,18 @@ public class DOIScannerTest {
 		statusCode = response.getStatus();
 		assertEquals(200, statusCode);
 
-		// Test DOI obsolescence through scanning the resource registry for inactive
-		// data packages with DOIs and then removing that DOI
+		/* Test DOI obsolescence through scanning the resource registry for inactive
+		 * data packages with DOIs and then removing that DOI
+		 * 
+		 * Note: This logic is no longer valid as of Ticket #912:
+		 *       https://trac.lternet.edu/trac/NIS/ticket/912
+		 * 
 		try {
 			doiScanner.doScanToObsolete();
 		} catch (DOIException e) {
 			fail(e.getMessage());
 		}
+		*/
 
 		// Test that the test data package DOI is no longer available
 		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,
