@@ -338,7 +338,7 @@ public class DOIScannerTest {
 		} catch (DOIException e) {
 			fail(e.getMessage());
 		}
-		*/
+		
 
 		// Test that the test data package DOI is no longer available
 		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,
@@ -351,6 +351,7 @@ public class DOIScannerTest {
 		doi = null;
 		doi = getDoiValue(testPackageId);
 		assertNull("Expected DOI object to be null!", doi);
+		*/
 
 	}
 
