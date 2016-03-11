@@ -333,51 +333,28 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The revision of the metadata document
 	 * @param entityId
 	 *          The entityId of the entity
-	 * @return The data entity media type, e.g. "text/plain"
+	 * @return The data entity media type, e.g. "text/csv"
 	 */
 	public MediaType getDataEntityFormat(String scope, Integer identifier,
 	    String revision, String entityId) throws Exception {
-		MediaType dataFormat = null;
-		String entityFormat = null;
-		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-		EMLDataManager emlDataManager = new EMLDataManager();
+		MediaType mediaType = null;
 
-		/*
-		 * Handle symbolic revisions such as "newest" and "oldest".
-		 */
-		if (revision != null) {
-			if (revision.equals("newest")) {
-				Integer newest = emlDataManager.getNewestRevision(scope,
-				    identifier.toString());
-				if (newest != null) {
-					revision = newest.toString();
-				}
-			} else if (revision.equals("oldest")) {
-				Integer oldest = emlDataManager.getOldestRevision(scope,
-				    identifier.toString());
-				if (oldest != null) {
-					revision = oldest.toString();
-				}
-			}
-		}
-
-		/*
-		 * Determine the data format for this entity
-		 */
 		Integer revisionInt = new Integer(revision);
-		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revisionInt);
-		String packageId = emlPackageIdFormat.format(emlPackageId);
-		entityFormat = emlDataManager.getDataFormat(packageId, entityId);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		String resourceId = composeResourceId(ResourceType.data, scope, identifier, revisionInt, entityId);
+		String dataFormat = dataPackageRegistry.getDataFormat(resourceId);
+		
 
 		try {
-			dataFormat = MediaType.valueOf(entityFormat);
-		} catch (IllegalArgumentException e) {
+			mediaType = MediaType.valueOf(dataFormat);
+		} 
+		catch (IllegalArgumentException e) {
 			// Set to OCTET_STREAM if non-standard media type.
-			dataFormat = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+			mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
 		}
 
-		return dataFormat;
-
+		return mediaType;
 	}
 
 	
@@ -719,6 +696,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 				// Store the size of the data entity resource
 				storeResourceSize(entityURI, file);
+
+				// Store the data format of the data entity resource, as derived by the EML parser
+				String dataFormat = emlEntity.getDataFormat();
+				if (dataFormat != null) storeDataFormat(entityURI, dataFormat);
 
 				/*
 				 * Get the <access> XML block for this data entity and store the
@@ -2594,6 +2575,25 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    dbDriver, dbURL, dbUser, dbPassword);
 			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
 			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Stores the data format of a PASTA data entity resource in the data package registry.
+	 * 
+	 * @param resourceId   The PASTA resource identifier string
+	 * @param dataFormat   The data format value to be stored, e.g. "text/csv"
+	 */
+	public void storeDataFormat(String resourceId, String dataFormat) {
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
+			dataPackageRegistry.updateDataFormat(resourceId, dataFormat);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

@@ -258,54 +258,6 @@ public class EMLDataCache {
   }
   
   	
-	/**
-	 * Deletes all data entity entries from the Data Cache Registry for the
-	 * specified package id.
-	 * 
-   * @param emlPackageId   The packageId whose entities are to be deleted.
-   * @return success, true if deleted successfully, else false
-	 */
-	public boolean deleteDataEntities(EmlPackageId emlPackageId) 
-	        throws ClassNotFoundException, SQLException {
-    Connection connection = null;
-    boolean success = false;
-    String deleteString;
-    int rowCount = -1;
-    Statement stmt = null;
-    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-    
-    if (emlPackageIdFormat != null) {
-      String packageId = emlPackageIdFormat.format(emlPackageId);
-    
-      deleteString = "DELETE FROM " + DATA_CACHE_REGISTRY + 
-                     "  WHERE package_id='" + packageId + "'";
-      
-      try {
-        connection = getConnection();
-        stmt = connection.createStatement();
-        rowCount = stmt.executeUpdate(deleteString);
-        success = (rowCount > 0);
-        logger.debug("deleteString: " + deleteString);
-        logger.debug("Number of rows deleted: " + rowCount);
-        if (stmt != null) stmt.close();
-      }
-      catch(ClassNotFoundException e) {
-        e.printStackTrace();
-        throw(e);
-      }
-      catch(SQLException e) {
-        e.printStackTrace();
-        throw(e);
-      }
-      finally {
-        returnConnection(connection);
-      }
-    }
-    
-      return success;
-  }
-  
-  
   /**
    * Deletes all data entity entries from the Data Cache Registry for the
    * specified scope and identifier
