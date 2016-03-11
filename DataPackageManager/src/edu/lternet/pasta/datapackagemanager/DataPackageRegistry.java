@@ -2840,6 +2840,61 @@ public class DataPackageRegistry {
 
   
   /**
+   * Update the data_format field of a resource in the resource registry.
+   * 
+   * @param resourceId
+   *          The resource identifier of the resource to be updated
+   *          
+   * @param data_format
+   *          The value to be stored in the data_format field, e.g. "text/csv"
+   *          
+   * @throws ClassNotFoundException, IllegalArgumentException, SQLException
+   */
+	public void updateDataFormat(String resourceId, String dataFormat)
+			throws ClassNotFoundException, SQLException {
+		Connection conn = null;
+
+		if (dataFormat == null) {
+			throw new IllegalArgumentException("Data format is null");
+		}
+
+		try {
+			conn = this.getConnection();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+
+		String queryString = String.format(
+			"UPDATE datapackagemanager.resource_registry SET data_format='%s' WHERE resource_id='%s'",
+			dataFormat, resourceId);
+
+		try {
+			Statement statement = conn.createStatement();
+			int rowCount = statement.executeUpdate(queryString);
+			if (rowCount != 1) {
+				String msg = String.format(
+						"When updating data_format, expected 1 row updated, instead %d rows were updated.",
+						rowCount);
+				throw new SQLException(msg);
+			}
+		}
+		catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			if (conn != null)
+				conn.close();
+		}
+
+  }
+
+	
+  /**
    * Update the format_type field of a resource in the resource registry.
    * 
    * @param resourceId

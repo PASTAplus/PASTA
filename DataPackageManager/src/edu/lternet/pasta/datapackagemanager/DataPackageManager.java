@@ -720,6 +720,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				// Store the size of the data entity resource
 				storeResourceSize(entityURI, file);
 
+				// Store the data format of the data entity resource, as derived by the EML parser
+				String dataFormat = emlEntity.getDataFormat();
+				if (dataFormat != null) storeDataFormat(entityURI, dataFormat);
+
 				/*
 				 * Get the <access> XML block for this data entity and store the
 				 * entity's access control rules in the access_matrix table for this
@@ -2594,6 +2598,25 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    dbDriver, dbURL, dbUser, dbPassword);
 			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
 			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Stores the data format of a PASTA data entity resource in the data package registry.
+	 * 
+	 * @param resourceId   The PASTA resource identifier string
+	 * @param dataFormat   The data format value to be stored, e.g. "text/csv"
+	 */
+	public void storeDataFormat(String resourceId, String dataFormat) {
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
+			dataPackageRegistry.updateDataFormat(resourceId, dataFormat);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
