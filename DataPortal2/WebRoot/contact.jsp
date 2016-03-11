@@ -61,14 +61,14 @@
 								<h3 align="left">People</h3>
 								<ul>
 									<li>
-									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=10391">
-									James Brunt</a>, LTER Chief Information Officer</li>
-									<li>
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13823">
 									Mark Servilla</a>, <abbr title="Network Information System">NIS</abbr> Lead Scientist</li>
 									<li>
 									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=13757">
 									Duane Costa</a>, <abbr title="Network Information System">NIS</abbr> Analyst/Programmer III</li>
+									<li>
+									<a class="searchsubcat" href="http://search.lternet.edu/directory_view.php?personid=10391">
+									James Brunt</a>, Information Management Specialist</li>
 								</ul>
 								<h3 align="left">Physical Address</h3>
 								<ul class="no-list-style">
@@ -78,10 +78,7 @@
 									Albuquerque, New Mexico, USA<br />
 									Phone: 505 277-2597<br />
 									Fax: 505 277-2541<br />
-									Email:
-									<a class="searchsubcat" href="mailto:tech-support@lternet.edu">tech-support@lternet.edu</a><br />
-									URL: <a class="searchsubcat" href="https://lno.lternet.edu">https://lno.lternet.edu</a>
-									</li>
+                </li>
 								</ul>
 								<h3 align="left">Mailing Address</h3>
 								<ul class="no-list-style">
