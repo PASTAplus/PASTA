@@ -86,6 +86,7 @@ public class DataPackageRegistry {
   private final String PROVENANCE = "datapackagemanager.PROVENANCE";
   private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
   private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
+  private final String DATA_CACHE_REGISTRY = "datapackagemanager.DATA_CACHE_REGISTRY";
  
   private String dbDriver;           // database driver
   private String dbURL;              // database URL
@@ -1106,6 +1107,108 @@ public class DataPackageRegistry {
     }
     
     return entityName;
+    
+  }
+
+
+  /**
+   * Gets the data_format value for a given data entity resource identifier
+   * from the DATA_CACHE_REGISTRY table
+   * 
+   * @param resourceId   the resource identifier
+   * @return  the value of the database table's 'data_format' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getDataCacheDataFormat(String entityId) 
+          throws ClassNotFoundException, SQLException {
+    
+    String dataFormat = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT DISTINCT data_format FROM " + DATA_CACHE_REGISTRY +
+            "  WHERE entity_id='" + entityId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        dataFormat = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return dataFormat;
+    
+  }
+
+
+  /**
+   * Gets the data_format value for a given data entity resource identifier
+   * from the RESOURCE_REGISTRY table
+   * 
+   * @param resourceId   the resource identifier
+   * @return  the value of the database table's 'data_format' field matching
+   *          the specified resourceId ('resource_id') value
+   */
+  public String getDataFormat(String resourceId) 
+          throws ClassNotFoundException, SQLException {
+    
+    String dataFormat = null;
+    
+    Connection connection = null;
+    String selectString = 
+            "SELECT data_format FROM " + RESOURCE_REGISTRY +
+            "  WHERE resource_id='" + resourceId + "'";
+    logger.debug("selectString: " + selectString);
+
+    Statement stmt = null;
+
+    try {
+      connection = getConnection();
+      stmt = connection.createStatement();
+      ResultSet rs = stmt.executeQuery(selectString);
+
+      while (rs.next()) {
+        dataFormat = rs.getString(1);
+      }
+
+      if (stmt != null) stmt.close();
+    }
+    catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      e.printStackTrace();
+      throw (e);
+    }
+    finally {
+      returnConnection(connection);
+    }
+    
+    return dataFormat;
     
   }
 
@@ -2468,6 +2571,65 @@ public class DataPackageRegistry {
 		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
 		    + " FROM datapackagemanager.resource_registry WHERE"
 		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL AND sha1_checksum IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setPackageId(packageId);
+				resource.setEntityId(entityId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			conn.close();
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
+	 * Returns an array list of resources that are lacking data_format
+	 * values in the resource registry.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listDataFormatlessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type = 'data' AND data_format IS NULL;";
 
 		Statement stat = null;
 		try {

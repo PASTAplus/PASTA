@@ -333,51 +333,28 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The revision of the metadata document
 	 * @param entityId
 	 *          The entityId of the entity
-	 * @return The data entity media type, e.g. "text/plain"
+	 * @return The data entity media type, e.g. "text/csv"
 	 */
 	public MediaType getDataEntityFormat(String scope, Integer identifier,
 	    String revision, String entityId) throws Exception {
-		MediaType dataFormat = null;
-		String entityFormat = null;
-		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
-		EMLDataManager emlDataManager = new EMLDataManager();
+		MediaType mediaType = null;
 
-		/*
-		 * Handle symbolic revisions such as "newest" and "oldest".
-		 */
-		if (revision != null) {
-			if (revision.equals("newest")) {
-				Integer newest = emlDataManager.getNewestRevision(scope,
-				    identifier.toString());
-				if (newest != null) {
-					revision = newest.toString();
-				}
-			} else if (revision.equals("oldest")) {
-				Integer oldest = emlDataManager.getOldestRevision(scope,
-				    identifier.toString());
-				if (oldest != null) {
-					revision = oldest.toString();
-				}
-			}
-		}
-
-		/*
-		 * Determine the data format for this entity
-		 */
 		Integer revisionInt = new Integer(revision);
-		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revisionInt);
-		String packageId = emlPackageIdFormat.format(emlPackageId);
-		entityFormat = emlDataManager.getDataFormat(packageId, entityId);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		String resourceId = composeResourceId(ResourceType.data, scope, identifier, revisionInt, entityId);
+		String dataFormat = dataPackageRegistry.getDataFormat(resourceId);
+		
 
 		try {
-			dataFormat = MediaType.valueOf(entityFormat);
-		} catch (IllegalArgumentException e) {
+			mediaType = MediaType.valueOf(dataFormat);
+		} 
+		catch (IllegalArgumentException e) {
 			// Set to OCTET_STREAM if non-standard media type.
-			dataFormat = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+			mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
 		}
 
-		return dataFormat;
-
+		return mediaType;
 	}
 
 	
