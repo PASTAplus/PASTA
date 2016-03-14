@@ -602,9 +602,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			}
 		} catch (ResourceExistsException e) {
 			throw (e); // Don't do a roll-back when this exception occurs
-		} catch (Exception e) {
-			rollbackDataEntities(scope, identifier, revision);
-			throw (e);
 		}
 
 		isDataPackageValid = isDataPackageValid && isDataValid;
@@ -626,7 +623,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * performed by deleting the data package (for this specific revision
 			 * only) from the Data Manager.
 			 */
-			try {
 				if (isUpdate) {
 					solrResult = solrCatalog.updateEmlDocument(emlPackageId,
 							emlDocument);
@@ -635,10 +631,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					solrResult = solrCatalog.createEmlDocument(emlPackageId,
 							emlDocument);
 				}
-			} catch (Exception e) {
-				rollbackDataEntities(scope, identifier, revision);
-				throw (e);
-			}
 
 			/*
 			 * Check whether there was a problem inserting or updating to the 
@@ -660,18 +652,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			} 
 			catch (Exception e) {
 				provenanceIndex.rollbackProvenanceRecords(packageId);
-				rollbackDataEntities(scope, identifier, revision);
 				throw (e);
 			}
-		}
-
-		/*
-		 * If the data package is not valid, and this is not evaluate mode,
-		 * roll-back any data entity inserts that were performed by deleting the
-		 * data package (for this specific revision only) from the Data Manager.
-		 */
-		if (!isDataPackageValid && !isEvaluate) {
-			rollbackDataEntities(scope, identifier, revision);
 		}
 
 		/*
@@ -964,21 +946,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				solrCatalog.deleteEmlDocument(emlPackageId);
 
 				/*
-				 * If the metadata was successfully deleted, then delete the data
-				 * entities from the Data Manager
+				 * Delete the data package from the resource registry
 				 */
-				if (deleted || true) {
-					DataManagerClient dataManagerClient = new DataManagerClient();
-					deleted = dataManagerClient.deleteDataEntities(scope, identifier);
-
-					/*
-					 * If the metadata and the data entities were successfully deleted,
-					 * then delete the data package from the Data Package Registry
-					 */
-					if (deleted || true) {
-						deleted = dataPackageRegistry.deleteDataPackage(scope, identifier);
-					}
-				}
+				
+				deleted = dataPackageRegistry.deleteDataPackage(scope, identifier);
 			}
 		} catch (ClassNotFoundException e) {
 			logger.error("Error connecting to Data Package Registry: "
@@ -2507,36 +2478,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		return formatType;
-	}
-
-	
-	/**
-	 * Rollback the creation of data entities in the data manager for the
-	 * specified scope and identifier
-	 * 
-	 * @param scope
-	 *          the scope value, e.g. "knb-lter-lno"
-	 * @param identifier
-	 *          the identifier value, e.g. 1
-	 * @param revision
-	 *          the revision value, e.g. 2
-	 */
-	public void rollbackDataEntities(String scope, Integer identifier,
-	    Integer revision) {
-		try {
-			DataManagerClient dataManagerClient = new DataManagerClient();
-			dataManagerClient.deleteDataEntities(scope, identifier, revision);
-		}
-		/*
-		 * If an exception occurs, simply issue a warning. We don't want to throw an
-		 * exception during the rollback operation because this is a secondary
-		 * exception that occurs during the processing of the primary exception. We
-		 * want the primary exception to be the one that generates the response
-		 * code.
-		 */
-		catch (Exception e) {
-			logger.warn("Rollback operation failed: " + e.getMessage());
-		}
 	}
 
 	
