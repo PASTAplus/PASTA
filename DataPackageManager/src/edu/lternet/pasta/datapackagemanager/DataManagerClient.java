@@ -99,56 +99,6 @@ public class DataManagerClient {
 	}
 
 	
-	/**
-	 * Delete data entities for the specified scope and identifier from the
-	 * Data Manager.
-	 * 
-	 * @param   scope       the scope of the data package to be deleted
-	 * @param   identifier  the identifier of the data package to be deleted
-	 * @return  true if the data entities were successfully deleted, else false
-	 */
-	public boolean deleteDataEntities(String scope, Integer identifier) 
-	        throws IOException, 
-	               Exception {
-		boolean deleted = false;
-		int rowCount = 0;
-		
-    EMLDataManager emlDataManager = new EMLDataManager();
-    rowCount = emlDataManager.deleteDataEntities(scope, identifier.toString());
-    deleted = (rowCount > 0);
-		
-		return deleted;
-	}
-
-	
-  /**
-   * Delete data entities for the specified scope, identifier,
-   * and revision from the Data Manager. This is typically used
-   * in a rollback procedure during a failed Create or Update.
-   * 
-   * @param   scope       the scope of the data package to be deleted
-   * @param   identifier  the identifier of the data package to be deleted
-   * @param   revision    the revision of the data package to be deleted
-   * @return  true if the data entities were successfully deleted, else false
-   */
-  public boolean deleteDataEntities(String scope, 
-                                    Integer identifier, 
-                                    Integer revision) 
-          throws IOException, 
-                 Exception {
-    boolean deleted = false;
-    int rowCount = 0;
-    
-    EMLDataManager emlDataManager = new EMLDataManager();
-    rowCount = emlDataManager.deleteDataEntities(scope, 
-                                                 identifier.toString(), 
-                                                 revision.toString());
-    deleted = (rowCount > 0);
-    
-    return deleted;
-  }
-
-  
   /**
    * Evaluate data entities in the Data Manager
    * 
@@ -190,20 +140,6 @@ public class DataManagerClient {
 
 		EMLDataManager emlDataManager = new EMLDataManager(); 
 
-    /*
-     * Handle symbolic revisions such as "newest" and "oldest".
-     */
-    if (revision != null) {
-      if (revision.equals("newest")) {
-        Integer newest = emlDataManager.getNewestRevision(scope, identifier.toString());
-        if (newest != null) { revision = newest.toString(); }
-      }
-      else if (revision.equals("oldest")) {
-        Integer oldest = emlDataManager.getOldestRevision(scope, identifier.toString());
-        if (oldest != null) { revision = oldest.toString(); }
-      }
-    }
-    
     file = emlDataManager.readDataEntity(resourceLocation, scope, identifier.toString(), revision, entityId);
 
     return file;

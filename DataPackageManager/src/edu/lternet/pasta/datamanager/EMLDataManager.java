@@ -296,9 +296,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
 
       try {
-	      EMLDataCache emlDataCache = 
-	        new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-		
 		    if (entityArray != null) {
 		      for (Entity entity : entityArray) {
 		        
@@ -322,30 +319,12 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
               //String entityURL = deriveDataURL(emlPackageId, entityId);
               entityIdNamePairs.put(entityId, entityName);
             
-              /*
-               * If this is not evaluate mode, and if the user is trying to 
-               * create an entity that is already registered in the data cache,
-               * throw a ResourceAlreadyExists exception.
-               */
-              if (!evaluateMode &&
-                  emlDataCache.isEntityRegistered(packageId, entityId)
-                 ) {
-                throw new ResourceExistsException(
-                  "Entity already exists for packageId: " + 
-                  packageId + ", entityId: " + entityId);
-              }
-            
               String url = emlEntity.getUrl();
               emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);
 
               // Download the entity
 	          downloadEntity(emlPackageId, emlEntity, evaluateMode);
 	          
-	            // Unless this is evaluate mode, register the entity
-              if (!evaluateMode) {
-                registerEntity(emlDataCache, emlPackageId, emlEntity);
-              }
-            
               /* Load entity into a database unless it's an
                * image entity (spatialRaster or spatialVector)
                * or an otherEntity or it uses an externally defined
@@ -401,67 +380,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
-	 * Deletes all data entities for the specified scope and identifier.
-	 * 
-   * @param   scope      the scope value of the entities to delete, e.g. "knb-lter-gce"
-   * @param   identifier the identifier value of the entities to delete, e.g. "1"
-   * @return  rowCount, the number of data entities deleted from the data cache
-	 * @throws  ResourceNotFoundException when no entities for the specified data
-	 *          package are found in the data registry
-	 * @throws  SQLException when there is a problem interacting with the
-	 *          data registry.
-	 */
-	public int deleteDataEntities(String scope, String identifier) 
-	        throws ClassNotFoundException, ResourceNotFoundException, SQLException {    
-    EMLDataCache emlDataCache = 
-               new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-      
-    /*
-     * Delete the entities from the Data Cache's database
-     */
-    int rowCount = emlDataCache.deleteDataEntities(scope, identifier);
-    if (rowCount < 1) {
-      throw new ResourceNotFoundException(
-          "No entities found for scope: " + scope + ", identifier: " + identifier);
-    }
-    
-    return rowCount;
-	}
-	
-	
-  /**
-   * Deletes all data entities for the specified scope, identifier, and revision.
-   * 
-   * @param   scope      the scope value of the entities to delete, e.g. "knb-lter-gce"
-   * @param   identifier the identifier value of the entities to delete, e.g. "1"
-   * @param   revision   the revision value of the entities to delete, e.g. "2"
-   * @return  rowCount, the number of data entities deleted from the data cache
-   * @throws  ResourceNotFoundException when no entities for the specified data
-   *          package are found in the data registry
-   * @throws  SQLException when there is a problem interacting with the
-   *          data registry.
-   */
-  public int deleteDataEntities(String scope, String identifier, String revision) 
-          throws ClassNotFoundException, ResourceNotFoundException, SQLException {    
-    EMLDataCache emlDataCache = 
-               new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-      
-    /*
-     * Delete the entities from the Data Cache's database
-     */
-    int rowCount = emlDataCache.deleteDataEntities(scope, identifier, revision);
-    if (rowCount < 1) {
-      throw new ResourceNotFoundException(
-          "No entities found for scope: " + scope + 
-                                 ", identifier: " + identifier + 
-                                 ", revision: " + revision);
-    }
-    
-    return rowCount;
-  }
-  
-  
-	/**
 	 * Downloads and stores a data entity.
 	 * 
 	 * @param emlPackageId     an EmlPackageId object
@@ -515,91 +433,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
-  /**
-   * Gets the data format of an entity based on its scope,
-   * identifier, revision, and entityId.
-   * 
-   * @param   packageId   the packageId of the entity
-   * @param   entityId    the entityId of the entity
-   * @return  dataFormat  a string representing the data format
-   */
-  public String getDataFormat(String packageId, String entityId) 
-          throws ClassNotFoundException, SQLException {
-    String dataFormat = null;
-
-    try {
-      EMLDataCache emlDataCache = 
-        new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-      dataFormat = emlDataCache.getDataFormat(packageId, entityId);
-    }
-    catch (SQLException e) {
-      logger.error("Error connecting to Data Cache Registry: " + 
-                   e.getMessage());
-      throw(e);
-    }
-    
-    return dataFormat;
-  }
-
-     
-  /**
-   * Gets the newest revision of an entity based on its scope and
-   * identifier.
-   * 
-   * @param   scope       the scope of the entity
-   * @param   identifier  the identifier of the entity
-   * @return  newest      an Integer representing the newest revision
-   * @throws  SQLException  
-   *            if an error occurs when connection to the data cache
-   */
-  public Integer getNewestRevision(String scope, String identifier) 
-          throws ClassNotFoundException, SQLException {
-    Integer newest = null;
-
-    try {
-      EMLDataCache emlDataCache = 
-        new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-        newest = emlDataCache.getNewestRevision(scope, identifier);     
-    }
-    catch (SQLException e) {
-      logger.error("Error connecting to Data Cache Registry: " + 
-                   e.getMessage());
-      throw(e);
-    }
-    
-    return newest;
-  }
-
-     
-  /**
-   * Gets the oldest revision of an entity based on its scope and
-   * identifier.
-   * 
-   * @param  scope       the scope of the entity
-   * @param  identifier  the identifier of the entity
-   * @return oldest      an Integer representing the oldest revision
-   * @throws SQLException  
-   *            if an error occurs when connection to the data cache
-   */
-  public Integer getOldestRevision(String scope, String identifier)
-    throws ClassNotFoundException, SQLException {
-    Integer oldest = null;
-    
-    try {
-      EMLDataCache emlDataCache = 
-        new EMLDataCache(dbDriver, dbURL, dbUser, dbPassword);
-        oldest = emlDataCache.getOldestRevision(scope, identifier);
-    }
-    catch (SQLException e) {
-      logger.error("Error connecting to Data Cache Registry: " + 
-                   e.getMessage());
-      throw(e);
-    }
-    
-    return oldest;
-  }
-
-     
   /*
    * The next two methods are deprecated.
    */
@@ -729,31 +562,5 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  
 	  return entityFile;
 	}
-
-  
-  /**
-   * Registers an entity in the Data Cache Registry.
-   * 
-   * @param emlDataCache     an EMLDataCache object
-   * @param emlPackageId     an EmlPackageId object
-   * @param emlEntity        the entity
-   * @return success, a boolean representing success (true) or failure (false)
-   */
-  public boolean registerEntity(EMLDataCache emlDataCache, 
-                                EmlPackageId emlPackageId, 
-                                EMLEntity emlEntity)
-          throws Exception {
-    boolean success = false;
-
-    try {
-      success = emlDataCache.addDataEntity(emlPackageId, emlEntity);
-    }
-    catch (Exception e) {
-      logger.error("Error adding entity to data cache registry: " + e.getMessage());
-      throw(e);
-    }
-    
-    return success;
-  }
 
 }

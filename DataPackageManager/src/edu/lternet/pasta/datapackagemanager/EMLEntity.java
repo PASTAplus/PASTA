@@ -180,6 +180,17 @@ public class EMLEntity {
   }
   
   
+  public String getDataFormat() {
+    String dataFormat = null;
+    
+    if (this.entity != null) {
+    	dataFormat = entity.getDataFormat();
+    }
+      
+    return dataFormat;
+  }
+  
+  
   public String getEntityId() {
     return entityId;
   }

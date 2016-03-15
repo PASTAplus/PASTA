@@ -19,6 +19,7 @@ CREATE TABLE datapackagemanager.resource_registry (
   format_type VARCHAR(100),                                 -- the metadata format type, e.g. 'eml://ecoinformatics.org/eml-2.1.1'
   mime_type VARCHAR(100),                                   -- the mime type, e.g. 'text/csv'
   resource_size BIGINT,                                     -- the size of the resource in bytes
+  data_format TEXT,                                         -- the data format as determined by parsing the EML
   CONSTRAINT resource_registry_pk PRIMARY KEY (resource_id)
 );
 
