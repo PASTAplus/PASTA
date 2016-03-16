@@ -45,7 +45,7 @@ public class TestAuthSystemValidator {
         
         Set<String> set = AuthSystemValidator.NON_CANONICAL;
         
-        assertEquals(9, set.size());
+        assertEquals(11, set.size());
         assertTrue(set.contains("KNB"));
         assertTrue(set.contains("knb"));
         assertTrue(set.contains("PASTA"));
