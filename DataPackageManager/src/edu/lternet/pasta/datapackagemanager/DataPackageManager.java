@@ -2246,6 +2246,69 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns the size value (in bytes) for the given resource identifier if
+	 * it exists; otherwise, throw a ResourceNotFoundException.
+	 * 
+	 * @param resourceId
+	 * @param authToken
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readEntitySizes(String scope, Integer identifier, Integer revision, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    ResourceNotFoundException, Exception {
+
+		String entitySizes = null;
+		StringBuilder stringBuilder = new StringBuilder("");
+		String user = authToken.getUserId();
+		
+
+		try {
+			String entityList = listDataEntities(scope, identifier, revision, user);
+			
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+
+			/*
+			 * Check whether user is authorized to read the data entity
+			 *
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
+			    Rule.Permission.read);
+			if (!isAuthorized) {
+				String gripe = "User " + user
+				    + " does not have permission to read the size value for this resource: "
+				    + resourceId;
+				throw new UnauthorizedException(gripe);
+			}*/
+
+			entitySizes = dataPackageRegistry.getEntitySizes(scope, identifier, revision);
+
+			/*if (entitySizes == null) {
+				String gripe = "A size value does not exist for this resource: " + resourceId;
+				throw new ResourceNotFoundException(gripe);
+			}*/
+
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		return entitySizes;
+
+	}
+
+	
+	/**
 	 * Returns the SHA-1 checksum for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
