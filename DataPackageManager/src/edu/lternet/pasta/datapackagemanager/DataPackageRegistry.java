@@ -1444,8 +1444,9 @@ public class DataPackageRegistry {
 
 		Connection connection = null;
 		String selectString = String.format(
-				  "SELECT entity_id,resource_size FROM %s WHERE scope='%s' AND identifier=%d AND revision=%d",
-		          RESOURCE_REGISTRY, scope, identifier, revision);
+			"SELECT entity_id,resource_size FROM %s " +
+		    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d",
+		    RESOURCE_REGISTRY, scope, identifier, revision);
 		logger.debug("selectString: " + selectString);
 
 		Statement stmt = null;

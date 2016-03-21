@@ -69,6 +69,7 @@ import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
@@ -2260,51 +2261,54 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 */
 	public String readEntitySizes(String scope, Integer identifier, Integer revision, AuthToken authToken)
 	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
-
+	    	ResourceNotFoundException, Exception {
 		String entitySizes = null;
+		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 		StringBuilder stringBuilder = new StringBuilder("");
 		String user = authToken.getUserId();
 		
-
 		try {
 			String entityList = listDataEntities(scope, identifier, revision, user);
-			
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
-
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-
-			/*
-			 * Check whether user is authorized to read the data entity
-			 *
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
-			if (!isAuthorized) {
-				String gripe = "User " + user
-				    + " does not have permission to read the size value for this resource: "
-				    + resourceId;
-				throw new UnauthorizedException(gripe);
-			}*/
 
 			entitySizes = dataPackageRegistry.getEntitySizes(scope, identifier, revision);
 
-			/*if (entitySizes == null) {
-				String gripe = "A size value does not exist for this resource: " + resourceId;
+			if (entitySizes == null) {
+				String gripe = "No entity size values found for this data package: " + packageId;
 				throw new ResourceNotFoundException(gripe);
-			}*/
-
-		} catch (ClassNotFoundException e) {
+			}
+			else {
+				String[] lines = entitySizes.split("\n");
+				for (String line : lines) {
+					if ((line != null) && (line.length() > 0)) {
+						String[] keyValuePair = line.split(",");
+						if (keyValuePair.length == 2) {
+							String entityId = keyValuePair[0];
+							String entitySize = keyValuePair[1];
+							String resourceId = DataPackageManager.composeResourceId(ResourceType.data, scope, identifier, revision, entityId);
+							boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+							if (isAuthorized) {
+								stringBuilder.append(String.format("%s,%s\n", entityId, entitySize));
+							}
+						}
+					}
+				}
+			}
+		} 
+		catch (ClassNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 			throw (e);
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 
+		entitySizes = stringBuilder.toString();
 		return entitySizes;
-
 	}
 
 	
