@@ -526,6 +526,23 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/data/size/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/size/eml/{scope}/{identifier}/{revision}/{entityId}>`_
 
+*Read Data Entity Sizes*
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Sizes operation, specifying the scope, identifier, and revision of the data package
+whose data entity sizes are to be read in the URI, returning a newline-separated list of
+entity identifiers and size values (in bytes). Each line in the list contains an entity identifier
+and its corresponding size value, separated by a comma. Only data entities that the user is
+authorized to read are included in the list.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/size/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/size/eml/{scope}/{identifier}/{revision}>`_
+
 *Read Data Package*
 ^^^^^^^^^^^^^^^^^^^
 
