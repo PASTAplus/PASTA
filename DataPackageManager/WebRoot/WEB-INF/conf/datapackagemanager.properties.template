@@ -96,6 +96,7 @@ datapackagemanager.test.entity.name=NoneSuchBugCount
 datapackagemanager.test.entity.size=882
 datapackagemanager.test.entity2.id=8d2b8f34c7316b6035b48de2b9ecc1aa
 datapackagemanager.test.entity2.name=AnySuchBugCount
+datapackagemanager.test.entity2.size=819
 datapackagemanager.test.maxidletime=30000
 datapackagemanager.test.idlesleeptime=2000
 datapackagemanager.test.initialsleeptime=5000

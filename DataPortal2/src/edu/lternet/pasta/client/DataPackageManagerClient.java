@@ -1107,6 +1107,50 @@ public class DataPackageManagerClient extends PastaClient {
 
 	
 	/**
+	 * Executes the 'readDataEntitySizes' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * 
+	 * @return a list of data entities and their corresponding entity sizes in bytes
+	 */
+	public String readDataEntitySizes(String scope, Integer identifier, String revision) 
+			throws Exception {
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/data/size/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			ContentType contentType = ContentType.getOrDefault(httpEntity);
+			this.contentType = contentType.toString();
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} 
+		finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entityString;
+	}
+
+	
+	/**
 	 * Executes the 'readDataPackage' web service method.
 	 * 
 	 * @param scope

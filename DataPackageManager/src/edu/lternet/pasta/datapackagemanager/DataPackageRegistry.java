@@ -1437,6 +1437,60 @@ public class DataPackageRegistry {
    * @return  the value of the 'resource_size' field matching
    *          the specified resourceId ('resource_id') value
    */
+	public String getEntitySizes(String scope, Integer identifier, Integer revision)
+			throws ClassNotFoundException, SQLException {
+		String entitySizes = null;
+		StringBuilder sb = new StringBuilder("");
+
+		Connection connection = null;
+		String selectString = String.format(
+			"SELECT entity_id,resource_size FROM %s " +
+		    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d",
+		    RESOURCE_REGISTRY, scope, identifier, revision);
+		logger.debug("selectString: " + selectString);
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				String entityId = rs.getString(1);
+				Long entitySize = rs.getLong(2);
+				sb.append(String.format("%s,%d\n", entityId, entitySize));
+			}
+
+			if (stmt != null)
+				stmt.close();
+		}
+		catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+
+		entitySizes = sb.toString();
+		return entitySizes;
+	}
+
+  
+  /**
+   * Gets the resource size value for a given resourceId.
+   * 
+   * @param   resourceId   the resource identifier
+   * @return  the value of the 'resource_size' field matching
+   *          the specified resourceId ('resource_id') value
+   */
 	public Long getResourceSize(String resourceId)
 			throws ClassNotFoundException, SQLException {
 		Long resourceSize = null;
