@@ -316,7 +316,6 @@ public class DataPackageManagerResourceTest {
    */
   private void testCreateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
-    String utcString = "1364505531871";
     String errorSnippet = "Attempting to insert a data package that already exists in PASTA";
     
     // Test CREATE for OK status
@@ -326,7 +325,8 @@ public class DataPackageManagerResourceTest {
     
     // Check the message body
     String entityString = (String) response.getEntity();
-    assertTrue(entityString.length() == utcString.length());   
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("create_"));
     this.transaction = entityString;
     waitForPastaUpload(testRevision);
     
@@ -350,14 +350,17 @@ public class DataPackageManagerResourceTest {
 
     // Check the message body
     entityString = (String) response.getEntity();
-    assertTrue(entityString.length() == utcString.length());
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("create_"));
     this.transaction = entityString;
+
     try {
     	Thread.sleep(10000);
     }
     catch (Exception e) {
     	;
     }
+
     testReadDataPackageError(testRevision.toString(), errorSnippet);
   }
   
@@ -414,7 +417,6 @@ public class DataPackageManagerResourceTest {
    * Test the status and message body of the Evaluate Data Package use case
    */
   private void testEvaluateDataPackage() {
-    String utcString = "1364505531871";
     DummyCookieHttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     List<MediaType> acceptHeaders = new ArrayList<MediaType>();
     MediaType xmlMediaType = new MediaType("application", "xml");
@@ -427,14 +429,17 @@ public class DataPackageManagerResourceTest {
     
     // Check the message body
     String entityString = (String) response.getEntity();
-    assertTrue(entityString.length() == utcString.length());
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("evaluate_"));
     this.transaction = entityString;
+
     try {
     	Thread.sleep(30000);
     }
     catch (Exception e) {
     	;
     }
+    
     testReadEvaluateReport();
   }
   
@@ -1064,7 +1069,6 @@ public class DataPackageManagerResourceTest {
   private void testUpdateDataPackage() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     String conflictError = "but an equal or higher revision";
-    String utcString = "1364505531871";
     
     // Test UPDATE for OK status
     String testPackageId = testScope + "." + testIdentifier + "." + testUpdateRevision;
@@ -1075,7 +1079,8 @@ public class DataPackageManagerResourceTest {
     
     // Check the message body
     String entityString = (String) response.getEntity();
-    assertTrue(entityString.length() == utcString.length());
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("update_"));
     this.transaction = entityString;
     waitForPastaUpload(testUpdateRevision);
 
@@ -1099,14 +1104,17 @@ public class DataPackageManagerResourceTest {
     statusCode = response.getStatus();
     assertEquals(202, statusCode);
     entityString = (String) response.getEntity(); // Check the message body
-    assertTrue(entityString.length() == utcString.length());
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("update_"));
     this.transaction = entityString;
+
     try {
     	Thread.sleep(10000);
     }
     catch (Exception e) {
     	;
     }
+
     testReadDataPackageError(testUpdateRevision.toString(), conflictError);
   }
 
