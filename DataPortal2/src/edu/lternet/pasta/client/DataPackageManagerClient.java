@@ -212,7 +212,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String createDataPackage(File emlFile) throws Exception {
-
+		String serviceMethod = "createDataPackage";
 		String contentType = "application/xml";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(BASE_URL + "/eml");
@@ -248,33 +248,29 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logIdleTime("createDataPackage", emlPackageId.toString(), idleTime);
+					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
+					
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
-					} catch (ResourceNotFoundException e) {
-						logger.error(e.getMessage());
+					} 
+					catch (ResourceNotFoundException e) {
+						logger.info(e.getMessage());
+						
 						try {
 							resourceMap = readDataPackage(packageScope, packageIdentifier,
 									packageRevision.toString());
 							break;
-						} catch (ResourceNotFoundException e1) {
-							logger.error(e1.getMessage());
+						} 
+						catch (ResourceNotFoundException e1) {
+							logger.info(e1.getMessage());
 							Thread.sleep(idleSleepTime);
 							idleTime += idleSleepTime;
 						}
 					}
 				}
 
-				if (idleTime > maxIdleTime) {
-					String gripe = "Fiddle sticks!  Creating this data package has "
-					    + "exceeded our patience and we have been forced to terminate "
-					    + "this browser process, but the data package may still be "
-					    + "created in PASTA if an error was not encountered.  Please "
-					    + "check the audit logs or the Data Package Browser at a later "
-					    + "time.";
-					throw new Exception(gripe);
-				}
+				fiddlesticks(serviceMethod, idleTime);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -299,7 +295,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String getDataPackageArchive(String scope, Integer identifier,
 	    String revision, HttpServletResponse servletResponse) throws Exception {
-
+		String serviceMethod = "getDataPackageArchive";
 		String contentType = "text/plain";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
@@ -329,32 +325,28 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logIdleTime("getDataPackageArchive", emlPackageId.toString(), idleTime);
+					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
+					
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
-					} catch (ResourceNotFoundException e) {
-						logger.error(e.getMessage());
+					} 
+					catch (ResourceNotFoundException e) {
+						logger.info(e.getMessage());
+						
 						try {
 							readDataPackageArchive(scope, identifier, revision, entityString, servletResponse);
 							break;
-						} catch (ResourceNotFoundException e1) {
-							logger.error(e1.getMessage());
+						} 
+						catch (ResourceNotFoundException e1) {
+							logger.info(e1.getMessage());
 							Thread.sleep(idleSleepTime);
 							idleTime += idleSleepTime;
 						}
 					}
 				}
 
-				if (idleTime > maxIdleTime) {
-					String gripe = "Fiddle sticks!  Creating this data package archive has "
-					    + "exceeded our patience and we have been forced to terminate "
-					    + "this browser process, but the data package may still be "
-					    + "created in PASTA if an error was not encountered.  Please "
-					    + "check the audit logs or the Data Package Browser at a later "
-					    + "time.";
-					throw new Exception(gripe);
-				}
+				fiddlesticks(serviceMethod, idleTime);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -418,6 +410,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      Manager web service API</a>
 	 */
 	public String evaluateDataPackage(File emlFile) throws Exception {
+		String serviceMethod = "evaluateDataPackage";
 		String contentType = "application/xml";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
@@ -453,33 +446,30 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 
 				while (idleTime <= maxIdleTime) {
-					logIdleTime("evaluateDataPackage", emlPackageId.toString(), idleTime);
+					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
+					
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
-					} catch (ResourceNotFoundException e) {
-						logger.error(e.getMessage());
+					} 
+					catch (ResourceNotFoundException e) {
+						logger.info(e.getMessage());
+						
 						try {
 							qualityReport = readEvaluateReport(packageScope, packageIdentifier,
 							    packageRevision.toString(), entityString);
 							break;
-						} catch (ResourceNotFoundException e1) {
-							logger.error(e1.getMessage());
+						} 
+						catch (ResourceNotFoundException e1) {
+							logger.info(e1.getMessage());
 							Thread.sleep(idleSleepTime);
 							idleTime += idleSleepTime;
 						}
 					}
 				}
+				
+				fiddlesticks(serviceMethod, idleTime);
 
-				if (idleTime > maxIdleTime) {
-					String gripe = "Fiddle sticks!  Creating this data package has "
-					    + "exceeded our patience and we have been forced to terminate "
-					    + "this browser process, but the data package may still be "
-					    + "created in PASTA if an error was not encountered.  Please "
-					    + "check the audit logs or the Data Package Browser at a later "
-					    + "time.";
-					throw new Exception(gripe);
-				}
 				}
 				else {
 					throw new UserErrorException("An EML packageId value could not be parsed from the file. Check that the file contains valid EML.");
@@ -494,6 +484,52 @@ public class DataPackageManagerClient extends PastaClient {
 
 		return qualityReport;
 	}
+	
+	
+	/*
+	 * Throw an exception if the amount of idle time exceeds the maximum value.
+	 * Generate a message appropriate to the operation being performed.
+	 */
+	private void fiddlesticks(String serviceMethod, Integer idleTime) 
+			throws Exception {
+		String msg = null;
+		String verb = "";
+		String advice = "";
+		String archiveAdvice = "";
+		String evaluateAdvice = "";
+		String uploadAdvice = "Please check the <a href='scopebrowse'>Browse Data by Package Identifier</a> " +
+		                      "page at a later time to see if this data package was successfully uploaded.";
+		
+		if (idleTime > maxIdleTime) {
+
+			switch(serviceMethod) {
+		    	case "createDataPackage":
+		    		verb = "upload";
+					advice = uploadAdvice;
+		    		break;
+		    	case "evaluateDataPackage": 
+		    		verb = "evaluate";
+		    		advice = evaluateAdvice;
+		    		break;
+		    	case "getDataPackageArchive": 
+		    		verb = "create an archive of";
+		    		advice = archiveAdvice;
+		    		break;
+		    	case "updateDataPackage":
+		    		verb = "upload";
+					advice = uploadAdvice;
+		    		break;
+		    	default: 
+		    		throw new IllegalArgumentException("Unknown service method: " + serviceMethod);
+		    }
+			
+			msg = String.format("PASTA needs more time to %s this data package so we won't keep your browser waiting any longer. %s", 
+					            verb, advice);
+	
+			throw new Exception(msg);
+		}
+	}
+	
 	
 	/**
 	 * Determines whether the user has permission to read the resource identified
@@ -1604,8 +1640,7 @@ public class DataPackageManagerClient extends PastaClient {
 	
 	
 	private void logIdleTime(String methodName, String packageId, Integer idleTime) {
-		logger.info(String.format("%s: %s; Idle Time: %d", 
-				                  methodName, packageId, idleTime));
+		logger.info(String.format("%s: %s; Idle Time: %d", methodName, packageId, idleTime));
 	}
 
 	
@@ -1663,7 +1698,7 @@ public class DataPackageManagerClient extends PastaClient {
 	 */
 	public String updateDataPackage(String scope, Integer identifier, File emlFile)
 	    throws Exception {
-		
+		String serviceMethod = "updateDataPackage";
 		final String contentType = "application/xml";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
@@ -1700,33 +1735,29 @@ public class DataPackageManagerClient extends PastaClient {
 				Thread.sleep(initialSleepTime);
 				
 				while (idleTime <= maxIdleTime) {
-					logIdleTime("updateDataPackage", emlPackageId.toString(), idleTime);
+					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
+					
 					try {
 						String errorText = readDataPackageError(entityString);
 						throw new Exception(errorText);
-					} catch (ResourceNotFoundException e) {
-						logger.error(e.getMessage());
+					} 
+					catch (ResourceNotFoundException e) {
+						logger.info(e.getMessage());
+						
 						try {
 							resourceMap = readDataPackage(packageScope, packageIdentifier,
 									packageRevision.toString());
 							break;
-						} catch (ResourceNotFoundException e1) {
-							logger.error(e1.getMessage());
+						} 
+						catch (ResourceNotFoundException e1) {
+							logger.info(e1.getMessage());
 							Thread.sleep(idleSleepTime);
 							idleTime += idleSleepTime;
 						}
 					}
 				}
 
-				if (idleTime > maxIdleTime) {
-					String gripe = "Fiddle sticks!  Updating this data package has "
-					    + "exceeded our patience and we have been forced to terminate "
-					    + "this browser process, but the data package may still be "
-					    + "created in PASTA if an error was not encountered.  Please "
-					    + "check the audit logs or the Data Package Browser at a later "
-					    + "time.";
-					throw new Exception(gripe);
-				}
+				fiddlesticks(serviceMethod, idleTime);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
