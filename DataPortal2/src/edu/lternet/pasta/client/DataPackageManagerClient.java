@@ -504,26 +504,26 @@ public class DataPackageManagerClient extends PastaClient {
 
 			switch(serviceMethod) {
 		    	case "createDataPackage":
-		    		verb = "upload";
+		    		verb = "uploading";
 					advice = uploadAdvice;
 		    		break;
 		    	case "evaluateDataPackage": 
-		    		verb = "evaluate";
+		    		verb = "evaluating";
 		    		advice = evaluateAdvice;
 		    		break;
 		    	case "getDataPackageArchive": 
-		    		verb = "create an archive of";
+		    		verb = "creating an archive of";
 		    		advice = archiveAdvice;
 		    		break;
 		    	case "updateDataPackage":
-		    		verb = "upload";
+		    		verb = "uploading";
 					advice = uploadAdvice;
 		    		break;
 		    	default: 
 		    		throw new IllegalArgumentException("Unknown service method: " + serviceMethod);
 		    }
 			
-			msg = String.format("PASTA needs more time to %s this data package so we won't keep your browser waiting any longer. %s", 
+			msg = String.format("PASTA is still %s this data package so we won't keep your browser waiting any longer. %s", 
 					            verb, advice);
 	
 			throw new Exception(msg);
