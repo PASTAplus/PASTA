@@ -504,6 +504,25 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		return versionString;
 	}
+	
+	
+	private String generateTransactionID(String operation, String scope, Integer identifier, Integer revision) {
+		String transactionId = "";
+		long time = System.currentTimeMillis();
+		long random = (long) (Math.random() * 100000L);
+
+		if (operation != null) transactionId = operation;
+		
+		if ((scope != null) && (identifier != null)) {
+			transactionId = String.format("%s_%s.%d", transactionId, scope, identifier);
+			if (revision != null) {
+				transactionId = String.format("%s.%d", transactionId, revision);
+			}
+		}
+		transactionId = String.format("%s_%d%d", transactionId, time, random);
+		
+		return transactionId;
+	}
 
 
 	/**
@@ -852,8 +871,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-		Long time = new Date().getTime();
-		String transaction = time.toString();
+		String transaction = generateTransactionID("create", null, null, null);
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
@@ -964,8 +982,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-		Long time = new Date().getTime();
-		String transaction = time.toString();
+		String transaction = generateTransactionID("archive", scope, identifier, revision);
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
@@ -1079,8 +1096,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-		Long time = new Date().getTime();
-		String transaction = time.toString();
+		String transaction = generateTransactionID("evaluate", null, null, null);
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
@@ -7897,8 +7913,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "updateDataPackage";
 		Rule.Permission permission = Rule.Permission.write;
 
-		Long time = new Date().getTime();
-		String transaction = time.toString();
+		String transaction = generateTransactionID("update", scope, identifier, null);
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();

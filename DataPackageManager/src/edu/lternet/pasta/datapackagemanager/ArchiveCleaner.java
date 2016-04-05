@@ -99,6 +99,7 @@ public class ArchiveCleaner {
 		
 	}
 
+	
 	/*
 	 * Instance methods
 	 */
@@ -107,31 +108,35 @@ public class ArchiveCleaner {
 	 * Removes any archive file that is older than the specified time-to-live (ttl).
 	 * 
 	 * @param ttl The time-to-live value in milliseconds.
+	 * @return    the number of archive files that were removed
 	 */
-	public void doClean(Long ttl) {
-		
+	public int doClean(Long ttl) {
 		File tmpDir = new File(this.tmpDir);
-		String[] ext = {"zip"};
-    Long time = new Date().getTime();
-    Long lastModified = null;
+		String[] ext = { "zip" };
+		Long time = new Date().getTime();
+		Long lastModified = null;
+		int deleteCount = 0;
 
-    Collection<File> files = FileUtils.listFiles(tmpDir, ext, false);
-		
-		for (File file : files) {		
+		Collection<File> files = FileUtils.listFiles(tmpDir, ext, false);
+
+		for (File file : files) {
 			if (file != null && file.exists()) {
 				lastModified = file.lastModified();
 				// Remove file if older than the ttl
 				if (lastModified + ttl <= time) {
 					try {
-	          FileUtils.forceDelete(file);
-          } catch (IOException e) {
-	          logger.error(e.getMessage());
-	          e.printStackTrace();
-          }
+						FileUtils.forceDelete(file);
+						deleteCount++;
+					}
+					catch (IOException e) {
+						logger.error(e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 		}
-	
+		
+		return deleteCount;
 	}
 	
 }
