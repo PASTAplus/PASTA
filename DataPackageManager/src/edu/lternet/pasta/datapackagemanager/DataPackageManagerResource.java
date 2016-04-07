@@ -4127,7 +4127,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
-		final String serviceMethodName = "readDataEntitySize";
+		final String serviceMethodName = "readDataEntitySizes";
 		Rule.Permission permission = Rule.Permission.read;
 		String resourceId = null;
 
