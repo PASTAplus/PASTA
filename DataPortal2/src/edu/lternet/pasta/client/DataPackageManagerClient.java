@@ -51,6 +51,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlUtility;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.ResourceNotFoundException;
@@ -238,6 +239,8 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				EmlPackageIdFormat epif = new EmlPackageIdFormat();
+				String packageId = epif.format(emlPackageId);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -270,7 +273,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime);
+				fiddlesticks(serviceMethod, idleTime, packageId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -315,8 +318,9 @@ public class DataPackageManagerClient extends PastaClient {
 			HttpEntity httpEntity = httpResponse.getEntity();
 			String entityString = EntityUtils.toString(httpEntity);
 			EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, new Integer(revision));
+			EmlPackageIdFormat epif = new EmlPackageIdFormat();
+			String packageId = epif.format(emlPackageId);
 			
-
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
 				Integer idleTime = 0;
@@ -346,7 +350,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime);
+				fiddlesticks(serviceMethod, idleTime, packageId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -436,6 +440,8 @@ public class DataPackageManagerClient extends PastaClient {
 
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				if (emlPackageId != null) {
+					EmlPackageIdFormat epif = new EmlPackageIdFormat();
+					String packageId = epif.format(emlPackageId);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -468,7 +474,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 				
-				fiddlesticks(serviceMethod, idleTime);
+				fiddlesticks(serviceMethod, idleTime, packageId);
 
 				}
 				else {
@@ -490,15 +496,20 @@ public class DataPackageManagerClient extends PastaClient {
 	 * Throw an exception if the amount of idle time exceeds the maximum value.
 	 * Generate a message appropriate to the operation being performed.
 	 */
-	private void fiddlesticks(String serviceMethod, Integer idleTime) 
-			throws Exception {
+	private void fiddlesticks(String serviceMethod, Integer idleTime, String packageId) 
+			throws PastaIdleTimeException {
 		String msg = null;
 		String verb = "";
 		String advice = "";
 		String archiveAdvice = "";
-		String evaluateAdvice = "";
-		String uploadAdvice = "Please check the <a href='scopebrowse'>Browse Data by Package Identifier</a> " +
-		                      "page at a later time to see if this data package was successfully uploaded.";
+		String evaluateAdvice = String.format("You may wish to query the <a class='searchsubcat' href='auditReport.jsp'>audit logs</a> " +
+                                              "at a later time to see if '%s' was successfully evaluated. To do so, " +
+				                              "select 'evaluateDataPackage' from the list of service methods, and enter " +
+                                              "today's date as the begin date.",
+                                              packageId);
+		String uploadAdvice = String.format("Please check the <a class='searchsubcat' href='scopebrowse'>Browse Data by Package Identifier</a> " +
+		                                    "page at a later time to see if '%s' was successfully uploaded.",
+		                                    packageId);
 		
 		if (idleTime > maxIdleTime) {
 
@@ -523,10 +534,10 @@ public class DataPackageManagerClient extends PastaClient {
 		    		throw new IllegalArgumentException("Unknown service method: " + serviceMethod);
 		    }
 			
-			msg = String.format("PASTA is still %s this data package so we won't keep your browser waiting any longer. %s", 
-					            verb, advice);
+			msg = String.format("PASTA is still %s data package '%s' so we won't keep your browser waiting any longer. %s", 
+					            verb, packageId, advice);
 	
-			throw new Exception(msg);
+			throw new PastaIdleTimeException(msg);
 		}
 	}
 	
@@ -1725,6 +1736,8 @@ public class DataPackageManagerClient extends PastaClient {
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
 				
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				EmlPackageIdFormat epif = new EmlPackageIdFormat();
+				String packageId = epif.format(emlPackageId);
 				String packageScope = emlPackageId.getScope();
 				Integer packageIdentifier = emlPackageId.getIdentifier();
 				Integer packageRevision = emlPackageId.getRevision();
@@ -1757,7 +1770,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime);
+				fiddlesticks(serviceMethod, idleTime, packageId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);

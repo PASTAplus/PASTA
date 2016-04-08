@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.LoginClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
+import edu.lternet.pasta.client.PastaIdleTimeException;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.EmlUtility;
@@ -320,144 +321,146 @@ public class Harvester implements Runnable {
   /*
    * Harvests or evaluates a single EML document.
    */
-  private void processEMLFile(String harvestDirPath, String uid, File emlFile,
-      boolean isEvaluate) {
-    String packageId = "";
-    EmlPackageId emlPackageId = null;
-    
-    try {
-      DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
-      String serviceMessage = null;
-      
-      /* 
-       * Parse the packageId from the EML document.
-       * 
-       * If we fail to determine the packageId value by parsing the
-       * EML document, then assign a dummy value. Increment the
-       * integer part of the dummy value to ensure uniqueness during
-       * this harvest.
-       */
-      try {
-        emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
-        EmlPackageIdFormat epif = new EmlPackageIdFormat();
-        packageId = epif.format(emlPackageId);
-      }
-      catch (Exception e) {
-        packageId = "Unknown-Package-ID-" + dummyPackageIdCounter++;
-      }
-      
-      String packageIdPath = harvestDirPath + "/" + packageId;
-      String verb = isEvaluate ? "Evaluating" : "Uploading";
-      logger.info(String.format("%s data package: %s", verb, packageId));
+	private void processEMLFile(String harvestDirPath, String uid, File emlFile, boolean isEvaluate) {
+		String filename = "serviceMessage.txt";
+		String packageId = "";
+		EmlPackageId emlPackageId = null;
 
-      Harvester.createDirectory(packageIdPath);
+		try {
+			DataPackageManagerClient dpmClient = new DataPackageManagerClient(uid);
+			String serviceMessage = null;
 
-      /* Process upload operation */
-      if (!isEvaluate) {
-        if (emlPackageId != null) {
-          String scope = emlPackageId.getScope();
-          Integer identifier = emlPackageId.getIdentifier();
-          boolean isUpdate = isUpdate(dpmClient, scope, identifier);
+			/*
+			 * Parse the packageId from the EML document.
+			 * 
+			 * If we fail to determine the packageId value by parsing the EML
+			 * document, then assign a dummy value. Increment the integer part
+			 * of the dummy value to ensure uniqueness during this harvest.
+			 */
+			try {
+				emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				EmlPackageIdFormat epif = new EmlPackageIdFormat();
+				packageId = epif.format(emlPackageId);
+			}
+			catch (Exception e) {
+				packageId = "Unknown-Package-ID-" + dummyPackageIdCounter++;
+			}
 
-          String resourceMap = null;
-          try {
-            if (isUpdate) {
-              resourceMap = dpmClient.updateDataPackage(scope, identifier,
-                  emlFile);
-            }
-            else {
-              resourceMap = dpmClient.createDataPackage(emlFile);
-            }
+			String packageIdPath = harvestDirPath + "/" + packageId;
+			String verb = isEvaluate ? "Evaluating" : "Uploading";
+			logger.info(String.format("%s data package: %s", verb, packageId));
 
-            if (resourceMap != null) {
-              String resourceMapPath = packageIdPath + "/resourceMap.txt";
-              File resourceMapFile = new File(resourceMapPath);
-              FileUtils.writeStringToFile(resourceMapFile, resourceMap);
-              
-              /* Store a local copy of the quality report so that
-               * quality check statistics can be displayed in the
-               * harvest report.
-               */
-              String revision = emlPackageId.getRevision().toString();
-              String qualityReportStr = 
-                dpmClient.readDataPackageReport(scope, identifier, revision);
-              String qualityReportPath = packageIdPath + "/qualityReport.xml";
-              File qualityReportFile = new File(qualityReportPath);
-              boolean append = false;
-              FileUtils.writeStringToFile(qualityReportFile, qualityReportStr, append);
-            }
-          }
-		  catch (Exception e) {
-				String fileName = null;
-				String eMessage = e.getMessage();
+			Harvester.createDirectory(packageIdPath);
 
-				if (isQualityReport(eMessage)) {
-					serviceMessage = eMessage;
-					fileName = "qualityReport.xml";
+			/* 
+			 * Process upload (insert or update) operation 
+			 */
+			if (!isEvaluate) {
+				if (emlPackageId != null) {
+					String scope = emlPackageId.getScope();
+					Integer identifier = emlPackageId.getIdentifier();
+					boolean isUpdate = isUpdate(dpmClient, scope, identifier);
+
+					String resourceMap = null;
+					try {
+						if (isUpdate) {
+							resourceMap = dpmClient.updateDataPackage(scope, identifier, emlFile);
+						}
+						else {
+							resourceMap = dpmClient.createDataPackage(emlFile);
+						}
+
+						if (resourceMap != null) {
+							String resourceMapPath = packageIdPath + "/resourceMap.txt";
+							File resourceMapFile = new File(resourceMapPath);
+							FileUtils.writeStringToFile(resourceMapFile, resourceMap);
+
+							/*
+							 * Store a local copy of the quality report so that
+							 * quality check statistics can be displayed in the
+							 * harvest report.
+							 */
+							String revision = emlPackageId.getRevision().toString();
+							String qualityReportStr = dpmClient.readDataPackageReport(scope, identifier, revision);
+							String qualityReportPath = packageIdPath + "/qualityReport.xml";
+							File qualityReportFile = new File(qualityReportPath);
+							boolean append = false;
+							FileUtils.writeStringToFile(qualityReportFile, qualityReportStr, append);
+						}
+					}
+					catch (PastaIdleTimeException e) {
+						writeServiceMessage(packageIdPath, filename, e.getMessage());
+					}
+					catch (Exception e) {
+						String eMessage = e.getMessage();
+
+						if (isQualityReport(eMessage)) {
+							filename = "qualityReport.xml";
+							serviceMessage = eMessage;
+						}
+						else {
+							serviceMessage = String.format("Error uploading packageId '%s': %s", packageId, eMessage);
+							logger.error(serviceMessage);
+						}
+
+						writeServiceMessage(packageIdPath, filename, serviceMessage);
+					}
 				}
 				else {
-					serviceMessage = String.format(
-							"Error uploading packageId '%s': %s",
-							packageId, eMessage);
-					fileName = "serviceMessage.txt";
+					serviceMessage = PACKAGEID_PARSING_ERROR;
 					logger.error(serviceMessage);
-					e.printStackTrace();
+					writeServiceMessage(packageIdPath, filename, serviceMessage);
 				}
+			}
+			/* 
+			 * Process evaluate operation 
+			 */
+			else {
+				if (emlPackageId != null) {
+					String qualityReportXML = null;
 
-				String serviceMessagePath = packageIdPath + "/" + fileName;
-				File serviceMessageFile = new File(serviceMessagePath);
-				boolean append = true;
-				FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
-		  }
+					try {
+						qualityReportXML = dpmClient.evaluateDataPackage(emlFile);
+						String qualityReportPath = packageIdPath + "/qualityReport.xml";
+						File qualityReportFile = new File(qualityReportPath);
+						FileUtils.writeStringToFile(qualityReportFile, qualityReportXML);
+					}
+					catch (PastaIdleTimeException e) {
+						writeServiceMessage(packageIdPath, filename, e.getMessage());
+					}
+					catch (Exception e) {
+						logger.error(serviceMessage);
+						writeServiceMessage(packageIdPath, filename, e.getMessage());
+					}
+				}
+				else {
+					serviceMessage = PACKAGEID_PARSING_ERROR;
+					logger.error(serviceMessage);
+					writeServiceMessage(packageIdPath, filename, serviceMessage);
+				}
+			}
 		}
-        else {
-          serviceMessage = PACKAGEID_PARSING_ERROR;
-          logger.error(serviceMessage);
-          String fileName = "serviceMessage.txt";
-          String serviceMessagePath = packageIdPath + "/" + fileName;
-          File serviceMessageFile = new File(serviceMessagePath);
-          boolean append = true;
-          FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
-        }
-      }
-      /* Process evaluate operation */
-      else {
-        if (emlPackageId != null) {
-          String qualityReportXML = null;
-          try {
-            qualityReportXML = dpmClient.evaluateDataPackage(emlFile);
-            String qualityReportPath = packageIdPath + "/qualityReport.xml";
-            File qualityReportFile = new File(qualityReportPath);
-            FileUtils.writeStringToFile(qualityReportFile, qualityReportXML);
-          }
-          catch (Exception e) {
-            serviceMessage = e.getMessage();
-            logger.error(serviceMessage);
-            e.printStackTrace();
-            String serviceMessagePath = packageIdPath + "/serviceMessage.txt";
-            File serviceMessageFile = new File(serviceMessagePath);
-            FileUtils.writeStringToFile(serviceMessageFile, serviceMessage);
-          }
-        }
-        else {
-          serviceMessage = PACKAGEID_PARSING_ERROR;
-          logger.error(serviceMessage);
-          String fileName = "serviceMessage.txt";
-          String serviceMessagePath = packageIdPath + "/" + fileName;
-          File serviceMessageFile = new File(serviceMessagePath);
-          boolean append = true;
-          FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
-        }
-        
-      }
+		catch (PastaAuthenticationException e) {
+			logger.error(e.getMessage());
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+  
+  
+    private void writeServiceMessage(String packageIdPath, String filename, String serviceMessage) {
+		String serviceMessagePath = packageIdPath + "/" + filename;
+
+		try {
+			File serviceMessageFile = new File(serviceMessagePath);
+			boolean append = true;
+			FileUtils.writeStringToFile(serviceMessageFile, serviceMessage, append);
+		}
+		catch (IOException e) {
+			logger.error(String.format("Error writing service message to file %s: %s", serviceMessagePath, e.getMessage()));
+		}
     }
-    catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-    }
-    catch (Exception e) {
-      logger.error(e.getMessage());
-    }
-  }
   
   
   /*
