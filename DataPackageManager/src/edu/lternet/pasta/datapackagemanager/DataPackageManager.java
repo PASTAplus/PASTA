@@ -1688,6 +1688,79 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * For the specified data package, returns a newline-separated 
+	 * list of strings, where each string contains an entity id followed by a
+	 * comma followed by the name of that entity.
+	 * 
+	 * @param scope
+	 *          the scope value
+	 * @param identifier
+	 *          the identifier value
+	 * @param revision
+	 *          the revision value
+	 * @param authToken
+	 *          the authorization token
+	 * @return a newline-separated list of strings, where each string contains an entity id followed by a
+	 *         comma followed by the entity name.
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws UnauthorizedException
+	 * @throws ResourceNotFoundException
+	 * @throws Exception
+	 */
+	public String readDataEntityNames(String scope, Integer identifier, Integer revision, AuthToken authToken)
+	    throws ClassNotFoundException, SQLException, UnauthorizedException,
+	    	ResourceNotFoundException, Exception {
+		String entityNames = null;
+		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+		StringBuilder stringBuilder = new StringBuilder("");
+		
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+
+			entityNames = dataPackageRegistry.getEntityNames(scope, identifier, revision);
+
+			if (entityNames == null) {
+				String gripe = "No entity name values found for this data package: " + packageId;
+				throw new ResourceNotFoundException(gripe);
+			}
+			else {
+				String[] lines = entityNames.split("\n");
+				for (String line : lines) {
+					if ((line != null) && (line.length() > 0)) {
+						String[] keyValuePair = line.split(",");
+						if (keyValuePair.length >= 2) {
+							int firstCommaPosition = line.indexOf(',');
+							String entityId = line.substring(0, firstCommaPosition);
+							String entityName = line.substring(firstCommaPosition + 1);
+							String resourceId = DataPackageManager.composeResourceId(ResourceType.data, scope, identifier, revision, entityId);
+							boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+							if (isAuthorized) {
+								stringBuilder.append(String.format("%s,%s\n", entityId, entityName));
+							}
+						}
+					}
+				}
+			}
+		} 
+		catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} 
+		catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		entityNames = stringBuilder.toString();
+		return entityNames;
+	}
+
+	
+	/**
 	 * Reads a data entity and returns it as a byte array. The specified user must
 	 * be authorized to read the data entity resource.
 	 * 
@@ -2247,12 +2320,22 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
-	 * Returns the size value (in bytes) for the given resource identifier if
-	 * it exists; otherwise, throw a ResourceNotFoundException.
+	 * For the specified data package, returns a newline-separated 
+	 * list of strings, where each string contains an entity id followed by a
+	 * comma followed by the size of that entity (in bytes).
+	 * Throws a ResourceNotFoundException if the specified data package does
+	 * not exist.
 	 * 
-	 * @param resourceId
+	 * @param scope
+	 *          the scope value
+	 * @param identifier
+	 *          the identifier value
+	 * @param revision
+	 *          the revision value
 	 * @param authToken
-	 * @return
+	 *          the authorization token
+	 * @return a newline-separated list of strings, where each string contains an entity id followed by a
+	 *         comma followed by an integer representing the size (in bytes) of that entity.
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws UnauthorizedException
@@ -2268,7 +2351,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		String user = authToken.getUserId();
 		
 		try {
-			String entityList = listDataEntities(scope, identifier, revision, user);
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
@@ -2305,6 +2387,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			throw (e);
 		}
 
 		entitySizes = stringBuilder.toString();

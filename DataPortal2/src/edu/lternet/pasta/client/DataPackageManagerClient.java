@@ -1091,6 +1091,53 @@ public class DataPackageManagerClient extends PastaClient {
 
 	
 	/**
+	 * Executes the 'readDataEntityNames' web service method.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * 
+	 * @return a list of data entity identifiers and their corresponding entity names,
+	 *         one entity per line with id and name separated by a comma. Note that
+	 *         many entity names themselves contain commas, so when parsing the return
+	 *         value, split the string only up to the first occurrence of a comma.
+	 */
+	public String readDataEntityNames(String scope, Integer identifier, String revision) 
+			throws Exception {
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/name/eml" + urlTail;
+		HttpGet httpGet = new HttpGet(url);
+		String entityString = null;
+
+		// Set header content
+		if (this.token != null) {
+			httpGet.setHeader("Cookie", "auth-token=" + this.token);
+		}
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity);
+			ContentType contentType = ContentType.getOrDefault(httpEntity);
+			this.contentType = contentType.toString();
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} 
+		finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entityString;
+	}
+
+	
+	/**
 	 * Executes the 'readDataEntitySize' web service method.
 	 * 
 	 * @param scope

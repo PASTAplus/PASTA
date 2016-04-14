@@ -475,6 +475,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String report = null;
 				String data = "";
 				String doiId = null;
+				String entityNames = dpmClient.readDataEntityNames(scope, id, revision);
 				String entitySizes = dpmClient.readDataEntitySizes(scope, id, revision);
 
 				while (tokens.hasNext()) {
@@ -516,8 +517,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 								String entitySizeStr = "";
 
 								try {
-									entityName = dpmClient.readDataEntityName(
-											scope, id, revision, entityId);
+									entityName = findEntityName(entityNames, entityId);
 									entitySize = findEntitySize(entitySizes, entityId);
 									if (entitySize != null) {
 										entitySizeStr = String.format("&nbsp;&nbsp;<small><em>(%s bytes)</em></small>", entitySize);
@@ -793,6 +793,21 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
+	}
+	
+	
+	private String findEntityName(String entityNames, String entityId) {
+		String entityName = null;
+		if (entityNames != null && entityId != null) {
+			String[] lines = entityNames.split("\n");
+			for (String line : lines) {
+				if (line.startsWith(entityId)) {
+					entityName = line.substring(entityId.length() + 1);
+				}
+			}
+		}
+		
+		return entityName;
 	}
 	
 	

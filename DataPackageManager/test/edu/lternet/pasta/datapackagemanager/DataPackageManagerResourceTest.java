@@ -303,6 +303,7 @@ public class DataPackageManagerResourceTest {
 	  testReadMetadataFormat();
 	  testReadDataEntity();
 	  testReadDataEntityName();
+	  testReadDataEntityNames();
 	  testReadDataEntitySize();
 	  testReadDataEntitySizes();
 	  testReadDataEntityAcl();
@@ -640,6 +641,33 @@ public class DataPackageManagerResourceTest {
 
     // Test for 404 NOT FOUND status with a bogus package id
     response = dataPackageManagerResource.readDataEntityName(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Entity Names operation
+   */
+  private void testReadDataEntityNames() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataEntityNames(httpHeaders, testScope, testIdentifier, testRevision);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      String testString = String.format("%s,%s\n", testEntityId, testEntityName);
+      assertTrue(entityString.contains(testString));
+      String testString2 = String.format("%s,%s\n", testEntityId2, testEntityName2);
+      assertTrue(entityString.contains(testString2));
+    }
+
+    // Test for 404 NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntityNames(httpHeaders, testScopeBogus, testIdentifier, testRevision);
     assertEquals(404, response.getStatus());
   }
     
