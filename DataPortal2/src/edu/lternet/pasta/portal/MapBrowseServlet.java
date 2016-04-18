@@ -249,7 +249,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String[] uriTokens = null;
 				String entityId = null;
 				String resource = null;
-				Boolean isAuthorized = false;
 
 				String map = null;
 				StrTokenizer tokens = null;
@@ -497,45 +496,36 @@ public class MapBrowseServlet extends DataPortalServlet {
 						}
 						else
 							if (resource.contains(dataUri)) {
-
-								try {
-									isAuthorized = dpmClient
-											.isAuthorized(resource);
-								}
-								catch (Exception e2) {
-									logger.error(e2.getMessage());
-									isAuthorized = false; // Fall on side of
-															// restriction
-								}
-
 								uriTokens = resource.split("/");
-
 								entityId = uriTokens[uriTokens.length - 1];
-
 								String entityName = null;
 								String entitySize = null;
 								String entitySizeStr = "";
 
-								try {
-									entityName = findEntityName(entityNames, entityId);
-									entitySize = findEntitySize(entitySizes, entityId);
-									if (entitySize != null) {
-										entitySizeStr = String.format("&nbsp;&nbsp;<small><em>(%s bytes)</em></small>", entitySize);
-									}
-								}
-								catch (Exception e1) {
-									logger.error(e1.getMessage());
-									e1.printStackTrace();
-									entityName = entityId;
+								entityName = findEntityName(entityNames, entityId);
+								entitySize = findEntitySize(entitySizes, entityId);
+								
+								if (entitySize != null) {
+									entitySizeStr = String.format("&nbsp;&nbsp;<small><em>(%s bytes)</em></small>", entitySize);
 								}
 
-								// Safe URL encoding of entity name
+								// Safe URL encoding of entity id
 								try {
 									entityId = urlCodec.encode(entityId);
 								}
 								catch (EncoderException e) {
 									logger.error(e.getMessage());
 									e.printStackTrace();
+								}
+								
+								/*
+								 * Entity name will only be returned for authorized data
+								 * entities, so if it's non-null then we know the user is authorized.
+								 */
+								Boolean isAuthorized = false;
+
+								if (entityName != null) {
+									isAuthorized = true;
 								}
 
 								if (isAuthorized) {
@@ -550,18 +540,17 @@ public class MapBrowseServlet extends DataPortalServlet {
 											+ "</li>\n";
 								}
 								else {
-									String hover = null;
+									entityName = "Data object";
+									String tooltip = null;
 									if (uid.equals("public")) {
-										hover = "If this data entity is not linked, you may need to log in before you can access it.";
+										tooltip = "You may need to log in before you can access this data object.";
 									}
 									else {
-										hover = "If this data entity is not linked, you may not have permission to access it.";
+										tooltip = "You may not have permission to access this data object.";
 									}
-									data += "<li>" + entityName
-											+ " [<span name=\"" + hover
-											+ "\" class=\"tooltip\">"
-											+ "<em>more info</em>"
-											+ "</span>]</li>\n";
+									data += String.format(
+											  "<li>%s [<span name='%s' class='tooltip'><em>more info</em></span>]</li>\n", 
+											  entityName, tooltip);
 								}
 							}
 							else {
