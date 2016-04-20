@@ -510,7 +510,22 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/name/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/name/eml/{scope}/{identifier}/{revision}/{entityId}>`_
 
-.. _read-data-package:
+*Read Data Entity Names*
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Names operation, specifying the scope, identifier, and revision of the data package
+whose data entity names are to be read in the URI, returning a newline-separated list of
+entity identifiers and name values. Each line in the list contains an entity identifier
+and its corresponding name value, separated by a comma. Only data entities that the user is
+authorized to read are included in the list.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/name/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/name/eml/{scope}/{identifier}/{revision}>`_
 
 *Read Data Entity Size*
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -542,6 +557,8 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/data/size/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/size/eml/{scope}/{identifier}/{revision}>`_
+
+.. _read-data-package:
 
 *Read Data Package*
 ^^^^^^^^^^^^^^^^^^^

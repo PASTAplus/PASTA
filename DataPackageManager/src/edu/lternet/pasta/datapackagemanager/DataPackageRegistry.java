@@ -1430,13 +1430,20 @@ public class DataPackageRegistry {
   }
   
   
-  /**
-   * Gets the resource size value for a given resourceId.
-   * 
-   * @param   resourceId   the resource identifier
-   * @return  the value of the 'resource_size' field matching
-   *          the specified resourceId ('resource_id') value
-   */
+	/**
+	 * Gets the resource size value for a given resourceId.
+	 * 
+	 * @param scope
+	 *            the data package scope value
+	 * @param identifier
+	 *            the data package identifier value
+	 * @param revison
+	 *            the data package revision value
+	 * @return a String value separated by newlines, where each line has
+	 *         a data entity resource id followed by a comma followed by
+	 *         the value of the 'resource_size' field matching the specified
+	 *         data entity
+	 */
 	public String getEntitySizes(String scope, Integer identifier, Integer revision)
 			throws ClassNotFoundException, SQLException {
 		String entitySizes = null;
@@ -1479,11 +1486,73 @@ public class DataPackageRegistry {
 			returnConnection(connection);
 		}
 
-		entitySizes = sb.toString();
+		String sbString = sb.toString();
+		if (!sbString.equals("")) { entitySizes = sbString; }
 		return entitySizes;
 	}
 
   
+	  /**
+	   * Gets a list of entity names for a specified data package.
+	   * 
+	   * @param scope
+	   *            the data package scope value
+	   * @param identifier
+	   *            the data package identifier value
+	   * @param revison
+	   *            the data package revision value
+	   * @return  a newline separated list, where each line in the list is an
+	   *          entity id followed by a comma, followed by an entity
+	   *          name value.
+	   */
+		public String getEntityNames(String scope, Integer identifier, Integer revision)
+				throws ClassNotFoundException, SQLException {
+			String entityNames = null;
+			StringBuilder sb = new StringBuilder("");
+
+			Connection connection = null;
+			String selectString = String.format(
+				"SELECT entity_id,entity_name FROM %s " +
+			    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d",
+			    RESOURCE_REGISTRY, scope, identifier, revision);
+			logger.debug("selectString: " + selectString);
+
+			Statement stmt = null;
+
+			try {
+				connection = getConnection();
+				stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery(selectString);
+
+				while (rs.next()) {
+					String entityId = rs.getString(1);
+					String entityName = rs.getString(2);
+					sb.append(String.format("%s,%s\n", entityId, entityName));
+				}
+
+				if (stmt != null)
+					stmt.close();
+			}
+			catch (ClassNotFoundException e) {
+				logger.error("ClassNotFoundException: " + e.getMessage());
+				e.printStackTrace();
+				throw (e);
+			}
+			catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				e.printStackTrace();
+				throw (e);
+			}
+			finally {
+				returnConnection(connection);
+			}
+
+			String sbString = sb.toString();
+			if (!sbString.equals("")) { entityNames = sbString; }
+			return entityNames;
+		}
+
+	  
   /**
    * Gets the resource size value for a given resourceId.
    * 
