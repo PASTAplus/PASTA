@@ -237,7 +237,7 @@ public class DataPackageManagerClient extends PastaClient {
 			String entityString = EntityUtils.toString(httpEntity);
 
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
-				
+				String transactionId = entityString;
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				EmlPackageIdFormat epif = new EmlPackageIdFormat();
 				String packageId = epif.format(emlPackageId);
@@ -254,7 +254,7 @@ public class DataPackageManagerClient extends PastaClient {
 					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
 					
 					try {
-						String errorText = readDataPackageError(entityString);
+						String errorText = readDataPackageError(transactionId);
 						throw new Exception(errorText);
 					} 
 					catch (ResourceNotFoundException e) {
@@ -273,7 +273,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime, packageId);
+				fiddlesticks(serviceMethod, idleTime, packageId, transactionId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -296,8 +296,8 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String getDataPackageArchive(String scope, Integer identifier,
-	    String revision, HttpServletResponse servletResponse) throws Exception {
+	public String getDataPackageArchive(String scope, Integer identifier, String revision, HttpServletResponse servletResponse) 
+			throws Exception {
 		String serviceMethod = "getDataPackageArchive";
 		String contentType = "text/plain";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -322,7 +322,7 @@ public class DataPackageManagerClient extends PastaClient {
 			String packageId = epif.format(emlPackageId);
 			
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
-				
+				String transactionId = entityString;
 				Integer idleTime = 0;
 
 				// Initial sleep period to mitigate potential error-check race condition 
@@ -332,14 +332,14 @@ public class DataPackageManagerClient extends PastaClient {
 					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
 					
 					try {
-						String errorText = readDataPackageError(entityString);
+						String errorText = readDataPackageError(transactionId);
 						throw new Exception(errorText);
 					} 
 					catch (ResourceNotFoundException e) {
 						logger.info(e.getMessage());
 						
 						try {
-							readDataPackageArchive(scope, identifier, revision, entityString, servletResponse);
+							readDataPackageArchive(scope, identifier, revision, transactionId, servletResponse);
 							break;
 						} 
 						catch (ResourceNotFoundException e1) {
@@ -350,7 +350,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime, packageId);
+				fiddlesticks(serviceMethod, idleTime, packageId, transactionId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
@@ -437,45 +437,48 @@ public class DataPackageManagerClient extends PastaClient {
 			String entityString = EntityUtils.toString(httpEntity);
 						
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
-
+				String transactionId = entityString;
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
+				
 				if (emlPackageId != null) {
 					EmlPackageIdFormat epif = new EmlPackageIdFormat();
 					String packageId = epif.format(emlPackageId);
-				String packageScope = emlPackageId.getScope();
-				Integer packageIdentifier = emlPackageId.getIdentifier();
-				Integer packageRevision = emlPackageId.getRevision();
+					String scope = emlPackageId.getScope();
+					Integer identifier = emlPackageId.getIdentifier();
+					Integer revision = emlPackageId.getRevision();
+					Integer idleTime = 0;
 
-				Integer idleTime = 0;
+					/*
+					 * Initial sleep period to mitigate potential error-check race condition
+					 */
+					Thread.sleep(initialSleepTime);
 
-				// Initial sleep period to mitigate potential error-check race condition
-				Thread.sleep(initialSleepTime);
+					while (idleTime <= maxIdleTime) {
+						logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
 
-				while (idleTime <= maxIdleTime) {
-					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
-					
-					try {
-						String errorText = readDataPackageError(entityString);
-						throw new Exception(errorText);
-					} 
-					catch (ResourceNotFoundException e) {
-						logger.info(e.getMessage());
-						
 						try {
-							qualityReport = readEvaluateReport(packageScope, packageIdentifier,
-							    packageRevision.toString(), entityString);
-							break;
-						} 
-						catch (ResourceNotFoundException e1) {
-							logger.info(e1.getMessage());
-							Thread.sleep(idleSleepTime);
-							idleTime += idleSleepTime;
+							String errorText = readDataPackageError(transactionId);
+							throw new Exception(errorText);
+						}
+						catch (ResourceNotFoundException e) {
+							/*
+							 * The transactionId is no longer found, so the transaction has completed.
+							 */
+							logger.info(e.getMessage());
+
+							try {
+								qualityReport = readEvaluateReport(scope, identifier, revision.toString(), transactionId);
+								break;
+							}
+							catch (ResourceNotFoundException e1) {
+								logger.info(e1.getMessage());
+								Thread.sleep(idleSleepTime);
+								idleTime += idleSleepTime;
+							}
 						}
 					}
-				}
-				
-				fiddlesticks(serviceMethod, idleTime, packageId);
 
+					fiddlesticks(serviceMethod, idleTime, packageId, transactionId);
 				}
 				else {
 					throw new UserErrorException("An EML packageId value could not be parsed from the file. Check that the file contains valid EML.");
@@ -496,17 +499,17 @@ public class DataPackageManagerClient extends PastaClient {
 	 * Throw an exception if the amount of idle time exceeds the maximum value.
 	 * Generate a message appropriate to the operation being performed.
 	 */
-	private void fiddlesticks(String serviceMethod, Integer idleTime, String packageId) 
+	private void fiddlesticks(String serviceMethod, Integer idleTime, String packageId, String transactionId) 
 			throws PastaIdleTimeException {
 		String msg = null;
 		String verb = "";
 		String advice = "";
 		String archiveAdvice = "";
-		String evaluateAdvice = String.format("You may wish to query the <a class='searchsubcat' href='auditReport.jsp'>audit logs</a> " +
-                                              "at a later time to see if '%s' was successfully evaluated. To do so, " +
-				                              "select 'evaluateDataPackage' from the list of service methods, and enter " +
-                                              "today's date as the begin date.",
-                                              packageId);
+		String evaluateURL = String.format("%s/evaluate/report/eml/%s", this.BASE_URL, transactionId);
+		String evaluateAdvice = 
+				String.format("You may check the availability of an evaluate report at a later time using the following URL: %s",
+						     evaluateURL);
+		
 		String uploadAdvice = String.format("Please check the <a class='searchsubcat' href='scopebrowse'>Browse Data by Package Identifier</a> " +
 		                                    "page at a later time to see if '%s' was successfully uploaded.",
 		                                    packageId);
@@ -520,7 +523,7 @@ public class DataPackageManagerClient extends PastaClient {
 		    		break;
 		    	case "evaluateDataPackage": 
 		    		verb = "evaluating";
-		    		advice = evaluateAdvice;
+		    		advice = evaluateAdvice; 		
 		    		break;
 		    	case "getDataPackageArchive": 
 		    		verb = "creating an archive of";
@@ -1781,7 +1784,7 @@ public class DataPackageManagerClient extends PastaClient {
 			String entityString = EntityUtils.toString(httpEntity);
 			
 			if (statusCode == HttpStatus.SC_ACCEPTED) {
-				
+				String transactionId = entityString;
 				EmlPackageId emlPackageId = EmlUtility.emlPackageIdFromEML(emlFile);
 				EmlPackageIdFormat epif = new EmlPackageIdFormat();
 				String packageId = epif.format(emlPackageId);
@@ -1798,15 +1801,14 @@ public class DataPackageManagerClient extends PastaClient {
 					logIdleTime(serviceMethod, emlPackageId.toString(), idleTime);
 					
 					try {
-						String errorText = readDataPackageError(entityString);
+						String errorText = readDataPackageError(transactionId);
 						throw new Exception(errorText);
 					} 
 					catch (ResourceNotFoundException e) {
 						logger.info(e.getMessage());
 						
 						try {
-							resourceMap = readDataPackage(packageScope, packageIdentifier,
-									packageRevision.toString());
+							resourceMap = readDataPackage(packageScope, packageIdentifier, packageRevision.toString());
 							break;
 						} 
 						catch (ResourceNotFoundException e1) {
@@ -1817,7 +1819,7 @@ public class DataPackageManagerClient extends PastaClient {
 					}
 				}
 
-				fiddlesticks(serviceMethod, idleTime, packageId);
+				fiddlesticks(serviceMethod, idleTime, packageId, transactionId);
 
 			} else {
 				handleStatusCode(statusCode, entityString);
