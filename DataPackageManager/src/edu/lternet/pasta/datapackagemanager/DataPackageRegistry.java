@@ -498,7 +498,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		if (rowCount != 1) {
@@ -637,7 +637,8 @@ public class DataPackageRegistry {
 		Connection conn = null;
 		try {
 			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
+		} 
+		catch (ClassNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
@@ -651,9 +652,13 @@ public class DataPackageRegistry {
 		try {
 			stat = conn.createStatement();
 			rowCount = stat.executeUpdate(queryString);
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+		}
+		finally {
+			returnConnection(conn);
 		}
 
 		if (rowCount != 1) {
@@ -2111,7 +2116,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		String tokenString = BasicAuthToken.makeTokenString(PUBLIC, PUBLIC);
@@ -2664,7 +2669,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -2723,7 +2728,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -2782,7 +2787,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -2841,7 +2846,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -2909,7 +2914,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -2968,7 +2973,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -3046,7 +3051,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return resourceList;
@@ -3092,7 +3097,7 @@ public class DataPackageRegistry {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 		return doiList;
@@ -3172,8 +3177,7 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 		finally {
-			if (conn != null)
-				conn.close();
+			returnConnection(conn);
 		}
 
   }
@@ -3225,8 +3229,7 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 		finally {
-			if (conn != null)
-				conn.close();
+			returnConnection(conn);
 		}
 
   }
@@ -3275,7 +3278,7 @@ public class DataPackageRegistry {
       throw(e);
     } 
     finally {
-      conn.close();
+      returnConnection(conn);
     }
 
   }
@@ -3324,7 +3327,7 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 		finally {
-			conn.close();
+			returnConnection(conn);
 		}
 
 	}

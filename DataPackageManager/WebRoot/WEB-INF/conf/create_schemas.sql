@@ -23,7 +23,6 @@ CREATE TABLE datapackagemanager.resource_registry (
   CONSTRAINT resource_registry_pk PRIMARY KEY (resource_id)
 );
 
-
 CREATE TYPE datapackagemanager.order_type AS ENUM ('allowFirst', 'denyFirst');
 CREATE TYPE datapackagemanager.access_type AS ENUM ('allow', 'deny');
 CREATE TYPE datapackagemanager.permission AS ENUM ('read', 'write', 'changePermission');
@@ -38,20 +37,8 @@ CREATE TABLE datapackagemanager.access_matrix (
   CONSTRAINT access_matrix_pk PRIMARY KEY (access_matrix_id),
   CONSTRAINT access_matrix_resource_id_fk FOREIGN KEY (resource_id) REFERENCES datapackagemanager.resource_registry
 );
-
-
-CREATE TABLE datapackagemanager.data_cache_registry (
-  PACKAGE_ID VARCHAR(64),                                   -- package Id
-  SCOPE VARCHAR(64),                                        -- scope
-  IDENTIFIER INT8,                                          -- identifier
-  REVISION INT8,                                            -- revision
-  ENTITY_ID VARCHAR(256),                                   -- entity id
-  ENTITY_NAME VARCHAR(256),                                 -- entity name
-  DATA_FORMAT VARCHAR(64),                                  -- data format
-  DATE_CREATED DATE,                                        -- date created
-  UPDATE_DATE DATE                                          -- update date
-);
-
+CREATE INDEX resource_id_idx ON datapackagemanager.access_matrix ( resource_id );
+CREATE INDEX principal_idx ON datapackagemanager.access_matrix ( principal );
 
 CREATE SEQUENCE datapackagemanager.subscription_id_seq;
 CREATE TABLE datapackagemanager.emlsubscription (
@@ -71,5 +58,3 @@ CREATE TABLE datapackagemanager.provenance (
   SOURCE_ID TEXT NOT NULL,                                      -- packageId of source data package
   CONSTRAINT PK_PROVENANCE PRIMARY KEY (DERIVED_ID, SOURCE_ID)  -- two-column primary key
 );
-
-
