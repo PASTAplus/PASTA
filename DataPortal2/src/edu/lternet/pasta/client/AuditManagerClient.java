@@ -272,9 +272,10 @@ public class AuditManagerClient extends PastaClient {
 
 
   /**
+   * Returns an audit report based on the provided oid (object id) value
    * 
-   * @param oid
-   * @return
+   * @param  oid 	the oid (object id) value of the audit report to be returned
+   * @return The XML document of the report as a String object.
    * @throws PastaEventException
    */
   public String reportByOid(String oid) throws PastaEventException {

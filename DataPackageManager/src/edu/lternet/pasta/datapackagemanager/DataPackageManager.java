@@ -2399,9 +2399,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Returns the SHA-1 checksum for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
-	 * @param resourceId
-	 * @param authToken
-	 * @return
+	 * @param resourceId   the resource identifier
+	 * @param authToken    the authorization token
+	 * @return the SHA-1 checksum string
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws UnauthorizedException
@@ -2457,9 +2457,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Returns the size value (in bytes) for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
-	 * @param resourceId
-	 * @param authToken
-	 * @return
+	 * @param resourceId   the resource identifier
+	 * @param authToken    the authorization token
+	 * @return the size value (in bytes)
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws UnauthorizedException
@@ -2515,9 +2515,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Returns the Digital Object Identifier for the given resource identifier if
 	 * it exists; otherwise, throw a ResourceNotFoundException.
 	 * 
-	 * @param resourceId
-	 * @param authToken
-	 * @return
+	 * @param resourceId   the resource identifier
+	 * @param authToken    the authorization token
+	 * @return the Digital Object Identifier (DOI) value
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws UnauthorizedException
@@ -2573,9 +2573,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Returns the format type stored for the given resource identifier if
 	 * the resource exists; otherwise, throw a ResourceNotFoundException.
 	 * 
-	 * @param resourceId
-	 * @param authToken
-	 * @return
+	 * @param resourceId   the resource identifier
+	 * @param authToken    the authorization token
+	 * @return the format type
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws UnauthorizedException

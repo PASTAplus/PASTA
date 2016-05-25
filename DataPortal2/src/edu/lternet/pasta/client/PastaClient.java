@@ -156,13 +156,13 @@ public class PastaClient {
   
   
   /**
-   * Composes the pasta URL from the pasta hostname and pasta protocol values
-   * stored in the dataportal.properties file.
+   * Composes the PASTA URL from the PASTA hostname and PASTA protocol values
+   * specified in the dataportal.properties file.
    * 
    * @param pastaProtocol     The PASTA protocol, e.g. "http"
    * @param pastaHostname     The PASTA hostname, e.g. "pasta-s.lternet.edu"
    * @param pastaPort         The PASTA port value, e.g. 8888 (may be null or empty string)
-   * @return
+   * @return                  a string representing the PASTA URL
    */
   public static String composePastaUrl(String pastaProtocol, String pastaHostname, Integer pastaPort) {
     String pastaUrl = pastaProtocol + "://" + pastaHostname;
