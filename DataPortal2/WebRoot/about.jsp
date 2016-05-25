@@ -62,10 +62,10 @@
 								<abbr title="Network Information System">NIS</abbr> Data Portal is the main path for uploading and 
 								discovery of varied LTER data products that are 
 								in <abbr title="Provenance Aware Synthesis Tracking Architecture">PASTA</abbr>.</p>
-								<p>Visit the
+								<!-- <p>Visit the
 								<a href="https://nis.lternet.edu:8443/x/agBP" class="searchsubcat" target="_blank">
 								<abbr title="Network Information System">NIS</abbr> Community Website</a> for information about 
-								upcoming updates to the LTER Network Portal.</p>
+								upcoming updates to the LTER Network Portal.</p> -->
 								
 								<!-- For Scientists, Researchers, Students, and the General Public -->
 								<!-- <div class="spacer"></div> -->
@@ -99,18 +99,19 @@
 												approach to continuously release 
 												improved versions as they are ready 
 												for the community.</p>
-												<p>Visit the
+												<!--   <p>Visit the
 												<a href="https://nis.lternet.edu:8443/x/BIBH" class="searchsubcat" target="_blank">
 												<abbr title="Network Information System">NIS</abbr> User&#39;s Guide</a> for detailed 
 												information on how to best utilize 
 												the LTER Network Data Portal.</p>
+												
 												<p>Any questions not answered by 
 												the <abbr title="Network Information System">NIS</abbr> User&#39;s Guide may be addressed 
 												in either the comments section (at 
 												the bottom of every page in the 
 												User Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
-												tech-support@lternet.edu</a>.</p>
+												tech-support@lternet.edu</a>.</p>-->
 											</div>
 										</div>
 									</div>
@@ -167,6 +168,7 @@
 												approach to adding bug fixes, improvements, 
 												and new features to each of the 
 												services.</p>
+												<!-- 
 												<p>Information about the structure 
 												and functions of the APIs and the 
 												overall source-code documentation 
@@ -182,6 +184,7 @@
 												Guide) or by emailing
 												<a href="mailto:tech-support@lternet.edu" class="searchsubcat">
 												tech-support@lternet.edu</a>.</p>
+												 -->
 									<p><sup>*</sup>User authentication is <em>required</em> for all data input to the <abbr title="Provenance Aware Synthesis Tracking Architecture">PASTA</abbr> system.</p>
 											</div>
 										</div>
