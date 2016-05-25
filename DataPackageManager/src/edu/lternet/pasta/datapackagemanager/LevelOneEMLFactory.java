@@ -117,12 +117,69 @@ public final class LevelOneEMLFactory {
     }
     //String systemAttribute = getSystemAttribute(levelZeroEMLDocument);
     setSystemAttribute(levelZeroEMLDocument);
-    appendContact(levelZeroEMLDocument);
+    
+    // Only append the Level-1 contact element if the document doesn't already have one
+    if (!hasLevelOneContact(levelZeroEMLDocument)) {
+    	appendContact(levelZeroEMLDocument);
+    }
+    
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
 
     return levelZeroEMLDocument;
   }
+
+
+	/**
+	 * Boolean to determine whether this data package contains a
+	 * Level-1 contact element. If it does, we don't want to add
+	 * a duplicate element.
+	 * 
+     * @param   emlDocument  the Level-0 EML Document
+	 * @return  true if this data package has a Level-1 contact element,
+	 *          else false
+	 */
+	public boolean hasLevelOneContact(Document emlDocument)
+	          throws TransformerException {
+		boolean hasLevelOneContact = false;
+	    CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+	    // Parse the access elements
+		NodeList datasetContacts = xpathapi.selectNodeList(emlDocument, CONTACT_PATH);
+		if (datasetContacts != null) {
+			for (int i = 0; i < datasetContacts.getLength(); i++) {
+				boolean hasPositionName = false;
+				boolean hasOrganizationName = false;
+				Element contactElement = (Element) datasetContacts.item(i);
+
+				NodeList positionNames = contactElement.getElementsByTagName("positionName");
+				if (positionNames != null) {
+					for (int j = 0; j < positionNames.getLength(); j++) {
+						Element positionNameElement = (Element) positionNames.item(j);
+						String positionName = positionNameElement.getTextContent();
+						if ("Information Manager".equals(positionName)) {
+							hasPositionName = true;
+						}
+					}
+				}
+	
+				NodeList organizationNames = contactElement.getElementsByTagName("organizationName");
+				if (organizationNames != null) {
+					for (int j = 0; j < organizationNames.getLength(); j++) {
+						Element organizationNameElement = (Element) organizationNames.item(j);
+						String organizationName = organizationNameElement.getTextContent();
+						if ("LTER Network Office".equals(organizationName)) {
+							hasOrganizationName = true;
+						}
+					}
+				}
+				
+				hasLevelOneContact = hasLevelOneContact || (hasPositionName && hasOrganizationName);
+			}
+		}
+
+		return hasLevelOneContact;
+	}
 
 
   /*

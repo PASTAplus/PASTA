@@ -471,7 +471,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			// Get the packageId from the EMLDataPackage object
 			String packageId = levelZeroDataPackage.getPackageId();
 
-			// Is this a Level 1 data package?
+			/* Is this a Level 1 data package?
 			if (levelZeroDataPackage.isLevelOne()) {
 				String message = "The data package you are attempting to insert, '"
 				    + packageId
@@ -479,6 +479,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + "inserted into PASTA.";
 				throw new UserErrorException(message);
 			}
+			*/
 
 			// Is this discovery-level EML?
 			if (!levelZeroDataPackage.hasEntity()) {
@@ -1002,7 +1003,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			// Get the packageId from the EMLDataPackage object
 			String packageId = levelZeroDataPackage.getPackageId();
 
-			// Is this a Level 1 data package?
+			/* Is this a Level 1 data package?
 			if (levelZeroDataPackage.isLevelOne()) {
 				String message = "The data package you are attempting to evaluate, '"
 				    + packageId
@@ -1010,6 +1011,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + "inserted into PASTA.";
 				throw new UserErrorException(message);
 			}
+			*/
 
 			// Is this discovery-level EML?
 			if (!levelZeroDataPackage.hasEntity()) {
@@ -2771,7 +2773,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new UserErrorException(message);
 			}
 
-			// Is this a Level 1 data package?
+			/* Is this a Level 1 data package?
 			if (levelZeroDataPackage.isLevelOne()) {
 				String message = "The data package you are attempting to update, '"
 				    + packageId
@@ -2779,6 +2781,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + "inserted into PASTA.";
 				throw new UserErrorException(message);
 			}
+			*/
 
 			// Is this discovery-level EML?
 			if (!levelZeroDataPackage.hasEntity()) {

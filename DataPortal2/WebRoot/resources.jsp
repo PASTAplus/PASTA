@@ -61,11 +61,13 @@
 								<h3 align="left">Websites</h3>
 								<ul>
 									<li><a class="searchsubcat" href="http://www.lternet.edu">LTER Network</a></li>
+									<!--
 									<li><a class="searchsubcat" href="http://lno.lternet.edu">LTER Network Office</a></li>
-									<!--  <li>
+									<li>
 									  <a class="searchsubcat" href="https://nis.lternet.edu:8443/x/agBP">
 								  	  <abbr title="Network Information System">NIS</abbr> Guides</a>
-								  </li> -->
+								    </li> 
+								    -->
 								</ul>
 								<h3 align="left">Tools</h3>
 								<ul>
@@ -74,7 +76,8 @@
 									<li><a class="searchsubcat" href="https://lter.dev.gios.asu.edu/lter/html/index.php">LTER Network Information System Reporting Tool</a>
 								  </li>
 								</ul>
-								<!-- /Content --></div>
+								<!-- /Content -->
+							</div>
 						</div>
 					</div>
 				</div>
