@@ -19,6 +19,8 @@
 package edu.lternet.pasta.portal.statistics;
 
 import edu.lternet.pasta.portal.ConfigurationListener;
+import edu.lternet.pasta.portal.database.DatabaseClient;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 
@@ -28,6 +30,7 @@ import java.util.*;
 import java.util.Date;
 
 /**
+ *  
  * User: servilla
  * Date: 8/20/13
  * Time: 1:53 PM
@@ -36,13 +39,16 @@ import java.util.Date;
  * Package: edu.lternet.pasta.utilities.statistics
  * <p/>
  * Generate data package and site growth statistics for PASTA.
+
+ * @author Mark Servilla
+ * @author Duane Costa
  */
 public class GrowthStats {
 
 
  /* Instance variables */
 
-  private Connection conn = null;
+  DatabaseClient databaseClient;
 
  /* Class variables */
 
@@ -62,23 +68,7 @@ public class GrowthStats {
     String dbUrl = options.getString("db.pkg.URL");
     String dbUser = options.getString("db.User");
     String dbPassword = options.getString("db.Password");
-
-    try {
-      Class.forName(dbDriver);
-    }
-    catch (ClassNotFoundException e) {
-      logger.error("GrowthStats: " + e.getMessage());
-      e.printStackTrace();
-    }
-
-    try {
-      conn = getConnection(dbUrl, dbUser, dbPassword);
-    }
-    catch (SQLException e) {
-      logger.error("GrowthStats: " + e.getMessage());
-      e.printStackTrace();
-    }
-
+	this.databaseClient = new DatabaseClient(dbDriver, dbUrl, dbUser, dbPassword);
   }
 
  /* Instance methods */
@@ -154,21 +144,26 @@ public class GrowthStats {
   }
 
   private HashMap<String, Long> buildHashMap(String sql) throws SQLException {
-
+	Connection conn = databaseClient.getConnection();
     HashMap<String, Long> map = new HashMap<String, Long>();
 
-    if (conn != null) {
-      Statement stmnt = conn.createStatement();
-      ResultSet rs = stmnt.executeQuery(sql);
+	try {
+		if (conn != null) {
+			Statement stmnt = conn.createStatement();
+			ResultSet rs = stmnt.executeQuery(sql);
 
-      while (rs.next()) {
-        String key = rs.getString(1);
-        Long date_created = rs.getTimestamp(2).getTime();
-        if (!map.containsKey(key)) {
-          map.put(key, date_created);
-        }
-      }
-    }
+			while (rs.next()) {
+				String key = rs.getString(1);
+				Long date_created = rs.getTimestamp(2).getTime();
+				if (!map.containsKey(key)) {
+					map.put(key, date_created);
+				}
+			}
+		}
+	}
+	finally {
+		databaseClient.closeConnection(conn);
+	}
 
     return map;
 
@@ -282,32 +277,8 @@ public class GrowthStats {
 
   }
 
-  private Connection getConnection(String dbUrl, String dbUser, String dbPassword)
-      throws SQLException {
 
-    Connection conn = null;
-    SQLWarning warn;
-
-    conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-
-    // If a SQLWarning object is available, print its warning(s).
-    // There may be multiple warnings chained.
-    warn = conn.getWarnings();
-
-    if (warn != null) {
-      while (warn != null) {
-        logger.error("SQLState: " + warn.getSQLState());
-        logger.error("Message:  " + warn.getMessage());
-        logger.error("Vendor: " + warn.getErrorCode());
-        warn = warn.getNextWarning();
-      }
-    }
-
-    return conn;
-  }
-
-
- /* Class methods */
+  /* Class methods */
 
   public static void main(String[] args) {
 
