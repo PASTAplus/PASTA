@@ -3,8 +3,8 @@ var Requests = {
    _relativeUrl : "/test/",
 
    _setUserAndPassword : function(requestForm) {
-      requestForm.user.value = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
-      requestForm.password.value = "S@ltL@ke";
+      requestForm.user.value = "uid=user_here,o=LTER,dc=ecoinformatics,dc=org";
+      requestForm.password.value = "password_here";
    },
 
    _clearUserAndPassword : function(requestForm) {
