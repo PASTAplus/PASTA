@@ -84,15 +84,20 @@ public final class KnbLdap extends Ldap {
 		this.keystoreFile = FileUtility.assertCanRead(keystoreFile);
 	}
 
-	public static void main(String[] arg) throws LDAPException {
+	public static void main(String[] args) throws LDAPException {
 
-		String fileName = "./WebRoot/WEB-INF/conf/keystore.jks";
+		if (args.length != 2) {
+			System.err.println("Please enter KNB LDAP username and password as command line arguments.");
+			System.exit(1);
+		}
+		
+		String fileName = "./conf/keystore.jks";
 		File keystore = FileUtility.assertCanRead(fileName);
 
 		KnbLdap ldap = new KnbLdap(keystore);
 
-		String user = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
-		String password = "S@ltL@ke";
+		String user = args[0];
+		String password = args[1];
 
 		System.out.println(ldap.authenticate(user, password));
 	}
