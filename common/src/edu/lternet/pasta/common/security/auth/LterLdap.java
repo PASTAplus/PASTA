@@ -43,12 +43,17 @@ public final class LterLdap extends Ldap {
         super(server, port);
     }
 
-    public static void main(String[] arg) throws LDAPException {
+    public static void main(String[] args) throws LDAPException {
 
+		if (args.length != 2) {
+			System.err.println("Please enter LTER LDAP username and password as command line arguments.");
+			System.exit(1);
+		}
+		
         LterLdap ldap = new LterLdap();
 
-        String user = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
-        String password = "S@ltL@ke";
+		String user = args[0];
+		String password = args[1];
 
         System.out.println(ldap.authenticate(user, password));
     }
