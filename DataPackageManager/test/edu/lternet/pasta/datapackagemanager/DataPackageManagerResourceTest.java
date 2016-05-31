@@ -356,7 +356,7 @@ public class DataPackageManagerResourceTest {
     this.transaction = entityString;
 
     try {
-    	Thread.sleep(10000);
+    	Thread.sleep(15000);
     }
     catch (Exception e) {
     	;
@@ -1137,7 +1137,7 @@ public class DataPackageManagerResourceTest {
     this.transaction = entityString;
 
     try {
-    	Thread.sleep(10000);
+    	Thread.sleep(15000);
     }
     catch (Exception e) {
     	;
