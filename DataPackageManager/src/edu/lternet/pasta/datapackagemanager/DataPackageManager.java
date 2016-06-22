@@ -153,7 +153,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	private static String resourceDir = null;
 	private static String entityDir = null;
-	private static String reportDir = null;
 	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
 
 	private static final String SLASH = "/";
@@ -1558,7 +1557,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
 			entityDir = options.getOption("datapackagemanager.entityDir");
-			reportDir = options.getOption("datapackagemanager.reportDir");
 			
 			// Data Manager Library (DML) options
 			String anonymousFtpPasswd = options.getOption("anonymousFtpPasswd");
