@@ -50,6 +50,9 @@
       <fileset dir="${shared.lib.dir}/apache-xalan">
         <include name="**/xalan.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xerces">
+        <include name="serializer.jar"/>
+      </fileset>
       <fileset dir="${shared.lib.dir}/unboundid">
         <include name="unboundid-ldapsdk-se.jar"/>
       </fileset>
