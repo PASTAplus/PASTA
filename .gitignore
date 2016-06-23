@@ -18,6 +18,7 @@ web-service-api
 common/WebRoot
 common/lib
 common/src/edu/lternet/pasta/common/proxy/PastaUrls.properties
+common/test/edu/lternet/pasta/common/security/auth/UserCreds.properties
 */WebRoot/WEB-INF/conf/*.properties
 */WebRoot/WEB-INF/doc/
 /Gatekeeper/WebRoot/WEB-INF/conf/private-key.ser
