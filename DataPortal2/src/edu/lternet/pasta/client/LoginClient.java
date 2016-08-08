@@ -128,26 +128,11 @@ public class LoginClient {
 
   }
 
-  /*
-   * Methods
-   */
-
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
-
-    ConfigurationListener.configure();
-
-    try {
-      new LoginClient("cjack", "Pr1cklyP3@r");
-    } catch (PastaAuthenticationException e) {
-      logger.error(e.getMessage());
-    }
-
-  }
-
   
+  /*
+   * Class methods
+   */
+
 	/*
 	 * Closes the HTTP client
 	 */
@@ -161,6 +146,10 @@ public class LoginClient {
 		}
 	}
 
+
+  /*
+   * Instance methods
+   */
 
   /**
    * Perform a PASTA login operation using the user's credentials. Because there
