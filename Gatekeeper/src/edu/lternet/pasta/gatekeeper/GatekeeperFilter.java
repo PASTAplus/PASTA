@@ -86,10 +86,8 @@ public final class GatekeeperFilter implements Filter
 
     private static Logger logger = Logger.getLogger(GatekeeperFilter.class);
     private FilterConfig filterConfig;
-    private static int BAD_REQUEST_CODE = 400;
-    private static int UNAUTHORIZED_CODE = 401;
-    private boolean publicUser = false;
-    private Integer contentLength = null;
+    private static final int BAD_REQUEST_CODE = 400;
+    private static final int UNAUTHORIZED_CODE = 401;
 
     private enum CookieUse {
         EXTERNAL, INTERNAL
@@ -133,8 +131,8 @@ public final class GatekeeperFilter implements Filter
         doDiagnostics(req);
 
         try {
-            Cookie internalCookie = hasAuthToken(req.getCookies()) ?
-                                        doCookie(req) : doHeader(req, res);
+        	boolean hasAuthToken = hasAuthToken(req.getCookies());
+            Cookie internalCookie = hasAuthToken ? doCookie(req) : doHeader(req, res);
             chain.doFilter(new PastaRequestWrapper(req, internalCookie), res);
         }
         catch (IllegalStateException e) {
@@ -192,9 +190,9 @@ public final class GatekeeperFilter implements Filter
      *  Process incoming basic-authentication header or "public" user
      */
     private Cookie doHeader(HttpServletRequest req, HttpServletResponse res) {
-
-        AuthToken authToken =
-                makeAuthenticated(req.getHeader(HttpHeaders.AUTHORIZATION));
+    	String rawHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
+    	boolean publicUser = (rawHeader == null || rawHeader.isEmpty());
+        AuthToken authToken = makeAuthenticated(rawHeader);
 
         // Only return authToken (in cookie) if real user
         if (!publicUser) {
@@ -202,8 +200,6 @@ public final class GatekeeperFilter implements Filter
               makeAuthTokenCookie(authToken, CookieUse.EXTERNAL);
           res.addCookie(externalCookie);
         }
-
-
 
         return makeAuthTokenCookie(authToken, CookieUse.INTERNAL);
     }
@@ -267,11 +263,9 @@ public final class GatekeeperFilter implements Filter
             tmpHeader = BasicAuthToken.makeTokenString(
                     ConfigurationListener.getPublicUser(),
                     ConfigurationListener.getPublicUser());
-            publicUser = true;
         }
         else {
             tmpHeader = rawHeader;
-            publicUser = false;
         }
 
         KnbAuthSystem knb = new KnbAuthSystem(ConfigurationListener.getLdapKeyStore());
@@ -327,43 +321,54 @@ public final class GatekeeperFilter implements Filter
 	 * name and its contents to the designated logger.
 	 * 
 	 * @param req
-	 *          The HttpServletRequest object.
+	 *          the HttpServletRequest object.
+	 * @return contentLength  
+	 *          the content length that was specified in the 
+	 *          request headers, possibly null
 	 */
-	private void dumpHeader(HttpServletRequest req, Boolean noAuthPeek) {
+	private Integer dumpHeader(HttpServletRequest req, Boolean noAuthPeek) {
 		Enumeration<String> headerNames = req.getHeaderNames();
 		String headerName = null;
+		Integer contentLength = null;
 
 		String header = null;
-    StringBuilder sb = new StringBuilder();
-    sb.append(String.format("Header: %n"));
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("Header: %n"));
 
 		while (headerNames.hasMoreElements()) {
 
 			headerName = headerNames.nextElement();
 			header = req.getHeader(headerName);
 
-      if (headerName.equals("Authorization") && noAuthPeek) header = "********";
+			if (headerName.equals("Authorization") && noAuthPeek)
+				header = "********";
 
 			if (headerName.equals("Content-Length")) {
-				this.contentLength = Integer.valueOf(header);
+				contentLength = Integer.valueOf(header);
 			}
 
 			sb.append(String.format("     %s: %s%n", headerName, header));
 
 		}
 
-    logger.info(sb.toString());
+		logger.info(sb.toString());
+		return contentLength;
 
 	}
+
   
 	/**
 	 * dumpBody outputs the contents of the request message body to the
 	 * designated logger.  Note that the use of this method will render the
 	 * request object inoperable for and subsequent calls.
 	 * 
-	 * @param req The HttpServletRequest object.
+	 * @param req 
+	 *          the HttpServletRequest object.
+	 * @param contentLength 
+	 *          the content length that was specified in the 
+	 *          request headers, possibly null
 	 */
-	private void dumpBody(HttpServletRequest req) {
+	private void dumpBody(HttpServletRequest req, Integer contentLength) {
 
 		if (contentLength != null) {
 
@@ -375,7 +380,7 @@ public final class GatekeeperFilter implements Filter
 
 				if (br.markSupported()) {
 
-					br.mark(this.contentLength + 1);
+					br.mark(contentLength + 1);
 
 					while ((line = br.readLine()) != null) {
 						System.out.println(line);
@@ -406,8 +411,8 @@ public final class GatekeeperFilter implements Filter
 
     Boolean noAuthPeek = true;
 
-    dumpHeader(req, noAuthPeek);
-    //dumpBody(req);
+    Integer contentLength = dumpHeader(req, noAuthPeek);
+    //dumpBody(req, contentLength);
 
   }
 
