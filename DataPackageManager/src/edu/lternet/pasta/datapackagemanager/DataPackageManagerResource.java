@@ -871,33 +871,37 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-		String transaction = generateTransactionID("create", null, null, null);
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+			
+			// Is user authorized to run the 'createDataPackage' service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
 
-		authToken = getAuthToken(headers);
-		String userId = authToken.getUserId();
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+					String.format("User %s is not authorized to execute service method %s", 
+							      userId, serviceMethodName));
+			}
 
-		// Is user authorized to run the 'createDataPackage' service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-				serviceMethodName, permission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException("User " + userId
-					+ " is not authorized to execute service method "
-					+ serviceMethodName);
+			String transaction = generateTransactionID("create", null, null, null);
+			
+			// Perform createDataPackage in new thread
+			Creator creator = new Creator(emlFile, userId, authToken, transaction);
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			executorService.execute(creator);
+			executorService.shutdown();
+			
+			responseBuilder = Response.status(Response.Status.ACCEPTED);
+			responseBuilder.entity(transaction);
+			response = responseBuilder.build();
+			response = stampHeader(response);
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 		}
 
-		// Perform createDataPackage in new thread
-		Creator creator = new Creator(emlFile, userId, authToken, transaction);
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		executorService.execute(creator);
-		executorService.shutdown();
-
-		responseBuilder = Response.status(Response.Status.ACCEPTED);
-		responseBuilder.entity(transaction);
-		response = responseBuilder.build();
-		response = stampHeader(response);
-
 		return response;
-
 	}
 
 
@@ -8093,43 +8097,47 @@ public class DataPackageManagerResource extends PastaWebService {
 	@Path("/eml/{scope}/{identifier}")
 	@Consumes("application/xml")
 	@Produces("text/plain")
-	public Response updateDataPackage(@Context HttpHeaders headers,
+	public Response updateDataPackage(
+			@Context HttpHeaders headers, 
 			@PathParam("scope") String scope,
-			@PathParam("identifier") Integer identifier, File emlFile) {
-
+			@PathParam("identifier") Integer identifier, 
+			File emlFile) {
 		AuthToken authToken = null;
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
 		final String serviceMethodName = "updateDataPackage";
 		Rule.Permission permission = Rule.Permission.write;
 
-		String transaction = generateTransactionID("update", scope, identifier, null);
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
 
-		authToken = getAuthToken(headers);
-		String userId = authToken.getUserId();
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						String.format("User %s is not authorized to execute service method %s", 
+								      userId, serviceMethodName));
+			}
 
-		// Is user authorized to run the service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-				serviceMethodName, permission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException("User " + userId
-					+ " is not authorized to execute service method "
-					+ serviceMethodName);
+			String transaction = generateTransactionID("update", scope, identifier, null);
+
+			// Perform updateDataPackage in new thread
+			Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			executorService.execute(updator);
+			executorService.shutdown();
+
+			responseBuilder = Response.status(Response.Status.ACCEPTED);
+			responseBuilder.entity(transaction);
+			response = responseBuilder.build();
+			response = stampHeader(response);
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 		}
 
-		// Perform updateDataPackage in new thread
-		Updator updator = new Updator(emlFile, scope, identifier, userId,
-				authToken, transaction);
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		executorService.execute(updator);
-		executorService.shutdown();
-
-		responseBuilder = Response.status(Response.Status.ACCEPTED);
-		responseBuilder.entity(transaction);
-		response = responseBuilder.build();
-		response = stampHeader(response);
 		return response;
-
 	}
 
 
