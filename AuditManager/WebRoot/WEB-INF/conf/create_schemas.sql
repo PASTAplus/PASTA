@@ -17,3 +17,5 @@ CREATE INDEX entrytime_idx ON auditmanager.eventlog ( entryTime );
 CREATE INDEX servicemethod_idx ON auditmanager.eventlog ( serviceMethod );
 CREATE INDEX resourceid_idx ON auditmanager.eventlog ( resourceId );
 CREATE INDEX userid_idx ON auditmanager.eventlog ( userid );
+CREATE INDEX statuscode_idx ON auditmanager.eventlog ( statusCode );
+CREATE INDEX category_idx ON auditmanager.eventlog ( category );
