@@ -140,6 +140,7 @@ public class SolrIndex {
     	
 		if (dataPackage != null) {
 			List<String> titles = dataPackage.getTitles();
+			List<String> projectTitles = dataPackage.getProjectTitles();
 			List<ResponsibleParty> responsibleParties = dataPackage.getCreatorList();
 			
 			// Get content of several different date nodes
@@ -152,6 +153,7 @@ public class SolrIndex {
 			List<String> keywords = dataPackage.getKeywords();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
+			String projectAbstractText = dataPackage.getProjectAbstractText();
 			String fundingText = dataPackage.getFundingText();
 			String methodsText = dataPackage.getMethodsText();
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();
@@ -224,6 +226,15 @@ public class SolrIndex {
 			}
 			
 			/*
+			 *  Index the "projectTitle" field, a multi-valued field.
+			 */
+			for (String projectTitle : projectTitles) {
+				String normalizedTitle = normalizeText(projectTitle);
+				// Note how we use addField() for multi-valued fields
+				solrInputDocument.addField("projectTitle", normalizedTitle);
+			}
+			
+			/*
 			 *  Index the "author", "organization", and "responsibleParties" fields. 
 			 *  The first two are multi-valued while "responsibleParties" is single value. 
 			 *  Only single value fields can be sorted in search results, and it must
@@ -284,6 +295,10 @@ public class SolrIndex {
 
 			if (abstractText != null) {
 				solrInputDocument.setField("abstract", abstractText);
+			}
+
+			if (projectAbstractText != null) {
+				solrInputDocument.setField("projectAbstract", projectAbstractText);
 			}
 
 			if (fundingText != null) {

@@ -85,6 +85,8 @@ public class EMLParser {
                                                   "storedProcedure";
   public static final String VIEW_ENTITY = "view";
   private static final String PACKAGE_ID_PATH = "//eml/@packageId";
+  public static final String PROJECT_ABSTRACT_PATH = "//dataset/project/abstract";
+  public static final String PROJECT_TITLE_PATH = "//dataset/project/title";
   
   private static final String ENTITY_NAME = "entityName";
   private static final String OBJECT_NAME = "physical/objectName";
@@ -183,11 +185,26 @@ public class EMLParser {
           dataPackage.titles.add(title);
         }
 
+        // Parse the project title nodes
+        NodeList projectTitleNodeList = xpathapi.selectNodeList(document, PROJECT_TITLE_PATH);
+        for (int i = 0; i < projectTitleNodeList.getLength(); i++) {
+          String projectTitle = projectTitleNodeList.item(i).getTextContent();
+          projectTitle = XmlUtility.xmlEncode(projectTitle);
+          dataPackage.projectTitles.add(projectTitle);
+        }
+
         // Parse the abstract text
         Node abstractNode = xpathapi.selectSingleNode(document, ABSTRACT_PATH);
         if (abstractNode != null) {
           String abstractText = abstractNode.getTextContent().trim();
           this.dataPackage.setAbstractText(abstractText);
+        }
+
+        // Parse the project abstract text
+        Node projectAbstractNode = xpathapi.selectSingleNode(document, PROJECT_ABSTRACT_PATH);
+        if (projectAbstractNode != null) {
+          String projectAbstractText = projectAbstractNode.getTextContent().trim();
+          this.dataPackage.setProjectAbstractText(projectAbstractText);
         }
 
         // Parse the methods text
