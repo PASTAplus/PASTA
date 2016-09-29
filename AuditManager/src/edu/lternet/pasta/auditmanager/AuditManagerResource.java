@@ -299,7 +299,7 @@ public class AuditManagerResource extends PastaWebService
      *
      * @param headers
      *            the HTTP request headers containing the authorization token.
-     * @param logEntry
+     * @param auditEntry
      *            the POST request's body, of XML representing a log entry.
      * @return an appropriate HTTP response.
      */
@@ -386,7 +386,7 @@ public class AuditManagerResource extends PastaWebService
      *
      * @param headers
      *             the HTTP request headers containing the authorization token.
-     * @param uriInfo
+     * @param oid
      *             the POST request's body, of XML representing a log entry.
      * @return an appropriate HTTP response.
      */
