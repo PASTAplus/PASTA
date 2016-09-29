@@ -2159,7 +2159,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				if (dataPackageMetadata != null) {
 					boolean evaluateMode = false;
 					File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
-					metadataXML = FileUtils.readFileToString(levelOneEMLFile);
+					try {
+						metadataXML = FileUtils.readFileToString(levelOneEMLFile);
+					}
+					catch (IOException e) {
+						logger.error("Error reading Level-1 metadata file: "
+							    + e.getMessage());
+							e.printStackTrace();
+							throw (e);
+					}
 				}
 			}
 		} catch (ClassNotFoundException e) {

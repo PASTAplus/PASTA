@@ -57,11 +57,13 @@ public class DataPackage {
   ArrayList<TemporalCoverage> temporalCoverageList;
   ArrayList<String> timescales = null;
   ArrayList<String> titles = null;
+  ArrayList<String> projectTitles = null;
   String site = null;
   String abstractText = null;
   String methodsText = null;
   String fundingText = null;
   String geographicDescriptionText = null;
+  String projectAbstractText = null;
   String taxonomicCoverageText = null;
 
   // Date fields
@@ -92,6 +94,7 @@ public class DataPackage {
     this.dataSources = new ArrayList<String>();
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
+    this.projectTitles = new ArrayList<String>();
     this.temporalCoverageList = new ArrayList<TemporalCoverage>();
     this.timescales = new ArrayList<String>();
     this.titles = new ArrayList<String>();
@@ -238,6 +241,11 @@ public class DataPackage {
 	}
 
 
+	public String getProjectAbstractText() {
+		return projectAbstractText;
+	}
+
+
   public String getSite() {
 	return site;
   }
@@ -248,6 +256,11 @@ public class DataPackage {
   }
   
   
+	public ArrayList<String> getProjectTitles() {
+		return projectTitles;
+	}
+	  
+	  
   public String getPubDate() {
     return pubDate;
   }
@@ -358,6 +371,11 @@ public class DataPackage {
     }
   }
   
+  
+	public void setProjectAbstractText(String projectAbstractText) {
+		this.projectAbstractText = projectAbstractText;
+	}
+
   
   public void setPubDate(String pubDate) {
     this.pubDate = pubDate;
