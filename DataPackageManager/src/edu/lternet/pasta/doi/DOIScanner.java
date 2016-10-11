@@ -246,8 +246,8 @@ public class DOIScanner {
 
 				try {
 
-					ezidRegistrar.registerDataCiteMetadata();
 					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+					ezidRegistrar.registerDataCiteMetadata();
 
 				} catch (EzidException e) {
 
@@ -259,7 +259,11 @@ public class DOIScanner {
 					 */
 
 					if (e.getMessage().equals("identifier already exists")) {
-						logger.warn("Proceeding with resource registry update...");
+						String msg = String.format(
+                            "%s already exists in EZID but it needs to be updated in the resource registry for %s.", 
+                            doi, resource.getPackageId()
+                        );
+						logger.warn(msg + "  Proceeding with resource registry update...");
 					} else {
 						logger.error(e.getMessage());
 						e.printStackTrace();
