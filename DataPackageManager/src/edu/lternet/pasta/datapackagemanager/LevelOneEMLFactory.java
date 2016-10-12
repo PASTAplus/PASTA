@@ -118,10 +118,10 @@ public final class LevelOneEMLFactory {
     //String systemAttribute = getSystemAttribute(levelZeroEMLDocument);
     setSystemAttribute(levelZeroEMLDocument);
     
-    // Only append the Level-1 contact element if the document doesn't already have one
+    /* Only append the Level-1 contact element if the document doesn't already have one
     if (!hasLevelOneContact(levelZeroEMLDocument)) {
     	appendContact(levelZeroEMLDocument);
-    }
+    }*/
     
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
@@ -168,7 +168,7 @@ public final class LevelOneEMLFactory {
 					for (int j = 0; j < organizationNames.getLength(); j++) {
 						Element organizationNameElement = (Element) organizationNames.item(j);
 						String organizationName = organizationNameElement.getTextContent();
-						if ("LTER Network Office".equals(organizationName)) {
+						if ("Environmental Data Initiative".equals(organizationName)) {
 							hasOrganizationName = true;
 						}
 					}
@@ -184,25 +184,25 @@ public final class LevelOneEMLFactory {
 
   /*
    * Append a Level-1 contact element to document containing contact
-   * info for the LTER Network Office (LNO)
+   * info for the Environmental Data Initiative (EDI)
    */
   private void appendContact(Document doc) {
     Element lnoContact = doc.createElement("contact");
     Element positionName = doc.createElement("positionName");
     positionName.appendChild(doc.createTextNode("Information Manager"));
     Element organizationName = doc.createElement("organizationName");
-    organizationName.appendChild(doc.createTextNode("LTER Network Office"));
+    organizationName.appendChild(doc.createTextNode("Environmental Data Initiative"));
     Element address = doc.createElement("address");
     Element deliveryPoint1 = doc.createElement("deliveryPoint");
-    deliveryPoint1.appendChild(doc.createTextNode("UNM Biology Department, MSC03-2020"));
+    deliveryPoint1.appendChild(doc.createTextNode("Center for Limnology"));
     Element deliveryPoint2 = doc.createElement("deliveryPoint");
-    deliveryPoint2.appendChild(doc.createTextNode("1 University of New Mexico"));
+    deliveryPoint2.appendChild(doc.createTextNode("University of Wisconsin"));
     Element city = doc.createElement("city");
-    city.appendChild(doc.createTextNode("Albuquerque"));    
+    city.appendChild(doc.createTextNode("Madison"));    
     Element administrativeArea = doc.createElement("administrativeArea");
-    administrativeArea.appendChild(doc.createTextNode("NM"));    
+    administrativeArea.appendChild(doc.createTextNode("WI"));    
     Element postalCode = doc.createElement("postalCode");
-    postalCode.appendChild(doc.createTextNode("87131-0001"));    
+    postalCode.appendChild(doc.createTextNode("53706"));    
     Element country = doc.createElement("country");
     country.appendChild(doc.createTextNode("USA"));   
     address.appendChild(deliveryPoint1);
@@ -211,21 +211,21 @@ public final class LevelOneEMLFactory {
     address.appendChild(administrativeArea);
     address.appendChild(postalCode);
     address.appendChild(country);
-    Element phone1 = doc.createElement("phone");
-    phone1.setAttribute("phonetype", "voice");
-    phone1.appendChild(doc.createTextNode("505 277-2535"));
-    Element phone2 = doc.createElement("phone");
-    phone2.setAttribute("phonetype", "fax");
-    phone2.appendChild(doc.createTextNode("505 277-2541"));
+    //Element phone1 = doc.createElement("phone");
+    //phone1.setAttribute("phonetype", "voice");
+    //phone1.appendChild(doc.createTextNode("505 277-2535"));
+    //Element phone2 = doc.createElement("phone");
+    //phone2.setAttribute("phonetype", "fax");
+    //phone2.appendChild(doc.createTextNode("505 277-2541"));
     Element electronicMailAddress = doc.createElement("electronicMailAddress");
-    electronicMailAddress.appendChild(doc.createTextNode("tech-support@lternet.edu"));    
+    electronicMailAddress.appendChild(doc.createTextNode("info@environmentaldatainitiative.org"));    
     Element onlineUrl = doc.createElement("onlineUrl");
-    onlineUrl.appendChild(doc.createTextNode("http://www.lternet.edu"));    
+    onlineUrl.appendChild(doc.createTextNode("http://environmentaldatainitiative.org"));    
     lnoContact.appendChild(positionName);
     lnoContact.appendChild(organizationName);
     lnoContact.appendChild(address);
-    lnoContact.appendChild(phone1);
-    lnoContact.appendChild(phone2);
+    //lnoContact.appendChild(phone1);
+    //lnoContact.appendChild(phone2);
     lnoContact.appendChild(electronicMailAddress);
     lnoContact.appendChild(onlineUrl);
     NodeList contacts = getContacts(doc);  

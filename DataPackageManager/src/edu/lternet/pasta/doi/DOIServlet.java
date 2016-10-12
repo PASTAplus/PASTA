@@ -47,35 +47,42 @@ public class DOIServlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
+			throws ServletException, IOException {
 
-		logger.info("DOI processing...");
+		logger.info("DOI processing started...");
 
 		try {
 			DOIScanner doiScanner = new DOIScanner();
 			doiScanner.doScanToRegister();
-			
+
 			/*
 			 * 
 			 * Note: This logic is no longer valid as of Ticket #912:
-			 *       https://trac.lternet.edu/trac/NIS/ticket/912
+			 * https://trac.lternet.edu/trac/NIS/ticket/912
 			 *
-			doiScanner.doScanToObsolete();
+			 * doiScanner.doScanToObsolete();
 			 */
-			
-		} catch (ConfigurationException e) {
+
+		}
+		catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
-		} catch (DOIException e) {
+		}
+		catch (DOIException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			logger.error(e.getMessage());
-	    e.printStackTrace();
-    } catch (SQLException e) {
+			e.printStackTrace();
+		}
+		catch (SQLException e) {
 			logger.error(e.getMessage());
-	    e.printStackTrace();
-    }
+			e.printStackTrace();
+		}
+		finally {
+			logger.info("DOI processing finished.");
+		}
 
 	}
 
