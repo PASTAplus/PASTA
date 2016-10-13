@@ -141,6 +141,7 @@ public class SolrIndex {
 		if (dataPackage != null) {
 			List<String> titles = dataPackage.getTitles();
 			List<String> projectTitles = dataPackage.getProjectTitles();
+			List<String> relatedProjectTitles = dataPackage.getRelatedProjectTitles();
 			List<ResponsibleParty> responsibleParties = dataPackage.getCreatorList();
 			
 			// Get content of several different date nodes
@@ -235,6 +236,14 @@ public class SolrIndex {
 			}
 			
 			/*
+			 *  Index the "relatedProjectTitle" field, a multi-valued field.
+			 */
+			for (String relatedProjectTitle : relatedProjectTitles) {
+				String normalizedTitle = normalizeText(relatedProjectTitle);
+				solrInputDocument.addField("relatedProjectTitle", normalizedTitle);
+			}
+			
+			/*
 			 *  Index the "author", "organization", and "responsibleParties" fields. 
 			 *  The first two are multi-valued while "responsibleParties" is single value. 
 			 *  Only single value fields can be sorted in search results, and it must
@@ -297,9 +306,14 @@ public class SolrIndex {
 				solrInputDocument.setField("abstract", abstractText);
 			}
 
+			/*
+			 * We (EDI) have decided to not index project abstract. Leaving this
+			 * commented-out for now in case we changed our mind.
+			 * 
 			if (projectAbstractText != null) {
 				solrInputDocument.setField("projectAbstract", projectAbstractText);
 			}
+			*/
 
 			if (fundingText != null) {
 				solrInputDocument.setField("funding", fundingText);

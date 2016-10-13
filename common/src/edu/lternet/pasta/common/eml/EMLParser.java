@@ -87,6 +87,7 @@ public class EMLParser {
   private static final String PACKAGE_ID_PATH = "//eml/@packageId";
   public static final String PROJECT_ABSTRACT_PATH = "//dataset/project/abstract";
   public static final String PROJECT_TITLE_PATH = "//dataset/project/title";
+  public static final String RELATED_PROJECT_TITLE_PATH = "//dataset/project/relatedProject/title";
   
   private static final String ENTITY_NAME = "entityName";
   private static final String OBJECT_NAME = "physical/objectName";
@@ -191,6 +192,14 @@ public class EMLParser {
           String projectTitle = projectTitleNodeList.item(i).getTextContent();
           projectTitle = XmlUtility.xmlEncode(projectTitle);
           dataPackage.projectTitles.add(projectTitle);
+        }
+
+        // Parse the related project title nodes
+        NodeList relatedProjectTitleNodeList = xpathapi.selectNodeList(document, RELATED_PROJECT_TITLE_PATH);
+        for (int i = 0; i < relatedProjectTitleNodeList.getLength(); i++) {
+          String relatedProjectTitle = relatedProjectTitleNodeList.item(i).getTextContent();
+          relatedProjectTitle = XmlUtility.xmlEncode(relatedProjectTitle);
+          dataPackage.relatedProjectTitles.add(relatedProjectTitle);
         }
 
         // Parse the abstract text
