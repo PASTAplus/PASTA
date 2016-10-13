@@ -137,7 +137,8 @@
     <field name="timescale" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="geographicdescription" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
     <field name="projectTitle" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
-    <field name="projectAbstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
+    <field name="relatedProjectTitle" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <!-- <field name="projectAbstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/> -->
 
     <!-- tdate fields -->
     <field name="pubdate" type="tdate" indexed="true" stored="true" multiValued="false"/>
@@ -216,7 +217,8 @@
    <copyField source="timescale" dest="text"/>
    <copyField source="geographicdescription" dest="text"/>
    <copyField source="projectTitle" dest="text"/>
-   <copyField source="projectAbstract" dest="text"/>
+   <copyField source="relatedProjectTitle" dest="text"/>
+   <!-- <copyField source="projectAbstract" dest="text"/> -->
 
    <!-- Create a string version of author for faceting 
    <copyField source="author" dest="author_s"/> -->
