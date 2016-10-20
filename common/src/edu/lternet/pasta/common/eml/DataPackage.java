@@ -58,6 +58,7 @@ public class DataPackage {
   ArrayList<String> timescales = null;
   ArrayList<String> titles = null;
   ArrayList<String> projectTitles = null;
+  ArrayList<String> relatedProjectTitles = null;
   String site = null;
   String abstractText = null;
   String methodsText = null;
@@ -95,6 +96,7 @@ public class DataPackage {
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
     this.projectTitles = new ArrayList<String>();
+    this.relatedProjectTitles = new ArrayList<String>();
     this.temporalCoverageList = new ArrayList<TemporalCoverage>();
     this.timescales = new ArrayList<String>();
     this.titles = new ArrayList<String>();
@@ -258,6 +260,11 @@ public class DataPackage {
   
 	public ArrayList<String> getProjectTitles() {
 		return projectTitles;
+	}
+	  
+	  
+	public ArrayList<String> getRelatedProjectTitles() {
+		return relatedProjectTitles;
 	}
 	  
 	  
