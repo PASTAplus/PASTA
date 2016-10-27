@@ -11,14 +11,6 @@
   <!-- Copy shared libraries into the local lib directory -->
   <target name="prepare" depends="prepare-common">
   	
-     <!-- Make sure the browse directory contains a browse cache file -->
-  	 <copy todir="${browse.dir}" preservelastmodified="true" verbose="true"
-  	       filtering="no" overwrite="false">
-         <fileset dir="${web.dir}/browse">
-             <include name="browseCache.xml"/>
-         </fileset>
-  	 </copy>
-  	
   	 <!-- Make a data directory that holds data files for desktop uploads -->
   	 <mkdir dir="${web.dir}/data"/>
   	 <!-- <chmod file="${web.dir}/data" perm="ugo+rwx"/> -->
