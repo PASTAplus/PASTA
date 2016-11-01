@@ -244,8 +244,8 @@ public class EMLDataPackageTest {
       assertFalse(xmlString.contains(levelZeroURL));
       assertFalse(xmlString.contains("system=\"knb\""));
       assertFalse(xmlString.contains("authSystem=\"knb\""));
-      assertTrue(xmlString.contains("system=\"https://pasta.lternet.edu\""));
-      assertTrue(xmlString.contains("authSystem=\"https://pasta.lternet.edu/authentication\""));
+      assertTrue(xmlString.contains("system=\"https://environmentaldatainitiative.org\""));
+      assertTrue(xmlString.contains("authSystem=\"https://environmentaldatainitiative.org/authentication\""));
       assertTrue(xmlString.contains(levelOneURL));
     }
     catch (Exception e) {
