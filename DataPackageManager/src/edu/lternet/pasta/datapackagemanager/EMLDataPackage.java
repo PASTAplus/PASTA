@@ -35,7 +35,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.DataPackage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -86,7 +86,7 @@ public class EMLDataPackage {
   
   /**
    * Constructs an EMLDataPackage object with a specified
-   * 'org.ecoinformatics.datamanager.parser.DataPackage' object. EMLDataPackage 
+   * 'edu.lternet.pasta.dml.parser.DataPackage' object. EMLDataPackage 
    * acts as a wrapper that encapsulates its Data Manager data package object.
    * 
    * @param dataPackage  A DataPackage object as defined by the Data Manager 

@@ -30,7 +30,7 @@ import java.net.URL;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.parser.Entity;
+import edu.lternet.pasta.dml.parser.Entity;
 
 import edu.lternet.pasta.common.EmlPackageId;
 
@@ -80,7 +80,7 @@ public class EMLEntity {
 
   /**
    * Constructs an EMLEntity object with a specified
-   * 'org.ecoinformatics.datamanager.parser.Entity' object. EMLEntity acts as a
+   * 'edu.lternet.pasta.dml.parser.Entity' object. EMLEntity acts as a
    * wrapper that encapsulates its Data Manager Library entity object.
    * 
    * @param entity  An entity object as defined by the Data Manager Library.

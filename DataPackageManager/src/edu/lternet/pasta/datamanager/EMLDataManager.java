@@ -35,14 +35,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.ecoinformatics.datamanager.DataManager;
-import org.ecoinformatics.datamanager.database.ConnectionNotAvailableException;
-import org.ecoinformatics.datamanager.database.DatabaseConnectionPoolInterface;
-import org.ecoinformatics.datamanager.download.DataStorageInterface;
-import org.ecoinformatics.datamanager.download.EcogridEndPointInterface;
-import org.ecoinformatics.datamanager.parser.DataPackage;
-import org.ecoinformatics.datamanager.parser.Entity;
-import org.ecoinformatics.datamanager.sample.EcogridEndPoint;
+import edu.lternet.pasta.dml.DataManager;
+import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
+import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
+import edu.lternet.pasta.dml.download.DataStorageInterface;
+import edu.lternet.pasta.dml.download.EcogridEndPointInterface;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.Entity;
+import edu.lternet.pasta.dml.sample.EcogridEndPoint;
 
 import edu.ucsb.nceas.utilities.Options;
 

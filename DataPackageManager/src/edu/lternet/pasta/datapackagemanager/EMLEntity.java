@@ -34,8 +34,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xpath.CachedXPathAPI;
-import org.ecoinformatics.datamanager.parser.DataPackage;
-import org.ecoinformatics.datamanager.parser.Entity;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.Entity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

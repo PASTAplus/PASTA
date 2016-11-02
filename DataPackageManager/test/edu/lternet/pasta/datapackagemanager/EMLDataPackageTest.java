@@ -35,7 +35,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.ecoinformatics.datamanager.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.DataPackage;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

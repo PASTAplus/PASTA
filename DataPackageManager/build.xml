@@ -41,6 +41,7 @@
 			</fileset>
 			<fileset dir="${shared.lib.dir}/datamanager">
 				<include name="**/*.jar"/>
+				<exclude name="**/datamanager.jar"/>
 			</fileset>
 			<fileset dir="${shared.lib.dir}/jersey">
 				<include name="**/*.jar"/>
