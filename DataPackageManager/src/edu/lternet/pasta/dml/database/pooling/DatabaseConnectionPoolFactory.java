@@ -54,7 +54,7 @@ public class DatabaseConnectionPoolFactory {
 
 	
 	/* Configuration directory and file name for the properties file */
-	private static final String CONFIG_NAME = "datamanager";
+	private static final String CONFIG_NAME = "datapackagemanager";
 	
 	private static ResourceBundle options = null;
 	private static String implementationClass = null;

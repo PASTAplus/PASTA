@@ -33,6 +33,7 @@ package edu.lternet.pasta.dml.download;
 
 import java.util.ResourceBundle;
 
+
 /**
  * This class implements EcogridEndPointInterface and is configurable using a properties file.
  * Should be useful for switching to remote endpoints etc.
@@ -54,7 +55,8 @@ public class ConfigurableEcogridEndPoint implements AuthenticatedEcogridEndPoint
 	
 	public ConfigurableEcogridEndPoint() {
 		
-		ResourceBundle props = ResourceBundle.getBundle("endpoint");
+        String className = ConfigurableEcogridEndPoint.class.getName();
+		ResourceBundle props = ResourceBundle.getBundle(className);
 		metacatEcogridEndPoint 				= props.getString("metacatEcogridEndPoint");
 		metacatAuthenticatedEcogridEndPoint = props.getString("metacatAuthenticatedEcogridEndPoint");
 		metacatEcogridAuthEndPoint 			= props.getString("metacatEcogridAuthEndPoint");

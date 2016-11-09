@@ -39,7 +39,7 @@ public class EMLInspectionApp implements DatabaseConnectionPoolInterface {
      * application.
      */
 
-    private static final String CONFIG_NAME = "datamanager";
+    private static final String CONFIG_NAME = "datapackagemanager";
 
     /*
      * These fields will be assigned values when the properties file is loaded. 

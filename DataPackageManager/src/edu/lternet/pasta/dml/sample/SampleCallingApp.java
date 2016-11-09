@@ -56,7 +56,7 @@ public class SampleCallingApp implements DatabaseConnectionPoolInterface {
    * information as well as the sample metadata document used by this 
    * application.
    */
-  private static final String CONFIG_NAME = "datamanager";
+  private static final String CONFIG_NAME = "datapackagemanager";
 
   /*
    * These fields will be assigned values when the properties file is loaded. 

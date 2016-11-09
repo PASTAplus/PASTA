@@ -24,7 +24,7 @@ emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.x
 dbAdapter=PostgresAdapter
 dbDriver=org.postgresql.Driver
 dbURL=jdbc:postgresql://localhost/pasta
-dbImplementationClass=org.ecoinformatics.datamanager.database.pooling.PostgresDatabaseConnectionPool
+dbImplementationClass=edu.lternet.pasta.dml.database.pooling.PostgresDatabaseConnectionPool
 dbServerName=localhost
 dbName=pasta
 dbUser=pasta
@@ -55,6 +55,7 @@ scopeRegistry=ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-
 #
 testDocument=knb-lter-gce.1.9
 testServer=http://metacat.lternet.edu/knb/metacat
+documentURL=http://svn.lternet.edu/svn/NIS/trunk/DataPackageManager/test/data/NoneSuchBugCount.xml
 entityName=INS-GCEM-0011_1_3.TXT
 packageID=knb-lter-gce.1.9
 
