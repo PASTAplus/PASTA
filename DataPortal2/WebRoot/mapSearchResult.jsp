@@ -47,7 +47,7 @@
 
 	<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" >
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false"></script>
-	<script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+	<script type="text/javascript" src="js/markerclusterer.js"></script>
     <script src="js/oms.min.js"></script>
 
 <script>
