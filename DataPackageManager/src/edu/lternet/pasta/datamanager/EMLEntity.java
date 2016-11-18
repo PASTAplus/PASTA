@@ -63,6 +63,7 @@ public class EMLEntity {
   private String dataFormat = "";
   protected String packageId;
   private String url = "";
+  private String fileUrl = null;
   
   
   /*
@@ -185,6 +186,16 @@ public class EMLEntity {
   public String getDataFormat() {
     return dataFormat;
   }
+  
+  
+  /**
+   * Gets the fileUrl value for this entity (possibly null).
+   * 
+   * @return  the fileUrl string value
+   */
+  public String getFileUrl() {
+	  return fileUrl;
+  }
 
   
   /**
@@ -204,6 +215,16 @@ public class EMLEntity {
    */
   public String getUrl() {
     return url;
+  }
+  
+  
+  /**
+   * Sets the fileUrl value for this entity
+   * 
+   * @return   the URL string
+   */
+  public void setFileUrl(String fileUrl) {
+	  this.fileUrl = fileUrl;
   }
  
 }

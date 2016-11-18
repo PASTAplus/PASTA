@@ -670,6 +670,7 @@ public class DownloadHandler implements Runnable
              catch (MalformedURLException e) {
             	 String eClassName = e.getClass().getName();
             	 String eMessage = String.format("%s: %s", eClassName, e.getMessage());
+                 onlineURLsException = true;
             	 exception = new DataSourceNotFoundException(String.format(
             			 "The URL '%s' is a malformed URL: %s", resourceName, eMessage));
              }
@@ -679,6 +680,7 @@ public class DownloadHandler implements Runnable
             	 if (responseCode > 0) {
             		 eMessage = String.format("Response Code: %d %s; %s", responseCode, responseMessage, eMessage);
             	 }
+                 onlineURLsException = true;
             	 exception = new DataSourceNotFoundException(String.format(
             			 "The URL '%s' is not reachable: %s", resourceName, eMessage));
              }

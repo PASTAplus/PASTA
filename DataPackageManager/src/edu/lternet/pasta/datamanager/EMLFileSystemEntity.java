@@ -230,6 +230,18 @@ public class EMLFileSystemEntity extends EMLEntity {
 	
 	
 	/**
+	 * Compose the file URL for this entity.
+	 * 
+	 * @return  the fileURL string
+	 */
+	public String getEntityFileURL(boolean evaluateMode) {
+		String evaluatePath = evaluateMode ? "evaluate/" : "";
+		String fileURL = String.format("file://%s/%s/%s%s", baseDir, packageId, evaluatePath, entityId);
+		return fileURL;
+	}
+	
+	
+	/**
 	 * Returns the resource location value for this file system entity, as
 	 * stored in the baseDir instance variable.
 	 * 
