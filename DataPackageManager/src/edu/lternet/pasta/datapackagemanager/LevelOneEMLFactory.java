@@ -24,16 +24,20 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Attr;
@@ -43,6 +47,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
+
+import edu.lternet.pasta.common.XmlUtility;
+import edu.ucsb.nceas.utilities.XMLUtilities;
 
 /**
  * Constructs Level-1 metadata from Level-0 metadata
@@ -59,6 +67,7 @@ public final class LevelOneEMLFactory {
   private static final String CONTACT_PATH = "//dataset/contact";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
+  private static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://pasta.lternet.edu/authentication";
   public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.lternet.edu";
   private static final String OBJECT_NAME = "physical/objectName";
@@ -71,6 +80,10 @@ public final class LevelOneEMLFactory {
   private static final String TABLE_ENTITY = "dataTable";
   private static final String VIEW_ENTITY = "view";
   
+  private static final String DISTRIBUTION_PATH = "//dataset/distribution";
+  private static final String COVERAGE_PATH = "//dataset/coverage";
+  private static final String PURPOSE_PATH = "//dataset/purpose";
+  private static final String MAINTENANCE_PATH = "//dataset/maintenance";
   
   /*
    * Instance variables
@@ -125,9 +138,62 @@ public final class LevelOneEMLFactory {
     
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
+    checkIntellectualRights(levelZeroEMLDocument);
 
     return levelZeroEMLDocument;
   }
+  
+  
+    /**
+     * 
+     */
+  	private void checkIntellectualRights(Document emlDocument)
+        throws TransformerException {
+  		boolean hasIntellectualRights = hasIntellectualRights(emlDocument);
+  		
+  		if (hasIntellectualRights) {
+  			logger.info("An intellectualRights element was found in the Level-0 EML.");
+  		}
+  		else {
+  			addDefaultIntellectualRights(emlDocument);
+  		}
+  	}
+
+  	
+	/**
+	 * Boolean to determine whether this data package contains an
+	 * element at the specified element path.
+	 * 
+	 * @param   emlDocument  the EML Document
+	 * @param   elementPath  the path being tested, e.g. //dataset/contact
+	 * @return  true if this data package has an intellectualRights element,
+	 *          else false
+	 */
+	private boolean hasElement(Document emlDocument, String elementPath)
+	          throws TransformerException {
+		boolean hasElement = false;
+	    CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+	    // Parse the access elements
+		NodeList elementNodes = xpathapi.selectNodeList(emlDocument, elementPath);
+		hasElement = (elementNodes != null) && (elementNodes.getLength() > 0);
+
+		return hasElement;
+	}
+
+
+	/**
+	 * Boolean to determine whether this data package contains an
+	 * intellectualRights element.
+	 * 
+	 * @param   emlDocument  the EML Document
+	 * @return  true if this data package has an intellectualRights element,
+	 *          else false
+	 */
+	private boolean hasIntellectualRights(Document emlDocument)
+	          throws TransformerException {
+		return hasElement(emlDocument, INTELLECTUAL_RIGHTS_PATH);
+	}
 
 
 	/**
@@ -234,6 +300,46 @@ public final class LevelOneEMLFactory {
   }
 
 
+  /*
+   * Append a Level-1 intellectualRights element to document.
+   */
+	private void addDefaultIntellectualRights(Document doc)
+			throws TransformerException {
+		NodeList contacts = getContacts(doc);
+		Element intellectualRightsElement = doc.createElement("intellectualRights");
+		Element paraElement = doc.createElement("para");
+		paraElement.appendChild(doc.createTextNode(
+				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
+		intellectualRightsElement.appendChild(paraElement);
+		Node datasetNode = getDatasetNode(doc);
+		
+		/* 
+		 * Determine where to insert the intellectualRights element. This
+		 * depends on the presence of nearby optional elements.
+		 */
+		String insertBefore = null;
+		if (hasElement(doc, DISTRIBUTION_PATH)) {
+			insertBefore = DISTRIBUTION_PATH;
+		}
+		else if (hasElement(doc, COVERAGE_PATH)) {
+			insertBefore = COVERAGE_PATH;
+		}
+		else if (hasElement(doc, PURPOSE_PATH)) {
+			insertBefore = PURPOSE_PATH;
+		}
+		else if (hasElement(doc, MAINTENANCE_PATH)) {
+			insertBefore = MAINTENANCE_PATH;
+		}
+		else {
+			insertBefore = CONTACT_PATH;
+		}
+		
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);		
+		datasetNode.insertBefore(intellectualRightsElement, insertNode);
+	}
+
+
   /**
    * Returns a list of all {@code //dataset/contact} elements contained in
    * this EML document.
@@ -247,6 +353,28 @@ public final class LevelOneEMLFactory {
     try {
       XPath xPath = XPathFactory.newInstance().newXPath();
       nodeList = (NodeList) xPath.evaluate(CONTACT_PATH, emlDocument, XPathConstants.NODESET);
+    }
+    catch (XPathExpressionException e) {
+      throw new IllegalStateException(e);
+    }
+
+    return nodeList;
+  }
+
+
+  /**
+   * Returns a list of all elements contained in
+   * this EML document
+   * 
+   * @return a list of all {@code //dataset/contact} elements contained in
+   *         the EML document.
+   */
+  private NodeList getElementNodeList(Document emlDocument, String elementPath) {
+    NodeList nodeList = null;
+
+    try {
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      nodeList = (NodeList) xPath.evaluate(elementPath, emlDocument, XPathConstants.NODESET);
     }
     catch (XPathExpressionException e) {
       throw new IllegalStateException(e);
@@ -405,5 +533,27 @@ public final class LevelOneEMLFactory {
     Element rootElement = levelZeroEMLDocument.getDocumentElement();
     rootElement.setAttribute("system", LEVEL_ONE_SYSTEM_ATTRIBUTE);
   }
+  
+  
+	public static void main(String[] args) {
+		String filePath = args[0];
+		String newFilePath = String.format("%s_new", filePath);
+		File newFile = new File(newFilePath);
+		LevelOneEMLFactory loef = new LevelOneEMLFactory();
+		File levelZeroEMLFile = new File(filePath);
+		//String levelOneEMLString = null;
+		//Node documentElement = levelZeroEMLDocument.getDocumentElement();
+		//String levelZeroEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+		try {
+			Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
+			loef.checkIntellectualRights(levelZeroEMLDocument);
+		    Node documentElement = levelZeroEMLDocument.getDocumentElement();
+		    String levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+		    FileUtils.writeStringToFile(newFile, levelOneEMLString, "UTF-8");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }
