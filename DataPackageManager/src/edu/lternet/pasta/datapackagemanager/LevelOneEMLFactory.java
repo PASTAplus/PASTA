@@ -67,7 +67,7 @@ public final class LevelOneEMLFactory {
   private static final String CONTACT_PATH = "//dataset/contact";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
-  private static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
+  public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://pasta.lternet.edu/authentication";
   public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.lternet.edu";
   private static final String OBJECT_NAME = "physical/objectName";
@@ -145,9 +145,12 @@ public final class LevelOneEMLFactory {
   
   
     /**
+     * Check to see whether the Level-0 EML already has an intellectualRights
+     * element and if not, add one.
      * 
+     * @param emlDocument  the Level-0 EML document to be checked
      */
-  	private void checkIntellectualRights(Document emlDocument)
+  	void checkIntellectualRights(Document emlDocument)
         throws TransformerException {
   		boolean hasIntellectualRights = hasIntellectualRights(emlDocument);
   		
@@ -160,6 +163,29 @@ public final class LevelOneEMLFactory {
   	}
 
   	
+	/**
+	 * Count the number of elements at a given path. This method is useful
+	 * for JUnit tests.
+	 * 
+	 * @param   emlDocument  the EML Document
+	 * @param   elementPath  the path being tested, e.g. //dataset/contact
+	 * @return  elementCount  the number of elements found
+	 */
+	public int elementCount(Document emlDocument, String elementPath)
+	          throws TransformerException {
+		int elementCount = -1;
+	    CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+	    // Parse the access elements
+		NodeList elementNodes = xpathapi.selectNodeList(emlDocument, elementPath);
+		if (elementNodes != null) {
+			elementCount = elementNodes.getLength();
+		}
+
+		return elementCount;
+	}
+
+
 	/**
 	 * Boolean to determine whether this data package contains an
 	 * element at the specified element path.
