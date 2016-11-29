@@ -85,6 +85,9 @@ public final class LevelOneEMLFactory {
   private static final String PURPOSE_PATH = "//dataset/purpose";
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
   
+  private static final String INTELLECTUAL_RIGHTS_TEXT = "This information is released to the public under the Creative Commons license Attribution 4.0 International (CC BY 4.0) subject to the following restrictions: The Data User must realize that these data sets are being actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this dataset. Where appropriate, the Data User may be encouraged to consider collaboration and/or co-authorship with original investigators. The Data User must realize that the data may be misinterpreted if taken out of context. The Data User must acknowledge use of the data by an appropriate citation. A generic citation for our databases is provided on this website. While substantial efforts are made to ensure the accuracy of data and documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The data authors shall not be liable for damages resulting from any use or misinterpretation of data sets. Data users should be aware that we periodically update data sets. By using these data, the Data User agrees to abide by the terms of this agreement. Thank you for your cooperation.";
+
+  
   /*
    * Instance variables
    */
@@ -334,8 +337,7 @@ public final class LevelOneEMLFactory {
 		NodeList contacts = getContacts(doc);
 		Element intellectualRightsElement = doc.createElement("intellectualRights");
 		Element paraElement = doc.createElement("para");
-		paraElement.appendChild(doc.createTextNode(
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
+		paraElement.appendChild(doc.createTextNode(INTELLECTUAL_RIGHTS_TEXT));
 		intellectualRightsElement.appendChild(paraElement);
 		Node datasetNode = getDatasetNode(doc);
 		
