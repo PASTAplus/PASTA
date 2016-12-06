@@ -221,7 +221,8 @@ public final class LevelOneEMLFactory {
 	 */
 	private boolean hasIntellectualRights(Document emlDocument)
 	          throws TransformerException {
-		return hasElement(emlDocument, INTELLECTUAL_RIGHTS_PATH);
+		//return hasElement(emlDocument, INTELLECTUAL_RIGHTS_PATH);
+		return true;
 	}
 
 
