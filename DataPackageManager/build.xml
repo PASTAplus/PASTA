@@ -2,7 +2,8 @@
 <project basedir="." default="deploy" name="DataPackageManager">
 	<property file="build.properties"/>
 	<property file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"/>
-
+	<property name="classes.dir" value="WebRoot/WEB-INF/classes"/>
+	<property name="test.classes.dir" location="build/test/classes"/>
 	<property name="webapp.name" value="package"/>
 
 	<!-- Import standard build file -->
@@ -10,6 +11,12 @@
 
 	<!-- Copy shared libraries into the local lib directory -->
 	<target name="prepare" depends="prepare-common">
+	    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties" 
+	          todir="${classes.dir}" 
+	    />   
+	    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties" 
+	          todir="${test.classes.dir}" 
+	    />   
 		<copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
 			<fileset dir="${shared.lib.dir}/apache-commons">
@@ -41,6 +48,7 @@
 			</fileset>
 			<fileset dir="${shared.lib.dir}/datamanager">
 				<include name="**/*.jar"/>
+				<exclude name="**/datamanager.jar"/>
 			</fileset>
 			<fileset dir="${shared.lib.dir}/jersey">
 				<include name="**/*.jar"/>

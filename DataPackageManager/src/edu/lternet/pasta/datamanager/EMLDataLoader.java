@@ -35,15 +35,15 @@ import java.io.OutputStream;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.download.DataSourceNotFoundException;
-import org.ecoinformatics.datamanager.download.DataStorageInterface;
+import edu.lternet.pasta.dml.download.DataSourceNotFoundException;
+import edu.lternet.pasta.dml.download.DataStorageInterface;
 
 import edu.lternet.pasta.common.EmlPackageId;
 
 
 /**
  * This class implements:
- *   org.ecoinformatics.datamanager.download.DataStorageInterface
+ *   edu.lternet.pasta.dml.download.DataStorageInterface
  *   
  * The purpose of this class in to interact with the Data Manager library's
  * download handler. 

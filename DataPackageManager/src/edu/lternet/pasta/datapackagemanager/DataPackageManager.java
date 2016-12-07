@@ -48,12 +48,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.DataManager;
-import org.ecoinformatics.datamanager.database.ConnectionNotAvailableException;
-import org.ecoinformatics.datamanager.database.DatabaseConnectionPoolInterface;
-import org.ecoinformatics.datamanager.download.DownloadHandler;
-import org.ecoinformatics.datamanager.parser.DataPackage;
-import org.ecoinformatics.datamanager.quality.QualityReport;
+import edu.lternet.pasta.dml.DataManager;
+import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
+import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
+import edu.lternet.pasta.dml.download.DownloadHandler;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.quality.QualityReport;
 
 import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;

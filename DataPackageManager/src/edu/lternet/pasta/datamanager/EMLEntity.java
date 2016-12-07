@@ -30,7 +30,7 @@ import java.net.URL;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.parser.Entity;
+import edu.lternet.pasta.dml.parser.Entity;
 
 import edu.lternet.pasta.common.EmlPackageId;
 
@@ -63,6 +63,7 @@ public class EMLEntity {
   private String dataFormat = "";
   protected String packageId;
   private String url = "";
+  private String fileUrl = null;
   
   
   /*
@@ -80,7 +81,7 @@ public class EMLEntity {
 
   /**
    * Constructs an EMLEntity object with a specified
-   * 'org.ecoinformatics.datamanager.parser.Entity' object. EMLEntity acts as a
+   * 'edu.lternet.pasta.dml.parser.Entity' object. EMLEntity acts as a
    * wrapper that encapsulates its Data Manager Library entity object.
    * 
    * @param entity  An entity object as defined by the Data Manager Library.
@@ -185,6 +186,16 @@ public class EMLEntity {
   public String getDataFormat() {
     return dataFormat;
   }
+  
+  
+  /**
+   * Gets the fileUrl value for this entity (possibly null).
+   * 
+   * @return  the fileUrl string value
+   */
+  public String getFileUrl() {
+	  return fileUrl;
+  }
 
   
   /**
@@ -204,6 +215,16 @@ public class EMLEntity {
    */
   public String getUrl() {
     return url;
+  }
+  
+  
+  /**
+   * Sets the fileUrl value for this entity
+   * 
+   * @return   the URL string
+   */
+  public void setFileUrl(String fileUrl) {
+	  this.fileUrl = fileUrl;
   }
  
 }

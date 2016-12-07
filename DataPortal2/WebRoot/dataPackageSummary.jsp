@@ -78,7 +78,7 @@
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="js/data-shelf-ajax.js" type="text/javascript"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false" type="text/javascript"></script>
 <script src="./js/map_functions.js" type="text/javascript"></script>
 <script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/keydragzoom/src/keydragzoom.js" type="text/javascript"></script>
 

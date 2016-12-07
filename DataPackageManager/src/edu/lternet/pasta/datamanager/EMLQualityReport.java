@@ -29,8 +29,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.parser.DataPackage;
-import org.ecoinformatics.datamanager.quality.QualityReport;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.quality.QualityReport;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.ucsb.nceas.utilities.IOUtil;

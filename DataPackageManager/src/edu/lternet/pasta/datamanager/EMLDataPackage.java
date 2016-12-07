@@ -25,7 +25,7 @@
 package edu.lternet.pasta.datamanager;
 
 import org.apache.log4j.Logger;
-import org.ecoinformatics.datamanager.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.DataPackage;
 
 import edu.lternet.pasta.common.EmlPackageId;
 
@@ -69,7 +69,7 @@ public class EMLDataPackage {
 
   /**
    * Constructs an EMLDataPackage object with a specified
-   * 'org.ecoinformatics.datamanager.parser.DataPackage' object. 
+   * 'edu.lternet.pasta.dml.parser.DataPackage' object. 
    * EMLDataPackage acts as a wrapper that encapsulates its Data 
    * Manager Library DataPackage object.
    * 

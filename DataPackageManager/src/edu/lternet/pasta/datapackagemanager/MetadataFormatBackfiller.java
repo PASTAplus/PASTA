@@ -27,7 +27,7 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.ecoinformatics.datamanager.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.DataPackage;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;

@@ -24,7 +24,7 @@ emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.x
 dbAdapter=PostgresAdapter
 dbDriver=org.postgresql.Driver
 dbURL=jdbc:postgresql://localhost/pasta
-dbImplementationClass=org.ecoinformatics.datamanager.database.pooling.PostgresDatabaseConnectionPool
+dbImplementationClass=edu.lternet.pasta.dml.database.pooling.PostgresDatabaseConnectionPool
 dbServerName=localhost
 dbName=pasta
 dbUser=pasta
@@ -45,7 +45,7 @@ dbMaxConnections=10
 ##
 ## LTER Scope Registry
 ##
-scopeRegistry=ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,lter-landsat-ledaps,msb-tempbiodev,msb-paleon,ltreb-cap,msb-cap
+scopeRegistry=edi,ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,lter-landsat-ledaps,msb-tempbiodev,msb-paleon,ltreb-cap,msb-cap
 
 #
 # Sample document properties. Used by the sample calling application
@@ -55,6 +55,7 @@ scopeRegistry=ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-bnz,knb-
 #
 testDocument=knb-lter-gce.1.9
 testServer=http://metacat.lternet.edu/knb/metacat
+documentURL=http://svn.lternet.edu/svn/NIS/trunk/DataPackageManager/test/data/NoneSuchBugCount.xml
 entityName=INS-GCEM-0011_1_3.TXT
 packageID=knb-lter-gce.1.9
 

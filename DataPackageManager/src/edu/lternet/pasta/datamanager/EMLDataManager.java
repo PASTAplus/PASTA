@@ -35,14 +35,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.ecoinformatics.datamanager.DataManager;
-import org.ecoinformatics.datamanager.database.ConnectionNotAvailableException;
-import org.ecoinformatics.datamanager.database.DatabaseConnectionPoolInterface;
-import org.ecoinformatics.datamanager.download.DataStorageInterface;
-import org.ecoinformatics.datamanager.download.EcogridEndPointInterface;
-import org.ecoinformatics.datamanager.parser.DataPackage;
-import org.ecoinformatics.datamanager.parser.Entity;
-import org.ecoinformatics.datamanager.sample.EcogridEndPoint;
+import edu.lternet.pasta.dml.DataManager;
+import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
+import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
+import edu.lternet.pasta.dml.download.DataStorageInterface;
+import edu.lternet.pasta.dml.download.EcogridEndPointInterface;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.parser.Entity;
+import edu.lternet.pasta.dml.sample.EcogridEndPoint;
 
 import edu.ucsb.nceas.utilities.Options;
 
@@ -312,32 +312,32 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		                      entity.getName() + "' " +
 		                      "because its distribution is 'inline' or 'offline'.");
 		        }
-		        else {	        
-		          EMLEntity emlEntity = new EMLEntity(entity);
-              String entityId = emlEntity.getEntityId();
-              String entityName = emlEntity.getEntityName();
-              //String entityURL = deriveDataURL(emlPackageId, entityId);
-              entityIdNamePairs.put(entityId, entityName);
-            
-              String url = emlEntity.getUrl();
-              emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);
+						else {
+							EMLEntity emlEntity = new EMLEntity(entity);
+							String entityId = emlEntity.getEntityId();
+							String entityName = emlEntity.getEntityName();
+							// String entityURL = deriveDataURL(emlPackageId,
+							// entityId);
+							entityIdNamePairs.put(entityId, entityName);
 
-              // Download the entity
-	          downloadEntity(emlPackageId, emlEntity, evaluateMode);
-	          
-              /* Load entity into a database unless it's an
-               * image entity (spatialRaster or spatialVector)
-               * or an otherEntity or it uses an externally defined
-               * format
-               */
-              if (!entity.getIsImageEntity() &&
-                  !entity.isExternallyDefinedFormat() &&
-                  !entity.isOtherEntity()
-                 ) {
-	              loadEntity(emlPackageId, emlEntity);
-              }
-		    }
-		  }
+							String url = emlEntity.getUrl();
+							emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);
+
+							// Download the entity
+							downloadEntity(emlPackageId, emlEntity, evaluateMode);
+
+							/*
+							 * Load entity into a database unless it's an image
+							 * entity (spatialRaster or spatialVector) or an
+							 * otherEntity or it uses an externally defined
+							 * format
+							 */
+							if (!entity.getIsImageEntity() && !entity.isExternallyDefinedFormat()
+									&& !entity.isOtherEntity()) {
+								loadEntity(emlPackageId, emlEntity);
+							}
+						}
+					  }
 		      
           /*
            * Delete the entities from the Data Manager Library's Data Registry.
@@ -410,11 +410,13 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       	  throw new IllegalStateException(errorMsg);
         }
 	    else {
+			EMLFileSystemEntity efse = 
+					new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
+			String entityFileURL = efse.getEntityFileURL(evaluateMode);
+			emlEntity.setFileUrl(entityFileURL);
 				if (!evaluateMode) {
 					// Double-check to ensure that the entity file exists on the
 					// system in the expected location
-					EMLFileSystemEntity efse = new EMLFileSystemEntity(
-							entityDir, emlPackageId, entityId);
 					File entityFile = efse.getEntityFile();
 					if ((entityFile == null) || (!entityFile.exists())) {
 						String errorMsg = 
@@ -480,37 +482,46 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
    * @throws IOException     when an IO error occurs
    * @throws Exception
    */
-  public boolean loadEntity(EmlPackageId emlPackageId, EMLEntity emlEntity)
-          throws MalformedURLException, IOException, Exception {
-    boolean success = false;
-    
-    Entity entity = emlEntity.getEntity();
-    
-    if (dataManager != null) {
-      try {
-        success = dataManager.loadDataToDB(entity, eepi);
-      }
-      catch (MalformedURLException e) {
-        logger.error("MalformedURLException while loading entity.");
-        e.printStackTrace();
-        throw(e);
-      } 
-      catch (IOException e) {
-        logger.error("IOException while loading entity.");
-        e.printStackTrace();
-        throw(e);
-      } 
-      catch (Exception e) {
-        logger.error("Exception while loading entity.");
-        e.printStackTrace();
-        throw(e);
-      }
-    }
-      
-    logger.debug("Finished loadEntity(), success = " + success);
-    
-    return success;
-  }
+	public boolean loadEntity(EmlPackageId emlPackageId, EMLEntity emlEntity)
+			throws MalformedURLException, IOException, Exception {
+		boolean success = false;
+		String fileURL = emlEntity.getFileUrl();
+		String entityURL = null;
+
+		Entity entity = emlEntity.getEntity();
+
+		if (dataManager != null) {
+			try {
+				if (fileURL != null) {  // if PASTA has a copy of the entity on its file system
+					entityURL = entity.getURL(); // first store the remote entity URL value
+					entity.setURL(fileURL);  // set the file URL for data table upload
+				}
+				success = dataManager.loadDataToDB(entity, eepi);
+				if (fileURL != null) {
+					entity.setURL(entityURL);  // reset back to the remote entity URL value
+				}
+			}
+			catch (MalformedURLException e) {
+				logger.error("MalformedURLException while loading entity.");
+				e.printStackTrace();
+				throw (e);
+			}
+			catch (IOException e) {
+				logger.error("IOException while loading entity.");
+				e.printStackTrace();
+				throw (e);
+			}
+			catch (Exception e) {
+				logger.error("Exception while loading entity.");
+				e.printStackTrace();
+				throw (e);
+			}
+		}
+
+		logger.debug("Finished loadEntity(), success = " + success);
+
+		return success;
+	}
 
   
   /**
