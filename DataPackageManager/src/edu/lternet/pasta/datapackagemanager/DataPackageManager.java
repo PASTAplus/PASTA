@@ -522,6 +522,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new ResourceExistsException(message);
 			}
 
+			// Is this data package actively being worked on in PASTA?
+			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+			boolean isActive = workingOn.isActive(scope, identifier, revision);
+
+			/*
+			 * If this data package is already active in PASTA, throw an exception
+			 */
+			if (isActive) {
+				String message = "Attempting to insert a data package that is currently being processed in PASTA: "
+				    + levelZeroDataPackage.getDocid();
+				throw new UserErrorException(message);
+			}
+
 			boolean isUpdate = false;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
@@ -561,6 +574,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		AccessMatrix datasetAccessMatrix = new AccessMatrix(datasetAccessXML);
 		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
+		WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+		
+		if (!isEvaluate) {
+			workingOn.addDataPackage(scope, identifier, revision);
+		}
 
 		/*
 		 * Is the metadata for this data package valid?
@@ -601,7 +619,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
           isDataValid = levelZeroDataPackage.isDataValid();
 				}
 			}
-		} catch (ResourceExistsException e) {
+		} 
+		catch (ResourceExistsException e) {
+			if (!isEvaluate) workingOn.updateEndDate(scope, identifier, revision);
 			throw (e); // Don't do a roll-back when this exception occurs
 		}
 
@@ -653,6 +673,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			} 
 			catch (Exception e) {
 				provenanceIndex.rollbackProvenanceRecords(packageId);
+				workingOn.updateEndDate(scope, identifier, revision);
 				throw (e);
 			}
 		}
@@ -751,7 +772,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * The return value of an Evaluate operation is always the quality report.
 			 */
 			resourceMap = qualityReportXML;
-		} else {
+		} 
+		else {
 			if (isDataPackageValid) {
 
 				/*
@@ -839,12 +861,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 								);
 				}
 
+				workingOn.updateEndDate(scope, identifier, revision);
+
 				/*
 				 * Notify the Event Manager about the new resource
 				 */
 				notifyEventManager(packageId, scope, identifier, revision, user,
 				    authToken);
-			} else {
+			} 
+			else {
+				workingOn.updateEndDate(scope, identifier, revision);
 				throw new UserErrorException(qualityReportXML);
 			}
 		}
@@ -2858,6 +2884,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + " does not have permission to update this data package: "
 				    + resourceId;
 				throw new UnauthorizedException(message);
+			}
+
+			// Is this data package actively being worked on in PASTA?
+			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+			boolean isActive = workingOn.isActive(scope, identifier, revision);
+
+			/*
+			 * If this data package is already active in PASTA, throw an exception
+			 */
+			if (isActive) {
+				String message = "Attempting to update a data package that is currently being processed in PASTA: "
+				    + levelZeroDataPackage.getDocid();
+				throw new UserErrorException(message);
 			}
 
 			boolean isUpdate = true;

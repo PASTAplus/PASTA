@@ -135,41 +135,41 @@ public class DataPackageRegistry {
   /**
    * @param args
    */
-  public static void main(String[] args) {
-    
-    Options options = null;
-    options = ConfigurationListener.getOptions();
-    
-    String dirPath = "WebRoot/WEB-INF/conf";
+	public static void main(String[] args) {
 
-    if (options == null) {
-      ConfigurationListener configurationListener = new ConfigurationListener();
-      configurationListener.initialize(dirPath);
-      options = ConfigurationListener.getOptions();
-    }
+		Options options = null;
+		options = ConfigurationListener.getOptions();
 
-    DataPackageRegistry dpr = null;
-    String dbDriver = "org.postgresql.Driver";
-    String dbURL = "jdbc:postgresql://localhost:5432/pasta";
-    String dbUser = "pasta";
-    String dbPassword = "p@st@";
-    
-    // String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
-    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+		String dirPath = "WebRoot/WEB-INF/conf";
 
-    try {
-      dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-      if (dpr.getDoi(resourceId) == null) {
-        logger.info("It's NULL");
-      } else {
-        logger.info("It's not NULL");
-      }
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    }
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
 
-  }
+		DataPackageRegistry dpr = null;
+		String dbDriver = options.getOption("dbDriver");
+		String dbURL = options.getOption("dbURL");
+		String dbUser = options.getOption("dbUser");
+		String dbPassword = options.getOption("dbPassword");
+
+		String resourceId = "https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1";
+
+		try {
+			dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+			String doi = dpr.getDoi(resourceId);
+			if (doi == null) {
+				logger.info(String.format("The DOI for %s is null", resourceId));
+			} else {
+				logger.info(String.format("The DOI for %s is %s", resourceId, doi));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
 
 
   /*
@@ -3330,6 +3330,13 @@ public class DataPackageRegistry {
 			returnConnection(conn);
 		}
 
+	}
+	
+	
+	public WorkingOn makeWorkingOn() 
+		throws ClassNotFoundException, SQLException {
+		WorkingOn workingOn = new WorkingOn(dbDriver, dbURL, dbUser, dbPassword);
+		return workingOn;
 	}
 
 }
