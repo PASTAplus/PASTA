@@ -220,6 +220,52 @@ public class WorkingOn {
 
 	
 	/**
+	 * Deletes a data package record from the working_on table. This is provided
+	 * as a convenience to JUnit test so they can clean-up after themselves.
+	 * 
+	 * @param scope
+	 *            The scope value
+	 * @param identifier
+	 *            The identifier integer value
+	 * @param revision
+	 *            The revision value
+	 */
+	public void deleteDataPackage(String scope, Integer identifier, Integer revision)
+			throws ClassNotFoundException, SQLException {
+		Connection connection = null;
+		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+
+		StringBuilder deleteSQL = new StringBuilder("DELETE FROM " + WORKING_ON + 
+				" WHERE scope=? AND identifier=? and revision=?");
+
+		String deleteString = deleteSQL.toString();
+
+		try {
+			connection = getConnection();
+			PreparedStatement pstmt = connection.prepareStatement(deleteString);
+			pstmt.setString(1, scope);
+			pstmt.setInt(2, identifier);
+			pstmt.setInt(3, revision);
+			pstmt.executeUpdate();
+			if (pstmt != null) {
+				pstmt.close();
+			}
+			logger.info(String.format("%s has been deleted from the %s table", 
+					                  packageId, WORKING_ON));
+		} 
+		catch (SQLException e) {
+			logger.error(String.format("Error deleting data package %s from table %s",
+					                   packageId, WORKING_ON));
+			logger.error("SQLException: " + e.getMessage());
+			throw (e);
+		} 
+		finally {
+			returnConnection(connection);
+		}
+	}
+
+	
+	/**
 	 * Sets the end_date value of the data package, marking it as no longer
 	 * actively being worked on. (Note: this is not the same as saying that the
 	 * data package was successfully uploaded to PASTA.)
