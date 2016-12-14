@@ -35,6 +35,10 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -3333,10 +3337,50 @@ public class DataPackageRegistry {
 	}
 	
 	
+	/**
+	 * Creates a WorkingOn object and returns it.
+	 * 
+	 * @return a new WorkingOn object that has been initialized with the
+	 *         database connection settings
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	public WorkingOn makeWorkingOn() 
 		throws ClassNotFoundException, SQLException {
 		WorkingOn workingOn = new WorkingOn(dbDriver, dbURL, dbUser, dbPassword);
 		return workingOn;
+	}
+	
+	
+	/**
+	 * Returns an XML formatted list of data packages that are currently
+	 * being worked on in PASTA, as determined by the contents of the
+	 * datapackagemanager.working_on table.
+	 * 
+	 * @return an XML string
+	 * @throws Exception
+	 */
+	public String listWorkingOn()
+		throws Exception {
+		StringBuilder sb = new StringBuilder("<workingOn>\n");
+		String xmlString = "";
+		
+		
+		WorkingOn workingOn = makeWorkingOn();
+		Map<String, String> activeList = workingOn.listActiveDataPackages();
+		TreeMap<String, String> sortedList = new TreeMap<String, String>(activeList);
+		for (String key : sortedList.keySet()) {
+			String value = sortedList.get(key);
+			sb.append(String.format("  <dataPackage>\n"));
+			sb.append(String.format("    <packageId>%s</packageId>\n", key));
+			sb.append(String.format("    <startDate>%s</startDate>\n", value));
+			sb.append(String.format("  </dataPackage>\n"));
+		}
+		
+		
+		sb.append("</workingOn>\n");
+		xmlString = sb.toString();
+		return xmlString;
 	}
 
 }

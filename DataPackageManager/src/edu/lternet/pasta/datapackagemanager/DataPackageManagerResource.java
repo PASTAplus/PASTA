@@ -8019,6 +8019,154 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List Working On</strong> operation, lists the set of data 
+	 * packages that PASTA is currently working on inserting or updating. 
+	 * Note that data packages that are being evaluated by PASTA are not 
+	 * included in this list. (See example below.)
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/package/workingon/eml"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of recent data package inserts or updates</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	       &lt;workingOn&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;knb-lter-nwk.1504.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-08 16:58:29.307&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;lter-landsat-ledaps.7.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-08 17:20:59.998&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;knb-lter-nwk.1490.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-12 16:55:05.453&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	       &lt;/workingOn&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, which if successful, contains an XML document
+	 */
+	@GET
+	@Path("/workingon/eml")
+	@Produces("application/xml")
+	public Response listWorkingOn(@Context HttpHeaders headers, @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listWorkingOn";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = 
+					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						"User " + 
+				        userId + 
+				        " is not authorized to execute service method " + 
+				        serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String xml = dataPackageManager.listWorkingOn();
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+	
+	/**
 	 * <strong>Update Data Package</strong> operation, specifying the scope and
 	 * identifier of the data package to be updated in the URI, along with the
 	 * EML document describing the data package to be created in the request

@@ -1558,6 +1558,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Lists all data packages that are actively being worked on.
+	 * 
+	 * @return An XML string, as composed by the DataPackageRegistry class.
+	 */
+	public String listWorkingOn() 
+			throws Exception {
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String packageListString = dataPackageRegistry.listWorkingOn();
+		return packageListString;
+	}
+
+	
+	/**
 	 * Loads Data Manager options from a configuration file.
 	 */
 	private static void loadOptions() throws Exception {
