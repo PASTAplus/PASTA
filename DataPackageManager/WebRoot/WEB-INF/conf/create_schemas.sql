@@ -73,7 +73,7 @@ CREATE TABLE datapackagemanager.reservation (
    principal          VARCHAR(250) NOT NULL,              -- the principal for whom this reservation is made
    scope              VARCHAR(100) NOT NULL,              -- the scope of the reserved identifier
    identifier         INT8         NOT NULL,              -- the value of the reserved identifier
-   date_reserved      timestamp  not null,                -- date that the identifier was reserved
+   date_reserved      timestamp    NOT NULL,              -- date that the identifier was reserved
    date_uploaded      timestamp,                          -- date that the data package was uploaded
    CONSTRAINT PK_RESERVATION PRIMARY KEY (SCOPE, IDENTIFIER)  -- two-column primary key
 );
