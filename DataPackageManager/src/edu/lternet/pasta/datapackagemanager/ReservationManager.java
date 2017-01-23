@@ -142,24 +142,34 @@ public class ReservationManager {
 
 		try {
 			reservationManager = new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
-			reservationManager.addDataPackage(scope, identifier, principal);
-		    String reservationsXML = reservationManager.listActiveReservations();
+			reservationManager.addDataPackageReservation(scope, identifier, principal);
+
+			String reservationsXML = reservationManager.listActiveReservations();
 			System.out.println(reservationsXML);
-			boolean isActive = reservationManager.isActive(scope, identifier);
+			boolean isActive = reservationManager.isActiveReservation(scope, identifier);
 			String word = isActive ? "" : "NOT ";
 			System.out.println(String.format("%s.%d IS %sACTIVE.", scope, identifier, word));
+			
+			String identifiers = reservationManager.listReservationIdentifiers(scope);
+			System.out.println(String.format("\nIdentifiers reserved for scope %s:", scope));
+			System.out.println(identifiers);
 			
 			reservationManager.setDateUploaded(scope, identifier);
 		    reservationsXML = reservationManager.listActiveReservations();
 			System.out.println(reservationsXML);
-			isActive = reservationManager.isActive(scope, identifier);
+			isActive = reservationManager.isActiveReservation(scope, identifier);
 			word = isActive ? "" : "NOT ";
 			System.out.println(String.format("%s.%d IS %sACTIVE.", scope, identifier, word));
 			
-			reservationManager.deleteDataPackage(scope, identifier);
+			reservationManager.deleteDataPackageReservation(scope, identifier);
+
+			identifiers = reservationManager.listReservationIdentifiers(scope);
+			System.out.println(String.format("\nIdentifiers reserved for scope %s:", scope));
+			System.out.println(identifiers);
+			
 		    reservationsXML = reservationManager.listActiveReservations();
 			System.out.println(reservationsXML);
-			isActive = reservationManager.isActive(scope, identifier);
+			isActive = reservationManager.isActiveReservation(scope, identifier);
 			word = isActive ? "" : "NOT ";
 			System.out.println(String.format("%s.%d IS %sACTIVE.", scope, identifier, word));
 		} 
@@ -186,7 +196,7 @@ public class ReservationManager {
 	 * @param principal
 	 *            The user who is making the reservation
 	 */
-	public void addDataPackage(String scope, Integer identifier, String principal)
+	public void addDataPackageReservation(String scope, Integer identifier, String principal)
 			throws ClassNotFoundException, SQLException {
 		Connection connection = null;
 		java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
@@ -233,7 +243,7 @@ public class ReservationManager {
 	 * @param identifier
 	 *            The identifier integer value
 	 */
-	public void deleteDataPackage(String scope, Integer identifier)
+	public void deleteDataPackageReservation(String scope, Integer identifier)
 			throws ClassNotFoundException, SQLException {
 		Connection connection = null;
 		String packageId = String.format("%s.%d", scope, identifier);
@@ -415,18 +425,57 @@ public class ReservationManager {
   
   
 	/**
+	 * Gets a simple flat list of active reservation identifiers for the 
+	 * specified scope.
+	 * 
+	 * @return    a newline-separated list of numeric identifier values
+	 */
+	public String listReservationIdentifiers(String scope) throws Exception {
+		Connection conn = null;
+		StringBuilder queryBuilder = new StringBuilder();
+		StringBuilder identifiers = new StringBuilder("");
+
+		queryBuilder.append("SELECT identifier FROM ");
+		queryBuilder.append(RESERVATION);
+		queryBuilder.append(" WHERE date_uploaded IS NULL AND");
+		queryBuilder.append(String.format(" scope='%s'", scope));
+		queryBuilder.append(" ORDER BY identifier ASC;");
+		String sqlQuery = queryBuilder.toString();
+
+		try {
+			conn = getConnection();
+
+			if (conn != null) {
+				Statement stmnt = conn.createStatement();
+				ResultSet rs = stmnt.executeQuery(sqlQuery);
+
+				while (rs.next()) {
+					Integer identifier = rs.getInt(1);
+					identifiers.append(String.format("%d\n", identifier));
+				}
+			}
+		}
+		finally {
+			returnConnection(conn);
+		}
+		
+		String identifiersList = identifiers.toString().trim();
+		return identifiersList;
+	}
+  
+  
+	/**
 	 * Boolean to determine whether the specified data package identifier is 
 	 * actively reserved in PASTA, based on a specified scope and identifier.
 	 * A data package is reserved if it is present in the reservation table and
-	 * its upload date is NULL and there is no record
-	 * of it being interrupted by a previous shutdown.
+	 * its upload date is NULL.
 	 * 
 	 * @param scope
-	 *            the scope value, e.g. "knb-lter-lno"
+	 *            the scope value, e.g. "knb-lter-nin"
 	 * @param identifier
 	 *            the identifier value, e.g. 1
 	 */
-	public boolean isActive(String scope, Integer identifier)
+	public boolean isActiveReservation(String scope, Integer identifier)
 			throws ClassNotFoundException, SQLException {
 		boolean isActiveIdentifier = false;
 		Connection connection = null;

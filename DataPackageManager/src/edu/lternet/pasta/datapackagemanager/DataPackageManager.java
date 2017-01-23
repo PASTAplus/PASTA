@@ -877,7 +877,105 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		return resourceMap;
 	}
+	
+	
+	/**
+	 * Creates a new reservation for the specified user and scope. The
+	 * next reservable identifier is determined, the reservation is placed,
+	 * and the identifier is returned as the method's value.
+	 * 
+	 * @param userId    The user who is making the reservation
+	 * @param scope     The scope of the reserved identifier, e.g. "edi"
+	 * @return identifier  The integer value of the reserved identifier
+	 * @throws Exception
+	 */
+	public Integer createReservation(String userId, String scope) 
+			throws Exception {
+		Integer identifier = getNextReservableIdentifier(scope);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+		
+		dataPackageRegistry.addDataPackageReservation(scope, identifier, userId);
+		
+		return identifier;
+	}
+	
+	
+	/*
+	 * Determine the next reservable identifier value for the specified scope.
+	 * Three lists must be checked:
+	 *    1. List of identifiers known in the resource registry belong
+	 *       to the specified scope, including identifiers for data packages 
+	 *       that have been deleted;
+	 *    2. List of "working on" identifiers for the specified scope, 
+	 *       i.e. inserts or updates that are currently in progress;
+	 *    3. List of reserved identifiers for the specified scope.
+	 */
+	private Integer getNextReservableIdentifier(String scope) 
+		throws Exception{
+		Integer nextReservable = null;
+		final Boolean isSpokenFor = new Boolean(true);
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		
+		HashMap<Integer, Boolean> spokenFor = new HashMap<Integer, Boolean>();
 
+		/*
+		 * First get a list of all known identifiers for this scope that exist
+		 * in the resource registry. Include identifiers for data packages that
+		 * were deleted since these identifier values can't be reused.
+		 */
+		boolean includeDeleted = true;
+		ArrayList<String> identifierList = 
+				dataPackageRegistry.listDataPackageIdentifiers(scope, includeDeleted);
+
+		for (String identifier : identifierList) {
+			Integer spokenForIdentifier = Integer.parseInt(identifier);
+			spokenFor.put(spokenForIdentifier, isSpokenFor);
+		}
+		
+		/*
+		 * Next get a list of all known identifiers for this scope that are
+		 * actively being worked on (i.e. an upload operation for this
+		 * identifier is actively in progress).
+		 */
+		ArrayList<Integer> identifiers = dataPackageRegistry.listWorkingOnIdentifiers(scope);
+		
+		for (Integer identifier : identifiers) {
+			spokenFor.put(identifier, isSpokenFor);
+		}
+		
+		
+		/*
+		 * Finally, get a list of all active reservations for this scope.
+		 */
+		String reservationString = dataPackageRegistry.listReservationIdentifiers(scope);
+		String[] reservationEntries = reservationString.split("\n");
+		if (reservationEntries != null && reservationEntries.length > 0) {
+			for (String reservedIdentifier : reservationEntries) {
+				Integer spokenForIdentifier = Integer.parseInt(reservedIdentifier);
+				spokenFor.put(spokenForIdentifier, isSpokenFor);
+			}
+		}
+		
+		/*
+		 * Now find the first available identifier value that isn't claimed by
+		 * one of the three previous lists.
+		 */
+		Integer nextCandidate = new Integer(1);
+		while (nextReservable == null) {
+			Boolean value = spokenFor.get(nextCandidate);
+			if (value != null && value.equals(isSpokenFor)) {
+				nextCandidate = nextCandidate + 1;
+			}
+			else {
+				nextReservable = nextCandidate;
+			}
+		}
+		
+
+		return nextReservable;
+	}
 	
 	/*
 	 * Notifies the event manager of a change to a data package by using an
@@ -1258,6 +1356,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Lists all numeric identifiers that are actively reserved by end users
+	 * for the current scope.
+	 * 
+	 * @return A string of newline-separated numeric identifier values.
+	 */
+	public String listReservationIdentifiers(String scope) 
+			throws Exception {
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationsString = dataPackageRegistry.listReservationIdentifiers(scope);
+		return reservationsString;
+	}
+
+	
+	/**
 	 * List the package ID values (including revisions) of all data packages that 
 	 * are active (not deleted) in the resource registry.
 	 * 
@@ -1422,24 +1535,24 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 
 	/**
-	 * List the identifier values for data packages with the specified scope that
-	 * are readable by the specified user.
+	 * List the identifier values for data packages with the specified scope.
 	 * 
 	 * @param scope
 	 *          the scope value
-	 * @param user
-	 *          the user name
+	 * @param includeDeleted
+	 *          if true, included identifiers for deleted data packages,
+	 *          else exclude them
 	 * @return a newline-separated list of identifier values
 	 */
-	public String listDataPackageIdentifiers(String scope, String user)
+	public String listDataPackageIdentifiers(String scope, boolean includeDeleted)
 	    throws ClassNotFoundException, SQLException, IllegalArgumentException,
 	    ResourceNotFoundException {
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
 		    dbURL, dbUser, dbPassword);
 		String identifierListString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
-		ArrayList<String> identifierList = dataPackageRegistry
-		    .listDataPackageIdentifiers(scope);
+		ArrayList<String> identifierList = 
+				dataPackageRegistry.listDataPackageIdentifiers(scope, includeDeleted);
 
 		// Throw a ResourceNotFoundException if the list is empty
 		if (identifierList == null || identifierList.size() == 0) {

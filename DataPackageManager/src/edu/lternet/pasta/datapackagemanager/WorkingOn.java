@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -420,7 +421,7 @@ public class WorkingOn {
   
   
 	/**
-	 * Gets a list of recent uploads, either inserts or updates.
+	 * Gets a list of active uploads, either inserts or updates.
 	 * 
 	 * @return    a Map of active data packages in PASTA where the key is the 
 	 *            package ID and the value is the timestamp as of when
@@ -463,6 +464,46 @@ public class WorkingOn {
 		}
 
 		return activeDataPackages;
+	}
+  
+  
+	/**
+	 * Gets a list of active identifiers for the specified scope.
+	 * 
+	 * @return    a list of identifier Integer values
+	 */
+	public ArrayList<Integer> listWorkingOnIdentifiers(String scope) 
+			throws Exception {
+		Connection conn = null;
+		ArrayList<Integer> identifiers = new ArrayList<Integer>();
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT identifier FROM ");
+		sb.append(WORKING_ON);
+		sb.append(" WHERE start_date IS NOT NULL  AND ");
+		sb.append(String.format("   scope='%s' AND ", scope));
+		sb.append("   end_date IS NULL AND ");
+		sb.append("   interrupted=false ");
+		String sqlQuery = sb.toString();
+
+		try {
+			conn = getConnection();
+
+			if (conn != null) {
+				Statement stmnt = conn.createStatement();
+				ResultSet rs = stmnt.executeQuery(sqlQuery);
+
+				while (rs.next()) {
+					Integer identifier = rs.getInt(1);
+					identifiers.add(identifier);
+				}
+			}
+		}
+		finally {
+			returnConnection(conn);
+		}
+
+		return identifiers;
 	}
   
   

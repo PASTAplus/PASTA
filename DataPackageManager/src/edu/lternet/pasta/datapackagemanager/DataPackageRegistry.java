@@ -349,6 +349,14 @@ public class DataPackageRegistry {
       }
     }
   }
+  
+  
+    public void addDataPackageReservation(String scope, Integer identifier, String principal)
+			throws ClassNotFoundException, SQLException {
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+    	reservationManager.addDataPackageReservation(scope, identifier, principal);
+    }
 
   
 	/**
@@ -2187,7 +2195,27 @@ public class DataPackageRegistry {
 	  }
 
 	  
-	  /**
+		/**
+		 * Returns a newline-separated list of numeric identifier values
+		 * for the specified scope that are currently reserved for future 
+		 * upload to PASTA, as determined by the contents of the
+		 * datapackagemanager.reservation table.
+		 * 
+		 * @return an XML string
+		 * @throws Exception
+		 */
+		public String listReservationIdentifiers(String scope)
+			throws Exception {
+
+			ReservationManager reservationManager = 
+					new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+			String identifiersString = reservationManager.listReservationIdentifiers(scope);
+			
+			return identifiersString;
+		}
+
+		
+	 /**
 	   * Lists all data package revisions known to PASTA, including active and deleted.
 	   * 
 	   * @param  includeInactive  if true, include deleted revisions
@@ -2355,10 +2383,16 @@ public class DataPackageRegistry {
 
   
 	/**
+	 * List the identifier values for data packages with the specified scope.
 	 * 
 	 * @param scope
+	 *          the scope value
+	 * @param includeDeleted
+	 *          if true, included identifiers for deleted data packages,
+	 *          otherwise exclude them
+	 * @return A list of identifier values
 	 */
-	public ArrayList<String> listDataPackageIdentifiers(String scope)
+	public ArrayList<String> listDataPackageIdentifiers(String scope, boolean includeDeleted)
         throws ClassNotFoundException, SQLException, IllegalArgumentException {
       ArrayList<String> identifierList = new ArrayList<String>();
       
@@ -2367,9 +2401,13 @@ public class DataPackageRegistry {
         String selectString = 
           "SELECT DISTINCT identifier FROM " + RESOURCE_REGISTRY +
           "  WHERE resource_type='dataPackage'" +
-          "  AND scope='" + scope + "'" +
-          "  AND date_deactivated IS NULL" +
-          "  ORDER BY identifier";
+          "  AND scope='" + scope + "'";
+        
+        if (!includeDeleted) {
+            selectString = selectString + "  AND date_deactivated IS NULL";
+        }
+          
+        selectString = selectString + "  ORDER BY identifier";
         Statement stmt = null;
       
         try {
@@ -3381,6 +3419,24 @@ public class DataPackageRegistry {
 		sb.append("</workingOn>\n");
 		xmlString = sb.toString();
 		return xmlString;
+	}
+	
+	
+	/**
+	 * Returns a list of numeric identifier values
+	 * for the specified scope that are actively being worked on for uploads
+	 * (insert or update).
+	 * 
+	 * @return an XML string
+	 * @throws Exception
+	 */
+	public ArrayList<Integer> listWorkingOnIdentifiers(String scope)
+		throws Exception {
+
+		WorkingOn workingOn = makeWorkingOn();
+		ArrayList<Integer> identifiers = workingOn.listWorkingOnIdentifiers(scope);
+		
+		return identifiers;
 	}
 
 }
