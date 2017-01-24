@@ -1376,6 +1376,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns an XML-formatted list of all reservations currently in PASTA.
+	 * 
+	 * @return An XML-formatted string.
+	 */
+	public String listActiveReservations() 
+			throws Exception {
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationXML = reservationManager.listActiveReservations();
+		return reservationXML;
+	}
+
+	
+	/**
 	 * Lists all numeric identifiers that are actively reserved by end users
 	 * for the current scope.
 	 * 

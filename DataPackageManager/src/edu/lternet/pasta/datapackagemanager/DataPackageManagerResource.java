@@ -1996,6 +1996,154 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List Active Reservations</strong> operation, lists the set of data 
+	 * package identifiers that users have actively reserved in PASTA. 
+	 * Note that data packages that have been successfully uploaded by PASTA are 
+	 * no longer considered active reservations and thus are not included in 
+	 * this list.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/package/reservations/eml"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of active data 
+	 * package reservations</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+           &lt;reservations&gt;
+             &lt;reservation&gt;
+               &lt;docid&gt;edi.99&lt;/docid&gt;
+               &lt;principal&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+               &lt;dateReserved&gt;2017-01-23 14:11:48.234&lt;/dateReserved&gt;
+             &lt;/reservation&gt;
+             &lt;reservation&gt;
+               &lt;docid&gt;edi.100&lt;/docid&gt;
+               &lt;principal&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+               &lt;dateReserved&gt;2017-01-23 14:14:49.205&lt;/dateReserved&gt;
+             &lt;/reservation&gt;
+           &lt;/reservations&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, which if successful, contains an XML document
+	 */
+	@GET
+	@Path("/reservations/eml")
+	@Produces("application/xml")
+	public Response listActiveReservations(@Context HttpHeaders headers, @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listActiveReservations";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = 
+					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						"User " + 
+				        userId + 
+				        " is not authorized to execute service method " + 
+				        serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String xml = dataPackageManager.listActiveReservations();
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+	
+	/**
 	 * <strong>List Reservation Identifiers</strong> operation, lists the set of 
 	 * numeric identifiers for the specified scope that end users have actively
 	 * reserved for future upload to PASTA.
