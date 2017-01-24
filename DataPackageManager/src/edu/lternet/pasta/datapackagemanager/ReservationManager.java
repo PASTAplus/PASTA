@@ -295,7 +295,8 @@ public class ReservationManager {
 		Connection conn = null;
 		try {
 			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
+		} 
+		catch (ClassNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
@@ -510,6 +511,53 @@ public class ReservationManager {
 		}
 
 		return isActiveIdentifier;
+	}  
+
+	
+	/**
+	 * For a given identifier, determine which user id, if any, has actively
+	 * reserved that identifier. May return null.
+	 * 
+	 * @param scope
+	 *            the scope value, e.g. "knb-lter-nin"
+	 * @param identifier
+	 *            the identifier value, e.g. 1
+	 * @return the user id, e.g. "uid=LNO,o=LTER,dc=ecoinformatics,dc=org"
+	 */
+	public String getReservationUserId(String scope, Integer identifier)
+			throws ClassNotFoundException, SQLException {
+		String userId = null;
+		Connection connection = null;
+		String selectString = 
+				"SELECT principal FROM " + RESERVATION + 
+				"  WHERE scope='" + scope + 
+				"' AND identifier='" + identifier + 
+				"' AND date_uploaded IS NULL;";
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				userId = rs.getString(1);
+			}
+
+			if (stmt != null)
+				stmt.close();
+		} catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			throw (e);
+		} catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			throw (e);
+		} finally {
+			returnConnection(connection);
+		}
+
+		return userId;
 	}  
 
 	

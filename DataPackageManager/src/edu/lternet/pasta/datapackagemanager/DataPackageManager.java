@@ -579,6 +579,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		if (!isEvaluate) {
 			workingOn.addDataPackage(scope, identifier, revision);
 		}
+		
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationUserId = reservationManager.getReservationUserId(scope, identifier);
+		if (reservationUserId != null && !reservationUserId.equals(user)) {
+			String msg = String.format(
+					"%s.%d is currently reserved by user %s. You should be logged in as user %s to evaluate or upload this data package. Alternatively, you could change the packageId of this data package to a value that does not conflict with the reserved identifier %s.%d",
+					scope, identifier, reservationUserId, reservationUserId, scope, identifier);
+			throw new Exception(msg);
+		}
 
 		/*
 		 * Is the metadata for this data package valid?
@@ -861,7 +871,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 								);
 				}
 
+				/*
+				 * Since the data package is no longer being worked on, set
+				 * the end date in the working_on table.
+				 */
 				workingOn.updateEndDate(scope, identifier, revision);
+				
+				/*
+				 * Set the date uploaded in the reservation table to indicate
+				 * that this identifier is no longer actively reserved.
+				 */
+				reservationManager.setDateUploaded(scope, identifier);
 
 				/*
 				 * Notify the Event Manager about the new resource
