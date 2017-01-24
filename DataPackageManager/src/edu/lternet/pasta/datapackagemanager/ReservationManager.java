@@ -322,11 +322,7 @@ public class ReservationManager {
 			returnConnection(conn);
 		}
 
-		if (rowCount == null || rowCount < 1) {
-			String msg = String.format("Reservation.setDateUploaded(): Failed to set date_uploaded for data package %s", packageId); 
-			throw new SQLException(msg);
-		}
-		else {
+		if (rowCount >= 1) {
 			logger.info(String.format("Data package %s has been uploaded. Its identifier is no longer reserved.", packageId));
 		}
 	}
