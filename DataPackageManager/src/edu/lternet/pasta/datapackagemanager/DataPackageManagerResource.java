@@ -1998,9 +1998,9 @@ public class DataPackageManagerResource extends PastaWebService {
 	/**
 	 * <strong>List Active Reservations</strong> operation, lists the set of data 
 	 * package identifiers that users have actively reserved in PASTA. 
-	 * Note that data packages that have been successfully uploaded by PASTA are 
-	 * no longer considered active reservations and thus are not included in 
-	 * this list.
+	 * Note that data packages identifier that have been successfully uploaded 
+	 * into PASTA are no longer considered active reservations and thus are not 
+	 * included in this list.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">

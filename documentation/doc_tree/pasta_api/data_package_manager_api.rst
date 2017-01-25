@@ -9,6 +9,8 @@ The Data Package Manager API consists of six groups of PASTA web services:
 #. :ref:`Accessing <accessing>` data package resources
 #. :ref:`Provenance <provenance>` tracking and metadata
 #. Data package :ref:`Event Notifications <event-notifications>`
+#. Data package :ref:`Identifier Reservations <reservations>`
+#. :ref:`System Monitoring <system-monitoring>` services
 #. :ref:`Miscellaneous <miscellaneous>` data package services
 
 .. _upload-and-evaluation:
@@ -887,7 +889,206 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/event/eml/schema <https://pasta.lternet.edu/package/docs/api#GET%20:%20/event/eml/schema>`_
 
+.. _reservations:
+
+Identifier Reservation Services
+-------------------------------
+
+Web service methods whereby an end user may reserve data package identifiers for future upload to PASTA.
+
+
+*Create Reservation*
+^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Create Reservation operation, creates a new reservation in PASTA for the 
+specified user on the next reservable identifier for the specified scope. The 
+integer value of the reserved identifier (as assigned by PASTA) is returned in 
+the web service response body. User authentication is required.
+
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/reservations/eml/{scope} <https://pasta.lternet.edu/package/docs/api#POST%20:%20/reservations/eml/{scope}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to reserve the next available identifier for the specified scope ("edi")::
+
+     curl -i -u uid=jsmith,o=LTER,dc=ecoinformatics,dc=org:SOME_PASSWORD -X POST "https://pasta.lternet.edu/package/reservations/eml/edi"
+
+     HTTP/1.1 201 Created
+
+     12
+
+     In the example above, user "jsmith" creates a reservation on the next
+     available identifier for the "edi" scope. PASTA assigns the value "12",
+     meaning that data package identifier "edi.12" is now reserved for future 
+     upload by user "jsmith". Only user "jsmith" will be allowed to upload
+     data packages with identifier "edi.12".
+
+
+*List Active Reservations*
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Active Reservations operation, lists the set of data package identifiers that 
+users have actively reserved in PASTA. Note that data package identifiers that have been 
+successfully uploaded into PASTA are no longer considered active reservations and 
+thus are not included in this list.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/reservations/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/reservations/eml>`_
+
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list active reservations::
+
+     curl -X GET https://pasta.lternet.edu/package/reservations/eml
+
+     <reservations>
+       <reservation>
+         <docid>edi.99</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 14:11:48.234</dateReserved>
+       </reservation>
+       <reservation>
+         <docid>edi.100</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 14:14:49.205</dateReserved>
+       </reservation>
+       <reservation>
+         <docid>edi.7</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 16:03:44.48</dateReserved>
+       </reservation>
+       <reservation>
+         <docid>edi.10</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 16:16:29.321</dateReserved>
+       </reservation>
+       <reservation>
+         <docid>edi.11</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 16:16:49.304</dateReserved>
+       </reservation>
+       <reservation>
+         <docid>edi.12</docid>
+         <principal>uid=LNO,o=LTER,dc=ecoinformatics,dc=org</principal>
+         <dateReserved>2017-01-23 16:16:51.857</dateReserved>
+       </reservation>
+     </reservations>
+
+
+*List Reservation Identifiers*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Reservation Identifiers operation, lists the set of numeric identifiers for 
+the specified scope that end users have actively reserved for future upload to PASTA.
+The numeric identifiers are listed one per line.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/reservations/eml/{scope} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/reservations/eml/{scope}>`_
+
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list reservation identifiers for a specified scope::
+
+     curl -X GET https://pasta.lternet.edu/package/reservations/eml/edi
+
+     7
+     10
+     11
+     12
+     99
+     100
+
+.. _system-monitoring:
+
+System Monitoring Services
+--------------------------
+
+Web service methods for monitoring the state of data packages being processed in PASTA.
+
+
+*List Working On*
+^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Working On operation, lists the set of data packages that PASTA is currently working on inserting or updating. 
+(Note that data packages currently being evaluated by PASTA are not included in the list.)
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/workingon/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/workingon/eml>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list data packages that PASTA is working on uploading::
+
+     curl -X GET https://pasta.lternet.edu/package/workingon/eml
+
+     <workingOn>
+       <dataPackage>
+         <packageId>edi.9.1</packageId>
+         <startDate>2016-12-21 10:43:24.923</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nin.1.2</packageId>
+         <startDate>2016-12-08 16:58:29.307</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nin.1.4</packageId>
+         <startDate>2016-12-08 17:20:59.998</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1836.1</packageId>
+         <startDate>2016-12-12 16:54:09.269</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1837.1</packageId>
+         <startDate>2016-12-12 16:55:05.453</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1837.2</packageId>
+         <startDate>2016-12-12 16:55:36.232</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1838.1</packageId>
+         <startDate>2016-12-12 16:58:01.403</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1844.1</packageId>
+         <startDate>2017-01-23 16:41:32.349</startDate>
+       </dataPackage>
+       <dataPackage>
+         <packageId>knb-lter-nwk.1849.1</packageId>
+         <startDate>2017-01-24 13:37:29.09</startDate>
+       </dataPackage>
+     </workingOn>
+
 .. _miscellaneous:
+
 
 Miscellaneous Services
 ----------------------

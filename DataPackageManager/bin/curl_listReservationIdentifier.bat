@@ -1,22 +1,21 @@
 @ECHO OFF
 echo.
-echo Working On: localhost
-echo.
+echo edi identifiers reserved on: localhost
 SET SERVICE_HOST=http://localhost:8888
 SET SCOPE=edi
 curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
 echo.
-REM echo Working On: pasta-d
 echo.
+echo edi identifiers reserved on: pasta-d
 SET SERVICE_HOST=http://pasta-d.lternet.edu
-REM curl -X GET "%SERVICE_HOST%/package/workingon/eml/%scope%"
+curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
 echo.
-REM echo Working On: pasta-s
 echo.
+REM echo edi identifiers reserved on: pasta-s
 SET SERVICE_HOST=http://pasta-s.lternet.edu
-REM curl -X GET "%SERVICE_HOST%/package/workingon/eml/%scope%"
+REM curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
 echo.
-REM echo Working On: pasta
 echo.
+REM echo edi identifiers reserved on: pasta
 SET SERVICE_HOST=http://pasta.lternet.edu
-REM curl -X GET "%SERVICE_HOST%/package/workingon/eml/%scope%"
+REM curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
