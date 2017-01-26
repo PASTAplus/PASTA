@@ -973,8 +973,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		String[] reservationEntries = reservationString.split("\n");
 		if (reservationEntries != null && reservationEntries.length > 0) {
 			for (String reservedIdentifier : reservationEntries) {
-				Integer spokenForIdentifier = Integer.parseInt(reservedIdentifier);
-				spokenFor.put(spokenForIdentifier, isSpokenFor);
+				if (!reservedIdentifier.isEmpty()) {
+					Integer spokenForIdentifier = Integer.parseInt(reservedIdentifier);
+					spokenFor.put(spokenForIdentifier, isSpokenFor);
+				}
 			}
 		}
 		
@@ -993,7 +995,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			}
 		}
 		
-
 		return nextReservable;
 	}
 	
