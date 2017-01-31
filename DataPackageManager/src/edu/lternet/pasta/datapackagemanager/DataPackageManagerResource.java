@@ -1143,6 +1143,10 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = WebExceptionFactory.makeConflict(e).getResponse();
 			msg = e.getMessage();
 		}
+		catch (UserErrorException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
 		catch (Exception e) {
 			WebApplicationException webApplicationException = WebExceptionFactory
 					.make(Response.Status.INTERNAL_SERVER_ERROR, e,

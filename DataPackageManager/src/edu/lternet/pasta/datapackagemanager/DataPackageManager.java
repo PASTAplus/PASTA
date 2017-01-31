@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -267,6 +268,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+	  /*
+	   * Boolean to determine whether a given packageId scope is found in
+	   * the set of allowable scopes in PASTA's scope registry.
+	   */
+		public static boolean isValidScope(String scope) {
+			boolean isValid = false;
+
+			if (scope == null)
+				return false;
+			
+			String scopeRegistry = DataPackage.getScopeRegistry();
+			if (scopeRegistry == null)
+				return false;
+
+			StringTokenizer stringTokenizer = new StringTokenizer(scopeRegistry, ",");
+			final int tokenCount = stringTokenizer.countTokens();
+
+			for (int i = 0; i < tokenCount; i++) {
+				String token = stringTokenizer.nextToken();
+				if (scope.equals(token)) {
+					isValid = true;
+					break;
+				}
+			}
+
+			return isValid;
+		}
+	  
+	  
 	/**
 	 * Utility method to make a DataPackageRegistry object using database
 	 * connection settings.
@@ -911,6 +941,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 */
 	public Integer createReservation(String userId, String scope) 
 			throws Exception {
+		boolean isValidScope = isValidScope(scope);
+		if (!isValidScope) {
+			String msg = 
+					String.format("Attempting to create a data package identifier reservation for an unknown scope: %s",
+					              scope);
+			throw new UserErrorException(msg);
+		}
+		
 		Integer identifier = getNextReservableIdentifier(scope);
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
@@ -1640,7 +1678,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		revisionListString = stringBuffer.toString();
 		return revisionListString;
 	}
-
+	
 	
 	/**
 	 * List the scope values for all data packages that are readable by the
