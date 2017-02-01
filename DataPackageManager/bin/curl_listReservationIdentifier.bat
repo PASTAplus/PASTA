@@ -11,9 +11,9 @@ SET SERVICE_HOST=http://pasta-d.lternet.edu
 curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
 echo.
 echo.
-REM echo edi identifiers reserved on: pasta-s
+echo edi identifiers reserved on: pasta-s
 SET SERVICE_HOST=http://pasta-s.lternet.edu
-REM curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
+curl -X GET "%SERVICE_HOST%/package/reservations/eml/%scope%"
 echo.
 echo.
 REM echo edi identifiers reserved on: pasta
