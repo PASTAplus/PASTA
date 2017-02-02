@@ -82,49 +82,6 @@ public class FileSystemResource {
   */
 
  /**
-  * Deletes this resource from the file system.
-  * 
-  * @return true if the resource was successfully deleted, else false
-  */
- public boolean deleteResource() {
-   boolean success = false;
-   File resourceFile = getResourceFile();
-   
-   if (resourceFile != null) {
-     success = resourceFile.delete();
-   }
-   
-   // Do some housekeeping on empty directories
-   String dirPath = getDirPath();
-   if (dirPath != null) {
-     File dirFile = new File(dirPath);
-     if (dirFile != null && dirFile.exists()) {
-       dirFile.delete();
-     }
-   }
-   
-   return success;
- }
- 
- 
- /**
-  * Boolean to determine whether the resource exists on the file system.
-  * 
-  * @return  true if it exists, else false
-  */
- public boolean exists() {
-   boolean exists = false;
-   File resourceFile = getResourceFile();
-   
-   if (resourceFile != null) {
-     exists = resourceFile.exists();
-   }
-   
-   return exists;
- }
-
- 
- /**
   * Returns a path to the file system directory where the resource is stored.
   * 
   * @return  dirPath, the path to the directory, a String
@@ -143,30 +100,6 @@ public class FileSystemResource {
    }
 
    return dirPath;
- }
-
- 
- /**
-  * Access the resource file from the file system. Creates the
-  * directory that stores the resource if it doesn't already exist
-  * on the file system.
-  * 
-  * @return  the File object holding the resource
-  */
- public File getResourceFile() {
-   File resourceFile = null;
-   
-   String dirPath = getDirPath();
-   
-   File dirFile = new File(dirPath);
-   
-   if (dirFile != null && !dirFile.exists()) {
-     dirFile.mkdirs();
-   }
-   
-   resourceFile = new File(dirPath, packageId);
-   
-   return resourceFile;
  }
 
  
