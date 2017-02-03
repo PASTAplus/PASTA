@@ -156,7 +156,8 @@ public class DataPackageReport {
    if (this.emlPackageId != null) {
      FileSystemResource reportResource = new FileSystemResource(emlPackageId);
      reportResource.setEvaluateMode(evaluate);
-     String dirPath = reportResource.getDirPath();
+     boolean isReportResource = true;
+     String dirPath = reportResource.getDirPath(isReportResource);
      EMLQualityReport emlQualityReport = new EMLQualityReport(this.emlPackageId);
      if (emlQualityReport != null) {
        reportFilename = emlQualityReport.composeQualityReportFilename(evaluate, transaction);

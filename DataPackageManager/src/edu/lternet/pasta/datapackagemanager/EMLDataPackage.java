@@ -155,41 +155,78 @@ public class EMLDataPackage {
   }
   
   
-  /**
-   * Deletes data package resources from the file system. Only evaluate
-   * mode data package are allowed to be deleted from the file system.
-   * 
-   * @param   isEvaluate  true if this evaluate mode. 
-   */
-   public void deleteDataPackageResources(boolean isEvaluate)
-           throws IOException {
-     if (isEvaluate && this.emlPackageId != null) {
-       // First cleanup the metadata files
-       FileSystemResource dataPackageResource = 
-           new FileSystemResource(emlPackageId);
-       dataPackageResource.setEvaluateMode(isEvaluate);
-       String dirPath = dataPackageResource.getDirPath();   
-       File dirFile = new File(dirPath);  
-       if (dirFile != null && dirFile.exists()) { 
-         //FileUtils.deleteQuietly(dirFile);
-       }
-       
-       // Now cleanup the data entity files  
-       StringBuffer stringBuffer = new StringBuffer("");
-       String baseDir = EMLDataManager.getEntityDir();
-       stringBuffer.append(baseDir);
-       stringBuffer.append("/");
-       String packageId = dataPackage.getPackageId();
-       stringBuffer.append(packageId);
-       stringBuffer.append("/evaluate");
-       dirPath = stringBuffer.toString();
-       dirFile = new File(dirPath);  
-       if (dirFile != null && dirFile.exists()) { 
-         FileUtils.deleteQuietly(dirFile);
-       }
-     }
-   }
+	private boolean isEmptyDirectory(File dirFile) {
+		boolean isEmpty = false;
 
+		if (dirFile != null && dirFile.isDirectory()) {
+			if (dirFile.list().length == 0) {
+				isEmpty = true;
+			} 
+		} 
+		else {
+			logger.error(String.format("%s is not a directory", dirFile.getPath()));
+		}
+
+		return isEmpty;
+	}
+  
+	
+	/**
+	 * Deletes data package resources from the file system.
+	 * 
+	 * @param isEvaluate
+	 *            true if this evaluate mode.
+	 */
+	public void deleteDataPackageResources(boolean isEvaluate) throws IOException {
+		boolean success = false;
+
+		 /* 
+		  * Only evaluate mode data package resources are allowed to be deleted
+		  * from the file system.
+		  */
+		if (isEvaluate && this.emlPackageId != null) {
+
+			/*
+			 * Cleanup the data entity files that were downloaded for 
+			 * the evaluate operation
+			 */
+			StringBuffer stringBuffer = new StringBuffer("");
+			String baseDir = EMLDataManager.getEntityDir();
+			stringBuffer.append(baseDir);
+			stringBuffer.append("/");
+
+			String packageId = dataPackage.getPackageId();
+			stringBuffer.append(packageId);
+			String packageIdPath = stringBuffer.toString();
+			File packageIdDir = new File(packageIdPath);
+
+			stringBuffer.append("/evaluate");
+			String evaluateDirPath = stringBuffer.toString();
+			File evaluateDir = new File(evaluateDirPath);
+			if (evaluateDir != null && evaluateDir.exists()) {
+				success = FileUtils.deleteQuietly(evaluateDir);
+				if (!success) {
+					logger.warn(String.format("Unable to delete %s", evaluateDirPath));
+				}
+			}
+
+			/*
+			 * Cleanup the top-level packageId directory, but only if it is
+			 * empty! We don't an evaluate operation to remove valid resources
+			 * that were previously uploaded into PASTA! 
+			 */
+			if (packageIdDir != null && 
+				packageIdDir.exists() && 
+				isEmptyDirectory(packageIdDir)
+			   ) {
+				success = FileUtils.deleteQuietly(packageIdDir);
+				if (!success) {
+					logger.warn(String.format("Unable to delete %s", packageIdPath));
+				}
+			}
+
+		}
+	}
    
   /**
    * Accessor method for getting the Data Manager Library
@@ -387,9 +424,10 @@ public class EMLDataPackage {
 	   File emlFile = null;
 	   
 	   if (this.emlPackageId != null) {
-	     FileSystemResource reportResource = 
+	     FileSystemResource metadataResource = 
 	         new FileSystemResource(emlPackageId);
-	     String dirPath = reportResource.getDirPath();   
+	     boolean isReportResource = false;
+	     String dirPath = metadataResource.getDirPath(isReportResource);   
 	     File dirFile = new File(dirPath);  
 	     if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
 	     String emlFilename = (isLevelZero ? LEVEL_ZERO_FILE_NAME : LEVEL_ONE_FILE_NAME);
