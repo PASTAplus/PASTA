@@ -206,7 +206,14 @@ public class EMLDataPackage {
 			if (evaluateDir != null && evaluateDir.exists()) {
 				success = FileUtils.deleteQuietly(evaluateDir);
 				if (!success) {
-					logger.warn(String.format("Unable to delete %s", evaluateDirPath));
+					logger.warn(
+							String.format("Unable to delete %s after completion of evaluate", 
+									      evaluateDirPath));
+				}
+				else {
+					logger.info(
+							String.format("Deleted %s after completion of evaluate", 
+									      evaluateDirPath));
 				}
 			}
 
@@ -221,7 +228,13 @@ public class EMLDataPackage {
 			   ) {
 				success = FileUtils.deleteQuietly(packageIdDir);
 				if (!success) {
-					logger.warn(String.format("Unable to delete %s", packageIdPath));
+					logger.warn(String.format("Unable to delete %s after completion of evaluate",
+							                  packageIdPath));
+				}
+				else {
+					logger.info(
+							String.format("Deleted %s after completion of evaluate", 
+									      packageIdPath));
 				}
 			}
 
