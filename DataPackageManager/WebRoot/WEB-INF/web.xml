@@ -23,6 +23,12 @@
     <servlet-name>Archive Cleaner Servlet</servlet-name>
     <servlet-class>edu.lternet.pasta.datapackagemanager.ArchiveCleanerServlet</servlet-class>
   </servlet>
+  <servlet>
+    <display-name>WorkingOn Servlet</display-name>
+    <servlet-name>WorkingOn Servlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.datapackagemanager.WorkingOnServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
   <servlet-mapping>
     <servlet-name>JAX-RS REST Servlet</servlet-name>
     <url-pattern>/*</url-pattern>

@@ -1018,6 +1018,151 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>Create Reservation</strong> operation, creates a new
+	 * reservation in PASTA on the next reservable identifier for the
+	 * specified scope.
+	 * 
+	 * <h4>Request entity:</h4>
+	 * 
+	 * <p>
+	 * The request entity should be an XML document (MIME type
+	 * <code>application/xml</code>) that contains the subscription's EML
+	 * packageId, and URL, with the syntax:
+	 * </p>
+	 * 
+	 * <pre>
+	 *    &lt;subscription type="eml"&gt;
+	 *       &lt;packageId&gt;<em>packageId</em>&lt;/packageId&gt;
+	 *       &lt;url&gt;<em>url</em>&lt;/url&gt;
+	 *    &lt;/subscription&gt;
+	 * </pre>
+	 * 
+	 * <p>
+	 * The packageId can be either complete or partial. The URL must have 'http'
+	 * as its scheme and must be able to receive POST requests with MIME type
+	 * <code>text/plain</code>. Note that some characters must be escaped in
+	 * XML, such as ampersands (&amp;) in the query string of the URL, from
+	 * <code>&amp;</code> to <code>&amp;amp;</code>.
+	 * </p>
+	 * 
+	 * 
+	 * <h4>Responses:</h4>
+	 * 
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <td><b>Status</b></td>
+	 * <td><b>Reason</b></td>
+	 * <td><b>Entity</b></td>
+	 * <td><b>MIME type</b></td>
+	 * </tr>
+	 * <tr>
+	 * <td>201 Created</td>
+	 * <td>If the request was successful.</td>
+	 * <td>None, but the <code>Location</code> header will contain a URL that
+	 * references the new subscription.</td>
+	 * <td>N/A</td>
+	 * </tr>
+	 * <tr>
+	 * <td>400 Bad Request</td>
+	 * <td>If the request entity contains an error, such as improperly formatted
+	 * XML, EML packageId, or URL.</td>
+	 * <td>An error message.</td>
+	 * <td><code>text/plain</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td>401 Unauthorized</td>
+	 * <td>If the requesting user is not authorized to create subscriptions.</td>
+	 * <td>An error message.</td>
+	 * <td><code>text/plain</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td>409 Conflict</td>
+	 * <td>If a subscription already exists with the same creator, EML
+	 * packageId, and URL attributes.</td>
+	 * <td>
+	 * An error message.</td>
+	 * <td><code>text/plain</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * 
+	 * @param headers
+	 *            the HTTP request headers containing the authorization token.
+	 * @param requestBody
+	 *            the POST request's body, containing XML.
+	 * 
+	 * @return an appropriate HTTP response.
+	 */
+	@POST
+	@Path("/reservations/eml/{scope}")
+	@Consumes(MediaType.APPLICATION_XML)
+	public Response createReservation(@Context HttpHeaders headers,
+            @PathParam("scope") String scope) {
+		ResponseBuilder responseBuilder = null;
+		AuthToken authToken = null;
+		String msg = null;
+		Rule.Permission permission = Rule.Permission.write;
+		Response response = null;
+		final String serviceMethodName = "createReservation";
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the 'createReservation' service
+			// method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+			
+			DataPackageManager dpm = new DataPackageManager();
+
+			Integer reservationIdentifier = dpm.createReservation(userId, scope);
+			msg = String.format(
+					"Created reservation for data package: %s.%d",
+					scope, reservationIdentifier);
+			responseBuilder = Response.status(Response.Status.CREATED);
+			responseBuilder.entity(reservationIdentifier.toString());
+			response = responseBuilder.build();
+			response = stampHeader(response);
+		}
+		catch (XmlParsingException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (ResourceExistsException e) {
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (UserErrorException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (Exception e) {
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+			msg = e.getMessage();
+		}
+		finally {
+			audit(serviceMethodName, authToken, response, null, msg);
+		}
+
+		return response;
+	}
+
+
+	/**
 	 * <strong>Evaluate Data Package</strong> operation, specifying the EML
 	 * document describing the data package to be evaluated in the request
 	 * message body, and returning a <em>transaction identifier</em> in the
@@ -1855,6 +2000,293 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List Active Reservations</strong> operation, lists the set of data 
+	 * package identifiers that users have actively reserved in PASTA. 
+	 * Note that data packages identifier that have been successfully uploaded 
+	 * into PASTA are no longer considered active reservations and thus are not 
+	 * included in this list.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/package/reservations/eml"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of active data 
+	 * package reservations</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+           &lt;reservations&gt;
+             &lt;reservation&gt;
+               &lt;docid&gt;edi.99&lt;/docid&gt;
+               &lt;principal&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+               &lt;dateReserved&gt;2017-01-23 14:11:48.234&lt;/dateReserved&gt;
+             &lt;/reservation&gt;
+             &lt;reservation&gt;
+               &lt;docid&gt;edi.100&lt;/docid&gt;
+               &lt;principal&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
+               &lt;dateReserved&gt;2017-01-23 14:14:49.205&lt;/dateReserved&gt;
+             &lt;/reservation&gt;
+           &lt;/reservations&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, which if successful, contains an XML document
+	 */
+	@GET
+	@Path("/reservations/eml")
+	@Produces("application/xml")
+	public Response listActiveReservations(@Context HttpHeaders headers, @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listActiveReservations";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = 
+					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						"User " + 
+				        userId + 
+				        " is not authorized to execute service method " + 
+				        serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String xml = dataPackageManager.listActiveReservations();
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+	
+	/**
+	 * <strong>List Reservation Identifiers</strong> operation, lists the set of 
+	 * numeric identifiers for the specified scope that end users have actively
+	 * reserved for future upload to PASTA.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/package/reservations/eml/edi"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>A simple list of numeric identifier values reserved for 
+	 * the specified scope, one identifier per line</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	   67
+	   68
+	   69
+	   70
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, which if successful, contains an XML document
+	 */
+	@GET
+	@Path("/reservations/eml/{scope}")
+	@Produces("text/plain")
+	public Response listReservationIdentifiers(@Context HttpHeaders headers,
+			                               @PathParam("scope") String scope) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listReservationIdentifiers";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = 
+					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						"User " + 
+				        userId + 
+				        " is not authorized to execute service method " + 
+				        serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String reservations = dataPackageManager.listReservationIdentifiers(scope);
+			responseBuilder = Response.ok(reservations);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+	
+	/**
 	 * 
 	 * <strong>List Data Descendants</strong> operation, specifying the scope,
 	 * identifier, and revision values to match in the URI.
@@ -2347,8 +2779,9 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
+			boolean includeDeleted = false;
 			String identifierList = dataPackageManager
-					.listDataPackageIdentifiers(scope, userId);
+					.listDataPackageIdentifiers(scope, includeDeleted);
 
 			if (identifierList != null) {
 				responseBuilder = Response.ok(identifierList.trim());
@@ -8018,6 +8451,154 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+	/**
+	 * <strong>List Working On</strong> operation, lists the set of data 
+	 * packages that PASTA is currently working on inserting or updating. 
+	 * Note that data packages that are being evaluated by PASTA are not 
+	 * included in this list. (See example below.)
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/package/workingon/eml"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of recent data package inserts or updates</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	       &lt;workingOn&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;knb-lter-nwk.1504.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-08 16:58:29.307&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;lter-landsat-ledaps.7.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-08 17:20:59.998&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	         &lt;dataPackage&gt;
+	           &lt;packageId&gt;knb-lter-nwk.1490.1&lt;/packageId&gt;
+	           &lt;startDate&gt;2016-12-12 16:55:05.453&lt;/startDate&gt;
+	         &lt;/dataPackage&gt;
+	       &lt;/workingOn&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, which if successful, contains an XML document
+	 */
+	@GET
+	@Path("/workingon/eml")
+	@Produces("application/xml")
+	public Response listWorkingOn(@Context HttpHeaders headers, @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listWorkingOn";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = 
+					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+						"User " + 
+				        userId + 
+				        " is not authorized to execute service method " + 
+				        serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String xml = dataPackageManager.listWorkingOn();
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+	
 	/**
 	 * <strong>Update Data Package</strong> operation, specifying the scope and
 	 * identifier of the data package to be updated in the URI, along with the

@@ -66,4 +66,21 @@ public class DataPackageManagerTest {
     assertTrue(String.format("Expected %s to invalidate", invalid2), !DataPackageManager.isPastaDataSource(invalid2));
   }
 
+  
+  /**
+   * Test DataPackageManager.isValidScope() method.
+   */
+  @Test 
+  public void testIsValidScope() {
+    final String valid1 = "edi";
+    final String valid2 = "knb-lter-and";
+    final String invalid1 = "knb-lter-zzz";
+    final String invalid2 = "bogus-scope";
+    
+    assertTrue(String.format("Expected %s to validate", valid1), DataPackageManager.isValidScope(valid1));
+    assertTrue(String.format("Expected %s to validate", valid2), DataPackageManager.isValidScope(valid2));
+    assertTrue(String.format("Expected %s to invalidate", invalid1), !DataPackageManager.isValidScope(invalid1));
+    assertTrue(String.format("Expected %s to invalidate", invalid2), !DataPackageManager.isValidScope(invalid2));
+  }
+
 }

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -267,6 +268,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+	  /*
+	   * Boolean to determine whether a given packageId scope is found in
+	   * the set of allowable scopes in PASTA's scope registry.
+	   */
+		public static boolean isValidScope(String scope) {
+			boolean isValid = false;
+
+			if (scope == null)
+				return false;
+			
+			String scopeRegistry = DataPackage.getScopeRegistry();
+			if (scopeRegistry == null)
+				return false;
+
+			StringTokenizer stringTokenizer = new StringTokenizer(scopeRegistry, ",");
+			final int tokenCount = stringTokenizer.countTokens();
+
+			for (int i = 0; i < tokenCount; i++) {
+				String token = stringTokenizer.nextToken();
+				if (scope.equals(token)) {
+					isValid = true;
+					break;
+				}
+			}
+
+			return isValid;
+		}
+	  
+	  
 	/**
 	 * Utility method to make a DataPackageRegistry object using database
 	 * connection settings.
@@ -522,6 +552,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new ResourceExistsException(message);
 			}
 
+			// Is this data package actively being worked on in PASTA?
+			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+			boolean isActive = workingOn.isActive(scope, identifier, revision);
+
+			/*
+			 * If this data package is already active in PASTA, throw an exception
+			 */
+			if (isActive) {
+				String message = "Attempting to insert a data package that is currently being processed in PASTA: "
+				    + levelZeroDataPackage.getDocid();
+				throw new UserErrorException(message);
+			}
+
 			boolean isUpdate = false;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
@@ -561,6 +604,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		AccessMatrix datasetAccessMatrix = new AccessMatrix(datasetAccessXML);
 		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
+		WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+		
+		if (!isEvaluate) {
+			workingOn.addDataPackage(scope, identifier, revision);
+		}
+		
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationUserId = reservationManager.getReservationUserId(scope, identifier);
+		if (reservationUserId != null && !reservationUserId.equals(user)) {
+			String msg = String.format(
+					"%s.%d is currently reserved by user %s. You should be logged in as user %s to evaluate or upload this data package. Alternatively, you could change the packageId of this data package to a value that does not conflict with the reserved identifier %s.%d",
+					scope, identifier, reservationUserId, reservationUserId, scope, identifier);
+			throw new Exception(msg);
+		}
 
 		/*
 		 * Is the metadata for this data package valid?
@@ -601,7 +659,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
           isDataValid = levelZeroDataPackage.isDataValid();
 				}
 			}
-		} catch (ResourceExistsException e) {
+		} 
+		catch (ResourceExistsException e) {
+			if (!isEvaluate) workingOn.updateEndDate(scope, identifier, revision);
 			throw (e); // Don't do a roll-back when this exception occurs
 		}
 
@@ -653,6 +713,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			} 
 			catch (Exception e) {
 				provenanceIndex.rollbackProvenanceRecords(packageId);
+				workingOn.updateEndDate(scope, identifier, revision);
 				throw (e);
 			}
 		}
@@ -751,7 +812,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * The return value of an Evaluate operation is always the quality report.
 			 */
 			resourceMap = qualityReportXML;
-		} else {
+		} 
+		else {
 			if (isDataPackageValid) {
 
 				/*
@@ -840,18 +902,139 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 
 				/*
+				 * Since the data package is no longer being worked on, set
+				 * the end date in the working_on table.
+				 */
+				workingOn.updateEndDate(scope, identifier, revision);
+				
+				/*
+				 * Set the date uploaded in the reservation table to indicate
+				 * that this identifier is no longer actively reserved.
+				 */
+				reservationManager.setDateUploaded(scope, identifier);
+
+				/*
 				 * Notify the Event Manager about the new resource
 				 */
 				notifyEventManager(packageId, scope, identifier, revision, user,
 				    authToken);
-			} else {
+			} 
+			else {
+				workingOn.updateEndDate(scope, identifier, revision);
 				throw new UserErrorException(qualityReportXML);
 			}
 		}
 
 		return resourceMap;
 	}
+	
+	
+	/**
+	 * Creates a new reservation for the specified user and scope. The
+	 * next reservable identifier is determined, the reservation is placed,
+	 * and the identifier is returned as the method's value.
+	 * 
+	 * @param userId    The user who is making the reservation
+	 * @param scope     The scope of the reserved identifier, e.g. "edi"
+	 * @return identifier  The integer value of the reserved identifier
+	 * @throws Exception
+	 */
+	public Integer createReservation(String userId, String scope) 
+			throws Exception {
+		boolean isValidScope = isValidScope(scope);
+		if (!isValidScope) {
+			String msg = 
+					String.format("Attempting to create a data package identifier reservation for an unknown scope: %s",
+					              scope);
+			throw new UserErrorException(msg);
+		}
+		
+		Integer identifier = getNextReservableIdentifier(scope);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+			    dbDriver, dbURL, dbUser, dbPassword);
+		
+		dataPackageRegistry.addDataPackageReservation(scope, identifier, userId);
+		
+		return identifier;
+	}
+	
+	
+	/*
+	 * Determine the next reservable identifier value for the specified scope.
+	 * Three lists must be checked:
+	 *    1. List of identifiers known in the resource registry belong
+	 *       to the specified scope, including identifiers for data packages 
+	 *       that have been deleted;
+	 *    2. List of "working on" identifiers for the specified scope, 
+	 *       i.e. inserts or updates that are currently in progress;
+	 *    3. List of reserved identifiers for the specified scope.
+	 */
+	private Integer getNextReservableIdentifier(String scope) 
+		throws Exception{
+		Integer nextReservable = null;
+		final Boolean isSpokenFor = new Boolean(true);
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		
+		HashMap<Integer, Boolean> spokenFor = new HashMap<Integer, Boolean>();
 
+		/*
+		 * First get a list of all known identifiers for this scope that exist
+		 * in the resource registry. Include identifiers for data packages that
+		 * were deleted since these identifier values can't be reused.
+		 */
+		boolean includeDeleted = true;
+		ArrayList<String> identifierList = 
+				dataPackageRegistry.listDataPackageIdentifiers(scope, includeDeleted);
+
+		for (String identifier : identifierList) {
+			Integer spokenForIdentifier = Integer.parseInt(identifier);
+			spokenFor.put(spokenForIdentifier, isSpokenFor);
+		}
+		
+		/*
+		 * Next get a list of all known identifiers for this scope that are
+		 * actively being worked on (i.e. an upload operation for this
+		 * identifier is actively in progress).
+		 */
+		ArrayList<Integer> identifiers = dataPackageRegistry.listWorkingOnIdentifiers(scope);
+		
+		for (Integer identifier : identifiers) {
+			spokenFor.put(identifier, isSpokenFor);
+		}
+		
+		
+		/*
+		 * Finally, get a list of all active reservations for this scope.
+		 */
+		String reservationString = dataPackageRegistry.listReservationIdentifiers(scope);
+		String[] reservationEntries = reservationString.split("\n");
+		if (reservationEntries != null && reservationEntries.length > 0) {
+			for (String reservedIdentifier : reservationEntries) {
+				if (!reservedIdentifier.isEmpty()) {
+					Integer spokenForIdentifier = Integer.parseInt(reservedIdentifier);
+					spokenFor.put(spokenForIdentifier, isSpokenFor);
+				}
+			}
+		}
+		
+		/*
+		 * Now find the first available identifier value that isn't claimed by
+		 * one of the three previous lists.
+		 */
+		Integer nextCandidate = new Integer(1);
+		while (nextReservable == null) {
+			Boolean value = spokenFor.get(nextCandidate);
+			if (value != null && value.equals(isSpokenFor)) {
+				nextCandidate = nextCandidate + 1;
+			}
+			else {
+				nextReservable = nextCandidate;
+			}
+		}
+		
+		return nextReservable;
+	}
 	
 	/*
 	 * Notifies the event manager of a change to a data package by using an
@@ -1232,6 +1415,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Returns an XML-formatted list of all reservations currently in PASTA.
+	 * 
+	 * @return An XML-formatted string.
+	 */
+	public String listActiveReservations() 
+			throws Exception {
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationXML = reservationManager.listActiveReservations();
+		return reservationXML;
+	}
+
+	
+	/**
+	 * Lists all numeric identifiers that are actively reserved by end users
+	 * for the current scope.
+	 * 
+	 * @return A string of newline-separated numeric identifier values.
+	 */
+	public String listReservationIdentifiers(String scope) 
+			throws Exception {
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String reservationsString = dataPackageRegistry.listReservationIdentifiers(scope);
+		return reservationsString;
+	}
+
+	
+	/**
 	 * List the package ID values (including revisions) of all data packages that 
 	 * are active (not deleted) in the resource registry.
 	 * 
@@ -1396,24 +1608,24 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 
 	/**
-	 * List the identifier values for data packages with the specified scope that
-	 * are readable by the specified user.
+	 * List the identifier values for data packages with the specified scope.
 	 * 
 	 * @param scope
 	 *          the scope value
-	 * @param user
-	 *          the user name
+	 * @param includeDeleted
+	 *          if true, included identifiers for deleted data packages,
+	 *          else exclude them
 	 * @return a newline-separated list of identifier values
 	 */
-	public String listDataPackageIdentifiers(String scope, String user)
+	public String listDataPackageIdentifiers(String scope, boolean includeDeleted)
 	    throws ClassNotFoundException, SQLException, IllegalArgumentException,
 	    ResourceNotFoundException {
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
 		    dbURL, dbUser, dbPassword);
 		String identifierListString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
-		ArrayList<String> identifierList = dataPackageRegistry
-		    .listDataPackageIdentifiers(scope);
+		ArrayList<String> identifierList = 
+				dataPackageRegistry.listDataPackageIdentifiers(scope, includeDeleted);
 
 		// Throw a ResourceNotFoundException if the list is empty
 		if (identifierList == null || identifierList.size() == 0) {
@@ -1466,7 +1678,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		revisionListString = stringBuffer.toString();
 		return revisionListString;
 	}
-
+	
 	
 	/**
 	 * List the scope values for all data packages that are readable by the
@@ -1527,6 +1739,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		packageListString = stringBuffer.toString();
+		return packageListString;
+	}
+
+	
+	/**
+	 * Lists all data packages that are actively being worked on.
+	 * 
+	 * @return An XML string, as composed by the DataPackageRegistry class.
+	 */
+	public String listWorkingOn() 
+			throws Exception {
+		DataPackageRegistry dataPackageRegistry = 
+				new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String packageListString = dataPackageRegistry.listWorkingOn();
 		return packageListString;
 	}
 
@@ -2858,6 +3084,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + " does not have permission to update this data package: "
 				    + resourceId;
 				throw new UnauthorizedException(message);
+			}
+
+			// Is this data package actively being worked on in PASTA?
+			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+			boolean isActive = workingOn.isActive(scope, identifier, revision);
+
+			/*
+			 * If this data package is already active in PASTA, throw an exception
+			 */
+			if (isActive) {
+				String message = "Attempting to update a data package that is currently being processed in PASTA: "
+				    + levelZeroDataPackage.getDocid();
+				throw new UserErrorException(message);
 			}
 
 			boolean isUpdate = true;

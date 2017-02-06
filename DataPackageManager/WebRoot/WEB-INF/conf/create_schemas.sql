@@ -58,3 +58,22 @@ CREATE TABLE datapackagemanager.provenance (
   SOURCE_ID TEXT NOT NULL,                                      -- packageId of source data package
   CONSTRAINT PK_PROVENANCE PRIMARY KEY (DERIVED_ID, SOURCE_ID)  -- two-column primary key
 );
+
+
+CREATE TABLE datapackagemanager.working_on (
+  scope VARCHAR(100) NOT NULL,                        -- the scope
+  identifier INT8 NOT NULL,                           -- the identifier
+  revision INT8 NOT NULL,                             -- the revision
+  start_date TIMESTAMP NOT NULL,                      -- initiated date/time
+  end_date TIMESTAMP,                                 -- completed date/time
+  interrupted BOOLEAN default false   -- set to true if end_date is NULL at server startup 
+)
+
+CREATE TABLE datapackagemanager.reservation (
+   principal          VARCHAR(250) NOT NULL,              -- the principal for whom this reservation is made
+   scope              VARCHAR(100) NOT NULL,              -- the scope of the reserved identifier
+   identifier         INT8         NOT NULL,              -- the value of the reserved identifier
+   date_reserved      timestamp    NOT NULL,              -- date that the identifier was reserved
+   date_uploaded      timestamp,                          -- date that the data package was uploaded
+   CONSTRAINT PK_RESERVATION PRIMARY KEY (SCOPE, IDENTIFIER)  -- two-column primary key
+);

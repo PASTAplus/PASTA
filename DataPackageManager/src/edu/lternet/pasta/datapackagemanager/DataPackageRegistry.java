@@ -35,6 +35,10 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -135,41 +139,41 @@ public class DataPackageRegistry {
   /**
    * @param args
    */
-  public static void main(String[] args) {
-    
-    Options options = null;
-    options = ConfigurationListener.getOptions();
-    
-    String dirPath = "WebRoot/WEB-INF/conf";
+	public static void main(String[] args) {
 
-    if (options == null) {
-      ConfigurationListener configurationListener = new ConfigurationListener();
-      configurationListener.initialize(dirPath);
-      options = ConfigurationListener.getOptions();
-    }
+		Options options = null;
+		options = ConfigurationListener.getOptions();
 
-    DataPackageRegistry dpr = null;
-    String dbDriver = "org.postgresql.Driver";
-    String dbURL = "jdbc:postgresql://localhost:5432/pasta";
-    String dbUser = "pasta";
-    String dbPassword = "p@st@";
-    
-    // String resourceId = "http://localhost:8000/package/report/eml/knb-lter-nin/1/1";
-    String resourceId = "http://localhost:8000/package/report/eml/knb-lter-atz/1/1";
+		String dirPath = "WebRoot/WEB-INF/conf";
 
-    try {
-      dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-      if (dpr.getDoi(resourceId) == null) {
-        logger.info("It's NULL");
-      } else {
-        logger.info("It's not NULL");
-      }
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-    }
+		if (options == null) {
+			ConfigurationListener configurationListener = new ConfigurationListener();
+			configurationListener.initialize(dirPath);
+			options = ConfigurationListener.getOptions();
+		}
 
-  }
+		DataPackageRegistry dpr = null;
+		String dbDriver = options.getOption("dbDriver");
+		String dbURL = options.getOption("dbURL");
+		String dbUser = options.getOption("dbUser");
+		String dbPassword = options.getOption("dbPassword");
+
+		String resourceId = "https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1";
+
+		try {
+			dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+			String doi = dpr.getDoi(resourceId);
+			if (doi == null) {
+				logger.info(String.format("The DOI for %s is null", resourceId));
+			} else {
+				logger.info(String.format("The DOI for %s is %s", resourceId, doi));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
 
 
   /*
@@ -345,6 +349,14 @@ public class DataPackageRegistry {
       }
     }
   }
+  
+  
+    public void addDataPackageReservation(String scope, Integer identifier, String principal)
+			throws ClassNotFoundException, SQLException {
+		ReservationManager reservationManager = 
+				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+    	reservationManager.addDataPackageReservation(scope, identifier, principal);
+    }
 
   
 	/**
@@ -2183,7 +2195,27 @@ public class DataPackageRegistry {
 	  }
 
 	  
-	  /**
+		/**
+		 * Returns a newline-separated list of numeric identifier values
+		 * for the specified scope that are currently reserved for future 
+		 * upload to PASTA, as determined by the contents of the
+		 * datapackagemanager.reservation table.
+		 * 
+		 * @return an XML string
+		 * @throws Exception
+		 */
+		public String listReservationIdentifiers(String scope)
+			throws Exception {
+
+			ReservationManager reservationManager = 
+					new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+			String identifiersString = reservationManager.listReservationIdentifiers(scope);
+			
+			return identifiersString;
+		}
+
+		
+	 /**
 	   * Lists all data package revisions known to PASTA, including active and deleted.
 	   * 
 	   * @param  includeInactive  if true, include deleted revisions
@@ -2351,10 +2383,16 @@ public class DataPackageRegistry {
 
   
 	/**
+	 * List the identifier values for data packages with the specified scope.
 	 * 
 	 * @param scope
+	 *          the scope value
+	 * @param includeDeleted
+	 *          if true, included identifiers for deleted data packages,
+	 *          otherwise exclude them
+	 * @return A list of identifier values
 	 */
-	public ArrayList<String> listDataPackageIdentifiers(String scope)
+	public ArrayList<String> listDataPackageIdentifiers(String scope, boolean includeDeleted)
         throws ClassNotFoundException, SQLException, IllegalArgumentException {
       ArrayList<String> identifierList = new ArrayList<String>();
       
@@ -2363,9 +2401,13 @@ public class DataPackageRegistry {
         String selectString = 
           "SELECT DISTINCT identifier FROM " + RESOURCE_REGISTRY +
           "  WHERE resource_type='dataPackage'" +
-          "  AND scope='" + scope + "'" +
-          "  AND date_deactivated IS NULL" +
-          "  ORDER BY identifier";
+          "  AND scope='" + scope + "'";
+        
+        if (!includeDeleted) {
+            selectString = selectString + "  AND date_deactivated IS NULL";
+        }
+          
+        selectString = selectString + "  ORDER BY identifier";
         Statement stmt = null;
       
         try {
@@ -3330,6 +3372,71 @@ public class DataPackageRegistry {
 			returnConnection(conn);
 		}
 
+	}
+	
+	
+	/**
+	 * Creates a WorkingOn object and returns it.
+	 * 
+	 * @return a new WorkingOn object that has been initialized with the
+	 *         database connection settings
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public WorkingOn makeWorkingOn() 
+		throws ClassNotFoundException, SQLException {
+		WorkingOn workingOn = new WorkingOn(dbDriver, dbURL, dbUser, dbPassword);
+		return workingOn;
+	}
+	
+	
+	/**
+	 * Returns an XML formatted list of data packages that are currently
+	 * being worked on in PASTA, as determined by the contents of the
+	 * datapackagemanager.working_on table.
+	 * 
+	 * @return an XML string
+	 * @throws Exception
+	 */
+	public String listWorkingOn()
+		throws Exception {
+		StringBuilder sb = new StringBuilder("<workingOn>\n");
+		String xmlString = "";
+		
+		
+		WorkingOn workingOn = makeWorkingOn();
+		Map<String, String> activeList = workingOn.listActiveDataPackages();
+		TreeMap<String, String> sortedList = new TreeMap<String, String>(activeList);
+		for (String key : sortedList.keySet()) {
+			String value = sortedList.get(key);
+			sb.append(String.format("  <dataPackage>\n"));
+			sb.append(String.format("    <packageId>%s</packageId>\n", key));
+			sb.append(String.format("    <startDate>%s</startDate>\n", value));
+			sb.append(String.format("  </dataPackage>\n"));
+		}
+		
+		
+		sb.append("</workingOn>\n");
+		xmlString = sb.toString();
+		return xmlString;
+	}
+	
+	
+	/**
+	 * Returns a list of numeric identifier values
+	 * for the specified scope that are actively being worked on for uploads
+	 * (insert or update).
+	 * 
+	 * @return an XML string
+	 * @throws Exception
+	 */
+	public ArrayList<Integer> listWorkingOnIdentifiers(String scope)
+		throws Exception {
+
+		WorkingOn workingOn = makeWorkingOn();
+		ArrayList<Integer> identifiers = workingOn.listWorkingOnIdentifiers(scope);
+		
+		return identifiers;
 	}
 
 }

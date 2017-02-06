@@ -185,6 +185,17 @@ public class DataPackage
   
   
   /**
+   * Gets the value of the scope registry.
+   * 
+   * @return scopeRegistry  A comma-separated list of allowable
+   *   data package scope values, e.g. "scope1,scope2,scope3".
+   */
+  public static String getScopeRegistry() {
+	  return DataPackage.scopeRegistry;
+  }
+  
+  
+  /**
    * Sets the value of the scope registry, for use by the
    * 'packageIdPattern' quality check.
    * 

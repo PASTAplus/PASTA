@@ -86,7 +86,8 @@ public class DataPackageMetadata {
    if (this.emlPackageId != null) {
      FileSystemResource metadataResource = new FileSystemResource(emlPackageId);
      metadataResource.setEvaluateMode(evaluateMode);
-     String dirPath = metadataResource.getDirPath();   
+     boolean isReportResource = false;
+     String dirPath = metadataResource.getDirPath(isReportResource);   
      String metadataFilename = FILE_NAME;
      File metadataFile = new File(dirPath, metadataFilename);
      
