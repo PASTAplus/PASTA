@@ -606,6 +606,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
 		WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
 		
+		try {
 		if (!isEvaluate) {
 			workingOn.addDataPackage(scope, identifier, revision);
 		}
@@ -626,7 +627,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		boolean isMetadataValid = levelZeroDataPackage.isMetadataValid();
 		isDataPackageValid = isMetadataValid;
 
-		try {
 			if (isDataPackageValid || isEvaluate) {
 
 				/*
@@ -659,11 +659,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
           isDataValid = levelZeroDataPackage.isDataValid();
 				}
 			}
-		} 
-		catch (ResourceExistsException e) {
-			if (!isEvaluate) workingOn.updateEndDate(scope, identifier, revision);
-			throw (e); // Don't do a roll-back when this exception occurs
-		}
 
 		isDataPackageValid = isDataPackageValid && isDataValid;
 
@@ -713,7 +708,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			} 
 			catch (Exception e) {
 				provenanceIndex.rollbackProvenanceRecords(packageId);
-				workingOn.updateEndDate(scope, identifier, revision);
 				throw (e);
 			}
 		}
@@ -902,12 +896,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 
 				/*
-				 * Since the data package is no longer being worked on, set
-				 * the end date in the working_on table.
-				 */
-				workingOn.updateEndDate(scope, identifier, revision);
-				
-				/*
 				 * Set the date uploaded in the reservation table to indicate
 				 * that this identifier is no longer actively reserved.
 				 */
@@ -920,8 +908,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    authToken);
 			} 
 			else {
-				workingOn.updateEndDate(scope, identifier, revision);
 				throw new UserErrorException(qualityReportXML);
+			}
+		}
+		}
+		finally {
+			/*
+			 * Since the data package is no longer being worked on, set
+			 * the end date in the working_on table. This should occur
+			 * regardless of whether the upload succeeded or failed.
+			 */
+			if (!isEvaluate) {
+				workingOn.updateEndDate(scope, identifier, revision);
 			}
 		}
 
