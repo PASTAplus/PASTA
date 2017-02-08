@@ -1300,10 +1300,10 @@ public class DataPackageRegistry {
           new StringBuffer("<access:access " +
                                "xmlns:access=\"eml://ecoinformatics" +
                                ".org/access-" + EML_VERSION + "\" " +
-                               "authSystem=\"https://environmentaldatainitiative.org" +
+                               "authSystem=\"https://pasta.edirepository.org" +
                                "/authentication\" " +
                                "order=\"allowFirst\" " +
-                               "system=\"https://environmentaldatainitiative.org\">\n"
+                               "system=\"https://pasta.edirepository.org\">\n"
           );
 
     /* First compose an 'allow' entry for the resource owner/submitter */

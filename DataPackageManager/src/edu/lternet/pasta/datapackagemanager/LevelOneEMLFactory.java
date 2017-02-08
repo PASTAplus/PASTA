@@ -67,8 +67,8 @@ public final class LevelOneEMLFactory {
   private static final String CONTACT_PATH = "//dataset/contact";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
-  private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://environmentaldatainitiative.org/authentication";
-  public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://environmentaldatainitiative.org";
+  private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org/authentication";
+  public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
   public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   private static final String OBJECT_NAME = "physical/objectName";
   private static final String ONLINE_URL = "physical/distribution/online/url";

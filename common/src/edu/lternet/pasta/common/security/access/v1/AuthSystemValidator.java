@@ -76,7 +76,7 @@ public class AuthSystemValidator implements Validator<String> {
         set.add("ldaps://ldap.lternet.edu");
         set.add("ldaps://ldap.lternet.edu:636");
         set.add("https://pasta.lternet.edu/authentication");
-        set.add("https://environmentaldatainitiative.org/authentication");
+        set.add("https://pasta.edirepository.org/authentication");
 
         NON_CANONICAL = Collections.unmodifiableSet(set);
     }

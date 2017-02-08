@@ -3938,7 +3938,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * for the data entity</td>
 	 * <td align=center><code>application/xml</code></td>
 	 * <td><code><pre>
-     &lt;access authSystem="https://environmentaldatainitiative.org/authentication" order="allowFirst" system="https://environmentaldatainitiative.org"&gt;
+     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
        &lt;allow&gt;
          &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
          &lt;permission&gt;changePermission&lt;/permission&gt;
@@ -5435,7 +5435,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * for the data package</td>
 	 * <td align=center><code>application/xml</code></td>
 	 * <td><code><pre>
-     &lt;access authSystem="https://environmentaldatainitiative.org/authentication" order="allowFirst" system="https://environmentaldatainitiative.org"&gt;
+     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
        &lt;allow&gt;
          &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
          &lt;permission&gt;changePermission&lt;/permission&gt;
@@ -6402,7 +6402,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * for the data package report</td>
 	 * <td align=center><code>application/xml</code></td>
 	 * <td><code><pre>
-     &lt;access authSystem="https://environmentaldatainitiative.org/authentication" order="allowFirst" system="https://environmentaldatainitiative.org"&gt;
+     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
        &lt;allow&gt;
          &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
          &lt;permission&gt;changePermission&lt;/permission&gt;
@@ -7420,7 +7420,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * for the metadata</td>
 	 * <td align=center><code>application/xml</code></td>
 	 * <td><code><pre>
-     &lt;access authSystem="https://environmentaldatainitiative.org/authentication" order="allowFirst" system="https://environmentaldatainitiative.org"&gt;
+     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
        &lt;allow&gt;
          &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
          &lt;permission&gt;changePermission&lt;/permission&gt;

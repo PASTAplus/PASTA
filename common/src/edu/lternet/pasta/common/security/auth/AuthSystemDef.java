@@ -42,7 +42,7 @@ public enum AuthSystemDef {
     /**
      * The Knowledge Network of Bioinformatics {@code authSystem}.
      */
-    KNB("https://environmentaldatainitiative.org/authentication");
+    KNB("https://pasta.edirepository.org/authentication");
 
     private static final Map<AuthSystemDef, List<String>> aliasMap;
 

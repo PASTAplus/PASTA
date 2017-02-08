@@ -87,7 +87,7 @@ import edu.lternet.pasta.common.security.access.UnauthorizedException;
  *   <li><b>resourceId</b>: the resource ID related to audit log entry, if applicable, e.g. 'https://pasta.lternet.edu/package/metadata/eml/knb-lter-nwk/1416/1'</li>
  *   <li><b>user</b>: the user distinguished name on whose behalf the service method was executed, e.g. 'uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org'</li>
  *   <li><b>groups</b>: a comma-separated list of groups that the user is a member of, e.g. 'authenticated'</li>
- *   <li><b>authSystem</b>: the authentication system, e.g. 'https://environmentaldatainitiative.org/authentication'</li>
+ *   <li><b>authSystem</b>: the authentication system, e.g. 'https://pasta.edirepository.org/authentication'</li>
  *   <li><b>entryText</b>: auxiliary information to accompany the audit log entry</li>
  * </ul>
  * </p>
@@ -254,7 +254,7 @@ public class AuditManagerResource extends PastaWebService
            &lt;resourceId&gt;&lt;/resourceId&gt;
            &lt;user&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/user&gt;
            &lt;groups&gt;authenticated&lt;/groups&gt;
-           &lt;authSystem&gt;https://environmentaldatainitiative.org/authentication&lt;/authSystem&gt;
+           &lt;authSystem&gt;https://pasta.edirepository.org/authentication&lt;/authSystem&gt;
            &lt;entryText&gt;No entity resources found for scope abc&lt;/entryText&gt;
        &lt;/auditRecord&gt;
      * </pre>
