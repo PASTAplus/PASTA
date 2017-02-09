@@ -64,7 +64,7 @@ public class DataPackageUploadManager {
 	/*
 	 * Initializes the database properties and the data structures
 	 */
-	private static void initialize() throws Exception {
+	private static void initializeUploads() throws Exception {
 		loadOptions();
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 		final int DELTA_DAYS = 60;
@@ -80,7 +80,7 @@ public class DataPackageUploadManager {
 		if (recentInserts == null) {
 			logger.warn("Initializing recent inserts.");
 			recentInserts = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> inserts = dpr.getUploads("createDataPackage", fromDate, ARRAY_LIMIT);
+			ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, ARRAY_LIMIT);
 			for (int i = inserts.size() - 1; i >= 0; i--) {
 				recentInserts.add(inserts.get(i));
 			}
@@ -89,7 +89,7 @@ public class DataPackageUploadManager {
 		if (recentUpdates == null)  {
 			logger.warn("Initializing recent updates.");
 			recentUpdates = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> updates = dpr.getUploads("updateDataPackage", fromDate, ARRAY_LIMIT);
+			ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, ARRAY_LIMIT);
 			for (int i = updates.size() - 1; i >= 0; i--) {
 				recentUpdates.add(updates.get(i));
 			}
@@ -107,7 +107,7 @@ public class DataPackageUploadManager {
 	public static String getRecentInserts(int limit) throws Exception {
 		StringBuilder xmlStringBuilder = new StringBuilder("<dataPackageUploads>\n");
 
-		if (recentInserts == null) { initialize(); }
+		if (recentInserts == null) { initializeUploads(); }
 		
 		int nUploads = recentInserts.size();
 		int count = 0;
@@ -138,7 +138,7 @@ public class DataPackageUploadManager {
 	public static String getRecentUpdates(int limit)  throws Exception {
 		StringBuilder xmlStringBuilder = new StringBuilder("<dataPackageUploads>\n");
 		
-		if (recentUpdates == null) { initialize(); }
+		if (recentUpdates == null) { initializeUploads(); }
 		
 		int nUploads = recentUpdates.size();
 		int count = 0;
@@ -166,7 +166,7 @@ public class DataPackageUploadManager {
 	 * @throws Exception
 	 */
 	public static void addRecentInsert(DataPackageUpload dataPackageUpload) throws Exception {
-		if (recentInserts == null) { initialize(); }
+		if (recentInserts == null) { initializeUploads(); }
 		
 		System.out.println("Old recent inserts list:");
 		printUploads(ARRAY_LIMIT, true);
@@ -195,7 +195,7 @@ public class DataPackageUploadManager {
 	 * @throws Exception
 	 */
 	public static void addRecentUpdate(DataPackageUpload dataPackageUpload) throws Exception {
-		if (recentUpdates == null) { initialize(); }
+		if (recentUpdates == null) { initializeUploads(); }
 			
 		System.out.println("Old recent updates list:");
 		printUploads(ARRAY_LIMIT, false);

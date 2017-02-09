@@ -1603,6 +1603,36 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		dataSourcesString = stringBuilder.toString();
 		return dataSourcesString;
 	}
+	
+	
+	public String listDataPackageChanges(String fromDate) 
+		throws Exception {
+		final int limit = 0;
+		String xml = null;
+		StringBuilder sb = new StringBuilder("");
+		ArrayList<DataPackageUpload> recentChanges = new ArrayList<DataPackageUpload>();
+		
+		
+		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, limit);
+		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, limit);
+		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, limit);
+		
+		recentChanges.addAll(inserts);
+		recentChanges.addAll(updates);
+		recentChanges.addAll(deletes);
+		
+		sb.append("<dataPackageChanges>\n");
+		for (DataPackageUpload dpu : recentChanges) {
+			sb.append(dpu.toXML());
+		}
+		sb.append("</dataPackageChanges>\n");
+		
+		xml = sb.toString();
+		
+		return xml;
+	}
 
 
 	/**

@@ -8361,7 +8361,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * @return a Response, which if successful, contains a resultset XML
 	 *         document
 	 */
-@GET
+	@GET
 	@Path("/uploads/eml")
 	@Produces("application/xml")
 	public Response listRecentUploads(@Context HttpHeaders headers,
@@ -8422,6 +8422,86 @@ public class DataPackageManagerResource extends PastaWebService {
 				xml = DataPackageUploadManager.getRecentUpdates(limit);
 			}
 
+			responseBuilder = Response.ok(xml);
+			response = responseBuilder.build();
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	@GET
+	@Path("/changes/eml")
+	@Produces("application/xml")
+	public Response listDataPackageChanges(@Context HttpHeaders headers,
+			                               @Context UriInfo uriInfo) {
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listDataPackageChanges";
+		Rule.Permission permission = Rule.Permission.read;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+            QueryString queryString = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryString.getParams();
+            String fromDate = null;
+            String xml = "";
+            
+			if (queryParams != null) {
+				for (String key : queryParams.keySet()) {
+					if (key.equals("fromDate")) {
+						List<String> values = queryParams.get(key);
+						String startDateParam = values.get(0);
+						if (startDateParam != null) {				
+							if (startDateParam.startsWith("1") || (startDateParam.startsWith("2"))
+						       ) {
+								fromDate = startDateParam;
+							}
+							else {
+								throw new IllegalArgumentException("Bad date parameter: " + startDateParam);
+							}
+						}
+					}
+				}
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			xml = dataPackageManager.listDataPackageChanges(fromDate);
 			responseBuilder = Response.ok(xml);
 			response = responseBuilder.build();
 		}

@@ -1620,25 +1620,43 @@ public class DataPackageRegistry {
 
   
 	/**
-	 * Gets a list of recent uploads, either inserts or updates.
+	 * Gets a list of recent data package changes (inserts or updates or deletes.)
 	 * 
-	 * @param serviceMethod  one of "createDataPackage" or "updateDataPackage"
-	 * @param fromTime       the cut-off date for how far back we want to query, e.g. '2015-01-01'
-	 * @param limit          a limit on the number of uploads to return, e.g. 2
+	 * @param serviceMethod  one of "createDataPackage", "updateDataPackage", or
+	 *                       "deleteDataPackage"
+	 * @param fromTime       the cut-off date/time for how far back we want to 
+	 *                       query, e.g. '2015-01-01 12:00:00'
+	 * @param limit          a limit on the number of change records to return, 
+	 *                       e.g. 10. If limit is specified as 0 or less then 
+	 *                       there is no limit on the number of records returned.
 	 */
-	public ArrayList<DataPackageUpload> getUploads(String serviceMethod, String fromTime, Integer limit) 
+	public ArrayList<DataPackageUpload> getChanges(String serviceMethod, 
+			                                       String fromTime, 
+			                                       Integer limit) 
 			throws Exception {
 		Connection conn = null;
-		ArrayList<DataPackageUpload> uploadsList = new ArrayList<DataPackageUpload>();
+		ArrayList<DataPackageUpload> changeList = new ArrayList<DataPackageUpload>();
 		StringBuilder sb = new StringBuilder();
 		TreeSet<String> docids = new TreeSet<String>();
 		
-		sb.append("SELECT scope, identifier, revision, date_created FROM ");
-		sb.append(RESOURCE_REGISTRY);
-		sb.append(" WHERE resource_type='dataPackage' AND ");
-		sb.append("   date_deactivated IS NULL AND ");
-		sb.append("   date_created > '" + fromTime + "'\n");
-		sb.append("ORDER BY date_created DESC;");
+		if (serviceMethod.equals("deleteDataPackage")) {
+			sb.append("SELECT scope, identifier, revision, date_deactivated FROM ");
+			sb.append(RESOURCE_REGISTRY);
+			sb.append(" WHERE resource_type='dataPackage' AND ");
+			sb.append("   date_deactivated IS NOT NULL AND ");
+			sb.append("   date_deactivated >= '" + fromTime + "'\n");
+			sb.append("ORDER BY date_deactivated DESC;");
+		}
+		else {
+			sb.append("SELECT scope, identifier, revision, date_created FROM ");
+			sb.append(RESOURCE_REGISTRY);
+			sb.append(" WHERE resource_type='dataPackage' AND ");
+			sb.append("   date_deactivated IS NULL AND ");
+			sb.append("   date_created >= '" + fromTime + "'\n");
+			sb.append("ORDER BY date_created DESC;");
+		}
+		
+		
 		String sqlQuery = sb.toString();
 
 		try {
@@ -1652,31 +1670,46 @@ public class DataPackageRegistry {
 					String scope = rs.getString(1);
 					Integer identifier = rs.getInt(2);
 					Integer revision = rs.getInt(3);
-					java.sql.Date dateCreated = rs.getDate(4);
-					String uploadDate = dateCreated.toString();
-					String resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope, identifier, revision, null);
+					java.sql.Timestamp changeDate = rs.getTimestamp(4);
+					String changeDateStr = changeDate.toString();
+					String resourceId = DataPackageManager.composeResourceId(
+							ResourceType.dataPackage, scope, identifier, revision, null);
 					boolean isPublic = isPublicAccessible(resourceId);
 					
 					// Include only publicly-accessible data packages
 					if (isPublic) {
-						ArrayList<String> revisions = listDataPackageRevisions(scope, identifier);
+						if (serviceMethod.equals("deleteDataPackage")){
+							DataPackageUpload deletedPackage = 
+									new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
+							changeList.add(deletedPackage);
+						}
+						else {
+						ArrayList<String> revisions = 
+								listDataPackageRevisions(scope, identifier);
 						if (revisions != null) {
-							if ((revisions.size() == 1) && (serviceMethod.equals("createDataPackage"))) {
-								DataPackageUpload upload = new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
-								uploadsList.add(upload);
+							if ((revisions.size() == 1) && 
+								(serviceMethod.equals("createDataPackage"))
+							   ) {
+								DataPackageUpload upload = 
+										new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
+								changeList.add(upload);
 							}
-							else if ((revisions.size() > 1) && (serviceMethod.equals("updateDataPackage"))) {
+							else if ((revisions.size() > 1) && 
+									(serviceMethod.equals("updateDataPackage"))
+								    ) {
 									String docid = String.format("%s.%d", scope, identifier);
 									if (!docids.contains(docid)) {
-										DataPackageUpload upload = new DataPackageUpload(uploadDate, serviceMethod, scope, identifier, revision);
-										uploadsList.add(upload);
+										DataPackageUpload upload = 
+												new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
+										changeList.add(upload);
 										docids.add(docid);
 									}
 							}
 						}
 					}
+					}
 					
-					if (uploadsList.size() >= limit) {
+					if ((limit > 0) && (changeList.size() >= limit)) {
 						break;
 					}
 				}
@@ -1686,7 +1719,7 @@ public class DataPackageRegistry {
 			returnConnection(conn);
 		}
 
-		return uploadsList;
+		return changeList;
 	}
 
   
@@ -2380,7 +2413,7 @@ public class DataPackageRegistry {
       
       return entityList;
   }
-
+  
   
 	/**
 	 * List the identifier values for data packages with the specified scope.
