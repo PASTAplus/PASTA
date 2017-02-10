@@ -1629,10 +1629,15 @@ public class DataPackageRegistry {
 	 * @param limit          a limit on the number of change records to return, 
 	 *                       e.g. 10. If limit is specified as 0 or less then 
 	 *                       there is no limit on the number of records returned.
+	 * @param excludeDeleted used when service method is "createDataPackage" or
+	 *                       "updateDataPackage". If true, exclude data package
+	 *                       uploads that have since been deleted but would
+	 *                       otherwise be in the list.
 	 */
 	public ArrayList<DataPackageUpload> getChanges(String serviceMethod, 
 			                                       String fromTime, 
-			                                       Integer limit) 
+			                                       Integer limit,
+			                                       boolean excludeDeleted)
 			throws Exception {
 		Connection conn = null;
 		ArrayList<DataPackageUpload> changeList = new ArrayList<DataPackageUpload>();
@@ -1651,7 +1656,9 @@ public class DataPackageRegistry {
 			sb.append("SELECT scope, identifier, revision, date_created FROM ");
 			sb.append(RESOURCE_REGISTRY);
 			sb.append(" WHERE resource_type='dataPackage' AND ");
-			sb.append("   date_deactivated IS NULL AND ");
+			if (excludeDeleted) {
+				sb.append("   date_deactivated IS NULL AND ");
+			}
 			sb.append("   date_created >= '" + fromTime + "'\n");
 			sb.append("ORDER BY date_created DESC;");
 		}
@@ -1678,35 +1685,32 @@ public class DataPackageRegistry {
 					
 					// Include only publicly-accessible data packages
 					if (isPublic) {
-						if (serviceMethod.equals("deleteDataPackage")){
-							DataPackageUpload deletedPackage = 
-									new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
+						if (serviceMethod.equals("deleteDataPackage")) {
+							DataPackageUpload deletedPackage = new DataPackageUpload(changeDateStr, serviceMethod,
+									scope, identifier, revision);
 							changeList.add(deletedPackage);
-						}
+						} 
 						else {
-						ArrayList<String> revisions = 
-								listDataPackageRevisions(scope, identifier);
-						if (revisions != null) {
-							if ((revisions.size() == 1) && 
-								(serviceMethod.equals("createDataPackage"))
-							   ) {
-								DataPackageUpload upload = 
-										new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
-								changeList.add(upload);
-							}
-							else if ((revisions.size() > 1) && 
-									(serviceMethod.equals("updateDataPackage"))
-								    ) {
+							ArrayList<String> revisions = listDataPackageRevisions(scope, identifier);
+							if (revisions != null) {
+								Integer lowestRevision = lowestRevision(revisions);
+								boolean isLowestRevision = revision.equals(lowestRevision);
+								if (isLowestRevision && (serviceMethod.equals("createDataPackage"))) {
+									DataPackageUpload upload = new DataPackageUpload(changeDateStr, serviceMethod,
+											scope, identifier, revision);
+									changeList.add(upload);
+								} 
+								else if (!isLowestRevision && serviceMethod.equals("updateDataPackage")) {
 									String docid = String.format("%s.%d", scope, identifier);
 									if (!docids.contains(docid)) {
-										DataPackageUpload upload = 
-												new DataPackageUpload(changeDateStr, serviceMethod, scope, identifier, revision);
+										DataPackageUpload upload = new DataPackageUpload(changeDateStr, serviceMethod,
+												scope, identifier, revision);
 										changeList.add(upload);
 										docids.add(docid);
 									}
+								}
 							}
 						}
-					}
 					}
 					
 					if ((limit > 0) && (changeList.size() >= limit)) {
@@ -1721,9 +1725,25 @@ public class DataPackageRegistry {
 
 		return changeList;
 	}
+	
+	
+	public Integer lowestRevision(ArrayList<String> revisionsList) {
+		String firstString = revisionsList.get(0);
+		Integer lowest = Integer.parseInt(firstString);
+		
+		if (revisionsList.size() == 1) {
+			return lowest;
+		}
+		
+		for (int i = 1; i < revisionsList.size(); i++) {
+			Integer nextTry = Integer.parseInt(revisionsList.get(i));
+			if (nextTry < lowest) lowest = nextTry;			
+		}
 
-  
-  
+		return lowest;
+	}
+
+   
   /**
    * Gets the resourceLocation value for a given resourceId
    * 

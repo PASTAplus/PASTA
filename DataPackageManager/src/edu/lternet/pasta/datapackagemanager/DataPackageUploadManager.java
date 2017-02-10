@@ -76,11 +76,12 @@ public class DataPackageUploadManager {
 		long pastTime = todayTime - deltaTime;
 		Date pastDate = new Date(pastTime);
 		String fromDate = sdf.format(pastDate);
+		boolean excludeDeleted = true;
 
 		if (recentInserts == null) {
 			logger.warn("Initializing recent inserts.");
 			recentInserts = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, ARRAY_LIMIT);
+			ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, ARRAY_LIMIT, excludeDeleted);
 			for (int i = inserts.size() - 1; i >= 0; i--) {
 				recentInserts.add(inserts.get(i));
 			}
@@ -89,7 +90,7 @@ public class DataPackageUploadManager {
 		if (recentUpdates == null)  {
 			logger.warn("Initializing recent updates.");
 			recentUpdates = new ArrayList<DataPackageUpload>();
-			ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, ARRAY_LIMIT);
+			ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, ARRAY_LIMIT, excludeDeleted);
 			for (int i = updates.size() - 1; i >= 0; i--) {
 				recentUpdates.add(updates.get(i));
 			}

@@ -34,7 +34,7 @@ package edu.lternet.pasta.common;
  * package delete records.
  *
  */
-public class DataPackageUpload {
+public class DataPackageUpload implements Comparable<DataPackageUpload> {
 	
 	/*
 	 *  Class fields
@@ -128,11 +128,9 @@ public class DataPackageUpload {
 		String xmlString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
 		String dataPackageElementName = "dataPackageUpload";
-		String dateElementName = "uploadDate";
 		
 		if (serviceMethod.equals("deleteDataPackage")) {
 			dataPackageElementName = "dataPackageDelete";
-			dateElementName = "deleteDate";
 		}
 
 		stringBuffer.append(String.format("  <%s>\n", dataPackageElementName));
@@ -141,11 +139,28 @@ public class DataPackageUpload {
 		stringBuffer.append(String.format("    <identifier>%d</identifier>\n", identifier));
 		stringBuffer.append(String.format("    <revision>%d</revision>\n", revision));
 		stringBuffer.append(String.format("    <serviceMethod>%s</serviceMethod>\n", serviceMethod));
-		stringBuffer.append(String.format("    <%s>%s</%s>\n", dateElementName, uploadDate, dateElementName));
+		stringBuffer.append(String.format("    <date>%s</date>\n", uploadDate));
 		stringBuffer.append(String.format("  </%s>\n", dataPackageElementName));
 
 		xmlString = stringBuffer.toString();
 		return xmlString;
+	}
+
+
+	@Override
+	public int compareTo(DataPackageUpload dpu) {
+		/*
+		 * If date strings are the same, order by revision ascending
+		 */
+		if (this.uploadDate.equals(dpu.uploadDate)) {
+			return this.revision.compareTo(dpu.revision);
+		}
+		/*
+		 * but most of the time we'll be comparing the date strings
+		 */
+		else {
+			return this.uploadDate.compareTo(dpu.uploadDate);
+		}
 	}
 		  
 }

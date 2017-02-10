@@ -34,6 +34,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -1615,13 +1616,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
-		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, limit);
-		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, limit);
-		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, limit);
+		boolean excludeDeleted = false;
+		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, limit, excludeDeleted);
+		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, limit, excludeDeleted);
+		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, limit, excludeDeleted);
 		
 		recentChanges.addAll(inserts);
 		recentChanges.addAll(updates);
 		recentChanges.addAll(deletes);
+		Collections.sort(recentChanges);
 		
 		sb.append("<dataPackageChanges>\n");
 		for (DataPackageUpload dpu : recentChanges) {
