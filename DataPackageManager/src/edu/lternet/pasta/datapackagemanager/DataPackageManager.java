@@ -1606,6 +1606,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
+	/**
+	 * Generates an XML string listing data package changes, supporting the
+	 * listDataPackageChanges web service method.
+	 * 
+	 * @param  fromDate  the date-time determining how far back in time the
+	 *                   changes should be included. If null, include all
+	 *                   changes (inserts, updates, deletes) that are
+	 *                   recorded in the resource registry.
+	 * @return the XML string listing the data package changes. See the
+	 *         listDataPackageChanges web service method for an example
+	 *         document
+	 * @throws Exception
+	 */
 	public String listDataPackageChanges(String fromDate) 
 		throws Exception {
 		final int limit = 0;

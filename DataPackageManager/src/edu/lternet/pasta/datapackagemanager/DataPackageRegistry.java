@@ -351,6 +351,17 @@ public class DataPackageRegistry {
   }
   
   
+    /**
+     * This is a pass-through method that calls the
+     * ReservationManager.addDataPackageReservation() method.
+     * 
+     * @param scope             the data package scope, e.g. "edi"
+     * @param identifier        the data package identifier value
+     * @param principal         the user who is reserving the identifier,
+     *                          e.g. "uid=jsmith,o=LTER,dc=ecoinformatics,dc=org"
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */	
     public void addDataPackageReservation(String scope, Integer identifier, String principal)
 			throws ClassNotFoundException, SQLException {
 		ReservationManager reservationManager = 
@@ -523,10 +534,11 @@ public class DataPackageRegistry {
 
 	/**
 	 * Delete all resources associated with a data package based on
-	 * the specified scope and identifier values.
+	 * the specified scope and identifier values. This is achieved by setting
+	 * the date_deactivated field to a non-null value.
 	 * 
-	 * @param scope
-	 * @param identifier
+	 * @param scope        the scope of the data package to be deleted
+	 * @param identifier   the identifier of the data package to be deleted
 	 * @return  true if successfully deleted, else false
 	 */
 	public boolean deleteDataPackage(String scope, Integer identifier) 
@@ -575,17 +587,6 @@ public class DataPackageRegistry {
     return deleted;
 	}
 
-	
-	/**
-	 * 
-	 * @param scope
-	 * @param identifier
-	 * @param revision
-	 */
-	public boolean deleteDataPackage(String scope, String identifier, String revision){
-		return false;   // Not yet supported
-	}
-	
 	
 	/**
 	 * Delete provenance records for a data package.
@@ -1640,6 +1641,7 @@ public class DataPackageRegistry {
 			                                       boolean excludeDeleted)
 			throws Exception {
 		Connection conn = null;
+		boolean hasFromTime = fromTime != null;
 		ArrayList<DataPackageUpload> changeList = new ArrayList<DataPackageUpload>();
 		StringBuilder sb = new StringBuilder();
 		TreeSet<String> docids = new TreeSet<String>();
@@ -1647,19 +1649,23 @@ public class DataPackageRegistry {
 		if (serviceMethod.equals("deleteDataPackage")) {
 			sb.append("SELECT scope, identifier, revision, date_deactivated FROM ");
 			sb.append(RESOURCE_REGISTRY);
-			sb.append(" WHERE resource_type='dataPackage' AND ");
-			sb.append("   date_deactivated IS NOT NULL AND ");
-			sb.append("   date_deactivated >= '" + fromTime + "'\n");
+			sb.append(" WHERE resource_type='dataPackage' ");
+			sb.append("   AND date_deactivated IS NOT NULL ");
+			if (hasFromTime) {
+				sb.append("   AND date_deactivated >= '" + fromTime + "'\n");
+			}
 			sb.append("ORDER BY date_deactivated DESC;");
 		}
 		else {
 			sb.append("SELECT scope, identifier, revision, date_created FROM ");
 			sb.append(RESOURCE_REGISTRY);
-			sb.append(" WHERE resource_type='dataPackage' AND ");
+			sb.append(" WHERE resource_type='dataPackage' ");
 			if (excludeDeleted) {
-				sb.append("   date_deactivated IS NULL AND ");
+				sb.append("   AND date_deactivated IS NULL ");
 			}
-			sb.append("   date_created >= '" + fromTime + "'\n");
+			if (hasFromTime) {
+				sb.append("   AND date_created >= '" + fromTime + "'\n");
+			}
 			sb.append("ORDER BY date_created DESC;");
 		}
 		
@@ -1727,6 +1733,12 @@ public class DataPackageRegistry {
 	}
 	
 	
+	/**
+	 * Returns the lowest revision value in a list of revision values.
+	 * 
+	 * @param revisionsList   A list of string-represented revision values
+	 * @return                The lowest value found, in the form of an Integer
+	 */
 	public Integer lowestRevision(ArrayList<String> revisionsList) {
 		String firstString = revisionsList.get(0);
 		Integer lowest = Integer.parseInt(firstString);
@@ -2620,6 +2632,17 @@ public class DataPackageRegistry {
   }
 
 	
+	/**
+	 * List all data package scopes currently found in the resource registry.
+	 * Note that this differs from the "white-list" of scopes configured in
+	 * the properties file.
+	 * 
+	 * @return an ArrayList of strings where each string is a scope found in 
+	 *         the resource registry
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws IllegalArgumentException
+	 */
   public ArrayList<String> listDataPackageScopes()
       throws ClassNotFoundException, SQLException, IllegalArgumentException {
     ArrayList<String> scopeList = new ArrayList<String>();

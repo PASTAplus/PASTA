@@ -8451,6 +8451,122 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+	/**
+	 * <strong>List Recent Changes</strong> operation, optionally specifying the date and time from which the changes should be listed.
+	 * (See example below.)
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td><code>curl -i -X GET "https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-01T12:00:00"
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The query was successful</td>
+	 * <td align=center>An XML document containing the list of recent changes,
+	 * including inserts (createDataPackage), updates (updateDataPackage), and
+	 * deletes (deleteDataPackage).</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * <pre>
+       	&lt;dataPackageChanges&gt;
+			&lt;dataPackageUpload&gt;
+				&lt;packageId&gt;knb-lter-nwk.1210.1&lt;/packageId&gt;
+				&lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+				&lt;identifier&gt;1210&lt;/identifier&gt;
+				&lt;revision&gt;1&lt;/revision&gt;
+				&lt;serviceMethod&gt;createDataPackage&lt;/serviceMethod&gt;
+				&lt;date&gt;2017-02-02 15:15:06.9&lt;/date&gt;
+			&lt;/dataPackageUpload&gt;
+			&lt;dataPackageDelete&gt;
+				&lt;packageId&gt;knb-lter-nwk.1210.1&lt;/packageId&gt;
+				&lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+				&lt;identifier&gt;1210&lt;/identifier&gt;
+				&lt;revision&gt;1&lt;/revision&gt;
+				&lt;serviceMethod&gt;deleteDataPackage&lt;/serviceMethod&gt;
+				&lt;date&gt;2017-02-02 15:15:12.301&lt;/date&gt;
+			&lt;/dataPackageDelete&gt;
+			&lt;dataPackageUpload&gt;
+				&lt;packageId&gt;knb-lter-nwk.1211.1&lt;/packageId&gt;
+				&lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+				&lt;identifier&gt;1211&lt;/identifier&gt;
+				&lt;revision&gt;1&lt;/revision&gt;
+				&lt;serviceMethod&gt;createDataPackage&lt;/serviceMethod&gt;
+				&lt;date&gt;2017-02-02 15:15:58.331&lt;/date&gt;
+			&lt;/dataPackageUpload&gt;
+			&lt;dataPackageUpload&gt;
+				&lt;packageId&gt;knb-lter-nwk.1211.2&lt;/packageId&gt;
+				&lt;scope&gt;knb-lter-nwk&lt;/scope&gt;
+				&lt;identifier&gt;1211&lt;/identifier&gt;
+				&lt;revision&gt;2&lt;/revision&gt;
+				&lt;serviceMethod&gt;updateDataPackage&lt;/serviceMethod&gt;
+				&lt;date&gt;2017-02-02 15:16:28.374&lt;/date&gt;
+			&lt;/dataPackageUpload&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request message body contains an error, such as an
+	 * improperly formatted path query string</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute the
+	 * Search Data Packages service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * 
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param fromDate  optional query parameter to determine the date-time from
+	 *                  which data package changes should be listed
+	 * 
+	 * @return a Response, which if successful, contains an XML
+	 *         document (see example above)
+	 */
 	@GET
 	@Path("/changes/eml")
 	@Produces("application/xml")
@@ -8486,14 +8602,14 @@ public class DataPackageManagerResource extends PastaWebService {
 				for (String key : queryParams.keySet()) {
 					if (key.equals("fromDate")) {
 						List<String> values = queryParams.get(key);
-						String startDateParam = values.get(0);
-						if (startDateParam != null) {				
-							if (startDateParam.startsWith("1") || (startDateParam.startsWith("2"))
+						String fromDateParam = values.get(0);
+						if (fromDateParam != null) {				
+							if (fromDateParam.startsWith("1") || (fromDateParam.startsWith("2"))
 						       ) {
-								fromDate = startDateParam;
+								fromDate = fromDateParam;
 							}
 							else {
-								throw new IllegalArgumentException("Bad date parameter: " + startDateParam);
+								throw new IllegalArgumentException("Bad date parameter: " + fromDateParam);
 							}
 						}
 					}

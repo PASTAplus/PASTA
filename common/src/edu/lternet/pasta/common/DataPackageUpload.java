@@ -147,6 +147,9 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 	}
 
 
+	/**
+	 * Allows sorting of DataPackageUpload objects.
+	 */
 	@Override
 	public int compareTo(DataPackageUpload dpu) {
 		/*
