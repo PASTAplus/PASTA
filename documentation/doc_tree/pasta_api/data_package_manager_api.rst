@@ -431,6 +431,84 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/service-methods <https://pasta.lternet.edu/package/docs/api#GET%20:%20/service-methods>`_
 
+*List Recent Changes*
+^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Recent Changes operation, listing all data package insert, update, and
+delete operations, optionally specifying the date and time from which the 
+changes should be listed (by specifying the "fromDate" query parameter).
+If "fromDate" is omitted, lists the complete set of changes recorded in PASTA'a resource
+registry. The list of changes is returned in XML format. Inserts and updates are recorded
+in "dataPackageUpload" elements, while deletes are recorded in "dataPackageDelete"
+elements. (See example below)
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/workingon/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/workingon/eml>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list data packages that PASTA is working on uploading::
+
+     curl -X GET https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-10T12:00:00
+
+     <dataPackageChanges>
+        <dataPackageUpload>
+            <packageId>knb-lter-nwk.1225.1</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1225</identifier>
+            <revision>1</revision>
+            <serviceMethod>createDataPackage</serviceMethod>
+            <date>2017-02-10 16:48:56.368</date>
+        </dataPackageUpload>
+        <dataPackageDelete>
+            <packageId>knb-lter-nwk.1225.1</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1225</identifier>
+            <revision>1</revision>
+            <serviceMethod>deleteDataPackage</serviceMethod>
+            <date>2017-02-10 16:49:06.83</date>
+        </dataPackageDelete>
+        <dataPackageUpload>
+            <packageId>knb-lter-nwk.1226.1</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1226</identifier>
+            <revision>1</revision>
+            <serviceMethod>createDataPackage</serviceMethod>
+            <date>2017-02-10 16:49:53.201</date>
+        </dataPackageUpload>
+        <dataPackageUpload>
+            <packageId>knb-lter-nwk.1226.2</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1226</identifier>
+            <revision>2</revision>
+            <serviceMethod>updateDataPackage</serviceMethod>
+            <date>2017-02-10 16:50:22.802</date>
+        </dataPackageUpload>
+        <dataPackageDelete>
+            <packageId>knb-lter-nwk.1226.1</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1226</identifier>
+            <revision>1</revision>
+            <serviceMethod>deleteDataPackage</serviceMethod>
+            <date>2017-02-10 16:50:51.111</date>
+        </dataPackageDelete>
+        <dataPackageDelete>
+            <packageId>knb-lter-nwk.1226.2</packageId>
+            <scope>knb-lter-nwk</scope>
+            <identifier>1226</identifier>
+            <revision>2</revision>
+            <serviceMethod>deleteDataPackage</serviceMethod>
+            <date>2017-02-10 16:50:51.111</date>
+        </dataPackageDelete>
+     </dataPackageChanges>
+
+
 *List Recent Uploads*
 ^^^^^^^^^^^^^^^^^^^^^
 
