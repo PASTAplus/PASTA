@@ -638,7 +638,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder
 						.append("<sup><strong>*</strong></sup> <em>By downloading any data you implicitly acknowledge the "
 								+ "<a class=\"searchsubcat\" href=\"./metadataviewer?packageid="
-								+ packageId + "\">Data Package Usage Rights</a> detailed in the accompanying metadata.</em>");
+								+ packageId + "#toggleDataSetUsageRights\">Data Package Usage Rights</a> detailed in the accompanying metadata.</em>");
 				resourcesHTMLBuilder.append("</li>\n");
 
 				resourcesHTMLBuilder.append("</ul>\n");
