@@ -67,7 +67,7 @@ CREATE TABLE datapackagemanager.working_on (
   start_date TIMESTAMP NOT NULL,                      -- initiated date/time
   end_date TIMESTAMP,                                 -- completed date/time
   interrupted BOOLEAN default false   -- set to true if end_date is NULL at server startup 
-)
+);
 
 CREATE TABLE datapackagemanager.reservation (
    principal          VARCHAR(250) NOT NULL,              -- the principal for whom this reservation is made
