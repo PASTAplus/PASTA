@@ -189,6 +189,17 @@ public class EmlObject {
 	}
 	
 	
+	/**
+	 * Boolean to determine whether the data package has the intellectualRights 
+	 * element present.
+	 * 
+	 * @return true if the intellectualRights element is present, else false
+	 */
+	public boolean hasIntellectualRights() {
+		return this.dataPackage.hasIntellectualRights();
+	}
+	
+	
 	/*
 	 * Access methods for the bounding coordinates
 	 */

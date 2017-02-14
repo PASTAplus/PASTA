@@ -66,6 +66,7 @@ public class DataPackage {
   String geographicDescriptionText = null;
   String projectAbstractText = null;
   String taxonomicCoverageText = null;
+  boolean hasIntellectualRights = false;
 
   // Date fields
   String pubDate = null;
@@ -337,6 +338,11 @@ public class DataPackage {
 	}
 	
 	
+	public boolean hasIntellectualRights() {
+		return hasIntellectualRights;
+	}
+	
+	
 	public void setAbstractText(String abstractText) {
 		this.abstractText = abstractText;
 	}
@@ -361,6 +367,10 @@ public class DataPackage {
 			this.geographicDescriptionText = geographicDescriptionText;
 		}
 
+		
+		public void setIntellectualRights(boolean hasIntellectualRights) {
+			this.hasIntellectualRights = hasIntellectualRights;
+		}
 		
 		public void setMethodsText(String methodsText) {
 			this.methodsText = methodsText;

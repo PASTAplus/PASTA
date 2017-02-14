@@ -170,6 +170,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
 		String savedDataHTML = "";
+		boolean hasIntellectualRights = false;
 		boolean showSaved = false;
 		boolean isSaved = false;
 
@@ -631,15 +632,18 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("</div>\n");
 				resourcesHTMLBuilder.append("</li>\n");
 
-
+				hasIntellectualRights = emlObject.hasIntellectualRights();
+				if (hasIntellectualRights) {
 				resourcesHTMLBuilder.append("<li>\n");
 				resourcesHTMLBuilder
 						.append("<sup><strong>*</strong></sup> <em>By downloading any data you implicitly acknowledge the "
-								+ "<a class=\"searchsubcat\" href=\"http://www.lternet.edu/data/netpolicy.html\">"
-								+ "LTER Data Policy</a></em>");
+								+ "<a class=\"searchsubcat\" href=\"./metadataviewer?packageid="
+								+ packageId + "\">Data Package Usage Rights</a> detailed in the accompanying metadata.</em>");
 				resourcesHTMLBuilder.append("</li>\n");
 
 				resourcesHTMLBuilder.append("</ul>\n");
+				}
+				
 				resourcesHTML = resourcesHTMLBuilder.toString();
 
 

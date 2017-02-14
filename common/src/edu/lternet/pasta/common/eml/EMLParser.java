@@ -70,6 +70,7 @@ public class EMLParser {
   public static final String GEOGRAPHIC_COVERAGE_PATH = "//eml/dataset/coverage/geographicCoverage";
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
+  public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   public static final String DATA_SOURCE_PATH = "//methods/methodStep/dataSource/distribution/online/url";
   public static final String FUNDING_PATH = "//dataset/project/funding";
   public static final String METHODS_PATH = "//dataset/methods";
@@ -214,6 +215,12 @@ public class EMLParser {
         if (projectAbstractNode != null) {
           String projectAbstractText = projectAbstractNode.getTextContent().trim();
           this.dataPackage.setProjectAbstractText(projectAbstractText);
+        }
+
+        // Parse the intellectualRights to determine whether the element node is present
+        Node intellectualRightsNode = xpathapi.selectSingleNode(document, INTELLECTUAL_RIGHTS_PATH);
+        if (intellectualRightsNode != null && intellectualRightsNode.hasChildNodes()) {
+          this.dataPackage.setIntellectualRights(true);
         }
 
         // Parse the methods text
