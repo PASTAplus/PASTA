@@ -51,6 +51,7 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.EMLDataPackage;
 
 /**
  * 
