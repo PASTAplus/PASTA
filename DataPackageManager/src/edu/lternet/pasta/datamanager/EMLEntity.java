@@ -86,46 +86,42 @@ public class EMLEntity {
    * 
    * @param entity  An entity object as defined by the Data Manager Library.
    */
-  public EMLEntity(Entity entity) 
-          throws MalformedURLException, UnsupportedEncodingException {
-    this.entity = entity;
-    this.dataFormat = entity.getDataFormat();
-    this.entityName = entity.getName();
-    
-    if (entityName != null) { 
-        entityId = edu.lternet.pasta.common.eml.Entity.entityIdFromEntityName(entityName);
-    }
+	public EMLEntity(Entity entity) throws MalformedURLException, UnsupportedEncodingException {
+		this.entity = entity;
+		this.dataFormat = entity.getDataFormat();
+		this.entityName = entity.getName();
 
-    this.packageId = entity.getPackageId();
-    this.url = entity.getURL();
-    
-    try {
-      URL aURL = new URL(url);
-      if (aURL != null) {
-        logger.debug("Constructed URL object: " + aURL.toString());
-      }
-    }
-		catch (MalformedURLException e) {
-			String message = null;
-			if (url == null || url.equals("")) {
-				message = 
-			        String.format("Error when attempting to process entity \"%s\". " +
-                                  "All data entities in PASTA must specify an online URL. " +
-								  "No online URL value was found at this XPath: " +
-                                  "\"dataset/[entity-type]/physical/distribution/online/url\". " +
-                                  "(PASTA will use only the first occurrence of this XPath.)",
-						          entityName);
-			}
-			else {
-				message = 
-				    String.format("Error when attempting to process entity \"%s\" with entity URL \"%s\": %s",
-								  entityName, url, e.getMessage());
-			}
-			logger.error(message);
-			throw new MalformedURLException(message);
+		if (entityName != null) {
+			entityId = edu.lternet.pasta.common.eml.Entity.entityIdFromEntityName(entityName);
 		}
-  }
-  
+
+		this.packageId = entity.getPackageId();
+		this.url = entity.getURL();
+
+		if (url != null && !url.equals("")) {
+			try {
+				URL aURL = new URL(url);
+				if (aURL != null) {
+					logger.debug("Constructed URL object: " + aURL.toString());
+				}
+			} 
+			catch (MalformedURLException e) {
+				String message = null;
+				if (url == null || url.equals("")) {
+					message = String.format("Error when attempting to process entity \"%s\". "
+							+ "All data entities in PASTA must specify an online URL. "
+							+ "No online URL value was found at this XPath: "
+							+ "\"dataset/[entity-type]/physical/distribution/online/url\". "
+							+ "(PASTA will use only the first occurrence of this XPath.)", entityName);
+				} else {
+					message = String.format("Error when attempting to process entity \"%s\" with entity URL \"%s\": %s",
+							entityName, url, e.getMessage());
+				}
+				logger.error(message);
+				throw new MalformedURLException(message);
+			}
+		}
+	}  
 
   /*
    * Class methods

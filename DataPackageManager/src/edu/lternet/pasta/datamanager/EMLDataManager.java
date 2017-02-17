@@ -300,12 +300,17 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		    if (entityArray != null) {
 		      for (Entity entity : entityArray) {
 		        
-		        /*
+					EMLEntity emlEntity = new EMLEntity(entity);
+					String entityId = emlEntity.getEntityId();
+					String entityName = emlEntity.getEntityName();
+					entityIdNamePairs.put(entityId, entityName);
+
+				/*
 		         * Do not attempt to process an entity if the entity
 		         * does not have a distribution online and has either 
 		         * distribution offline or inline.
 		         */
-		        if ((entity != null) && 
+		        if ((entity != null) &&
 		            !entity.hasDistributionOnline() &&
 		            (entity.hasDistributionOffline() || entity.hasDistributionInline())
 		           ) {
@@ -314,12 +319,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		                      "because its distribution is 'inline' or 'offline'.");
 		        }
 						else {
-							EMLEntity emlEntity = new EMLEntity(entity);
-							String entityId = emlEntity.getEntityId();
-							String entityName = emlEntity.getEntityName();
-							// String entityURL = deriveDataURL(emlPackageId,
-							// entityId);
-							entityIdNamePairs.put(entityId, entityName);
 
 							String url = emlEntity.getUrl();
 							emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);

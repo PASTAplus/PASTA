@@ -5,9 +5,9 @@ REM SET SERVICE_HOST=http://package-d.lternet.edu:8080
 REM SET SERVICE_HOST=http://package-s.lternet.edu:8080
 REM SET SERVICE_HOST=http://pasta.lternet.edu
 
-SET SCOPE=knb-lter-nwk
-SET IDENTIFIER=1416
-SET REVISION=14
-SET ENTITY_ID=8d2b8f34c7316b6035b48de2b9ecc1aa
+SET SCOPE=knb-lter-nin
+SET IDENTIFIER=1
+SET REVISION=1
+SET ENTITY_ID=67e99349d1666e6f4955e9dda42c3cc2
 
 curl -X GET "%SERVICE_HOST%/package/data/size/eml/%SCOPE%/%IDENTIFIER%/%REVISION%/%ENTITY_ID%"
