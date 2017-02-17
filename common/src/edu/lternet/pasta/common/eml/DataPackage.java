@@ -61,6 +61,7 @@ public class DataPackage {
   ArrayList<String> relatedProjectTitles = null;
   String site = null;
   String abstractText = null;
+  String intellectualRightsText = null;
   String methodsText = null;
   String fundingText = null;
   String geographicDescriptionText = null;
@@ -229,6 +230,11 @@ public class DataPackage {
 	}
 
 
+	public String getIntellectualRightsText() {
+		return intellectualRightsText;
+	}
+
+
   public ArrayList<String> getKeywords() {
 	return keywords;
   }
@@ -372,6 +378,11 @@ public class DataPackage {
 			this.hasIntellectualRights = hasIntellectualRights;
 		}
 		
+		public void setIntellectualRightsText(String text) {
+			this.intellectualRightsText = text;
+		}
+
+	  
 		public void setMethodsText(String methodsText) {
 			this.methodsText = methodsText;
 		}

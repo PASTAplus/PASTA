@@ -159,6 +159,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String titleHTML = "";
 		String creatorsHTML = "";
 		String abstractHTML = "";
+		String intellectualRightsHTML = "";
 		String publicationDateHTML = "";
 		String spatialCoverageHTML = "";
 		String googleMapHTML = "";
@@ -367,6 +368,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 					if (abstractText != null) {
 						abstractHTML = toSingleLine(abstractText);
+					}
+
+					
+					String intellectualRightsText = emlObject.getIntellectualRightsText();
+
+					if (intellectualRightsText != null) {
+						intellectualRightsHTML = toSingleLine(intellectualRightsText);
 					}
 
 					String pubDate = emlObject.getPubDate();
@@ -614,8 +622,9 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 				resourcesHTMLBuilder.append(metadata);
 				resourcesHTMLBuilder.append(report);
-				resourcesHTMLBuilder
-						.append("<li>Data <sup><strong>*</strong></sup>\n");
+				/*resourcesHTMLBuilder
+						.append("<li>Data <sup><strong>*</strong></sup>\n");*/
+				resourcesHTMLBuilder.append("<li>Data\n");
 				resourcesHTMLBuilder.append("<ol>\n");
 				resourcesHTMLBuilder.append(data);
 				resourcesHTMLBuilder.append("</ol>\n");
@@ -632,6 +641,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("</div>\n");
 				resourcesHTMLBuilder.append("</li>\n");
 
+				/*
 				hasIntellectualRights = emlObject.hasIntellectualRights();
 				if (hasIntellectualRights) {
 				resourcesHTMLBuilder.append("<li>\n");
@@ -643,6 +653,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				resourcesHTMLBuilder.append("</ul>\n");
 				}
+				*/
 				
 				resourcesHTML = resourcesHTMLBuilder.toString();
 
@@ -779,6 +790,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		request.setAttribute("dataPackageResourcesHTML", resourcesHTML);
 		request.setAttribute("dataPackageCitationHTML", citationHTML);
 		request.setAttribute("digitalObjectIdentifier", digitalObjectIdentifier);
+		request.setAttribute("intellectualRightsHTML", intellectualRightsHTML);
 		request.setAttribute("pastaDataObjectIdentifier",
 				pastaDataObjectIdentifier);
 		request.setAttribute("provenanceHTML", provenanceHTML);
