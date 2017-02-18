@@ -1988,15 +1988,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
+
+			boolean hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision.toString());
+			if (!hasDataPackage) {
+				String msg = String.format("Unknown data package: %s", packageId);
+				throw new ResourceNotFoundException(msg);
+			}
+			
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 
 			entityNames = dataPackageRegistry.getEntityNames(scope, identifier, revision);
 
-			if (entityNames == null) {
-				String gripe = "No entity name values found for this data package: " + packageId;
-				throw new ResourceNotFoundException(gripe);
-			}
-			else {
+			if (entityNames != null) {
 				String[] lines = entityNames.split("\n");
 				for (String line : lines) {
 					if ((line != null) && (line.length() > 0)) {
@@ -2631,15 +2634,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
+			
+			boolean hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision.toString());
+			if (!hasDataPackage) {
+				String msg = String.format("Unknown data package: %s", packageId);
+				throw new ResourceNotFoundException(msg);
+			}
+			
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 
 			entitySizes = dataPackageRegistry.getEntitySizes(scope, identifier, revision);
 
-			if (entitySizes == null) {
-				String gripe = "No entity size values found for this data package: " + packageId;
-				throw new ResourceNotFoundException(gripe);
-			}
-			else {
+			if (entitySizes != null) {
 				String[] lines = entitySizes.split("\n");
 				for (String line : lines) {
 					if ((line != null) && (line.length() > 0)) {
