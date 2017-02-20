@@ -3,7 +3,17 @@ echo.
 echo Reservations for: localhost
 echo.
 SET SERVICE_HOST=http://localhost:8888
-curl -X GET "%SERVICE_HOST%/package/changes/eml?fromDate=2017-02-06T17:00:00"
+echo "fromDate=2017-01-01T17:00:00&toDate=2017-03-01T17:00:00&scope=knb-lter-hfr"
+curl -X GET "%SERVICE_HOST%/package/changes/eml?fromDate=2017-01-01T17:00:00&toDate=2017-03-01T17:00:00&scope=knb-lter-hfr"
+echo.
+echo "toDate=2017-01-01T17:00:00&scope=edi"
+curl -X GET "%SERVICE_HOST%/package/changes/eml?toDate=2017-01-01T17:00:00&scope=edi"
+echo.
+echo "scope=edi"
+curl -X GET "%SERVICE_HOST%/package/changes/eml?scope=edi"
+echo.
+echo "fromDate=2017-02-01T17:00:00&toDate=2017-02-08T17:00:00"
+curl -X GET "%SERVICE_HOST%/package/changes/eml?fromDate=2017-02-01T17:00:00&toDate=2017-02-08T17:00:00"
 echo.
 echo Reservations for: pasta-d
 echo.

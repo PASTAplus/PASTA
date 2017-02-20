@@ -8564,20 +8564,28 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * @param fromDate  optional query parameter to determine the date-time from
 	 *                  which data package changes should be listed
 	 * 
+	 * @param toDate    optional query parameter to determine the date-time up to
+	 *                  which data package changes should be listed
+	 * 
+	 * @param scope     optional query parameter to filter the results on a
+	 *                  particular data package scope value, e.g. "edi".
+	 *                  Multiple scope parameters are not supported (only the
+	 *                  last value specified will be used).
+	 * 
 	 * @return a Response, which if successful, contains an XML
 	 *         document (see example above)
 	 */
 	@GET
 	@Path("/changes/eml")
 	@Produces("application/xml")
-	public Response listDataPackageChanges(@Context HttpHeaders headers,
-			                               @Context UriInfo uriInfo) {
+	public Response listRecentChanges(@Context HttpHeaders headers,
+			                          @Context UriInfo uriInfo) {
 		AuthToken authToken = null;
 		String resourceId = null;
 		String entryText = null;
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
-		final String serviceMethodName = "listDataPackageChanges";
+		final String serviceMethodName = "listRecentChanges";
 		Rule.Permission permission = Rule.Permission.read;
 
 		try {
@@ -8596,11 +8604,13 @@ public class DataPackageManagerResource extends PastaWebService {
             QueryString queryString = new QueryString(uriInfo);
             Map<String, List<String>> queryParams = queryString.getParams();
             String fromDate = null;
+            String toDate = null;
+            String scope = null;
             String xml = "";
             
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
-					if (key.equals("fromDate")) {
+					if (key.equalsIgnoreCase("fromDate")) {
 						List<String> values = queryParams.get(key);
 						String fromDateParam = values.get(0);
 						if (fromDateParam != null) {				
@@ -8613,11 +8623,37 @@ public class DataPackageManagerResource extends PastaWebService {
 							}
 						}
 					}
+					else if (key.equalsIgnoreCase("toDate")) {
+						List<String> values = queryParams.get(key);
+						String toDateParam = values.get(0);
+						if (toDateParam != null) {				
+							if (toDateParam.startsWith("1") || (toDateParam.startsWith("2"))
+						       ) {
+								toDate = toDateParam;
+							}
+							else {
+								throw new IllegalArgumentException("Bad date parameter: " + toDateParam);
+							}
+						}
+					}
+					else if (key.equals("scope")) {
+						List<String> values = queryParams.get(key);
+						String scopeParam = values.get(0);
+						if (scopeParam != null) {
+							boolean isValidScope = DataPackageManager.isValidScope(scopeParam);
+							if (isValidScope) {
+								scope = scopeParam;
+							}
+							else {
+								throw new IllegalArgumentException("Bad scope parameter: " + scopeParam);
+							}
+						}
+					}
 				}
 			}
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			xml = dataPackageManager.listDataPackageChanges(fromDate);
+			xml = dataPackageManager.listDataPackageChanges(fromDate, toDate, scope);
 			responseBuilder = Response.ok(xml);
 			response = responseBuilder.build();
 		}

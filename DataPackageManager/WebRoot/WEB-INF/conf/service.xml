@@ -233,7 +233,7 @@
         </access>
     </pasta:service-method>
     
-    <pasta:service-method name="listDataPackageChanges">
+    <pasta:service-method name="listRecentChanges">
         <access
             system="https://pasta.edirepository.edu"
             authSystem="https://pasta.edirepository.edu/authentication"

@@ -1627,6 +1627,10 @@ public class DataPackageRegistry {
 	 *                       "deleteDataPackage"
 	 * @param fromTime       the cut-off date/time for how far back we want to 
 	 *                       query, e.g. '2015-01-01 12:00:00'
+	 * @param toTime         the cut-off date/time for how recent we want to 
+	 *                       query, e.g. '2016-01-01 12:00:00'
+	 * @param scope          if non-null, filter the results on a particular
+	 *                       data package scope value, e.g. "edi". 
 	 * @param limit          a limit on the number of change records to return, 
 	 *                       e.g. 10. If limit is specified as 0 or less then 
 	 *                       there is no limit on the number of records returned.
@@ -1636,12 +1640,16 @@ public class DataPackageRegistry {
 	 *                       otherwise be in the list.
 	 */
 	public ArrayList<DataPackageUpload> getChanges(String serviceMethod, 
-			                                       String fromTime, 
+			                                       String fromTime,
+			                                       String toTime,
+			                                       String scope,
 			                                       Integer limit,
 			                                       boolean excludeDeleted)
 			throws Exception {
 		Connection conn = null;
 		boolean hasFromTime = fromTime != null;
+		boolean hasToTime = toTime != null;
+		boolean hasScope = scope != null;
 		ArrayList<DataPackageUpload> changeList = new ArrayList<DataPackageUpload>();
 		StringBuilder sb = new StringBuilder();
 		TreeSet<String> docids = new TreeSet<String>();
@@ -1654,6 +1662,12 @@ public class DataPackageRegistry {
 			if (hasFromTime) {
 				sb.append("   AND date_deactivated >= '" + fromTime + "'\n");
 			}
+			if (hasToTime) {
+				sb.append("   AND date_deactivated <= '" + toTime + "'\n");
+			}
+			if (hasScope) {
+				sb.append("   AND scope= '" + scope + "'\n");
+			}
 			sb.append("ORDER BY date_deactivated DESC;");
 		}
 		else {
@@ -1665,6 +1679,12 @@ public class DataPackageRegistry {
 			}
 			if (hasFromTime) {
 				sb.append("   AND date_created >= '" + fromTime + "'\n");
+			}
+			if (hasToTime) {
+				sb.append("   AND date_created <= '" + toTime + "'\n");
+			}
+			if (hasScope) {
+				sb.append("   AND scope= '" + scope + "'\n");
 			}
 			sb.append("ORDER BY date_created DESC;");
 		}
@@ -1680,7 +1700,7 @@ public class DataPackageRegistry {
 				ResultSet rs = stmnt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
-					String scope = rs.getString(1);
+					scope = rs.getString(1);
 					Integer identifier = rs.getInt(2);
 					Integer revision = rs.getInt(3);
 					java.sql.Timestamp changeDate = rs.getTimestamp(4);
