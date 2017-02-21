@@ -63,7 +63,7 @@
 					      <p><strong>An <em>error</em> has occurred</strong> in the Data Portal:</p>                
                 <p class="nis-error">${pageContext.exception.message}</p>        
                 <p>For further assistance, please contact the
-                    <a href="mailto:info@environmentaldatainitiative.org?Subject=EDI%20Data%20Portal%20error" target="_top">
+                    <a href="mailto:support@environmentaldatainitiative.org?Subject=EDI%20Data%20Portal%20error" target="_top">
                     Environmental Data Initiative</a>. Please copy the error message shown 
                     above into your email message, along with any other information 
                     that might help us to assist you more promptly.</p>
