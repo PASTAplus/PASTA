@@ -438,24 +438,28 @@ Description
 """""""""""
 
 List Recent Changes operation, listing all data package insert, update, and
-delete operations, optionally specifying the date and time from which the 
-changes should be listed (by specifying the "fromDate" query parameter).
-If "fromDate" is omitted, lists the complete set of changes recorded in PASTA'a resource
-registry. The list of changes is returned in XML format. Inserts and updates are recorded
+delete operations, optionally specifying the date and time to and/or from which the 
+changes should be listed. An optional scope value can be specified to filter
+results for a particular data package scope (e.g. scope=edi).
+If "fromDate" and "toDate" are omitted, lists the complete set of changes recorded in PASTA'a resource
+registry. If a "scope" value is omitted, results are returned for all
+data package scopes that exist in the resource registry. Multiple instances of
+the scope parameter are not supported (only the last scope value specified will be used). 
+The list of changes is returned in XML format. Inserts and updates are recorded
 in "dataPackageUpload" elements, while deletes are recorded in "dataPackageDelete"
 elements. (See example below)
 
 REST API
 """"""""
 
-`GET : https://pasta.lternet.edu/package/workingon/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/workingon/eml>`_
+`GET : https://pasta.lternet.edu/package/changes/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/changes/eml>`_
 
 Examples
 """"""""
   
 1. Using :command:`curl` to list data packages that PASTA is working on uploading::
 
-     curl -X GET https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-10T12:00:00
+     curl -X GET https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-10T12:00:00&toDate=2017-02-11T12:00:00&scope=knb-lter-nwk
 
      <dataPackageChanges>
         <dataPackageUpload>

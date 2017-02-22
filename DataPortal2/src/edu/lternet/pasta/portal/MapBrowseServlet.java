@@ -159,6 +159,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String titleHTML = "";
 		String creatorsHTML = "";
 		String abstractHTML = "";
+		String intellectualRightsHTML = "";
 		String publicationDateHTML = "";
 		String spatialCoverageHTML = "";
 		String googleMapHTML = "";
@@ -173,6 +174,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		boolean hasIntellectualRights = false;
 		boolean showSaved = false;
 		boolean isSaved = false;
+		boolean isOffline = false;
 
 		String uid = (String) httpSession.getAttribute("uid");
 
@@ -369,6 +371,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 						abstractHTML = toSingleLine(abstractText);
 					}
 
+					
+					String intellectualRightsText = emlObject.getIntellectualRightsText();
+
+					if (intellectualRightsText != null) {
+						intellectualRightsHTML = toSingleLine(intellectualRightsText);
+					}
+
 					String pubDate = emlObject.getPubDate();
 
 					if (pubDate != null) {
@@ -477,6 +486,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String doiId = null;
 				String entityNames = dpmClient.readDataEntityNames(scope, id, revision);
 				String entitySizes = dpmClient.readDataEntitySizes(scope, id, revision);
+				
+				if ("".equals(entityNames) && "".equals(entitySizes)) {
+					String offlineMsg = "The metadata describes one or more data entities that have not been made available to this repository.";
+					data = String.format("<li>%s</li>\n", offlineMsg);
+					isOffline = true;
+				}
 
 				while (tokens.hasNext()) {
 					resource = tokens.nextToken();
@@ -614,11 +629,13 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("<ul class=\"no-list-style\">\n");
 				resourcesHTMLBuilder.append(metadata);
 				resourcesHTMLBuilder.append(report);
-				resourcesHTMLBuilder
-						.append("<li>Data <sup><strong>*</strong></sup>\n");
-				resourcesHTMLBuilder.append("<ol>\n");
+				/*resourcesHTMLBuilder
+						.append("<li>Data <sup><strong>*</strong></sup>\n");*/
+				String listOrder = isOffline ? "ul" : "ol";
+				resourcesHTMLBuilder.append("<li>Data\n");
+				resourcesHTMLBuilder.append(String.format("<%s>\n", listOrder));
 				resourcesHTMLBuilder.append(data);
-				resourcesHTMLBuilder.append("</ol>\n");
+				resourcesHTMLBuilder.append(String.format("</%s>\n", listOrder));
 				resourcesHTMLBuilder.append("</li>\n");
 
 				resourcesHTMLBuilder.append("<li>&nbsp;</li>\n");
@@ -632,6 +649,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append("</div>\n");
 				resourcesHTMLBuilder.append("</li>\n");
 
+				/*
 				hasIntellectualRights = emlObject.hasIntellectualRights();
 				if (hasIntellectualRights) {
 				resourcesHTMLBuilder.append("<li>\n");
@@ -643,6 +661,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				resourcesHTMLBuilder.append("</ul>\n");
 				}
+				*/
 				
 				resourcesHTML = resourcesHTMLBuilder.toString();
 
@@ -779,6 +798,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		request.setAttribute("dataPackageResourcesHTML", resourcesHTML);
 		request.setAttribute("dataPackageCitationHTML", citationHTML);
 		request.setAttribute("digitalObjectIdentifier", digitalObjectIdentifier);
+		request.setAttribute("intellectualRightsHTML", intellectualRightsHTML);
 		request.setAttribute("pastaDataObjectIdentifier",
 				pastaDataObjectIdentifier);
 		request.setAttribute("provenanceHTML", provenanceHTML);

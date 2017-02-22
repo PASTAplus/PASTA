@@ -1610,16 +1610,22 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Generates an XML string listing data package changes, supporting the
 	 * listDataPackageChanges web service method.
 	 * 
-	 * @param  fromDate  the date-time determining how far back in time the
+	 * @param  fromDate  the date-time determining how far back in time
 	 *                   changes should be included. If null, include all
 	 *                   changes (inserts, updates, deletes) that are
 	 *                   recorded in the resource registry.
+	 * @param  toDate    the date-time determining how recent in time
+	 *                   changes should be included. If null, include all
+	 *                   changes (inserts, updates, deletes) from the fromDate
+	 *                   to the present date-time.
+	 * @param  scope     Filter results by whether they match a particular 
+	 *                   data package scope value, e.g. "edi".
 	 * @return the XML string listing the data package changes. See the
 	 *         listDataPackageChanges web service method for an example
 	 *         document
 	 * @throws Exception
 	 */
-	public String listDataPackageChanges(String fromDate) 
+	public String listDataPackageChanges(String fromDate, String toDate, String scope) 
 		throws Exception {
 		final int limit = 0;
 		String xml = null;
@@ -1630,9 +1636,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
 		boolean excludeDeleted = false;
-		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, limit, excludeDeleted);
+		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
+		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
+		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
 		
 		recentChanges.addAll(inserts);
 		recentChanges.addAll(updates);
@@ -1988,15 +1994,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
+
+			boolean hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision.toString());
+			if (!hasDataPackage) {
+				String msg = String.format("Unknown data package: %s", packageId);
+				throw new ResourceNotFoundException(msg);
+			}
+			
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 
 			entityNames = dataPackageRegistry.getEntityNames(scope, identifier, revision);
 
-			if (entityNames == null) {
-				String gripe = "No entity name values found for this data package: " + packageId;
-				throw new ResourceNotFoundException(gripe);
-			}
-			else {
+			if (entityNames != null) {
 				String[] lines = entityNames.split("\n");
 				for (String line : lines) {
 					if ((line != null) && (line.length() > 0)) {
@@ -2631,15 +2640,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
+			
+			boolean hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier, revision.toString());
+			if (!hasDataPackage) {
+				String msg = String.format("Unknown data package: %s", packageId);
+				throw new ResourceNotFoundException(msg);
+			}
+			
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 
 			entitySizes = dataPackageRegistry.getEntitySizes(scope, identifier, revision);
 
-			if (entitySizes == null) {
-				String gripe = "No entity size values found for this data package: " + packageId;
-				throw new ResourceNotFoundException(gripe);
-			}
-			else {
+			if (entitySizes != null) {
 				String[] lines = entitySizes.split("\n");
 				for (String line : lines) {
 					if ((line != null) && (line.length() > 0)) {

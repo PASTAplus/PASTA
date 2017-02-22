@@ -190,6 +190,18 @@ public class EmlObject {
 	
 	
 	/**
+	 * Returns the abstract text string from the EML document.
+	 * 
+	 * @return abstract text
+	 */
+	public String getIntellectualRightsText() {
+		String intellectualRightsText = this.dataPackage.getIntellectualRightsText();
+		
+		return intellectualRightsText;
+	}
+	
+	
+	/**
 	 * Boolean to determine whether the data package has the intellectualRights 
 	 * element present.
 	 * 

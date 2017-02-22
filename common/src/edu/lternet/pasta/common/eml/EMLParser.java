@@ -220,6 +220,8 @@ public class EMLParser {
         // Parse the intellectualRights to determine whether the element node is present
         Node intellectualRightsNode = xpathapi.selectSingleNode(document, INTELLECTUAL_RIGHTS_PATH);
         if (intellectualRightsNode != null && intellectualRightsNode.hasChildNodes()) {
+          String intellectualRightsText = intellectualRightsNode.getTextContent().trim();
+          this.dataPackage.setIntellectualRightsText(intellectualRightsText);
           this.dataPackage.setIntellectualRights(true);
         }
 

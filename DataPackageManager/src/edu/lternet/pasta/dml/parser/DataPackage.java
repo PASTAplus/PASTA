@@ -73,6 +73,7 @@ public class DataPackage
 	  private static final String REVISION_WITH_LEADING_ZERO_PATTERN =   "^[A-Za-z_0-9\\-]+\\.\\d+\\.0\\d+$";
 	  //private static final String LTER_PACKAGE_ID_PATTERN =              "^knb-lter-[a-z][a-z][a-z]\\.\\d+\\.\\d+$";
 	  private static final String METACAT_PACKAGE_ID_PATTERN =           "^[A-Za-z_0-9\\-]+\\.\\d+\\.\\d+$";
+	  private static final String TECH_SUPPORT_EMAIL = "support@environmentaldatainitiative.org";
 	  
 	  
 	  /* A comma-separated list of allowable scope values. This value should be set
@@ -645,7 +646,7 @@ public class DataPackage
         	  packageIdQualityCheck.setSuggestion(
             		"Use a scope value that you are authorized to use for your site or project, " +
                     "or you may request that a new scope value be added to the list of allowed " +
-            	    "values by contacting tech_support@LTERnet.edu.");
+            	    "values by contacting " + TECH_SUPPORT_EMAIL);
         	}
         }
       }
