@@ -112,6 +112,7 @@ public class Entity extends DataObjectDescription
     private boolean hasDistributionOnline = false;
     private boolean hasDistributionOffline = false;
     private boolean hasDistributionInline = false;
+    private boolean hasPhysicalAuthentication = false;
     private boolean isImageEntity    = false;
     private boolean isOtherEntity    = false;
     private boolean hasGZipDataFile  = false;
@@ -129,6 +130,7 @@ public class Entity extends DataObjectDescription
     
     private EntityReport entityReport = null;
     private String entityAccessXML = null;
+    private String entityPhysicalAuthenticationXML = null;
     
     
     /* 
@@ -540,6 +542,33 @@ public class Entity extends DataObjectDescription
         Boolean hasEntityDescription = ((description != null) && (description.length() > 0));
         qualityCheck.setFound(hasEntityDescription.toString());
         if (hasEntityDescription) {
+          qualityCheck.setStatus(Status.valid);
+        }
+        else {
+          qualityCheck.setFailedStatus();
+        }
+        
+        addQualityCheck(qualityCheck);
+      }
+    }
+
+
+    /**
+     * Do a quality check for the presence of a least one 
+     * physical/authentication element in this entity. 
+     * 
+     */
+    public void checkIntegrityChecksumPresence() {
+      String qualityCheckIdentifier = "integrityChecksumPresence";
+      QualityCheck qualityCheckTemplate = 
+        QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+      QualityCheck qualityCheck = 
+        new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+      if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+        Boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
+        qualityCheck.setFound(hasIntegrityChecksum.toString());
+        if (hasIntegrityChecksum) {
           qualityCheck.setStatus(Status.valid);
         }
         else {
@@ -1063,6 +1092,30 @@ public class Entity extends DataObjectDescription
      */
     public void setHasDistributionInline(boolean distributionInline) {
       this.hasDistributionInline = distributionInline;
+    }
+    
+    
+    /**
+     * Boolean to determine if this entity has at least one
+     * physical/authentication element.
+     * 
+     * @return boolean  true if the entity has a physical/authentication
+     *                  element, else false
+     */
+    public boolean hasPhysicalAuthentication() {
+      return this.hasPhysicalAuthentication;
+    }
+    
+    
+    /**
+     * Sets the hasPhysicalAuthentication field to store whether this entity
+     * has at least one physical/authentication element.
+     * 
+     * @param physicalAuthentication   the boolean value to set. true if 
+     *        the entity has a physical/authentication element, else false
+     */
+    public void setHasPhysicalAuthentication(boolean physicalAuthentication) {
+      this.hasPhysicalAuthentication = physicalAuthentication;
     }
     
     

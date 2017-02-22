@@ -119,6 +119,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     protected String datasetCreatorPath = null;
     protected String datasetAbstractPath = null;
     protected String entityAccessPath = null;
+    protected String entityPhysicalAuthenticationPath = null;
     
     //private Hashtable entityHash = new Hashtable();
     //private Hashtable fileHash = new Hashtable();
@@ -176,7 +177,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 	public GenericDataPackageParser(String packageIdPath, String pubDatePath, String tableEntityPath,
 			String spatialRasterEntityPath, String spatialVectorEntityPath,
 			String storedProcedureEntityPath, String viewEntityPath,
-			String otherEntityPath) {
+			String otherEntityPath, String entityPhysicalAuthenticationPath) {
 		
 		//set default so that caller can pass nulls for some params
 		this.initDefaultXPaths();
@@ -206,11 +207,14 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		if (otherEntityPath != null) {	
 			this.otherEntityPath = otherEntityPath;
 		}	
+		if (entityPhysicalAuthenticationPath != null) {	
+			this.entityPhysicalAuthenticationPath = entityPhysicalAuthenticationPath;
+		}	
 	}
 
 	
 	/**
-	 * sets the default xpath strings for locating datapackage elements
+	 * sets the default xpath strings for locating data package elements
 	 * note that root element can be anything with a packageId attribute
 	 */
 	private void initDefaultXPaths() {
@@ -228,6 +232,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		datasetCreatorPath = "//dataset/creator";
 		datasetAbstractPath = "//dataset/abstract";
 		entityAccessPath = "physical/distribution/access";
+		entityPhysicalAuthenticationPath = "physical/authentication";
 	}
 
 	
@@ -1170,6 +1175,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean hasDistributionOnline = false;
             boolean hasDistributionOffline = false;
             boolean hasDistributionInline = false;
+            boolean hasPhysicalAuthentication = false;
             boolean isExternallyDefinedFormat = false;
             boolean isOtherEntity = false;
             boolean isImageEntity   = false;
@@ -1427,6 +1433,16 @@ public class GenericDataPackageParser implements DataPackageParserInterface
              entityAccessXML = nodeToXmlString(entityAccessNode);
            }
            
+           // Store the entity physical authentication XML since some applications may need it
+           NodeList physicalAuthenticationNodeList = xpathapi.selectNodeList(
+                                              entityNode, 
+                                              entityPhysicalAuthenticationPath);
+           if ((physicalAuthenticationNodeList != null) &&
+        	   (physicalAuthenticationNodeList.getLength() > 0)
+        	  ) {
+        	   hasPhysicalAuthentication = true;
+           }
+           
            NodeList onlineNodeList = xpathapi.selectNodeList(
                                               entityNode,
                                               "physical/distribution/online");
@@ -1611,6 +1627,9 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setEntityAccessXML(entityAccessXML);
           entityObject.setFieldDelimiter(fieldDelimiter);
           entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);
+          
+          entityObject.setHasPhysicalAuthentication(hasPhysicalAuthentication);
+          entityObject.checkIntegrityChecksumPresence();
           
           try {
               NodeList attributeListNodeList = 

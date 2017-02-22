@@ -206,6 +206,19 @@
       <suggestion></suggestion>
       <reference></reference>
     </qualityCheck>
+    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
+      <identifier>integrityChecksumPresence</identifier>
+      <name>Check for presence of a physical/authentication element containing the checksum info for an integrity check.</name>
+      <description>Warn if an entity does not have a physical/authentication element.</description>
+      <expected>At least one physical/authentication element containing the checksum info for an integrity check.</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>PASTA is planning to compare the contributor-supplied checksum value documented in the physical/authentication element to the checksum value of this entity 
+      from previous revisions of this data package. If PASTA already has a copy of this entity, it will be able to avoid an unnecessary download of the entity from your site, resulting in faster 
+      processing of the data package.</explanation>
+      <suggestion>Add a physical/authentication element and store the entity checksum value in it using a method such as MD5 or CRC.</suggestion>
+      <reference></reference>
+    </qualityCheck>
     <qualityCheck qualityType="metadata" system="knb" statusType="info" >
       <identifier>numHeaderLinesPresent</identifier>
       <name>'numHeaderLines' element is present</name>
