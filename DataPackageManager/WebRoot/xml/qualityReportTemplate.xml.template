@@ -209,13 +209,13 @@
     <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
       <identifier>integrityChecksumPresence</identifier>
       <name>A physical/authentication element is present</name>
-      <description>Check for presence of a physical/authentication element containing the checksum or hash value for an integrity check (e.g. MD5, SHA-1). Warn if an entity does not have a physical/authentication element.</description>
-      <expected>At least one physical/authentication element containing the checksum value for an integrity check.</expected>
+      <description>Check for presence of a physical/authentication element containing a checksum or hash value for an integrity check (e.g. MD5, SHA-1). Warn if an entity does not have a physical/authentication element.</description>
+      <expected>At least one physical/authentication element containing a checksum or hash value that can be used to perform an integrity check on the data.</expected>
       <found></found>
       <status>notChecked</status>
-      <explanation>PASTA is planning to compare the contributor-supplied checksum/hash value documented in the physical/authentication element to the checksum/hash value of this entity. 
-      from previous revisions of this data package. If PASTA already has a copy of this entity, it will be able to avoid an unnecessary download of the entity from your site, resulting in faster 
-      processing of the data package.</explanation>
+      <explanation>PASTA will use this value to check the integrity of the data it downloads from your site. In addition, PASTA is planning to compare the contributor-supplied checksum/hash value documented 
+      in the physical/authentication element to the checksum/hash value of this entity downloaded from previous revisions of this data package. If PASTA already has a copy of this entity, it will be able 
+      to avoid an unnecessary download of the entity from your site, resulting in faster processing of the new data package revision when you update it in PASTA.</explanation>
       <suggestion>Add a physical/authentication element and store the entity checksum or hash value in it using a method such as MD5 or SHA-1.</suggestion>
       <reference></reference>
     </qualityCheck>
