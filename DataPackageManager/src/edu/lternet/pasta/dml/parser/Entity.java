@@ -32,6 +32,7 @@
 
 package edu.lternet.pasta.dml.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -130,12 +131,17 @@ public class Entity extends DataObjectDescription
     
     private EntityReport entityReport = null;
     private String entityAccessXML = null;
-    private String entityPhysicalAuthenticationXML = null;
+    private HashMap<String, String> physicalAuthenticationMap = 
+    		new HashMap<String, String>();
+    
+    private String md5HashValue = null;
+    private String sha1HashValue = null;
     
     
     /* 
      * Constructors 
      */
+    
     
     /**
      * Constructs this object with some extra parameters.
@@ -182,6 +188,21 @@ public class Entity extends DataObjectDescription
         checkEntityName(name);
         checkEntityDescription(description);
     }
+    
+    
+    
+    public void setMd5HashValue(String hashValue) {
+    	this.md5HashValue = hashValue;
+    	
+    	checkIntegrityChecksum("MD5", hashValue);
+    }
+    
+    
+    public void setSha1HashValue(String hashValue) {
+    	this.sha1HashValue = hashValue;
+    	
+    	checkIntegrityChecksum("SHA-1", hashValue);
+    }
 
     
     /**
@@ -195,6 +216,26 @@ public class Entity extends DataObjectDescription
       //a.setParent(this);
     }
 
+    
+    /**
+     * Adds a physical authentication entry, mapping a hash method to a 
+     * hash value.
+     * 
+     * @param method     The hash method, e.g. "MD5"
+     * @param hashValue  The 32-character hash value.
+     */
+    public void addPhysicalAuthentication(String method, String hashValue) {
+    	if (method != null) {
+    		if (method.equalsIgnoreCase("MD5")) {
+    			physicalAuthenticationMap.put("MD5", hashValue);
+    		}
+    		else if (method.equalsIgnoreCase("SHA1") ||
+    				 method.equalsIgnoreCase("SHA-1")) {
+    			physicalAuthenticationMap.put("SHA-1", hashValue);
+    		}
+    	}
+    }
+    
     
     /**
      * Adds a quality check to the entity's associated entityReport object.
@@ -580,6 +621,49 @@ public class Entity extends DataObjectDescription
     }
 
 
+    /**
+     * Do a quality check matching the congruency of an actual integrity
+     * hash value to the value (if any) documented in the metadata.
+     * 
+     */
+	public void checkIntegrityChecksum(String actualHashMethod, String actualHashValue) {
+		String qualityCheckIdentifier = "integrityChecksum";
+		QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
+			if (hasIntegrityChecksum) {
+				boolean congruent = false;
+
+				for (String hashMethod : physicalAuthenticationMap.keySet()) {
+					if (hashMethod.equals(actualHashMethod)) {
+						String metadataHashValue = physicalAuthenticationMap.get(hashMethod);
+						if (metadataHashValue != null) {
+							qualityCheck.setExpected(metadataHashValue);
+							qualityCheck.setFound(actualHashValue);
+							if (actualHashValue.equals(metadataHashValue)) {
+								congruent = true;
+							}
+						}
+
+						if (congruent) {
+							qualityCheck.setStatus(Status.valid);
+						} 
+						else {
+							qualityCheck.setExplanation(qualityCheck.getExplanation());
+							qualityCheck.setSuggestion(qualityCheck.getSuggestion());
+							qualityCheck.setFailedStatus();
+						}
+
+						addQualityCheck(qualityCheck);
+					}
+				}
+			}
+		}
+	}
+
+	
     /**
      * Do a quality check on the entityName metadata value
      * 
@@ -1116,6 +1200,12 @@ public class Entity extends DataObjectDescription
      */
     public void setHasPhysicalAuthentication(boolean physicalAuthentication) {
       this.hasPhysicalAuthentication = physicalAuthentication;
+      
+      /*
+       * After setting the boolean, give the quality check an opportunity to
+       * run.
+       */
+      checkIntegrityChecksumPresence();
     }
     
     

@@ -35,6 +35,7 @@ package edu.lternet.pasta.dml.parser.generic;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -1185,6 +1186,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean isSimpleDelimited = true;
             boolean isTextFixed = false;
             boolean isCollapseDelimiters = false;
+            HashMap<String,String> integrityMap = new HashMap<String,String>();
 
             if (xpath != null) {
               if (xpath.equals(spatialRasterEntityPath) || 
@@ -1437,10 +1439,29 @@ public class GenericDataPackageParser implements DataPackageParserInterface
            NodeList physicalAuthenticationNodeList = xpathapi.selectNodeList(
                                               entityNode, 
                                               entityPhysicalAuthenticationPath);
+           int physicalAuthenticationNodeListLength = physicalAuthenticationNodeList.getLength();
            if ((physicalAuthenticationNodeList != null) &&
-        	   (physicalAuthenticationNodeList.getLength() > 0)
+        	   (physicalAuthenticationNodeListLength > 0)
         	  ) {
         	   hasPhysicalAuthentication = true;
+        	   
+        	   for (int j = 0; j < physicalAuthenticationNodeListLength; j++) {
+        		   String methodText = null;
+        		   Node physicalAuthenticationNode = physicalAuthenticationNodeList.item(j);
+                   String hashString = physicalAuthenticationNode.getTextContent();
+        		   NamedNodeMap paAttributes = physicalAuthenticationNode.getAttributes();
+        		   int nAttributes = paAttributes.getLength();
+        		   for (int k = 0; k < nAttributes; k++) {
+        			   Node attributeNode = paAttributes.item(k);
+        			   String nodeName = attributeNode.getNodeName();
+        			   if (nodeName.equals("method")) {
+        				   methodText = attributeNode.getNodeValue();
+        			   }
+        		   }
+        		   
+        		   integrityMap.put(methodText, hashString);
+        	   }
+        	   
            }
            
            NodeList onlineNodeList = xpathapi.selectNodeList(
@@ -1626,10 +1647,18 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setHasDistributionInline(hasDistributionInline);
           entityObject.setEntityAccessXML(entityAccessXML);
           entityObject.setFieldDelimiter(fieldDelimiter);
-          entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);
-          
+          entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);        
           entityObject.setHasPhysicalAuthentication(hasPhysicalAuthentication);
-          entityObject.checkIntegrityChecksumPresence();
+          
+          /*
+           * If any physical/authentication nodes were parsed, store the
+           * integrity hash method and its associated hash value in the
+           * entity object.
+           */
+          for (String hashMethod : integrityMap.keySet()) {
+        	  String hashValue = integrityMap.get(hashMethod);
+        	  entityObject.addPhysicalAuthentication(hashMethod, hashValue);
+          }
           
           try {
               NodeList attributeListNodeList = 
