@@ -179,7 +179,7 @@
       <status>notChecked</status>
       <explanation>Data Manager requires a non-empty, non-duplicate entityName value for every entity</explanation>
       <suggestion>Declare a non-empty entityName and ensure that there are no duplicate entityName values in the document</suggestion>
-      <reference>http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-dataTable.html#numberOfRecords</reference>
+      <reference></reference>
     </qualityCheck>
   </datasetReport>
   <entityReport>
@@ -384,6 +384,17 @@
       <suggestion></suggestion>
       <reference></reference>
     </qualityCheck>
+    <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
+      <identifier>numberOfRecordsPresence</identifier>
+      <name>Is the numberOfRecords element present?</name>
+      <description>Warn the user if the numberOfRecords check is not present</description>
+      <expected>A number of records element is expected for this entity</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>This is a valuable check that we have the correct table.</explanation>
+      <suggestion>Add a numberOfRecords element and store the number of entity records</suggestion>
+      <reference></reference>
+    </qualityCheck>
     <qualityCheck qualityType="congruency" system="knb" statusType="warn" >
       <identifier>numberOfRecords</identifier>
       <name>Number of records in metadata matches number of rows loaded</name>
@@ -391,7 +402,7 @@
       <expected></expected>
       <found></found>
       <status>notChecked</status>
-      <explanation></explanation>
+      <explanation>This is a valuable check that we have the correct table.</explanation>
       <suggestion></suggestion>
       <reference></reference>
     </qualityCheck>

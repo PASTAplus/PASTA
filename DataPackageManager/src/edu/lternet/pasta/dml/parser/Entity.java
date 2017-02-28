@@ -113,6 +113,7 @@ public class Entity extends DataObjectDescription
     private boolean hasDistributionOnline = false;
     private boolean hasDistributionOffline = false;
     private boolean hasDistributionInline = false;
+    private boolean hasNumberOfRecords = false;
     private boolean hasPhysicalAuthentication = false;
     private boolean isImageEntity    = false;
     private boolean isOtherEntity    = false;
@@ -664,6 +665,33 @@ public class Entity extends DataObjectDescription
 	}
 
 	
+	/**
+	 * Do a quality check for the presence of the numberOfRecords element in
+	 * this entity.
+	 */
+	public void checkNumberOfRecordsPresence() {
+		String qualityCheckIdentifier = "numberOfRecordsPresence";
+		QualityCheck qualityCheckTemplate = 
+				QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = 
+				new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			if (this.hasNumberOfRecords) {
+				qualityCheck.setFound("numberOfRecords element found");
+				qualityCheck.setStatus(Status.valid);
+				qualityCheck.setSuggestion("");
+			} 
+			else {
+				qualityCheck.setFound("numberOfRecords element not found");
+				qualityCheck.setFailedStatus();
+			}
+
+			addQualityCheck(qualityCheck);
+		}
+	}
+
+	
     /**
      * Do a quality check on the entityName metadata value
      * 
@@ -1188,6 +1216,24 @@ public class Entity extends DataObjectDescription
      */
     public boolean hasPhysicalAuthentication() {
       return this.hasPhysicalAuthentication;
+    }
+    
+    
+    /**
+     * Sets the hasNumberOfRecords field to store whether this entity
+     * has the numberOfRecords element.
+     * 
+     * @param hasElement   the boolean value to set. true if 
+     *        the entity has a numberOfRecords element, else false
+     */
+    public void setHasNumberOfRecords(boolean hasElement) {
+      this.hasNumberOfRecords = hasElement;
+      
+      /*
+       * After setting the boolean, give the quality check an opportunity to
+       * run.
+       */
+      checkNumberOfRecordsPresence();
     }
     
     

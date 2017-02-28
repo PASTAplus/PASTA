@@ -1176,6 +1176,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean hasDistributionOnline = false;
             boolean hasDistributionOffline = false;
             boolean hasDistributionInline = false;
+            boolean hasNumberOfRecords = false;
             boolean hasPhysicalAuthentication = false;
             boolean isExternallyDefinedFormat = false;
             boolean isOtherEntity = false;
@@ -1228,8 +1229,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
                     entityCaseSensitive = childValue;
                 } else if (childName.equals("numberOfRecords")) {
                     entityNumberOfRecords = childValue;
-                    /*numRecords = (new Integer(entityNumberOfRecords))
-                                    .intValue();*/
+                    hasNumberOfRecords = true;
                 }                
                
             }
@@ -1648,6 +1648,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setEntityAccessXML(entityAccessXML);
           entityObject.setFieldDelimiter(fieldDelimiter);
           entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);        
+          entityObject.setHasNumberOfRecords(hasNumberOfRecords);
           entityObject.setHasPhysicalAuthentication(hasPhysicalAuthentication);
           
           /*
