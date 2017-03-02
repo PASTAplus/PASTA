@@ -33,6 +33,7 @@ import edu.lternet.pasta.dml.parser.DataPackage;
 import edu.lternet.pasta.dml.quality.QualityReport;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.datapackagemanager.EMLDataPackage;
 import edu.lternet.pasta.datapackagemanager.FileSystemResource;
 import edu.ucsb.nceas.utilities.IOUtil;
 
