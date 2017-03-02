@@ -179,7 +179,7 @@
       <status>notChecked</status>
       <explanation>Data Manager requires a non-empty, non-duplicate entityName value for every entity</explanation>
       <suggestion>Declare a non-empty entityName and ensure that there are no duplicate entityName values in the document</suggestion>
-      <reference>http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-dataTable.html#numberOfRecords</reference>
+      <reference></reference>
     </qualityCheck>
   </datasetReport>
   <entityReport>
@@ -204,6 +204,30 @@
       <status>notChecked</status>
       <explanation>With entityName sometimes serving as a file name rather than a title, it is important to be very descriptive here.</explanation>
       <suggestion></suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
+      <identifier>integrityChecksumPresence</identifier>
+      <name>A physical/authentication element is present</name>
+      <description>Check for presence of a physical/authentication element containing a checksum or hash value for an integrity check (e.g. MD5, SHA-1). Warn if an entity does not have a physical/authentication element.</description>
+      <expected>At least one physical/authentication element containing a checksum or hash value that can be used to perform an integrity check on the data.</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>PASTA will use this value to check the integrity of the data it downloads from your site. In addition, PASTA is planning to compare the contributor-supplied checksum/hash value documented 
+      in the physical/authentication element to the checksum/hash value of this entity downloaded from previous revisions of this data package. If PASTA already has a copy of this entity, it will be able 
+      to avoid an unnecessary download of the entity from your site, resulting in faster processing of the new data package revision when you update it in PASTA.</explanation>
+      <suggestion>Add a physical/authentication element and store the entity checksum or hash value in it using a method such as MD5 or SHA-1.</suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="congruency" system="lter" statusType="error" >
+      <identifier>integrityChecksum</identifier>
+      <name>Compare the metadata checksum for an entity to the checksum of the downloaded entity</name>
+      <description>Two possible responses: valid if checksums match; error if checksums do not match.</description>
+      <expected></expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>Matching checksums will ensure data integrity during upload to the repository.</explanation>
+      <suggestion>If the found integrity hash value does not match the expected integrity hash value, there may have been a loss of integrity in the data download. Check that the hash method and hash value documented in the metadata are the correct values.</suggestion>
       <reference></reference>
     </qualityCheck>
     <qualityCheck qualityType="metadata" system="knb" statusType="info" >
@@ -360,6 +384,17 @@
       <suggestion></suggestion>
       <reference></reference>
     </qualityCheck>
+    <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
+      <identifier>numberOfRecordsPresence</identifier>
+      <name>Is the numberOfRecords element present?</name>
+      <description>Warn the user if the numberOfRecords check is not present</description>
+      <expected>A number of records element is expected for this entity</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>This is a valuable check that we have the correct table.</explanation>
+      <suggestion>Add a numberOfRecords element and store the number of entity records</suggestion>
+      <reference></reference>
+    </qualityCheck>
     <qualityCheck qualityType="congruency" system="knb" statusType="warn" >
       <identifier>numberOfRecords</identifier>
       <name>Number of records in metadata matches number of rows loaded</name>
@@ -367,7 +402,7 @@
       <expected></expected>
       <found></found>
       <status>notChecked</status>
-      <explanation></explanation>
+      <explanation>This is a valuable check that we have the correct table.</explanation>
       <suggestion></suggestion>
       <reference></reference>
     </qualityCheck>

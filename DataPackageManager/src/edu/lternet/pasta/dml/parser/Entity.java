@@ -32,6 +32,7 @@
 
 package edu.lternet.pasta.dml.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -112,6 +113,8 @@ public class Entity extends DataObjectDescription
     private boolean hasDistributionOnline = false;
     private boolean hasDistributionOffline = false;
     private boolean hasDistributionInline = false;
+    private boolean hasNumberOfRecords = false;
+    private boolean hasPhysicalAuthentication = false;
     private boolean isImageEntity    = false;
     private boolean isOtherEntity    = false;
     private boolean hasGZipDataFile  = false;
@@ -129,11 +132,17 @@ public class Entity extends DataObjectDescription
     
     private EntityReport entityReport = null;
     private String entityAccessXML = null;
+    private HashMap<String, String> physicalAuthenticationMap = 
+    		new HashMap<String, String>();
+    
+    private String md5HashValue = null;
+    private String sha1HashValue = null;
     
     
     /* 
      * Constructors 
      */
+    
     
     /**
      * Constructs this object with some extra parameters.
@@ -180,6 +189,21 @@ public class Entity extends DataObjectDescription
         checkEntityName(name);
         checkEntityDescription(description);
     }
+    
+    
+    
+    public void setMd5HashValue(String hashValue) {
+    	this.md5HashValue = hashValue;
+    	
+    	checkIntegrityChecksum("MD5", hashValue);
+    }
+    
+    
+    public void setSha1HashValue(String hashValue) {
+    	this.sha1HashValue = hashValue;
+    	
+    	checkIntegrityChecksum("SHA-1", hashValue);
+    }
 
     
     /**
@@ -193,6 +217,26 @@ public class Entity extends DataObjectDescription
       //a.setParent(this);
     }
 
+    
+    /**
+     * Adds a physical authentication entry, mapping a hash method to a 
+     * hash value.
+     * 
+     * @param method     The hash method, e.g. "MD5"
+     * @param hashValue  The 32-character hash value.
+     */
+    public void addPhysicalAuthentication(String method, String hashValue) {
+    	if (method != null) {
+    		if (method.equalsIgnoreCase("MD5")) {
+    			physicalAuthenticationMap.put("MD5", hashValue);
+    		}
+    		else if (method.equalsIgnoreCase("SHA1") ||
+    				 method.equalsIgnoreCase("SHA-1")) {
+    			physicalAuthenticationMap.put("SHA-1", hashValue);
+    		}
+    	}
+    }
+    
     
     /**
      * Adds a quality check to the entity's associated entityReport object.
@@ -551,6 +595,103 @@ public class Entity extends DataObjectDescription
     }
 
 
+    /**
+     * Do a quality check for the presence of a least one 
+     * physical/authentication element in this entity. 
+     * 
+     */
+    public void checkIntegrityChecksumPresence() {
+      String qualityCheckIdentifier = "integrityChecksumPresence";
+      QualityCheck qualityCheckTemplate = 
+        QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+      QualityCheck qualityCheck = 
+        new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+      if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+        Boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
+        qualityCheck.setFound(hasIntegrityChecksum.toString());
+        if (hasIntegrityChecksum) {
+          qualityCheck.setStatus(Status.valid);
+        }
+        else {
+          qualityCheck.setFailedStatus();
+        }
+        
+        addQualityCheck(qualityCheck);
+      }
+    }
+
+
+    /**
+     * Do a quality check matching the congruency of an actual integrity
+     * hash value to the value (if any) documented in the metadata.
+     * 
+     */
+	public void checkIntegrityChecksum(String actualHashMethod, String actualHashValue) {
+		String qualityCheckIdentifier = "integrityChecksum";
+		QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
+			if (hasIntegrityChecksum) {
+				boolean congruent = false;
+
+				for (String hashMethod : physicalAuthenticationMap.keySet()) {
+					if (hashMethod.equals(actualHashMethod)) {
+						String metadataHashValue = physicalAuthenticationMap.get(hashMethod);
+						if (metadataHashValue != null) {
+							qualityCheck.setExpected(metadataHashValue);
+							qualityCheck.setFound(actualHashValue);
+							if (actualHashValue.equals(metadataHashValue)) {
+								congruent = true;
+							}
+						}
+
+						if (congruent) {
+							qualityCheck.setStatus(Status.valid);
+						} 
+						else {
+							qualityCheck.setExplanation(qualityCheck.getExplanation());
+							qualityCheck.setSuggestion(qualityCheck.getSuggestion());
+							qualityCheck.setFailedStatus();
+						}
+
+						addQualityCheck(qualityCheck);
+					}
+				}
+			}
+		}
+	}
+
+	
+	/**
+	 * Do a quality check for the presence of the numberOfRecords element in
+	 * this entity.
+	 */
+	public void checkNumberOfRecordsPresence() {
+		String qualityCheckIdentifier = "numberOfRecordsPresence";
+		QualityCheck qualityCheckTemplate = 
+				QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = 
+				new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			if (this.hasNumberOfRecords) {
+				qualityCheck.setFound("numberOfRecords element found");
+				qualityCheck.setStatus(Status.valid);
+				qualityCheck.setSuggestion("");
+			} 
+			else {
+				qualityCheck.setFound("numberOfRecords element not found");
+				qualityCheck.setFailedStatus();
+			}
+
+			addQualityCheck(qualityCheck);
+		}
+	}
+
+	
     /**
      * Do a quality check on the entityName metadata value
      * 
@@ -1063,6 +1204,54 @@ public class Entity extends DataObjectDescription
      */
     public void setHasDistributionInline(boolean distributionInline) {
       this.hasDistributionInline = distributionInline;
+    }
+    
+    
+    /**
+     * Boolean to determine if this entity has at least one
+     * physical/authentication element.
+     * 
+     * @return boolean  true if the entity has a physical/authentication
+     *                  element, else false
+     */
+    public boolean hasPhysicalAuthentication() {
+      return this.hasPhysicalAuthentication;
+    }
+    
+    
+    /**
+     * Sets the hasNumberOfRecords field to store whether this entity
+     * has the numberOfRecords element.
+     * 
+     * @param hasElement   the boolean value to set. true if 
+     *        the entity has a numberOfRecords element, else false
+     */
+    public void setHasNumberOfRecords(boolean hasElement) {
+      this.hasNumberOfRecords = hasElement;
+      
+      /*
+       * After setting the boolean, give the quality check an opportunity to
+       * run.
+       */
+      checkNumberOfRecordsPresence();
+    }
+    
+    
+    /**
+     * Sets the hasPhysicalAuthentication field to store whether this entity
+     * has at least one physical/authentication element.
+     * 
+     * @param physicalAuthentication   the boolean value to set. true if 
+     *        the entity has a physical/authentication element, else false
+     */
+    public void setHasPhysicalAuthentication(boolean physicalAuthentication) {
+      this.hasPhysicalAuthentication = physicalAuthentication;
+      
+      /*
+       * After setting the boolean, give the quality check an opportunity to
+       * run.
+       */
+      checkIntegrityChecksumPresence();
     }
     
     

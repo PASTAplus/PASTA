@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datamanager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.Connection;
@@ -33,6 +34,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.dml.DataManager;
@@ -412,9 +414,10 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	    else {
 			EMLFileSystemEntity efse = 
 					new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
+			efse.setEvaluateMode(evaluateMode);
 			String entityFileURL = efse.getEntityFileURL(evaluateMode);
 			emlEntity.setFileUrl(entityFileURL);
-				if (!evaluateMode) {
+				if (true) {
 					// Double-check to ensure that the entity file exists on the
 					// system in the expected location
 					File entityFile = efse.getEntityFile();
@@ -424,6 +427,24 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 								          "entityDir: %s; packageId: %s; entity id: %s",
 										   entityDir, packageId, entityId);
 						throw new IllegalStateException(errorMsg);
+					}
+					else {
+						try (FileInputStream fis = new FileInputStream(entityFile)){
+							String md5 = DigestUtils.md5Hex(fis);
+							entity.setMd5HashValue(md5);
+						}
+						catch (IOException e) {
+							logger.warn("Unable to determine MD5 from entityfile: " +
+						                e.getMessage());
+						}
+						try (FileInputStream fis = new FileInputStream(entityFile)){
+							String sha1 = DigestUtils.shaHex(fis);
+							entity.setSha1HashValue(sha1);
+						}
+						catch (IOException e) {
+							logger.warn("Unable to determine SHA-1from entityfile: " +
+					                e.getMessage());
+						}
 					}
 				}
 			}

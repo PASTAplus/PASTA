@@ -35,6 +35,7 @@ package edu.lternet.pasta.dml.parser.generic;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -119,6 +120,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     protected String datasetCreatorPath = null;
     protected String datasetAbstractPath = null;
     protected String entityAccessPath = null;
+    protected String entityPhysicalAuthenticationPath = null;
     
     //private Hashtable entityHash = new Hashtable();
     //private Hashtable fileHash = new Hashtable();
@@ -176,7 +178,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 	public GenericDataPackageParser(String packageIdPath, String pubDatePath, String tableEntityPath,
 			String spatialRasterEntityPath, String spatialVectorEntityPath,
 			String storedProcedureEntityPath, String viewEntityPath,
-			String otherEntityPath) {
+			String otherEntityPath, String entityPhysicalAuthenticationPath) {
 		
 		//set default so that caller can pass nulls for some params
 		this.initDefaultXPaths();
@@ -206,11 +208,14 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		if (otherEntityPath != null) {	
 			this.otherEntityPath = otherEntityPath;
 		}	
+		if (entityPhysicalAuthenticationPath != null) {	
+			this.entityPhysicalAuthenticationPath = entityPhysicalAuthenticationPath;
+		}	
 	}
 
 	
 	/**
-	 * sets the default xpath strings for locating datapackage elements
+	 * sets the default xpath strings for locating data package elements
 	 * note that root element can be anything with a packageId attribute
 	 */
 	private void initDefaultXPaths() {
@@ -228,6 +233,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		datasetCreatorPath = "//dataset/creator";
 		datasetAbstractPath = "//dataset/abstract";
 		entityAccessPath = "physical/distribution/access";
+		entityPhysicalAuthenticationPath = "physical/authentication";
 	}
 
 	
@@ -1170,6 +1176,8 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean hasDistributionOnline = false;
             boolean hasDistributionOffline = false;
             boolean hasDistributionInline = false;
+            boolean hasNumberOfRecords = false;
+            boolean hasPhysicalAuthentication = false;
             boolean isExternallyDefinedFormat = false;
             boolean isOtherEntity = false;
             boolean isImageEntity   = false;
@@ -1179,6 +1187,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean isSimpleDelimited = true;
             boolean isTextFixed = false;
             boolean isCollapseDelimiters = false;
+            HashMap<String,String> integrityMap = new HashMap<String,String>();
 
             if (xpath != null) {
               if (xpath.equals(spatialRasterEntityPath) || 
@@ -1220,8 +1229,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
                     entityCaseSensitive = childValue;
                 } else if (childName.equals("numberOfRecords")) {
                     entityNumberOfRecords = childValue;
-                    /*numRecords = (new Integer(entityNumberOfRecords))
-                                    .intValue();*/
+                    hasNumberOfRecords = true;
                 }                
                
             }
@@ -1427,6 +1435,35 @@ public class GenericDataPackageParser implements DataPackageParserInterface
              entityAccessXML = nodeToXmlString(entityAccessNode);
            }
            
+           // Store the entity physical authentication XML since some applications may need it
+           NodeList physicalAuthenticationNodeList = xpathapi.selectNodeList(
+                                              entityNode, 
+                                              entityPhysicalAuthenticationPath);
+           int physicalAuthenticationNodeListLength = physicalAuthenticationNodeList.getLength();
+           if ((physicalAuthenticationNodeList != null) &&
+        	   (physicalAuthenticationNodeListLength > 0)
+        	  ) {
+        	   hasPhysicalAuthentication = true;
+        	   
+        	   for (int j = 0; j < physicalAuthenticationNodeListLength; j++) {
+        		   String methodText = null;
+        		   Node physicalAuthenticationNode = physicalAuthenticationNodeList.item(j);
+                   String hashString = physicalAuthenticationNode.getTextContent();
+        		   NamedNodeMap paAttributes = physicalAuthenticationNode.getAttributes();
+        		   int nAttributes = paAttributes.getLength();
+        		   for (int k = 0; k < nAttributes; k++) {
+        			   Node attributeNode = paAttributes.item(k);
+        			   String nodeName = attributeNode.getNodeName();
+        			   if (nodeName.equals("method")) {
+        				   methodText = attributeNode.getNodeValue();
+        			   }
+        		   }
+        		   
+        		   integrityMap.put(methodText, hashString);
+        	   }
+        	   
+           }
+           
            NodeList onlineNodeList = xpathapi.selectNodeList(
                                               entityNode,
                                               "physical/distribution/online");
@@ -1610,7 +1647,19 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setHasDistributionInline(hasDistributionInline);
           entityObject.setEntityAccessXML(entityAccessXML);
           entityObject.setFieldDelimiter(fieldDelimiter);
-          entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);
+          entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);        
+          entityObject.setHasNumberOfRecords(hasNumberOfRecords);
+          entityObject.setHasPhysicalAuthentication(hasPhysicalAuthentication);
+          
+          /*
+           * If any physical/authentication nodes were parsed, store the
+           * integrity hash method and its associated hash value in the
+           * entity object.
+           */
+          for (String hashMethod : integrityMap.keySet()) {
+        	  String hashValue = integrityMap.get(hashMethod);
+        	  entityObject.addPhysicalAuthentication(hashMethod, hashValue);
+          }
           
           try {
               NodeList attributeListNodeList = 
