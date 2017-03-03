@@ -93,6 +93,7 @@ public class EMLParser {
   private static final String ENTITY_NAME = "entityName";
   private static final String OBJECT_NAME = "physical/objectName";
   private static final String ONLINE_URL = "physical/distribution/online/url";
+  private static final String OFFLINE_PATH = "physical/distribution/offline";
   
   String[] ENTITY_TYPES = 
   {
@@ -435,6 +436,17 @@ public class EMLParser {
               if (urlNodeList != null && urlNodeList.getLength() > 0) {
                 String url = urlNodeList.item(0).getTextContent();
                 entity.setUrl(url);
+              }
+          
+              // check for physical/distribution/offline
+              NodeList offlineNodeList = xpathapi.selectNodeList(
+                                             entityNode,
+                                             OFFLINE_PATH
+                                 );
+          
+              if (offlineNodeList != null && offlineNodeList.getLength() > 0) {
+                String offlineText = offlineNodeList.item(0).getTextContent();
+                entity.setOfflineText(offlineText);
               }
           
               entityList.add(entity);

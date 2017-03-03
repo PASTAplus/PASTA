@@ -56,6 +56,7 @@ public class Entity {
   EntityType entityType = null;
   String name = null;
   String objectName = null;
+  String offlineText = null;
   String url = null;
 
   
@@ -140,6 +141,11 @@ public class Entity {
   }
 
   
+  public String getOfflineText() {
+	    return offlineText;
+  }
+
+	  
   public String getUrl() {
     return url;
   }
@@ -167,5 +173,10 @@ public class Entity {
   public void setUrl(String url) {
     this.url = url;
   }
+
+  
+  public void setOfflineText(String text) {
+	    this.offlineText = text;
+	  }
 
 }

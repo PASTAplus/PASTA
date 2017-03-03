@@ -47,6 +47,7 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EmlObject;
+import edu.lternet.pasta.common.eml.Entity;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.portal.codegeneration.CodeGenerationServlet;
@@ -171,10 +172,9 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
 		String savedDataHTML = "";
-		boolean hasIntellectualRights = false;
 		boolean showSaved = false;
 		boolean isSaved = false;
-		boolean isOffline = false;
+		boolean hasOffline = false;
 
 		String uid = (String) httpSession.getAttribute("uid");
 
@@ -488,9 +488,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String entitySizes = dpmClient.readDataEntitySizes(scope, id, revision);
 				
 				if ("".equals(entityNames) && "".equals(entitySizes)) {
-					String offlineMsg = "The metadata describes one or more data entities that have not been made available to this repository.";
-					data = String.format("<li>%s</li>\n", offlineMsg);
-					isOffline = true;
+					hasOffline = true;
 				}
 
 				while (tokens.hasNext()) {
@@ -510,8 +508,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 									+ "\" target=\"_blank\">Report</a></li>\n";
 
 						}
-						else
-							if (resource.contains(dataUri)) {
+						else if (resource.contains(dataUri)) {
 								uriTokens = resource.split("/");
 								entityId = uriTokens[uriTokens.length - 1];
 								String entityName = null;
@@ -568,6 +565,18 @@ public class MapBrowseServlet extends DataPortalServlet {
 											  "<li>%s [<span name='%s' class='tooltip'><em>more info</em></span>]</li>\n", 
 											  entityName, tooltip);
 								}
+								
+								
+								/*
+								 * Check for offline entities
+								 */
+								ArrayList<Entity> entityList = emlObject.getDataPackage().getEntityList();
+								for (Entity entity : entityList) {
+									String offlineText = entity.getOfflineText();
+									if (offlineText != null) {
+										hasOffline = true;
+									}
+								}					
 							}
 							else {
 
@@ -631,7 +640,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append(report);
 				/*resourcesHTMLBuilder
 						.append("<li>Data <sup><strong>*</strong></sup>\n");*/
-				String listOrder = isOffline ? "ul" : "ol";
+				if (hasOffline) {
+					String offlineMsg = 
+							"Offline data: the metadata describes one or more data entities that have not been made available to this repository.";
+					data += String.format("<li>%s</li>\n", offlineMsg);
+				}
+				String listOrder = "ol";
 				resourcesHTMLBuilder.append("<li>Data\n");
 				resourcesHTMLBuilder.append(String.format("<%s>\n", listOrder));
 				resourcesHTMLBuilder.append(data);
