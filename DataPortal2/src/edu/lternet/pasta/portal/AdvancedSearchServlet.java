@@ -210,8 +210,11 @@ public class AdvancedSearchServlet extends DataPortalServlet {
 			termsList = solrAdvancedSearch.getTermsList();
 			if ((termsList != null) && (termsList.size() > 0)) {
 				termsListHTML = termsList.toHTML();
-				httpSession.setAttribute("termsListHTML", termsListHTML);
 			}
+			else {
+				termsListHTML = "";
+			}
+			httpSession.setAttribute("termsListHTML", termsListHTML);
 
 			ResultSetUtility resultSetUtility = null;
 			if (uid.equals("public")) {
