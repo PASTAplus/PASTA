@@ -1705,6 +1705,7 @@ public class DataPackageRegistry {
 					Integer revision = rs.getInt(3);
 					java.sql.Timestamp changeDate = rs.getTimestamp(4);
 					String changeDateStr = changeDate.toString();
+					changeDateStr = changeDateStr.replace(" ", "T");
 					String resourceId = DataPackageManager.composeResourceId(
 							ResourceType.dataPackage, scope, identifier, revision, null);
 					boolean isPublic = isPublicAccessible(resourceId);
