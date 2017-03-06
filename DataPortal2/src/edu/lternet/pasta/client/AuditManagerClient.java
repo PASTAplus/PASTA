@@ -190,10 +190,10 @@ public class AuditManagerClient extends PastaClient {
 		
 		for (String line : lines) {
 			line = line + "\n";
-			if (line.contains("<dataPackageUpload>")) {
+			if (line.contains("<dataPackage>")) {
 				sb = new StringBuilder(line);
 			}
-			else if (line.contains("</dataPackageUpload>")) {
+			else if (line.contains("</dataPackage>")) {
 				sb.append(line);
 				String dataPackageXML = sb.toString();
 				String uploadDate = parseElement(dataPackageXML, "date");
