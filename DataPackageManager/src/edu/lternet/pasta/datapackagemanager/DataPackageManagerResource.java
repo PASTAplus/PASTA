@@ -8452,8 +8452,44 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
-	 * <strong>List Recent Changes</strong> operation, optionally specifying the date and time from which the changes should be listed.
-	 * (See example below.)
+	 * <strong>List Recent Changes</strong> operation, listing data package
+	 * changes (insert, update, and delete operations) recorded in PASTA's resource
+	 * registry.
+	 * 
+	 * If a query string is omitted, all changes (inserts, updates, and
+	 * deletes) to the resource registry will be returned. If query parameters 
+	 * are included, they are used to filter that set of changes based on their 
+	 * attributes.</p>
+	 * 
+	 * <h4>Query parameters:</h4>
+	 * 
+	 * <p>
+	 * Query parameters are specified as <em>key=value</em> pairs, multiple
+	 * pairs must be delimited with ampersands (&amp;), and only a single value
+	 * should be specified for a particular key. The following query parameter
+	 * keys are allowed:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li><code>fromDate</code></li>
+	 * <li><code>toDate</code></li>
+	 * <li><code>scope</code></li>
+	 * </ul>
+	 * 
+	 * <p>
+     * If <code>fromDate</code> or <code>toDate</code> are specified, their values
+     * should comply with ISO 8601 datetime format. For example:
+ 	 * <ul>
+	 * <li><code>fromDate=2017-02-01T12:00:00</code></li>
+	 * <li><code>toDate=2017-02-28</code></li>
+	 * </ul>
+	 * If <code>scope</code> is specified, its value must be one of the recognized 
+	 * scope values as configured in PASTA. For example:
+ 	 * <ul>
+	 * <li><code>scope=knb-lter-bes</code></li>
+	 * </ul>
+	 * </p>
+	 * 
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -8465,7 +8501,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>None</td>
 	 * <td align=center></td>
-	 * <td><code>curl -i -X GET "https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-01T12:00:00"
+	 * <td><code>curl -i -X GET "https://pasta.lternet.edu/package/changes/eml?fromDate=2017-02-01T12:00:00&toDate=2017-02-28&scope=knb-lter-bes"
 	 * </td>
 	 * </tr>
 	 * </table>
@@ -8561,19 +8597,12 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * </table>
 	 * 
-	 * @param fromDate  optional query parameter to determine the date-time from
-	 *                  which data package changes should be listed
-	 * 
-	 * @param toDate    optional query parameter to determine the date-time up to
-	 *                  which data package changes should be listed
-	 * 
-	 * @param scope     optional query parameter to filter the results on a
-	 *                  particular data package scope value, e.g. "edi".
-	 *                  Multiple scope parameters are not supported (only the
-	 *                  last value specified will be used).
-	 * 
+	 * @param headers
+	 *            HTTP headers containing the requesting user's credentials.
+	 * @param uriInfo
+	 *            contains the query parameters used to match subscriptions.
 	 * @return a Response, which if successful, contains an XML
-	 *         document (see example above)
+	 *            document (see example above)
 	 */
 	@GET
 	@Path("/changes/eml")
