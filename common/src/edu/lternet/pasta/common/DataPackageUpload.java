@@ -127,12 +127,8 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 	public String toXML() {
 		String xmlString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
-		String dataPackageElementName = "dataPackageUpload";
+		String dataPackageElementName = "dataPackage";
 		
-		if (serviceMethod.equals("deleteDataPackage")) {
-			dataPackageElementName = "dataPackageDelete";
-		}
-
 		stringBuffer.append(String.format("  <%s>\n", dataPackageElementName));
 		stringBuffer.append(String.format("    <packageId>%s</packageId>\n", packageId));
 		stringBuffer.append(String.format("    <scope>%s</scope>\n", scope));
