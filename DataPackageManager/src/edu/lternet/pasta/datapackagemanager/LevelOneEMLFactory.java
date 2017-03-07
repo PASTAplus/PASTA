@@ -84,6 +84,8 @@ public final class LevelOneEMLFactory {
   private static final String COVERAGE_PATH = "//dataset/coverage";
   private static final String PURPOSE_PATH = "//dataset/purpose";
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
+  private static final String SHORTNAME_PATH = "//dataset/shortName";
+  private static final String TITLE_PATH = "//dataset/title";
   
   private static final String INTELLECTUAL_RIGHTS_TEXT = 
 	//"This information is released to the public under the Creative Commons license Attribution 4.0 International (CC BY 4.0) subject to the following restrictions: The Data User must realize that these data sets are being actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this dataset. Where appropriate, the Data User may be encouraged to consider collaboration and/or co-authorship with original investigators. The Data User must realize that the data may be misinterpreted if taken out of context. The Data User must acknowledge use of the data by an appropriate citation. A generic citation for our databases is provided on this website. While substantial efforts are made to ensure the accuracy of data and documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The data authors shall not be liable for damages resulting from any use or misinterpretation of data sets. Data users should be aware that we periodically update data sets. By using these data, the Data User agrees to abide by the terms of this agreement. Thank you for your cooperation.";
@@ -149,6 +151,28 @@ public final class LevelOneEMLFactory {
   }
   
   
+	/**
+	 * Enhance a Level-1 EML document with additional information such as the
+	 * DOI identifier.
+	 * 
+	 * @param levelOneEMLDocument
+	 *            the original Level-1 EML Document
+	 * @return the enhanced Level-1 EML Document, a Document object
+	 * @throws TransformerException
+	 */
+	public Document enhance(Document leveOneEMLDocument, String alternateID, String attributeValue)
+			throws TransformerException {
+		if (leveOneEMLDocument == null) {
+			throw new IllegalArgumentException(
+					"null Document object passed to LevelOneEMLFactory.enhance() method");
+		}
+
+		addAlternateIdentifier(leveOneEMLDocument, alternateID, attributeValue);
+
+		return leveOneEMLDocument;
+	}
+  
+	
     /**
      * Check to see whether the Level-0 EML already has an intellectualRights
      * element and if not, add one.
@@ -337,7 +361,6 @@ public final class LevelOneEMLFactory {
    */
 	private void addDefaultIntellectualRights(Document doc)
 			throws TransformerException {
-		NodeList contacts = getContacts(doc);
 		Element intellectualRightsElement = doc.createElement("intellectualRights");
 		Element paraElement = doc.createElement("para");
 		paraElement.appendChild(doc.createTextNode(INTELLECTUAL_RIGHTS_TEXT));
@@ -369,6 +392,44 @@ public final class LevelOneEMLFactory {
 		Node insertNode = insertNodeList.item(0);		
 		datasetNode.insertBefore(intellectualRightsElement, insertNode);
 	}
+
+
+	    /**
+	     * Add an alternateIdentifier element to the Level-1 metadata document.
+	     * 
+	     * @param doc                   The document object
+	     * @param alternateID           The alternate identifier string value
+	     * @param attributeValue        The value of the system attribute
+	     * 
+	     * @throws TransformerException
+	     */
+		public void addAlternateIdentifier(Document doc, String alternateID, String attributeValue)
+				throws TransformerException {
+			final String elementName = "alternateIdentifier";
+			final String attributeName = "system";
+			Element element = doc.createElement(elementName);
+			element.appendChild(doc.createTextNode(alternateID));
+			if (attributeValue != null) {
+				element.setAttribute(attributeName, attributeValue);
+			}
+			Node datasetNode = getDatasetNode(doc);
+			
+			/* 
+			 * Determine where to insert the alternateIdentifier element. This
+			 * depends on the presence of nearby optional elements.
+			 */
+			String insertBefore = null;
+			if (hasElement(doc, SHORTNAME_PATH)) {
+				insertBefore = SHORTNAME_PATH;  // insert before the shortName
+			}
+			else {
+				insertBefore = TITLE_PATH; // no shortName, so insert before the title
+			}
+			
+			NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+			Node insertNode = insertNodeList.item(0);		
+			datasetNode.insertBefore(element, insertNode);
+		}
 
 
   /**

@@ -25,27 +25,16 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import edu.lternet.pasta.dml.parser.DataPackage;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.datamanager.EMLDataManager;
-import edu.ucsb.nceas.utilities.IOUtil;
-import edu.ucsb.nceas.utilities.XMLUtilities;
 
 /**
  * @author dcosta
@@ -67,14 +56,11 @@ public class EMLDataPackage {
    * Instance fields
    */
   
-  private Logger logger = Logger.getLogger(EMLDataPackage.class);
-  
-  private final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
-  private final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
+    private Logger logger = Logger.getLogger(EMLDataPackage.class);
   
 	public DataPackage dataPackage;   // A Data Manager Library data package
 	private ArrayList<EMLEntity> emlEntityList = null;
-  private EmlPackageId emlPackageId = null;
+    private EmlPackageId emlPackageId = null;
 	private String scope = null;
 	private Integer identifier = null;
 	private Integer revision = null;
@@ -424,94 +410,4 @@ public class EMLDataPackage {
   }
 
   
-	/**
-	 * Stores a local copy of EML metadata on the file system.
-	 * 
-	 * @param   xmlContent   the XML string content
-	 * @param   isLevelZero  true if this is Level-0 metadata,
-	 *                       false if this is Level-1 metadata
-	 * @return  the EML file that was created
-	 */
-	 public File storeMetadata(String xmlContent, boolean isLevelZero) 
-	         throws IOException {
-	   File emlFile = null;
-	   
-	   if (this.emlPackageId != null) {
-	     FileSystemResource metadataResource = 
-	         new FileSystemResource(emlPackageId);
-	     boolean isReportResource = false;
-	     String dirPath = metadataResource.getDirPath(isReportResource);   
-	     File dirFile = new File(dirPath);  
-	     if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
-	     String emlFilename = (isLevelZero ? LEVEL_ZERO_FILE_NAME : LEVEL_ONE_FILE_NAME);
-	     emlFile = new File(dirPath, emlFilename);
-	     FileWriter fileWriter = null;
-	     
-	     StringBuffer stringBuffer = new StringBuffer(xmlContent);
-	     try {
-	       fileWriter = new FileWriter(emlFile);
-	       IOUtil.writeToWriter(stringBuffer, fileWriter, true);
-	     }
-	     catch (IOException e) {
-	       logger.error("IOException storing quality report:\n" + 
-	                    e.getMessage());
-	       e.printStackTrace();
-	       throw(e);
-	     }
-	     finally {
-	       if (fileWriter != null) { fileWriter.close(); }
-	     }
-	   }
-	   
-	   return emlFile;
-	 }
-
-	 
-	/**
-	 * Derive a Level-1 EML file from a Level-0 EML file.
-	 * 
-	 * @param levelZeroEMLFile    the Level-0 EML file
-	 * @param entityURIHashMap       an association where the keys
-	 *         are entity names (<entityName>) and the values are
-	 *         the PASTA data URLs that should replace the site
-	 *         data URLs in the Level-1 EML document.
-	 * @return a Level-1 EML file
-	 * @throws IOException
-	 * @throws TransformerException
-	 * @throws ParserConfigurationException 
-	 * @throws SAXException 
-	 */
- public File toLevelOne(File levelZeroEMLFile,
-                        HashMap<String, String> entityURIHashMap) 
-         throws IOException,
-                TransformerException, SAXException, ParserConfigurationException {
-    String levelOneEMLString = null;
-    File levelOneEMLFile = null;
-    Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
-    Node documentElement = levelZeroEMLDocument.getDocumentElement();
-    String levelZeroEMLString = XMLUtilities
-        .getDOMTreeAsString(documentElement);
-    LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
-    Document levelOneEMLDocument = levelOneEMLFactory.make(
-        levelZeroEMLDocument, entityURIHashMap);
-    documentElement = levelOneEMLDocument.getDocumentElement();
-    levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
-    
-    // Convert to dereferenced EML
-    // levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
-
-    try {
-      boolean isLevelZero = true;
-      storeMetadata(levelZeroEMLString, isLevelZero);
-
-      isLevelZero = false;
-      levelOneEMLFile = storeMetadata(levelOneEMLString, isLevelZero);      
-    }
-    catch (IOException e) {
-      throw (e);
-    }
-
-    return levelOneEMLFile;
-  }
-
 }

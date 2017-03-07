@@ -27,6 +27,7 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -44,12 +45,17 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
 import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
@@ -64,6 +70,7 @@ import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -78,7 +85,9 @@ import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
+import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.Options;
+import edu.ucsb.nceas.utilities.XMLUtilities;
 
 /**
  * @author dcosta
@@ -89,6 +98,10 @@ import edu.ucsb.nceas.utilities.Options;
  *          basic services offered by the Data Package Manager web service.
  */
 public class DataPackageManager implements DatabaseConnectionPoolInterface {
+
+	private static final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
+	private static final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
+	private static final String DOI_SYSTEM_VALUE = "doi";
 
 	public enum DataPackageManagerAction {
 		CREATE, READ, UPDATE, DELETE, SEARCH
@@ -577,6 +590,112 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+	/**
+	 * Derive a Level-1 EML file from a Level-0 EML file.
+	 * 
+	 * @param levelZeroEMLFile    the Level-0 EML file
+	 * @param entityURIHashMap       an association where the keys
+	 *         are entity names (<entityName>) and the values are
+	 *         the PASTA data URLs that should replace the site
+	 *         data URLs in the Level-1 EML document.
+	 * @return a Level-1 EML XML string
+	 * @throws IOException
+	 * @throws TransformerException
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 */
+ public String toLevelOne(File levelZeroEMLFile,
+                        HashMap<String, String> entityURIHashMap) 
+         throws IOException,
+                TransformerException, SAXException, ParserConfigurationException {
+    String levelOneEMLString = null;
+    Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
+    Node documentElement = levelZeroEMLDocument.getDocumentElement();
+    LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
+    Document levelOneEMLDocument = levelOneEMLFactory.make(
+        levelZeroEMLDocument, entityURIHashMap);
+    documentElement = levelOneEMLDocument.getDocumentElement();
+    levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+    
+    // Convert to dereferenced EML
+    // levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
+
+    return levelOneEMLString;
+  }
+
+
+	/**
+	 * Derive an enhanced Level-1 EML file from an existing Level-1 EML file.
+	 * Additional information is added to the document, such as the DOI
+	 * alternate identifier. This enhancement to the Level-1 EML occurs at a 
+	 * later stage in the processing than when the original Level-1 EML is 
+	 * generated.
+	 * 
+	 * @param levelOneEMLFile    the Level-1 EML file
+	 * @return an enhanced Level-1 EML XML string with information added
+	 * @throws IOException
+	 * @throws TransformerException
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 */
+	public String toLevelOneEnhanced(File levelOneEMLFile, String alternateID, String attributeValue)
+			throws IOException, TransformerException, SAXException, ParserConfigurationException {
+		String enhancedEMLString = null;
+		Document levelOneEMLDocument = XmlUtility.xmlFileToDocument(levelOneEMLFile);
+		Node documentElement = levelOneEMLDocument.getDocumentElement();
+		LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
+		Document enhancedEMLDocument = 
+				levelOneEMLFactory.enhance(levelOneEMLDocument, alternateID, attributeValue);
+		documentElement = enhancedEMLDocument.getDocumentElement();
+		enhancedEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+
+		return enhancedEMLString;
+	}
+
+ /**
+	 * Stores a local copy of EML metadata on the file system.
+	 * 
+	 * @param  emlPackageId the package id object of this metadata file 
+	 * @param  xmlContent   the XML string content
+	 * @param  isLevelZero  true if this is Level-0 metadata,
+	 *                       false if this is Level-1 metadata
+	 * @return the EML file that was created
+	 */
+	 private File storeMetadata(EmlPackageId emlPackageId, String xmlContent, boolean isLevelZero) 
+	         throws IOException {
+	   File emlFile = null;
+	   
+	   if (emlPackageId != null) {
+	     FileSystemResource metadataResource = 
+	         new FileSystemResource(emlPackageId);
+	     boolean isReportResource = false;
+	     String dirPath = metadataResource.getDirPath(isReportResource);   
+	     File dirFile = new File(dirPath);  
+	     if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
+	     String emlFilename = (isLevelZero ? LEVEL_ZERO_FILE_NAME : LEVEL_ONE_FILE_NAME);
+	     emlFile = new File(dirPath, emlFilename);
+	     FileWriter fileWriter = null;
+	     
+	     StringBuffer stringBuffer = new StringBuffer(xmlContent);
+	     try {
+	       fileWriter = new FileWriter(emlFile);
+	       IOUtil.writeToWriter(stringBuffer, fileWriter, true);
+	     }
+	     catch (IOException e) {
+	       logger.error("IOException storing quality report:\n" + 
+	                    e.getMessage());
+	       e.printStackTrace();
+	       throw(e);
+	     }
+	     finally {
+	       if (fileWriter != null) { fileWriter.close(); }
+	     }
+	   }
+	   
+	   return emlFile;
+	 }
+
+	 
 	/*
 	 * Implements common logic that is shared by the createDatePackage(),
 	 * evaluateDataPackage(), and updateDataPackage() methods.
@@ -606,6 +725,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
 		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
 		WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
+		File levelOneEMLFile = null;
 		
 		try {
 		if (!isEvaluate) {
@@ -669,9 +789,24 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		 */
 		if (isDataPackageValid && !isEvaluate) {
 			MetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
-			File levelOneEMLFile = levelZeroDataPackage.toLevelOne(emlFile,
-			    entityURIHashMap);
-			String emlDocument = FileUtils.readFileToString(levelOneEMLFile);
+			String levelOneXML = toLevelOne(emlFile, entityURIHashMap);
+
+		    try {
+		        Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(emlFile);
+		        Node documentElement = levelZeroEMLDocument.getDocumentElement();
+		        String levelZeroXML = XMLUtilities.getDOMTreeAsString(documentElement);
+
+		        boolean isLevelZero = true;
+		        storeMetadata(emlPackageId, levelZeroXML, isLevelZero);
+		        
+
+		        isLevelZero = false;
+		        levelOneEMLFile = storeMetadata(emlPackageId, levelOneXML, isLevelZero);      
+		    }
+		    catch (IOException e) {
+		        throw (e);
+		    }
+		
 			String solrResult = null;
 
 			/*
@@ -682,11 +817,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 				if (isUpdate) {
 					solrResult = solrCatalog.updateEmlDocument(emlPackageId,
-							emlDocument);
+							levelOneXML);
 				}
 				else {
 					solrResult = solrCatalog.createEmlDocument(emlPackageId,
-							emlDocument);
+							levelOneXML);
 				}
 
 			/*
@@ -705,7 +840,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			ProvenanceIndex provenanceIndex = new ProvenanceIndex(dataPackageRegistry);
 			try {
-				provenanceIndex.insertProvenanceRecords(packageId, emlDocument);
+				provenanceIndex.insertProvenanceRecords(packageId, levelOneXML);
 			} 
 			catch (Exception e) {
 				provenanceIndex.rollbackProvenanceRecords(packageId);
@@ -869,6 +1004,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 									if (doi != null) {
 										SolrMetadataCatalog solrCatalog = new SolrMetadataCatalog(solrUrl);
 										solrCatalog.indexDoi(emlPackageId, doi);
+										
+										/*
+										 * Insert the DOI into the EML as an alternate identifier
+										 */
+										if (levelOneEMLFile != null) {
+											String enhancedXML =  toLevelOneEnhanced(levelOneEMLFile, doi, DOI_SYSTEM_VALUE);
+									        boolean isLevelZero = false;
+									        storeMetadata(emlPackageId, enhancedXML, isLevelZero);
+										}
 									}
 								}
 								catch (DOIException e) {

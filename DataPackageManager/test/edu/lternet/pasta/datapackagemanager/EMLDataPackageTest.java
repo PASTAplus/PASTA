@@ -228,33 +228,6 @@ public class EMLDataPackageTest {
 
   
   /**
-   * Test toLevelOne() method
-   */
-  @Test 
-  public void testToLevelOne() {
-    String entityName = "NoneSuchBugCount";
-    String levelZeroURL = "http://trachyte.lternet.edu:8080/test/NoneSuchBugCount.txt";
-    String levelOneURL = "https://pasta.lternet.edu/package/data/eml/knb-lter-lno/10032/1/NoneSuchBugCount";
-    HashMap<String, String> entityURLMap = new HashMap<String, String>();
-    entityURLMap.put(entityName, levelOneURL);
-    
-    try {
-      File levelOneFile = emlDataPackage.toLevelOne(testEmlFile, entityURLMap);
-      String xmlString = FileUtility.fileToString(levelOneFile);
-      assertFalse(xmlString.contains(levelZeroURL));
-      assertFalse(xmlString.contains("system=\"knb\""));
-      assertFalse(xmlString.contains("authSystem=\"knb\""));
-      assertTrue(xmlString.contains("system=\"https://pasta.edirepository.org\""));
-      assertTrue(xmlString.contains("authSystem=\"https://pasta.edirepository.org/authentication\""));
-      assertTrue(xmlString.contains(levelOneURL));
-    }
-    catch (Exception e) {
-      fail("Exception in testToLevelOne(): " + e.getMessage());
-    }
-  }
-
-  
-  /**
    * Clean up and release any objects after each test is complete.
    */
   @After
