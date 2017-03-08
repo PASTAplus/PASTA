@@ -652,7 +652,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return enhancedEMLString;
 	}
 
- /**
+
+    /**
 	 * Stores a local copy of EML metadata on the file system.
 	 * 
 	 * @param  emlPackageId the package id object of this metadata file 
@@ -682,7 +683,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	       IOUtil.writeToWriter(stringBuffer, fileWriter, true);
 	     }
 	     catch (IOException e) {
-	       logger.error("IOException storing quality report:\n" + 
+	       logger.error("IOException storing metadata file:\n" + 
 	                    e.getMessage());
 	       e.printStackTrace();
 	       throw(e);
