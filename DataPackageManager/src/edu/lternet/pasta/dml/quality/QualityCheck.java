@@ -73,6 +73,8 @@ public class QualityCheck {
   /*
    * Instance variables
    */
+  
+  boolean identifierFoundInTemplate = false;
 
   // The quality check identifier
   private String identifier = "";
@@ -146,6 +148,8 @@ public class QualityCheck {
     this(identifier);
     
     if (qualityCheckTemplate != null) {
+    	
+      this.identifierFoundInTemplate = true;
       
       String system = qualityCheckTemplate.getSystem();
       setSystem(system);
@@ -202,6 +206,7 @@ public class QualityCheck {
     shouldRunCheck = QualityReport.isQualityReporting() &&
                      dataPackage != null &&
                      qualityCheck != null &&
+            		 qualityCheck.identifierFoundInTemplate &&
                      qualityCheck.isIncluded();
     
     return shouldRunCheck;
@@ -218,6 +223,7 @@ public class QualityCheck {
     shouldRunCheck = QualityReport.isQualityReporting() &&
                      entity != null &&
                      qualityCheck != null &&
+                     qualityCheck.identifierFoundInTemplate &&
                      qualityCheck.isIncluded();
     
     return shouldRunCheck;
