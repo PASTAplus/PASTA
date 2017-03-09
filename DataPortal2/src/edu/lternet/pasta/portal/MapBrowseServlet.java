@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.ScaledNumberFormat;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EmlObject;
@@ -486,6 +487,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String doiId = null;
 				String entityNames = dpmClient.readDataEntityNames(scope, id, revision);
 				String entitySizes = dpmClient.readDataEntitySizes(scope, id, revision);
+				ScaledNumberFormat scaledNumberFormat = new ScaledNumberFormat();
 				
 				if ("".equals(entityNames) && "".equals(entitySizes)) {
 					hasOffline = true;
@@ -519,7 +521,14 @@ public class MapBrowseServlet extends DataPortalServlet {
 								entitySize = findEntitySize(entitySizes, entityId);
 								
 								if (entitySize != null) {
-									entitySizeStr = String.format("&nbsp;&nbsp;<small><em>(%s bytes)</em></small>", entitySize);
+									try {
+										long l = Long.parseLong(entitySize);
+										String s = scaledNumberFormat.format(l);
+										entitySizeStr = String.format("&nbsp;&nbsp;<em>(%s)</em>", s);
+									}
+									catch (NumberFormatException e) {
+										entitySizeStr = String.format("&nbsp;&nbsp;<em>(%s bytes)</em>", entitySize);
+									}
 								}
 
 								// Safe URL encoding of entity id
