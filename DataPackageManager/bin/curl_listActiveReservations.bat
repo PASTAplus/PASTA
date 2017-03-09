@@ -16,7 +16,7 @@ echo.
 SET SERVICE_HOST=http://pasta-s.lternet.edu
 curl -X GET "%SERVICE_HOST%/package/reservations/eml"
 echo.
-REM echo Reservations for: pasta
+echo Reservations for: pasta
 echo.
 SET SERVICE_HOST=http://pasta.lternet.edu
-REM curl -X GET "%SERVICE_HOST%/package/reservations/eml"
+curl -X GET "%SERVICE_HOST%/package/reservations/eml"
