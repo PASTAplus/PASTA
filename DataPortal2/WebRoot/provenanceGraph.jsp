@@ -10,7 +10,9 @@
       + ":" + request.getServerPort() + path + "/";
 
   String provenanceHTML = (String) request.getAttribute("provenanceHTML");
-  String source = (String) request.getAttribute("source");
+  String sourcesHTML = (String) request.getAttribute("sourcesHTML");
+  Integer nSources = (Integer) request.getAttribute("nSources");
+  String sourceLabel = (nSources > 1) ? "sources" : "source";
   String derived = (String) request.getAttribute("derived");
   
 %>
@@ -91,13 +93,13 @@
 							<div class="span12">
 								<!-- Content -->
 
-    <div class="canvas" id="mainCanvas" style="width: 365px; height: 280px; border: 1px solid black;">
+    <div class="canvas" id="mainCanvas" style="width: 400px; height: 440px; border: 1px solid black;">
       <h3 class="block" id="derived" style="left: 15px; top: 15px;"><%= derived %></h3>
-      <h3 class="block" id="source" style="left: 200px; top: 200px;"><%= source %></h3>
+      <h3 class="block" id="source" style="left: 200px; top: 200px;"><%= sourcesHTML %></h3>
       <div class="connector derived source down_start down_end">
         <label class="source-label">derived</label>
         <label class="middle-label">is derived from</label>
-        <label class="destination-label">source</label>
+        <label class="destination-label"><%= sourceLabel %></label>
       </div>
     </div>
 

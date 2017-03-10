@@ -709,6 +709,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 				
 				String source = null;
 				String derived = null;
+				StringBuffer sourcesHTMLBuilder = new StringBuffer("");
+				int nSources = 0;
 				
 				if (dataSourcesStr != null &&
                     dataSourcesStr.length() > 0) {
@@ -721,9 +723,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 							provenanceHTMLBuilder.append("<ol>\n");
 							for (String uri : dataSources) {
 								String mapbrowseURL = mapbrowseURL(uri);
-								if (source == null) { source = packageIdFromPastaId(uri); }
+								source = packageIdFromPastaId(uri);
 								String listItem = String.format("<li>%s</li>", mapbrowseURL);
 								provenanceHTMLBuilder.append(listItem);
+								sourcesHTMLBuilder.append(String.format("%s<br/>", source));
+								nSources++;
 							}
 							provenanceHTMLBuilder.append("</ol>\n");
 							provenanceHTMLBuilder.append("<br/>");
@@ -757,11 +761,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 				/*
 				 * Provenance graph
 				 */
-				if ((source != null) && (derived != null)) {				
+				if ((nSources > 0) && (source != null) && (derived != null)) {
+					String sourcesHTML = sourcesHTMLBuilder.toString();
 					String graphString = 
-						String.format("View a <a class=\"searchsubcat\" href=\"./provenanceGraph?source=%s&derived=%s\">"
+						String.format("View a <a class=\"searchsubcat\" href=\"./provenanceGraph?nSources=%d&sourcesHTML=%s&derived=%s\">"
 									+ "provenance graph</a> of this data package",
-									source, derived);
+									nSources, sourcesHTML, derived);
 					provenanceHTMLBuilder.append(graphString);
 					provenanceHTMLBuilder.append("<br/><br/>");
 				}

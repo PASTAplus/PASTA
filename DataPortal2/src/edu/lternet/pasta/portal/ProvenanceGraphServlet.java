@@ -112,11 +112,14 @@ public class ProvenanceGraphServlet extends DataPortalServlet {
 			String uid = (String) httpSession.getAttribute("uid");
 			if (uid == null || uid.isEmpty())
 				uid = "public";
-			String source = request.getParameter("source");
+			String nSourcesStr = request.getParameter("nSources");
+			Integer nSources = new Integer(Integer.parseInt(nSourcesStr));
+			String sourcesHTML = request.getParameter("sourcesHTML");
 			String derived = request.getParameter("derived");
 
-			if ((source != null) && (derived != null)) {
-				request.setAttribute("source", source);
+			if ((sourcesHTML != null) && (derived != null)) {
+				request.setAttribute("sourcesHTML", sourcesHTML);
+				request.setAttribute("nSources", nSources);
 				request.setAttribute("derived", derived);
 				RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 				requestDispatcher.forward(request, response);
