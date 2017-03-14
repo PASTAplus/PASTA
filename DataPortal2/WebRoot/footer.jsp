@@ -151,7 +151,7 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 					</span>
 					<div class="row-fluid">
 						<div class="span12 ">
-							Copyright 2009-2014 <a href="http://www.lternet.edu">Long Term Ecological Research
+							Copyright 2009-2017 <a href="http://www.lternet.edu">Long Term Ecological Research
 							Network</a>. This material is based upon work supported 
 							by the <a href="http://www.nsf.gov/">National Science 
 							Foundation</a> under Cooperative Agreements
@@ -165,6 +165,7 @@ if (recentScope4 != null && !recentScope4.equals("")) {
 							<a href="http://www.LTERnet.edu/contact" target="_blank">
 							contact us</a> with questions, comments, or for technical 
 							assistance regarding this web site or the LTER Network.<br/><br/>
+							This website is managed by the <a href="http://environmentaldatainitiative.org/">Environmental Data Initiative</a> on behalf of LTER.<br/><br/>
 						</div>
 					</div>
 				</div>
