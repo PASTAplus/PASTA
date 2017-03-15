@@ -978,11 +978,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					String today = sdf.format(date);
 					DataPackageUpload dpu = null;
 					if (isUpdate) {
-						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision);
+						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision, user);
 						DataPackageUploadManager.addRecentUpdate(dpu);
 					}
 					else {
-						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision);
+						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision, user);
 						DataPackageUploadManager.addRecentInsert(dpu);
 					}
 				}
