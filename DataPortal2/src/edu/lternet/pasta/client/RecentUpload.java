@@ -59,7 +59,7 @@ public class RecentUpload extends DataPackageUpload {
 	 */
 	public RecentUpload(DataPackageManagerClient dpmClient, String uploadDate, String serviceMethod, 
             String scope, Integer identifier, Integer revision) {
-		super(uploadDate, serviceMethod, scope, identifier, revision);
+		super(uploadDate, serviceMethod, scope, identifier, revision, null);
 		
 		String knownTitle = RecentUpload.getKnownTitle(packageId);
 		if (knownTitle == null) {
