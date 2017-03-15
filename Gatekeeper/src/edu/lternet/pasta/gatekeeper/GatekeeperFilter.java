@@ -88,6 +88,9 @@ public final class GatekeeperFilter implements Filter
     private FilterConfig filterConfig;
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
+    
+    private static final String ROBOT_PATTERNS_PATH = 
+      "C:/home/pasta/git/NIS/Gatekeeper/WebRoot/WEB-INF/conf/robotPatterns.txt";
 
     private enum CookieUse {
         EXTERNAL, INTERNAL
@@ -99,6 +102,12 @@ public final class GatekeeperFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException {
         filterConfig = config;
+        try {
+        	BotMatcher.initializeRobotPatterns(ROBOT_PATTERNS_PATH);
+        }
+        catch (IOException e) {
+        	throw new ServletException(e.getMessage());
+        }
     }
 
     /**
@@ -124,14 +133,19 @@ public final class GatekeeperFilter implements Filter
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;        
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         
-        boolean isBot = isRequestFromBot(httpServletRequest);
-        boolean isBrowser = isRequestFromBrowser(httpServletRequest);
-
         // Output HttpServletRequest diagnostic information
-		    logger.info("Request URL: " + httpServletRequest.getMethod() + " - "
- 		    		+ httpServletRequest.getRequestURL().toString());
+		logger.info(String.format("Request URL: %s - %s",
+ 		    		              httpServletRequest.getMethod(), 
+ 		    		              httpServletRequest.getRequestURL().toString()));
 
-        doDiagnostics(httpServletRequest);
+        // Output bot detection information
+        String robot = BotMatcher.findRobot(httpServletRequest);
+        boolean isBot = robot != null;
+        String botDetected = isBot ? robot : "none";
+		logger.info(String.format("Bot detected: %s",
+			                      botDetected));
+        
+		doDiagnostics(httpServletRequest);
 
         try {
         	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
