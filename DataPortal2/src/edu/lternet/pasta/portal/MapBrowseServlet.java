@@ -489,10 +489,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 				String entitySizes = dpmClient.readDataEntitySizes(scope, id, revision);
 				ScaledNumberFormat scaledNumberFormat = new ScaledNumberFormat();
 				
-				if ("".equals(entityNames) && "".equals(entitySizes)) {
-					hasOffline = true;
-				}
-
 				while (tokens.hasNext()) {
 					resource = tokens.nextToken();
 
@@ -576,16 +572,6 @@ public class MapBrowseServlet extends DataPortalServlet {
 								}
 								
 								
-								/*
-								 * Check for offline entities
-								 */
-								ArrayList<Entity> entityList = emlObject.getDataPackage().getEntityList();
-								for (Entity entity : entityList) {
-									String offlineText = entity.getOfflineText();
-									if (offlineText != null) {
-										hasOffline = true;
-									}
-								}					
 							}
 							else {
 
@@ -649,11 +635,24 @@ public class MapBrowseServlet extends DataPortalServlet {
 				resourcesHTMLBuilder.append(report);
 				/*resourcesHTMLBuilder
 						.append("<li>Data <sup><strong>*</strong></sup>\n");*/
+
+				/*
+				 * Check for offline entities
+				 */
+				ArrayList<Entity> entityList = emlObject.getDataPackage().getEntityList();
+				for (Entity entity : entityList) {
+					String offlineText = entity.getOfflineText();
+					if (offlineText != null) {
+						hasOffline = true;
+						break;
+					}
+				}					
 				if (hasOffline) {
 					String offlineMsg = 
 							"Offline data: the metadata describes one or more data entities that have not been made available to this repository.";
 					data += String.format("<li>%s</li>\n", offlineMsg);
 				}
+
 				String listOrder = "ol";
 				resourcesHTMLBuilder.append("<li>Data\n");
 				resourcesHTMLBuilder.append(String.format("<%s>\n", listOrder));
