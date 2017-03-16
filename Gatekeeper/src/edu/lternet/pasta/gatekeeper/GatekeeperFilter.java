@@ -89,9 +89,6 @@ public final class GatekeeperFilter implements Filter
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
     
-    private static final String ROBOT_PATTERNS_PATH = 
-      "C:/home/pasta/git/NIS/Gatekeeper/WebRoot/WEB-INF/conf/robotPatterns.txt";
-
     private enum CookieUse {
         EXTERNAL, INTERNAL
     }
@@ -101,13 +98,14 @@ public final class GatekeeperFilter implements Filter
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
+    	try {
+    		BotMatcher.initializeRobotPatterns("webapps/gatekeeper/WEB-INF/conf/robotPatterns.txt");
+    	}
+    	catch (IOException e) {
+    		throw new ServletException(e);
+    	}
+    	
         filterConfig = config;
-        try {
-        	BotMatcher.initializeRobotPatterns(ROBOT_PATTERNS_PATH);
-        }
-        catch (IOException e) {
-        	throw new ServletException(e.getMessage());
-        }
     }
 
     /**
