@@ -99,7 +99,7 @@ public final class GatekeeperFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException {
     	try {
-    		BotMatcher.initializeRobotPatterns("webapps/gatekeeper/WEB-INF/conf/robotPatterns.txt");
+    		BotMatcher.initializeRobotPatterns("/home/pasta/git/NIS/Gatekeeper/WebRoot/WEB-INF/conf/robotPatterns.txt");
     	}
     	catch (IOException e) {
     		throw new ServletException(e);
