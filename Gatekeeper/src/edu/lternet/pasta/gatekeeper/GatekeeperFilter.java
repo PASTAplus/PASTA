@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -99,7 +100,10 @@ public final class GatekeeperFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException {
     	try {
-    		BotMatcher.initializeRobotPatterns("/home/pasta/git/NIS/Gatekeeper/WebRoot/WEB-INF/conf/robotPatterns.txt");
+            ServletContext sc = config.getServletContext();
+            String realPath = sc.getRealPath("/");
+            logger.info("Servlet Context Real Path: " + realPath);
+    		BotMatcher.initializeRobotPatterns(realPath + "/WEB-INF/conf/robotPatterns.txt");
     	}
     	catch (IOException e) {
     		throw new ServletException(e);
@@ -131,6 +135,7 @@ public final class GatekeeperFilter implements Filter
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;        
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         
+            
         // Output HttpServletRequest diagnostic information
 		logger.info(String.format("Request URL: %s - %s",
  		    		              httpServletRequest.getMethod(), 
