@@ -1660,7 +1660,7 @@ public class DataPackageRegistry {
 		TreeSet<String> docids = new TreeSet<String>();
 		
 		if (serviceMethod.equals("deleteDataPackage")) {
-			sb.append("SELECT scope, identifier, revision, principal_owner, date_deactivated FROM ");
+			sb.append("SELECT scope, identifier, revision, principal_owner, doi, date_deactivated FROM ");
 			sb.append(RESOURCE_REGISTRY);
 			sb.append(" WHERE resource_type='dataPackage' ");
 			sb.append("   AND date_deactivated IS NOT NULL ");
@@ -1676,7 +1676,7 @@ public class DataPackageRegistry {
 			sb.append("ORDER BY date_deactivated DESC;");
 		}
 		else {
-			sb.append("SELECT scope, identifier, revision, principal_owner, date_created FROM ");
+			sb.append("SELECT scope, identifier, revision, principal_owner, doi, date_created FROM ");
 			sb.append(RESOURCE_REGISTRY);
 			sb.append(" WHERE resource_type='dataPackage' ");
 			if (excludeDeleted) {
@@ -1709,7 +1709,10 @@ public class DataPackageRegistry {
 					Integer identifier = rs.getInt(2);
 					Integer revision = rs.getInt(3);
 					String principal = rs.getString(4);
-					java.sql.Timestamp changeDate = rs.getTimestamp(5);
+					String doi = rs.getString(5);
+					String doiStr = 
+					    ((doi == null) || doi.equalsIgnoreCase("NULL")) ? null : doi;
+					java.sql.Timestamp changeDate = rs.getTimestamp(6);
 					String changeDateStr = changeDate.toString();
 					changeDateStr = changeDateStr.replace(" ", "T");
 					String resourceId = DataPackageManager.composeResourceId(
@@ -1720,7 +1723,7 @@ public class DataPackageRegistry {
 					if (isPublic) {
 						if (serviceMethod.equals("deleteDataPackage")) {
 							DataPackageUpload deletedPackage = new DataPackageUpload(changeDateStr, serviceMethod,
-									scope, identifier, revision, principal);
+									scope, identifier, revision, principal, doiStr);
 							changeList.add(deletedPackage);
 						} 
 						else {
@@ -1730,14 +1733,14 @@ public class DataPackageRegistry {
 								boolean isLowestRevision = revision.equals(lowestRevision);
 								if (isLowestRevision && (serviceMethod.equals("createDataPackage"))) {
 									DataPackageUpload upload = new DataPackageUpload(changeDateStr, serviceMethod,
-											scope, identifier, revision, principal);
+											scope, identifier, revision, principal, doiStr);
 									changeList.add(upload);
 								} 
 								else if (!isLowestRevision && serviceMethod.equals("updateDataPackage")) {
 									String docid = String.format("%s.%d", scope, identifier);
 									if (!excludeDuplicateUpdates || !docids.contains(docid)) {
 										DataPackageUpload upload = new DataPackageUpload(changeDateStr, serviceMethod,
-												scope, identifier, revision, principal);
+												scope, identifier, revision, principal, doiStr);
 										changeList.add(upload);
 										docids.add(docid);
 									}

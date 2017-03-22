@@ -45,6 +45,7 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 	 *  Instance fields	
 	 */
 	
+	protected String doi;
 	protected Integer identifier;
 	protected Integer revision;
 	protected String packageId;
@@ -71,10 +72,11 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 	 * @param identifier     the data package identifier value
 	 * @param revision       the data package revision value
 	 * @param principal      the principal owner of the data package
+	 * @param doi            the doi for this data package, possibly null
 	 */
 	public DataPackageUpload(String uploadDate, String serviceMethod, 
 			            String scope, Integer identifier, Integer revision,
-			            String principal) {
+			            String principal, String doi) {
 		this.uploadDate = uploadDate;
 		this.serviceMethod = serviceMethod;
 		this.scope = scope;
@@ -82,6 +84,7 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 		this.revision = revision;
 		this.packageId = String.format("%s.%d.%d", this.scope, this.identifier, this.revision);
 		this.principal = principal;
+		this.doi = doi;
 	}
 	
 	
@@ -106,6 +109,11 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 
 	public String getPrincipal() {
 		return principal;
+	}
+
+
+	public String getDoi() {
+		return doi;
 	}
 
 
@@ -136,6 +144,7 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 		String xmlString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
 		String dataPackageElementName = "dataPackage";
+		String doiStr = (doi != null) ? doi : "";
 		
 		stringBuffer.append(String.format("  <%s>\n", dataPackageElementName));
 		stringBuffer.append(String.format("    <packageId>%s</packageId>\n", packageId));
@@ -143,6 +152,7 @@ public class DataPackageUpload implements Comparable<DataPackageUpload> {
 		stringBuffer.append(String.format("    <identifier>%d</identifier>\n", identifier));
 		stringBuffer.append(String.format("    <revision>%d</revision>\n", revision));
 		stringBuffer.append(String.format("    <principal>%s</principal>\n", principal));
+		stringBuffer.append(String.format("    <doi>%s</doi>\n", doiStr));
 		stringBuffer.append(String.format("    <serviceMethod>%s</serviceMethod>\n", serviceMethod));
 		stringBuffer.append(String.format("    <date>%s</date>\n", uploadDate));
 		stringBuffer.append(String.format("  </%s>\n", dataPackageElementName));

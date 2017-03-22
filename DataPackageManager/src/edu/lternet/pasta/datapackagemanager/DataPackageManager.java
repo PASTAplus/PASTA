@@ -968,16 +968,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				boolean isPublic = dataPackageRegistry.isPublicAccessible(dataPackageURI);
 				if (isPublic) {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date date = new Date();
 					String today = sdf.format(date);
 					DataPackageUpload dpu = null;
 					if (isUpdate) {
-						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision, user);
+						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision, user, null);
 						DataPackageUploadManager.addRecentUpdate(dpu);
 					}
 					else {
-						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision, user);
+						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision, user, null);
 						DataPackageUploadManager.addRecentInsert(dpu);
 					}
 				}
