@@ -1638,13 +1638,18 @@ public class DataPackageRegistry {
 	 *                       "updateDataPackage". If true, exclude data package
 	 *                       uploads that have since been deleted but would
 	 *                       otherwise be in the list.
+	 * @param excludeDuplicateUpdates used when service method is
+	 *                       "updateDataPackage". If true, report only a single
+	 *                       data package update operation for a given document
+	 *                       identifier (i.e. "scope.identifier"). 
 	 */
 	public ArrayList<DataPackageUpload> getChanges(String serviceMethod, 
 			                                       String fromTime,
 			                                       String toTime,
 			                                       String scope,
 			                                       Integer limit,
-			                                       boolean excludeDeleted)
+			                                       boolean excludeDeleted,
+			                                       boolean excludeDuplicateUpdates)
 			throws Exception {
 		Connection conn = null;
 		boolean hasFromTime = fromTime != null;
@@ -1730,7 +1735,7 @@ public class DataPackageRegistry {
 								} 
 								else if (!isLowestRevision && serviceMethod.equals("updateDataPackage")) {
 									String docid = String.format("%s.%d", scope, identifier);
-									if (!docids.contains(docid)) {
+									if (!excludeDuplicateUpdates || !docids.contains(docid)) {
 										DataPackageUpload upload = new DataPackageUpload(changeDateStr, serviceMethod,
 												scope, identifier, revision, principal);
 										changeList.add(upload);
