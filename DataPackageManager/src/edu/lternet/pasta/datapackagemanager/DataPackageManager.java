@@ -1781,9 +1781,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
 		boolean excludeDeleted = false;
-		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
+		boolean excludeDuplicateUpdates = false;
+		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
+		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
+		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
 		
 		recentChanges.addAll(inserts);
 		recentChanges.addAll(updates);
