@@ -897,11 +897,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    ResourceType.metadata, resourceLocation, packageId, scope,
 			    identifier, revision, null, null, user, metadataFormatType, mayOverwrite);
 			
-			// Store the checksum of the metadata resource
-			File file = getMetadataFile(scope, identifier, revision.toString(),
-					user, authToken);
-			storeChecksum(metadataURI, file);
-			
 			/*
 			 * Store the access control rules for the metadata resource
 			 */
@@ -1024,6 +1019,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 						}
 					}
 				}
+				
+				// Store the checksum of the metadata resource
+				File file = getMetadataFile(scope, identifier, revision.toString(),
+						user, authToken);
+				storeChecksum(metadataURI, file);
 				
 				/*
 				 * Optimize data storage for the data package
