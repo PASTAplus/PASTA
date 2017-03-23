@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -88,7 +89,7 @@ public final class GatekeeperFilter implements Filter
     private FilterConfig filterConfig;
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
-
+    
     private enum CookieUse {
         EXTERNAL, INTERNAL
     }
@@ -98,6 +99,16 @@ public final class GatekeeperFilter implements Filter
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
+    	try {
+            ServletContext sc = config.getServletContext();
+            String realPath = sc.getRealPath("/");
+            logger.info("Servlet Context Real Path: " + realPath);
+    		BotMatcher.initializeRobotPatterns(realPath + "/WEB-INF/conf/robotPatterns.txt");
+    	}
+    	catch (IOException e) {
+    		throw new ServletException(e);
+    	}
+    	
         filterConfig = config;
     }
 
@@ -121,33 +132,42 @@ public final class GatekeeperFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
-        HttpServletRequest req = (HttpServletRequest) request;        
-        HttpServletResponse res = (HttpServletResponse) response;
-
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;        
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        
+            
         // Output HttpServletRequest diagnostic information
-		    logger.info("Request URL: " + req.getMethod() + " - "
- 		    		+ req.getRequestURL().toString());
+		logger.info(String.format("Request URL: %s - %s",
+ 		    		              httpServletRequest.getMethod(), 
+ 		    		              httpServletRequest.getRequestURL().toString()));
 
-        doDiagnostics(req);
+        // Output bot detection information
+        String robot = BotMatcher.findRobot(httpServletRequest);
+        boolean isBot = robot != null;
+        String botDetected = isBot ? robot : "none";
+		logger.info(String.format("Bot detected: %s",
+			                      botDetected));
+        
+		doDiagnostics(httpServletRequest);
 
         try {
-        	boolean hasAuthToken = hasAuthToken(req.getCookies());
-            Cookie internalCookie = hasAuthToken ? doCookie(req) : doHeader(req, res);
-            chain.doFilter(new PastaRequestWrapper(req, internalCookie), res);
+        	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
+            Cookie internalCookie = hasAuthToken ? doCookie(httpServletRequest) : doHeader(httpServletRequest, httpServletResponse);
+            chain.doFilter(new PastaRequestWrapper(httpServletRequest, internalCookie), httpServletResponse);
         }
         catch (IllegalStateException e) {
-            res.setStatus(BAD_REQUEST_CODE);
-            PrintWriter out = res.getWriter();
+            httpServletResponse.setStatus(BAD_REQUEST_CODE);
+            PrintWriter out = httpServletResponse.getWriter();
             out.println(e);
         }
         catch (UnauthorizedException e) {
-            res.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = res.getWriter();
+            httpServletResponse.setStatus(UNAUTHORIZED_CODE);
+            PrintWriter out = httpServletResponse.getWriter();
             out.println(e.getMessage());
         }
         catch (IllegalArgumentException e) {
-            res.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = res.getWriter();
+            httpServletResponse.setStatus(UNAUTHORIZED_CODE);
+            PrintWriter out = httpServletResponse.getWriter();
             out.println(e.getMessage());
         }
 
@@ -584,4 +604,59 @@ public final class GatekeeperFilter implements Filter
 
     }
 
+    /**
+     * Boolean to determine whether this request originated from a bot.
+     * 
+     * @param request         the request object
+     * @return true if this request originated from a bot, else false
+     */
+    private boolean isRequestFromBot(HttpServletRequest request) {
+      boolean isFromBot = false;
+      final String name = "User-Agent";
+      Enumeration<?> values = request.getHeaders(name);
+      
+      if (values != null) {
+        while (values.hasMoreElements()) {
+          String value = (String) values.nextElement();
+          if (value.contains("http://") ||
+              value.contains("Yandex")
+             ) {
+            isFromBot = true;
+          }
+        }
+      }
+      
+      return isFromBot;
+    }
+    
+    
+    /**
+     * Boolean to determine whether this request originated from a browser.
+     * 
+     * @param request         the request object
+     * @return true if this request originated from a browser, else false
+     */
+    private boolean isRequestFromBrowser(HttpServletRequest request) {
+      boolean isFromBrowser = false;
+      final String name = "User-Agent";
+      Enumeration<?> values = request.getHeaders(name);
+      
+      if (values != null) {
+        while (values.hasMoreElements()) {
+          String value = (String) values.nextElement();
+          if (value.contains("ICEbrowser")) { return false; } // Trac ticket #471
+          if (value.contains("Chrome") || 
+              value.contains("Mozilla") || 
+              value.contains("Opera") || 
+              value.contains("Safari")
+             ) {
+            isFromBrowser = true;
+          }
+        }
+      }
+      
+      return isFromBrowser;
+    }
+    
+    
 }

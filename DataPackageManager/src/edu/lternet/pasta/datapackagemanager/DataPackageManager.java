@@ -968,16 +968,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				boolean isPublic = dataPackageRegistry.isPublicAccessible(dataPackageURI);
 				if (isPublic) {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					Date date = new Date();
 					String today = sdf.format(date);
 					DataPackageUpload dpu = null;
 					if (isUpdate) {
-						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision, user);
+						dpu = new DataPackageUpload(today, "updateDataPackage", scope, identifier, revision, user, null);
 						DataPackageUploadManager.addRecentUpdate(dpu);
 					}
 					else {
-						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision, user);
+						dpu = new DataPackageUpload(today, "createDataPackage", scope, identifier, revision, user, null);
 						DataPackageUploadManager.addRecentInsert(dpu);
 					}
 				}
@@ -1781,9 +1781,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
 		boolean excludeDeleted = false;
-		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
-		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, toDate, scope, limit, excludeDeleted);
+		boolean excludeDuplicateUpdates = false;
+		ArrayList<DataPackageUpload> inserts = dpr.getChanges("createDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
+		ArrayList<DataPackageUpload> updates = dpr.getChanges("updateDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
+		ArrayList<DataPackageUpload> deletes = dpr.getChanges("deleteDataPackage", fromDate, toDate, scope, limit, excludeDeleted, excludeDuplicateUpdates);
 		
 		recentChanges.addAll(inserts);
 		recentChanges.addAll(updates);
