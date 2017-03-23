@@ -226,8 +226,8 @@ public final class MethodStepFactory {
     	String contactText = contactNode.getTextContent();
     	
     	if (contactText != null &&
-    		contactText.contains("LTER Network Office") &&
-    		contactText.contains("tech-support@lternet.edu")
+    		(contactText.contains("LTER Network Office") ||
+    		 contactText.contains("tech-support@lternet.edu"))
     	   ) {
     		isLNOContact = true;
     	}
