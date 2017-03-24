@@ -101,7 +101,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	private static final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
 	private static final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
-	private static final String DOI_SYSTEM_VALUE = "doi";
+	private static final String DOI_SYSTEM_VALUE = "https://doi.org";
 
 	public enum DataPackageManagerAction {
 		CREATE, READ, UPDATE, DELETE, SEARCH
