@@ -293,15 +293,20 @@ public final class GatekeeperFilter implements Filter
         AuthTokenWithPassword basicToken =
                 AuthTokenFactory.makeAuthTokenWithPassword(tmpHeader);
         String user = basicToken.getUserId();
+        // Remove whitespace from the user string
+        if (user != null) {
+        	user = user.replace(" ", "").trim();
+        }
         String password = basicToken.getPassword();
 
         Set<String> groups = new HashSet<String>();
         if (!user.equals(ConfigurationListener.getPublicUser())) {
 
             if (!knb.authenticate(user, password)) {
-                String s = "The user '" + user
-                        + "' could not be authenticated "
-                        + "using the LTER LDAP server.";
+                String s = 
+                	String.format(
+                		"The user '%s' could not be authenticated using the LTER LDAP server.",
+                		user);
                 throw new UnauthorizedException(s); // Handle this better
             }
             // groups = knb.getGroups(user); // No groups currently stored here
@@ -604,32 +609,7 @@ public final class GatekeeperFilter implements Filter
 
     }
 
-    /**
-     * Boolean to determine whether this request originated from a bot.
-     * 
-     * @param request         the request object
-     * @return true if this request originated from a bot, else false
-     */
-    private boolean isRequestFromBot(HttpServletRequest request) {
-      boolean isFromBot = false;
-      final String name = "User-Agent";
-      Enumeration<?> values = request.getHeaders(name);
-      
-      if (values != null) {
-        while (values.hasMoreElements()) {
-          String value = (String) values.nextElement();
-          if (value.contains("http://") ||
-              value.contains("Yandex")
-             ) {
-            isFromBot = true;
-          }
-        }
-      }
-      
-      return isFromBot;
-    }
-    
-    
+
     /**
      * Boolean to determine whether this request originated from a browser.
      * 
