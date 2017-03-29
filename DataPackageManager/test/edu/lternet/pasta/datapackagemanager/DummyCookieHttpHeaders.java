@@ -118,7 +118,7 @@ public class DummyCookieHttpHeaders implements HttpHeaders {
      */
     //@Override
     public MultivaluedMap<String, String> getRequestHeaders() {
-        throw new UnsupportedOperationException();
+        return null;
     }
     
     

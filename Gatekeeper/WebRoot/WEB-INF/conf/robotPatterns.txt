@@ -96,7 +96,7 @@ htdig
 htmlparser
 HttpComponents\/1.1
 HTTPFetcher
-http.?client
+###http.?client
 httpget
 httrack
 ia_archiver
@@ -108,7 +108,7 @@ Indy Library
 internetseer
 intute
 iSiloX
-java
+###java
 jeeves
 jobo
 kyluka

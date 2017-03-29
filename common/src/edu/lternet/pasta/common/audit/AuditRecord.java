@@ -65,7 +65,7 @@ public class AuditRecord {
   public AuditRecord(
       Date date, String service, String entryText,
       AuthToken authToken, int httpStatusCode, String serviceMethod,
-      String resourceId) {
+      String resourceId, String robot) {
     super();
     this.entryTime = ISO8601Utility.formatDateTime(date);
     this.category = categoryFromStatusCode(httpStatusCode);
@@ -74,6 +74,12 @@ public class AuditRecord {
     this.authToken = authToken;
     if (authToken != null) {
       this.user = authToken.getUserId();
+      if (this.user != null && 
+    	  this.user.equals("public") && 
+    	  (robot != null)
+    	 ) {
+    	  this.user = robot;
+      }
       Set<String> groupsSet = authToken.getGroups();
       this.groups = groupsSetToGroupsString(groupsSet);
       AuthSystemDef authSystemDef = authToken.getAuthSystem();
