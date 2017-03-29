@@ -167,12 +167,26 @@ public final class GatekeeperFilter implements Filter
 
         try {
         	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
-            Cookie internalCookie = hasAuthToken ? doCookie(httpServletRequest) : doHeader(httpServletRequest, httpServletResponse);
-            PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
+        	Cookie internalCookie;
+        	if (hasAuthToken) {
+        	    /*
+        	     *  Process incoming authentication token
+        	     */
+        		internalCookie = doCookie(httpServletRequest);
+        	}
+        	else {
+        	    /*
+        	     *  Process incoming basic-authentication header or "public" user
+        	     */
+        		internalCookie = doHeader(httpServletRequest, httpServletResponse);
+        	}
+
+        	PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
             if (isBot) {
             	pastaRequestWrapper.putHeader("Robot", robot);
             }
-    		doDiagnostics(pastaRequestWrapper);
+
+            doDiagnostics(pastaRequestWrapper);
             chain.doFilter(pastaRequestWrapper, httpServletResponse);
         }
         catch (IllegalStateException e) {
@@ -580,7 +594,7 @@ public final class GatekeeperFilter implements Filter
   /**
    * Boolean to determine whether this request originated from a browser.
    * 
-   * @param request         the request object
+   * @param request  the request object
    * @return true if this request originated from a browser, else false
    */
   private boolean isRequestFromBrowser(HttpServletRequest request) {
@@ -624,7 +638,8 @@ public final class GatekeeperFilter implements Filter
         /*
          * Constructors
          */
-        public PastaRequestWrapper(HttpServletRequest request, Cookie cookie) {
+
+	    public PastaRequestWrapper(HttpServletRequest request, Cookie cookie) {
             super(request);
             this.cookie = cookie;
             this.customHeaders = new HashMap<String, String>();
@@ -637,14 +652,15 @@ public final class GatekeeperFilter implements Filter
         
         public String getHeader(String name) {
 
-	        // check the custom headers first
+	        // Check the custom headers first, e.g. if name is "robot"
 	        String headerValue = customHeaders.get(name);
 	        
 	        if (headerValue != null){
 	            return headerValue;
 	        }
 
-	        if (name.equals(HttpHeaders.AUTHORIZATION)) return null;
+	        if (name.equals(HttpHeaders.AUTHORIZATION)) 
+	        	return null;
 
             String header = super.getHeader(name);
 
@@ -661,29 +677,37 @@ public final class GatekeeperFilter implements Filter
 
         
         public Enumeration<String> getHeaders(String name) {
-
+        	
             Enumeration<String> enumStr = super.getHeaders(name);
+
+            if (name.equalsIgnoreCase("Robot")) {
+        		List<String> ls = new ArrayList<String>();
+        		String value = getHeader(name);
+        		ls.add(value);
+                enumStr = Collections.enumeration(ls);
+        	}
 
             if (name.equals(HttpHeaders.AUTHORIZATION)) {
                 List<String> ls = new ArrayList<String>();
                 enumStr = Collections.enumeration(ls);
             }
 
-            if (!name.equals(HttpHeaders.COOKIE) || (cookie == null))
+            if (!name.equals(HttpHeaders.COOKIE) || (cookie == null)) {
                 return enumStr;
-
-            ArrayList<String> list = Collections.list(enumStr);
-            list.add(cookie.getName() + "=" + cookie.getValue());
-
-            return Collections.enumeration(list);
+            }
+            else {
+            	ArrayList<String> list = Collections.list(enumStr);
+            	list.add(cookie.getName() + "=" + cookie.getValue());
+            	return Collections.enumeration(list);
+            }
         }
 
         
         public Enumeration<String> getHeaderNames() {
-	        // create a set of the custom header names
+	        // Create a set of the custom header names
 	        Set<String> set = new HashSet<String>(customHeaders.keySet());
 	        
-	        // now add the headers from the wrapped request object
+	        // Now add the headers from the wrapped request object
 	        @SuppressWarnings("unchecked")
 	        Enumeration<String> e = ((HttpServletRequest) getRequest()).getHeaderNames();
 	        while (e.hasMoreElements()) {
@@ -700,23 +724,33 @@ public final class GatekeeperFilter implements Filter
         }
 
         
-        public Cookie[] getCookies() {
-
+        public Cookie[] getCookies() {       	
             Cookie[] cookies = super.getCookies();
-            if (cookie == null) return cookies;
 
-            ArrayList<Cookie> list = (cookies == null) ? new ArrayList<Cookie>()
-                    : new ArrayList<Cookie>(Arrays.asList(cookies));
-
-            list.add(cookie);
-            cookies = new Cookie[list.size()];
-            return list.toArray(cookies);
+            if (cookie == null) {
+				return cookies;
+			} 
+			else {
+				ArrayList<Cookie> cookieList = (cookies == null) ? new ArrayList<Cookie>()
+						: new ArrayList<Cookie>(Arrays.asList(cookies));
+				cookieList.add(cookie);
+				cookies = new Cookie[cookieList.size()];
+				return cookieList.toArray(cookies);
+			}
         }
 
+        
+        /**
+         * Adds a custom header name and corresponding value to the wrapper
+         * class
+         * 
+         * @param name   the custom header name
+         * @param value  the custom header value
+         */
 	    public void putHeader(String name, String value){
 	        this.customHeaders.put(name, value);
 	    }
 	 
-    } // end PastaRequestWrapper
+    } // end PastaRequestWrapper inner class
 
 }
