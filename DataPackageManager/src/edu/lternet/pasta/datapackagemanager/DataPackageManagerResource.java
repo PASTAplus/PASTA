@@ -67,6 +67,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -355,6 +356,27 @@ public class DataPackageManagerResource extends PastaWebService {
 		AuthToken authToken = new AttrListAuthTokenV1(cookieToken);
 
 		return authToken;
+	}
+
+
+	/**
+	 * Gets the Robot header value, if provided in the headers
+	 * 
+	 * @param headers
+	 *            the HttpHeaders object
+	 * @return the Robot header string, possibly null
+	 */
+	public static String getRobot(HttpHeaders headers) {
+		MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
+		
+		System.out.println("HttpHeaders:");
+		String robotHeader = requestHeaders.getFirst("Robot");
+		
+		for (String header : requestHeaders.keySet()) {
+			System.out.println("  " + header + " = " + requestHeaders.getFirst(header));
+		}
+
+		return robotHeader;
 	}
 
 
@@ -7280,6 +7302,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
+			String robot = getRobot(headers);
+			logger.info("Robot header: " + robot);
 
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(

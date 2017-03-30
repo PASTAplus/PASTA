@@ -120,6 +120,11 @@ public class LoginServlet extends DataPortalServlet {
     String from = (String) httpSession.getAttribute("from");
 
     String uid = request.getParameter("uid");
+    
+	if (uid != null) {
+		uid = uid.trim();
+	}
+	
     String password = request.getParameter("password");
     String forward = null;
 

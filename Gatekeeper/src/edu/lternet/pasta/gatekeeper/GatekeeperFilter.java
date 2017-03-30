@@ -28,8 +28,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -85,14 +87,27 @@ import edu.lternet.pasta.common.security.token.BasicAuthToken;
 public final class GatekeeperFilter implements Filter
 {
 
+	/*
+	 * Class variables
+	 */
     private static Logger logger = Logger.getLogger(GatekeeperFilter.class);
-    private FilterConfig filterConfig;
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
     
+    
+    /*
+     * Instance variables
+     */
+    private FilterConfig filterConfig;
+
     private enum CookieUse {
         EXTERNAL, INTERNAL
     }
+    
+    
+    /*
+     * Instance methods
+     */
 
     /**
      * Overridden init method that sets the filterConfig.
@@ -112,6 +127,7 @@ public final class GatekeeperFilter implements Filter
         filterConfig = config;
     }
 
+    
     /**
      * Overridden destroy method that free's the filterConfig.
      */
@@ -120,6 +136,7 @@ public final class GatekeeperFilter implements Filter
         filterConfig = null;
     }
 
+    
     /**
      * Overridden doFilter method.
      * @param request ServletRequest representing the incoming user http(s)
@@ -145,15 +162,32 @@ public final class GatekeeperFilter implements Filter
         String robot = BotMatcher.findRobot(httpServletRequest);
         boolean isBot = robot != null;
         String botDetected = isBot ? robot : "none";
-		logger.info(String.format("Bot detected: %s",
-			                      botDetected));
+		logger.info(String.format("Bot detected: %s", botDetected));
         
-		doDiagnostics(httpServletRequest);
 
         try {
         	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
-            Cookie internalCookie = hasAuthToken ? doCookie(httpServletRequest) : doHeader(httpServletRequest, httpServletResponse);
-            chain.doFilter(new PastaRequestWrapper(httpServletRequest, internalCookie), httpServletResponse);
+        	Cookie internalCookie;
+        	if (hasAuthToken) {
+        	    /*
+        	     *  Process incoming authentication token
+        	     */
+        		internalCookie = doCookie(httpServletRequest);
+        	}
+        	else {
+        	    /*
+        	     *  Process incoming basic-authentication header or "public" user
+        	     */
+        		internalCookie = doHeader(httpServletRequest, httpServletResponse);
+        	}
+
+        	PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
+            if (isBot) {
+            	pastaRequestWrapper.putHeader("Robot", robot);
+            }
+
+            doDiagnostics(pastaRequestWrapper);
+            chain.doFilter(pastaRequestWrapper, httpServletResponse);
         }
         catch (IllegalStateException e) {
             httpServletResponse.setStatus(BAD_REQUEST_CODE);
@@ -173,6 +207,7 @@ public final class GatekeeperFilter implements Filter
 
     }
 
+    
     /*
      *  Process incoming authentication token
      */
@@ -187,9 +222,9 @@ public final class GatekeeperFilter implements Filter
             throw new IllegalStateException(gripe);
         } else {
 
-            String[] authTokeStrParts = authTokenStr.split("-");
-            authToken = authTokeStrParts[0];
-            byte[] signature = Base64.decodeBase64(authTokeStrParts[1]);
+            String[] authTokenStrParts = authTokenStr.split("-");
+            authToken = authTokenStrParts[0];
+            byte[] signature = Base64.decodeBase64(authTokenStrParts[1]);
 
             if (!isValidSignature(authToken, signature)) {
                 String gripe = "Authentication token is not valid!";
@@ -206,6 +241,7 @@ public final class GatekeeperFilter implements Filter
 
     }
 
+    
     /*
      *  Process incoming basic-authentication header or "public" user
      */
@@ -224,6 +260,7 @@ public final class GatekeeperFilter implements Filter
         return makeAuthTokenCookie(authToken, CookieUse.INTERNAL);
     }
 
+    
     private void assertTimeToLive(AuthToken attrlist) throws UnauthorizedException {
 
         if (attrlist == null) {
@@ -237,11 +274,13 @@ public final class GatekeeperFilter implements Filter
         }
     }
 
+    
     private boolean hasAuthToken(Cookie[] cookies) {
         if (retrieveAuthTokenString(cookies) == null) return false;
         return true;
     }
 
+    
     private AuthToken decryptToken(String tokenStr) throws IllegalStateException {
 
         String errorMsg = "Invalid AuthToken Submitted.";
@@ -263,6 +302,7 @@ public final class GatekeeperFilter implements Filter
         return AuthTokenFactory.makeCookieAuthToken(decrypted);
     }
 
+    
     private String retrieveAuthTokenString(Cookie[] cookies) {
 
         /* no cookies */
@@ -276,6 +316,7 @@ public final class GatekeeperFilter implements Filter
         return null;
     }
 
+    
     private AuthToken makeAuthenticated(String rawHeader) {
 
         String tmpHeader = null;
@@ -293,15 +334,20 @@ public final class GatekeeperFilter implements Filter
         AuthTokenWithPassword basicToken =
                 AuthTokenFactory.makeAuthTokenWithPassword(tmpHeader);
         String user = basicToken.getUserId();
+        // Remove whitespace from the user string
+        if (user != null) {
+        	user = user.replace(" ", "").trim();
+        }
         String password = basicToken.getPassword();
 
         Set<String> groups = new HashSet<String>();
         if (!user.equals(ConfigurationListener.getPublicUser())) {
 
             if (!knb.authenticate(user, password)) {
-                String s = "The user '" + user
-                        + "' could not be authenticated "
-                        + "using the LTER LDAP server.";
+                String s = 
+                	String.format(
+                		"The user '%s' could not be authenticated using the LTER LDAP server.",
+                		user);
                 throw new UnauthorizedException(s); // Handle this better
             }
             // groups = knb.getGroups(user); // No groups currently stored here
@@ -317,6 +363,7 @@ public final class GatekeeperFilter implements Filter
         return token;
     }
 
+    
     private Cookie makeAuthTokenCookie(AuthToken attrlist, CookieUse use) {
 
         String cookieValue = attrlist.getTokenString();
@@ -335,6 +382,7 @@ public final class GatekeeperFilter implements Filter
         return c;
 
     }
+    
     
 	/**
 	 * dumpHeader iterates through all request headers and lists both the header
@@ -421,6 +469,7 @@ public final class GatekeeperFilter implements Filter
 
 	}
 
+	
   private void doDiagnostics(HttpServletRequest req) {
 
     String remoteAddr = req.getRemoteAddr();
@@ -436,6 +485,7 @@ public final class GatekeeperFilter implements Filter
 
   }
 
+  
   /*
    * Generate MD5withRSA digital signature for tokenString and return base64
    * encoded signature as a string.
@@ -474,6 +524,7 @@ public final class GatekeeperFilter implements Filter
 
   }
 
+  
   private void writeSignature(String tokenString, byte[] signature) {
 
     String signatureDir = ConfigurationListener.getSignatureDir();
@@ -497,6 +548,7 @@ public final class GatekeeperFilter implements Filter
 
   }
 
+  
   private Boolean isValidSignature(String tokenString, byte[] signature) {
 
     Boolean isValid = false;
@@ -537,126 +589,168 @@ public final class GatekeeperFilter implements Filter
     return isValid;
 
   }
+  
+  
+  /**
+   * Boolean to determine whether this request originated from a browser.
+   * 
+   * @param request  the request object
+   * @return true if this request originated from a browser, else false
+   */
+  private boolean isRequestFromBrowser(HttpServletRequest request) {
+    boolean isFromBrowser = false;
+    final String name = "User-Agent";
+    Enumeration<?> values = request.getHeaders(name);
+    
+    if (values != null) {
+      while (values.hasMoreElements()) {
+        String value = (String) values.nextElement();
+        if (value.contains("ICEbrowser")) { return false; } // Trac ticket #471
+        if (value.contains("Chrome") || 
+            value.contains("Mozilla") || 
+            value.contains("Opera") || 
+            value.contains("Safari")
+           ) {
+          isFromBrowser = true;
+        }
+      }
+    }
+    
+    return isFromBrowser;
+  }
+  
 
-    public static class PastaRequestWrapper extends HttpServletRequestWrapper
-    {
+  public static class PastaRequestWrapper extends HttpServletRequestWrapper {
 
+    	/*
+    	 * Class variables
+    	 */
         private static Logger logger = Logger.getLogger(PastaRequestWrapper.class);
+        
+        
+        /*
+         * Instance variables
+         */
         private Cookie cookie;
+	    private final Map<String, String> customHeaders;
 
-        public PastaRequestWrapper(HttpServletRequest request, Cookie cookie) {
+        
+        /*
+         * Constructors
+         */
 
+	    public PastaRequestWrapper(HttpServletRequest request, Cookie cookie) {
             super(request);
             this.cookie = cookie;
+            this.customHeaders = new HashMap<String, String>();
         }
 
+        
+        /*
+         * Instance methods
+         */
+        
         public String getHeader(String name) {
 
-            if (name.equals(HttpHeaders.AUTHORIZATION)) return null;
+	        // Check the custom headers first, e.g. if name is "robot"
+	        String headerValue = customHeaders.get(name);
+	        
+	        if (headerValue != null){
+	            return headerValue;
+	        }
+
+	        if (name.equals(HttpHeaders.AUTHORIZATION)) 
+	        	return null;
+
             String header = super.getHeader(name);
-            if (name.equals(HttpHeaders.COOKIE) && header.isEmpty()
-                    && (cookie != null))
-                return cookie.getName();
+
+            if (name.equals(HttpHeaders.COOKIE) && 
+            	header != null &&
+            	header.isEmpty() && 
+            	(cookie != null)
+               ) {
+                header = cookie.getName();
+            }  
 
             return header;
         }
 
+        
         public Enumeration<String> getHeaders(String name) {
-
+        	
             Enumeration<String> enumStr = super.getHeaders(name);
+
+            if (name.equalsIgnoreCase("Robot")) {
+        		List<String> ls = new ArrayList<String>();
+        		String value = getHeader(name);
+        		ls.add(value);
+                enumStr = Collections.enumeration(ls);
+        	}
 
             if (name.equals(HttpHeaders.AUTHORIZATION)) {
                 List<String> ls = new ArrayList<String>();
                 enumStr = Collections.enumeration(ls);
             }
 
-            if (!name.equals(HttpHeaders.COOKIE) || (cookie == null))
+            if (!name.equals(HttpHeaders.COOKIE) || (cookie == null)) {
                 return enumStr;
-
-            ArrayList<String> list = Collections.list(enumStr);
-            list.add(cookie.getName() + "=" + cookie.getValue());
-            return Collections.enumeration(list);
+            }
+            else {
+            	ArrayList<String> list = Collections.list(enumStr);
+            	list.add(cookie.getName() + "=" + cookie.getValue());
+            	return Collections.enumeration(list);
+            }
         }
 
+        
         public Enumeration<String> getHeaderNames() {
+	        // Create a set of the custom header names
+	        Set<String> set = new HashSet<String>(customHeaders.keySet());
+	        
+	        // Now add the headers from the wrapped request object
+	        @SuppressWarnings("unchecked")
+	        Enumeration<String> e = ((HttpServletRequest) getRequest()).getHeaderNames();
+	        while (e.hasMoreElements()) {
+	            // add the names of the request headers into the list
+	            String n = e.nextElement();
+	            set.add(n);
+	        }
 
-            Enumeration<String> enumStr = super.getHeaderNames();
-            ArrayList<String> list = Collections.list(enumStr);
-            if (!list.contains(HttpHeaders.COOKIE) && (cookie != null)) {
-                list.add(HttpHeaders.COOKIE);
+            if (!set.contains(HttpHeaders.COOKIE) && (cookie != null)) {
+                set.add(HttpHeaders.COOKIE);
             }
 
-            return Collections.enumeration(list);
+            return Collections.enumeration(set);
         }
 
-        public Cookie[] getCookies() {
-
+        
+        public Cookie[] getCookies() {       	
             Cookie[] cookies = super.getCookies();
-            if (cookie == null) return cookies;
 
-            ArrayList<Cookie> list = (cookies == null) ? new ArrayList<Cookie>()
-                    : new ArrayList<Cookie>(Arrays.asList(cookies));
-
-            list.add(cookie);
-            cookies = new Cookie[list.size()];
-            return list.toArray(cookies);
+            if (cookie == null) {
+				return cookies;
+			} 
+			else {
+				ArrayList<Cookie> cookieList = (cookies == null) ? new ArrayList<Cookie>()
+						: new ArrayList<Cookie>(Arrays.asList(cookies));
+				cookieList.add(cookie);
+				cookies = new Cookie[cookieList.size()];
+				return cookieList.toArray(cookies);
+			}
         }
 
-    }
+        
+        /**
+         * Adds a custom header name and corresponding value to the wrapper
+         * class
+         * 
+         * @param name   the custom header name
+         * @param value  the custom header value
+         */
+	    public void putHeader(String name, String value){
+	        this.customHeaders.put(name, value);
+	    }
+	 
+    } // end PastaRequestWrapper inner class
 
-    /**
-     * Boolean to determine whether this request originated from a bot.
-     * 
-     * @param request         the request object
-     * @return true if this request originated from a bot, else false
-     */
-    private boolean isRequestFromBot(HttpServletRequest request) {
-      boolean isFromBot = false;
-      final String name = "User-Agent";
-      Enumeration<?> values = request.getHeaders(name);
-      
-      if (values != null) {
-        while (values.hasMoreElements()) {
-          String value = (String) values.nextElement();
-          if (value.contains("http://") ||
-              value.contains("Yandex")
-             ) {
-            isFromBot = true;
-          }
-        }
-      }
-      
-      return isFromBot;
-    }
-    
-    
-    /**
-     * Boolean to determine whether this request originated from a browser.
-     * 
-     * @param request         the request object
-     * @return true if this request originated from a browser, else false
-     */
-    private boolean isRequestFromBrowser(HttpServletRequest request) {
-      boolean isFromBrowser = false;
-      final String name = "User-Agent";
-      Enumeration<?> values = request.getHeaders(name);
-      
-      if (values != null) {
-        while (values.hasMoreElements()) {
-          String value = (String) values.nextElement();
-          if (value.contains("ICEbrowser")) { return false; } // Trac ticket #471
-          if (value.contains("Chrome") || 
-              value.contains("Mozilla") || 
-              value.contains("Opera") || 
-              value.contains("Safari")
-             ) {
-            isFromBrowser = true;
-          }
-        }
-      }
-      
-      return isFromBrowser;
-    }
-    
-    
 }

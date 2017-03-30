@@ -193,7 +193,14 @@ public final class MethodStepFactory {
 
         for (Node contact : parentEml.getContacts()) {
             contact = emlDoc.adoptNode(contact.cloneNode(true));
-            dataSource.appendChild(contact);
+            /*
+             * If the contact is for the LTER Network Office, exclude it from
+             * the provenance metadata since it is no longer in operation.
+             */
+            boolean isLNOContact = isLNOContact(contact);
+            if (!isLNOContact) {
+                dataSource.appendChild(contact);
+            }
         }
 
         appendDistribution(emlDoc, parentEml, dataSource);
@@ -208,6 +215,24 @@ public final class MethodStepFactory {
             dataSource.insertBefore(title, dataSource.getFirstChild());
         }
 
+    }
+    
+    
+    /*
+     * Is this an obsolete contact for the LNO?
+     */
+    private boolean isLNOContact(Node contactNode) {
+    	boolean isLNOContact = false;
+    	String contactText = contactNode.getTextContent();
+    	
+    	if (contactText != null &&
+    		(contactText.contains("LTER Network Office") ||
+    		 contactText.contains("tech-support@lternet.edu"))
+    	   ) {
+    		isLNOContact = true;
+    	}
+    	
+    	return isLNOContact;
     }
 
     

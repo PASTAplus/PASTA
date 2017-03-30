@@ -149,12 +149,18 @@ public class PastaClient {
    * @return     The distinguished name, 
    *               e.g. "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org"
    */
-  public static String composeDistinguishedName(String uid) {
-    String distinguishedName = "uid=" + uid + ",o=LTER,dc=ecoinformatics,dc=org";
-    return distinguishedName;
-  }
+	public static String composeDistinguishedName(String uid) {
+		String uidTrimmed = "";
+		
+		if (uid != null) {
+			uidTrimmed = uid.trim();
+		}
+		String distinguishedName = "uid=" + uidTrimmed + ",o=LTER,dc=ecoinformatics,dc=org";
+
+		return distinguishedName;
+	}  
   
-  
+	
   /**
    * Composes the PASTA URL from the PASTA hostname and PASTA protocol values
    * specified in the dataportal.properties file.
