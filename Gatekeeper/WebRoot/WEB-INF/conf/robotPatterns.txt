@@ -49,7 +49,7 @@ contentmatch
 ContentSmartz
 core
 CoverScout
-curl\/7
+###curl\/7
 cursor
 custo
 DataCha0s\/2\.0
