@@ -152,25 +152,53 @@ public class ResponsibleParty {
   }
 
 
+  public String getGivenInitials() {
+	    StringBuffer sb = new StringBuffer("");
+	    
+	    for (String givenName : givenNames) {
+	    	String firstInitial = firstInitial(givenName);
+	    	sb.append(String.format(" %s", firstInitial));
+	    }
+	    
+	    return sb.toString().trim();
+	  }
+
+  
+  /*
+   * Shorten a name to just its first initial followed by a period.
+   */
+  private String firstInitial(String name) {
+	  String firstInitial = name;
+	  
+	  if (name != null && name.length() > 1) {
+		  firstInitial = String.format("%c.", name.charAt(0));
+	  }
+	  
+	  return firstInitial;
+  }
+
+  
   /**
    * Get individual name.
    * 
+   * @param  useFullGivenName  if true, use the full given name, otherwise
+   *                           use the first initials of the given name
+   * 
    * @return individualName Individual name.
    */
-  public String getIndividualName() {
-    
+  public String getIndividualName(boolean useFullGivenName) {    
     String individualName = this.surName;
     
-    String givenName = this.getGivenName();
+    String givenName = useFullGivenName ? getGivenName() : getGivenInitials();
+    
     if ((givenName != null) && (!givenName.equals(""))) {
       individualName += ", " + givenName;
     }
     
     return individualName;
-    
   }
   
-
+  
   public String getSalutation() {
     return salutation;
   }

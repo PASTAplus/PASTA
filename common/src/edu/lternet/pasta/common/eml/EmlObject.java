@@ -177,6 +177,27 @@ public class EmlObject {
 		
 	}
 	
+	
+	/**
+	 * Returns the publication year based on the publication date in the
+	 * EML document.
+	 * 
+	 * @return Publication year
+	 */
+	public String getPubYear() {
+		String pubDate = getPubDate();
+		String pubYear = pubDate;
+		
+		if (pubDate != null) {
+			if (pubDate.length() > 4) {
+				pubYear = pubDate.substring(0,4);
+			}
+		}
+		
+		return pubYear;
+	}
+	
+	
 	/**
 	 * Returns the abstract text string from the EML document.
 	 * 
