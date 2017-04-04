@@ -35,7 +35,10 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -61,6 +64,7 @@ import edu.ucsb.nceas.utilities.XMLUtilities;
  * This class represents a metadata package information to describe entity
  * 
  * @author tao
+ * @author Duane Costa
  */
 public class DataPackage 
 {
@@ -103,6 +107,9 @@ public class DataPackage
   private String title = null;
   private String abstractText = null;
   private List<Party> creators = null;
+  
+  // for each map entry, key is the identifier value and value is the optional system attribute value
+  private Map<String, String> alternateIdentifiers = null; 
     
   
   /*
@@ -119,6 +126,7 @@ public class DataPackage
 	  this.packageId = packageId;  
     this.qualityReport = new QualityReport(this);
     this.creators = new ArrayList<Party>();
+    this.alternateIdentifiers = new HashMap<String, String>();
     
     qualityCheckPackageId(packageId);
   }
@@ -222,6 +230,18 @@ public class DataPackage
     if (qualityReport != null) {
       qualityReport.addDatasetQualityCheck(qualityCheck);
     }
+  }
+  
+  
+  /**
+   * Puts an alternate identifier into the map. The key is the alternate
+   * identifier value and the value is the system attribute value, which may
+   * be null or empty.
+   * 
+   * @param qualityCheck    the new quality check to add
+   */
+  public void putAlternateIdentifier(String alternateIdentifier, String systemAttribute) {
+      alternateIdentifiers.put(alternateIdentifier, systemAttribute);
   }
   
   
@@ -1172,6 +1192,74 @@ public void setCreators(List<Party> creators) {
 
       addDatasetQualityCheck(qualityCheck);
     }
+  }
+  
+  
+  private boolean isPastaDoi(String alternateIdentifier) {
+	  boolean isPastaDoi = false;
+	  
+	  final String[] doiShoulders = { 
+			  "10.5072/FK2", 
+			  "10.6073/pasta"
+	  };
+	  
+	  if (alternateIdentifier != null && !alternateIdentifier.isEmpty()) {
+		  for (String doiShoulder : doiShoulders) {
+			  if (alternateIdentifier.contains(doiShoulder)) {
+				  isPastaDoi = true;
+			  }
+		  }
+	  }
+	  
+	  return isPastaDoi;
+  }
+  
+  
+  /**
+   *  Do a quality check on alternateIdentifier elements (if any) that
+   *  have been parsed in the data package
+   */
+  public void checkAlternateIdentifiers() {
+	    String identifier = "pastaDoiAbsent";
+	    QualityCheck qualityCheckTemplate = 
+	      QualityReport.getQualityCheckTemplate(identifier);
+	    QualityCheck qualityCheck = 
+	      new QualityCheck(identifier, qualityCheckTemplate);
+
+	    if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+	    	boolean foundPastaDoi = false;
+	    	String foundStr = null;
+	    	StringBuffer sb = new StringBuffer("");
+
+	    	Set<String> keySet = alternateIdentifiers.keySet();
+	    	for (String alternateIdentifier : keySet) {
+	    		String systemAttribute = alternateIdentifiers.get(alternateIdentifier);
+	    		if (isPastaDoi(alternateIdentifier)) {
+	    			foundPastaDoi = true;
+		    		String pastaDoi = 
+		    				String.format("%s", alternateIdentifier);
+		    		if (systemAttribute != null) {
+		    			pastaDoi = String.format("%s, system='%s'", pastaDoi, systemAttribute);
+		    		}
+		    		sb.append(pastaDoi + "\n");	
+	    		}
+	    	}
+	    	if (!foundPastaDoi) {
+	    		qualityCheck.setStatus(Status.valid);		
+	    		qualityCheck.setFound("No PASTA DOI alternateIdentifier elements found");
+	    		qualityCheck.setSuggestion("");
+	    	}
+	    	else {
+	    		/*
+	    		 * We found a PASTA DOI when we shouldn't have
+	    		 */
+		    	foundStr = sb.toString();
+	    		qualityCheck.setFound(foundStr);
+	    		qualityCheck.setFailedStatus();
+	    	}
+
+	    	addDatasetQualityCheck(qualityCheck);
+	    }
   }
   
   
