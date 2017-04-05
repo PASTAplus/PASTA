@@ -121,6 +121,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     protected String datasetAbstractPath = null;
     protected String entityAccessPath = null;
     protected String entityPhysicalAuthenticationPath = null;
+    protected String alternateIdentifierPath = null;
     
     //private Hashtable entityHash = new Hashtable();
     //private Hashtable fileHash = new Hashtable();
@@ -234,6 +235,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		datasetAbstractPath = "//dataset/abstract";
 		entityAccessPath = "physical/distribution/access";
 		entityPhysicalAuthenticationPath = "physical/authentication";
+		alternateIdentifierPath = "//dataset/alternateIdentifier";
 	}
 
 	
@@ -348,6 +350,26 @@ public class GenericDataPackageParser implements DataPackageParserInterface
               emlDataPackage.setAccessXML(accessXML);
             }
             
+            // Store the dataset alternate identifiers and their system attribute values
+            NodeList alternateIdentifierNodeList = xpathapi.selectNodeList(doc, alternateIdentifierPath);
+            if (alternateIdentifierNodeList != null) {
+            	for (int i = 0; i < alternateIdentifierNodeList.getLength(); i++) {
+            		String systemAttributeValue = null;
+            		Node alternateIdentifierNode = alternateIdentifierNodeList.item(i);
+            		NamedNodeMap attributeNames = alternateIdentifierNode.getAttributes();
+            		if ((attributeNames != null) && (attributeNames.getLength() > 0)) {
+            		    Node systemAttributeNode = attributeNames.getNamedItem("system");
+            		    if (systemAttributeNode != null) {
+            		        systemAttributeValue = systemAttributeNode.getNodeValue();
+            		    }
+            		}
+            		String alternateIdentifierValue = alternateIdentifierNode.getTextContent();
+            		emlDataPackage.putAlternateIdentifier(alternateIdentifierValue, systemAttributeValue);
+            	}
+            }
+            
+            emlDataPackage.checkAlternateIdentifiers();
+            	
             // Store the dataset title
             Node datasetTitleNode = xpathapi.selectSingleNode(doc, datasetTitlePath);
             if (datasetTitleNode != null) {
@@ -386,7 +408,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 					Party party = new Party(surName, givenNames, organization);
 					emlDataPackage.getCreators().add(party );
             	}
-              
             }
             
             // Store the pubDate

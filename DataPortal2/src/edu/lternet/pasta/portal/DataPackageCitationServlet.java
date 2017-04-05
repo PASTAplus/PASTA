@@ -159,7 +159,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 		}
 
 		if (isPackageId) {
-			html = this.mapFormatter(uid, scope, id, revision);
+			html = this.citationFormatter(uid, scope, id, revision);
 		} else {
 			throw new ServletException("The 'scope', 'identifier', or 'revision' field of the packageId is empty.");
 		}
@@ -187,7 +187,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	}
 
 	/**
-	 * Formats the output for the data package resource map.
+	 * Formats the output for the data package citation.
 	 * 
 	 * @param scope
 	 *          The data package scope (namespace) value
@@ -196,9 +196,9 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 	 * @param revision
 	 *          The data package revision value
 	 * 
-	 * @return The formatted resource map as HTML
+	 * @return The formatted citation as HTML
 	 */
-	private String mapFormatter(String uid, String scope, Integer identifier, String revision) {
+	private String citationFormatter(String uid, String scope, Integer identifier, String revision) {
 
 		String html = null;
 
@@ -248,8 +248,8 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 				if (personCount != 0) {
 
 					for (ResponsibleParty creator : creators) {
-						
-						String individualName = creator.getIndividualName();
+						boolean useFullGivenName = false;
+						String individualName = creator.getIndividualName(useFullGivenName);
 
 						if (individualName != null) {
 							cnt++;
@@ -322,7 +322,7 @@ public class DataPackageCitationServlet extends DataPortalServlet {
 			
 			citationUrl = "<a href=\"" + citationId + "\">" + citationId + "</a>"; 
 
-			String pubDate = emlObject.getPubDate();
+			String pubDate = emlObject.getPubYear();
 
 			if (pubDate != null) {
 				pubDateText += "(" + pubDate + "): ";

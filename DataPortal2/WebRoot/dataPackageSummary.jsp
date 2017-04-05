@@ -13,7 +13,8 @@
   String publicationDateHTML = (String) request.getAttribute("dataPackagePublicationDateHTML");
   String packageIdHTML = (String) request.getAttribute("dataPackageIdHTML");
   String resourcesHTML = (String) request.getAttribute("dataPackageResourcesHTML");
-  String citationHTML = (String) request.getAttribute("dataPackageCitationHTML");
+  String citationHTML = (String) request.getAttribute("citationHTML");
+  String citationLinkHTML = (String) request.getAttribute("citationLinkHTML");
   String digitalObjectIdentifier = (String) request.getAttribute("digitalObjectIdentifier");
   String pastaDataObjectIdentifier = (String) request.getAttribute("pastaDataObjectIdentifier");
   String provenanceHTML = (String) request.getAttribute("provenanceHTML");
@@ -154,6 +155,15 @@
 								</c:when>
 							</c:choose>
 
+                                    <div class="table-row">                                     
+                                        <div class="table-cell text-align-right">
+                                            <label class="labelBold">Citation:</label>
+                                        </div>
+                                        <div class="table-cell">
+                                            <%= citationHTML %>
+                                        </div>                                          
+                                    </div>
+
 							<c:set var="showAbstract" value="<%= showAbstract %>"/>
 							<c:choose>
 								<c:when test="${showAbstract}">
@@ -275,16 +285,18 @@
 										</div>											
 									</div>
 
+<!-- 
 									<div class="table-row">										
 										<div class="table-cell text-align-right">
 											<label class="labelBold">Citation:</label>
 										</div>
 										<div class="table-cell">
 											<ul class="no-list-style">
-												<li><%= citationHTML %></li>
+												<li><%= citationLinkHTML %></li>
 											</ul>
 										</div>											
 									</div>
+-->
 
 									<div class="table-row">										
 										<div class="table-cell text-align-right">
