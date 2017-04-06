@@ -7318,7 +7318,6 @@ public class DataPackageManagerResource extends PastaWebService {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 			robot = getRobot(headers);
-			logger.info("Robot header: " + robot);
 
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
