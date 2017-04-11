@@ -48,8 +48,6 @@ public class EmlObject {
 	private Logger logger = Logger.getLogger(EmlObject.class);
 
 	private DataPackage dataPackage = null;
-	private Integer personCount = 0;
-	private Integer orgCount = 0;
 
 	/*
 	 * Constructors
@@ -85,28 +83,36 @@ public class EmlObject {
 	 * Instance methods
 	 */
 
-  /**
-   * Returns ArrayList of Creators.
-   * 
-   * @return Creator array list
-   */
-  public ArrayList<ResponsibleParty> getCreators() {
-
-    ArrayList<ResponsibleParty> creators = this.dataPackage.getCreatorList();
-    
-    for (ResponsibleParty creator : creators) {
-      if (creator.isPerson()) {
-        this.personCount++;
-      }
-      else if (creator.isOrganization()) {
-        this.orgCount++;
-      }
-    }
-    
-    return creators;
-  }
-
   
+	/**
+	 * Returns ArrayList of Creators.
+	 * 
+	 * @return Creator array list
+	 */
+	public ArrayList<ResponsibleParty> getCreators() {
+		return (dataPackage.getCreatorList());
+	}
+
+	
+  /**
+   * Returns a count of persons.
+   * 
+   * @return a count of creators that are persons.
+   */
+	public int getPersonCount() {
+		int personCount = 0;
+		ArrayList<ResponsibleParty> creators = this.dataPackage.getCreatorList();
+
+		for (ResponsibleParty creator : creators) {
+			if (creator.isPerson()) {
+				personCount++;
+			}
+		}
+		
+		return personCount;
+	}
+  
+	
   	/**
   	 * Access the dataPackage instance variable.
   	 * 
@@ -117,26 +123,25 @@ public class EmlObject {
 	}
 
 
-	/**
-	 * Returns the number of creators of type PERSON after the call to 
-	 * getCreators().
-	 * 
-	 * @return Person count
-	 */
-	public Integer getPersonCount()	{
-		return this.personCount;
-	}
-	
-	/**
-	 * Returns the number of creators of type ORGANIZATION after the call to 
-	 * getCreators().
-	 * 
-	 * @return Organization count
-	 */
-	public Integer getOrgCount() {
-		return this.orgCount;
-	}
+	  /**
+	   * Returns a count of organizations in the creators list.
+	   * 
+	   * @return a count of creators that are organizations
+	   */
+		public int getOrgCount() {
+			int orgCount = 0;
+			ArrayList<ResponsibleParty> creators = this.dataPackage.getCreatorList();
 
+			for (ResponsibleParty creator : creators) {
+				if (creator.isOrganization()) {
+					orgCount++;
+				}
+			}
+			
+			return orgCount;
+		}
+	  
+		
 	/**
 	 * Returns ArrayList of titles.
 	 * 
