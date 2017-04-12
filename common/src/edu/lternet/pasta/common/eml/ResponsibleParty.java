@@ -170,7 +170,7 @@ public class ResponsibleParty {
   private String firstInitial(String name) {
 	  String firstInitial = name;
 	  
-	  if (name != null && name.length() > 1) {
+	  if (name != null && name.length() > 0) {
 		  firstInitial = String.format("%c.", name.charAt(0));
 	  }
 	  
@@ -183,16 +183,35 @@ public class ResponsibleParty {
    * 
    * @param  useFullGivenName  if true, use the full given name, otherwise
    *                           use the first initials of the given name
+   * @param  lastNameFirst     if true, position last name ahead of given name
    * 
    * @return individualName Individual name.
    */
-  public String getIndividualName(boolean useFullGivenName) {    
-    String individualName = this.surName;
-    
+  public String getIndividualName(boolean useFullGivenName, boolean lastNameFirst) {    
+	String individualName = "";
+    String surName = this.surName;
     String givenName = useFullGivenName ? getGivenName() : getGivenInitials();
     
     if ((givenName != null) && (!givenName.equals(""))) {
-      individualName += ", " + givenName;
+    	if (useFullGivenName) {
+    		if (lastNameFirst) {
+    			individualName = String.format("%s, %s", surName, givenName);
+    		}
+    		else {
+    			individualName = String.format("%s %s", givenName, surName);
+    		}
+    	}
+    	else {
+    		if (lastNameFirst) {
+    			individualName = String.format("%s %s", surName, givenName);
+    		}
+    		else {
+    			individualName = String.format("%s %s", givenName, surName);
+    		}
+    	}
+    }
+    else {
+    	individualName = surName;
     }
     
     return individualName;

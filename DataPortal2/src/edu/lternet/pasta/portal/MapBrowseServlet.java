@@ -25,7 +25,9 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -332,7 +334,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 							creatorsHTMLBuilder.append("<li>");
 
 							boolean useFullGivenName = true;
-							String individualName = creator.getIndividualName(useFullGivenName);
+							boolean lastNameFirst = true;
+							String individualName = creator.getIndividualName(useFullGivenName, lastNameFirst);
 							String positionName = creator.getPositionName();
 							String organizationName = creator
 									.getOrganizationName();
@@ -996,93 +999,64 @@ public class MapBrowseServlet extends DataPortalServlet {
 			titles = emlObject.getTitles();
 
 			if (titles != null) {
-
 				for (Title title : titles) {
 					if (title.getTitleType().equals(Title.MAIN)) {
 						titleText += title.getTitle() + ".";
 					}
 				}
-
 			}
 
 			creators = emlObject.getCreators();
 
 			if (creators != null) {
-
-				Integer personCount = emlObject.getPersonCount();
-				Integer orgCount = emlObject.getOrgCount();
-				Integer cnt = 0;
+				int personCount = emlObject.getPersonCount();
+				int orgCount = emlObject.getOrgCount();
+				int cnt = 0;
 
 				// Citations should include only person names, if possible
 				if (personCount != 0) {
-
-					for (ResponsibleParty creator : creators) {
+					for (ResponsibleParty creator : creators) {	
+						boolean useFullGivenName = false;;
+						boolean lastNameFirst = (cnt == 0);
+						String individualName = creator.getIndividualName(useFullGivenName, lastNameFirst);
 						
-						boolean useFullGivenName = false;
-						String individualName = creator.getIndividualName(useFullGivenName);
-
 						if (individualName != null) {
 							cnt++;
 							if (cnt == personCount) {
-								creatorText += individualName + " ";
-							} else {
-								creatorText += individualName + "; ";
+								if (cnt == 1) {
+									creatorText += individualName + " ";
+								}
+								else {
+									creatorText += individualName + ". ";
+								}
+							} 
+							else {
+								creatorText += individualName + ", ";
 							}
 						}
-
 					}
-
-				} else if (orgCount != 0) { // otherwise, use organization names
-
+				} 
+				else if (orgCount != 0) { // otherwise, use organization names
 					for (ResponsibleParty creator : creators) {
-
 						String organizationName = creator.getOrganizationName();
 
 						if (organizationName != null) {
 							cnt++;
 							if (cnt == orgCount) {
-								creatorText += organizationName + " ";
+								creatorText += organizationName + ". ";
 							} else {
-								creatorText += organizationName + "; ";
+								creatorText += organizationName + ", ";
 							}
 						}
-
 					}
-
 				}
-
-			}
-
-			creators = emlObject.getCreators();
-
-			if (creators != null) {
-
-				Integer orgCount = emlObject.getOrgCount();
-				Integer cnt = 0;
-
-				if (orgCount != 0) {
-
-					for (ResponsibleParty creator : creators) {
-
-						String organizationName = creator.getOrganizationName();
-						
-						if (organizationName != null) {
-							if (!orgText.contains(organizationName)) {
-								cnt++;
-									orgText += organizationName + "; ";
-							}
-						}
-
-					}
-
-				}
-
 			}
 
 			try {
 				citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
 				citationId = citationId.replace("doi:", DxDoiOrg);
-			} catch (Exception e) {
+			} 
+			catch (Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();
 				citationId = dpmClient.getPastaPackageUri(scope, identifier, revision);
@@ -1090,12 +1064,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 				    + " that are \"publicly\" accessible.";
 			}
 			
-			citationUrl = "<a href=\"" + citationId + "\">" + citationId + "</a>"; 
+			citationUrl = "<a href=\"" + citationId + "\">" + citationId + "</a>."; 
 
 			String pubYear = emlObject.getPubYear();
 
 			if (pubYear != null) {
-				pubDateText = " (" + pubYear + "):";
+				pubDateText = pubYear + ".";
 			}
 			else {
 				pubDateText = "";
@@ -1107,12 +1081,29 @@ public class MapBrowseServlet extends DataPortalServlet {
 			html = "<p class=\"warning\">" + e.getMessage() + "</p>\n";
 			return html;
 		}
+		
+		String datasetAccessed=datasetAccessed();
 
-		html = String.format("<ul class=\"no-list-style\"><li>%s%s <cite>%s</cite> %s %s %s</li><li>%s</li></ul>", 
-	               creatorText.trim(), pubDateText, titleText, orgText, PUBLISHER, citationUrl, caveat);
+		html = String.format("<ul class=\"no-list-style\"><li>%s%s <cite>%s</cite> %s %s %s %s</li><li>%s</li></ul>", 
+	               creatorText, pubDateText, titleText, orgText, PUBLISHER, citationUrl, datasetAccessed, caveat);
 		
 		return html;
 
+	}
+	
+	
+	private String datasetAccessed() {
+		String datasetAccessed = null;
+		
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+		String dateString = sdf.format(now);
+		if (dateString.startsWith("0")) {
+			dateString = dateString.substring(1);
+		}
+		datasetAccessed = String.format("Dataset accessed %s.", dateString);
+		
+		return datasetAccessed;
 	}
 	
 }
