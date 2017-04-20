@@ -1571,6 +1571,59 @@ public class DataPackageRegistry {
 		}
 
 	  
+		  /**
+		   * Gets the date_created value for a given resourceId.
+		   * 
+		   * @param   resourceId   the resource identifier
+		   * @return  the value of the 'date_created' field matching
+		   *          the specified resourceId ('resource_id') value
+		   */
+			public String getResourceDateCreated(String resourceId)
+					throws ClassNotFoundException, SQLException {
+				String dateCreated = null;
+
+				Connection connection = null;
+				String selectString = 
+						  "SELECT date_created FROM " + RESOURCE_REGISTRY + 
+						  "  WHERE resource_id='" + resourceId + "'";
+				logger.debug("selectString: " + selectString);
+
+				Statement stmt = null;
+
+				try {
+					connection = getConnection();
+					stmt = connection.createStatement();
+					ResultSet rs = stmt.executeQuery(selectString);
+
+					while (rs.next()) {
+						dateCreated = rs.getString(1);
+					}
+
+					if (stmt != null)
+						stmt.close();
+				}
+				catch (ClassNotFoundException e) {
+					logger.error("ClassNotFoundException: " + e.getMessage());
+					e.printStackTrace();
+					throw (e);
+				}
+				catch (SQLException e) {
+					logger.error("SQLException: " + e.getMessage());
+					e.printStackTrace();
+					throw (e);
+				}
+				finally {
+					returnConnection(connection);
+				}
+				
+				if (dateCreated != null) {
+					dateCreated = dateCreated.replace(' ', 'T');
+				}
+
+				return dateCreated;
+			}
+
+		  
   /**
    * Gets the resource size value for a given resourceId.
    * 

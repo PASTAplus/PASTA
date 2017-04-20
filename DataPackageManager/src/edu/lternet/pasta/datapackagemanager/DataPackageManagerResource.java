@@ -5347,11 +5347,12 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 	@GET
 	@Path("/eml/{scope}/{identifier}/{revision}")
-	@Produces("text/plain")
+	@Produces({ "application/rdf+xml", "text/plain" })
 	public Response readDataPackage(@Context HttpHeaders headers,
 			@PathParam("scope") String scope,
 			@PathParam("identifier") Integer identifier,
-			@PathParam("revision") String revision) {
+			@PathParam("revision") String revision,
+			@QueryParam("ore") String oreParam) {
 		AuthToken authToken = null;
 		String resourceMap = null;
 		String entryText = null;
@@ -5360,6 +5361,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "readDataPackage";
 		Rule.Permission permission = Rule.Permission.read;
 		String robot = null;
+		boolean oreFormat = (oreParam != null);
 
 		try {
 			authToken = getAuthToken(headers);
@@ -5377,7 +5379,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceMap = dataPackageManager.readDataPackage(scope, identifier,
-					revision, authToken, userId);
+					revision, authToken, userId, oreFormat);
 
 			if (resourceMap != null) {
 				responseBuilder = Response.ok(resourceMap);
