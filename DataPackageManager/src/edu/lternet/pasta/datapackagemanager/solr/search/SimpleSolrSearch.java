@@ -311,7 +311,7 @@ public class SimpleSolrSearch {
 						 * on them. They should be deprecated. They have been
 						 * replaced with element names that exactly match their
 						 * corresponding Solr field names: "id", "packageid", and "pubdate".
-						 */
+						 *
 						if (fieldName.equals("id")) {
 							sb.append(String.format("%s%s<docid>%s</docid>\n", INDENT, INDENT, fieldValue));
 						}
@@ -321,6 +321,7 @@ public class SimpleSolrSearch {
 						else if (fieldName.equals("pubdate")) {
 							sb.append(String.format("%s%s<pubDate>%s</pubDate>\n", INDENT, INDENT, fieldValue));
 						}
+						*/
 					}
 				}
 			}
