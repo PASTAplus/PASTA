@@ -80,6 +80,7 @@ import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
+import edu.lternet.pasta.datapackagemanager.ore.ResourceMap;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
@@ -2288,16 +2289,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The revision of the data package.
 	 * @param user
 	 *          The user name
+	 * @param oreFormat
+	 *          If true, return the resource map in ORE formatted
+	 *          as application/rdf+xml
 	 */
 	public String readDataPackage(String scope, Integer identifier,
-	    String revisionStr, AuthToken authToken, String user)
-	    throws ClassNotFoundException, SQLException, IllegalArgumentException {
-		
+	                              String revisionStr, AuthToken authToken, 
+	                              String user, boolean oreFormat)
+	        throws Exception {		
 		boolean hasDataPackage = false;
 		Integer revision = null;
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
 		    dbURL, dbUser, dbPassword);
-		String resourceMap = null;
+		String resourceMapStr = null;
 		StringBuffer stringBuffer = new StringBuffer("");
 
 		/*
@@ -2332,23 +2336,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String entityId = null;
 			String dataPackageId = composeResourceId(ResourceType.dataPackage, scope,
 			    identifier, revision, entityId);
-			/*
-			 * If we have the data package but it was previously deleted (i.e.
-			 * de-activated)
-			 * 
-			 * Note: This logic is no longer valid as of Ticket #912:
-			 *       https://trac.lternet.edu/trac/NIS/ticket/912
-			 *
-			 *
-			boolean isDeactivatedDataPackage = dataPackageRegistry
-			    .isDeactivatedDataPackage(scope, identifier);
-			if (isDeactivatedDataPackage) {
-				String message = "Attempting to read a data package that was previously deleted from PASTA: "
-				    + dataPackageId;
-				throw new ResourceDeletedException(message);
-			}
-			*/
-
+			
 			/*
 			 * Check whether user is authorized to read the data package
 			 */
@@ -2365,15 +2353,23 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * Get the resource map
 			 */
-			ArrayList<String> resources = dataPackageRegistry
-			    .getDataPackageResources(scope, identifier, revision);
+			if (oreFormat) {
+				// Return the resource map in ORE format (application/rdf+xml)
+				ResourceMap resourceMap = new ResourceMap(this, pastaUriHead, scope, identifier, revision);
+				resourceMapStr = resourceMap.toXML();
+			} 
+			else {
+				// Return the resource map in simple plain text format (text/plain)
+				ArrayList<String> resources = dataPackageRegistry.getDataPackageResources(scope, identifier, revision);
 
-			for (String resourceId : resources) {
-				stringBuffer.append(resourceId + "\n");
+				for (String resourceId : resources) {
+					stringBuffer.append(resourceId + "\n");
+				}
+
+				resourceMapStr = stringBuffer.toString();
 			}
-
-			resourceMap = stringBuffer.toString();
-		} else {
+		} 
+		else {
 			if (!hasDataPackage) {
 				String packageId = EMLDataPackage.composePackageId(scope, identifier,
 				    revisionStr);
@@ -2381,10 +2377,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + packageId;
 				throw new ResourceNotFoundException(message);
 			}
-
 		}
 
-		return resourceMap;
+		return resourceMapStr;
 	}
 
 	

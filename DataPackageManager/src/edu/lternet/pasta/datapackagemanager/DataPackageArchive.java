@@ -174,8 +174,9 @@ public class DataPackageArchive {
 			String map = null;
 
 			try {
+				boolean oreFormat = false;
 				map = dpm.readDataPackage(scope, identifier, revision.toString(),
-				    authToken, userId);
+				    authToken, userId, oreFormat);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();

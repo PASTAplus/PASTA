@@ -332,7 +332,7 @@ public class DataPackageManagerResourceTest {
     waitForPastaUpload(testRevision);
     
     // Test readDataPackage for OK status
-    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString(), null);
     statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -560,7 +560,7 @@ public class DataPackageManagerResourceTest {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    Response response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testRevision.toString(), null);
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -573,7 +573,7 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), null);
     assertEquals(404, response.getStatus());
   }
     
@@ -1113,7 +1113,7 @@ public class DataPackageManagerResourceTest {
     waitForPastaUpload(testUpdateRevision);
 
     // Test readDataPackage for OK status
-    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString());
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier, testUpdateRevision.toString(), null);
     statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
