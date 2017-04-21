@@ -101,10 +101,10 @@ public class ResourceMap {
 			configurationListener.initialize(CONFIG_DIR);
 			DataPackageManager dpm = new DataPackageManager();
 			String pastaUriHead = "https://pasta-d.lternet.edu/package/";
-			ResourceMap resourceMap = new ResourceMap(dpm, pastaUriHead, "edi", 8, 2);
+			ResourceMap resourceMap = new ResourceMap(dpm, pastaUriHead, "knb-lter-nin", 1, 1);
 			String xml = resourceMap.toXML();
 			System.out.println(xml);
-		} 
+		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -142,9 +142,11 @@ public class ResourceMap {
 		String entityList = dpm.listDataEntities(scope, identifier, revision, "");
 		String[] entities = entityList.split("\n");
 		for (String entity : entities) {
-			String entityURI = String.format("%s/data/%s/%s/%d/%s",
-                PASTA_URI, scope, identifier, revision, entity);
-			entityURIs.add(entityURI);
+			if (entity.length() > 0) {
+				String entityURI = 
+						String.format("%s/data/%s/%s/%d/%s", PASTA_URI, scope, identifier, revision, entity);
+				entityURIs.add(entityURI);
+			}
 		}
 				
 		/*

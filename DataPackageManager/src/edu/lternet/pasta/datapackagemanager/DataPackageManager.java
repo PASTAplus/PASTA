@@ -1644,13 +1644,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		ArrayList<String> entityList = dataPackageRegistry.listDataEntities(scope,
 		    identifier, revision);
 
-		// Throw a ResourceNotFoundException if the list is empty
+		/* Throw a ResourceNotFoundException if the list is empty
 		if (entityList == null || entityList.size() == 0) {
 			String message = "No entity resources found for scope = '" + scope
 			    + "'; identifier = '" + identifier + "'; revision = '" + revision
 			    + "'\n\n";
 			throw new ResourceNotFoundException(message);
-		}
+		}*/
 
 		for (String entity : entityList) {
 			stringBuffer.append(entity + "\n");
