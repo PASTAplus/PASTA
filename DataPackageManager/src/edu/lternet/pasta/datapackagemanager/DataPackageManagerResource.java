@@ -5237,6 +5237,11 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * or oldest revision, respectively.
 	 * </p>
 	 * 
+	 * <p>
+	 * When the "?ore" query parameter is appended to the request URL, an OAI-ORE 
+	 * compliant resource map in RDF-XML format is returned.
+	 * </p>
+	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
 	 * <tr>
@@ -5279,7 +5284,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The request to read the data package was successful</td>
-	 * <td align=center>A resource graph with reference URLs to each of the
+	 * <td align=center>A resource map with reference URLs to each of the
 	 * metadata, data, and quality report resources that comprise the data
 	 * package.</td>
 	 * <td align=center><code>'text/plain'</code></td>

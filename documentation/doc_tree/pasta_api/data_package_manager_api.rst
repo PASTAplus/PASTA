@@ -651,15 +651,86 @@ Description
 """""""""""
 
 Read Data Package operation, specifying the scope, identifier, and revision of the data package to 
-be read in the URI, returning a resource graph with reference URLs to each of the metadata, data, 
+be read in the URI, returning a resource map with reference URLs to each of the metadata, data, 
 and quality report resources that comprise the data package.
 
 Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
+
+When the "?ore" query parameter is appended to the request URL, an OAI-ORE compliant resource map in RDF-XML format is returned.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/{scope}/{identifier}/{revision}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to read a data package resource map::
+
+     curl -X GET https://pasta.lternet.edu/package/eml/knb-lter-nin/1/1
+
+     https://pasta-d.lternet.edu/package/data/eml/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2
+     https://pasta-d.lternet.edu/package/metadata/eml/knb-lter-nin/1/1
+     https://pasta-d.lternet.edu/package/report/eml/knb-lter-nin/1/1
+     https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1
+
+2. Using :command:`curl` to read a data package resource map, using the "?ore" query parameter to specify that the resource map should be returned as an OAI-ORE compliant RDF-XML document::
+
+     curl -X GET https://pasta.lternet.edu/package/eml/knb-lter-nin/1/1?ore
+     
+     <?xml version="1.0" encoding="UTF-8"?>
+     <rdf:RDF
+        xmlns:cito="http://purl.org/spar/cito/"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:foaf="http://xmlns.com/foaf/0.1/"
+        xmlns:ore="http://www.openarchives.org/ore/terms/"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:rdfs1="http://www.w3.org/2001/01/rdf-schema#"
+     >
+       <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1">
+         <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/ResourceMap"/>
+         <dcterms:created>2013-05-10T22:27:29.763</dcterms:created>
+         <dcterms:modified>2013-05-10T22:27:29.763</dcterms:modified>
+         <dcterms:creator rdf:resource="http://environmentaldatainitiative.org"/>
+         <ore:describes rdf:resource="https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1#aggregation"/>
+         <dcterms:identifier>doi:10.6073/pasta/3bcc89b2d1a410b7a2c678e3c55055e1</dcterms:identifier>
+         <dc:format>application/rdf+xml</dc:format>
+       </rdf:Description>
+       <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1#aggregation">
+         <rdf:type rdf:resource="http://www.openarchives.org/ore/terms/Aggregation"/>
+         <ore:aggregates rdf:resource="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1"/>
+         <ore:aggregates rdf:resource="https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2"/>
+         <ore:aggregates rdf:resource="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1"/>
+       </rdf:Description>
+       <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1">
+         <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1</dcterms:identifier>
+         <cito:documents rdf:resource="https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2"/>
+         <cito:documents rdf:resource="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1"/>
+       </rdf:Description>
+       <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2">
+         <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2</dcterms:identifier>
+         <cito:isDocumentedBy rdf:resource="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1"/>
+       </rdf:Description>
+       <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1">
+         <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1</dcterms:identifier>
+         <cito:isDocumentedBy rdf:resource="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1"/>
+       </rdf:Description>
+       <rdf:Description rdf:about="http://environmentaldatainitiative.org">
+         <foaf:name>Environmental Data Initiative</foaf:name>
+         <foaf:mbox>info@environmentaldatainitiative.org</foaf:mbox>
+       </rdf:Description>
+       <rdf:Description rdf:about="http://www.openarchives.org/ore/terms/ResourceMap">
+         <rdfs1:label>ResourceMap</rdfs1:label>
+         <rdfs1:isDefinedBy>http://www.openarchives.org/ore/terms/</rdfs1:isDefinedBy>
+       </rdf:Description>
+       <rdf:Description rdf:about="http://www.openarchives.org/ore/terms/Aggregation">
+         <rdfs1:label>Aggregation</rdfs1:label>
+         <rdfs1:isDefinedBy>http://www.openarchives.org/ore/terms/</rdfs1:isDefinedBy>
+       </rdf:Description>
+     </rdf:RDF>
+
 
 *Read Data Package ACL*
 ^^^^^^^^^^^^^^^^^^^^^^^

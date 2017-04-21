@@ -86,7 +86,8 @@ public class TestResourceMap {
 
 	  
 	  /**
-	   * Test generation of an RDF-XML Resource Map
+	   * Test generation of an RDF-XML Resource Map by comparing it to a file
+	   * stored in the test/data directory.
 	   */
 	  @Test 
 	  public void testToXML() {
