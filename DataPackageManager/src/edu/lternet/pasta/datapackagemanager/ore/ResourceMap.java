@@ -61,6 +61,8 @@ public class ResourceMap {
 
 	private static final String CITO_DOCUMENTS = "cito:documents";
 	private static final String CITO_IS_DOCUMENTED_BY = "cito:isDocumentedBy";
+	private static final String CITO_IS_SUPPORTED_BY = "cito:isSupportedBy";
+	private static final String CITO_SUPPORTS = "cito:supports";
 	private static final String CREATOR_MBOX = "info@environmentaldatainitiative.org";
 	private static final String CREATOR_NAME = "Environmental Data Initiative";
 	private static final String CREATOR_URL = "http://environmentaldatainitiative.org";
@@ -216,7 +218,7 @@ public class ResourceMap {
 			metadataDescription.addElement(entityResourceElement);
 		}
 
-		reportResourceElement = new EmptyElement(CITO_DOCUMENTS, RDF_RESOURCE, reportURI);
+		reportResourceElement = new EmptyElement(CITO_IS_SUPPORTED_BY, RDF_RESOURCE, reportURI);
 		metadataDescription.addElement(reportResourceElement);
 		
 		
@@ -238,7 +240,7 @@ public class ResourceMap {
 		reportDescription = new Description(reportURI);
 		TextElement reportTextElement = new TextElement(DCTERMS_IDENTIFIER, reportURI);
 		reportDescription.addElement(reportTextElement);
-		EmptyElement reportEmptyElement = new EmptyElement(CITO_IS_DOCUMENTED_BY, RDF_RESOURCE, metadataURI);
+		EmptyElement reportEmptyElement = new EmptyElement(CITO_SUPPORTS, RDF_RESOURCE, metadataURI);
 		reportDescription.addElement(reportEmptyElement);
 		
 		/*
