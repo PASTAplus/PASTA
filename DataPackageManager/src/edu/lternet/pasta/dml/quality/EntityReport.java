@@ -2,6 +2,8 @@ package edu.lternet.pasta.dml.quality;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import edu.lternet.pasta.dml.parser.Entity;
 
 /**
@@ -136,7 +138,8 @@ public class EntityReport {
         String entityId = entity.getId();
         StringBuffer stringBuffer = new StringBuffer("");
         stringBuffer.append("  <entityReport>\n");
-        stringBuffer.append("    <entityName>" + entityName + "</entityName>\n");
+        String escapedEntityName = StringEscapeUtils.escapeXml(entityName);
+        stringBuffer.append("    <entityName>" + escapedEntityName + "</entityName>\n");
         if (entityId != null && !entityId.equals("")) {
           stringBuffer.append("    <entityId>" + entityId + "</entityId>\n");
         }  

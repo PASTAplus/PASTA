@@ -156,7 +156,7 @@ public final class FileUtility {
             }
 
             while ((line = rdr.readLine()) != null) {
-                sb.append(System.getProperty("line.separator"));
+                sb.append("\n");
                 sb.append(line);
             }
 

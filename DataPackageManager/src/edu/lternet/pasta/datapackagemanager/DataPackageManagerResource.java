@@ -5237,6 +5237,11 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * or oldest revision, respectively.
 	 * </p>
 	 * 
+	 * <p>
+	 * When the "?ore" query parameter is appended to the request URL, an OAI-ORE 
+	 * compliant resource map in RDF-XML format is returned.
+	 * </p>
+	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
 	 * <tr>
@@ -5279,7 +5284,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The request to read the data package was successful</td>
-	 * <td align=center>A resource graph with reference URLs to each of the
+	 * <td align=center>A resource map with reference URLs to each of the
 	 * metadata, data, and quality report resources that comprise the data
 	 * package.</td>
 	 * <td align=center><code>'text/plain'</code></td>
@@ -5347,11 +5352,12 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 	@GET
 	@Path("/eml/{scope}/{identifier}/{revision}")
-	@Produces("text/plain")
+	@Produces({ "application/rdf+xml", "text/plain" })
 	public Response readDataPackage(@Context HttpHeaders headers,
 			@PathParam("scope") String scope,
 			@PathParam("identifier") Integer identifier,
-			@PathParam("revision") String revision) {
+			@PathParam("revision") String revision,
+			@QueryParam("ore") String oreParam) {
 		AuthToken authToken = null;
 		String resourceMap = null;
 		String entryText = null;
@@ -5360,6 +5366,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "readDataPackage";
 		Rule.Permission permission = Rule.Permission.read;
 		String robot = null;
+		boolean oreFormat = (oreParam != null);
 
 		try {
 			authToken = getAuthToken(headers);
@@ -5377,7 +5384,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceMap = dataPackageManager.readDataPackage(scope, identifier,
-					revision, authToken, userId);
+					revision, authToken, userId, oreFormat);
 
 			if (resourceMap != null) {
 				responseBuilder = Response.ok(resourceMap);
