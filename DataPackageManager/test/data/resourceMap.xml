@@ -26,7 +26,7 @@
   <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1">
     <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1</dcterms:identifier>
     <cito:documents rdf:resource="https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2"/>
-    <cito:documents rdf:resource="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1"/>
+    <cito:isSupportedBy rdf:resource="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2">
     <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/data/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2</dcterms:identifier>
@@ -34,7 +34,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1">
     <dcterms:identifier>https://pasta-d.lternet.edu/package/eml/report/knb-lter-nin/1/1</dcterms:identifier>
-    <cito:isDocumentedBy rdf:resource="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1"/>
+    <cito:supports rdf:resource="https://pasta-d.lternet.edu/package/eml/metadata/knb-lter-nin/1/1"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://environmentaldatainitiative.org">
     <foaf:name>Environmental Data Initiative</foaf:name>
