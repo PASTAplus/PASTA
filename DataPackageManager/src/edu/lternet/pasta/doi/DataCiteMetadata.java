@@ -51,7 +51,7 @@ public class DataCiteMetadata extends CitationMetadata {
 
 	private Logger logger = Logger.getLogger(DataCiteMetadata.class);
 
-	private DigitalObjectIdentifier identifier = null;
+	private DigitalObjectIdentifier digitalObjectIdentifier = null;
 	private ResourceType resourceType = null;
 	private AlternateIdentifier alternateIdentifier = null;
 
@@ -73,7 +73,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	 * @param doi
 	 */
 	public void setDigitalObjectIdentifier(DigitalObjectIdentifier doi) {
-		this.identifier = doi;
+		this.digitalObjectIdentifier = doi;
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	 * @return DataCite digital object identifier for the PASTA resource
 	 */
 	public DigitalObjectIdentifier getDigitalObjectIdentifier() {
-		return this.identifier;
+		return this.digitalObjectIdentifier;
 	}
 
 	/**
@@ -138,10 +138,10 @@ public class DataCiteMetadata extends CitationMetadata {
 		xml.append(" http://schema.datacite.org/meta/kernel-2.2/metadata.xsd\">\n");
 
 		// The DOI identifier, woo-hoo
-		if (this.identifier != null) {
+		if (this.digitalObjectIdentifier != null) {
 			xml.append("    <identifier identifierType=\""
-			    + this.identifier.getType() + "\">");
-			xml.append(this.identifier.getIdentifier() + "</identifier>\n");
+			    + this.digitalObjectIdentifier.getType() + "\">");
+			xml.append(this.digitalObjectIdentifier.getIdentifier() + "</identifier>\n");
 		}
 
 		// Creators section

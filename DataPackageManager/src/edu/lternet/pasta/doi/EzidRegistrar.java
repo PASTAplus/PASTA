@@ -44,84 +44,49 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
  * @author servilla
+ * @author dcosta
  * @since Nov 17, 2012
  * 
+ * 
+ * The EzidRegistrar class extends the Registrar class. Its main job is to
+ * load properties appropriate for connecting to the EZID DOI Registry.
  */
-public class EzidRegistrar {
+public class EzidRegistrar extends Registrar {
 
 	/*
 	 * Class variables
 	 */
 
-	private static final Logger logger = Logger
-	    .getLogger(edu.lternet.pasta.doi.EzidRegistrar.class);
-
-	private static final String dirPath = "WebRoot/WEB-INF/conf";
 
 	/*
 	 * Instance variables
 	 */
 
-	private DataCiteMetadata dataCiteMetadata = null;
-
-	private String host = null;
-	private String port = null;
-	private String protocol = null;
-
-	private String ezidUser = null;
-	private String ezidPassword = null;
-	private String keystore = null;
-	private String keystorePassword = null;
-
 	private String sessionId = null;
 
+	
 	/*
 	 * Constructors
 	 */
 
 	public EzidRegistrar() throws ConfigurationException {
+		super();    
+	}
 
-		Options options = null;
-		options = ConfigurationListener.getOptions();
-
-		if (options == null) {
-			ConfigurationListener configurationListener = new ConfigurationListener();
-			configurationListener.initialize(dirPath);
-			options = ConfigurationListener.getOptions();
-		}
-
-		this.loadOptions(options);
-
-    }
-
+	
 	/*
 	 * Class methods
 	 */
 
+	
 	/*
 	 * Instance methods
 	 */
-
-	/*
-	 * Closes the HTTP client
-	 */
-	private void closeHttpClient(CloseableHttpClient httpClient) {
-		try {
-			httpClient.close();
-		}
-		catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
 
 	/**
 	 * Loads Data Manager options from a configuration file.
@@ -129,15 +94,15 @@ public class EzidRegistrar {
 	 * @param options Configuration options object.
 	 * @throws ConfigurationException
 	 */
-	private void loadOptions(Options options) throws ConfigurationException {
+	protected void loadOptions(Options options) throws ConfigurationException {
 
 		if (options != null) {
 
 			this.host = options.getOption("datapackagemanager.ezidHost");
 			this.port = options.getOption("datapackagemanager.ezidPort");
 			this.protocol = options.getOption("datapackagemanager.ezidProtocol");
-			this.ezidUser = options.getOption("datapackagemanager.ezidUser");
-			this.ezidPassword = options.getOption("datapackagemanager.ezidPassword");
+			this.registrarUser = options.getOption("datapackagemanager.ezidUser");
+			this.registrarPassword = options.getOption("datapackagemanager.ezidPassword");
 
 		} else {
 			throw new ConfigurationException("Configuration options failed to load");
@@ -147,31 +112,13 @@ public class EzidRegistrar {
 
 	
 	/**
-	 * Sets the DataCite metadata object.
-	 * 
-	 * @param dataCiteMetadata
-	 */
-	public void setDataCiteMetadata(DataCiteMetadata dataCiteMetadata) {
-		this.dataCiteMetadata = dataCiteMetadata;
-	}
-
-	/**
-	 * Gets the DataCite metadata object.
-	 * 
-	 * @return DataCite metadata object
-	 */
-	public DataCiteMetadata getDataCiteMetadata() {
-		return this.dataCiteMetadata;
-	}
-
-	/**
-	 * Login to the EZID web service API system and return a valid session
+	 * Login to the DOI Registrar web service API system and return a valid session
 	 * identifier.
 	 * 
-	 * @return The EZID session id
-	 * @throws EzidException
+	 * @return The session id
+	 * @throws RegistrarException
 	 */
-	public void login() throws EzidException {
+	public void login() throws RegistrarException {
 
 		String sessionId = null;
 
@@ -189,7 +136,7 @@ public class EzidRegistrar {
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-		    this.ezidUser, this.ezidPassword);
+		    this.registrarUser, this.registrarPassword);
 	    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 	    credentialsProvider.setCredentials(authScope, credentials);
 
@@ -205,7 +152,7 @@ public class EzidRegistrar {
 	    context.setCredentialsProvider(credentialsProvider);
 	    context.setAuthCache(authCache);
 
-		HttpGet httpGet = new HttpGet(this.getEzidUrl("/login"));
+		HttpGet httpGet = new HttpGet(this.getRegistrarUrl("/login"));
 
 		HttpResponse response = null;
 		Header[] headers = null;
@@ -249,23 +196,24 @@ public class EzidRegistrar {
 			}
 
 		} else {
-			String gripe = "login: failed EZID login.";
-			throw new EzidException(gripe);
+			String gripe = "login: failed DOI Registrar login.";
+			throw new RegistrarException(gripe);
 		}
 
 		this.sessionId = sessionId;
 
 	}
 
+	
 	/**
-	 * Logout of the EZID service session.
+	 * Logout of the DOI Registrar service session.
 	 * 
-	 * @throws EzidException
+	 * @throws RegistrarException
 	 */
-	public void logout() throws EzidException {
+	public void logout() throws RegistrarException {
 
 	    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		String url = this.getEzidUrl("/logout");
+		String url = this.getRegistrarUrl("/logout");
 		HttpGet httpGet = new HttpGet(url);
 		String entityString = null;
 		Integer statusCode = null;
@@ -293,24 +241,67 @@ public class EzidRegistrar {
 		}
 
 		if (statusCode != HttpStatus.SC_OK) {
-			String gripe = "Failed to logout of EZID cleanly.";
-			throw new EzidException(gripe);
+			String gripe = "Failed to logout of DOI registrar cleanly.";
+			throw new RegistrarException(gripe);
 		}
 
 		logger.info("logout: " + entityString);
 
 	}
 
+	
+	/**
+	 * Parse the "Set-Cookie" header looking for the "sessionid" key-value pair
+	 * and return the session identifier.
+	 * 
+	 * @param setCookieHeader
+	 *          The full "Set-Cookie" header.
+	 * 
+	 * @return The session identifier
+	 */
+	protected String getSessionId(String setCookieHeader) {
+
+		String sessionId = null;
+
+		String[] headerParts = setCookieHeader.split(";");
+
+		for (int i = 0; i < headerParts.length; i++) {
+
+			// Extract token value from the key-value pair.
+			if (headerParts[i].startsWith("sessionid=")) {
+				int start = "sessionid=".length();
+				int end = headerParts[i].length() - 1;
+				sessionId = headerParts[i].substring(start, end);
+			}
+
+		}
+
+		return sessionId;
+
+	}
+
+	
+	/**
+	 * Gets the service session identifier.
+	 * 
+	 * @return service session identifier
+	 */
+	protected String getSessionId() {
+		return this.sessionId;
+	}
+
+	
 	/**
 	 * Registers the resource DOI based on the DataCite metadata object.
 	 * 
-	 * @throws EzidException
+	 * @throws RegistrarException
 	 */
-	public void registerDataCiteMetadata() throws EzidException {
-
-		if (this.dataCiteMetadata == null) {
+	@Override
+	public void registerDataCiteMetadata(DataCiteMetadata dataCiteMetadata) 
+			throws Exception {
+		if (dataCiteMetadata == null) {
 			String gripe = "registerDataCiteMetadata: DataCite metadata object is null.";
-			throw new EzidException(gripe);
+			throw new RegistrarException(gripe);
 		}
 
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
@@ -319,7 +310,7 @@ public class EzidRegistrar {
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-		    this.ezidUser, this.ezidPassword);
+		    this.registrarUser, this.registrarPassword);
 	    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 	    credentialsProvider.setCredentials(authScope, credentials);
 
@@ -335,13 +326,13 @@ public class EzidRegistrar {
 	    context.setCredentialsProvider(credentialsProvider);
 	    context.setAuthCache(authCache);
 
-		String doi = this.dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-		String url = this.getEzidUrl("/id/" + doi);
+		String doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
+		String url = this.getRegistrarUrl("/id/" + doi);
 		StringBuffer metadata = new StringBuffer("");
 		metadata
-		    .append("datacite: " + this.dataCiteMetadata.toDataCiteXml() + "\n");
+		    .append("datacite: " + dataCiteMetadata.toDataCiteXml() + "\n");
 		metadata
-		    .append("_target: " + this.dataCiteMetadata.getLocationUrl() + "\n");
+		    .append("_target: " + dataCiteMetadata.getLocationUrl() + "\n");
 		HttpPut httpPut = new HttpPut(url);
 		httpPut.setHeader("Content-type", "text/plain");
 		HttpEntity stringEntity = null;
@@ -368,7 +359,7 @@ public class EzidRegistrar {
 			closeHttpClient(httpClient);
 		}
 
-		logger.info("registerDataCiteMetadata: " + this.dataCiteMetadata.getLocationUrl() + "\n" + entityString);
+		logger.info("registerDataCiteMetadata: " + dataCiteMetadata.getLocationUrl() + "\n" + entityString);
 
 		// Test for DOI collision or DOI registration failure
 		if ((statusCode == HttpStatus.SC_BAD_REQUEST) && 
@@ -376,23 +367,24 @@ public class EzidRegistrar {
 			(entityString.contains("identifier already exists"))
 		   ) {
 			String gripe = "identifier already exists";
-			throw new EzidException(gripe);
+			throw new RegistrarException(gripe);
 		} else if (statusCode != HttpStatus.SC_CREATED) {
-			logger.error(this.dataCiteMetadata.toDataCiteXml());
+			logger.error(dataCiteMetadata.toDataCiteXml());
 			String gripe = "DOI registration failed for: " + doi;
-			throw new EzidException(gripe);
+			throw new RegistrarException(gripe);
 		}
 
 	}
 
+	
 	/**
-	 * Make the DOI obsolete by setting the EZID metadata field "_status" to
+	 * Make the DOI obsolete by setting the Datacite metadata field "_status" to
 	 * "unavailable".
 	 * 
 	 * @param doi The DOI to obsolete
-	 * @throws EzidException
+	 * @throws RegistrarException
 	 */
-	public void obsoleteDoi(String doi) throws EzidException {
+	public void obsoleteDoi(String doi) throws RegistrarException {
 
 		HttpHost httpHost = new HttpHost(this.host, Integer.valueOf(this.port),
 		    this.protocol);
@@ -400,7 +392,7 @@ public class EzidRegistrar {
 		AuthScope authScope = new AuthScope(httpHost.getHostName(),
 		    httpHost.getPort());
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-		    this.ezidUser, this.ezidPassword);
+		    this.registrarUser, this.registrarPassword);
 	    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 	    credentialsProvider.setCredentials(authScope, credentials);
 
@@ -416,7 +408,7 @@ public class EzidRegistrar {
 	    context.setCredentialsProvider(credentialsProvider);
 	    context.setAuthCache(authCache);
 		
-		String url = this.getEzidUrl("/id/" + doi);
+		String url = this.getRegistrarUrl("/id/" + doi);
 
 		StringBuffer metadata = new StringBuffer("");
 		metadata.append("_status: unavailable | withdrawn by author\n");
@@ -451,62 +443,12 @@ public class EzidRegistrar {
 
 	 if (statusCode != HttpStatus.SC_OK) {
 			String gripe = "DOI obsoletion failed for: " + doi;
-			throw new EzidException(gripe);
+			throw new RegistrarException(gripe);
 		}
 
 	}
 
 	
-	/**
-	 * Parse the "Set-Cookie" header looking for the "sessionid" key-value pair
-	 * and return the session identifier.
-	 * 
-	 * @param setCookieHeader
-	 *          The full "Set-Cookie" header.
-	 * 
-	 * @return The session identifier
-	 */
-	private String getSessionId(String setCookieHeader) {
-
-		String sessionId = null;
-
-		String[] headerParts = setCookieHeader.split(";");
-
-		for (int i = 0; i < headerParts.length; i++) {
-
-			// Extract token value from the key-value pair.
-			if (headerParts[i].startsWith("sessionid=")) {
-				int start = "sessionid=".length();
-				int end = headerParts[i].length() - 1;
-				sessionId = headerParts[i].substring(start, end);
-			}
-
-		}
-
-		return sessionId;
-
-	}
-
-	/**
-	 * Builds full URL to EZID services.
-	 * 
-	 * @param url
-	 *          The EZID URL path
-	 * @return The full URL
-	 */
-	private String getEzidUrl(String url) {
-		return this.protocol + "://" + this.host + url;
-	}
-
-	/**
-	 * Gets the EZID service session identifier.
-	 * 
-	 * @return EZID service session identifier
-	 */
-	private String getSessionId() {
-		return this.sessionId;
-	}
-
 	/**
 	 * @param args
 	 */
@@ -517,7 +459,8 @@ public class EzidRegistrar {
 		try {
 			ezidRegistrar = new EzidRegistrar();
 			ezidRegistrar.obsoleteDoi("doi:10.6073/pasta/dcbd7c1aab57af6a65672aa917bb3faf");
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
