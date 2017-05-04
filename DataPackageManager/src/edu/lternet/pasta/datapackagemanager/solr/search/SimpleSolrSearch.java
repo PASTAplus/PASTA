@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -257,6 +258,7 @@ public class SimpleSolrSearch {
 					
 					if (fieldName.equals("title")) {			
 						String title = (String) solrDocument.getFirstValue("title");
+						title = StringEscapeUtils.escapeXml(title);
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
 												INDENT, INDENT, fieldName, title, fieldName));
 					}
@@ -279,6 +281,7 @@ public class SimpleSolrSearch {
 									valueStr = (String) value;
 								}
 								
+								valueStr = StringEscapeUtils.escapeXml(valueStr);
 								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
 										                INDENT, INDENT, INDENT, fieldName, valueStr, fieldName));
 							}
@@ -300,6 +303,7 @@ public class SimpleSolrSearch {
 							fieldValue = (String) solrDocument.getFieldValue(fieldName);
 							if (fieldValue == null) fieldValue = "";
 						}
+						fieldValue = StringEscapeUtils.escapeXml(fieldValue);
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
 				                                INDENT, INDENT, fieldName, fieldValue, fieldName));
 
