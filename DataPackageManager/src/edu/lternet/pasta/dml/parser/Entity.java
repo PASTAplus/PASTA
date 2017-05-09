@@ -79,6 +79,16 @@ public class Entity extends DataObjectDescription
     public static String VIEWENTITY = "VIEWENTITY";
     public static String OTHERENTITY = "OTHERENTITY";
     
+    public static TreeSet<String> preferredFormatStrings;
+    
+    static {
+    	preferredFormatStrings = new TreeSet<String>();
+    	preferredFormatStrings.add("YYYY-MM-DD");
+    	preferredFormatStrings.add("YYYY");
+    	preferredFormatStrings.add("Dummy Value");
+    }
+    
+    
     /*
      * Instance fields
      */
@@ -204,7 +214,27 @@ public class Entity extends DataObjectDescription
     	
     	checkIntegrityChecksum("SHA-1", hashValue);
     }
+    
+    
+    /*
+     * Class methods
+     */
+    
+    public static boolean isPreferredFormatString(String formatString) {
+    	return preferredFormatStrings.contains(formatString);
+    }
+    
+    
+    public static void addPreferredFormatString(String formatString) {
+    	if (formatString != null) {
+    		preferredFormatStrings.add(formatString);
+    	}
+    }
 
+    
+    /*
+     * Instance methods
+     */
     
     /**
      * Add an Attribute to this table.
@@ -336,6 +366,37 @@ public class Entity extends DataObjectDescription
             found = "No 'numHeaderLines' element found";
         }
         qualityCheck.setFound(found);
+        addQualityCheck(qualityCheck);
+      }
+    }
+    
+    
+    /**
+     * Perform a quality check on a dateTime/formatString value found in
+     * the attribute list of this entity.
+     * 
+     * @param  formatString  the dateTime/formatString value
+     */
+    public void checkDateTimeFormatString(String formatString) {
+      String identifier = "dateTimeFormatString";
+      QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(identifier);
+      QualityCheck qualityCheck = new QualityCheck(identifier, qualityCheckTemplate);
+
+      if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+        qualityCheck.setFound(formatString);
+        boolean isPreferred = isPreferredFormatString(formatString);
+        
+    	qualityCheck.setExpected("One of the following preferred values is expected: " + 
+                preferredFormatStrings.toString());
+        if (isPreferred) {
+        	qualityCheck.setStatus(Status.valid);
+        	qualityCheck.setExplanation("The formatString is in the set of preferred values.");
+        }
+        else {
+        	qualityCheck.setFailedStatus();
+        	qualityCheck.setExplanation("The formatString is not in the set of preferred values.");
+        }
+        
         addQualityCheck(qualityCheck);
       }
     }

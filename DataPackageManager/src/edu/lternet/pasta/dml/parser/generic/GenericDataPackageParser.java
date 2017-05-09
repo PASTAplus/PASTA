@@ -633,12 +633,12 @@ public class GenericDataPackageParser implements DataPackageParserInterface
      * @param  xpathapi  XPath API
      * @param  attributeListNodeList   a NodeList
      * @param  xpath     the XPath path string to the data entity 
-     * @param  entObj    the entity object whose attribute list is processed
+     * @param  entity    the entity object whose attribute list is processed
      */
     private void processAttributeList(CachedXPathAPI xpathapi, 
                                       NodeList attributeListNodeList, 
                                       String xpath,
-                                      Entity entObj) 
+                                      Entity entity) 
             throws Exception
     {
         AttributeList attributeList = new AttributeList();
@@ -652,14 +652,14 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           if (xpath != null && xpath.equals(otherEntityPath)) {
             System.err.println(
                 "No attributeList was specified for otherEntity '" +
-                entObj.getName() + "'. This is allowable in EML."
+                entity.getName() + "'. This is allowable in EML."
                               );
             return;
           }
           else {
             throw new Exception(
                 "No attributeList was specified for entity '" + 
-                entObj.getName() + "'.");
+                entity.getName() + "'.");
           }
         }
         
@@ -691,7 +691,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         if (attributeNodeList != null && 
             attributeNodeList.getLength() > 0) 
         {
-            processAttributes(xpathapi, attributeNodeList, attributeList);
+            processAttributes(xpathapi, attributeNodeList, attributeList, entity);
             
             if (idString != null)
             {
@@ -755,10 +755,12 @@ public class GenericDataPackageParser implements DataPackageParserInterface
      * @param  xpathapi           the XPath API
      * @param  attributesNodeList a node list
      * @param  attributeList      an AttributeList object
+     * @param  entity             the entity object whose attribute list is being processed
      */
     private void processAttributes(CachedXPathAPI xpathapi, 
                                    NodeList attributesNodeList, 
-                                   AttributeList attributeList)
+                                   AttributeList attributeList,
+                                   Entity entity)
             throws Exception
     {
         int attributesNodeListLength = attributesNodeList.getLength();
@@ -1060,20 +1062,16 @@ public class GenericDataPackageParser implements DataPackageParserInterface
                             }
                         } else if (measurementScaleChildNodeName.
                                        equalsIgnoreCase("datetime")) {
-                            DateTimeDomain date = new DateTimeDomain();
+                            DateTimeDomain dateTimeDomain = new DateTimeDomain();
                             String formatString = 
                               (xpathapi.selectSingleNode(measurementScaleChildNode,
                                                          "./formatString")).
                                           getFirstChild().
                                           getNodeValue();
                             
-                        	  if (isDebugging) {
-                        	    //log.debug(
-                              //          "The format string in date time is " 
-                              //          + formatString);
-                        	  }
-                            date.setFormatString(formatString);
-                            domain = date;
+                            dateTimeDomain.setFormatString(formatString);
+                            domain = dateTimeDomain;
+                            entity.checkDateTimeFormatString(formatString);
                         }
                     }
                 }
