@@ -703,8 +703,8 @@ public class Entity extends DataObjectDescription
 					if (hashMethod.equals(actualHashMethod)) {
 						String metadataHashValue = physicalAuthenticationMap.get(hashMethod);
 						if (metadataHashValue != null) {
-							qualityCheck.setExpected(metadataHashValue);
-							qualityCheck.setFound(actualHashValue);
+							qualityCheck.setExpected(actualHashValue);
+							qualityCheck.setFound(metadataHashValue);
 							if (actualHashValue.equals(metadataHashValue)) {
 								congruent = true;
 							}
