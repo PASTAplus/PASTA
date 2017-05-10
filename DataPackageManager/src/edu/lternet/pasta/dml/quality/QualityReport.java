@@ -379,6 +379,25 @@ public class QualityReport {
   
 
   /**
+   * Add formatString values as specified in the properties file to the set
+   * of preferred values.
+   * 
+   * @param preferredList  a comma-separated list of preferred values as
+   *                       specified in the datapackagemanager.properties file.
+   *                       This will potentially extend the set already defined
+   *                       in the Entity class.
+   */
+  public static void setPreferredFormatStrings(String preferredList) {
+	  if (preferredList != null) {
+		  String[] formatStrings = preferredList.split(",");
+		  for (String formatString : formatStrings) {
+			  Entity.addPreferredFormatString(formatString);
+		  }
+	  }
+  }
+  
+
+  /**
    * This method ensures that the output String has only valid XML unicode characters as 
    * specified by the XML 1.0 standard. For reference, please see 
    * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the standard</a>. 

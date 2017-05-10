@@ -196,6 +196,17 @@
   <entityReport>
     <entityName></entityName>
     <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
+      <identifier>dateTimeFormatString</identifier>
+      <name>dateTime/formatString specified in metadata is from a preferred set of values</name>
+      <description></description>
+      <expected></expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation></explanation>    
+      <suggestion>Modify the dateTime/formatString, selecting from among the preferred values one that best matches the data format</suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
       <identifier>entityNameLength</identifier>
       <name>Length of entityName is not excessive (less than 100 char)</name>
       <description>length of entity name is less than 100 characters</description>
