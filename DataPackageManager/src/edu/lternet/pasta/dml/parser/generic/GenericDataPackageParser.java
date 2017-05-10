@@ -108,7 +108,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     // previously these were constants, now member variables with defaults
     protected String packageIdPath = null;
     protected String pubDatePath = null;
-    protected String tableEntityPath = null;
+    protected String dataTableEntityPath = null;
     protected String spatialRasterEntityPath = null;
     protected String spatialVectorEntityPath  = null;
     protected String storedProcedureEntityPath = null;
@@ -169,14 +169,15 @@ public class GenericDataPackageParser implements DataPackageParserInterface
      * for many more datapackage element locations
 	 * @param packageIdPath
 	 * @param pubDatePath
-	 * @param tableEntityPath
+	 * @param dataTableEntityPath
 	 * @param spatialRasterEntityPath
 	 * @param spatialVectorEntityPath
 	 * @param storedProcedureEntityPath
 	 * @param viewEntityPath
 	 * @param otherEntityPath
 	 */
-	public GenericDataPackageParser(String packageIdPath, String pubDatePath, String tableEntityPath,
+	public GenericDataPackageParser(String packageIdPath, String pubDatePath, 
+			String dataTableEntityPath,
 			String spatialRasterEntityPath, String spatialVectorEntityPath,
 			String storedProcedureEntityPath, String viewEntityPath,
 			String otherEntityPath, String entityPhysicalAuthenticationPath) {
@@ -191,8 +192,8 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		if (pubDatePath != null) {
 			this.pubDatePath = pubDatePath;
 		}
-		if (tableEntityPath != null) {
-			this.tableEntityPath = tableEntityPath;
+		if (dataTableEntityPath != null) {
+			this.dataTableEntityPath = dataTableEntityPath;
 		}
 		if (spatialRasterEntityPath != null) {	
 			this.spatialRasterEntityPath = spatialRasterEntityPath;
@@ -223,7 +224,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		// sets the default path values for documents
 		packageIdPath = "//*/@packageId";
 		pubDatePath = "//dataset/pubDate";
-		tableEntityPath = "//dataset/dataTable";
+		dataTableEntityPath = "//dataset/dataTable";
 		spatialRasterEntityPath = "//dataset/spatialRaster";
 		spatialVectorEntityPath = "//dataset/spatialVector";
 		storedProcedureEntityPath = "//dataset/storedProcedure";
@@ -334,7 +335,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           emlDataPackage.setNumberOfTemporalCoverageElements(nTemporalCoverageElements);
             
             // now dataTable, spatialRaster and spatialVector are handled
-            dataTableEntities              = xpathapi.selectNodeList(doc, tableEntityPath);
+            dataTableEntities              = xpathapi.selectNodeList(doc, dataTableEntityPath);
             spatialRasterEntities = 
                               xpathapi.selectNodeList(doc, spatialRasterEntityPath);
             spatialVectorEntities = 
@@ -430,7 +431,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         
         try {
             //log.debug("Processing entities");
-            processEntities(xpathapi, dataTableEntities, tableEntityPath, packageId);
+            processEntities(xpathapi, dataTableEntities, dataTableEntityPath, packageId);
             //TODO: current we still treat them as TableEntity java object, 
             //in future we need add new SpatialRasterEntity and SpatialVector
             // object for them
@@ -1198,6 +1199,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean hasNumberOfRecords = false;
             boolean hasPhysicalAuthentication = false;
             boolean isExternallyDefinedFormat = false;
+            boolean isDataTableEntity = false;
             boolean isOtherEntity = false;
             boolean isImageEntity   = false;
             boolean isGZipDataFile  = false;
@@ -1209,13 +1211,13 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             HashMap<String,String> integrityMap = new HashMap<String,String>();
 
             if (xpath != null) {
-              if (xpath.equals(spatialRasterEntityPath) || 
-                  xpath.equals(spatialVectorEntityPath)) {
-                isImageEntity = true;
-              }
-              else if (xpath.equals(otherEntityPath)) {
-                isOtherEntity = true;
-              }
+				if (xpath.equals(dataTableEntityPath)) {
+					isDataTableEntity = true;
+				} else if (xpath.equals(spatialRasterEntityPath) || xpath.equals(spatialVectorEntityPath)) {
+					isImageEntity = true;
+				} else if (xpath.equals(otherEntityPath)) {
+					isOtherEntity = true;
+				}
             }
             
              //go through the entities and put the information into the hash.
@@ -1655,6 +1657,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setURLFunction(onlineUrlFunction);
           entityObject.setDataFormat(format);
           entityObject.setCompressionMethod(compressionMethod);
+          entityObject.setIsDataTableEntity(isDataTableEntity);
           entityObject.setIsImageEntity(isImageEntity);
           entityObject.setIsOtherEntity(isOtherEntity);
           entityObject.setHasGZipDataFile(isGZipDataFile);

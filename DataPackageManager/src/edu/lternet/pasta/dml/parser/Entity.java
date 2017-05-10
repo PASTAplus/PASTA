@@ -125,6 +125,7 @@ public class Entity extends DataObjectDescription
     private boolean hasDistributionInline = false;
     private boolean hasNumberOfRecords = false;
     private boolean hasPhysicalAuthentication = false;
+    private boolean isDataTableEntity = false;
     private boolean isImageEntity    = false;
     private boolean isOtherEntity    = false;
     private boolean hasGZipDataFile  = false;
@@ -738,17 +739,19 @@ public class Entity extends DataObjectDescription
 				new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
 
 		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
-			if (this.hasNumberOfRecords) {
-				qualityCheck.setFound("numberOfRecords element found");
-				qualityCheck.setStatus(Status.valid);
-				qualityCheck.setSuggestion("");
-			} 
-			else {
-				qualityCheck.setFound("numberOfRecords element not found");
-				qualityCheck.setFailedStatus();
-			}
+			// Run this quality check only on dataTable entities
+			if (isDataTableEntity()) {
+				if (this.hasNumberOfRecords) {
+					qualityCheck.setFound("numberOfRecords element found");
+					qualityCheck.setStatus(Status.valid);
+					qualityCheck.setSuggestion("");
+				} else {
+					qualityCheck.setFound("numberOfRecords element not found");
+					qualityCheck.setFailedStatus();
+				}
 
-			addQualityCheck(qualityCheck);
+				addQualityCheck(qualityCheck);
+			}
 		}
 	}
 
@@ -1337,6 +1340,26 @@ public class Entity extends DataObjectDescription
     public void setIsImageEntity(boolean isImageEntity)
     {
       this.isImageEntity = isImageEntity;
+    }
+    
+    
+    /**
+     * Gets the isDataTableEntity value.
+     * 
+     * @return isDataTableEntity  true if this is a dataTable entity, else false
+     */
+    public boolean isDataTableEntity() {
+      return isDataTableEntity;
+    }
+    
+    
+    /**
+     * Sets the isDataTableEntity value.
+     * 
+     * @param isDataTableEntity  true if this is a dataTable entity, else false
+     */
+    public void setIsDataTableEntity(boolean isDataTableEntity) {
+      this.isDataTableEntity = isDataTableEntity;
     }
     
     
