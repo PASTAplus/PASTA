@@ -79,6 +79,16 @@ public class Entity extends DataObjectDescription
     public static String VIEWENTITY = "VIEWENTITY";
     public static String OTHERENTITY = "OTHERENTITY";
     
+    public static TreeSet<String> preferredFormatStrings;
+    
+    static {
+    	preferredFormatStrings = new TreeSet<String>();
+    	preferredFormatStrings.add("YYYY-MM-DD");
+    	preferredFormatStrings.add("YYYY");
+    	preferredFormatStrings.add("Dummy Value");
+    }
+    
+    
     /*
      * Instance fields
      */
@@ -115,6 +125,7 @@ public class Entity extends DataObjectDescription
     private boolean hasDistributionInline = false;
     private boolean hasNumberOfRecords = false;
     private boolean hasPhysicalAuthentication = false;
+    private boolean isDataTableEntity = false;
     private boolean isImageEntity    = false;
     private boolean isOtherEntity    = false;
     private boolean hasGZipDataFile  = false;
@@ -204,7 +215,27 @@ public class Entity extends DataObjectDescription
     	
     	checkIntegrityChecksum("SHA-1", hashValue);
     }
+    
+    
+    /*
+     * Class methods
+     */
+    
+    public static boolean isPreferredFormatString(String formatString) {
+    	return preferredFormatStrings.contains(formatString);
+    }
+    
+    
+    public static void addPreferredFormatString(String formatString) {
+    	if (formatString != null) {
+    		preferredFormatStrings.add(formatString);
+    	}
+    }
 
+    
+    /*
+     * Instance methods
+     */
     
     /**
      * Add an Attribute to this table.
@@ -336,6 +367,37 @@ public class Entity extends DataObjectDescription
             found = "No 'numHeaderLines' element found";
         }
         qualityCheck.setFound(found);
+        addQualityCheck(qualityCheck);
+      }
+    }
+    
+    
+    /**
+     * Perform a quality check on a dateTime/formatString value found in
+     * the attribute list of this entity.
+     * 
+     * @param  formatString  the dateTime/formatString value
+     */
+    public void checkDateTimeFormatString(String formatString) {
+      String identifier = "dateTimeFormatString";
+      QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(identifier);
+      QualityCheck qualityCheck = new QualityCheck(identifier, qualityCheckTemplate);
+
+      if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+        qualityCheck.setFound(formatString);
+        boolean isPreferred = isPreferredFormatString(formatString);
+        
+    	qualityCheck.setExpected("One of the following preferred values is expected: " + 
+                preferredFormatStrings.toString());
+        if (isPreferred) {
+        	qualityCheck.setStatus(Status.valid);
+        	qualityCheck.setExplanation("The formatString is in the set of preferred values.");
+        }
+        else {
+        	qualityCheck.setFailedStatus();
+        	qualityCheck.setExplanation("The formatString is not in the set of preferred values.");
+        }
+        
         addQualityCheck(qualityCheck);
       }
     }
@@ -641,8 +703,8 @@ public class Entity extends DataObjectDescription
 					if (hashMethod.equals(actualHashMethod)) {
 						String metadataHashValue = physicalAuthenticationMap.get(hashMethod);
 						if (metadataHashValue != null) {
-							qualityCheck.setExpected(metadataHashValue);
-							qualityCheck.setFound(actualHashValue);
+							qualityCheck.setExpected(actualHashValue);
+							qualityCheck.setFound(metadataHashValue);
 							if (actualHashValue.equals(metadataHashValue)) {
 								congruent = true;
 							}
@@ -677,17 +739,19 @@ public class Entity extends DataObjectDescription
 				new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
 
 		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
-			if (this.hasNumberOfRecords) {
-				qualityCheck.setFound("numberOfRecords element found");
-				qualityCheck.setStatus(Status.valid);
-				qualityCheck.setSuggestion("");
-			} 
-			else {
-				qualityCheck.setFound("numberOfRecords element not found");
-				qualityCheck.setFailedStatus();
-			}
+			// Run this quality check only on dataTable entities
+			if (isDataTableEntity()) {
+				if (this.hasNumberOfRecords) {
+					qualityCheck.setFound("numberOfRecords element found");
+					qualityCheck.setStatus(Status.valid);
+					qualityCheck.setSuggestion("");
+				} else {
+					qualityCheck.setFound("numberOfRecords element not found");
+					qualityCheck.setFailedStatus();
+				}
 
-			addQualityCheck(qualityCheck);
+				addQualityCheck(qualityCheck);
+			}
 		}
 	}
 
@@ -1276,6 +1340,26 @@ public class Entity extends DataObjectDescription
     public void setIsImageEntity(boolean isImageEntity)
     {
       this.isImageEntity = isImageEntity;
+    }
+    
+    
+    /**
+     * Gets the isDataTableEntity value.
+     * 
+     * @return isDataTableEntity  true if this is a dataTable entity, else false
+     */
+    public boolean isDataTableEntity() {
+      return isDataTableEntity;
+    }
+    
+    
+    /**
+     * Sets the isDataTableEntity value.
+     * 
+     * @param isDataTableEntity  true if this is a dataTable entity, else false
+     */
+    public void setIsDataTableEntity(boolean isDataTableEntity) {
+      this.isDataTableEntity = isDataTableEntity;
     }
     
     
