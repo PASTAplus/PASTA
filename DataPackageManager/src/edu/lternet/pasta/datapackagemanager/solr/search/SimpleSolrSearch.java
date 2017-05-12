@@ -278,6 +278,9 @@ public class SimpleSolrSearch {
 								}
 								else {
 									valueStr = (String) value;
+									if (fieldName.equals("keyword")) {
+										valueStr = StringEscapeUtils.escapeXml(valueStr);
+									}
 								}
 								
 								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
@@ -300,7 +303,9 @@ public class SimpleSolrSearch {
 						else {
 							fieldValue = (String) solrDocument.getFieldValue(fieldName);
 							if (fieldValue == null) fieldValue = "";
-							fieldValue = StringEscapeUtils.escapeXml(fieldValue);
+							if (!fieldName.equals("responsibleParties")) {
+								fieldValue = StringEscapeUtils.escapeXml(fieldValue);
+							}
 						}
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
 				                                INDENT, INDENT, fieldName, fieldValue, fieldName));
