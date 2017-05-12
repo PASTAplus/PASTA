@@ -103,7 +103,7 @@ public class DOIScanner {
 		}
 		
 		try {
-			registrar = new EzidRegistrar();
+			registrar = new DataCiteRegistrar();
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -308,10 +308,10 @@ public class DOIScanner {
 
 		ArrayList<String> doiList = null;
 
-		EzidRegistrar ezidRegistrar = null;
+		Registrar registrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar();
+			registrar = new DataCiteRegistrar();
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -332,7 +332,7 @@ public class DOIScanner {
 			logger.info("DOI to obsolete: " + doi);
 			
 			try {
-				ezidRegistrar.obsoleteDoi(doi);
+				registrar.obsoleteDoi(doi);
 			} catch (EzidException e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();

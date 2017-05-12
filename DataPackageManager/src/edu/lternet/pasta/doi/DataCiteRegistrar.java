@@ -32,6 +32,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
@@ -158,17 +159,17 @@ public class DataCiteRegistrar extends Registrar {
 		StringBuffer requestBodyBuffer = new StringBuffer("");
 		requestBodyBuffer.append("doi=" + doi + "\n");
 		requestBodyBuffer.append("url=:" + url + "\n");
-		HttpPut httpPut = new HttpPut(url);
-		httpPut.setHeader("Content-type", "text/plain");
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setHeader("Content-type", "text/plain");
 		HttpEntity stringEntity = null;
 		Integer statusCode = null;
 		String entityString = null;
 
 		try {
 			stringEntity = new StringEntity(requestBodyBuffer.toString());
-			httpPut.setEntity(stringEntity);
+			httpPost.setEntity(stringEntity);
 			logger.info("mintDOI request body:\n" + stringEntity);
-			HttpResponse httpResponse = httpClient.execute(httpHost, httpPut, context);
+			HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, context);
 			statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			entityString = EntityUtils.toString(httpEntity);
@@ -242,25 +243,22 @@ public class DataCiteRegistrar extends Registrar {
 	    context.setAuthCache(authCache);
 
 		String doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-		String url = this.getRegistrarUrl("/id/" + doi);
-		
+		String url = this.getRegistrarUrl("/metadata/" + doi);
 		
 		StringBuffer metadata = new StringBuffer("");
-		metadata
-		    .append("datacite: " + dataCiteMetadata.toDataCiteXml() + "\n");
-		metadata
-		    .append("_target: " + dataCiteMetadata.getLocationUrl() + "\n");
-		HttpPut httpPut = new HttpPut(url);
-		httpPut.setHeader("Content-type", "text/plain");
+		String metadataXML = dataCiteMetadata.toDataCiteXml();
+		metadata.append(metadataXML + "\n");
+		HttpPost httpPost = new HttpPost(url);
+		httpPost.setHeader("Content-type", "text/plain");
 		HttpEntity stringEntity = null;
 		Integer statusCode = null;
 		String entityString = null;
 
 		try {
 			stringEntity = new StringEntity(metadata.toString());
-			httpPut.setEntity(stringEntity);
+			httpPost.setEntity(stringEntity);
 			logger.info("Create metadata request body:\n" + stringEntity);
-			HttpResponse httpResponse = httpClient.execute(httpHost, httpPut, context);
+			HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, context);
 			statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
 			entityString = EntityUtils.toString(httpEntity);
@@ -286,13 +284,13 @@ public class DataCiteRegistrar extends Registrar {
 			if (statusCode == HttpStatus.SC_BAD_REQUEST) {
 				msg = "Bad request. Identifier already exists: ";
 			} 
-			else if (statusCode != HttpStatus.SC_UNAUTHORIZED) {
+			else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
 				msg = "Unauthorized request to mint DOI: ";
 			}
-			else if (statusCode != HttpStatus.SC_FORBIDDEN) {
+			else if (statusCode == HttpStatus.SC_FORBIDDEN) {
 				msg = "Forbidden: login problem, quota exceeded: ";
 			}
-			else if (statusCode != HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+			else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
 				msg = "Internal server error: ";
 			}
 		
