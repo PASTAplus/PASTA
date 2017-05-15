@@ -204,7 +204,8 @@ public class DataCiteMetadata extends CitationMetadata {
 
 		xml.append("</resource>\n");
 
-		return DataCiteMetadata.escape(xml.toString());
+		//return DataCiteMetadata.escape(xml.toString());
+		return xml.toString();
 
 	}
 	

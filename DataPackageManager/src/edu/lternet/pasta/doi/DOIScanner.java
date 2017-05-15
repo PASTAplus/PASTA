@@ -117,6 +117,16 @@ public class DOIScanner {
 	/*
 	 * Class methods
 	 */
+	
+	public static void main(String[] args) {
+		try {
+			DOIScanner doiScanner = new DOIScanner();
+			doiScanner.doScanToRegister();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/*
 	 * Instance methods
@@ -243,7 +253,6 @@ public class DOIScanner {
 				dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
 
 				try {
-
 					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
 					registrar.registerDataCiteMetadata(dataCiteMetadata);
 

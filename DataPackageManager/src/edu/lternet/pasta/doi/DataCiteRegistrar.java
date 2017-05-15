@@ -124,15 +124,15 @@ public class DataCiteRegistrar extends Registrar {
 	 * 
 	 * @throws RegistrarException
 	 */
-	private void mintDOI(String doi, String url)
+	private void mintDOI(String doi, String landingPageURL)
 			throws Exception {
 		if (doi == null) {
 			String gripe = "doi parameter is null.";
 			throw new RegistrarException(gripe);
 		}
 		
-		if (url == null) {
-			String gripe = "url parameter is null.";
+		if (landingPageURL == null) {
+			String gripe = "landingPageURL parameter is null.";
 			throw new RegistrarException(gripe);
 		}
 		
@@ -158,17 +158,19 @@ public class DataCiteRegistrar extends Registrar {
 
 		StringBuffer requestBodyBuffer = new StringBuffer("");
 		requestBodyBuffer.append("doi=" + doi + "\n");
-		requestBodyBuffer.append("url=:" + url + "\n");
-		HttpPost httpPost = new HttpPost(url);
+		requestBodyBuffer.append("url=" + landingPageURL + "\n");
+		String mintDoiUrl = getMintDoiUrl();
+		HttpPost httpPost = new HttpPost(mintDoiUrl);
 		httpPost.setHeader("Content-type", "text/plain");
 		HttpEntity stringEntity = null;
 		Integer statusCode = null;
 		String entityString = null;
+		String requestBody = requestBodyBuffer.toString();
 
 		try {
-			stringEntity = new StringEntity(requestBodyBuffer.toString());
+			stringEntity = new StringEntity(requestBody);
 			httpPost.setEntity(stringEntity);
-			logger.info("mintDOI request body:\n" + stringEntity);
+			logger.info("mintDOI request body:\n" + requestBody);
 			HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, context);
 			statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -242,22 +244,21 @@ public class DataCiteRegistrar extends Registrar {
 	    context.setCredentialsProvider(credentialsProvider);
 	    context.setAuthCache(authCache);
 
-		String doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-		String url = this.getRegistrarUrl("/metadata/" + doi);
+		String doi = dataCiteMetadata.getDigitalObjectIdentifier().getIdentifier();
+		String postMetadataURL = getPostMetadataUrl();
+		String landingPageUrl = dataCiteMetadata.getLocationUrl();
 		
-		StringBuffer metadata = new StringBuffer("");
-		String metadataXML = dataCiteMetadata.toDataCiteXml();
-		metadata.append(metadataXML + "\n");
-		HttpPost httpPost = new HttpPost(url);
-		httpPost.setHeader("Content-type", "text/plain");
+		String metadataXML = dataCiteMetadata.toDataCiteXml() + "\n";
+		HttpPost httpPost = new HttpPost(postMetadataURL);
+		httpPost.setHeader("Content-type", "application/xml");
 		HttpEntity stringEntity = null;
 		Integer statusCode = null;
 		String entityString = null;
 
 		try {
-			stringEntity = new StringEntity(metadata.toString());
+			stringEntity = new StringEntity(metadataXML);
 			httpPost.setEntity(stringEntity);
-			logger.info("Create metadata request body:\n" + stringEntity);
+			logger.info("Create metadata request body:\n" + metadataXML);
 			HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, context);
 			statusCode = httpResponse.getStatusLine().getStatusCode();
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -268,14 +269,12 @@ public class DataCiteRegistrar extends Registrar {
 			closeHttpClient(httpClient);
 		}
 
-		logger.info("registerDataCiteMetadata: " + dataCiteMetadata.getLocationUrl() + "\n" + entityString);
-
 		/*
 		 * If we succeeded in registering the metadata, the next step is to mint the DOI.
 		 */
 		if (statusCode == HttpStatus.SC_CREATED) {
 			logger.info(String.format("Created DataCite metadata for DOI: %s", doi));
-			mintDOI(doi, url);
+			mintDOI(doi, landingPageUrl);
 		}
 		else {
 			String msg = null;
