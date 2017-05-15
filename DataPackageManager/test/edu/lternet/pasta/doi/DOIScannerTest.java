@@ -247,7 +247,7 @@ public class DOIScannerTest {
 	@Before
 	public void setUp() throws Exception {
 
-		/* httpHeaders = new DummyCookieHttpHeaders(testUser);
+		httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test CREATE for OK status
 		response = dataPackageManagerResource.createDataPackage(httpHeaders,
@@ -269,7 +269,6 @@ public class DOIScannerTest {
 				testIdentifier,
 				testRevision
               );
-     */
 	}
 
 	/**
