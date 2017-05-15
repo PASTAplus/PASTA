@@ -210,17 +210,6 @@ public class DataCiteMetadata extends CitationMetadata {
 	}
 	
 	/**
-	 * EZID percent encoding of reserved characters: '%', '\n', '\r', and ':'.
-	 * 
-	 * @param s String to encode
-	 * @return Encoded string
-	 */
-	public static String escape(String s) {
-	  return s.replace("%", "%25").replace("\n", "%0A").
-	      replace("\r", "%0D").replace(":", "%3A");
-	  }
-	
-	/**
 	 * EZID percent decoding of reserved characters: '%', '\n', '\r', and ':'.
 	 * 
 	 * @param s String to decode

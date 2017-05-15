@@ -83,6 +83,17 @@ public class EzidRegistrar extends Registrar {
 	 * Class methods
 	 */
 
+	/**
+	 * EZID percent encoding of reserved characters: '%', '\n', '\r', and ':'.
+	 * 
+	 * @param s String to encode
+	 * @return Encoded string
+	 */
+	private static String escape(String s) {
+	  return s.replace("%", "%25").replace("\n", "%0A").
+	      replace("\r", "%0D").replace(":", "%3A");
+	  }
+	
 	
 	/*
 	 * Instance methods
@@ -329,8 +340,10 @@ public class EzidRegistrar extends Registrar {
 		String doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
 		String url = this.getRegistrarUrl("/id/" + doi);
 		StringBuffer metadata = new StringBuffer("");
+		String dataCiteXMLUnescaped = dataCiteMetadata.toDataCiteXml();
+		String dataCiteXML = EzidRegistrar.escape(dataCiteXMLUnescaped);
 		metadata
-		    .append("datacite: " + dataCiteMetadata.toDataCiteXml() + "\n");
+		    .append("datacite: " + dataCiteXML + "\n");
 		metadata
 		    .append("_target: " + dataCiteMetadata.getLocationUrl() + "\n");
 		HttpPut httpPut = new HttpPut(url);
@@ -369,7 +382,6 @@ public class EzidRegistrar extends Registrar {
 			String gripe = "identifier already exists";
 			throw new RegistrarException(gripe);
 		} else if (statusCode != HttpStatus.SC_CREATED) {
-			logger.error(dataCiteMetadata.toDataCiteXml());
 			String gripe = "DOI registration failed for: " + doi;
 			throw new RegistrarException(gripe);
 		}

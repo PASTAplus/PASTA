@@ -103,8 +103,22 @@ public class DOIScanner {
 		}
 		
 		try {
-			registrar = new DataCiteRegistrar();
-		} catch (ConfigurationException e) {
+			String doiProvider = options.getOption("datapackagemanager.doiProvider");
+
+			if (doiProvider == null) {
+				throw new ConfigurationException("No property value specified for datapackagemanager.doiProvider");
+			}
+			else if (doiProvider.equalsIgnoreCase("ezid")) {
+				registrar = new EzidRegistrar();
+			}
+			else if (doiProvider.equalsIgnoreCase("datacite")) {
+				registrar = new DataCiteRegistrar();
+			}
+			else {
+				throw new ConfigurationException("Unsupported property value specified for datapackagemanager.doiProvider: " + doiProvider);
+			}
+		} 
+		catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 			throw(e);
