@@ -5387,7 +5387,8 @@ public class DataPackageManagerResource extends PastaWebService {
 					revision, authToken, userId, oreFormat);
 
 			if (resourceMap != null) {
-				responseBuilder = Response.ok(resourceMap);
+				String mediaType = oreFormat ? "application/rdf+xml" : MediaType.TEXT_PLAIN;
+				responseBuilder = Response.ok(resourceMap, mediaType);
 				response = responseBuilder.build();
 			}
 			else {
