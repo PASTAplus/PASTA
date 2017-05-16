@@ -1,11 +1,13 @@
 package edu.lternet.pasta.metadatamanager;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.lternet.pasta.common.EmlPackageId;
@@ -20,6 +22,32 @@ public class SolrMetadataCatalog implements MetadataCatalog {
 	 * Instance variables
 	 */
     private String solrUrl = null;
+    
+    
+    /*
+     * Class methods
+     */
+    
+    /**
+     * Main program for testing indexing of EML documents
+     */
+    public static void main(String[] args) {
+    	String emlFilePath = args[0];
+    	File emlFile = new File(emlFilePath);
+    	String scope = "knb-lter-nwk";
+    	Integer identifier = new Integer(1424);
+    	Integer revision = new Integer(35);
+    	String solrUrl = "http://localhost:8983/solr";
+    	try {
+    		String emlXML = FileUtils.readFileToString(emlFile);
+    		EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+    		SolrMetadataCatalog smc = new SolrMetadataCatalog(solrUrl);
+    		smc.indexEmlDocument(epi, emlXML);
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }
 
    
     /*
