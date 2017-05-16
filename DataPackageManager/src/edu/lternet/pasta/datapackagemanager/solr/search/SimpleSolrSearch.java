@@ -278,7 +278,8 @@ public class SimpleSolrSearch {
 								}
 								else {
 									valueStr = (String) value;
-									if (fieldName.equals("keyword")) {
+									if (fieldName.equals("keyword") ||
+										fieldName.equals("timescale")) {
 										valueStr = StringEscapeUtils.escapeXml(valueStr);
 									}
 								}
@@ -303,7 +304,8 @@ public class SimpleSolrSearch {
 						else {
 							fieldValue = (String) solrDocument.getFieldValue(fieldName);
 							if (fieldValue == null) fieldValue = "";
-							if (!fieldName.equals("responsibleParties")) {
+							if (!fieldName.equals("responsibleParties") &&
+							    !fieldName.equals("titles")) {
 								fieldValue = StringEscapeUtils.escapeXml(fieldValue);
 							}
 						}
