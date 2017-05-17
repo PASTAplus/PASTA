@@ -149,7 +149,6 @@ public class Entity extends DataObjectDescription
     private String md5HashValue = null;
     private String sha1HashValue = null;
     
-    
     /* 
      * Constructors 
      */
@@ -226,7 +225,72 @@ public class Entity extends DataObjectDescription
     }
     
     
-    public static void addPreferredFormatString(String formatString) {
+    /**
+     * Find a preferred format string that differs only by case from the
+     * formatString that was specified in the EML document. This will allow
+     * the quality checker to suggest changing the case of the formatString
+     * value in the EML.
+     * 
+     * @param formatString       
+     *           the formatString as documented in the EML
+     * @return caseMismatch     
+     *           a preferred format string that differs only by case from the 
+     *           format string found in the EML, or null if no such string
+     *           can be found
+     */
+    public static String caseMismatchFormatString(String formatString) {
+    	String caseMismatch = null;
+    	
+		if (formatString != null) {
+			for (String preferred : preferredFormatStrings) {
+				if (!formatString.equals(preferred) && 
+					formatString.equalsIgnoreCase(preferred)
+				) {
+					caseMismatch = preferred;
+					break;
+				}
+			}
+		}
+
+    	return caseMismatch;
+    }
+    
+    
+    /**
+     * Find a preferred format string that differs only by dash-versus-slash
+     * characters from the formatString that was specified in the EML document. 
+     * This will allow the quality checker to suggest changing the 
+     * formatString by replacing slashes ("/") with dashes ("-") in the EML.
+     * 
+     * @param formatString       
+     *           the formatString as documented in the EML
+     * @return slashMismatch     
+     *           a preferred format string that differs only by the
+     *           fact that is uses dashes (ISO-8601) instead of slashes
+     */
+    public static String slashMismatchFormatString(String formatString) {
+    	String slashMismatch = null;
+    	
+    	/*
+    	 * Only go through the list of preferred when the formatString
+    	 * contains one or more slashes.
+    	 */
+		if (formatString != null && formatString.contains("/")) {
+			for (String preferred : preferredFormatStrings) {
+				if (!formatString.equals(preferred) && 
+					formatString.replace('/', '-').equals(preferred)
+				) {
+					slashMismatch = preferred;
+					break;
+				}
+			}
+		}
+
+    	return slashMismatch;
+    }
+    
+    
+   public static void addPreferredFormatString(String formatString) {
     	if (formatString != null) {
     		preferredFormatStrings.add(formatString);
     	}
@@ -384,19 +448,48 @@ public class Entity extends DataObjectDescription
       QualityCheck qualityCheck = new QualityCheck(identifier, qualityCheckTemplate);
 
       if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
-        qualityCheck.setFound(formatString);
         boolean isPreferred = isPreferredFormatString(formatString);
+        String explanation = null;
+        String suggestion = null;
         
-    	qualityCheck.setExpected("One of the following preferred values is expected: " + 
-                preferredFormatStrings.toString());
+        if (isPreferred) {
+            qualityCheck.setFound(formatString);
+            explanation = "A preferred format string was found.";
+        }
+        else {
+            qualityCheck.setFound(
+            		String.format("'%s' is not in the set of preferred values.", formatString));
+        	String caseMismatch = caseMismatchFormatString(formatString);
+        	if (caseMismatch != null) {
+        		explanation = 
+        			String.format(
+        				"The format string '%s' differs only by case with preferred format string '%s'.",
+        				formatString, caseMismatch);
+        		suggestion = String.format("Use '%s' in place of '%s'.",
+        				caseMismatch, formatString);
+        	}
+        	else {
+        		String slashMismatch = slashMismatchFormatString(formatString);
+        		if (slashMismatch != null) {
+            		explanation = 
+                			String.format(
+                				"The format string '%s' contains slashes instead of dashes.",
+                				formatString);
+            		suggestion = String.format("Use '%s' in place of '%s'.",
+                                               slashMismatch, formatString);
+        		}
+        	}
+        }
+        
         if (isPreferred) {
         	qualityCheck.setStatus(Status.valid);
-        	qualityCheck.setExplanation("The formatString is in the set of preferred values.");
         }
         else {
         	qualityCheck.setFailedStatus();
-        	qualityCheck.setExplanation("The formatString is not in the set of preferred values.");
         }
+
+        if (explanation != null) qualityCheck.setExplanation(explanation);   
+        if (suggestion != null) qualityCheck.setSuggestion(suggestion);
         
         addQualityCheck(qualityCheck);
       }
