@@ -106,16 +106,42 @@ datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-1.0
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
 
-# For DOI processing on production set prefix to 10.6073 and context to "pasta"; for
-# staging and development set prefix to 10.5072 and context to "FK2"
+# For DOI processing on production:
+#  set prefix to 10.6073 (EZID) or 10.0311 (DataCite)
+#  set context to "pasta"
+#  set doiUrlHead to https://portal.lternet.edu/nis/mapbrowse?packageid=
+# For DOI processing on staging:
+#  set prefix to 10.5072 (EZID and DataCite)
+#  set context to FK2
+#  set doiUrlHead to https://portal-s.lternet.edu/nis/mapbrowse?packageid=
+# For DOI processing on development:
+#  set prefix to 10.5072 (EZID and DataCite)
+#  set context to FK2
+#  set doiUrlHead to https://portal-d.lternet.edu/nis/mapbrowse?packageid=
+
 #datapackagemanager.doiPrefix=10.6073
+#datapackagemanager.doiPrefix=10.0311
 #datapackagemanager.doiContext=pasta
+#datapackagemanager.doiUrlHead=https://portal.lternet.edu/nis/mapbrowse?packageid=
 datapackagemanager.doiPrefix=10.5072
 datapackagemanager.doiContext=FK2
 datapackagemanager.doiTest=true
+datapackagemanager.doiUrlHead=https://portal-d.lternet.edu/nis/mapbrowse?packageid=
+
+# Toggle between ezid and datacite; useful during the migration from ezid to datacite
+datapackagemanager.doiProvider=datacite
+
+# For connecting with EZID
 datapackagemanager.ezidHost=ezid.cdlib.org
 datapackagemanager.ezidPort=-1
 datapackagemanager.ezidProtocol=https
 datapackagemanager.ezidUser=lternet
 datapackagemanager.ezidPassword=HIDE_PASSWORD
-datapackagemanager.doiUrlHead=https://portal.lternet.edu/nis/mapbrowse?packageid=
+
+# For connecting with DataCite
+#datapackagemanager.dataciteHost=mds.datacite.org
+datapackagemanager.dataciteHost=mds.test.datacite.org
+datapackagemanager.datacitePort=-1
+datapackagemanager.dataciteProtocol=https
+datapackagemanager.dataciteUser=DATACITE.EDI
+datapackagemanager.datacitePassword=HIDE_PASSWORD

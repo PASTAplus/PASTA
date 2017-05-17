@@ -37,6 +37,7 @@ import edu.ucsb.nceas.utilities.Options;
 
 /**
  * @author servilla
+ * @author dcosta
  * @since Nov 9, 2012
  * 
  *        Scans the Data Package resource registry and performs DOI registration
@@ -64,7 +65,7 @@ public class DOIScanner {
 	private String dbURL = null;
 	private String dbUser = null;
 	private String dbPassword = null;
-	private EzidRegistrar ezidRegistrar = null;
+	private Registrar registrar = null;
 	private String metadataDir = null;
 	private String doiUrlHead = null;
 	private String doiTest = null;
@@ -102,8 +103,22 @@ public class DOIScanner {
 		}
 		
 		try {
-			ezidRegistrar = new EzidRegistrar();
-		} catch (ConfigurationException e) {
+			String doiProvider = options.getOption("datapackagemanager.doiProvider");
+
+			if (doiProvider == null) {
+				throw new ConfigurationException("No property value specified for datapackagemanager.doiProvider");
+			}
+			else if (doiProvider.equalsIgnoreCase("ezid")) {
+				registrar = new EzidRegistrar();
+			}
+			else if (doiProvider.equalsIgnoreCase("datacite")) {
+				registrar = new DataCiteRegistrar();
+			}
+			else {
+				throw new ConfigurationException("Unsupported property value specified for datapackagemanager.doiProvider: " + doiProvider);
+			}
+		} 
+		catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 			throw(e);
@@ -116,6 +131,16 @@ public class DOIScanner {
 	/*
 	 * Class methods
 	 */
+	
+	public static void main(String[] args) {
+		try {
+			DOIScanner doiScanner = new DOIScanner();
+			doiScanner.doScanToRegister();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/*
 	 * Instance methods
@@ -158,7 +183,7 @@ public class DOIScanner {
 	 * 
 	 * @throws DOIException
 	 */
-	public void doScanToRegister() throws DOIException, ConfigurationException {
+	public void doScanToRegister() throws Exception {
 
 		ArrayList<Resource> resourceList = null;
 
@@ -186,7 +211,7 @@ public class DOIScanner {
 	 * 
 	 * @throws DOIException
 	 */
-	public String processOneResource(Resource resource) throws DOIException, ConfigurationException {
+	public String processOneResource(Resource resource) throws Exception {
 
 		File emlFile = null;
 		EmlObject emlObject = null;
@@ -195,7 +220,7 @@ public class DOIScanner {
 		String publicationYear = null;
 		ArrayList<ResponsibleParty> creators = null;
 		ArrayList<Title> titles = null;
-		DigitalObjectIdentifier identifier = null;
+		DigitalObjectIdentifier digitalObjectIdentifier = null;
 		ResourceType resourceType = null;
 		AlternateIdentifier alternateIdentifier = null;
 		Date time = null;
@@ -215,14 +240,14 @@ public class DOIScanner {
 				titles = emlObject.getTitles();
 
 				// If DOI testing, add salt to resource identifier to create unique DOI
-				// so subsequent tests will not result in EZID create errors.
+				// so subsequent tests will not result in DOI create errors.
 				if (this.isDoiTest) {
 					time = new Date();
 					Long salt = time.getTime();
-					identifier = new DigitalObjectIdentifier(resource.getResourceId()
+					digitalObjectIdentifier = new DigitalObjectIdentifier(resource.getResourceId()
 					    + salt.toString());
 				} else {
-					identifier = new DigitalObjectIdentifier(resource.getResourceId());
+					digitalObjectIdentifier = new DigitalObjectIdentifier(resource.getResourceId());
 				}
 
 				resourceType = new ResourceType(ResourceType.DATASET);
@@ -237,22 +262,18 @@ public class DOIScanner {
 				dataCiteMetadata.setPublicationYear(publicationYear);
 				dataCiteMetadata.setCreators(creators);
 				dataCiteMetadata.setTitles(titles);
-				dataCiteMetadata.setDigitalObjectIdentifier(identifier);
+				dataCiteMetadata.setDigitalObjectIdentifier(digitalObjectIdentifier);
 				dataCiteMetadata.setResourceType(resourceType);
 				dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
 
-				// Set and register DOI with DatCite metadata
-				ezidRegistrar.setDataCiteMetadata(dataCiteMetadata);
-
 				try {
-
 					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
-					ezidRegistrar.registerDataCiteMetadata();
+					registrar.registerDataCiteMetadata(dataCiteMetadata);
 
-				} catch (EzidException e) {
+				} catch (RegistrarException e) {
 
 					/*
-					 * In the event that a DOI registration succeeded with EZID, but
+					 * In the event that a DOI registration succeeded, but
 					 * failed to be recorded in the resource registry, the following
 					 * exception allows the resource registry to be updated with the DOI
 					 * string.
@@ -260,7 +281,7 @@ public class DOIScanner {
 
 					if (e.getMessage().equals("identifier already exists")) {
 						String msg = String.format(
-                            "%s already exists in EZID but it needs to be updated in the resource registry for %s.", 
+                            "%s already exists in DOI registry but it needs to be updated in the resource registry for %s.", 
                             doi, resource.getPackageId()
                         );
 						logger.warn(msg + "  Proceeding with resource registry update...");
@@ -310,10 +331,10 @@ public class DOIScanner {
 
 		ArrayList<String> doiList = null;
 
-		EzidRegistrar ezidRegistrar = null;
+		Registrar registrar = null;
 
 		try {
-			ezidRegistrar = new EzidRegistrar();
+			registrar = new DataCiteRegistrar();
 		} catch (ConfigurationException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -334,7 +355,7 @@ public class DOIScanner {
 			logger.info("DOI to obsolete: " + doi);
 			
 			try {
-				ezidRegistrar.obsoleteDoi(doi);
+				registrar.obsoleteDoi(doi);
 			} catch (EzidException e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();

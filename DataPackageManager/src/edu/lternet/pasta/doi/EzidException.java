@@ -29,30 +29,5 @@ package edu.lternet.pasta.doi;
  * @since April 5, 2012
  * 
  */
-public class EzidException extends Exception {
-
-	private static final long serialVersionUID = 1L;
-
-	/*
-	 * Constructors
-	 */
-
-	/**
-	 * EZID service exception.
-	 */
-	public EzidException() {
-
-	}
-
-	/**
-	 * EZID service exception.
-	 * 
-	 * @param gripe
-	 *          The cause of the exception in natural language text as a String
-	 *          object.
-	 */
-	public EzidException(String gripe) {
-		super(gripe);
-	}
-
+public class EzidException extends RegistrarException {
 }

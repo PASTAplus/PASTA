@@ -306,12 +306,9 @@ public class DOIScannerTest {
 		// and public data packages without DOIs
 		try {
 			doiScanner.doScanToRegister();
-		} catch (DOIException e) {
+		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-    catch (ConfigurationException e) {
-      fail(e.getMessage());
-    }
 
     // Test that the test data package did receive a DOI
 		response = dataPackageManagerResource.readDataPackageDoi(httpHeaders,

@@ -64,21 +64,10 @@ public class DOIServlet extends HttpServlet {
 			 */
 
 		}
-		catch (ConfigurationException e) {
+		catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
-		}
-		catch (DOIException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
+			throw new ServletException(e.getMessage());
 		}
 		finally {
 			logger.info("DOI processing finished.");

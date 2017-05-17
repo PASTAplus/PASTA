@@ -22,8 +22,6 @@ package edu.lternet.pasta.doi;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 
@@ -33,7 +31,7 @@ import edu.lternet.pasta.common.eml.Title;
  *
  * Container for generic citation metadata.
  */
-public class CitationMetadata {
+public abstract class CitationMetadata {
 	
 	/*
 	 * Class variables
@@ -42,8 +40,6 @@ public class CitationMetadata {
 	/*
 	 * Instance variables
 	 */
-	
-	private Logger logger = Logger.getLogger(CitationMetadata.class);
 	
 	protected String locationUrl = null;
 	protected String publicationYear = null;
@@ -134,12 +130,4 @@ public class CitationMetadata {
 		return this.titles;
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }
