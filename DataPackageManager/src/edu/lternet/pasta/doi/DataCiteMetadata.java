@@ -22,11 +22,8 @@ package edu.lternet.pasta.doi;
 
 import java.util.ArrayList;
 
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.codec.net.URLCodec;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 
@@ -43,7 +40,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	 * Class variables
 	 */
 
-	private static final String PUBLISHER = "Long Term Ecological Research Network";
+	private static final String PUBLISHER = "Environmental Data Initiative";
 
 	/*
 	 * Instance variables
@@ -128,62 +125,61 @@ public class DataCiteMetadata extends CitationMetadata {
 	 */
 	public String toDataCiteXml() {
 
-		StringBuffer xml = new StringBuffer("");
+		StringBuffer sb = new StringBuffer("");
 
 		// Pre-amble and opening tag
-		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		xml.append("<resource xmlns=\"http://datacite.org/schema/kernel-2.2\"\n");
-		xml.append("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-		xml.append("    xsi:schemaLocation=\"http://datacite.org/schema/kernel-2.2");
-		xml.append(" http://schema.datacite.org/meta/kernel-2.2/metadata.xsd\">\n");
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		sb.append("<resource xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+		sb.append("          xmlns=\"http://datacite.org/schema/kernel-4\"\n");
+		sb.append("          xsi:schemaLocation=\"http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd\">\n");
 
 		// The DOI identifier, woo-hoo
 		if (this.digitalObjectIdentifier != null) {
-			xml.append("    <identifier identifierType=\""
+			sb.append("    <identifier identifierType=\""
 			    + this.digitalObjectIdentifier.getType() + "\">");
-			xml.append(this.digitalObjectIdentifier.getIdentifier() + "</identifier>\n");
+			sb.append(this.digitalObjectIdentifier.getIdentifier() + "</identifier>\n");
 		}
 
 		// Creators section
-		xml.append("    <creators>\n");
+		sb.append("    <creators>\n");
 
 		ArrayList<ResponsibleParty> creators = super.creators;
 
 		if (creators != null) {
 			for (ResponsibleParty creator : creators) {
 			  String creatorName = creator.getCreatorName();
-				xml.append("        <creator>\n");
-				xml.append(String.format("            <creatorName>%s</creatorName>\n", creatorName));
-				xml.append("        </creator>\n");
+				sb.append("        <creator>\n");
+				sb.append(String.format("            <creatorName>%s</creatorName>\n", creatorName));
+				sb.append("        </creator>\n");
 			}
 		}
 
-		xml.append("    </creators>\n");
+		sb.append("    </creators>\n");
 
 		// Titles section
-		xml.append("    <titles>\n");
+		sb.append("    <titles>\n");
 
 		ArrayList<Title> titles = super.titles;
 
 		if (titles != null) {
 			for (Title title : titles) {
-				xml.append("        <title>" + title.getTitle() + "</title>\n");
+				sb.append("        <title>" + title.getTitle() + "</title>\n");
 			}
 		}
 
-		xml.append("    </titles>\n");
+		sb.append("    </titles>\n");
 
 		// Publisher section
-		xml.append("    <publisher>" + DataCiteMetadata.PUBLISHER
+		sb.append("    <publisher>" + DataCiteMetadata.PUBLISHER
 		    + "</publisher>\n");
 
 		// Publication year section
-		xml.append("    <publicationYear>" + this.publicationYear
+		sb.append("    <publicationYear>" + this.publicationYear
 		    + "</publicationYear>\n");
 
 		// Resource type section
 		if (this.resourceType != null) {
-			xml.append("    <resourceType resourceTypeGeneral=\""
+			sb.append("    <resourceType resourceTypeGeneral=\""
 			    + this.resourceType.getResourceTypeGeneral() + "\">"
 			    + this.resourceType.getResourceType() + "</resourceType>\n");
 		}
@@ -194,19 +190,21 @@ public class DataCiteMetadata extends CitationMetadata {
 			String alternateIdentifier = null;
 			alternateIdentifier = this.alternateIdentifier.getAlternateIdentifier();
 
-			xml.append("    <alternateIdentifiers>\n");
-			xml.append("        <alternateIdentifier alternateIdentifierType=\"");
-			xml.append(this.alternateIdentifier.getAlternateIdentifierType() + "\">");
-			xml.append(alternateIdentifier);
-			xml.append("</alternateIdentifier>\n");
-			xml.append("    </alternateIdentifiers>\n");
+			sb.append("    <alternateIdentifiers>\n");
+			sb.append("        <alternateIdentifier alternateIdentifierType=\"");
+			sb.append(this.alternateIdentifier.getAlternateIdentifierType() + "\">");
+			sb.append(alternateIdentifier);
+			sb.append("</alternateIdentifier>\n");
+			sb.append("    </alternateIdentifiers>\n");
 		}
 
-		xml.append("</resource>\n");
+		sb.append("    <language>eng</language>\n");
+
+		sb.append("</resource>\n");
 
 		//return DataCiteMetadata.escape(xml.toString());
-		return xml.toString();
-
+		String xml = sb.toString();
+		return xml;
 	}
 	
 	/**
