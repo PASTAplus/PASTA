@@ -83,9 +83,6 @@ public class Entity extends DataObjectDescription
     
     static {
     	preferredFormatStrings = new TreeSet<String>();
-    	preferredFormatStrings.add("YYYY-MM-DD");
-    	preferredFormatStrings.add("YYYY");
-    	preferredFormatStrings.add("Dummy Value");
     }
     
     
