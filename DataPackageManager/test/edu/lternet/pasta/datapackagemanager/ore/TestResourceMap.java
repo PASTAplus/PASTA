@@ -49,7 +49,7 @@ public class TestResourceMap {
 		private static final String dirPath = "WebRoot/WEB-INF/conf";
 		private static Options options = null;
 		private static String testPath = null;
-		private static String testResourceMapFileName = "ResourceMap.xml";
+		private static String testResourceMapFileName = "resourceMap.xml";
 		private static String testResourceMapPath;
 		private static String testScope = "knb-lter-nin";
 		private static Integer testIdentifier = new Integer(1);
