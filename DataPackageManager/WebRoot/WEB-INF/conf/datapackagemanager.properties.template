@@ -109,15 +109,15 @@ datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/q
 # For DOI processing on production:
 #  set prefix to 10.6073 (EZID) or 10.0311 (DataCite)
 #  set context to "pasta"
-#  set doiUrlHead to https://portal.lternet.edu/nis/mapbrowse?packageid=
+#  set doiUrlHead to https://portal.edirepository.org/nis/mapbrowse?packageid=
 # For DOI processing on staging:
 #  set prefix to 10.5072 (EZID and DataCite)
 #  set context to FK2
-#  set doiUrlHead to https://portal-s.lternet.edu/nis/mapbrowse?packageid=
+#  set doiUrlHead to https://portal-s.edirepository.org/nis/mapbrowse?packageid=
 # For DOI processing on development:
 #  set prefix to 10.5072 (EZID and DataCite)
 #  set context to FK2
-#  set doiUrlHead to https://portal-d.lternet.edu/nis/mapbrowse?packageid=
+#  set doiUrlHead to https://portal-d.edirepository.org/nis/mapbrowse?packageid=
 
 #datapackagemanager.doiPrefix=10.6073
 #datapackagemanager.doiPrefix=10.0311
@@ -126,7 +126,7 @@ datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/q
 datapackagemanager.doiPrefix=10.5072
 datapackagemanager.doiContext=FK2
 datapackagemanager.doiTest=true
-datapackagemanager.doiUrlHead=https://portal-d.lternet.edu/nis/mapbrowse?packageid=
+datapackagemanager.doiUrlHead=https://portal-d.edirepository.org/nis/mapbrowse?packageid=
 
 # Toggle between ezid and datacite; useful during the migration from ezid to datacite
 datapackagemanager.doiProvider=datacite
