@@ -110,6 +110,7 @@ public class EMLParser {
    */
   
   DataPackage dataPackage = null;
+  boolean eagerEscape = true;
   
   
   /*
@@ -125,6 +126,44 @@ public class EMLParser {
   /*
    * Instance methods
    */
+  
+  
+  /**
+   * Sets the boolean value of eagerEscape to control whether certain metadata fields
+   * should be XML-escaped as soon as they are parsed out of the EML. Currently the set of
+   * fields that would be eager-escape (if set to true) are:
+   *     title
+   *     projectTitle
+   *     relatedProjectTitle
+   *     givenNames
+   *     surName
+   *     organizationName
+   *     positionName
+   *     
+   * The last four in the above list are parsed by the ResponsibleParty class, but the
+   * eager-escape behavior is still controlled in this class.
+   * 
+   * @param isEager  true if the parser should "eager escape" certain fields,
+   *                 else false.
+   */
+  public void setEagerEscape(boolean isEager) {
+	  this.eagerEscape = isEager;
+  }
+  
+  
+  /**
+   * XML-encode the raw XML passed to this method, but only if eagerEscape is true,
+   * otherwise just return the original string.
+   * 
+   * @param  rawXml  The raw XML string.
+   * @return The XML-encoded string if eagerEscape is true, otherwise the
+   *         original raw string.
+   */
+  public String xmlEncodeIfEager(String rawXml) {
+	  String s = this.eagerEscape ? XmlUtility.xmlEncode(rawXml) : rawXml;
+	  return s;
+  }
+  
   
   /**
    * Parses an EML document.
@@ -184,7 +223,7 @@ public class EMLParser {
         NodeList titleNodeList = xpathapi.selectNodeList(document, TITLE_PATH);
         for (int i = 0; i < titleNodeList.getLength(); i++) {
           String title = titleNodeList.item(i).getTextContent();
-          title = XmlUtility.xmlEncode(title);
+          title = xmlEncodeIfEager(title);
           dataPackage.titles.add(title);
         }
 
@@ -192,7 +231,7 @@ public class EMLParser {
         NodeList projectTitleNodeList = xpathapi.selectNodeList(document, PROJECT_TITLE_PATH);
         for (int i = 0; i < projectTitleNodeList.getLength(); i++) {
           String projectTitle = projectTitleNodeList.item(i).getTextContent();
-          projectTitle = XmlUtility.xmlEncode(projectTitle);
+          projectTitle = xmlEncodeIfEager(projectTitle);
           dataPackage.projectTitles.add(projectTitle);
         }
 
@@ -200,7 +239,7 @@ public class EMLParser {
         NodeList relatedProjectTitleNodeList = xpathapi.selectNodeList(document, RELATED_PROJECT_TITLE_PATH);
         for (int i = 0; i < relatedProjectTitleNodeList.getLength(); i++) {
           String relatedProjectTitle = relatedProjectTitleNodeList.item(i).getTextContent();
-          relatedProjectTitle = XmlUtility.xmlEncode(relatedProjectTitle);
+          relatedProjectTitle = xmlEncodeIfEager(relatedProjectTitle);
           dataPackage.relatedProjectTitles.add(relatedProjectTitle);
         }
 
@@ -297,7 +336,7 @@ public class EMLParser {
         if (creatorNodeList != null) {
           for (int i =0; i < creatorNodeList.getLength(); i++) {
             Node creatorNode = creatorNodeList.item(i);
-            ResponsibleParty rp = new ResponsibleParty("creator");
+            ResponsibleParty rp = new ResponsibleParty(this, "creator");
             parseResponsibleParty(creatorNode, rp);
             dataPackage.addCreator(rp);
           }

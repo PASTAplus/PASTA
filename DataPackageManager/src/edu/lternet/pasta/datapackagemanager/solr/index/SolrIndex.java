@@ -136,6 +136,13 @@ public class SolrIndex {
     	String packageId = String.format("%s.%d", id, epid.getRevision());
     	
     	EMLParser emlParser = new EMLParser();
+    	/*
+    	 * Do not "eager escape" the content before it is indexed in Solr. 
+    	 * We will "lazy escape" all of the text fields later on in the 
+    	 * SimpleSolrSearch class when composing the search results XML.
+    	 */
+    	emlParser.setEagerEscape(false);
+
     	DataPackage dataPackage = emlParser.parseDocument(emlDocument);
     	
 		if (dataPackage != null) {
@@ -154,7 +161,7 @@ public class SolrIndex {
 			List<String> keywords = dataPackage.getKeywords();
 			String site = dataPackage.getSite();
 			String abstractText = dataPackage.getAbstractText();
-			String projectAbstractText = dataPackage.getProjectAbstractText();
+			//String projectAbstractText = dataPackage.getProjectAbstractText();
 			String fundingText = dataPackage.getFundingText();
 			String methodsText = dataPackage.getMethodsText();
 			String geographicDescriptionText = dataPackage.getGeographicDescriptionText();

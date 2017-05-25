@@ -257,7 +257,8 @@ public class SimpleSolrSearch {
 					String wrapperElement = wrapperElements.get(fieldName);
 					
 					if (fieldName.equals("title")) {			
-						String title = (String) solrDocument.getFirstValue("title");
+						String rawTitle = (String) solrDocument.getFirstValue("title");
+						String title = StringEscapeUtils.escapeXml(rawTitle);
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
 												INDENT, INDENT, fieldName, title, fieldName));
 					}
@@ -266,24 +267,21 @@ public class SimpleSolrSearch {
 						Collection<Object> multiValues = solrDocument.getFieldValues(fieldName);
 						if (multiValues != null && multiValues.size() > 0) {
 							for (Object value : multiValues) {
-								String valueStr = null;
+								String rawValueStr = null;
 								if (isDateField(fieldName)) {
 									Date dateValue = (Date) value;
 									dateValue = adjustDate(dateValue);
 									String formatPattern = bestDateFormat(fieldName);
 									SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
 									if (dateValue != null) {
-										valueStr = sdf.format(dateValue);
+										rawValueStr = sdf.format(dateValue);
 									}
 								}
 								else {
-									valueStr = (String) value;
-									if (fieldName.equals("keyword") ||
-										fieldName.equals("timescale")) {
-										valueStr = StringEscapeUtils.escapeXml(valueStr);
-									}
+									rawValueStr = (String) value;
 								}
 								
+								String valueStr = StringEscapeUtils.escapeXml(rawValueStr);
 								sb.append(String.format("%s%s%s<%s>%s</%s>\n", 
 										                INDENT, INDENT, INDENT, fieldName, valueStr, fieldName));
 							}
@@ -291,46 +289,28 @@ public class SimpleSolrSearch {
 						sb.append(String.format("%s%s</%s>\n", INDENT, INDENT, wrapperElement));
 					}
 					else {					
-						String fieldValue = "";
+						String rawValueStr = null;
+
 						if (isDateField(fieldName)) {
 							Date dateValue = (Date) solrDocument.getFieldValue(fieldName);
 							dateValue = adjustDate(dateValue);
 							String formatPattern = bestDateFormat(fieldName);
 							SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
 							if (dateValue != null) {
-								fieldValue = sdf.format(dateValue);
+								rawValueStr = sdf.format(dateValue);
 							}
 						}
 						else {
-							fieldValue = (String) solrDocument.getFieldValue(fieldName);
-							if (fieldValue == null) fieldValue = "";
-							if (!fieldName.equals("responsibleParties") &&
-							    !fieldName.equals("titles")) {
-								fieldValue = StringEscapeUtils.escapeXml(fieldValue);
-							}
+							rawValueStr = (String) solrDocument.getFieldValue(fieldName);
 						}
+						
+						if (rawValueStr == null) { 
+							rawValueStr = "";
+						}
+						
+						String valueStr = StringEscapeUtils.escapeXml(rawValueStr);
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
-				                                INDENT, INDENT, fieldName, fieldValue, fieldName));
-
-						/*
-						 * Support the older format for search results.
-						 * 
-						 * These element names ("docid", "packageId", and "pubDate")
-						 * were never officially documented but some clients might rely 
-						 * on them. They should be deprecated. They have been
-						 * replaced with element names that exactly match their
-						 * corresponding Solr field names: "id", "packageid", and "pubdate".
-						 *
-						if (fieldName.equals("id")) {
-							sb.append(String.format("%s%s<docid>%s</docid>\n", INDENT, INDENT, fieldValue));
-						}
-						else if (fieldName.equals("packageid")) {
-							sb.append(String.format("%s%s<packageId>%s</packageId>\n", INDENT, INDENT, fieldValue));
-						}
-						else if (fieldName.equals("pubdate")) {
-							sb.append(String.format("%s%s<pubDate>%s</pubDate>\n", INDENT, INDENT, fieldValue));
-						}
-						*/
+				                                INDENT, INDENT, fieldName, valueStr, fieldName));
 					}
 				}
 			}

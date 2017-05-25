@@ -16,6 +16,7 @@ public class ResponsibleParty {
    */
   
   private String elementType;        // "contact", "creator", "metadataProvider"
+  private EMLParser emlParser;
   
   private String salutation = "";
   private ArrayList<String> givenNames = null;
@@ -39,9 +40,10 @@ public class ResponsibleParty {
    * Constructors
    */
 
-  public ResponsibleParty (String elementType) {
+  public ResponsibleParty (EMLParser emlParser, String elementType) {
     deliveryPoints = new ArrayList<String>();
     givenNames = new ArrayList<String>();
+    this.emlParser = emlParser;
     this.elementType = elementType;
   }
 
@@ -71,7 +73,7 @@ public class ResponsibleParty {
    * @param   givenName  the givenName string to add
    */
   public void addGivenName(String givenName) {
-    this.givenNames.add(XmlUtility.xmlEncode(givenName));
+    this.givenNames.add(emlParser.xmlEncodeIfEager(givenName));
   }
   
   
@@ -340,17 +342,17 @@ public class ResponsibleParty {
 
 
   public void setSurName(String surName) {
-    this.surName = XmlUtility.xmlEncode(surName);
+    this.surName = emlParser.xmlEncodeIfEager(surName);
   }
 
 
   public void setOrganizationName(String organizationName) {
-    this.organizationName = XmlUtility.xmlEncode(organizationName);
+    this.organizationName = emlParser.xmlEncodeIfEager(organizationName);
   }
 
 
   public void setPositionName(String positionName) {
-    this.positionName = XmlUtility.xmlEncode(positionName);
+    this.positionName = emlParser.xmlEncodeIfEager(positionName);
   }
 
 
