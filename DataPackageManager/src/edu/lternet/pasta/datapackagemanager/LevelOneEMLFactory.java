@@ -87,9 +87,11 @@ public final class LevelOneEMLFactory {
   private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String TITLE_PATH = "//dataset/title";
   
-  private static final String INTELLECTUAL_RIGHTS_TEXT = 
-	//"This information is released to the public under the Creative Commons license Attribution 4.0 International (CC BY 4.0) subject to the following restrictions: The Data User must realize that these data sets are being actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this dataset. Where appropriate, the Data User may be encouraged to consider collaboration and/or co-authorship with original investigators. The Data User must realize that the data may be misinterpreted if taken out of context. The Data User must acknowledge use of the data by an appropriate citation. A generic citation for our databases is provided on this website. While substantial efforts are made to ensure the accuracy of data and documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The data authors shall not be liable for damages resulting from any use or misinterpretation of data sets. Data users should be aware that we periodically update data sets. By using these data, the Data User agrees to abide by the terms of this agreement. Thank you for your cooperation.";
-    "This information is released to the public domain under the Creative Commons license CC0 1.0 \"No Rights Reserved\" (see: https://creativecommons.org/share-your-work/public-domain/cc0/). It is considered professional conduct to appropriately cite the dataset if used in publications. The consumer of this data (\"Data User\" herein) should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The authors and the repository where this data was obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
+  private static final String INTELLECTUAL_RIGHTS_CC_BY = 
+	"This information is released to the public under the Creative Commons license Attribution 4.0 International (CC-BY 4.0, see: https://creativecommons.org/licenses/by/4.0/) subject to the following restrictions: The Data User must realize that these data sets are being actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this dataset. Where appropriate, the Data User may be encouraged to consider collaboration and/or co-authorship with original investigators. The Data User must realize that the data may be misinterpreted if taken out of context. The Data User must acknowledge use of the data by an appropriate citation. A generic citation for our databases is provided on this website. While substantial efforts are made to ensure the accuracy of data and documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The data authors shall not be liable for damages resulting from any use or misinterpretation of data sets. Data users should be aware that we periodically update data sets. By using these data, the Data User agrees to abide by the terms of this agreement. Thank you for your cooperation.";
+
+  private static final String INTELLECTUAL_RIGHTS_CC0 = 
+    "This information is released to the public domain under the Creative Commons license CC0 1.0 \"No Rights Reserved\" (see: https://creativecommons.org/publicdomain/zero/1.0/). It is considered professional conduct to appropriately cite the dataset if used in publications. The consumer of this data (\"Data User\" herein) should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of this data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is\". The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The authors and the repository where this data was obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
 
   
   /*
@@ -247,8 +249,7 @@ public final class LevelOneEMLFactory {
 	 */
 	private boolean hasIntellectualRights(Document emlDocument)
 	          throws TransformerException {
-		//return hasElement(emlDocument, INTELLECTUAL_RIGHTS_PATH);
-		return true;
+		return hasElement(emlDocument, INTELLECTUAL_RIGHTS_PATH);
 	}
 
 
@@ -363,7 +364,10 @@ public final class LevelOneEMLFactory {
 			throws TransformerException {
 		Element intellectualRightsElement = doc.createElement("intellectualRights");
 		Element paraElement = doc.createElement("para");
-		paraElement.appendChild(doc.createTextNode(INTELLECTUAL_RIGHTS_TEXT));
+		String packageId = getPackageIdAttribute(doc);
+		boolean isLTER = (packageId != null) && packageId.startsWith("knb-lter");
+		String intellectualRightsText = isLTER ? INTELLECTUAL_RIGHTS_CC_BY : INTELLECTUAL_RIGHTS_CC0;
+		paraElement.appendChild(doc.createTextNode(intellectualRightsText));
 		intellectualRightsElement.appendChild(paraElement);
 		Node datasetNode = getDatasetNode(doc);
 		
@@ -619,7 +623,7 @@ public final class LevelOneEMLFactory {
     
 
   /*
-   * Get the value of the @system attribute
+   * Set the value of the @system attribute
    */
   private void setSystemAttribute(Document levelZeroEMLDocument) {
     Element rootElement = levelZeroEMLDocument.getDocumentElement();
@@ -627,8 +631,25 @@ public final class LevelOneEMLFactory {
   }
   
   
+  /*
+   * Get the value of the @packageId attribute
+   */
+  private String getPackageIdAttribute(Document levelZeroEMLDocument) {
+    Element rootElement = levelZeroEMLDocument.getDocumentElement();
+    String packageId = rootElement.getAttribute("packageId");
+    return packageId;
+  }
+  
+  
+    /**
+     * This main program can be used for testing the insertion of a default
+     * intellectualRights element.
+     * 
+     * @param args     No command-line arguments are processed
+     */
 	public static void main(String[] args) {
-		String filePath = args[0];
+		String filePath = "/home/pasta/git/NIS/DataPackageManager/test/data/HasIntellectualRights.xml";
+		//String filePath = "/home/pasta/git/NIS/DataPackageManager/test/data/HasNoIntellectualRights.xml";
 		String newFilePath = String.format("%s_new", filePath);
 		File newFile = new File(newFilePath);
 		LevelOneEMLFactory loef = new LevelOneEMLFactory();
