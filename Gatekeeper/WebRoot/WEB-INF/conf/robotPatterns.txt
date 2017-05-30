@@ -66,6 +66,7 @@ EmailSiphon
 EmailWolf
 EndNote
 EThOS\+\(British\+Library\)
+EZID(\s|\+)link(\s|\+)checker
 facebookexternalhit\/
 favorg
 FDM(\s|\+)\d
