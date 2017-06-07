@@ -78,7 +78,6 @@ import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
-import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.datapackagemanager.ore.ResourceMap;
 import edu.lternet.pasta.doi.DOIException;

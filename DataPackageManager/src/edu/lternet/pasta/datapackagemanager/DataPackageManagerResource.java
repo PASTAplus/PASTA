@@ -7426,6 +7426,128 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+	@GET
+	@Path("/metadata/dc/{scope}/{identifier}/{revision}")
+	@Produces("application/xml")
+	public Response readMetadataDublinCore(@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") String revision) {
+		AuthToken authToken = null;
+		String metadataString = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+		final String serviceMethodName = "readMetadata";
+		Rule.Permission permission = Rule.Permission.read;
+		String resourceId = null;
+		String entryText = null;
+		String robot = null;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+			robot = getRobot(headers);
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+
+			/*
+			 * Handle symbolic revisions such as "newest" and "oldest".
+			 */
+			if (revision != null) {
+				if (revision.equals("newest")) {
+					Integer newest = dataPackageManager.getNewestRevision(
+							scope, identifier);
+					if (newest != null) {
+						revision = newest.toString();
+					}
+				}
+				else
+					if (revision.equals("oldest")) {
+						Integer oldest = dataPackageManager.getOldestRevision(
+								scope, identifier);
+						if (oldest != null) {
+							revision = oldest.toString();
+						}
+					}
+			}
+
+			EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
+					identifier.toString(), revision);
+			String packageId = emlPackageIdFormat.format(emlPackageId);
+
+			/*
+			 * Isolate the resourceId for the metadata resource so that its
+			 * value can be recorded in the audit log
+			 */
+			Integer revisionInt = new Integer(revision);
+			ArrayList<String> resources = dataPackageManager
+					.getDataPackageResources(scope, identifier, revisionInt);
+			if (resources != null && resources.size() > 0) {
+				for (String resource : resources) {
+					if (resource != null
+							&& resource.contains("/package/metadata/eml")) {
+						resourceId = resource;
+					}
+				}
+			}
+
+			metadataString = dataPackageManager.readMetadataDublinCore(scope, identifier,
+					revision, userId, authToken);
+
+			if (metadataString != null) {
+				byte[] byteArray = metadataString.getBytes("UTF-8");
+				responseBuilder = Response.ok();
+				responseBuilder.header("Content-Length", byteArray.length);
+				responseBuilder.entity(metadataString);
+				response = responseBuilder.build();
+			}
+			else {
+				ResourceNotFoundException e = new ResourceNotFoundException(
+						"Unable to access metadata for packageId: "
+								+ packageId.toString());
+				throw (e);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeNotFound(e);
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		response = stampHeader(response);
+		return response;
+	}
+
+
 	/**
 	 * <strong>Read Metadata ACL</strong> operation, specifying the scope,
 	 * identifier, and revision of the data package metadata whose Access
