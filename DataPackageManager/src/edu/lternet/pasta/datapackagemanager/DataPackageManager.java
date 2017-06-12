@@ -79,6 +79,7 @@ import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
+import edu.lternet.pasta.datapackagemanager.dc.DublinCore;
 import edu.lternet.pasta.datapackagemanager.ore.ResourceMap;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
@@ -162,6 +163,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	  }
 
 	  
+	  /**
+	   * Composes a data package metadata path based on the parent metadata
+	   * path value (as configured in the properties file as property
+	   * "datapackagemanager.metadataDir") and a specific packageId value
+	   * corresponding to a sub-directory directly under the parent directory.
+	   * 
+	   * For example:
+	   *   packageIdToMetadataPath("edi.1.1") -> "/home/pasta/local/data/edi.1.1"
+	   *   
+	   * Note that in most PASTA servers for the DataPackageManager service, the
+	   * metadata now resides in the same directory with the data entities and
+	   * is configured as such.
+	   * 
+	   * @param  packageId  the package identifier, e.g. "edi.1.1"
+	   * @return  the absolute path to the metadata directory for the specified
+	   *          data package
+	   */
+	  public static String packageIdToMetadataPath(String packageId) {
+	    String metadataPath = null;
+	    
+	    if (packageId != null) {
+	    	String metadataRootPath = getResourceDir();
+	        metadataPath = String.format("%s/%s", metadataRootPath, packageId);
+	    }
+	    
+	    return metadataPath;
+	  }
+
+	  
 	/*
 	 * Class fields
 	 */
@@ -188,6 +218,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String pastaUriHead = null;
 	private static String pastaUser = null;
 	private static String solrUrl = null;
+	private static String xslDir = null;
+
 	
 	private static Logger logger = Logger.getLogger(DataPackageManager.class);
 
@@ -802,7 +834,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		        
 
 		        isLevelZero = false;
-		        levelOneEMLFile = storeMetadata(emlPackageId, levelOneXML, isLevelZero);      
+		        levelOneEMLFile = storeMetadata(emlPackageId, levelOneXML, isLevelZero);
+		        
+		        /*
+		         * Now that the Level-1 EML is stored on disk, we can use it to
+		         * generate Dublin Core and store that as well.
+		         */
+		        String metadataChildDir = packageIdToMetadataPath(packageId);
+		        DublinCore dublinCore = new DublinCore();
+		        dublinCore.transformMetadata(xslDir, metadataChildDir);
 		    }
 		    catch (IOException e) {
 		        throw (e);
@@ -1008,6 +1048,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 											String enhancedXML =  toLevelOneEnhanced(levelOneEMLFile, doi, DOI_SYSTEM_VALUE);
 									        boolean isLevelZero = false;
 									        storeMetadata(emlPackageId, enhancedXML, isLevelZero);
+
+									        /*
+									         * Now that the Level-1 EML is stored on disk, we can use it to
+									         * generate Dublin Core and store that as well.
+									         */
+									        String metadataChildDir = packageIdToMetadataPath(packageId);
+									        DublinCore dublinCore = new DublinCore();
+									        dublinCore.transformMetadata(xslDir, metadataChildDir);
 										}
 									}
 								}
@@ -1979,6 +2027,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
 			entityDir = options.getOption("datapackagemanager.entityDir");
+			xslDir = options.getOption("datapackagemanager.xslDir");
+
 			
 			// Data Manager Library (DML) options
 			String anonymousFtpPasswd = options.getOption("anonymousFtpPasswd");

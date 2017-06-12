@@ -22,7 +22,6 @@
        to be carried out once.
     -->     
   <xsl:variable name="ids" select="//*[@id!='']"/>
-  <xsl:variable name="metacat-server">http://metacat.lternet.edu/metacat/metacat</xsl:variable>
 
   <xsl:template match="/">
     <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
@@ -85,12 +84,16 @@
       </xsl:element>
     </xsl:for-each>
 
-    <xsl:element name="dc:identifier"><xsl:value-of select="$metacat-server" />/<xsl:value-of select="$packageId" />/xml</xsl:element>
-
     <xsl:element name="dc:identifier">
       <xsl:value-of select="$packageId"/>
     </xsl:element>
 
+    <xsl:for-each select="eml:eml/dataset/alternateIdentifier">
+      <xsl:element name="dc:identifier">
+        <xsl:call-template name="alternateIdentifier"></xsl:call-template>
+      </xsl:element>
+    </xsl:for-each>
+      
     <xsl:for-each select="eml:eml/dataset//geographicCoverage/geographicDescription">
       <xsl:element name="dc:coverage">
         <xsl:value-of select="."/>
@@ -125,6 +128,11 @@
   </xsl:template>
 
 
+  <xsl:template name="alternateIdentifier">
+    <xsl:value-of select="." />
+  </xsl:template>
+  
+  
   <xsl:template name="creator">
     <xsl:choose>
       <xsl:when test="individualName/surName">
