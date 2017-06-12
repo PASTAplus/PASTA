@@ -104,6 +104,7 @@ datapackagemanager.test.idlesleeptime=2000
 datapackagemanager.test.initialsleeptime=5000
 datapackagemanager.version.header=Web-Service
 datapackagemanager.version.number=DataPackageManager-1.0
+datapackagemanager.xslDir=/home/pasta/local/apache-tomcat/webapps/package/xsl
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
 
 # For DOI processing on production:

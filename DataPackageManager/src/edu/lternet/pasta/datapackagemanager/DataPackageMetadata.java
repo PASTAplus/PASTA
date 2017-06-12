@@ -48,7 +48,9 @@ public class DataPackageMetadata {
   */
  
  private EmlPackageId emlPackageId = null;
- private final String FILE_NAME = "Level-1-EML.xml";
+ private final String FILE_NAME_EML = "Level-1-EML.xml";
+ private final String FILE_NAME_DC = "Level-1-DC.xml";   // Dublin Core metadata file
+ private String fileName;
  
  
  /*
@@ -62,6 +64,7 @@ public class DataPackageMetadata {
   */
  public DataPackageMetadata(EmlPackageId emlPackageId){
    this.emlPackageId = emlPackageId;
+   this.fileName = FILE_NAME_EML; // file name is EML by default
  }
 
  
@@ -88,7 +91,7 @@ public class DataPackageMetadata {
      metadataResource.setEvaluateMode(evaluateMode);
      boolean isReportResource = false;
      String dirPath = metadataResource.getDirPath(isReportResource);   
-     String metadataFilename = FILE_NAME;
+     String metadataFilename = fileName;
      File metadataFile = new File(dirPath, metadataFilename);
      
      if (metadataFile != null && metadataFile.exists()) {
@@ -97,6 +100,18 @@ public class DataPackageMetadata {
    }
      
    return xmlFile;
+ }
+ 
+ 
+ /**
+  * Sets the isDublinCore variable to true or false. A value of true
+  * indicates that we are working with Dublin Core metadata, else we
+  * default to EML metadata.
+  * 
+  * @param isDublinCore   true indicates Dublin Core, false indicates EML
+  */
+ public void setDublinCore(boolean isDublinCore) {
+	 fileName = isDublinCore ? FILE_NAME_DC : FILE_NAME_EML;
  }
  
 }

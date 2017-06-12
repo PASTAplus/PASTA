@@ -7426,6 +7426,132 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+	/**
+	 * <strong>Read Metadata Dublin Core</strong> operation, specifying the scope,
+	 * identifier, and revision of the Dublin Core metadata document to be read in 
+	 * the URI.
+	 * 
+	 * <p>
+	 * Revision may be specified as "newest" or "oldest" to retrieve the newest
+	 * or oldest revision, respectively.
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/dc/knb-lter-lno/1/1</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/dc/knb-lter-lno/1/newest</code>
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/metadata/dc/knb-lter-lno/1/oldest</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the metadata document was successful</td>
+	 * <td align=center>Dublin Core XML document</td>
+	 * <td align=center><code>application/xml</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * &lt;oai_dc:dc
+	 *     xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+	 *     xmlns:fn="http://www.w3.org/2005/xpath-functions" 
+	 *     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	 *     xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+	 *     xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" 
+	 *     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 *     xmlns:dc="http://purl.org/dc/elements/1.1/" 
+	 *     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"&gt;
+	 *     &lt;dc:title&gt;Stormwater runoff...&lt;/dc:title&gt;
+	 *     .
+	 *     .
+	 *     .
+	 * &lt;/oai_dc:dc&gt;
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as an illegal
+	 * identifier or revision value</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data
+	 * package metadata document</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package associated with the specified packageId
+	 * is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param scope
+	 *            The scope of the data package
+	 * @param identifier
+	 *            The identifier of the data package
+	 * @param revision
+	 *            The revision of the data package
+	 * @return a Response object containing the Dublin Core XML metadata document in its
+	 *         message body
+	 */
 	@GET
 	@Path("/metadata/dc/{scope}/{identifier}/{revision}")
 	@Produces("application/xml")

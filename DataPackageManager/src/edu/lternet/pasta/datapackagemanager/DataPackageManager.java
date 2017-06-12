@@ -2543,22 +2543,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			if (hasDataPackage) {
 				/*
-				 * If we have the data package but it was previously deleted (i.e.
-				 * de-activated)
-				 * 
-				 * Note: This logic is no longer valid as of Ticket #912:
-				 *       https://trac.lternet.edu/trac/NIS/ticket/912
-				 *
-				boolean isDeactivatedDataPackage = dataPackageRegistry
-				    .isDeactivatedDataPackage(scope, identifier);
-				if (isDeactivatedDataPackage) {
-					String message = "Attempting to read a metadata document that was "
-					    + "previously deleted from PASTA: " + metadataId;
-					throw new ResourceDeletedException(message);
-				}
-				*/
-
-				/*
 				 * Check whether user is authorized to read the data package metadata
 				 */
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
@@ -2608,6 +2592,92 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * Reads Dublin Core metadata from the Metadata Catalog and returns it as a String. The
+	 * specified user must be authorized to read the metadata resource.
+	 * 
+	 * @param scope
+	 *          The scope of the metadata document.
+	 * @param identifier
+	 *          The identifier of the metadata document.
+	 * @param revision
+	 *          The revision of the metadata document.
+	 * @param user
+	 *          The user name value
+	 * @param authToken
+	 *          The AuthToken object
+	 * @return The Dublin Core metadata document, an XML string.
+	 */
+	public String readMetadataDublinCore(String scope, Integer identifier, String revision,
+		    String user, AuthToken authToken) throws ClassNotFoundException,
+		    SQLException, ClientProtocolException, IOException, Exception {
+			String entityId = null;
+			String metadataXML = null;
+			boolean hasDataPackage = false;
+			Integer revisionInt = new Integer(revision);
+			String metadataId = composeResourceId(ResourceType.metadata, scope,
+			    identifier, revisionInt, entityId);
+			try {
+				DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
+				hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier,
+				    revision);
+
+				if (hasDataPackage) {
+					/*
+					 * Check whether user is authorized to read the data package metadata
+					 */
+					Authorizer authorizer = new Authorizer(dataPackageRegistry);
+					boolean isAuthorized = authorizer.isAuthorized(authToken, metadataId,
+					    Rule.Permission.read);
+					if (!isAuthorized) {
+						String message = "User " + user
+						    + " does not have permission to read this metadata document: "
+						    + metadataId;
+						throw new UnauthorizedException(message);
+					}
+
+					EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+					EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope,
+					    identifier.toString(), revision);
+					DataPackageMetadata dataPackageMetadata = new DataPackageMetadata(
+					    emlPackageId);
+					/*
+					 * This tells the dataPackageMetadata object that we want to 
+					 * retrieve Dublin Core instead of EML.
+					 */
+					dataPackageMetadata.setDublinCore(true);
+
+					if (dataPackageMetadata != null) {
+						boolean evaluateMode = false;
+						File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
+						try {
+							metadataXML = FileUtils.readFileToString(levelOneEMLFile);
+						}
+						catch (IOException e) {
+							logger.error("Error reading Level-1 metadata file: "
+								    + e.getMessage());
+								e.printStackTrace();
+								throw (e);
+						}
+					}
+				}
+			} catch (ClassNotFoundException e) {
+				logger.error("Error connecting to Data Package Registry: "
+				    + e.getMessage());
+				e.printStackTrace();
+				throw (e);
+			} catch (SQLException e) {
+				logger.error("Error connecting to Data Package Registry: "
+				    + e.getMessage());
+				e.printStackTrace();
+				throw (e);
+			}
+
+			return metadataXML;
+		}
+
+		
+	/**
 	 * Reads metadata from the Metadata Catalog and returns it as a String. The
 	 * specified user must be authorized to read the metadata resource.
 	 * 
@@ -2640,23 +2710,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    revision);
 
 			if (hasDataPackage) {
-				/*
-				 * If we have the data package but it was previously deleted (i.e.
-				 * de-activated)
-				 * 
-				 * Note: This logic is no longer valid as of Ticket #912:
-				 *       https://trac.lternet.edu/trac/NIS/ticket/912
-				 *
-				 *
-				boolean isDeactivatedDataPackage = dataPackageRegistry
-				    .isDeactivatedDataPackage(scope, identifier);
-				if (isDeactivatedDataPackage) {
-					String message = "Attempting to read a metadata document that was "
-					    + "previously deleted from PASTA: " + metadataId;
-					throw new ResourceDeletedException(message);
-				}
-				*/
-
 				/*
 				 * Check whether user is authorized to read the data package metadata
 				 */
