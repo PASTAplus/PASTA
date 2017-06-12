@@ -299,6 +299,7 @@ public class DataPackageManagerResourceTest {
 	  testReadDataPackage();
 	  testReadDataPackageAcl();
 	  testReadMetadata();
+	  testReadMetadataDublinCore();
 	  testReadMetadataAcl();
 	  testReadMetadataFormat();
 	  testReadDataEntity();
@@ -846,6 +847,34 @@ public class DataPackageManagerResourceTest {
 
     // Test for NOT FOUND status with a bogus package id
     response = dataPackageManagerResource.readMetadata(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Metadata Dublin Core use case
+   */
+  private void testReadMetadataDublinCore() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readMetadataDublinCore(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    // Check the message body
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+        assertFalse(entityString.isEmpty());
+        String packageId = String.format("%s.%d.%d", testScope, testIdentifier, testRevision);
+        String dcIdentiferElement = String.format("<dc:identifier>%s</dc:identifier>", packageId);
+        System.err.println("dcIdentiferElement: " + dcIdentiferElement);
+        assertTrue(entityString.contains(dcIdentiferElement));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readMetadataDublinCore(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
     assertEquals(404, response.getStatus());
   }
     
