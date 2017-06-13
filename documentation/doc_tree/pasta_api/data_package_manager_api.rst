@@ -868,7 +868,7 @@ REST API
 Description
 """""""""""
 
-Read Metadata operation, specifying the scope, identifier, and revision of the EML document to be read in the URI.
+Read Metadata (EML) operation, specifying the scope, identifier, and revision of the EML document to be read in the URI.
 
 Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
 
@@ -876,6 +876,21 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/metadata/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Metadata Dublin Core*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata (Dublin Core) operation, specifying the scope, identifier, and revision of the Dublin Core metadata to be read in the URI.
+
+Revision may be specified as "newest" or "oldest" to retrieve the newest or oldest revision, respectively.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/dc/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/dc/{scope}/{identifier}/{revision}>`_
 
 *Read Metadata ACL*
 ^^^^^^^^^^^^^^^^^^^
