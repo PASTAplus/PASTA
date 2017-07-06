@@ -262,6 +262,20 @@ public class SimpleSolrSearch {
 						sb.append(String.format("%s%s<%s>%s</%s>\n",
 												INDENT, INDENT, fieldName, title, fieldName));
 					}
+					else if (fieldName.equals("projectTitle") || fieldName.equals("relatedProjectTitle")) {			
+						Object fieldValue = solrDocument.getFieldValue(fieldName);
+						if (fieldValue != null) {
+							Collection<Object> fieldValues = solrDocument.getFieldValues(fieldName);
+							for (Object value : fieldValues) {
+								String rawTitle = (String) value;
+								String title = StringEscapeUtils.escapeXml(rawTitle);
+								sb.append(String.format("%s%s<%s>%s</%s>\n", INDENT, INDENT, fieldName, title, fieldName));
+							}
+						}
+						else {
+							sb.append(String.format("%s%s<%s></%s>\n", INDENT, INDENT, fieldName, fieldName));
+						}
+					}
 					else if (wrapperElement != null) {
 						sb.append(String.format("%s%s<%s>\n", INDENT, INDENT, wrapperElement));
 						Collection<Object> multiValues = solrDocument.getFieldValues(fieldName);
