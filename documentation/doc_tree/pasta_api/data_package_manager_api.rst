@@ -178,6 +178,8 @@ Multi-value Fields
 * coordinates
 * keyword
 * organization
+* projectTitle
+* relatedProjectTitle
 * timescale
 
 Search Results
