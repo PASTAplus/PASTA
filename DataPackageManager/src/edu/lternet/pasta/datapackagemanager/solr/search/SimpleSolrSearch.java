@@ -326,7 +326,7 @@ public class SimpleSolrSearch {
 								rawValueStr = sdf.format(dateValue);
 							}
 						}
-						if (isFloatField(fieldName)) {
+						else if (isFloatField(fieldName)) {
 							Float floatValue = (Float) solrDocument.getFieldValue(fieldName);
 							rawValueStr = floatValue.toString();
 						}
