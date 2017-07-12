@@ -177,6 +177,18 @@ public class SimpleSolrSearch {
 	}
 	
 	
+	private boolean isFloatField(String fieldName) {
+		boolean isFloat = false;
+		
+		if (fieldName != null) {
+			return (fieldName.equals("score")
+				   );
+		}
+		
+		return isFloat;
+	}
+	
+	
 	/**
 	 * Executes a Solr search.
 	 * 
@@ -313,6 +325,10 @@ public class SimpleSolrSearch {
 							if (dateValue != null) {
 								rawValueStr = sdf.format(dateValue);
 							}
+						}
+						if (isFloatField(fieldName)) {
+							Float floatValue = (Float) solrDocument.getFieldValue(fieldName);
+							rawValueStr = floatValue.toString();
 						}
 						else {
 							rawValueStr = (String) solrDocument.getFieldValue(fieldName);
