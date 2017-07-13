@@ -56,6 +56,14 @@ public class SimpleSolrSearch {
 
 	private static final Logger logger = Logger.getLogger(SimpleSolrSearch.class);
 	
+	/**
+	 * Default rows value. 
+	 * @TODO This value needs to be kept consistent with the default rows value configured
+	 *       in the solrconfig.xml file used by Solr. It would be good if this could somehow 
+	 *       be automated, but that's not easy, so hard-code for now.
+	 */
+	private static final Integer ROWS_DEFAULT = new Integer(10); 
+	
 	private static final String[] ALL_FIELDS =
 		{ 
 			"abstract",
@@ -106,7 +114,7 @@ public class SimpleSolrSearch {
 	 * Instance fields
 	 */
 
-	private Integer rows = null;
+	private Integer rows = ROWS_DEFAULT;
 	private SolrServer solrServer;
 	private SolrQuery solrQuery;
 	
@@ -256,7 +264,7 @@ public class SimpleSolrSearch {
 		long start = solrDocumentList.getStart();
 		String[] fieldsArray = getFieldList();
 		
-		String firstLine = String.format("<resultset numFound='%d' start='%d' rows='%d'>\n", numFound, start, rows);
+		String firstLine = String.format("<resultset numFound='%d' start='%d' rows='%d'>\n", numFound, start, this.rows);
 		StringBuilder sb = new StringBuilder(firstLine);
 		
 		for (SolrDocument solrDocument : solrDocumentList) {

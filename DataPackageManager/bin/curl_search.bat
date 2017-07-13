@@ -9,4 +9,4 @@ REM curl -X GET "%SERVICE_HOST%/package/search/eml?defType=edismax&q=%22soil%20t
 REM curl -X GET "%SERVICE_HOST%/package/search/eml?defType=edismax&q=soil&q=temperature&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=packageid&sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
 REM curl -X GET "%SERVICE_HOST%/package/search/eml?defType=edismax&q=water+balance&fl=*&sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
 REM curl -X GET "%SERVICE_HOST%/package/search/eml?defType=edismax&q=*&sort=packageid,asc&debug=false&start=0&rows=100&fl=*"
-curl -X GET "%SERVICE_HOST%/package/search/eml?defType=edismax&q=bugs&start=0&rows=5&fl=packageid,score"
+curl -X GET "%SERVICE_HOST%/package/search/eml?rows=1&defType=edismax&q=id:knb-lter-nwk.3105&fl=packageid,score"
