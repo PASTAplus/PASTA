@@ -231,9 +231,9 @@
     </qualityCheck>
     <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
       <identifier>integrityChecksumPresence</identifier>
-      <name>A physical/authentication element is present</name>
-      <description>Check for presence of a physical/authentication element containing a checksum or hash value for an integrity check (e.g. MD5, SHA-1). Warn if an entity does not have a physical/authentication element.</description>
-      <expected>At least one physical/authentication element containing a checksum or hash value that can be used to perform an integrity check on the data.</expected>
+      <name>A physical/authentication element is present and specifies a method attribute with a value of MD5 or SHA-1</name>
+      <description>Check for presence of a physical/authentication element containing a checksum or hash value for an integrity check (e.g. MD5, SHA-1). Warn if an entity does not have a physical/authentication element, or if none of the physical/authentication elements specify a method attribute with a value of MD5 or SHA-1.</description>
+      <expected>At least one physical/authentication element with a method attribute specifying MD5 or SHA-1 and containing a checksum or hash value that can be used to perform an integrity check on the data.</expected>
       <found></found>
       <status>notChecked</status>
       <explanation>PASTA will use this value to check the integrity of the data it downloads from your site. In addition, PASTA is planning to compare the contributor-supplied checksum/hash value documented 

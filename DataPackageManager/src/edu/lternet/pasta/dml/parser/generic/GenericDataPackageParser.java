@@ -1682,6 +1682,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         	  String hashValue = integrityMap.get(hashMethod);
         	  entityObject.addPhysicalAuthentication(hashMethod, hashValue);
           }
+          entityObject.checkIntegrityChecksumPresence();
           
           try {
               NodeList attributeListNodeList = 

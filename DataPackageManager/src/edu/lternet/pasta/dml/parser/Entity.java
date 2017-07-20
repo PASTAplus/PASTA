@@ -747,30 +747,48 @@ public class Entity extends DataObjectDescription
     }
 
 
-    /**
-     * Do a quality check for the presence of a least one 
-     * physical/authentication element in this entity. 
-     * 
-     */
-    public void checkIntegrityChecksumPresence() {
-      String qualityCheckIdentifier = "integrityChecksumPresence";
-      QualityCheck qualityCheckTemplate = 
-        QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
-      QualityCheck qualityCheck = 
-        new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+	/**
+	 * Do a quality check for the presence of a least one
+	 * physical/authentication element in this entity that
+	 * specifies a method attribute with a value of MD5
+	 * or SHA-1.
+	 * 
+	 */
+	public void checkIntegrityChecksumPresence() {
+		String qualityCheckIdentifier = "integrityChecksumPresence";
+		QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
 
-      if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
-        Boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
-        qualityCheck.setFound(hasIntegrityChecksum.toString());
-        if (hasIntegrityChecksum) {
-          qualityCheck.setStatus(Status.valid);
-        }
-        else {
-          qualityCheck.setFailedStatus();
-        }
-        
-        addQualityCheck(qualityCheck);
-      }
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			Boolean hasIntegrityChecksum = this.hasPhysicalAuthentication();
+			Boolean hasMethodAttribute = this.hasMethodAttribute();
+			Boolean isValid = new Boolean(false);
+			if (hasIntegrityChecksum && hasMethodAttribute) {
+				isValid = true;
+			}
+			qualityCheck.setFound(isValid.toString());
+			if (isValid) {
+				qualityCheck.setStatus(Status.valid);
+			} else {
+				qualityCheck.setFailedStatus();
+				if (!hasIntegrityChecksum) {
+					qualityCheck.setFound("No authentication element was found.");
+				} else if (!hasMethodAttribute) {
+					qualityCheck.setFound(
+							"One or more authentication elements were found, but no method attribute with value MD5 or SHA-1 was found.");
+				}
+			}
+
+			addQualityCheck(qualityCheck);
+		}
+	}    
+    
+    private boolean hasMethodAttribute() {
+       	boolean hasMD5 = physicalAuthenticationMap.get("MD5") != null;
+    	boolean hasSHA1 = physicalAuthenticationMap.get("SHA-1") != null;
+    	boolean hasMethodAttribute= hasMD5 || hasSHA1;
+    	
+    	return hasMethodAttribute;
     }
 
 
@@ -1400,12 +1418,6 @@ public class Entity extends DataObjectDescription
      */
     public void setHasPhysicalAuthentication(boolean physicalAuthentication) {
       this.hasPhysicalAuthentication = physicalAuthentication;
-      
-      /*
-       * After setting the boolean, give the quality check an opportunity to
-       * run.
-       */
-      checkIntegrityChecksumPresence();
     }
     
     
