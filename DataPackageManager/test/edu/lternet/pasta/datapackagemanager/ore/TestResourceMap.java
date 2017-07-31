@@ -50,11 +50,12 @@ public class TestResourceMap {
 		private static Options options = null;
 		private static String testPath = null;
 		private static String testResourceMapFileName = "resourceMap.xml";
-		private static String testResourceMapPath;
 		private static String testScope = "knb-lter-nin";
 		private static Integer testIdentifier = new Integer(1);
 		private static Integer testRevision = new Integer(1);
 		private static String testRevisionStr;
+		private static final String testString =
+				"<rdf:Description rdf:about=\"https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1\">";
 	
 		static {
 			testRevisionStr = testRevision.toString();
@@ -78,16 +79,13 @@ public class TestResourceMap {
 		      if (testPath == null) {
 		          fail("No value found for DataPackageManager property 'datapackagemanager.test.path'");
 		      }
-		      else {
-		    	  testResourceMapPath = String.format("%s/%s", testPath, testResourceMapFileName);
-		      }
 		    }
 		}
 
 	  
 	  /**
-	   * Test generation of an RDF-XML Resource Map by comparing it to a file
-	   * stored in the test/data directory.
+	   * Test generation of an RDF-XML Resource Map by comparing it to a known substring that
+	   * we expect it to contain.
 	   */
 	  @Test 
 	  public void testToXML() {
@@ -102,9 +100,8 @@ public class TestResourceMap {
 	      String xmlString = 
 	    		  dataPackageManager.readDataPackage(testScope, testIdentifier, testRevisionStr,
 	    				                             authToken, user, oreFormat);
-	      String testString = FileUtility.fileToString(testResourceMapPath);
-	      boolean isEqual = (xmlString != null) && xmlString.trim().equals(testString.trim());
-	      assertTrue(isEqual);
+	      boolean containsSubstring = xmlString.contains(testString);
+	      assertTrue(containsSubstring);
 	      
 	    }
 	    catch (Exception e) {
