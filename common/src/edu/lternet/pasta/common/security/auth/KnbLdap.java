@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.ExtendedRequest;
@@ -49,6 +50,7 @@ import com.unboundid.ldap.sdk.SearchResultReference;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
 import com.unboundid.util.ssl.SSLUtil;
+import com.unboundid.util.ssl.TrustAllTrustManager;
 import com.unboundid.util.ssl.TrustStoreTrustManager;
 
 import edu.lternet.pasta.common.FileUtility;
@@ -137,6 +139,33 @@ public final class KnbLdap extends Ldap {
 	}
 
 	/**
+	 * Returns an LDAPS connection to the specified host with all of the necessary
+	 * properties.
+	 *
+	 * @throws IllegalStateException
+	 */
+	private LDAPConnection makeLdapsConnection(String host, Integer port)
+			throws IllegalStateException {
+
+		// FollowReferrals must be set to false. Otherwise, referral
+		// URLs are not included in LDAP search results.
+		LDAPConnectionOptions options = new LDAPConnectionOptions();
+		options.setFollowReferrals(false);
+
+		SSLUtil sslUtil = new SSLUtil(new TrustAllTrustManager());
+
+		try {
+			SSLSocketFactory sslSocketFactory = sslUtil.createSSLSocketFactory();
+			LDAPConnection connection = new LDAPConnection(sslSocketFactory, options);
+			connection.connect(host, port);
+			return connection;
+		} catch (GeneralSecurityException | LDAPException e) {
+			throw new IllegalStateException(e);
+		}
+
+	}
+
+	/**
 	 * Returns an LDAP connection to the specified host with all of the necessary
 	 * properties.
 	 * 
@@ -210,7 +239,7 @@ public final class KnbLdap extends Ldap {
 		} catch (LDAPException e) {
 			throw new IllegalStateException(e);
 		}
-		
+
 	}
 
 	/**
@@ -218,27 +247,19 @@ public final class KnbLdap extends Ldap {
 	 * authentication fails, LDAP referral URLs will be checked if that flag is
 	 * set to {@code true}, which involves recursively calling this method again.
 	 */
-	private boolean authenticate(String user, String password, String host,
-	    boolean checkReferrals) {
+	private boolean authenticate(String user, String password, String host, boolean checkReferrals) {
+
+		// Default LDAPS port
+		Integer port = 636;
 
 		try {
 			
-			connection = makeTlsConnection(host);
+			connection = makeLdapsConnection(host, port);
 			
 		} catch (IllegalStateException e) {
-			System.err.println("LDAP TLS negotiation error: " + e);
+			System.err.println("LDAPS negotiation error: " + e);
 			e.printStackTrace();
-			
-			// Attempt non-TLS connection
-			try {
-				
-				connection = makeConnection(host);
-			
-			} catch (IllegalStateException e1) {
-				System.err.println("LDAP negotiation error: " + e1);
-				e1.printStackTrace();
-				return false;
-			}
+			return false;
 		}
 
 		try {

@@ -7,7 +7,7 @@
 .DS_Store
 .idea
 .tern-project
-*/*.iml
+*.iml
 /out
 classes
 build
