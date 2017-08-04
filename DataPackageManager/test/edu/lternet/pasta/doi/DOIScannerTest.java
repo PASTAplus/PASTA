@@ -278,7 +278,8 @@ public class DOIScannerTest {
 	public void tearDown() throws Exception {
 
 	}
-
+	
+	
 	/**
 	 * Test the process of generating DOIs for all data packages without DOIs,
 	 * including the single test instance of knb-lter-xyz.*.*.; test deleting the
@@ -301,7 +302,8 @@ public class DOIScannerTest {
 		}
 
 		doiScanner.setDoiTest(true);
-
+		testIsLTERScope(doiScanner);
+		
 		// Test DOI registration through scanning the resource registry for active
 		// and public data packages without DOIs
 		try {
@@ -352,6 +354,27 @@ public class DOIScannerTest {
 
 	}
 
+	/**
+	 * Tests the DOIScanner.isLTERScope() method against a number of test strings.
+	 * Executed as a sub-test from within the testDOIScan() test.
+	 */
+	private void testIsLTERScope(DOIScanner doiScanner) {
+		String[] lterScopes = {"knb-lter-and", "ecotrends", "lter-landsat", "lter-landsat-ledaps"};
+		String[] nonLterScopes = {"edi", "msb-tempbiodev", "EcoTrends"};
+		
+		try {
+			for (String scope : lterScopes) {
+				assertTrue(doiScanner.isLTERScope(scope));
+			}
+			for (String scope : nonLterScopes) {
+				assertFalse(doiScanner.isLTERScope(scope));
+			}
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+
+	
 	private String getDoiValue(String packageId) {
 
 		String doi = null;

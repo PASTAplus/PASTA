@@ -67,7 +67,8 @@ public class DOIScanner {
 	private String dbPassword = null;
 	private Registrar registrar = null;
 	private String metadataDir = null;
-	private String doiUrlHead = null;
+	private String doiUrlHeadEDI = null;
+	private String doiUrlHeadLTER = null;
 	private String doiTest = null;
 	private Boolean isDoiTest = null;
 	
@@ -162,7 +163,8 @@ public class DOIScanner {
 			this.dbUser = options.getOption("dbUser");
 			this.dbPassword = options.getOption("dbPassword");
 
-			this.doiUrlHead = options.getOption("datapackagemanager.doiUrlHead");
+			this.doiUrlHeadEDI = options.getOption("datapackagemanager.doiUrlHead.edi");
+			this.doiUrlHeadLTER = options.getOption("datapackagemanager.doiUrlHead.lter");
 			this.doiTest = options.getOption("datapackagemanager.doiTest");
 
 			// Load PASTA service options
@@ -201,6 +203,48 @@ public class DOIScanner {
 		}
 
 	}
+	
+	
+	/**
+	 * Boolean to determine whether a data package is an LTER data package based on its scope value.
+	 * 
+	 * @param scope   the data package scope value
+	 * @return  true if an LTER data package, else false
+	 * @throws DOIException
+	 */
+	public boolean isLTERScope(String scope) 
+			throws DOIException {
+		boolean isLTERScope = false;
+		
+		if (scope != null) {
+			if (scope.equals("ecotrends") ||
+				scope.startsWith("knb-lter-") ||
+				scope.startsWith("lter-landsat")
+			   ) {
+				isLTERScope = true;
+			}
+		}
+		else {
+			throw new DOIException("The resource has a null scope value.");
+		}
+		
+		return isLTERScope;
+	}
+	
+	
+	private String scopeFromPackageId(String packageId)
+			throws DOIException {
+		String scope = null;
+		
+		if (packageId != null && packageId.contains(".")) {
+			scope = packageId.substring(0, packageId.indexOf('.'));
+		}
+		else {
+			throw new DOIException("The resource has a null or invalid packageId value.");
+		}
+		
+		return scope;
+	}
 
 	
 	/**
@@ -234,7 +278,14 @@ public class DOIScanner {
 
 				// Set local metadata attributes
 				resourceUrl = resource.getResourceId();
-				doiUrl = this.doiUrlHead + resource.getPackageId();
+				String doiUrlHead = this.doiUrlHeadEDI;
+				String packageId = resource.getPackageId();
+				String scope = scopeFromPackageId(packageId);
+				if (isLTERScope(scope)) {
+					doiUrlHead = this.doiUrlHeadLTER;
+				}
+				doiUrl = doiUrlHead + packageId;
+				logger.info("DOI landing page URL will be set to: " + doiUrl);
 				publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 				creators = emlObject.getCreators();
 				titles = emlObject.getTitles();
