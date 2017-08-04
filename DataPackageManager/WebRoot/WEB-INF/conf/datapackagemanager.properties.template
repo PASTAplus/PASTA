@@ -133,6 +133,7 @@ datapackagemanager.doiContext=FK2
 datapackagemanager.doiTest=true
 datapackagemanager.doiUrlHead.edi=https://portal-d.edirepository.org/nis/mapbrowse?packageid=
 datapackagemanager.doiUrlHead.lter=https://portal-d.lternet.edu/nis/mapbrowse?packageid=
+
 # Toggle between ezid and datacite; useful during the migration from ezid to datacite
 datapackagemanager.doiProvider=datacite
 
