@@ -86,6 +86,8 @@ public final class LevelOneEMLFactory {
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
   private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String TITLE_PATH = "//dataset/title";
+  private static final String ACCESS_ALLOW_PATH = "//access/allow";
+  private static final String ACCESS_ALLOW_PRINCIPAL_PATH = "//access/allow/principal";
   
   private static final String INTELLECTUAL_RIGHTS_CC_BY = 
     "This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
@@ -93,6 +95,9 @@ public final class LevelOneEMLFactory {
   private static final String INTELLECTUAL_RIGHTS_CC0 = 
     "This data package is released to the \"public domain\" under Creative Commons CC0 1.0 \"No Rights Reserved\" (see: https://creativecommons.org/publicdomain/zero/1.0/). It is considered professional etiquette to provide attribution of the original work if this data package is shared in whole or by individual components. A generic citation is provided for this data package on the website https://portal.edirepository.org (herein \"website\") in the summary metadata page. Communication (and collaboration) with the creators of this data package is recommended to prevent duplicate research or publication. This data package (and its components) is made available \"as is\" and with no warranty of accuracy or fitness for use. The creators of this data package and the website shall not be liable for any damages resulting from misinterpretation or misuse of the data package or its components. Periodic updates of this data package may be available from the website. Thank you.";
   
+  private final static String EDI = "uid=EDI,o=LTER,dc=ecoinformatics,dc=org";
+  private final static String EDI2 = "uid=EDI,o=lter,dc=ecoinformatics,dc=org";
+
   /*
    * Instance variables
    */
@@ -147,6 +152,7 @@ public final class LevelOneEMLFactory {
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
     checkIntellectualRights(levelZeroEMLDocument);
+    checkEdiPrincipal(levelZeroEMLDocument);
 
     return levelZeroEMLDocument;
   }
@@ -190,6 +196,31 @@ public final class LevelOneEMLFactory {
   		else {
   			addDefaultIntellectualRights(emlDocument);
   		}
+  	}
+
+  	
+    /**
+     * Check to see whether the Level-0 EML with scope of "EDI" already has an
+     * principal element for uid=EDI..., and if not, add one.
+     * 
+     * @param emlDocument  the Level-0 EML document to be checked
+     */
+  	void checkEdiPrincipal(Document emlDocument)
+        throws TransformerException {
+		String packageId = getPackageIdAttribute(emlDocument);
+		if (packageId != null) {
+			String scope = packageId.split(".")[0];
+			if (scope.equals("edi")) {
+				boolean hasEdiPrincipal = hasEdiPrincipal(emlDocument);
+  		
+				if (hasEdiPrincipal) {
+					logger.info("An access/allow/principal element for EDI was found in the Level-0 EML.");
+				}
+				else {
+					addEdiPrincipal(emlDocument);
+				}
+			}
+		}
   	}
 
   	
@@ -304,6 +335,37 @@ public final class LevelOneEMLFactory {
 	}
 
 
+	/**
+	 * Boolean to determine whether this data package contains an access 
+	 * control element for principal with uid=EDI... If it does, we don't 
+	 * want to add a duplicate element.
+	 * 
+     * @param   emlDocument  the Level-0 EML Document
+	 * @return  true if this data package has a //access/allow/principal element for
+	 *          an EDI uid, else false
+	 */
+	public boolean hasEdiPrincipal(Document emlDocument)
+	          throws TransformerException {
+		boolean hasEDI = false;
+	    CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+	    // Parse the //access/allow/principal elements
+		NodeList principalNodeList = xpathapi.selectNodeList(emlDocument, ACCESS_ALLOW_PRINCIPAL_PATH);
+		if (principalNodeList != null) {
+			for (int i = 0; i < principalNodeList.getLength(); i++) {
+				Element principalElement = (Element) principalNodeList.item(i);
+				String principalText = principalElement.getTextContent();
+
+				if (EDI.equals(principalText) || EDI2.equals(principalText)) {
+					hasEDI = true;
+				}
+			}
+		}
+
+		return hasEDI;
+	}
+
+
   /*
    * Append a Level-1 contact element to document containing contact
    * info for the Environmental Data Initiative (EDI)
@@ -397,6 +459,34 @@ public final class LevelOneEMLFactory {
 	}
 
 
+	  /*
+	   * Add a Level-1 access/allow element with EDI principal to document.
+	   */
+		private void addEdiPrincipal(Document doc)
+				throws TransformerException {
+			Element allowElement = doc.createElement("allow");
+			Element principalElement = doc.createElement("principal");
+			principalElement.appendChild(doc.createTextNode(EDI));
+			allowElement.appendChild(principalElement);
+			Element permissionElement = doc.createElement("permission");
+			permissionElement.appendChild(doc.createTextNode("all"));
+			allowElement.appendChild(permissionElement);
+			
+			/* 
+			 * Insert the access/allow element before an existing access/allow element.
+			 */
+			if (hasElement(doc, ACCESS_ALLOW_PATH)) {
+				Node accessNode = getAccessNode(doc);
+				if (accessNode != null) {
+					String insertBefore = ACCESS_ALLOW_PATH;
+					NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+					Node insertNode = insertNodeList.item(0);		
+					accessNode.insertBefore(allowElement, insertNode);
+				}
+			}
+		}
+
+
 	    /**
 	     * Add an alternateIdentifier element to the Level-1 metadata document.
 	     * 
@@ -476,6 +566,26 @@ public final class LevelOneEMLFactory {
     }
 
     return nodeList;
+  }
+
+
+  /**
+   * Returns the access element node contained in this EML document.
+   * 
+   * @return  the access element Node object
+   */
+  private Node getAccessNode(Document emlDocument) {
+    Node node = null;
+
+    try {
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      node = (Node) xPath.evaluate("//access", emlDocument, XPathConstants.NODE);
+    }
+    catch (XPathExpressionException e) {
+      throw new IllegalStateException(e);
+    }
+
+    return node;
   }
 
 
