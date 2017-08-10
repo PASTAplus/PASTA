@@ -25,12 +25,10 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,8 +44,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
 
 import edu.lternet.pasta.common.XmlUtility;
 import edu.ucsb.nceas.utilities.XMLUtilities;
@@ -67,6 +63,7 @@ public final class LevelOneEMLFactory {
   private static final String CONTACT_PATH = "//dataset/contact";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
+  private static final String DATASET_PATH = "//eml/dataset";
   private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org/authentication";
   public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
   public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
@@ -86,8 +83,8 @@ public final class LevelOneEMLFactory {
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
   private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String TITLE_PATH = "//dataset/title";
-  private static final String ACCESS_ALLOW_PATH = "//access/allow";
-  private static final String ACCESS_ALLOW_PRINCIPAL_PATH = "//access/allow/principal";
+  private static final String ACCESS_ALLOW_PATH = "//eml/access/allow";
+  private static final String ACCESS_ALLOW_PRINCIPAL_PATH = "//eml/access/allow/principal";
   
   private static final String INTELLECTUAL_RIGHTS_CC_BY = 
     "This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
@@ -206,10 +203,10 @@ public final class LevelOneEMLFactory {
      * @param emlDocument  the Level-0 EML document to be checked
      */
   	void checkEdiPrincipal(Document emlDocument)
-        throws TransformerException {
+  			throws TransformerException {
 		String packageId = getPackageIdAttribute(emlDocument);
 		if (packageId != null) {
-			String scope = packageId.split(".")[0];
+			String scope = packageId.split("\\.")[0];
 			if (scope.equals("edi")) {
 				boolean hasEdiPrincipal = hasEdiPrincipal(emlDocument);
   		
@@ -349,7 +346,7 @@ public final class LevelOneEMLFactory {
 		boolean hasEDI = false;
 	    CachedXPathAPI xpathapi = new CachedXPathAPI();
 
-	    // Parse the //access/allow/principal elements
+	    // Parse the //eml/access/allow/principal elements
 		NodeList principalNodeList = xpathapi.selectNodeList(emlDocument, ACCESS_ALLOW_PRINCIPAL_PATH);
 		if (principalNodeList != null) {
 			for (int i = 0; i < principalNodeList.getLength(); i++) {
@@ -484,6 +481,20 @@ public final class LevelOneEMLFactory {
 					accessNode.insertBefore(allowElement, insertNode);
 				}
 			}
+			else {
+				Node emlNode = getEmlNode(doc);
+				Element accessElement = doc.createElement("access");
+			    //<access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" scope="document" system="https://pasta.edirepository.org">
+				accessElement.setAttribute("authSystem", "https://pasta.edirepository.org/authentication");
+				accessElement.setAttribute("order", "allowFirst");
+				accessElement.setAttribute("scope", "document");
+				accessElement.setAttribute("system", "https://pasta.edirepository.org");
+				accessElement.appendChild(allowElement);
+				String insertBefore = DATASET_PATH;
+				NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+				Node insertNode = insertNodeList.item(0);		
+				emlNode.insertBefore(accessElement, insertNode);
+			}
 		}
 
 
@@ -605,6 +616,21 @@ public final class LevelOneEMLFactory {
     catch (XPathExpressionException e) {
       throw new IllegalStateException(e);
     }
+
+    return node;
+  }
+
+
+  /**
+   * Returns the eml element node contained in
+   * this EML document.
+   * 
+   * @return  the eml element Node object
+   */
+  private Node getEmlNode(Document emlDocument) {
+    Node node = null;
+
+    node = emlDocument.getFirstChild();
 
     return node;
   }

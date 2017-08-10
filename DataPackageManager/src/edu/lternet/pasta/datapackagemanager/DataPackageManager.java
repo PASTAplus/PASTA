@@ -835,6 +835,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		        isLevelZero = false;
 		        levelOneEMLFile = storeMetadata(emlPackageId, levelOneXML, isLevelZero);
+
+		        DataPackage dataPackage = parseEml(levelOneEMLFile, isEvaluate);
+		        
+		        /*
+		         * Level One EML may potentially have a different access block than
+		         * the Level Zero EML, so the access matrix needs to be regenerated.
+		         */
+				if (dataPackage != null) {
+					EMLDataPackage levelOneDataPackage = new EMLDataPackage(dataPackage);
+					datasetAccessXML = levelOneDataPackage.getAccessXML();
+					datasetAccessMatrix = new AccessMatrix(datasetAccessXML);
+				}
 		        
 		        /*
 		         * Now that the Level-1 EML is stored on disk, we can use it to
