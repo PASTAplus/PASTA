@@ -2050,12 +2050,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String qualityReportingStr = options.getOption("qualityReporting");
 			String qualityReportTemplate = options.getOption("qualityReportTemplate");
 			String emlDereferencerXSLT = options.getOption("emlDereferencerXSLT");
-			String preferredFormatStrings = options.getOption("dml.preferredFormatStrings");
+			String preferredFormatStringsURL = options.getOption("dml.preferredFormatStringsURL");
 			if (qualityReportingStr != null) {
 				if (qualityReportingStr.equalsIgnoreCase("true")) {
 					QualityReport.setQualityReporting(true, qualityReportTemplate);
 					QualityReport.setEmlDereferencerXSLTPath(emlDereferencerXSLT);
-					QualityReport.setPreferredFormatStrings(preferredFormatStrings);
+					QualityReport.setPreferredFormatStrings(preferredFormatStringsURL);
 				} else if (qualityReportingStr.equalsIgnoreCase("false")) {
 					QualityReport.setQualityReporting(false, null);
 				}

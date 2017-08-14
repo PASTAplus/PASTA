@@ -1,11 +1,16 @@
 package edu.lternet.pasta.dml.quality;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -382,19 +387,34 @@ public class QualityReport {
    * Add formatString values as specified in the properties file to the set
    * of preferred values.
    * 
-   * @param preferredList  a comma-separated list of preferred values as
-   *                       specified in the datapackagemanager.properties file.
-   *                       This will potentially extend the set already defined
-   *                       in the Entity class.
+   * @param preferredFormatStringsURL  
+   *     a URL to a newline-separated list of preferred formatString values, as
+   *     configured in the datapackagemanager.properties file with property name
+   *     of "dml.preferredFormatStringsURL".
    */
-  public static void setPreferredFormatStrings(String preferredList) {
-	  if (preferredList != null) {
-		  String[] formatStrings = preferredList.split(",");
-		  for (String formatString : formatStrings) {
-			  Entity.addPreferredFormatString(formatString);
-		  }
-	  }
-  }
+  public static void setPreferredFormatStrings(String preferredFormatStringsURL) 
+  		throws MalformedURLException, IOException {
+		if (preferredFormatStringsURL != null) {
+			try {
+				URLConnection conn = new URL(preferredFormatStringsURL).openConnection();
+				try (BufferedReader is = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+					String line;
+					while ((line = is.readLine()) != null) {
+						String formatString = line.trim();
+						Entity.addPreferredFormatString(formatString);
+					}
+				}
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				throw (e);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw (e);
+			}
+		} else {
+			throw new MalformedURLException("preferredFormatStringsURL property value is null");
+		}
+	}
   
 
   /**

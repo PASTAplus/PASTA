@@ -12,7 +12,7 @@ anonymousFtpPasswd=pasta@LTERnet.edu
 qualityReporting=true
 qualityReportTemplate=/home/pasta/local/apache-tomcat/webapps/package/xml/qualityReportTemplate.xml
 emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.xsl
-dml.preferredFormatStrings=YYYY-MM-DDThh:mm-hh:mm,YYYY-MM-DD hh:mm-hh:mm,YYYY-MM-DD hh:mm:ss,YYYY-MM-DDThh:mm,YYYY-MM-DDThh:mm:ss,YYYY-MM-DD hh:mm,YYYY-MM-DD,YYYYMMDD,YYYY-MM,YYYYMM,YYYYDDD,YYYY,hh:mm:ss,hh:mm,hhmm,hh
+dml.preferredFormatStringsURL=file:///home/pasta/git/NIS/DataPackageManager/WebRoot/WEB-INF/conf/preferredFormatStrings.txt
 
 #
 # Database connection properties
