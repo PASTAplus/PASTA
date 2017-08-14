@@ -916,10 +916,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    ResourceType.data, entityDir, packageId, scope, identifier,
 				    revision, entityId, entityName, user, formatType, mayOverwrite);
 				
-				// Store the checksum of the data entity resource
+				// Store the checksums of the data entity resource
 				File file = getDataEntityFile(scope, identifier,
 						revision.toString(), entityId, authToken, user);
-				storeChecksum(entityURI, file);
+				storeChecksums(entityURI, file);
 
 				// Store the size of the data entity resource
 				storeResourceSize(entityURI, file);
@@ -970,7 +970,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			// Store the checksum of the report resource
 			File file = readDataPackageReport(scope, identifier,
 					revision.toString(), emlPackageId, authToken, user);
-			storeChecksum(reportURI, file);
+			storeChecksums(reportURI, file);
 
 			/*
 			 * Store the access control rules for the quality report resource
@@ -1083,7 +1083,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				// Store the checksum of the metadata resource
 				File file = getMetadataFile(scope, identifier, revision.toString(),
 						user, authToken);
-				storeChecksum(metadataURI, file);
+				storeChecksums(metadataURI, file);
 				
 				/*
 				 * Optimize data storage for the data package
@@ -3202,17 +3202,58 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	
 	
 	/**
-	 * Calculates and stores the SHA-1 checksum of a PASTA resource in the data package registry.
+	 * Calculates and stores the MD5 and SHA-1 checksums of a PASTA resource in the 
+	 * data package registry.
 	 * 
 	 * @param resourceId         The PASTA resource identifier string
 	 * @param file               The file object whose checksum is to be calculated
 	 */
-	public void storeChecksum(String resourceId, File file) {
+	public void storeChecksums(String resourceId, File file) {
+		try {
+			storeMD5Checksum(resourceId, file);
+			storeSHA1Checksum(resourceId, file);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Calculates and stores the MD5 checksum of a PASTA resource in the 
+	 * data package registry.
+	 * 
+	 * @param resourceId         The PASTA resource identifier string
+	 * @param file               The file object whose MD5 checksum is to be calculated
+	 */
+	public void storeMD5Checksum(String resourceId, File file) {
+		try {
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+				    dbDriver, dbURL, dbUser, dbPassword);
+			String md5Checksum = DigestUtilsWrapper.getMD5Checksum(file);
+			dataPackageRegistry.updateMD5Checksum(resourceId, md5Checksum);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+	}
+
+	
+	/**
+	 * Calculates and stores the SHA-1 checksum of a PASTA resource in the 
+	 * data package registry.
+	 * 
+	 * @param resourceId         The PASTA resource identifier string
+	 * @param file               The file object whose SHA-1 checksum is to be calculated
+	 */
+	public void storeSHA1Checksum(String resourceId, File file) {
 		try {
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 				    dbDriver, dbURL, dbUser, dbPassword);
 			String sha1Checksum = DigestUtilsWrapper.getSHA1Checksum(file);
-			dataPackageRegistry.updateShaChecksum(resourceId, sha1Checksum);
+			dataPackageRegistry.updateSHA1Checksum(resourceId, sha1Checksum);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

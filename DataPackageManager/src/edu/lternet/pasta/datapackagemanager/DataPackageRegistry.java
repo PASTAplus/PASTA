@@ -2879,13 +2879,13 @@ public class DataPackageRegistry {
 
 	
 	/**
-	 * Returns an array list of resources that are lacking checksums in
+	 * Returns an array list of resources that are lacking MD5 checksums in
 	 * the resource registry.
 	 * 
 	 * @return Array list of resources
 	 * @throws SQLException
 	 */
-	public ArrayList<Resource> listChecksumlessResources() throws SQLException {
+	public ArrayList<Resource> listMd5ChecksumlessResources() throws SQLException {
 
 		ArrayList<Resource> resourceList = new ArrayList<Resource>();
 
@@ -2899,7 +2899,66 @@ public class DataPackageRegistry {
 
 		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
 		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL AND sha1_checksum IS NULL;";
+		    + " resource_type != 'dataPackage' AND md5_checksum IS NULL;";
+
+		Statement stat = null;
+		try {
+			stat = conn.createStatement();
+			ResultSet result = stat.executeQuery(queryString);
+
+			while (result.next()) {
+				Resource resource = new Resource();
+				String resourceId = result.getString("resource_id");
+				String resourceType = result.getString("resource_type");
+				String scope = result.getString("scope");
+				Integer identifier = new Integer(result.getInt("identifier"));
+				Integer revision = new Integer(result.getInt("revision"));
+				String packageId = scope + "." + identifier + "." + revision;
+				String entityId = result.getString("entity_id");
+				resource.setResourceId(resourceId);
+				resource.setResourceType(resourceType);
+				resource.setScope(scope);
+				resource.setIdentifier(identifier);
+				resource.setRevision(revision);
+				resource.setPackageId(packageId);
+				resource.setEntityId(entityId);
+				resourceList.add(resource);
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			returnConnection(conn);
+		}
+
+		return resourceList;
+
+	}
+
+	
+	/**
+	 * Returns an array list of resources that are lacking SHA-1 checksums in
+	 * the resource registry.
+	 * 
+	 * @return Array list of resources
+	 * @throws SQLException
+	 */
+	public ArrayList<Resource> listSha1ChecksumlessResources() throws SQLException {
+
+		ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+
+		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+		    + " FROM datapackagemanager.resource_registry WHERE"
+		    + " resource_type != 'dataPackage' AND sha1_checksum IS NULL;";
 
 		Statement stat = null;
 		try {
@@ -3436,6 +3495,56 @@ public class DataPackageRegistry {
   }
 
 	
+	  /**
+	   * Update the MD5 checksum of a resource to the resource registry.
+	   * 
+	   * @param resourceId
+	   *          The resource identifier of the resource to be updated
+	   * @param md5Checksum
+	   *          The MD5 checksum of the resource, a 32 character string
+	   * @throws SQLException
+	   */
+	  public void updateMD5Checksum(String resourceId, String md5Checksum)
+	          throws ChecksumException, ClassNotFoundException, SQLException {
+	    Connection conn = null;
+	    
+	    if ((md5Checksum == null) || (md5Checksum.length() != 32)) {
+	      throw new ChecksumException("MD5 checksum must be 32 characters in length");
+	    }
+	    
+	    try {
+	      conn = this.getConnection();
+	    } 
+	    catch (ClassNotFoundException e) {
+	      logger.error(e.getMessage());
+	      e.printStackTrace();
+	      throw(e);
+	    }
+
+	    String queryString = String.format("UPDATE datapackagemanager.resource_registry "
+	        + "SET md5_checksum='%s' WHERE resource_id='%s'", md5Checksum, resourceId);
+
+	    try {
+	      Statement statement = conn.createStatement();
+	      int rowCount = statement.executeUpdate(queryString);
+	      if (rowCount != 1) {
+	        String msg = String.format("When updating MD5 checksum, expected 1 row updated, instead %d rows were updated.", 
+	        		                   rowCount);
+	        throw new ChecksumException(msg);
+	      }
+	    } 
+	    catch (SQLException e) {
+	      logger.error(e.getMessage());
+	      e.printStackTrace();
+	      throw(e);
+	    } 
+	    finally {
+	      returnConnection(conn);
+	    }
+
+	  }
+
+
   /**
    * Update the SHA-1 checksum of a resource to the resource registry.
    * 
@@ -3445,7 +3554,7 @@ public class DataPackageRegistry {
    *          The SHA-1 checksum of the resource
    * @throws SQLException
    */
-  public void updateShaChecksum(String resourceId, String sha1Checksum)
+  public void updateSHA1Checksum(String resourceId, String sha1Checksum)
           throws ChecksumException, ClassNotFoundException, SQLException {
     Connection conn = null;
     

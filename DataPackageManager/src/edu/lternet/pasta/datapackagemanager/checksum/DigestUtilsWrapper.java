@@ -41,6 +41,21 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class DigestUtilsWrapper {
 
 	/**
+	 * Gets the MD5 checksum of a file object 
+	 * 
+	 * @param file  the file object whose checksum is being calculated
+	 * @return the MD5 checksum, a 32-character string
+	 * @throws Exception
+	 */
+	public static String getMD5Checksum(File file) throws Exception {
+		InputStream fis = new FileInputStream(file);
+		String md5Hex = DigestUtils.md5Hex(fis);
+		fis.close();
+		return md5Hex;
+	}
+
+
+	/**
 	 * Gets the SHA-1 checksum of a file object 
 	 * 
 	 * @param file  the file object whose checksum is being calculated
