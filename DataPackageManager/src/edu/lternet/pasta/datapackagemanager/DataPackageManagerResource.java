@@ -1266,7 +1266,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	@Path("/evaluate/eml")
 	@Consumes("application/xml")
 	@Produces({ "application/xml", "text/html" })
-	public Response evaluateDataPackage(@Context HttpHeaders headers,
+	public Response evaluateDataPackage(@Context HttpHeaders headers, @Context UriInfo uriInfo,
 			File emlFile) {
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
@@ -1279,7 +1279,18 @@ public class DataPackageManagerResource extends PastaWebService {
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
-		// Is user authorized to run the 'createDataPackage' service method?
+        QueryString queryString = new QueryString(uriInfo);
+        Map<String, List<String>> queryParams = queryString.getParams(); 
+        boolean useChecksum = false;
+		if (queryParams != null) {
+			for (String key : queryParams.keySet()) {
+				if (key.equalsIgnoreCase("useChecksum")) {
+					useChecksum = true;
+				}
+			}
+		}
+
+		// Is user authorized to run the 'evaluateDataPackage' service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
 				serviceMethodName, permission, authToken);
 		if (!serviceMethodAuthorized) {
@@ -1290,7 +1301,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		// Perform evaluateDataPackage in new thread
 		Evaluator evaluator = new Evaluator(emlFile, userId, authToken,
-				transaction);
+				transaction, useChecksum);
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		executorService.execute(evaluator);
 		executorService.shutdown();
@@ -9236,7 +9247,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	@Consumes("application/xml")
 	@Produces("text/plain")
 	public Response updateDataPackage(
-			@Context HttpHeaders headers, 
+			@Context HttpHeaders headers, @Context UriInfo uriInfo,
 			@PathParam("scope") String scope,
 			@PathParam("identifier") Integer identifier, 
 			File emlFile) {
@@ -9250,6 +9261,17 @@ public class DataPackageManagerResource extends PastaWebService {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
+	        QueryString queryString = new QueryString(uriInfo);
+	        Map<String, List<String>> queryParams = queryString.getParams(); 
+	        boolean useChecksum = false;
+			if (queryParams != null) {
+				for (String key : queryParams.keySet()) {
+					if (key.equalsIgnoreCase("useChecksum")) {
+						useChecksum = true;
+					}
+				}
+			}
+
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
 			if (!serviceMethodAuthorized) {
@@ -9261,7 +9283,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			String transaction = generateTransactionID("update", scope, identifier, null);
 
 			// Perform updateDataPackage in new thread
-			Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction);
+			Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, transaction, useChecksum);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(updator);
 			executorService.shutdown();
@@ -10497,16 +10519,17 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userId = null;
 		AuthToken authToken = null;
 		String transaction = null;
+		boolean useChecksum = false;
 
 
 		public Evaluator(File emlFile, String userId, AuthToken authToken,
-				String transaction) {
+				String transaction, boolean useChecksum) {
 
 			this.emlFile = emlFile;
 			this.userId = userId;
 			this.authToken = authToken;
 			this.transaction = transaction;
-
+			this.useChecksum = useChecksum;
 		}
 
 
@@ -10524,7 +10547,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 				dpm = new DataPackageManager();
 				xmlString = dpm.evaluateDataPackage(emlFile, userId, authToken,
-						transaction);
+						transaction, useChecksum);
 
 				if (xmlString == null) {
 					gripe = "Data package evaluate operation failed for unknown reason";
@@ -10600,10 +10623,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userId = null;
 		AuthToken authToken = null;
 		String transaction = null;
+		boolean useChecksum = false;
 
 
 		public Updator(File emlFile, String scope, Integer identifier,
-				String userId, AuthToken authToken, String transaction) {
+				String userId, AuthToken authToken, String transaction,
+				boolean useChecksum) {
 
 			this.emlFile = emlFile;
 			this.scope = scope;
@@ -10611,7 +10636,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			this.userId = userId;
 			this.authToken = authToken;
 			this.transaction = transaction;
-
+			this.useChecksum = useChecksum;
 		}
 
 
@@ -10629,7 +10654,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 				dpm = new DataPackageManager();
 				map = dpm.updateDataPackage(emlFile, scope, identifier, userId,
-						authToken, transaction);
+						authToken, transaction, useChecksum);
 
 				if (map == null) {
 					gripe = "Data package update operation failed for unknown reason";

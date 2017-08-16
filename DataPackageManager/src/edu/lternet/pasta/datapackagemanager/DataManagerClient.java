@@ -87,13 +87,17 @@ public class DataManagerClient {
 	 * @param transaction  the transaction identifier
    * @return             A Map of entityId / entityName pairs
 	 */
-	public Map<String, String> createDataEntities(DataPackage dataPackage, String transaction) 
+	public Map<String, String> createDataEntities(DataPackageRegistry dataPackageRegistry, 
+			                                      DataPackage dataPackage, 
+			                                      String transaction, 
+			                                      boolean useChecksum) 
 	        throws IOException,
 	               MalformedURLException,
 	               Exception {
     boolean evaluateMode = false;    
     EMLDataManager emlDataManager = new EMLDataManager();
-    Map<String, String> entityPairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
+    Map<String, String> entityPairs = 
+    		emlDataManager.createDataEntities(dataPackageRegistry, dataPackage, evaluateMode, transaction, useChecksum);
       
     return entityPairs;
 	}
@@ -107,11 +111,15 @@ public class DataManagerClient {
    * @param transaction  the transaction identifier
    * @return             A Map of entityId / entityName pairs
    */
-  public Map<String, String> evaluateDataEntities(DataPackage dataPackage, String transaction)
+  public Map<String, String> evaluateDataEntities(DataPackageRegistry dataPackageRegistry, 
+                                                  DataPackage dataPackage, 
+                                                  String transaction, 
+                                                  boolean useChecksum)
       throws IOException, Exception {
     boolean evaluateMode = true;
     EMLDataManager emlDataManager = new EMLDataManager();
-    Map<String, String> entityIdNamePairs = emlDataManager.createDataEntities(dataPackage, evaluateMode, transaction);
+    Map<String, String> entityIdNamePairs = 
+    		emlDataManager.createDataEntities(dataPackageRegistry, dataPackage, evaluateMode, transaction, useChecksum);
 
     return entityIdNamePairs;
   }

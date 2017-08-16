@@ -612,9 +612,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			}
 
 			boolean isUpdate = false;
+			boolean useChecksum = false;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction);
+			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
 		}
 		
 		// Return the resource map
@@ -736,7 +737,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private String createDataPackageAux(File emlFile, EMLDataPackage levelZeroDataPackage,
 				DataPackageRegistry dataPackageRegistry, String packageId, String scope,
 				Integer identifier, Integer revision, String user, AuthToken authToken,
-				boolean isUpdate, boolean isEvaluate, String transaction)
+				boolean isUpdate, boolean isEvaluate, String transaction, boolean useChecksum)
 			throws	ClassNotFoundException, SQLException, IOException,
 					ClientProtocolException, TransformerException, Exception {
 		Authorizer authorizer = new Authorizer(dataPackageRegistry);
@@ -790,10 +791,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				DataPackage dataPackage = levelZeroDataPackage.getDataPackage();
 				if (isEvaluate) {
 					entityIdNamePairs = dataManagerClient.evaluateDataEntities(
-					    dataPackage, transaction);
+							dataPackageRegistry, dataPackage, transaction, useChecksum);
 				} else {
-					entityIdNamePairs = dataManagerClient.createDataEntities(dataPackage,
-					    transaction);
+					entityIdNamePairs = dataManagerClient.createDataEntities(dataPackageRegistry, dataPackage,
+					    transaction, useChecksum);
 				}
 
 				if (entityIdNamePairs != null) {
@@ -1370,7 +1371,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return the quality report XML string
 	 */
 	public String evaluateDataPackage(File emlFile, String user,
-	    AuthToken authToken, String transaction) throws ClientProtocolException,
+	    AuthToken authToken, String transaction, boolean useChecksum) throws ClientProtocolException,
 	    FileNotFoundException, IOException, Exception {
 		DataPackage dataPackage = null;
 		final boolean isEvaluate = true;
@@ -1423,7 +1424,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean isUpdate = false;
 			xmlString = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction);
+			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
 
 			// Clean up resources in evaluate mode
 			levelZeroDataPackage.deleteDataPackageResources(isEvaluate);
@@ -3326,7 +3327,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *         package.
 	 */
 	public String updateDataPackage(File emlFile, String scope,
-	    Integer identifier, String user, AuthToken authToken, String transaction)
+	    Integer identifier, String user, AuthToken authToken, String transaction,
+	    boolean useChecksum)
 	    throws ClientProtocolException, FileNotFoundException, IOException,
 	    UserErrorException, Exception {
 		boolean isEvaluate = false;
@@ -3456,7 +3458,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean isUpdate = true;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction);
+			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
 		}
 
 		// Return the resource map

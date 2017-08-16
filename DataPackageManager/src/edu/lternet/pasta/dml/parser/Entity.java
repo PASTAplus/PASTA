@@ -331,6 +331,24 @@ public class Entity extends DataObjectDescription
     
     
     /**
+     * Retrieves the physical authentication hash value stored for a specified method
+     * such as "MD5" or "SHA-1".
+     * 
+     * @param method     the method, e.g. "MD5" or "SHA-1".
+     * @return the associated hash value, as parsed from the EML metadata document.
+     *         For MD5, a 32 character string. For SHA-1, a 40 character string.
+     *         Returns null if the EML did not document a value for the specified method.
+     */
+    public String getPhysicalAuthentication(String method) {
+    	String hashValue = null;
+    	
+    	hashValue = physicalAuthenticationMap.get(method);
+    	
+    	return hashValue;
+    }
+    
+    
+    /**
      * Adds a quality check to the entity's associated entityReport object.
      * 
      * @param qualityCheck    the new quality check to add to the list

@@ -1837,6 +1837,61 @@ public class DataPackageRegistry {
 
 		return lowest;
 	}
+	
+	
+	public String findMatchingResource(EmlPackageId emlPackageId, 
+			                          String resourceId,
+			                          String method, 
+			                          String hashValue)
+			throws IllegalStateException, ClassNotFoundException, SQLException {
+		Connection connection = null;
+		String resourceMatch = null;
+		String scope = emlPackageId.getScope();
+		Integer identifier = emlPackageId.getIdentifier();
+		//Integer revision = emlPackageId.getRevision();
+		String methodField = null;
+		
+		if (method != null) {
+			if (method.equalsIgnoreCase("MD5")) {
+				methodField = "md5_checksum";
+			} else if (method.equalsIgnoreCase("SHA-1") || method.equalsIgnoreCase("SHA1")) {
+				methodField = "sha1_checksum";
+			} else {
+				throw new IllegalStateException("Unknown checksum method: " + method);
+			}
+		}
+		else {
+			throw new IllegalStateException("'method' argument is null");
+		}
+		
+	    String selectString = String.format(
+	       "SELECT resource_id FROM %s WHERE scope=? AND identifier=? AND %s=? ORDER BY revision ASC LIMIT 1",
+	       RESOURCE_REGISTRY, methodField);
+	    
+	    logger.debug("selectString: " + selectString);
+		
+		try {
+			connection = getConnection();
+			PreparedStatement pstmt = connection.prepareStatement(selectString);
+			pstmt.setString(1, scope);
+			pstmt.setInt(2, identifier);
+			pstmt.setString(3, hashValue);
+			ResultSet rs = pstmt.executeQuery();
+		    while (rs.next()) {
+		    	resourceMatch = rs.getString(1);
+		    }
+			if (pstmt != null) { pstmt.close(); }
+		}
+		catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			throw(e);
+		}
+		finally {
+			returnConnection(connection);
+		}
+
+		return resourceMatch;
+	}
 
    
   /**

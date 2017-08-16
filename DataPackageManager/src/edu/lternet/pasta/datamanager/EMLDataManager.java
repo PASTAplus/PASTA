@@ -53,6 +53,7 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 import edu.lternet.pasta.datapackagemanager.EMLDataPackage;
 
 /**
@@ -275,9 +276,11 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * @param transaction  the transaction identifier
 	 * @return         a map of entityIds mapped to their associated entityURLs
 	 */
-	public Map<String, String> createDataEntities(DataPackage dataPackage,
+	public Map<String, String> createDataEntities(DataPackageRegistry dataPackageRegistry,
+			                                    DataPackage dataPackage,
 	                                            boolean evaluateMode,
-	                                            String transaction) 
+	                                            String transaction,
+	                                            boolean useChecksum) 
 	        throws IOException, 
 	               MalformedURLException, 
 	               ResourceExistsException, 
@@ -326,7 +329,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 							emlDataLoader.putUrlMapEntries(url, emlPackageId, entityId);
 
 							// Download the entity
-							downloadEntity(emlPackageId, emlEntity, evaluateMode);
+							downloadEntity(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode, useChecksum);
 
 							/*
 							 * Load entity into a database unless it's an image
@@ -379,7 +382,51 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 
 		return entityIdNamePairs;
 	}
+	
+	
+	private boolean linkData(DataPackageRegistry dataPackageRegistry, 
+			                 EmlPackageId emlPackageId, 
+			                 EMLEntity emlEntity, 
+			                 boolean evaluateMode) 
+			throws ClassNotFoundException, SQLException {
+		boolean wasLinked = false;
+		Entity entity = emlEntity.getEntity();
+		
+		String md5 = entity.getPhysicalAuthentication("MD5");
+		if (md5 != null) {
+			wasLinked = linkToPreviousRevision(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode, "MD5", md5);
+		}
+		else {
+			String sha1 = entity.getPhysicalAuthentication("SHA-1");
+			if (sha1 != null) {
+				wasLinked = linkToPreviousRevision(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode, "SHA-1", sha1);
+			}
+		}
 
+		return wasLinked;
+	}
+	
+	
+	private boolean linkToPreviousRevision(DataPackageRegistry dataPackageRegistry, 
+			                               EmlPackageId emlPackageId, EMLEntity emlEntity, 
+			                               boolean evaluateMode, String method, String hashValue) 
+			throws ClassNotFoundException, SQLException {
+		boolean wasLinked = false;
+		
+		//String resourceId = emlEntity.getResourceId();
+		String resourceId = "";
+		
+		String matchingResourceId = dataPackageRegistry.findMatchingResource(emlPackageId, 
+				                                                                resourceId, 
+				                                                                method, 
+				                                                                hashValue);
+		if (matchingResourceId != null) {
+			logger.info(String.format("Found matching entity: %s, %s, %s", matchingResourceId, method, hashValue));
+		}
+
+		return wasLinked;
+	}
+	
 	
 	/**
 	 * Downloads and stores a data entity.
@@ -392,66 +439,73 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * @throws IllegalStateException if the Data Manager Library indicates
 	 *         that the entity failed to download successfully
 	 */
-	public void downloadEntity(EmlPackageId emlPackageId,
+	public void downloadEntity(DataPackageRegistry dataPackageRegistry,
+			                      EmlPackageId emlPackageId,
 	                              EMLEntity emlEntity,
-	                              boolean evaluateMode)
-	        throws IllegalStateException {
-	  boolean success = false;
-	  boolean preserveFormat = true;
+	                              boolean evaluateMode,
+	                              boolean useChecksum)
+	        throws IllegalStateException, ClassNotFoundException, SQLException {
+	  boolean wasLinked = false;
 	  Entity entity = emlEntity.getEntity();
 	  String entityName = emlEntity.getEntityName();
 	  String entityId = emlEntity.getEntityId();
 	  String packageId = emlPackageId.toString();
 	  
-	  if (dataManager != null) {
-	    success = dataManager.downloadData(entity, eepi, dataStorageList, preserveFormat);
-        if (!success) {
-      	  String errorMsg = 
-              String.format("An entity failed to download successfully: packageId: %s; entity name: %s; entity id: %s",
-      			            packageId, entityName, entityId);
-      	  throw new IllegalStateException(errorMsg);
-        }
-	    else {
-			EMLFileSystemEntity efse = 
-					new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
-			efse.setEvaluateMode(evaluateMode);
-			String entityFileURL = efse.getEntityFileURL(evaluateMode);
-			emlEntity.setFileUrl(entityFileURL);
-				if (true) {
-					// Double-check to ensure that the entity file exists on the
-					// system in the expected location
-					File entityFile = efse.getEntityFile();
-					if ((entityFile == null) || (!entityFile.exists())) {
-						String errorMsg = 
-							String.format("An entity file is missing from the data repository: " +
-								          "entityDir: %s; packageId: %s; entity id: %s",
-										   entityDir, packageId, entityId);
-						throw new IllegalStateException(errorMsg);
-					}
-					else {
-						try (FileInputStream fis = new FileInputStream(entityFile)){
-							String md5 = DigestUtils.md5Hex(fis);
-							entity.setMd5HashValue(md5);
-						}
-						catch (IOException e) {
-							logger.warn("Unable to determine MD5 from entityfile: " +
-						                e.getMessage());
-						}
-						try (FileInputStream fis = new FileInputStream(entityFile)){
-							String sha1 = DigestUtils.shaHex(fis);
-							entity.setSha1HashValue(sha1);
-						}
-						catch (IOException e) {
-							logger.warn("Unable to determine SHA-1from entityfile: " +
-					                e.getMessage());
-						}
-					}
-				}
-			}
+	  boolean forceUseChecksum = true;
+	  if (useChecksum || forceUseChecksum) {
+		  wasLinked = linkData(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
 	  }
-	  else {
-      	  String errorMsg = "dataManager is null.";
-          throw new IllegalStateException(errorMsg);
+	  
+	  if (!wasLinked) {
+		  if (dataManager != null) {
+			  boolean preserveFormat = true;
+			  boolean success = dataManager.downloadData(entity, eepi, dataStorageList, preserveFormat);
+			  if (!success) {
+				  String errorMsg = 
+						  String.format("An entity failed to download successfully: " +
+				                        "packageId: %s; entity name: %s; entity id: %s",
+								        packageId, entityName, entityId);
+				  throw new IllegalStateException(errorMsg);
+			  }
+		  }
+		  else {
+	      	  String errorMsg = "dataManager is null.";
+	          throw new IllegalStateException(errorMsg);
+		  }
+	  }
+			  
+	  EMLFileSystemEntity efse = new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
+	  efse.setEvaluateMode(evaluateMode);
+	  String entityFileURL = efse.getEntityFileURL(evaluateMode);
+	  emlEntity.setFileUrl(entityFileURL);
+
+	  /*
+	   * Double-check to ensure that the entity file exists on the system in the expected location.
+	   */
+	  File entityFile = efse.getEntityFile();
+	  if ((entityFile == null) || (!entityFile.exists())) {
+		  String errorMsg = 
+		  String.format("An entity file is missing from the data repository: " +
+						"entityDir: %s; packageId: %s; entity id: %s",
+					    entityDir, packageId, entityId);
+		  throw new IllegalStateException(errorMsg);
+	  }
+	  else {			
+		  try (FileInputStream fis = new FileInputStream(entityFile)) {
+			  String md5 = DigestUtils.md5Hex(fis);
+			  entity.setMd5HashValue(md5);
+		  } 
+		  catch (IOException e) {
+			  logger.warn("Unable to determine MD5 from entityfile: " + e.getMessage());
+		  }
+			
+		  try (FileInputStream fis = new FileInputStream(entityFile)) {
+			  String sha1 = DigestUtils.shaHex(fis);
+			  entity.setSha1HashValue(sha1);
+		  } 
+		  catch (IOException e) {
+			  logger.warn("Unable to determine SHA-1from entityfile: " + e.getMessage());
+		  }
 	  }
 	}
 
