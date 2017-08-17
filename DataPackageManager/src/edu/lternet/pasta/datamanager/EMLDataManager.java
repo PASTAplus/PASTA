@@ -421,7 +421,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 				                                                                method, 
 				                                                                hashValue);
 		if (matchingResourceId != null) {
-			logger.info(String.format("Found matching entity: %s, %s, %s", matchingResourceId, method, hashValue));
+			logger.info(String.format("Found matching entity: resource_id=%s, method=%s, checksum=%s", matchingResourceId, method, hashValue));
 		}
 
 		return wasLinked;
