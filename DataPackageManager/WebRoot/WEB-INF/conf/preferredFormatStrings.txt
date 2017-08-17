@@ -1,16 +1,455 @@
-YYYY-MM-DDThh:mm-hh:mm
-YYYY-MM-DD hh:mm-hh:mm
-YYYY-MM-DD hh:mm:ss
-YYYY-MM-DDThh:mm
-YYYY-MM-DDThh:mm:ss
-YYYY-MM-DD hh:mm
 YYYY-MM-DD
+YYYY-MM-DD hh:mm:ss.sss
+YYYY-MM-DDThh:mm:ss.sss
+YYYY-MM-DD hh:mm:ss.sssZ
+YYYY-MM-DDThh:mm:ss.sssZ
+YYYY-MM-DD hh:mm:ss.sss+hh:mm
+YYYY-MM-DDThh:mm:ss.sss+hh:mm
+YYYY-MM-DD hh:mm:ss.sss+hhmm
+YYYY-MM-DDThh:mm:ss.sss+hhmm
+YYYY-MM-DD hh:mm:ss.sss+hh
+YYYY-MM-DDThh:mm:ss.sss+hh
+YYYY-MM-DD hh:mm:ss.sss-hh:mm
+YYYY-MM-DDThh:mm:ss.sss-hh:mm
+YYYY-MM-DD hh:mm:ss.sss-hhmm
+YYYY-MM-DDThh:mm:ss.sss-hhmm
+YYYY-MM-DD hh:mm:ss.sss-hh
+YYYY-MM-DDThh:mm:ss.sss-hh
+YYYY-MM-DD hhmmss.sss
+YYYY-MM-DDThhmmss.sss
+YYYY-MM-DD hhmmss.sssZ
+YYYY-MM-DDThhmmss.sssZ
+YYYY-MM-DD hhmmss.sss+hh:mm
+YYYY-MM-DDThhmmss.sss+hh:mm
+YYYY-MM-DD hhmmss.sss+hhmm
+YYYY-MM-DDThhmmss.sss+hhmm
+YYYY-MM-DD hhmmss.sss+hh
+YYYY-MM-DDThhmmss.sss+hh
+YYYY-MM-DD hhmmss.sss-hh:mm
+YYYY-MM-DDThhmmss.sss-hh:mm
+YYYY-MM-DD hhmmss.sss-hhmm
+YYYY-MM-DDThhmmss.sss-hhmm
+YYYY-MM-DD hhmmss.sss-hh
+YYYY-MM-DDThhmmss.sss-hh
+YYYY-MM-DD hh:mm:ss
+YYYY-MM-DDThh:mm:ss
+YYYY-MM-DD hh:mm:ssZ
+YYYY-MM-DDThh:mm:ssZ
+YYYY-MM-DD hh:mm:ss+hh:mm
+YYYY-MM-DDThh:mm:ss+hh:mm
+YYYY-MM-DD hh:mm:ss+hhmm
+YYYY-MM-DDThh:mm:ss+hhmm
+YYYY-MM-DD hh:mm:ss+hh
+YYYY-MM-DDThh:mm:ss+hh
+YYYY-MM-DD hh:mm:ss-hh:mm
+YYYY-MM-DDThh:mm:ss-hh:mm
+YYYY-MM-DD hh:mm:ss-hhmm
+YYYY-MM-DDThh:mm:ss-hhmm
+YYYY-MM-DD hh:mm:ss-hh
+YYYY-MM-DDThh:mm:ss-hh
+YYYY-MM-DD hhmmss
+YYYY-MM-DDThhmmss
+YYYY-MM-DD hhmmssZ
+YYYY-MM-DDThhmmssZ
+YYYY-MM-DD hhmmss+hh:mm
+YYYY-MM-DDThhmmss+hh:mm
+YYYY-MM-DD hhmmss+hhmm
+YYYY-MM-DDThhmmss+hhmm
+YYYY-MM-DD hhmmss+hh
+YYYY-MM-DDThhmmss+hh
+YYYY-MM-DD hhmmss-hh:mm
+YYYY-MM-DDThhmmss-hh:mm
+YYYY-MM-DD hhmmss-hhmm
+YYYY-MM-DDThhmmss-hhmm
+YYYY-MM-DD hhmmss-hh
+YYYY-MM-DDThhmmss-hh
+YYYY-MM-DD hh:mm
+YYYY-MM-DDThh:mm
+YYYY-MM-DD hh:mmZ
+YYYY-MM-DDThh:mmZ
+YYYY-MM-DD hh:mm+hh:mm
+YYYY-MM-DDThh:mm+hh:mm
+YYYY-MM-DD hh:mm+hhmm
+YYYY-MM-DDThh:mm+hhmm
+YYYY-MM-DD hh:mm+hh
+YYYY-MM-DDThh:mm+hh
+YYYY-MM-DD hh:mm-hh:mm
+YYYY-MM-DDThh:mm-hh:mm
+YYYY-MM-DD hh:mm-hhmm
+YYYY-MM-DDThh:mm-hhmm
+YYYY-MM-DD hh:mm-hh
+YYYY-MM-DDThh:mm-hh
+YYYY-MM-DD hhmm
+YYYY-MM-DDThhmm
+YYYY-MM-DD hhmmZ
+YYYY-MM-DDThhmmZ
+YYYY-MM-DD hhmm+hh:mm
+YYYY-MM-DDThhmm+hh:mm
+YYYY-MM-DD hhmm+hhmm
+YYYY-MM-DDThhmm+hhmm
+YYYY-MM-DD hhmm+hh
+YYYY-MM-DDThhmm+hh
+YYYY-MM-DD hhmm-hh:mm
+YYYY-MM-DDThhmm-hh:mm
+YYYY-MM-DD hhmm-hhmm
+YYYY-MM-DDThhmm-hhmm
+YYYY-MM-DD hhmm-hh
+YYYY-MM-DDThhmm-hh
+YYYY-MM-DD hh
+YYYY-MM-DDThh
+YYYY-MM-DD hhZ
+YYYY-MM-DDThhZ
+YYYY-MM-DD hh+hh:mm
+YYYY-MM-DDThh+hh:mm
+YYYY-MM-DD hh+hhmm
+YYYY-MM-DDThh+hhmm
+YYYY-MM-DD hh+hh
+YYYY-MM-DDThh+hh
+YYYY-MM-DD hh-hh:mm
+YYYY-MM-DDThh-hh:mm
+YYYY-MM-DD hh-hhmm
+YYYY-MM-DDThh-hhmm
+YYYY-MM-DD hh-hh
+YYYY-MM-DDThh-hh
+YYYY
 YYYYMMDD
+YYYYMMDD hh:mm:ss.sss
+YYYYMMDDThh:mm:ss.sss
+YYYYMMDD hh:mm:ss.sssZ
+YYYYMMDDThh:mm:ss.sssZ
+YYYYMMDD hh:mm:ss.sss+hh:mm
+YYYYMMDDThh:mm:ss.sss+hh:mm
+YYYYMMDD hh:mm:ss.sss+hhmm
+YYYYMMDDThh:mm:ss.sss+hhmm
+YYYYMMDD hh:mm:ss.sss+hh
+YYYYMMDDThh:mm:ss.sss+hh
+YYYYMMDD hh:mm:ss.sss-hh:mm
+YYYYMMDDThh:mm:ss.sss-hh:mm
+YYYYMMDD hh:mm:ss.sss-hhmm
+YYYYMMDDThh:mm:ss.sss-hhmm
+YYYYMMDD hh:mm:ss.sss-hh
+YYYYMMDDThh:mm:ss.sss-hh
+YYYYMMDD hhmmss.sss
+YYYYMMDDThhmmss.sss
+YYYYMMDD hhmmss.sssZ
+YYYYMMDDThhmmss.sssZ
+YYYYMMDD hhmmss.sss+hh:mm
+YYYYMMDDThhmmss.sss+hh:mm
+YYYYMMDD hhmmss.sss+hhmm
+YYYYMMDDThhmmss.sss+hhmm
+YYYYMMDD hhmmss.sss+hh
+YYYYMMDDThhmmss.sss+hh
+YYYYMMDD hhmmss.sss-hh:mm
+YYYYMMDDThhmmss.sss-hh:mm
+YYYYMMDD hhmmss.sss-hhmm
+YYYYMMDDThhmmss.sss-hhmm
+YYYYMMDD hhmmss.sss-hh
+YYYYMMDDThhmmss.sss-hh
+YYYYMMDD hh:mm:ss
+YYYYMMDDThh:mm:ss
+YYYYMMDD hh:mm:ssZ
+YYYYMMDDThh:mm:ssZ
+YYYYMMDD hh:mm:ss+hh:mm
+YYYYMMDDThh:mm:ss+hh:mm
+YYYYMMDD hh:mm:ss+hhmm
+YYYYMMDDThh:mm:ss+hhmm
+YYYYMMDD hh:mm:ss+hh
+YYYYMMDDThh:mm:ss+hh
+YYYYMMDD hh:mm:ss-hh:mm
+YYYYMMDDThh:mm:ss-hh:mm
+YYYYMMDD hh:mm:ss-hhmm
+YYYYMMDDThh:mm:ss-hhmm
+YYYYMMDD hh:mm:ss-hh
+YYYYMMDDThh:mm:ss-hh
+YYYYMMDD hhmmss
+YYYYMMDDThhmmss
+YYYYMMDD hhmmssZ
+YYYYMMDDThhmmssZ
+YYYYMMDD hhmmss+hh:mm
+YYYYMMDDThhmmss+hh:mm
+YYYYMMDD hhmmss+hhmm
+YYYYMMDDThhmmss+hhmm
+YYYYMMDD hhmmss+hh
+YYYYMMDDThhmmss+hh
+YYYYMMDD hhmmss-hh:mm
+YYYYMMDDThhmmss-hh:mm
+YYYYMMDD hhmmss-hhmm
+YYYYMMDDThhmmss-hhmm
+YYYYMMDD hhmmss-hh
+YYYYMMDDThhmmss-hh
+YYYYMMDD hh:mm
+YYYYMMDDThh:mm
+YYYYMMDD hh:mmZ
+YYYYMMDDThh:mmZ
+YYYYMMDD hh:mm+hh:mm
+YYYYMMDDThh:mm+hh:mm
+YYYYMMDD hh:mm+hhmm
+YYYYMMDDThh:mm+hhmm
+YYYYMMDD hh:mm+hh
+YYYYMMDDThh:mm+hh
+YYYYMMDD hh:mm-hh:mm
+YYYYMMDDThh:mm-hh:mm
+YYYYMMDD hh:mm-hhmm
+YYYYMMDDThh:mm-hhmm
+YYYYMMDD hh:mm-hh
+YYYYMMDDThh:mm-hh
+YYYYMMDD hhmm
+YYYYMMDDThhmm
+YYYYMMDD hhmmZ
+YYYYMMDDThhmmZ
+YYYYMMDD hhmm+hh:mm
+YYYYMMDDThhmm+hh:mm
+YYYYMMDD hhmm+hhmm
+YYYYMMDDThhmm+hhmm
+YYYYMMDD hhmm+hh
+YYYYMMDDThhmm+hh
+YYYYMMDD hhmm-hh:mm
+YYYYMMDDThhmm-hh:mm
+YYYYMMDD hhmm-hhmm
+YYYYMMDDThhmm-hhmm
+YYYYMMDD hhmm-hh
+YYYYMMDDThhmm-hh
+YYYYMMDD hh
+YYYYMMDDThh
+YYYYMMDD hhZ
+YYYYMMDDThhZ
+YYYYMMDD hh+hh:mm
+YYYYMMDDThh+hh:mm
+YYYYMMDD hh+hhmm
+YYYYMMDDThh+hhmm
+YYYYMMDD hh+hh
+YYYYMMDDThh+hh
+YYYYMMDD hh-hh:mm
+YYYYMMDDThh-hh:mm
+YYYYMMDD hh-hhmm
+YYYYMMDDThh-hhmm
+YYYYMMDD hh-hh
+YYYYMMDDThh-hh
 YYYY-MM
 YYYYMM
+YYYY-DDD
+YYYY-DDD hh:mm:ss.sss
+YYYY-DDDThh:mm:ss.sss
+YYYY-DDD hh:mm:ss.sssZ
+YYYY-DDDThh:mm:ss.sssZ
+YYYY-DDD hh:mm:ss.sss+hh:mm
+YYYY-DDDThh:mm:ss.sss+hh:mm
+YYYY-DDD hh:mm:ss.sss+hhmm
+YYYY-DDDThh:mm:ss.sss+hhmm
+YYYY-DDD hh:mm:ss.sss+hh
+YYYY-DDDThh:mm:ss.sss+hh
+YYYY-DDD hh:mm:ss.sss-hh:mm
+YYYY-DDDThh:mm:ss.sss-hh:mm
+YYYY-DDD hh:mm:ss.sss-hhmm
+YYYY-DDDThh:mm:ss.sss-hhmm
+YYYY-DDD hh:mm:ss.sss-hh
+YYYY-DDDThh:mm:ss.sss-hh
+YYYY-DDD hhmmss.sss
+YYYY-DDDThhmmss.sss
+YYYY-DDD hhmmss.sssZ
+YYYY-DDDThhmmss.sssZ
+YYYY-DDD hhmmss.sss+hh:mm
+YYYY-DDDThhmmss.sss+hh:mm
+YYYY-DDD hhmmss.sss+hhmm
+YYYY-DDDThhmmss.sss+hhmm
+YYYY-DDD hhmmss.sss+hh
+YYYY-DDDThhmmss.sss+hh
+YYYY-DDD hhmmss.sss-hh:mm
+YYYY-DDDThhmmss.sss-hh:mm
+YYYY-DDD hhmmss.sss-hhmm
+YYYY-DDDThhmmss.sss-hhmm
+YYYY-DDD hhmmss.sss-hh
+YYYY-DDDThhmmss.sss-hh
+YYYY-DDD hh:mm:ss
+YYYY-DDDThh:mm:ss
+YYYY-DDD hh:mm:ssZ
+YYYY-DDDThh:mm:ssZ
+YYYY-DDD hh:mm:ss+hh:mm
+YYYY-DDDThh:mm:ss+hh:mm
+YYYY-DDD hh:mm:ss+hhmm
+YYYY-DDDThh:mm:ss+hhmm
+YYYY-DDD hh:mm:ss+hh
+YYYY-DDDThh:mm:ss+hh
+YYYY-DDD hh:mm:ss-hh:mm
+YYYY-DDDThh:mm:ss-hh:mm
+YYYY-DDD hh:mm:ss-hhmm
+YYYY-DDDThh:mm:ss-hhmm
+YYYY-DDD hh:mm:ss-hh
+YYYY-DDDThh:mm:ss-hh
+YYYY-DDD hhmmss
+YYYY-DDDThhmmss
+YYYY-DDD hhmmssZ
+YYYY-DDDThhmmssZ
+YYYY-DDD hhmmss+hh:mm
+YYYY-DDDThhmmss+hh:mm
+YYYY-DDD hhmmss+hhmm
+YYYY-DDDThhmmss+hhmm
+YYYY-DDD hhmmss+hh
+YYYY-DDDThhmmss+hh
+YYYY-DDD hhmmss-hh:mm
+YYYY-DDDThhmmss-hh:mm
+YYYY-DDD hhmmss-hhmm
+YYYY-DDDThhmmss-hhmm
+YYYY-DDD hhmmss-hh
+YYYY-DDDThhmmss-hh
+YYYY-DDD hh:mm
+YYYY-DDDThh:mm
+YYYY-DDD hh:mmZ
+YYYY-DDDThh:mmZ
+YYYY-DDD hh:mm+hh:mm
+YYYY-DDDThh:mm+hh:mm
+YYYY-DDD hh:mm+hhmm
+YYYY-DDDThh:mm+hhmm
+YYYY-DDD hh:mm+hh
+YYYY-DDDThh:mm+hh
+YYYY-DDD hh:mm-hh:mm
+YYYY-DDDThh:mm-hh:mm
+YYYY-DDD hh:mm-hhmm
+YYYY-DDDThh:mm-hhmm
+YYYY-DDD hh:mm-hh
+YYYY-DDDThh:mm-hh
+YYYY-DDD hhmm
+YYYY-DDDThhmm
+YYYY-DDD hhmmZ
+YYYY-DDDThhmmZ
+YYYY-DDD hhmm+hh:mm
+YYYY-DDDThhmm+hh:mm
+YYYY-DDD hhmm+hhmm
+YYYY-DDDThhmm+hhmm
+YYYY-DDD hhmm+hh
+YYYY-DDDThhmm+hh
+YYYY-DDD hhmm-hh:mm
+YYYY-DDDThhmm-hh:mm
+YYYY-DDD hhmm-hhmm
+YYYY-DDDThhmm-hhmm
+YYYY-DDD hhmm-hh
+YYYY-DDDThhmm-hh
+YYYY-DDD hh
+YYYY-DDDThh
+YYYY-DDD hhZ
+YYYY-DDDThhZ
+YYYY-DDD hh+hh:mm
+YYYY-DDDThh+hh:mm
+YYYY-DDD hh+hhmm
+YYYY-DDDThh+hhmm
+YYYY-DDD hh+hh
+YYYY-DDDThh+hh
+YYYY-DDD hh-hh:mm
+YYYY-DDDThh-hh:mm
+YYYY-DDD hh-hhmm
+YYYY-DDDThh-hhmm
+YYYY-DDD hh-hh
+YYYY-DDDThh-hh
 YYYYDDD
-YYYY
-hh:mm:ss
-hh:mm
-hhmm
-hh
+YYYYDDD hh:mm:ss.sss
+YYYYDDDThh:mm:ss.sss
+YYYYDDD hh:mm:ss.sssZ
+YYYYDDDThh:mm:ss.sssZ
+YYYYDDD hh:mm:ss.sss+hh:mm
+YYYYDDDThh:mm:ss.sss+hh:mm
+YYYYDDD hh:mm:ss.sss+hhmm
+YYYYDDDThh:mm:ss.sss+hhmm
+YYYYDDD hh:mm:ss.sss+hh
+YYYYDDDThh:mm:ss.sss+hh
+YYYYDDD hh:mm:ss.sss-hh:mm
+YYYYDDDThh:mm:ss.sss-hh:mm
+YYYYDDD hh:mm:ss.sss-hhmm
+YYYYDDDThh:mm:ss.sss-hhmm
+YYYYDDD hh:mm:ss.sss-hh
+YYYYDDDThh:mm:ss.sss-hh
+YYYYDDD hhmmss.sss
+YYYYDDDThhmmss.sss
+YYYYDDD hhmmss.sssZ
+YYYYDDDThhmmss.sssZ
+YYYYDDD hhmmss.sss+hh:mm
+YYYYDDDThhmmss.sss+hh:mm
+YYYYDDD hhmmss.sss+hhmm
+YYYYDDDThhmmss.sss+hhmm
+YYYYDDD hhmmss.sss+hh
+YYYYDDDThhmmss.sss+hh
+YYYYDDD hhmmss.sss-hh:mm
+YYYYDDDThhmmss.sss-hh:mm
+YYYYDDD hhmmss.sss-hhmm
+YYYYDDDThhmmss.sss-hhmm
+YYYYDDD hhmmss.sss-hh
+YYYYDDDThhmmss.sss-hh
+YYYYDDD hh:mm:ss
+YYYYDDDThh:mm:ss
+YYYYDDD hh:mm:ssZ
+YYYYDDDThh:mm:ssZ
+YYYYDDD hh:mm:ss+hh:mm
+YYYYDDDThh:mm:ss+hh:mm
+YYYYDDD hh:mm:ss+hhmm
+YYYYDDDThh:mm:ss+hhmm
+YYYYDDD hh:mm:ss+hh
+YYYYDDDThh:mm:ss+hh
+YYYYDDD hh:mm:ss-hh:mm
+YYYYDDDThh:mm:ss-hh:mm
+YYYYDDD hh:mm:ss-hhmm
+YYYYDDDThh:mm:ss-hhmm
+YYYYDDD hh:mm:ss-hh
+YYYYDDDThh:mm:ss-hh
+YYYYDDD hhmmss
+YYYYDDDThhmmss
+YYYYDDD hhmmssZ
+YYYYDDDThhmmssZ
+YYYYDDD hhmmss+hh:mm
+YYYYDDDThhmmss+hh:mm
+YYYYDDD hhmmss+hhmm
+YYYYDDDThhmmss+hhmm
+YYYYDDD hhmmss+hh
+YYYYDDDThhmmss+hh
+YYYYDDD hhmmss-hh:mm
+YYYYDDDThhmmss-hh:mm
+YYYYDDD hhmmss-hhmm
+YYYYDDDThhmmss-hhmm
+YYYYDDD hhmmss-hh
+YYYYDDDThhmmss-hh
+YYYYDDD hh:mm
+YYYYDDDThh:mm
+YYYYDDD hh:mmZ
+YYYYDDDThh:mmZ
+YYYYDDD hh:mm+hh:mm
+YYYYDDDThh:mm+hh:mm
+YYYYDDD hh:mm+hhmm
+YYYYDDDThh:mm+hhmm
+YYYYDDD hh:mm+hh
+YYYYDDDThh:mm+hh
+YYYYDDD hh:mm-hh:mm
+YYYYDDDThh:mm-hh:mm
+YYYYDDD hh:mm-hhmm
+YYYYDDDThh:mm-hhmm
+YYYYDDD hh:mm-hh
+YYYYDDDThh:mm-hh
+YYYYDDD hhmm
+YYYYDDDThhmm
+YYYYDDD hhmmZ
+YYYYDDDThhmmZ
+YYYYDDD hhmm+hh:mm
+YYYYDDDThhmm+hh:mm
+YYYYDDD hhmm+hhmm
+YYYYDDDThhmm+hhmm
+YYYYDDD hhmm+hh
+YYYYDDDThhmm+hh
+YYYYDDD hhmm-hh:mm
+YYYYDDDThhmm-hh:mm
+YYYYDDD hhmm-hhmm
+YYYYDDDThhmm-hhmm
+YYYYDDD hhmm-hh
+YYYYDDDThhmm-hh
+YYYYDDD hh
+YYYYDDDThh
+YYYYDDD hhZ
+YYYYDDDThhZ
+YYYYDDD hh+hh:mm
+YYYYDDDThh+hh:mm
+YYYYDDD hh+hhmm
+YYYYDDDThh+hhmm
+YYYYDDD hh+hh
+YYYYDDDThh+hh
+YYYYDDD hh-hh:mm
+YYYYDDDThh-hh:mm
+YYYYDDD hh-hhmm
+YYYYDDDThh-hhmm
+YYYYDDD hh-hh
+YYYYDDDThh-hh
