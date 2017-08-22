@@ -420,8 +420,34 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 					FileSystem fileSystem = FileSystems.getDefault();
 					Path newPath = fileSystem.getPath(linkFromPath);
 					Path existingPath = fileSystem.getPath(linkToPath);
+
+					try {
+						Integer nlink = (Integer) java.nio.file.Files.getAttribute(newPath, "unix:nlink");
+						logger.info(
+								String.format(
+								    "Before checksum optimization, %d hard link(s) detected for %s", 
+								    nlink, newPath));
+					}
+					catch (Exception e) {
+						// This is just informational, so no action needed if it fails
+					}
+
+					// Create the hard link
 					hardLinkPath = hardLinker.hardLink(newPath, existingPath);
-					if (hardLinkPath != null) success = true;
+
+					if (hardLinkPath != null) {
+						success = true;
+						try {
+							Integer nlink = (Integer) java.nio.file.Files.getAttribute(newPath, "unix:nlink");
+							logger.info(
+									String.format(
+									    "After checksum optimization, %d hard link(s) detected for %s", 
+									    nlink, newPath));
+						}
+						catch (Exception e) {
+							// This is just informational, so no action needed if it fails
+						}
+					}
 				} 
 				catch (IOException e) {
 					String msg = String.format("Error creating hard link from %s to %s. ", linkFromPath, linkToPath);
@@ -521,7 +547,19 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 					    entityDir, packageId, entityId);
 		  throw new IllegalStateException(errorMsg);
 	  }
-	  else {			
+	  else {
+		  FileSystem fileSystem = FileSystems.getDefault();
+
+		  Path filePath = fileSystem.getPath(entityFile.getAbsolutePath());
+		  try {
+			  Integer nlink = (Integer) java.nio.file.Files.getAttribute(filePath, "unix:nlink");
+			  logger.info(String.format("After download, %d hard link(s) detected for %s", 
+					                    nlink, filePath));
+		  }
+		  catch (Exception e) {
+			  // This is just informational, so no action needed if it fails
+		  }
+
 		  try (FileInputStream fis = new FileInputStream(entityFile)) {
 			  String md5 = DigestUtils.md5Hex(fis);
 			  entity.setMd5HashValue(md5);
