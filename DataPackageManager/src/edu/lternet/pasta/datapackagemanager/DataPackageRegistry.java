@@ -55,6 +55,7 @@ import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.token.AuthTokenFactory;
 import edu.lternet.pasta.common.security.token.BasicAuthToken;
+import edu.lternet.pasta.datamanager.EMLFileSystemEntity;
 import edu.ucsb.nceas.utilities.Options;
 
 
@@ -1839,13 +1840,12 @@ public class DataPackageRegistry {
 	}
 	
 	
-	public String findMatchingResource(EmlPackageId emlPackageId, 
-			                          String resourceId,
+	public EMLFileSystemEntity findMatchingEntity(EmlPackageId emlPackageId, 
 			                          String method, 
 			                          String hashValue)
 			throws IllegalStateException, ClassNotFoundException, SQLException {
+		EMLFileSystemEntity matchingEmlFileSystemEntity= null;
 		Connection connection = null;
-		String resourceMatch = null;
 		String scope = emlPackageId.getScope();
 		Integer identifier = emlPackageId.getIdentifier();
 		//Integer revision = emlPackageId.getRevision();
@@ -1865,7 +1865,7 @@ public class DataPackageRegistry {
 		}
 		
 	    String selectString = String.format(
-	       "SELECT resource_id FROM %s WHERE scope=? AND identifier=? AND %s=? ORDER BY revision ASC LIMIT 1",
+	       "SELECT scope, identifier, revision, entity_id FROM %s WHERE scope=? AND identifier=? AND %s=? ORDER BY revision ASC LIMIT 1",
 	       RESOURCE_REGISTRY, methodField);
 	    
 	    logger.debug("selectString: " + selectString);
@@ -1878,7 +1878,12 @@ public class DataPackageRegistry {
 			pstmt.setString(3, hashValue);
 			ResultSet rs = pstmt.executeQuery();
 		    while (rs.next()) {
-		    	resourceMatch = rs.getString(1);
+		    	String matchingScope = rs.getString(1);
+		    	Integer matchingIdentifier = rs.getInt(2);
+		    	Integer matchingRevision = rs.getInt(3);
+		    	String matchingEntityId = rs.getString(4);
+		    	EmlPackageId matchingEmlPackageId = new EmlPackageId(matchingScope, matchingIdentifier, matchingRevision);
+		    	matchingEmlFileSystemEntity = new EMLFileSystemEntity(matchingEmlPackageId, matchingEntityId);
 		    }
 			if (pstmt != null) { pstmt.close(); }
 		}
@@ -1890,7 +1895,7 @@ public class DataPackageRegistry {
 			returnConnection(connection);
 		}
 
-		return resourceMatch;
+		return matchingEmlFileSystemEntity;
 	}
 
    

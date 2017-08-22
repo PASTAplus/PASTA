@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -384,7 +387,54 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
-	private boolean linkData(DataPackageRegistry dataPackageRegistry, 
+	private boolean linkToPreviousRevision(DataPackageRegistry dataPackageRegistry, 
+			                               EmlPackageId emlPackageId,
+			                               EMLEntity emlEntity, 
+			                               boolean evaluateMode, 
+			                               String method, 
+			                               String hashValue)
+			throws ClassNotFoundException, SQLException {
+		boolean success = false;
+		Path hardLinkPath = null;
+		String entityId = emlEntity.getEntityId();
+	    EMLFileSystemEntity emlFileSystemEntity = new EMLFileSystemEntity(emlPackageId, entityId);
+	    emlFileSystemEntity.setEvaluateMode(evaluateMode);
+	    File entityFile = emlFileSystemEntity.getEntityFile();
+	    
+	    String linkFromPath = entityFile.getAbsolutePath();
+	    if (entityFile != null && entityFile.exists()) {
+	    	logger.warn("The entity was unexpectedly found on the system at path: " + linkFromPath);
+	    	success = true;
+	    }
+	    else {
+			EMLFileSystemEntity matchingEmlFileSystemEntity = 
+					dataPackageRegistry.findMatchingEntity(emlPackageId, method, hashValue);
+			if (matchingEmlFileSystemEntity != null) {
+				matchingEmlFileSystemEntity.setEvaluateMode(false);
+				File matchingEntityFile = matchingEmlFileSystemEntity.getEntityFile();
+				String linkToPath = matchingEntityFile.getAbsolutePath();
+				logger.info(String.format("Found matching entity file at path: %s", linkToPath));
+				HardLinker hardLinker = new HardLinker();
+				// Link to the existing entity file
+				try {
+					FileSystem fileSystem = FileSystems.getDefault();
+					Path newPath = fileSystem.getPath(linkFromPath);
+					Path existingPath = fileSystem.getPath(linkToPath);
+					hardLinkPath = hardLinker.hardLink(newPath, existingPath);
+					if (hardLinkPath != null) success = true;
+				} 
+				catch (IOException e) {
+					String msg = String.format("Error creating hard link from %s to %s. ", linkFromPath, linkToPath);
+					logger.error(msg + e.getMessage());
+				}
+			}  
+	    }
+
+		return success;
+	}
+
+	
+	private boolean useChecksum(DataPackageRegistry dataPackageRegistry, 
 			                 EmlPackageId emlPackageId, 
 			                 EMLEntity emlEntity, 
 			                 boolean evaluateMode) 
@@ -407,29 +457,10 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
-	private boolean linkToPreviousRevision(DataPackageRegistry dataPackageRegistry, 
-			                               EmlPackageId emlPackageId, EMLEntity emlEntity, 
-			                               boolean evaluateMode, String method, String hashValue) 
-			throws ClassNotFoundException, SQLException {
-		boolean wasLinked = false;
-		
-		//String resourceId = emlEntity.getResourceId();
-		String resourceId = "";
-		
-		String matchingResourceId = dataPackageRegistry.findMatchingResource(emlPackageId, 
-				                                                                resourceId, 
-				                                                                method, 
-				                                                                hashValue);
-		if (matchingResourceId != null) {
-			logger.info(String.format("Found matching entity: resource_id=%s, method=%s, checksum=%s", matchingResourceId, method, hashValue));
-		}
-
-		return wasLinked;
-	}
-	
-	
 	/**
-	 * Downloads and stores a data entity.
+	 * Downloads and stores a data entity, or hard links to an existing data entity if
+	 * useChecksum is enabled and a matching entity from a previous revision can be
+	 * found.
 	 * 
 	 * @param emlPackageId     an EmlPackageId object
 	 * @param entityId         the entity id
@@ -453,7 +484,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  
 	  boolean forceUseChecksum = true;
 	  if (useChecksum || forceUseChecksum) {
-		  wasLinked = linkData(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
+		  wasLinked = useChecksum(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
 	  }
 	  
 	  if (!wasLinked) {
@@ -485,7 +516,7 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  File entityFile = efse.getEntityFile();
 	  if ((entityFile == null) || (!entityFile.exists())) {
 		  String errorMsg = 
-		  String.format("An entity file is missing from the data repository: " +
+				  String.format("An entity file is missing from the data repository: " +
 						"entityDir: %s; packageId: %s; entity id: %s",
 					    entityDir, packageId, entityId);
 		  throw new IllegalStateException(errorMsg);

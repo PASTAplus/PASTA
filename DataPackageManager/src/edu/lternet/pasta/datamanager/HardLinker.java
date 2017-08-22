@@ -30,23 +30,10 @@ import java.nio.file.Files;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-
-import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
-import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
-import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
-import edu.lternet.pasta.doi.ConfigurationException;
-import edu.lternet.pasta.doi.Resource;
-import edu.ucsb.nceas.utilities.Options;
 
 
 /**
- * A small class to test out the hard link capability on a given system
+ * A small class to test out the hard link capability on a given system.
  * @author dcosta
  *
  */
@@ -69,23 +56,14 @@ public class HardLinker {
 		// Delete the first file
 		boolean wasDeleted = file1.delete();
 		
-		if (wasDeleted) {
+		if (wasDeleted || !file1.exists()) {
+			HardLinker hardLinker = new HardLinker();
 			// Link to the second file
 		    try {
 				FileSystem fileSystem = FileSystems.getDefault();
 				Path firstPath = fileSystem.getPath(path1);
 			    Path secondPath = fileSystem.getPath(path2);
-					
-		    	String createLinkMsg = String.format("Creating hard link from %s to %s",
-		                                             path1, path2);
-		    	System.err.println(createLinkMsg);
-		    	Path returnPath = Files.createLink(firstPath, secondPath);
-		    	if (returnPath != null) {
-		    		System.err.println("Succeeded");
-		    	}
-		    	else {
-		    		System.err.println("Failed");
-		    	}
+			    hardLinker.hardLink(firstPath, secondPath);					
 		    }
 		    catch (IOException e) {
 		    	String msg = String.format("Error creating hard link from %s to %s",
@@ -93,8 +71,34 @@ public class HardLinker {
 		    	System.err.println(msg);
 		    }							    								
 		}
+	}
+
+	
+	/**
+	 * Hard links two files. 
+	 * 
+	 * @param newPath         The path of the new directory entry to be created by hard linking to an existing file.
+	 * @param existingPath    The path of the already existing file.
+	 * @return                The path to the hard link.
+	 * @throws IOException
+	 */
+	public Path hardLink(Path newPath, Path existingPath) 
+			throws IOException {
+		Path hardLinkPath = null;
+		String newPathStr = newPath.toString();
+		String existingPathStr = existingPath.toString();
+		String createLinkMsg = String.format("Creating hard link from %s to %s", newPathStr, existingPathStr);
+		System.err.println(createLinkMsg);
+		hardLinkPath = Files.createLink(newPath, existingPath);
 		
-		
+		if (hardLinkPath != null) {
+			System.err.println("Hard link succeeded");
+		} 
+		else {
+			System.err.println("Hard link failed");
+		}
+
+		return hardLinkPath;
 	}
 
 }
