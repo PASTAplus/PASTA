@@ -30,6 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -1090,16 +1093,38 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Optimize data storage for the data package
 				 */
 				try {
-					StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
-					storageManager.optimizeStorage();
+					Integer nlink = new Integer(0);
+					String absolutePath = file.getAbsolutePath();
+					FileSystem fileSystem = FileSystems.getDefault();
+					Path filePath = fileSystem.getPath(absolutePath);
+					
+					try {
+						nlink = (Integer) java.nio.file.Files.getAttribute(filePath, "unix:nlink");
+						logger.info(String.format("%d hard links detected for %s", nlink, absolutePath));
+					}
+					catch (UnsupportedOperationException e) {
+						logger.warn(String.format("UnsupportedOperationException while attempting to detect hard link for %s: %s",
+								                  absolutePath, e.getMessage()));
+					}
+					catch (IOException e) {
+						logger.warn(String.format("IOException while attempting to detect hard link for %s",
+  						                          absolutePath));
+					}
+					
+					if (nlink <= 1) {
+						logger.info(String.format("Attempting storage optimization for %s", absolutePath));
+						StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
+						storageManager.optimizeStorage();
+					}
+					else {
+						logger.info(String.format("%s is already hard-linked, no storage optimization needed.",
+								                  absolutePath));
+					}
 				}
 				catch (Exception e) {
 					logger.error(
 							String.format("Exception optimizing data storage for data package %s: %s",
-									      packageId,
-									      e.getMessage()
-									     )
-								);
+									      packageId, e.getMessage()));
 				}
 
 				/*
