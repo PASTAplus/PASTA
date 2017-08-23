@@ -287,7 +287,7 @@ public class StorageManager {
 					 * If we haven't yet optimized this data entity by linking 
 					 * it to a prior revision's data entity
 					 */
-					if (!fse.isOptimized()) {
+					if (!fse.isOptimized() && !fse.isHardLinked()) {
 						ArrayList<EMLFileSystemEntity> priorFileSystemEntities = getFileSystemEntities(priorEmlPackageId);
 
 						/*

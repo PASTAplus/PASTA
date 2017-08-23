@@ -25,7 +25,13 @@
 package edu.lternet.pasta.datamanager;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+
+import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
@@ -43,6 +49,7 @@ public class EMLFileSystemEntity extends EMLEntity {
   /*
    * Class fields
    */
+	private static Logger logger = Logger.getLogger(EMLFileSystemEntity.class);
   
 
   /*
@@ -267,11 +274,50 @@ public class EMLFileSystemEntity extends EMLEntity {
    * 
    * @return optimized, true if data storage for this entity has been optimized
    */
-  public boolean isOptimized() {
-	  return optimized;
-  }
+	public boolean isOptimized() {
+		return optimized;
+	}
   
-  
+	
+	/**
+	 * Checks to see whether the entity file has been previously linked,
+	 * most likely by way of the useChecksum logic. If it has, return true.
+	 * 
+	 * @return true if data storage for this entity has been hard-linked, i.e.,
+	 * when the unix:nlink attribute has a value greater than 1.
+	 */
+	public boolean isHardLinked() {
+		boolean isLinked = false;
+		File entityFile = getEntityFile();
+
+		if (entityFile != null && entityFile.exists()) {
+			String absolutePath = entityFile.getAbsolutePath();
+			FileSystem fileSystem = FileSystems.getDefault();
+			Path filePath = fileSystem.getPath(absolutePath);
+			Integer nlink = new Integer(-99);
+
+			try {
+				nlink = (Integer) java.nio.file.Files.getAttribute(filePath, "unix:nlink");
+				logger.debug(String.format("%d hard link(s) detected for %s", nlink, absolutePath));
+				if (nlink > 1) {
+					isLinked = true;
+				}
+			} 
+			catch (UnsupportedOperationException e) {
+				logger.warn(
+						String.format("UnsupportedOperationException while attempting to detect hard link for %s: %s",
+								absolutePath, e.getMessage()));
+			} 
+			catch (IOException e) {
+				logger.warn(String.format("IOException while attempting to detect hard link for %s", 
+						                  absolutePath));
+			}
+		}
+
+		return isLinked;
+	}	  
+		
+
 	/**
 	 * Renames the entity to a temporary file name.
 	 */

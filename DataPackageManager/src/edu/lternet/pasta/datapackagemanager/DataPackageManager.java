@@ -1093,33 +1093,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Optimize data storage for the data package
 				 */
 				try {
-					Integer nlink = new Integer(0);
-					String absolutePath = file.getAbsolutePath();
-					FileSystem fileSystem = FileSystems.getDefault();
-					Path filePath = fileSystem.getPath(absolutePath);
-					
-					try {
-						nlink = (Integer) java.nio.file.Files.getAttribute(filePath, "unix:nlink");
-						logger.info(String.format("%d hard links detected for %s", nlink, absolutePath));
-					}
-					catch (UnsupportedOperationException e) {
-						logger.warn(String.format("UnsupportedOperationException while attempting to detect hard link for %s: %s",
-								                  absolutePath, e.getMessage()));
-					}
-					catch (IOException e) {
-						logger.warn(String.format("IOException while attempting to detect hard link for %s",
-  						                          absolutePath));
-					}
-					
-					if (nlink <= 1) {
-						logger.info(String.format("Attempting storage optimization for %s", absolutePath));
-						StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
-						storageManager.optimizeStorage();
-					}
-					else {
-						logger.info(String.format("%s is already hard-linked, no storage optimization needed.",
-								                  absolutePath));
-					}
+					StorageManager storageManager = new StorageManager(dataPackageRegistry, emlPackageId);
+					storageManager.optimizeStorage();
 				}
 				catch (Exception e) {
 					logger.error(
