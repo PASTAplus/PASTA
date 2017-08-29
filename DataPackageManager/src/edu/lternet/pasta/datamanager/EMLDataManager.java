@@ -508,8 +508,9 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  String entityId = emlEntity.getEntityId();
 	  String packageId = emlPackageId.toString();
 	  
-	  boolean forceUseChecksum = true;
-	  if (useChecksum || forceUseChecksum) {
+	  //boolean forceUseChecksum = true;
+	  //if (useChecksum || forceUseChecksum) {
+	  if (useChecksum) {
 		  wasLinked = useChecksum(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
 	  }
 	  
