@@ -24,7 +24,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
 
-import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.dml.parser.DataPackage;
 import edu.lternet.pasta.dml.parser.Entity;
 import org.w3c.dom.Document;
