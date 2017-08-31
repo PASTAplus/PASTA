@@ -21,7 +21,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
+
+import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.dml.parser.DataPackage;
 import edu.lternet.pasta.dml.parser.Entity;
 import org.w3c.dom.Document;
@@ -38,6 +41,7 @@ public class QualityReport {
    * Class variables
    */
   
+  private static Logger logger = Logger.getLogger(QualityReport.class);
   private static final String INCLUDE_SYSTEM_PATH = "//includeSystem";
   private static final String QUALITY_CHECK_PATH = "//qualityCheck";
 
@@ -399,10 +403,14 @@ public class QualityReport {
 				URLConnection conn = new URL(preferredFormatStringsURL).openConnection();
 				try (BufferedReader is = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
 					String line;
+					int count = 0;
 					while ((line = is.readLine()) != null) {
 						String formatString = line.trim();
 						Entity.addPreferredFormatString(formatString);
+						count++;
 					}
+					logger.info(String.format("%d datetime format strings added from URL: %s",
+							                  count, preferredFormatStringsURL));
 				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
