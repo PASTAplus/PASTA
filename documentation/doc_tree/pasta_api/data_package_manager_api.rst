@@ -77,6 +77,16 @@ text; the *transaction identifier* may be used in a subsequent call to
 :ref:`Read Data Package Error <read-data-package-error>` to determine the 
 operation status or to :ref:`Read Evaluate Report <read-evaluate-report>` to obtain the evaluate quality report.
 
+An optional query parameter, "useChecksum", can be appended to the URL. When specified, 
+the useChecksum query parameter directs the server to determine whether it can use an
+existing copy of a data entity from a previous revision of the data package based on
+matching a metadata-documented checksum value (MD5 or SHA-1) to the checksum of the
+existing copy. If a match is found, the server will skip the upload of the data entity from
+the remote URL and instead use its matching copy. 
+
+Please Note: Specifying "useChecksum" can save time by eliminating data uploads, but clients
+should take care to ensure that metadata-documented checksum values are accurate and up to date.
+
 REST API
 """"""""
 
@@ -95,6 +105,16 @@ body, and returning a *transaction identifier* in the response message body as p
 :ref:`Read Data Package Error <read-data-package-error>`  to determine the operation status; 
 see :ref:`Read Data Package<read-data-package>` to obtain the data package resource map if 
 the operation completed successfully.
+
+An optional query parameter, "useChecksum", can be appended to the URL. When specified, 
+the useChecksum query parameter directs the server to determine whether it can use an
+existing copy of a data entity from a previous revision of the data package based on
+matching a metadata-documented checksum value (MD5 or SHA-1) to the checksum of the
+existing copy. If a match is found, the server will skip the upload of the data entity from
+the remote URL and instead use its matching copy. 
+
+Please Note: Specifying "useChecksum" can save time by eliminating data uploads, but clients
+should take care to ensure that metadata-documented checksum values are accurate and up to date.
 
 REST API
 """"""""
