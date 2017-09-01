@@ -1216,6 +1216,20 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * </table>
 	 * 
+	 * <h4>Query parameters:</h4>
+	 * 
+	 * <p>
+	 * An optional query parameter, "useChecksum", can be appended to the URL. When specified, 
+	 * the useChecksum query parameter directs the server to determine whether it can use an
+	 * existing copy of a data entity from a previous revision of the data package based on
+	 * matching a metadata-documented checksum value (MD5 or SHA-1) to the checksum of the
+	 * existing copy. If a match is found, the server will skip the upload of the data entity from
+	 * the remote URL and instead use its matching copy. 
+	 * 
+	 * Please Note: Specifying "useChecksum" can save time by eliminating data uploads, but clients
+	 * should take care to ensure that metadata-documented checksum values are accurate and up to date.
+	 * </p>
+	 * 
 	 * <h4>Response:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
 	 * <tr>
@@ -9196,6 +9210,20 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * https://pasta.lternet.edu/package/eml/knb-lter-lno/1</code></td>
 	 * </tr>
 	 * </table>
+	 * 
+	 * <h4>Query parameters:</h4>
+	 * 
+	 * <p>
+	 * An optional query parameter, "useChecksum", can be appended to the URL. When specified, 
+	 * the useChecksum query parameter directs the server to determine whether it can use an
+	 * existing copy of a data entity from a previous revision of the data package based on
+	 * matching a metadata-documented checksum value (MD5 or SHA-1) to the checksum of the
+	 * existing copy. If a match is found, the server will skip the upload of the data entity from
+	 * the remote URL and instead use its matching copy. 
+	 * 
+	 * Please Note: Specifying "useChecksum" can save time by eliminating data uploads, but clients
+	 * should take care to ensure that metadata-documented checksum values are accurate and up to date.
+	 * </p>
 	 * 
 	 * <h4>Responses:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
