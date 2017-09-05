@@ -125,6 +125,8 @@ public class UploadEvaluateServlet extends DataPortalServlet {
     HttpSession httpSession = request.getSession();
 
     String uid = (String) httpSession.getAttribute("uid");
+    String useChecksumStr = (String) request.getAttribute("useChecksum");
+    boolean useChecksum = (useChecksumStr != null);
     
     if (uid == null || uid.isEmpty())
       uid = "public";
@@ -159,7 +161,7 @@ public class UploadEvaluateServlet extends DataPortalServlet {
 
             DataPackageManagerClient dpmClient = new DataPackageManagerClient(
                 uid);
-            String xml = dpmClient.evaluateDataPackage(eml);
+            String xml = dpmClient.evaluateDataPackage(eml, useChecksum);
 
             ReportUtility qrUtility = new ReportUtility(xml);
             String htmlTable = qrUtility.xmlToHtmlTable(cwd + xslpath);

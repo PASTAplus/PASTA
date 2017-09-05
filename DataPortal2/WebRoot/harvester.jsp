@@ -125,6 +125,19 @@
 									<div class="table-cell">
 									</div>
                                 </div>
+                                <div class="table-row">
+                                    <div class="table-cell">
+                                        <input name="desktopUpload" type="radio" value="2" />
+                                        Allow PASTA to skip upload of a data entity if it has a matching copy
+                                    </div>
+                                    <div class="table-cell">
+                                    <span name='<%= Tooltip.USE_CHECKSUM %>'
+                                          class="tooltip">
+                                        <img src="images/hand.png" />
+                                        <dfn>Please note</dfn>
+                                    </span>
+                                    </div>
+                                </div>
 								<div class="table-row">
 									<div class="table-cell">
 								    	<input name="desktopUpload" type="radio" value="1" /> 

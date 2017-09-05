@@ -35,9 +35,13 @@ package edu.lternet.pasta.portal;
 public class Tooltip {
 	
 	public static final String DESKTOP_HARVEST = 
-			"When using this method to upload data, online data URLs documented in the EML will be replaced with links to the data files you select.";
+			"When using this method to upload data, online data URLs documented in the EML will be replaced with " +
+	        "links to the data files you select from your local system.";
 
 	public static final String SEARCH_TERMS = 
 			"Enclose terms containing spaces within quotes, e.g., \"Puerto Rico\"";
 
+	public static final String USE_CHECKSUM = 
+			"When selecting this option, you allow PASTA to skip data upload of a data entity if PASTA " +
+	        "already has a previous revision whose checksum matches the checksum that you have documented in the EML.";
 }

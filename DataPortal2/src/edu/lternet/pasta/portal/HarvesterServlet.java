@@ -160,6 +160,7 @@ public class HarvesterServlet extends DataPortalServlet {
 		String uid = (String) httpSession.getAttribute("uid");
 		String urlTextArea = null;
 		String warningMessage = "";
+		boolean useChecksum = false;
 
 		try {
 			if (uid == null) {
@@ -229,6 +230,11 @@ public class HarvesterServlet extends DataPortalServlet {
 											 fieldValue.equalsIgnoreCase("1")
 											) {
 											isDesktopUpload = true;
+									}
+									else if (fieldName.equals("desktopUpload") && 
+											 fieldValue.equalsIgnoreCase("2")
+											) {
+											useChecksum = true;
 									}
 								}
 							}
@@ -318,7 +324,7 @@ public class HarvesterServlet extends DataPortalServlet {
 
 				if (harvester == null) {
 					harvester = new Harvester(harvesterPath,
-						harvestReportId, uid, isEvaluate);
+						harvestReportId, uid, isEvaluate, useChecksum);
 				}
 
 				if (emlTextArea != null) {

@@ -407,17 +407,25 @@ public class DataPackageManagerClient extends PastaClient {
 	 * @param emlFile
 	 *          the Level-0 EML document describing the data package to be
 	 *          evaluated
+	 * @param useChecksum, if true, adds the "useChecksum" query parameter to the
+	 *          end of the evaluate URL, instructing PASTA to optimize downloads
+	 *          by using the MD5 or SHA-1 integrity checksums to use data entity
+	 *          from a previous revision when possible
 	 * @return a string holding the XML quality report document resulting from the
 	 *         evaluation
 	 * @see <a target="top"
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String evaluateDataPackage(File emlFile) throws Exception {
+	public String evaluateDataPackage(File emlFile, boolean useChecksum) throws Exception {
 		String serviceMethod = "evaluateDataPackage";
 		String contentType = "application/xml";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost httpPost = new HttpPost(BASE_URL + "/evaluate/eml");
+		String evaluateURL = "/evaluate/eml";
+		if (useChecksum) {
+			evaluateURL += "?useChecksum";
+		}
+		HttpPost httpPost = new HttpPost(BASE_URL + evaluateURL);
 		String qualityReport = null;
 
 		// Set header content

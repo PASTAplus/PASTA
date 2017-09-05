@@ -239,7 +239,8 @@ public class DataPackageManagerClientTest {
   public void testEvaluateDataPackage() {
     try {
       // Test Evaluate for OK status
-      String qualityReport = dpmClient.evaluateDataPackage(testEmlFile);
+      boolean useChecksum = true;
+      String qualityReport = dpmClient.evaluateDataPackage(testEmlFile, useChecksum);
 
       // Check the message body
       assertFalse(qualityReport == null);

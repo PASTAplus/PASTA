@@ -77,6 +77,7 @@ public class Harvester implements Runnable {
   // List of EML documents URLs to batch process
   private ArrayList<String> documentURLs = null;
   private String uid = null;
+  private boolean useChecksum = false;
 
   
   /*
@@ -91,12 +92,14 @@ public class Harvester implements Runnable {
    * @param uid  the user identifier, e.g. "ucarroll"
    * @param isEvaluate  true if evaluate, false if upload
    */
-  public Harvester(String harvesterPath, String harvestReportId, String uid, boolean isEvaluate) {
+  public Harvester(String harvesterPath, String harvestReportId, String uid, 
+		           boolean isEvaluate, boolean useChecksum) {
     this.harvesterPath = harvesterPath;
     this.harvestReportId = harvestReportId;	
 	this.harvestDirPath = String.format("%s/%s", harvesterPath, harvestReportId);
     this.uid = uid;
     this.evaluate = isEvaluate;
+    this.useChecksum = useChecksum;
   }
   
 
@@ -148,8 +151,9 @@ public class Harvester implements Runnable {
         uid = "ucarroll";
       }
       boolean isEvaluate = true;
+      boolean useChecksum = true;
       String harvestReportId = uid + "-evaluate";
-      Harvester harvester = new Harvester(harvesterPath, harvestReportId, uid, isEvaluate);
+      Harvester harvester = new Harvester(harvesterPath, harvestReportId, uid, isEvaluate, useChecksum);
       password = options.getString("eventservice.password");
       if (password == null) {
         logger.error("No value found for property: 'eventservice.password'");
@@ -321,7 +325,8 @@ public class Harvester implements Runnable {
   /*
    * Harvests or evaluates a single EML document.
    */
-	private void processEMLFile(String harvestDirPath, String uid, File emlFile, boolean isEvaluate) {
+	private void processEMLFile(String harvestDirPath, String uid, File emlFile, 
+			                    boolean isEvaluate) {
 		String filename = "serviceMessage.txt";
 		String packageId = "";
 		EmlPackageId emlPackageId = null;
@@ -420,7 +425,7 @@ public class Harvester implements Runnable {
 					String qualityReportXML = null;
 
 					try {
-						qualityReportXML = dpmClient.evaluateDataPackage(emlFile);
+						qualityReportXML = dpmClient.evaluateDataPackage(emlFile, this.useChecksum);
 						String qualityReportPath = packageIdPath + "/qualityReport.xml";
 						File qualityReportFile = new File(qualityReportPath);
 						FileUtils.writeStringToFile(qualityReportFile, qualityReportXML);

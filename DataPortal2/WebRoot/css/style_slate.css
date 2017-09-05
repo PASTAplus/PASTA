@@ -2487,7 +2487,7 @@ select.select-menu {
     background: #333;
     background: rgba(0,0,0,.8);
 /*    font-style: italic;  */
-    font-size: 14px;
+    font-size: 11px;
     border-radius: 5px;
     bottom: 26px;
     color: #fff;
@@ -2496,7 +2496,7 @@ select.select-menu {
     padding: 5px 5px;
     position: absolute;
     z-index: 98;
-    width: 240px;
+    width: 360px;
 }
 
 .tooltip:hover:before {
@@ -2883,6 +2883,12 @@ p.cite cite {
 #p-arra-img {
 	margin: 0px 0px 10px 0px; 
 	width: 81px;
+}
+
+#edi-img {
+	/* Original dimensions of EDI Logo are 111 by 109 (H X W) */
+	height: 61px;
+	width: 60px;
 }
 
 #dataone-img {
