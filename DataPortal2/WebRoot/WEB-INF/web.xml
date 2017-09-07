@@ -210,6 +210,12 @@
     <servlet-name>MapSearchServlet</servlet-name>
     <servlet-class>edu.lternet.pasta.portal.MapSearchServlet</servlet-class>
   </servlet>
+  <servlet>
+    <description>Tombstone Servlet</description>
+    <display-name>TombstoneServlet</display-name>
+    <servlet-name>TombstoneServlet</servlet-name>
+    <servlet-class>edu.lternet.pasta.portal.TombstoneServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
@@ -337,6 +343,10 @@
   <servlet-mapping>
     <servlet-name>MapSearchServlet</servlet-name>
     <url-pattern>/mapSearchServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TombstoneServlet</servlet-name>
+    <url-pattern>/tombstoneServlet</url-pattern>
   </servlet-mapping>
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
