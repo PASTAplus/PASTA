@@ -67,7 +67,7 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>The Environmental Data Initiative (EDI) Data Portal</h2>
+								<h2>LTER Data Portal</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
