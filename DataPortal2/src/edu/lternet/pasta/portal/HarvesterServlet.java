@@ -227,14 +227,14 @@ public class HarvesterServlet extends DataPortalServlet {
 										isEvaluate = true;
 									}
 									else if (fieldName.equals("desktopUpload") && 
-											 fieldValue.equalsIgnoreCase("1")
+											 fieldValue.equalsIgnoreCase("desktopUpload")
 											) {
-											isDesktopUpload = true;
+										isDesktopUpload = true;
 									}
-									else if (fieldName.equals("desktopUpload") && 
-											 fieldValue.equalsIgnoreCase("2")
+									else if (fieldName.equals("useChecksum") && 
+											 fieldValue.equalsIgnoreCase("useChecksum")
 											) {
-											useChecksum = true;
+										useChecksum = true;
 									}
 								}
 							}
@@ -242,6 +242,8 @@ public class HarvesterServlet extends DataPortalServlet {
 					}
 					else if (metadataSource.equals("urlList")) {
 						urlTextArea = request.getParameter("urlTextArea");
+						String useChecksumParam = request.getParameter("useChecksum");
+						useChecksum = (useChecksumParam != null);
 						if (urlTextArea == null || 
 							urlTextArea.trim().isEmpty()
 						   ) {
@@ -253,6 +255,8 @@ public class HarvesterServlet extends DataPortalServlet {
 						}
 					} 
 					else if (metadataSource.equals("harvestList")) {
+						String useChecksumParam = request.getParameter("useChecksum");
+						useChecksum = (useChecksumParam != null);
 						harvestListURL = request.getParameter("harvestListURL");
 						if (harvestListURL == null || 
 							harvestListURL.trim().isEmpty()
@@ -271,6 +275,8 @@ public class HarvesterServlet extends DataPortalServlet {
 					 * data files to a URL accessible location.
 					 */
 					else if (metadataSource.equals("desktopHarvester")) {
+						String useChecksumParam = request.getParameter("useChecksum");
+						useChecksum = (useChecksumParam != null);
 						emlFile = (File) httpSession.getAttribute("emlFile");
 						ArrayList<Entity> entityList = parseEntityList(emlFile);
 						harvestReportId = (String) httpSession.getAttribute("harvestReportId");
@@ -337,6 +343,7 @@ public class HarvesterServlet extends DataPortalServlet {
 						httpSession.setAttribute("emlFile", emlFile);
 						httpSession.setAttribute("harvestReportId", harvestReportId);
 						httpSession.setAttribute("isEvaluate", new Boolean(isEvaluate));
+						httpSession.setAttribute("useChecksum", new Boolean(useChecksum));
 					}
 					else {
 						harvester.processSingleDocument(emlFile);

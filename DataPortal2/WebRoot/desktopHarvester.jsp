@@ -22,6 +22,7 @@
 	String emlFileName = emlFile.getName();
 	Boolean isEvaluate = (Boolean) httpSession.getAttribute("isEvaluate");
 	String buttonVerb = isEvaluate ? "Evaluate" : "Upload";
+    Boolean useChecksum = (Boolean) httpSession.getAttribute("useChecksum");
 	
   final String pageTitle = buttonVerb + " Data Package";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
@@ -159,6 +160,10 @@
 
 											<input id="metadataSource" name="metadataSource"
 												type="hidden" value="desktopHarvester" />
+                                            <c:if test="${useChecksum}">
+                                                <input id="useChecksum" name="useChecksum"
+                                                    type="hidden" value="useChecksum" />
+                                            </c:if>
 										</form>
 									</div>
 									<!-- /Content -->
