@@ -490,8 +490,9 @@ public class DataPackageManagerClientTest {
           + testUpdateRevisionStr;
       DataPackageManagerClient.modifyTestEmlFile(testEmlFile, testScope,
           testPackageId);
+      boolean useChecksum = false;
       String entityString = dpmClient.updateDataPackage(testScope,
-          testIdentifier, testEmlFile);
+          testIdentifier, testEmlFile, useChecksum);
 
       // Check the message body
       assertFalse(entityString == null);
