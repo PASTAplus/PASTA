@@ -369,7 +369,7 @@ public class Harvester implements Runnable {
 					String resourceMap = null;
 					try {
 						if (isUpdate) {
-							resourceMap = dpmClient.updateDataPackage(scope, identifier, emlFile);
+							resourceMap = dpmClient.updateDataPackage(scope, identifier, emlFile, this.useChecksum);
 						}
 						else {
 							resourceMap = dpmClient.createDataPackage(emlFile);

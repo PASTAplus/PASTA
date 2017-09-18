@@ -1765,13 +1765,16 @@ public class DataPackageManagerClient extends PastaClient {
 	 *      href="http://package.lternet.edu/package/docs/api">Data Package
 	 *      Manager web service API</a>
 	 */
-	public String updateDataPackage(String scope, Integer identifier, File emlFile)
+	public String updateDataPackage(String scope, Integer identifier, File emlFile, boolean useChecksum)
 	    throws Exception {
 		String serviceMethod = "updateDataPackage";
 		final String contentType = "application/xml";
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 		String urlTail = makeUrlTail(scope, identifier.toString(), null, null);
-		final String url = BASE_URL + "/eml" + urlTail;
+		String url = BASE_URL + "/eml" + urlTail;
+		if (useChecksum) {
+			url += "?useChecksum";
+		}
 		HttpPut httpPut = new HttpPut(url);
 		String resourceMap = null;
 
