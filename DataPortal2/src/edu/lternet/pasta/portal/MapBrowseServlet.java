@@ -77,6 +77,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 	private static final String forward = "./dataPackageSummary.jsp";
 	private static final String PUBLISHER = "Environmental Data Initiative. ";
 	private static final String DxDoiOrg = "http://dx.doi.org/";
+	private static final String wasDeletedMsg = 
+	"This data package has been deleted by the metadata provider. It remains accessible for archival purposes only.";
 
 
 	/**
@@ -178,10 +180,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 		String digitalObjectIdentifier = "";
 		String pastaDataObjectIdentifier = "";
 		String savedDataHTML = "";
+		String wasDeletedHTML = "";
 		EmlObject emlObject = null;
 		boolean showSaved = false;
 		boolean isSaved = false;
 		boolean hasOffline = false;
+		boolean wasDeleted = false;
 
 		String uid = (String) httpSession.getAttribute("uid");
 
@@ -272,6 +276,12 @@ public class MapBrowseServlet extends DataPortalServlet {
 				try {
 
 					dpmClient = new DataPackageManagerClient(uid);
+					
+					String deletionList = dpmClient.listDeletedDataPackages();
+					wasDeleted = isDeletedDataPackage(deletionList, scope, identifier);
+					if (wasDeleted) {
+						wasDeletedHTML = String.format("<big>%s</big>", wasDeletedMsg);
+					}
 
 					String revisionList = dpmClient.listDataPackageRevisions(
 							scope, id, null);
@@ -823,6 +833,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 			handleDataPortalError(logger, e);
 		}
 		
+		request.setAttribute("wasDeletedHTML", wasDeletedHTML);
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("abstractHTML", abstractHTML);
@@ -1104,6 +1115,27 @@ public class MapBrowseServlet extends DataPortalServlet {
 		datasetAccessed = String.format("Dataset accessed %s.", dateString);
 		
 		return datasetAccessed;
+	}
+	
+	
+	private boolean isDeletedDataPackage(String deletionList, String scope, String identifier) {
+		boolean isDeleted = false;
+		
+		if (deletionList != null && !deletionList.isEmpty()) {
+			String docid = String.format("%s.%s", scope, identifier);
+			String[] tokens = deletionList.split("\n");
+
+			if ((tokens != null) & (tokens.length > 0)) {
+				for (String token : tokens) {
+					if (docid.equals(token.trim())) {
+						isDeleted = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		return isDeleted;
 	}
 	
 }

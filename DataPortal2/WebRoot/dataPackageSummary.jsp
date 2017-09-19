@@ -6,6 +6,7 @@
   final String pageTitle = "Data Package Summary";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
 
+  String wasDeletedHTML = (String) request.getAttribute("wasDeletedHTML");
   String titleHTML = (String) request.getAttribute("dataPackageTitleHTML");
   String creatorsHTML = (String) request.getAttribute("dataPackageCreatorsHTML");
   String abstractHTML = (String) request.getAttribute("abstractHTML");
@@ -39,6 +40,10 @@
   String showCoordinates = "true";
   if ((expandCoordinates != null) && !expandCoordinates) { 
   	showCoordinates = "false";
+  }
+  String showWasDeleted = "true";
+  if ((wasDeletedHTML == null) || (wasDeletedHTML.equals(""))) { 
+    showWasDeleted = "false";
   }
 %>
 
@@ -114,10 +119,21 @@
 				<div class="box_shadow box_layout">
 					<div class="row-fluid">
 						<div class="span12">
-							<div class="recent_title">
-								<h2>Data Package Summary</h2>
-							</div>		
-							<span class="row-fluid separator_border"></span>
+                            <c:set var="showWasDeleted" value="<%= showWasDeleted %>"/>
+                            <c:choose>
+                                <c:when test="${showWasDeleted}">
+                                    <div class="recent_title">
+                                        <h2><%= wasDeletedHTML %></h2>
+                                    </div>      
+                                </c:when>
+                            </c:choose>
+
+                            <span class="row-fluid separator_border"></span>
+ 
+                            <div class="recent_title">
+                                <h2>Data Package Summary</h2>
+                            </div>      
+
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
