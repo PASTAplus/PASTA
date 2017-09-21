@@ -2957,7 +2957,15 @@ kbd.nis {
 }
 
 code.nis {
-	color: black;
+    color: black;
+}
+
+.nis-banner-msg {
+    padding: 7px;
+	color: white;
+    background-color: #5990bd;
+    font-size: 1.1em;
+    text-align: center;
 }
 
 .nis-error {
