@@ -35,8 +35,8 @@ package edu.lternet.pasta.portal;
 public class Tooltip {
 	
 	public static final String DESKTOP_HARVEST = 
-			"When using this method to upload data, online data URLs documented in the EML will be replaced with " +
-	        "links to the data files you select from your local system.";
+			"With this option, data URLs in the EML will be ignored. You will be asked to upload a data file " +
+	        "for every data entity in the package.";
 
 	public static final String SEARCH_TERMS = 
 			"Enclose terms containing spaces within quotes, e.g., \"Puerto Rico\"";
