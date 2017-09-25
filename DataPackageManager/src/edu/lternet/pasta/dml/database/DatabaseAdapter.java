@@ -321,7 +321,7 @@ public abstract class DatabaseAdapter {
       			dateFormatMatchesQualityCheck.setFailedStatus();
       			String found = dateFormatMatchesQualityCheck.getFound();
       			if (found == null || found.isEmpty()) {
-      				dateFormatMatchesQualityCheck.setFound(msg);
+      				dateFormatMatchesQualityCheck.setFound(msg + "\\n");
       				String explanation = "One or more dates found in the data do not match the given format string.";
       		    	this.dateFormatMatchesQualityCheck.setExplanation(explanation);
       			}
