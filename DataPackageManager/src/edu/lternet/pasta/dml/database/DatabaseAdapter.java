@@ -32,6 +32,9 @@
 package edu.lternet.pasta.dml.database;
 
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -44,6 +47,7 @@ import edu.lternet.pasta.dml.parser.AttributeList;
 import edu.lternet.pasta.dml.parser.DateTimeDomain;
 import edu.lternet.pasta.dml.parser.Domain;
 import edu.lternet.pasta.dml.parser.StorageType;
+import edu.lternet.pasta.dml.quality.QualityCheck;
 
 /**
  * This class provide a bridge between DatabaseHandler and a specific db.
@@ -84,6 +88,7 @@ public abstract class DatabaseAdapter {
 	private final String XML_SCHEMA_DATATYPES = 
 	    "http://www.w3.org/2001/XMLSchema-datatypes";
 	protected static final int DEFAULT_TABLE_NAME_MAX_LENGTH = 30;
+	private QualityCheck dateFormatMatchesQualityCheck = null;
   
   
   /*
@@ -303,15 +308,32 @@ public abstract class DatabaseAdapter {
       sqlAttributePart.append(name);
       Domain domain = attribute.getDomain();
       
-      /* If attributeType is "datetime", convert to a timestamp
-       * and wrap single quotes around the value. But only if we
-       * have a format string!
+      /* If attributeType is "datetime", convert to a timestamp and wrap single 
+       * quotes around the value. But only if we have a format string!
        */
       if (attributeType.equalsIgnoreCase("datetime")) {
       	String formatString = ((DateTimeDomain)domain).getFormatString();
       	
+      	if (this.dateFormatMatchesQualityCheck != null) {
+      		String msg = formatStringMatchesDataValue(formatString, value);
+      		
+      		if (msg != null) {
+      			dateFormatMatchesQualityCheck.setFailedStatus();
+      			String found = dateFormatMatchesQualityCheck.getFound();
+      			if (found == null || found.isEmpty()) {
+      				dateFormatMatchesQualityCheck.setFound(msg);
+      				String explanation = "One or more dates found in the data do not match the given format string.";
+      		    	this.dateFormatMatchesQualityCheck.setExplanation(explanation);
+      			}
+      			else if (found.length() <= 300) {
+      				String newFound = found + msg + "\\n";
+      				dateFormatMatchesQualityCheck.setFound(newFound);
+      			}
+      		}
+      	}
+      	
       	// Transform the datetime format string for database compatibility
-        formatString = transformFormatString(formatString);
+        String formatStringPrime = transformFormatString(formatString);
         
         // Transform the datetime value for database compatibility
         value = transformDatetime(value);
@@ -327,7 +349,7 @@ public abstract class DatabaseAdapter {
         sqlDataPart.append(COMMA);
         
     	sqlDataPart.append(SINGLEQUOTE);
-        sqlDataPart.append(formatString);
+        sqlDataPart.append(formatStringPrime);
         sqlDataPart.append(SINGLEQUOTE);
         
         sqlDataPart.append(RIGHTPARENTH);
@@ -394,6 +416,32 @@ public abstract class DatabaseAdapter {
   }
   
 
+	private String formatStringMatchesDataValue(String formatStr, String dateStr) {
+		String msg = null;
+
+		try {
+			log.debug("pattern: " + formatStr);
+			String javaPattern = formatStr.replace("T", "'T'")
+					                      .replace("Z", "'Z'")
+					                      .replace(".sss", ".SSS");
+			DateTimeFormatter df = DateTimeFormatter.ofPattern(javaPattern);
+			try {
+				TemporalAccessor ta = df.parse(dateStr);
+			}
+			catch (DateTimeParseException e) {
+				msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
+			                        dateStr, formatStr);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
+		                        dateStr, formatStr);
+		}
+		
+		return msg;
+	}
+
+	
   /**
    * Gets attribute type for a given attribute. Attribute types include:
    *   "datetime"
@@ -705,6 +753,15 @@ public abstract class DatabaseAdapter {
 		  }
 	  }
 	  return data;
+  }
+  
+  
+  /**
+   * Setter method for the dateFormatMatchesQualityCheck instance value.
+   * @param qualityCheck  the QualityCheck object to set.
+   */
+  public void setDateFormatMatchesQualityCheck(QualityCheck qualityCheck) {
+	  this.dateFormatMatchesQualityCheck = qualityCheck;
   }
   
 }

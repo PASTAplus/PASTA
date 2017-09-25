@@ -199,12 +199,23 @@
       <identifier>dateTimeFormatString</identifier>
       <name>dateTime/formatString specified in metadata is from a preferred set of values</name>
       <description>Certain features of dateTime data formats are preferred, eg, ISO 8601, 4-digit years. 
-        This check looks at metadata to see if the dateTime format is in that prefered list.</description>
+      This check looks at metadata to see if the dateTime format is in that preferred list.</description>
       <expected>A formatString value that is a member of the preferred set is expected.</expected>
       <found></found>
       <status>notChecked</status>
       <explanation>In the current version of EML (2.1), the dateTime/formatString is interpreted as ISO-8601. This check is classified as a warn, so other formats are allowed. In the future (e.g., future version of EML), other formatStrings may be added to the preferred list.</explanation>    
       <suggestion>Modify the dateTime/formatString, selecting from among the preferred values one that best matches the data format</suggestion>
+      <reference></reference>
+    </qualityCheck>
+    <qualityCheck qualityType="congruency" system="lter" statusType="warn" >
+      <identifier>dateFormatMatches</identifier>
+      <name>Date format in metadata matches data</name>
+      <description>dateTime/formatString in attribute metadata is from the preferred list, and the data matches. A non-match generates only a warn.</description>
+      <expected>Format string is preferred, and all data values match the format string</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation>One or more dates do not match the given format string.</explanation>    
+      <suggestion>Dates should be consistently formatted and match the formatString in metadata.</suggestion>
       <reference></reference>
     </qualityCheck>
     <qualityCheck qualityType="metadata" system="knb" statusType="warn" >

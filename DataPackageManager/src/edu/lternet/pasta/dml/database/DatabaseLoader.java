@@ -52,6 +52,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
   private boolean completed = false;
   private boolean success = false;
   private Exception exception = null;
+  private QualityCheck dateFormatMatchesQualityCheck = null;
   
   
   /*
@@ -225,6 +226,17 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
       QualityCheck dataLoadTemplate = 
         QualityReport.getQualityCheckTemplate(dataLoadIdentifier);
       dataLoadQualityCheck = new QualityCheck(dataLoadIdentifier, dataLoadTemplate);
+      
+      // Initialize the dateFormatMatchesQualityCheck
+      String dateFormatMatchesIdentifier = "dateFormatMatches";
+      QualityCheck dateFormatMatchesTemplate = 
+        QualityReport.getQualityCheckTemplate(dateFormatMatchesIdentifier);
+    	this.dateFormatMatchesQualityCheck = new QualityCheck(dateFormatMatchesIdentifier, dateFormatMatchesTemplate);
+    	this.dateFormatMatchesQualityCheck.setStatus(QualityCheck.Status.valid);
+        if (QualityCheck.shouldRunQualityCheck(entity, dateFormatMatchesQualityCheck)) {
+        	// Tell the database adapter to apply the dateFormatMatches quality check
+        	databaseAdapter.setDateFormatMatchesQualityCheck(dateFormatMatchesQualityCheck);
+        }
     }
     
     AttributeList attributeList = entity.getAttributeList();
@@ -485,16 +497,16 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
         }
       } 
       finally {
-    	  /*
-        try {
-          connection.setAutoCommit(true);
-        } 
-        catch (Exception ee) {
-          log.error(ee.getMessage());
-        }
-        */
-
-        DataManager.returnConnection(connection);
+    	  if (QualityCheck.shouldRunQualityCheck(entity, dateFormatMatchesQualityCheck)) {
+    		  String found = this.dateFormatMatchesQualityCheck.getFound();
+    		  if (found == null || found.isEmpty()) {
+    			  this.dateFormatMatchesQualityCheck.setFound("Data values matched the specified formatString.");
+    		      this.dateFormatMatchesQualityCheck.setExplanation("");
+    		  }
+              entity.addQualityCheck(dateFormatMatchesQualityCheck);
+          }
+          
+          DataManager.returnConnection(connection);
       }
     }
     else {
@@ -569,5 +581,5 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
 	{
 		return exception;
 	}
-      
+	
 }
