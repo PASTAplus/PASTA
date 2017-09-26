@@ -53,6 +53,63 @@ public class DatabaseAdapterTest extends TestCase {
                    legalName, expectedNames[i]);
     }
   }
+  
+  
+  
+    public void testFormatStringMatchesDataValue() {
+	    String[] formatStrings =
+	    	{
+	    			"YYYY-MM-DD",
+	    			"YYYY-MM-DD hh:mm:ss.sss",
+	    			"YYYY-MM-DDThh:mm:ss.sss",
+	    			"YYYY-MM-DD hh:mm:ss.sssZ",
+	    			"YYYY-MM-DD hh:mm:ss.sss+HH",
+	    			"YYYY",
+	    			"hh:mm",
+	    			"YYYY-MM-DD hh:mm:ss",
+	    			"hhmm",
+	    			"YYYY-MM-DDThh:mm",
+	    			"hh:mm:ss",
+	    			"YYYYMMdd",
+	    			"hh",
+	    			"YYYY-MM-DDThh:mm:ss",
+	    			"YYYY-MM",
+	    			"YYYY-MM-DD hh:mm",
+	    			"YYYYMM",
+	    			"YYYYDDD",
+	    			"yyyymmdd"
+	        };
+	      
+	    String[] dataValues = 
+		  {
+				  "1976-09-23",
+				  "1976-09-23 12:30:30.000",
+				  "1976-09-23T12:30:30.000",
+				  "1976-09-23 12:30:30.000Z",
+				  "1976-09-23 10:30:30.000+10",
+				  "1976",
+				  "12:30",
+				  "1976-09-23 12:30:30",
+				  "1230",
+				  "1976-09-23T12:30",
+				  "12:30:46",
+				  "19760923",
+				  "08",
+				  "1976-09-23T12:59:50",
+				  "1976-09",
+				  "1976-09-23 12:30",
+				  "197609",
+				  "1976189",
+				  "19760923"
+		  };
+	    
+	    for (int i = 0; i < formatStrings.length; i++) {
+	    	String formatStr = formatStrings[i];
+	    	String dateStr = dataValues[i];
+	        String msg = DatabaseAdapter.formatStringMatchesDataValue(formatStr, dateStr);
+	        assertTrue(msg, (msg == null));
+	    }
+ }
 
 
   /**
@@ -61,6 +118,7 @@ public class DatabaseAdapterTest extends TestCase {
   public static Test suite() {
     TestSuite suite = new TestSuite();
     suite.addTest(new DatabaseAdapterTest("testGetLegalDBTableName"));
+    suite.addTest(new DatabaseAdapterTest("testFormatStringMatchesDataValue"));
     return suite;
   }
   
