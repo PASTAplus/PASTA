@@ -162,17 +162,23 @@ public abstract class DatabaseAdapter {
 				TemporalAccessor ta = df.parse(dateStr);
 			}
 			catch (DateTimeParseException e) {
-				if (javaPattern.contains("YYYY")) {
+				if (javaPattern.contains("YYYYMMDD")) {
+					// Try again using "YYYYMMdd" instead of "YYYYMMDD"
+					msg = formatStringMatchesDataValue(javaPattern.replace("YYYYMMDD", "YYYYMMdd"), dateStr);
+				}
+				else if (javaPattern.contains("YYYY")) {
 					// Try again using "uuuu" instead of "YYYY"
 					msg = formatStringMatchesDataValue(javaPattern.replace("YYYY", "uuuu"), dateStr);
 				}
 				else {
 					/*
-					 * Restore any "YYYY" strings that may have been replaced with "uuuu"
-					 * when composing the warning message to the user.
+					 * Restore any strings that may have been replaced with alternate formats
+					 * before composing the warning message to the user.
 					 */
 					msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
-	                                    dateStr, formatStr.replace("uuuu", "YYYY"));
+	                                    dateStr, 
+	                                    formatStr.replace("uuuu", "YYYY")
+	                                             .replace("YYYYMMdd", "YYYYMMDD"));
 				}
 			}
 		}

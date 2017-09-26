@@ -70,13 +70,13 @@ public class DatabaseAdapterTest extends TestCase {
 	    			"hhmm",
 	    			"YYYY-MM-DDThh:mm",
 	    			"hh:mm:ss",
-	    			"YYYYMMdd",
 	    			"hh",
 	    			"YYYY-MM-DDThh:mm:ss",
 	    			"YYYY-MM",
 	    			"YYYY-MM-DD hh:mm",
 	    			"YYYYMM",
 	    			"YYYYDDD",
+	    			"YYYYMMDD",
 	    			"yyyymmdd"
 	        };
 	      
@@ -93,13 +93,13 @@ public class DatabaseAdapterTest extends TestCase {
 				  "1230",
 				  "1976-09-23T12:30",
 				  "12:30:46",
-				  "19760923",
 				  "08",
 				  "1976-09-23T12:59:50",
 				  "1976-09",
 				  "1976-09-23 12:30",
 				  "197609",
 				  "1976189",
+				  "19760923",
 				  "19760923"
 		  };
 	    
