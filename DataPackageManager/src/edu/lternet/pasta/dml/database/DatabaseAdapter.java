@@ -416,6 +416,9 @@ public abstract class DatabaseAdapter {
   }
   
 
+    /*
+     * Use Java 8 DateTimeFormatter class to parse the date value based on the specified formatString.
+     */
 	private String formatStringMatchesDataValue(String formatStr, String dateStr) {
 		String msg = null;
 
@@ -429,8 +432,18 @@ public abstract class DatabaseAdapter {
 				TemporalAccessor ta = df.parse(dateStr);
 			}
 			catch (DateTimeParseException e) {
-				msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
-			                        dateStr, formatStr);
+				if (javaPattern.contains("YYYY")) {
+					// Try again using "uuuu" instead of "YYYY"
+					msg = formatStringMatchesDataValue(javaPattern.replace("YYYY", "uuuu"), dateStr);
+				}
+				else {
+					/*
+					 * Restore any "YYYY" strings that may have been replaced with "uuuu"
+					 * when composing the warning message to the user.
+					 */
+					msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
+	                                    dateStr, formatStr.replace("uuuu", "YYYY"));
+				}
 			}
 		}
 		catch (IllegalArgumentException e) {

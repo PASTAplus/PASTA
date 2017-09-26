@@ -127,7 +127,7 @@ public class SimpleDatabaseLoader implements DataStorageInterface, Runnable {
 		String tableName = entity.getDBTableName();
 		
 		String insertSQL = "";
-		Vector rowVector = new Vector();
+		Vector<String> rowVector = new Vector<String>();
 		Connection connection = null;
 		
 		try {
