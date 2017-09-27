@@ -2089,32 +2089,33 @@ public class DataPackageRegistry {
   
   
     /**
-     * Inserts a provenance record into the provenance table of the
-     * data package registry.
+     * Inserts a provenance record into the provenance table of the data package registry.
      * 
-     * @param derivedId
-     * @param sourceId
+     * @param derivedId          The PASTA packageId of the derived data package.
+     * @param dataSource         The data source may be a PASTA packageId or an external data URL.
+     * @param isPastaDataSource  true if the data source exists in PASTA, false if it is external to PASTA
      * @throws ClassNotFoundException
      * @throws SQLException
      * @throws ProvenanceException
      */
-	public void insertProvenance(String derivedId, String sourceId) 
+	public void insertProvenance(String derivedId, String dataSource, boolean isPastaDataSource) 
 			throws ClassNotFoundException, SQLException, ProvenanceException {
 		Connection connection = null;
 		
 		if (derivedId == null) {
 			throw new ProvenanceException("Provenance error: null package id for derived data package");
 		}
-		else if (sourceId == null) {
+		else if (dataSource == null) {
 			throw new ProvenanceException("Provenance error: null package id for source data package");
 		}
-		
+	
+		if (isPastaDataSource) {
 		/*
 		 * Check whether the documented source data package exists in
 		 * PASTA. Flag an error if it doesn't.
 		 */
 		EmlPackageIdFormat epif = new EmlPackageIdFormat();
-		EmlPackageId epi = epif.parse(sourceId);
+		EmlPackageId epi = epif.parse(dataSource);
 		String sourceResourceId = 
 				DataPackageManager.composeResourceId(ResourceType.dataPackage, 
 						                             epi.getScope(),
@@ -2125,7 +2126,8 @@ public class DataPackageRegistry {
 			throw new ProvenanceException(
 					String.format("The derived data package %s documents a dependency "
 							    + "on a non-existent source data package %s",
-							      derivedId, sourceId));
+							      derivedId, dataSource));
+		}
 		}
 
 		/*
@@ -2140,14 +2142,14 @@ public class DataPackageRegistry {
 			connection = getConnection();
 			PreparedStatement pstmt = connection.prepareStatement(deleteString);
 			pstmt.setString(1, derivedId);
-			pstmt.setString(2, sourceId);
+			pstmt.setString(2, dataSource);
 			pstmt.executeUpdate();
 			if (pstmt != null) { pstmt.close(); }
 		}
 		catch (SQLException e) {
 			logger.error(
 					String.format("Error deleting provenance record for derived id %s " +
-			                      "and source id %s", derivedId, sourceId));
+			                      "and source id %s", derivedId, dataSource));
 			logger.error("SQLException: " + e.getMessage());
 			throw(e);
 		}
@@ -2164,7 +2166,7 @@ public class DataPackageRegistry {
 			connection = getConnection();
 			PreparedStatement pstmt = connection.prepareStatement(insertString);
 			pstmt.setString(1, derivedId);
-			pstmt.setString(2, sourceId);
+			pstmt.setString(2, dataSource);
 			pstmt.executeUpdate();
 			if (pstmt != null) {
 				pstmt.close();
@@ -2173,7 +2175,7 @@ public class DataPackageRegistry {
 		catch (SQLException e) {
 			logger.error(
 					String.format("Error inserting provenance record for derived id %s " +
-			                      "and source id %s", derivedId, sourceId));
+			                      "and data source %s", derivedId, dataSource));
 			logger.error("SQLException: " + e.getMessage());
 			throw(e);
 		}

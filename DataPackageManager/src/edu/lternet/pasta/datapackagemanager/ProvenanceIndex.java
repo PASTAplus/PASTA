@@ -109,13 +109,21 @@ public class ProvenanceIndex {
 			 */
 			ArrayList<String> dataSources = dataPackage.getDataSources();
 			for (String dataSourceURL : dataSources) {
-				if (DataPackageManager.isPastaDataSource(dataSourceURL)) {
+				boolean isPastaDataSource = DataPackageManager.isPastaDataSource(dataSourceURL);
+				if (isPastaDataSource) {
 					String sourcePackageId = pastaURLtoPackageId(dataSourceURL);
-					dpr.insertProvenance(derivedPackageId, sourcePackageId);
+					dpr.insertProvenance(derivedPackageId, sourcePackageId, isPastaDataSource);
 					sourceIds.add(sourcePackageId);
 					logger.info(
 							String.format("Added provenance record: derived '%s' depends on source '%s'",
 									      derivedPackageId, sourcePackageId));
+				}
+				else {
+					dpr.insertProvenance(derivedPackageId, dataSourceURL, isPastaDataSource);
+					sourceIds.add(dataSourceURL);
+					logger.info(
+						String.format("Added provenance record: derived data package '%s' depends on external data source '%s'",
+									  derivedPackageId, dataSourceURL));
 				}
 			}
 
