@@ -2439,7 +2439,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 	@GET
 	@Path("/descendants/eml/{scope}/{identifier}/{revision}")
-	@Produces("text/plain")
+	@Produces("application/xml")
 	public Response listDataDescendants(@Context HttpHeaders headers,
 			@PathParam("scope") String scope,
 			@PathParam("identifier") Integer identifier,
@@ -2487,11 +2487,11 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			Integer revisionInt = new Integer(revision);
-			String dataSourcesList = dataPackageManager.listDataDescendants(scope,
+			String dataDescendantsXML = dataPackageManager.listDataDescendants(scope,
 					identifier, revisionInt, authToken);
 
-			if (dataSourcesList != null) {
-				responseBuilder = Response.ok(dataSourcesList.trim());
+			if (dataDescendantsXML != null) {
+				responseBuilder = Response.ok(dataDescendantsXML.trim());
 				response = responseBuilder.build();
 			}
 			else {
@@ -2620,7 +2620,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 	@GET
 	@Path("/sources/eml/{scope}/{identifier}/{revision}")
-	@Produces("text/plain")
+	@Produces("application/xml")
 	public Response listDataSources(@Context HttpHeaders headers,
 			@PathParam("scope") String scope,
 			@PathParam("identifier") Integer identifier,

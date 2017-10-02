@@ -71,7 +71,9 @@ public class EMLParser {
   public static final String TITLE_PATH = "//dataset/title";
   public static final String ABSTRACT_PATH = "//dataset/abstract";
   public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
-  public static final String DATA_SOURCE_PATH = "//methods/methodStep/dataSource/distribution/online/url";
+  public static final String DATA_SOURCE_PATH = "//methods/methodStep/dataSource";
+  public static final String DATA_SOURCE_URL_PATH = "distribution/online/url";
+  public static final String DATA_SOURCE_TITLE_PATH = "title";
   public static final String FUNDING_PATH = "//dataset/project/funding";
   public static final String METHODS_PATH = "//dataset/methods";
   public static final String KEYWORD_PATH = "//keyword";
@@ -346,9 +348,27 @@ public class EMLParser {
         NodeList dataSourceNodeList = xpathapi.selectNodeList(document, DATA_SOURCE_PATH);
         if (dataSourceNodeList != null) {
           for (int i =0; i < dataSourceNodeList.getLength(); i++) {
+        	  String title = "";
+        	  String url = "";
             Node dataSourceNode = dataSourceNodeList.item(i);
-            String dataSource = dataSourceNode.getTextContent();
-            dataPackage.addDataSource(dataSource);
+            NodeList dataSourceChildNodes = dataSourceNode.getChildNodes();
+            for (int j = 0; j < dataSourceChildNodes.getLength(); j++) {
+            	Node dataSourceChildNode = dataSourceChildNodes.item(j);
+            	if (dataSourceChildNode.getNodeName().equals("title")) {
+            		title = dataSourceChildNode.getTextContent();
+            	}
+            	else if (dataSourceChildNode.getNodeName().equals("distribution")) {
+            		Node onlineNode = xpathapi.selectSingleNode(dataSourceChildNode, "online");
+            		if (onlineNode != null) {
+            			Node urlNode = xpathapi.selectSingleNode(onlineNode, "url");
+            			if (urlNode != null) {
+            				url = urlNode.getTextContent();
+            			}
+            		}
+
+            	}
+            }
+            dataPackage.addDataSource(null, title, url);
           }
         }
 

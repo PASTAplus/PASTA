@@ -30,9 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -74,6 +71,8 @@ import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
+import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
@@ -127,19 +126,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	   * @param dataSourceURL
 	   * @return true if the data source is hosted by PASTA, else false.
 	   */
-	  public static boolean isPastaDataSource(String dataSourceURL) {
-			final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
-			Pattern pattern = Pattern.compile(patternString);
-			Matcher matcher = pattern.matcher(dataSourceURL);
-			return (matcher.matches());
-	  }
-	  
+	public static boolean isPastaDataSource(String dataSourceURL) {
+		if (dataSourceURL == null) {
+			return false;
+		}
+		final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
+		Pattern pattern = Pattern.compile(patternString);
+		Matcher matcher = pattern.matcher(dataSourceURL);
+		return (matcher.matches());
+	}	  
 	  
 	  /*
 	   * Composes a data package metadata resource identifier based on the PASTA URI
 	   * head value and a specific packageId value.
 	   */
-	  public static String packageIdToMetadataResourceId(String pastaUriHead, String packageId) {
+	  public static String packageIdToMetadataResourceId(String packageId) {
 	    String resourceId = null;
 	    final String SLASH = "/";
 	    
@@ -195,6 +196,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	  }
 
 	  
+		/**
+		 * Converts a pastaURL string to a packageId string, or null if the pastaURL
+		 * does not match the recognized PASTA url pattern.
+		 * 
+		 * @param pastaURL  the pastaURL string, 
+		 *                  e.g. https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5
+		 * @return the packageId string, 
+		 *                  e.g. knb-lter-hbr.58.5
+		 */
+		public static String pastaURLtoPackageId(String pastaURL) {
+			String packageId = null;
+
+			if (pastaURL != null) {
+				final String patternString = "^.*/eml/(\\S+)/(\\d+)/(\\d+)$";
+				Pattern pattern = Pattern.compile(patternString);
+				Matcher matcher = pattern.matcher(pastaURL);
+				if (matcher.matches()) {
+					String scope = matcher.group(1);
+					String identifier = matcher.group(2);
+					String revision = matcher.group(3);
+					packageId = String.format("%s.%s.%s", scope, identifier,
+							revision);
+				}
+			}
+
+			return packageId;
+		}	  
+
+		
 	/*
 	 * Class fields
 	 */
@@ -1749,14 +1779,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
 		
-		ArrayList<String> dataSources = dataPackageRegistry.listDataDescendants(sourceId);
+		ArrayList<edu.lternet.pasta.common.eml.DataPackage.DataDescendant> dataDescendants = 
+				dataPackageRegistry.listDataDescendants(sourceId);
+		
+	    stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	    stringBuilder.append("<dataDescendants>\n");
 
-		for (String packageId : dataSources) {
-			String resourceId = packageIdToMetadataResourceId(pastaUriHead, packageId);
-			stringBuilder.append(resourceId + "\n");
+		for (DataDescendant dataDescendant : dataDescendants) {
+			stringBuilder.append(dataDescendant.toXML());
 		}
 
-		dataDescendantsString = stringBuilder.toString();
+	    stringBuilder.append("</dataDescendants>\n");
+
+	    dataDescendantsString = stringBuilder.toString();
 		return dataDescendantsString;
 	}
 
@@ -1780,38 +1815,30 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			throws Exception {
 		String dataSourcesString = null;
 		StringBuilder stringBuilder = new StringBuilder("");
-		EMLParser emlParser = new EMLParser();
-		ArrayList<String> dataSources = null;
-		String userId = authToken.getUserId();
+		EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+		EmlPackageIdFormat epif = new EmlPackageIdFormat();
+		String derivedId = epif.format(epi);
 
-		String xml = readMetadata(scope, identifier, revision.toString(), userId, authToken);
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		
+		ArrayList<edu.lternet.pasta.common.eml.DataPackage.DataSource> dataSources = 
+				dataPackageRegistry.listDataSources(derivedId);
+		
+	    stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	    stringBuilder.append("<dataSources>\n");
 
-		if (xml != null) {
-			try {
-				InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
-				edu.lternet.pasta.common.eml.DataPackage dataPackage = emlParser.parseDocument(inputStream);
-
-				if (dataPackage != null) {
-					dataSources = dataPackage.getDataSources();
-				}
-			}
-			catch (Exception e) {
-				logger.error("Error parsing EML metacdata: " + e.getMessage());
-			}
+		for (DataSource dataSource : dataSources) {
+			stringBuilder.append(dataSource.toXML());
 		}
 
-		// Only include data source URLs that match the PASTA identifier pattern
-		for (String dataSource : dataSources) {
-			if (DataPackageManager.isPastaDataSource(dataSource)) {
-				stringBuilder.append(dataSource + "\n");
-			}
-		}
+	    stringBuilder.append("</dataSources>\n");
 
-		dataSourcesString = stringBuilder.toString();
+	    dataSourcesString = stringBuilder.toString();
 		return dataSourcesString;
 	}
-	
-	
+
+
 	/**
 	 * Generates an XML string listing data package changes, supporting the
 	 * listDataPackageChanges web service method.

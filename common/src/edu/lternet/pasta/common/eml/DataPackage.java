@@ -51,7 +51,6 @@ public class DataPackage {
   
   String packageId = null;
   ArrayList<ResponsibleParty> creatorList = null;
-  ArrayList<String> dataSources = null;
   ArrayList<Entity> entityList = null;
   ArrayList<String> keywords = null;
   ArrayList<TemporalCoverage> temporalCoverageList;
@@ -82,6 +81,7 @@ public class DataPackage {
   String northBoundingCoordinate = null;
   
   ArrayList<BoundingCoordinates> coordinatesList = new ArrayList<BoundingCoordinates>();
+  ArrayList<DataSource> dataSources = new ArrayList<DataSource>();
   
   /*
    * Constructors
@@ -92,9 +92,8 @@ public class DataPackage {
    * Initialize the array lists when constructing this DataPackage object.
    */
   
-  DataPackage() {
+  public DataPackage() {
     this.creatorList = new ArrayList<ResponsibleParty>();
-    this.dataSources = new ArrayList<String>();
     this.entityList = new ArrayList<Entity>();
     this.keywords = new ArrayList<String>();
     this.projectTitles = new ArrayList<String>();
@@ -129,8 +128,9 @@ public class DataPackage {
   /**
    * Add a new data source for this data package.
    */
-  public void addDataSource(String dataSource) {
-	dataSources.add(dataSource);
+  public void addDataSource(String packageId, String title, String url) {
+	  DataSource dataSource = new DataSource(packageId, title, url);
+	  dataSources.add(dataSource);
   }
   
   
@@ -215,7 +215,7 @@ public class DataPackage {
   }
 
 	  
-  public ArrayList<String> getDataSources() {
+  public ArrayList<DataSource> getDataSources() {
 	return dataSources;
   }
 
@@ -519,6 +519,87 @@ public class DataPackage {
 
 		public String solrSerialize() {
 			return String.format("%s %s %s %s", west, south, east, north);
+		}
+	}
+	
+	
+	public class DataSource {
+		private String sourceId, sourceTitle, sourceURL;
+		
+		public String getSourceId() {
+			return sourceTitle;
+		}
+		
+		
+		public String getSourceTitle() {
+			return sourceTitle;
+		}
+		
+		
+		public String getSourceURL() {
+			return sourceURL;
+		}
+		
+		
+		public DataSource(String sourceId, String sourceTitle, String sourceURL) {
+			this.sourceId = (sourceId == null) ? "" : sourceId;
+			this.sourceTitle = (sourceTitle == null) ? "" : sourceTitle;
+			this.sourceURL = (sourceURL == null) ? "" : sourceURL;
+		}
+
+		public String toXML() {
+			String xml = null;
+			StringBuilder stringBuilder = new StringBuilder("");
+			
+			stringBuilder.append("  <dataSource>");			
+			stringBuilder.append(String.format("    <packageId>%s</packageId>", sourceId));
+			stringBuilder.append(String.format("    <title>%s</title>", sourceTitle));
+			stringBuilder.append(String.format("    <url>%s</url>", sourceURL));		
+			stringBuilder.append("  </dataSource>");
+
+			xml = stringBuilder.toString();
+			return xml;
+		}
+	}
+	
+	
+	public class DataDescendant {
+		private String derivedId, derivedTitle, derivedURL;
+		
+		public String getDerivedId() {
+			return derivedId;
+		}
+		
+		
+		public String getDerivedTitle() {
+			return derivedTitle;
+		}
+		
+		
+		public String getDerivedURL() {
+			return derivedURL;
+		}
+		
+		
+		public DataDescendant(String derivedId, String derivedTitle, String derivedURL) {
+			this.derivedId = (derivedId == null) ? "" : derivedId;
+			this.derivedTitle = (derivedTitle == null) ? "" : derivedTitle;
+			this.derivedURL = (derivedURL == null) ? "" : derivedURL;
+		}
+		
+		
+		public String toXML() {
+			String xml = null;
+			StringBuilder stringBuilder = new StringBuilder("");
+			
+			stringBuilder.append("  <dataDescendant>");			
+			stringBuilder.append(String.format("    <packageId>%s</packageId>", derivedId));
+			stringBuilder.append(String.format("    <title>%s</title>", derivedTitle));
+			stringBuilder.append(String.format("    <url>%s</url>", derivedURL));		
+			stringBuilder.append("  </dataDescendant>");
+
+			xml = stringBuilder.toString();
+			return xml;
 		}
 	}
 	

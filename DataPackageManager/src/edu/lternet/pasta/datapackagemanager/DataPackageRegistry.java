@@ -50,6 +50,9 @@ import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
+import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -87,8 +90,7 @@ public class DataPackageRegistry {
   private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
   private final String ACCESS_MATRIX = "datapackagemanager.ACCESS_MATRIX";
   private final String DATA_PACKAGE_MANAGER_SCHEMA = "datapackagemanager";
-  private final String PROVENANCE_TABLE = "PROVENANCE";
-  private final String PROVENANCE = "datapackagemanager.PROVENANCE";
+  private final String PROV_MATRIX = "datapackagemanager.PROV_MATRIX";
   private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
   private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
   private final String DATA_CACHE_REGISTRY = "datapackagemanager.DATA_CACHE_REGISTRY";
@@ -600,7 +602,7 @@ public class DataPackageRegistry {
 		boolean deleted = false;
 
 		StringBuilder sqlBuilder = new StringBuilder();
-		sqlBuilder.append("DELETE FROM " + PROVENANCE + " WHERE derived_id=?");
+		sqlBuilder.append("DELETE FROM " + PROV_MATRIX + " WHERE derived_id=?");
 		String updateSQL = sqlBuilder.toString();
 
 		Connection conn = getConnection();
@@ -2089,76 +2091,44 @@ public class DataPackageRegistry {
   
   
     /**
-     * Inserts a provenance record into the provenance table of the data package registry.
+     * Inserts a provenance record into the prov_matrix table of the data package registry.
      * 
      * @param derivedId          The PASTA packageId of the derived data package.
-     * @param dataSource         The data source may be a PASTA packageId or an external data URL.
+     * @param derivedTitle       The title of the derived data package.
+     * @param sourceId           The PASTA packageId of the source data package. A null value indicates
+     *                           that the data source is external to PASTA.
+     * @param sourceTitle        The title of the data source.
      * @param isPastaDataSource  true if the data source exists in PASTA, false if it is external to PASTA
      * @throws ClassNotFoundException
      * @throws SQLException
      * @throws ProvenanceException
      */
-	public void insertProvenance(String derivedId, String dataSource, boolean isPastaDataSource) 
+	public void insertProvMatrix(String derivedId, String derivedTitle, 
+			                     String sourceId, String sourceTitle, String sourceURL) 
 			throws ClassNotFoundException, SQLException, ProvenanceException {
 		Connection connection = null;
-		
+		boolean isPastaDataSource = (sourceId != null);
+
+		/*
+		 * Two of the parameters must be non-null.
+		 */
 		if (derivedId == null) {
 			throw new ProvenanceException("Provenance error: null package id for derived data package");
 		}
-		else if (dataSource == null) {
-			throw new ProvenanceException("Provenance error: null package id for source data package");
+		else if (derivedTitle == null) {
+			throw new ProvenanceException("Provenance error: null title for derived data package");
+		}
+		else if (sourceTitle == null) {
+			throw new ProvenanceException("Provenance error: null title for data source");
 		}
 	
-		if (isPastaDataSource) {
-		/*
-		 * Check whether the documented source data package exists in
-		 * PASTA. Flag an error if it doesn't.
-		 */
-		EmlPackageIdFormat epif = new EmlPackageIdFormat();
-		EmlPackageId epi = epif.parse(dataSource);
-		String sourceResourceId = 
-				DataPackageManager.composeResourceId(ResourceType.dataPackage, 
-						                             epi.getScope(),
-						                             epi.getIdentifier(), 
-						                             epi.getRevision(), 
-						                             null);
-		if (!hasResource(sourceResourceId)) {
-			throw new ProvenanceException(
-					String.format("The derived data package %s documents a dependency "
-							    + "on a non-existent source data package %s",
-							      derivedId, dataSource));
-		}
+		if (isPastaDataSource && (sourceURL != null) && (!hasResource(sourceURL))) {
+			throw new ProvenanceException(String.format("The derived data package %s documents a dependency "
+						+ "on a non-existent source data package %s", derivedId, sourceURL));
 		}
 
-		/*
-		 * Since the combination of derivedId and sourceId is a primary key 
-		 * and must be unique, delete any existing provenance records for this 
-		 * pair of values.
-		 */
-		String deleteString = "DELETE FROM "  + PROVENANCE + "  WHERE derived_id=? AND source_id=?";
-		logger.debug("deleteString: " + deleteString);
-
-		try {
-			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(deleteString);
-			pstmt.setString(1, derivedId);
-			pstmt.setString(2, dataSource);
-			pstmt.executeUpdate();
-			if (pstmt != null) { pstmt.close(); }
-		}
-		catch (SQLException e) {
-			logger.error(
-					String.format("Error deleting provenance record for derived id %s " +
-			                      "and source id %s", derivedId, dataSource));
-			logger.error("SQLException: " + e.getMessage());
-			throw(e);
-		}
-		finally {
-			returnConnection(connection);
-		}
-
-		StringBuffer insertSQL = new StringBuffer("INSERT INTO " + PROVENANCE + "(");
-		insertSQL.append("derived_id, source_id) VALUES(?,?)");      
+		StringBuffer insertSQL = new StringBuffer("INSERT INTO " + PROV_MATRIX + "(");
+	    insertSQL.append("derived_id, derived_title, source_id, source_title, source_url) VALUES(?,?,?,?,?)");      
 		String insertString = insertSQL.toString();
 		logger.debug("insertString: " + insertString);
 
@@ -2166,7 +2136,10 @@ public class DataPackageRegistry {
 			connection = getConnection();
 			PreparedStatement pstmt = connection.prepareStatement(insertString);
 			pstmt.setString(1, derivedId);
-			pstmt.setString(2, dataSource);
+			pstmt.setString(2, derivedTitle);
+			pstmt.setString(3, sourceId);
+			pstmt.setString(4, sourceTitle);
+			pstmt.setString(5, sourceURL);
 			pstmt.executeUpdate();
 			if (pstmt != null) {
 				pstmt.close();
@@ -2174,8 +2147,8 @@ public class DataPackageRegistry {
 		}
 		catch (SQLException e) {
 			logger.error(
-					String.format("Error inserting provenance record for derived id %s " +
-			                      "and data source %s", derivedId, dataSource));
+					String.format("Error inserting provenance record for derived data package '%s' " +
+			                      "and data source titled '%s'", derivedId, sourceTitle));
 			logger.error("SQLException: " + e.getMessage());
 			throw(e);
 		}
@@ -2494,25 +2467,29 @@ public class DataPackageRegistry {
 	   * @throws SQLException
 	   * @throws IllegalArgumentException
 	   */
-	  public ArrayList<String> listDataDescendants(String sourceId)
+	  public ArrayList<DataDescendant> listDataDescendants(String sourceId)
 	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
-	    ArrayList<String> docidList = new ArrayList<String>();
+	    ArrayList<DataDescendant> dataDescendants = new ArrayList<DataDescendant>();
 
 	    Connection connection = null;
 	    String selectString = 
-	    		String.format("SELECT DISTINCT derived_id FROM %s" +
+	    		String.format("SELECT DISTINCT derived_id, derived_title FROM %s" +
 	                          "  WHERE source_id='%s' ORDER BY derived_id", 
-	                          PROVENANCE, sourceId);
+	                          PROV_MATRIX, sourceId);
 	    Statement stmt = null;
 
-	    try {
+        try {
 	      connection = getConnection();
 	      stmt = connection.createStatement();
 	      ResultSet rs = stmt.executeQuery(selectString);
+	      edu.lternet.pasta.common.eml.DataPackage dataPackage = new DataPackage(); 
 
 	      while (rs.next()) {
 	        String derivedId = rs.getString("derived_id");
-	        docidList.add(derivedId);
+	        String derivedTitle = rs.getString("derived_title");
+	        String derivedURL = DataPackageManager.packageIdToMetadataResourceId(derivedId);
+	        DataDescendant dataDescendant = dataPackage.new DataDescendant(derivedId, derivedTitle, derivedURL);
+	        dataDescendants.add(dataDescendant);
 	      }
 	    }
 	    catch (ClassNotFoundException e) {
@@ -2528,7 +2505,64 @@ public class DataPackageRegistry {
 	      returnConnection(connection);
 	    }
 
-	    return docidList;
+	    return dataDescendants;
+	  }
+
+	  
+	  /**
+	   * Lists all data packages that have a dependency on the specified
+	   * data package, such that the specified data package is a source
+	   * data package for the returned list of derived data packages.
+	   * 
+	   * @param  sourceId - the packageId of the source data package
+	   * @return A list of packageId strings corresponding to the list of
+	   *         derived data packages associated with the specified source
+	   *         data packages. If no other data package depends on the
+	   *         specified data package, then the list is empty.
+	   *         
+	   * @throws ClassNotFoundException
+	   * @throws SQLException
+	   * @throws IllegalArgumentException
+	   */
+	  public ArrayList<DataSource> listDataSources(String derivedId)
+	      throws ClassNotFoundException, SQLException, IllegalArgumentException {
+	    ArrayList<DataSource> dataSources = new ArrayList<DataSource>();
+
+	    Connection connection = null;
+	    String selectString = 
+	    		String.format("SELECT DISTINCT source_id, source_title, source_url FROM %s" +
+	                          "  WHERE derived_id='%s' ORDER BY source_title", 
+	                          PROV_MATRIX, derivedId);
+	    Statement stmt = null;
+
+        try {
+	      connection = getConnection();
+	      stmt = connection.createStatement();
+	      ResultSet rs = stmt.executeQuery(selectString);
+	      edu.lternet.pasta.common.eml.DataPackage dataPackage = new DataPackage(); 
+
+	      while (rs.next()) {
+	        String sourceId = rs.getString("source_id");
+	        String sourceTitle = rs.getString("source_title");
+	        String sourceURL = rs.getString("source_url");
+	        DataSource dataSource = dataPackage.new DataSource(sourceId, sourceTitle, sourceURL);
+	        dataSources.add(dataSource);
+	      }
+	    }
+	    catch (ClassNotFoundException e) {
+	      logger.error("ClassNotFoundException: " + e.getMessage());
+	      throw (e);
+	    }
+	    catch (SQLException e) {
+	      logger.error("SQLException: " + e.getMessage());
+	      throw (e);
+	    }
+	    finally {
+	      if (stmt != null) stmt.close();
+	      returnConnection(connection);
+	    }
+
+	    return dataSources;
 	  }
 
 	  

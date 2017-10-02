@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageMetadata;
@@ -117,7 +118,7 @@ public class ProvenanceBackfiller {
 					System.err.println("  " + packageId);
 
 					try {
-						ArrayList<String> sourceIds = 
+						ArrayList<DataPackage.DataSource> sourceIds = 
 								provenanceIndex.insertProvenanceRecords(packageId, emlDocument);
 						if ((sourceIds != null) && (sourceIds.size() > 0)) {
 							derivedDataPackageCount++;

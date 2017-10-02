@@ -19,6 +19,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.DataPackage.BoundingCoordinates;
+import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
@@ -379,10 +380,11 @@ public class SolrIndex {
 			/*
 			 * Add PASTA identifier values of source data packages to track provenance
 			 */
-			ArrayList<String> dataSources = dataPackage.getDataSources();
-			for (String dataSourceURL : dataSources) {
-				if (DataPackageManager.isPastaDataSource(dataSourceURL)) {
-					solrInputDocument.addField("derivedFrom", dataSourceURL);
+			ArrayList<DataSource> dataSources = dataPackage.getDataSources();
+			for (DataSource dataSource : dataSources) {
+				String sourceURL = dataSource.getSourceURL();
+				if (sourceURL != null && !sourceURL.isEmpty()) {
+					solrInputDocument.addField("derivedFrom", sourceURL);
 				}
 			}
 

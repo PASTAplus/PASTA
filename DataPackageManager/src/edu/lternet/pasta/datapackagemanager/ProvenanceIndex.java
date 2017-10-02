@@ -3,24 +3,14 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrInputDocument;
 
 import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
-import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 
 
@@ -94,76 +84,40 @@ public class ProvenanceIndex {
 	 * 
 	 * @param derivedId     the EML package id object of the EML document
 	 * @param emlDocument   the EML document string
-	 * @return sourceIds    a list of package id strings
+	 * @return sourceIds    a list of package id strings  
 	 */
-    public ArrayList<String> insertProvenanceRecords(String derivedPackageId, String emlDocument)  
+    public ArrayList<DataSource> insertProvenanceRecords(String derivedId, String emlDocument)  
     		throws ProvenanceException, SQLException, ClassNotFoundException {
-    	ArrayList<String> sourceIds = new ArrayList<String>();
+    	ArrayList<DataSource> dataSources = null;
     	
     	EMLParser emlParser = new EMLParser();
     	DataPackage dataPackage = emlParser.parseDocument(emlDocument);
     	
 		if (dataPackage != null) {
+	    	ArrayList<String> derivedTitles = dataPackage.getTitles();
+	    	String derivedTitle = derivedTitles.size() > 0 ? derivedTitles.get(0) : null;
 			/*
 			 * Add PASTA identifier values of source data packages to track provenance
 			 */
-			ArrayList<String> dataSources = dataPackage.getDataSources();
-			for (String dataSourceURL : dataSources) {
-				boolean isPastaDataSource = DataPackageManager.isPastaDataSource(dataSourceURL);
+			dataSources = dataPackage.getDataSources();
+			for (DataSource dataSource : dataSources) {
+				String sourceId = null;
+				String sourceTitle = dataSource.getSourceTitle();
+				String sourceURL = dataSource.getSourceURL();
+				boolean isPastaDataSource = DataPackageManager.isPastaDataSource(sourceURL);
 				if (isPastaDataSource) {
-					String sourcePackageId = pastaURLtoPackageId(dataSourceURL);
-					dpr.insertProvenance(derivedPackageId, sourcePackageId, isPastaDataSource);
-					sourceIds.add(sourcePackageId);
-					logger.info(
-							String.format("Added provenance record: derived '%s' depends on source '%s'",
-									      derivedPackageId, sourcePackageId));
+					sourceId = DataPackageManager.pastaURLtoPackageId(sourceURL);
 				}
-				else {
-					dpr.insertProvenance(derivedPackageId, dataSourceURL, isPastaDataSource);
-					sourceIds.add(dataSourceURL);
-					logger.info(
-						String.format("Added provenance record: derived data package '%s' depends on external data source '%s'",
-									  derivedPackageId, dataSourceURL));
-				}
+			    dpr.insertProvMatrix(derivedId, derivedTitle, sourceId, sourceTitle, sourceURL);
 			}
-
 		}
 		else {
 			String result = String.format("Provenance table insert failed while parsing docid %s",
-					                      derivedPackageId);
+					                      derivedId);
 			throw new ProvenanceException(result);
 		}
 		
-		return sourceIds;
+		return dataSources;
     }
     
-    
-	/**
-	 * Converts a pastaURL string to a packageId string, or null if the pastaURL
-	 * does not match the recognized PASTA url pattern.
-	 * 
-	 * @param pastaURL  the pastaURL string, 
-	 *                  e.g. https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5
-	 * @return the packageId string, 
-	 *                  e.g. knb-lter-hbr.58.5
-	 */
-	private String pastaURLtoPackageId(String pastaURL) {
-		String packageId = null;
-
-		if (pastaURL != null) {
-			final String patternString = "^.*/eml/(\\S+)/(\\d+)/(\\d+)$";
-			Pattern pattern = Pattern.compile(patternString);
-			Matcher matcher = pattern.matcher(pastaURL);
-			if (matcher.matches()) {
-				String scope = matcher.group(1);
-				String identifier = matcher.group(2);
-				String revision = matcher.group(3);
-				packageId = String.format("%s.%s.%s", scope, identifier,
-						revision);
-			}
-		}
-
-		return packageId;
-	}	  
-
 }
