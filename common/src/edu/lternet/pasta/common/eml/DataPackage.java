@@ -551,11 +551,11 @@ public class DataPackage {
 			String xml = null;
 			StringBuilder stringBuilder = new StringBuilder("");
 			
-			stringBuilder.append("  <dataSource>");			
-			stringBuilder.append(String.format("    <packageId>%s</packageId>", sourceId));
-			stringBuilder.append(String.format("    <title>%s</title>", sourceTitle));
-			stringBuilder.append(String.format("    <url>%s</url>", sourceURL));		
-			stringBuilder.append("  </dataSource>");
+			stringBuilder.append("    <dataSource>\n");			
+			stringBuilder.append(String.format("        <packageId>%s</packageId>\n", sourceId));
+			stringBuilder.append(String.format("        <title>%s</title>\n", sourceTitle));
+			stringBuilder.append(String.format("        <url>%s</url>\n", sourceURL));		
+			stringBuilder.append("    </dataSource>\n");
 
 			xml = stringBuilder.toString();
 			return xml;
@@ -592,11 +592,11 @@ public class DataPackage {
 			String xml = null;
 			StringBuilder stringBuilder = new StringBuilder("");
 			
-			stringBuilder.append("  <dataDescendant>");			
-			stringBuilder.append(String.format("    <packageId>%s</packageId>", derivedId));
-			stringBuilder.append(String.format("    <title>%s</title>", derivedTitle));
-			stringBuilder.append(String.format("    <url>%s</url>", derivedURL));		
-			stringBuilder.append("  </dataDescendant>");
+			stringBuilder.append("    <dataDescendant>\n");			
+			stringBuilder.append(String.format("        <packageId>%s</packageId>\n", derivedId));
+			stringBuilder.append(String.format("        <title>%s</title>\n", derivedTitle));
+			stringBuilder.append(String.format("        <url>%s</url>\n", derivedURL));		
+			stringBuilder.append("    </dataDescendant>\n");
 
 			xml = stringBuilder.toString();
 			return xml;
