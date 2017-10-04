@@ -4,7 +4,6 @@ token.ttl = 28800000
 token.authgroup = authenticated
 token.publicuser = public
 ldap.keystore = keystore.jks
-token.privatekey = private-key.ser
 lter.keystore = lternet.jks
 lter.certificate = lternet.crt
 lter.keystore.type = JKS
