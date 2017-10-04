@@ -281,28 +281,6 @@ public final class GatekeeperFilter implements Filter
     }
 
     
-    private AuthToken decryptToken(String tokenStr) throws IllegalStateException {
-
-        String errorMsg = "Invalid AuthToken Submitted.";
-
-        if (tokenStr == null || tokenStr.isEmpty()) {
-            throw new IllegalStateException(errorMsg);
-        }
-
-        String decrypted = null;
-        try {
-            decrypted =
-                    SymmetricEncrypter.decrypt(tokenStr,
-                                    ConfigurationListener.getPrivateKey());
-        }
-        catch (IllegalArgumentException e) {
-            throw new IllegalStateException(errorMsg);
-        }
-
-        return AuthTokenFactory.makeCookieAuthToken(decrypted);
-    }
-
-    
     private String retrieveAuthTokenString(Cookie[] cookies) {
 
         /* no cookies */

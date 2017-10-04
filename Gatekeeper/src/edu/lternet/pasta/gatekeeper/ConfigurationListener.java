@@ -34,8 +34,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.lternet.pasta.common.FileUtility;
-import edu.lternet.pasta.common.UserErrorException;
-import edu.lternet.pasta.common.security.auth.SymmetricEncrypter;
 
 /**
  * The ConfigurationListener class initializes the LTER restful web application.
@@ -56,7 +54,6 @@ public class ConfigurationListener implements ServletContextListener
     public static final String AUTH_GROUP = "token.authgroup";
     public static final String PUBLIC_USER = "token.publicuser";
     public static final String LDAP_KEY_STORE = "ldap.keystore";
-    public static final String PRIVATE_KEY = "token.privatekey";
     public static final String WEB_SERVICE_VERSION = "web.service.version";
     public static final String LTER_KEYSTORE = "lter.keystore";
     public static final String LTER_CERTIFICATE = "lter.certificate";
@@ -287,7 +284,6 @@ public class ConfigurationListener implements ServletContextListener
         setAuthGroup(prop);
         setPublicUser(prop);
         setLdapKeyStore(prop);
-        setPrivateKey(prop);
         setLterKeyStore(prop);
         setLterCertificate(prop);
         setLterKeyStoreType(prop);
@@ -360,22 +356,6 @@ public class ConfigurationListener implements ServletContextListener
         }
 
         ldapKeyStore = FileUtility.assertCanRead(new File(configDir, fileName));
-    }
-
-    private void setPrivateKey(Properties p) {
-
-        String fileName = p.getProperty(PRIVATE_KEY);
-
-        File f = null;
-        try {
-            f = FileUtility.assertCanRead(new File(configDir, fileName));
-            privateKey = SymmetricEncrypter.readKey(f);
-        }
-        catch (UserErrorException e) {
-            privateKey = SymmetricEncrypter.makeKey();
-            SymmetricEncrypter.writeKey(privateKey, f);
-        }
-
     }
 
     private void setLterKeyStore(Properties p) {
