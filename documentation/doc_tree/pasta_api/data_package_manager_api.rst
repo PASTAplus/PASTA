@@ -366,11 +366,29 @@ Description
 """""""""""
 
 List Data Descendants operation, specifying the scope, identifier, and revision values to match in the URI.
+Data descendants are data packages that are known to be derived, in whole or in part, from the specified 
+source data package.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/descendants/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/descendants/eml/{scope}/{identifier}/{revision}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list data descendants of a data package::
+
+     curl -X GET https://pasta.lternet.edu/package/descendants/eml/knb-lter-xyz/1/1
+
+     <?xml version="1.0" encoding="UTF-8"?>
+     <dataDescendants>
+         <dataDescendant>
+             <packageId>edi.9999.1</packageId>
+             <title>Fictitious Title of a PASTA Data Set</title>
+             <url>https://pasta.lternet.edu/package/metadata/eml/edi/9999/1</url>
+         </dataDescendant>
+     </dataDescendants>
 
 *List Data Sources*
 ^^^^^^^^^^^^^^^^^^^
@@ -378,12 +396,38 @@ REST API
 Description
 """""""""""
 
-List Data Sources operation, specifying the scope, identifier, and revision values to match in the URI.
+List Data Sources operation, specifying the scope, identifier, and revision values in the URI.
+For each data source, its package identifier, title, and URL values are included (if applicable) as
+documented in the metadata for the specified data package. Data sources can be either 
+internal or external to PASTA. Internal data sources include a "packageId" value and a URL to the 
+source metadata. For data sources external to PASTA, the "packageId" element will be empty 
+and a URL value may or not be documented.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/sources/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/sources/eml/{scope}/{identifier}/{revision}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list data sources of a data package::
+
+     curl -X GET https://pasta.lternet.edu/package/sources/eml/edi/9999/1
+
+     <?xml version="1.0" encoding="UTF-8"?>
+     <dataSources>
+         <dataSource>
+             <packageId>knb-lter-xyz.1.1</packageId>
+             <title>A multi-scaled geospatial and temporal database</title>
+             <url>https://pasta.lternet.edu/package/metadata/eml/knb-lter-xyz/1/1</url>
+         </dataSource>
+         <dataSource>
+             <packageId></packageId>
+             <title>Fictitious Title of an External Data Set</title>
+             <url>https://someplace.elsewhere.edu/some-metadata.xml</url>
+         </dataSource>
+     </dataSources>
 
 *List Data Package Identifiers*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
