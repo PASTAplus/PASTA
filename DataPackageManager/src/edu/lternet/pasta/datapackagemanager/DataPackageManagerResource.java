@@ -2373,15 +2373,21 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The list request was successful</td>
-	 * <td align=center>A list of data package metadata resource identifiers 
-	 * representing the descendant data packages. A descendant data package is 
-	 * defined as a data package which depends on the specified data package as 
+	 * <td align=center>An XML-formatted list representing descendant data packages. A descendant 
+	 * data package is defined as a data package which depends on the specified data package as 
 	 * one of its data sources.</td>
-	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>application/xml</code></td>
 	 * <td>
 	 * <pre>
-     *   https://pasta.lternet.edu/package/metadata/eml/lter-landsat-ledaps/7/1
-	 * </pre>
+     * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+     * &lt;dataDescendants&gt;
+     *     &lt;dataDescendant&gt;
+     *         &lt;packageId&gt;lter-landsat-ledaps.7.1&lt;/packageId&gt;
+     *         &lt;title&gt;LEDAPS corrected Landsat Enhanced Thematic Mapper image data for Andrews Forest LTER collected on 1984&#x2d;05&#x2d;16&lt;/title&gt;
+     *         &lt;url&gt;https://pasta.lternet.edu/package/metadata/eml/lter-landsat-ledaps/7/1&lt;/url&gt;
+     *     &lt;/dataDescendant&gt;
+     * &lt;/dataDescendants&gt;	 
+     * </pre>
 	 * </td>
 	 * </tr>
 	 * <tr>
@@ -2433,9 +2439,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * @param revision
 	 *            The revision of the data package. A string that represents a
 	 *            whole number, or, the symbolic values "oldest" or "newest".
-	 * @return a Response, containing a newline separated list of data package
-	 *         identifiers representing the data sources from which the
-	 *         specified data package was derived
+	 * @return a Response, containing an XML-formatted list of data descendants.
 	 */
 	@GET
 	@Path("/descendants/eml/{scope}/{identifier}/{revision}")
@@ -2556,12 +2560,19 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td align=center>200 OK</td>
 	 * <td align=center>The list request was successful</td>
-	 * <td align=center>A list of PASTA metadata resource identifiers representing 
+	 * <td align=center>An XML-formatted list of PASTA metadata resource identifiers representing 
 	 * the data sources from which this data package was derived</td>
-	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>application/xml</code></td>
 	 * <td>
 	 * <pre>
-     *   https://pasta.lternet.edu/package/metadata/eml/lter-landsat/7/1
+     * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+     * &lt;dataSources&gt;
+     *    &lt;dataSource&gt;
+     *        &lt;packageId&gt;lter-landsat.7.1&lt;/packageId&gt;
+     *        &lt;title&gt;Landsat Enhanced Thematic Mapper image data for Andrews Forest LTER collected on 1984-07-03&lt;/title&gt;
+     *        &lt;url&gt;https://pasta.lternet.edu/package/metadata/eml/lter-landsat/7/1&lt;/url&gt;
+     *    &lt;/dataSource&gt;
+     * &lt;/dataSources&gt;     
      * </pre>
 	 * </td>
 	 * </tr>
@@ -2614,8 +2625,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * @param revision
 	 *            The revision of the data package. A string that represents a
 	 *            whole number, or, the symbolic values "oldest" or "newest".
-	 * @return a Response, containing a newline separated list of data package
-	 *         metadata resource identifiers representing the data sources from which the
+	 * @return a Response, containing an XML-formatted list of
+	 *         metadata resources representing the data sources from which the
 	 *         specified data package was derived
 	 */
 	@GET
