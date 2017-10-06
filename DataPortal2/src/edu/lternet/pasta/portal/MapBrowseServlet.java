@@ -750,7 +750,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 				if ((dataDescendantsXML != null) && (dataDescendantsXML.length() > 0)) {
 					ArrayList<DataPackage.DataDescendant> dataDescendants = xmlToDataDescendants(dataDescendantsXML);
 					if ((dataDescendants != null) && (dataDescendants.size() > 0)) {
-						provenanceHTMLBuilder.append("This data package is a source for the following data sets:<br/>");
+						provenanceHTMLBuilder.append("This data package is a source for the following data packages:<br/>");
 						provenanceHTMLBuilder.append("<ol>\n");
 						for (DataPackage.DataDescendant dataDescendant : dataDescendants) {
 							provenanceHTMLBuilder.append(String.format("<li>%s</li>", dataDescendant.toHTML()));
