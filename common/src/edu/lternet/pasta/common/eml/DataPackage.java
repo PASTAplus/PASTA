@@ -560,6 +560,23 @@ public class DataPackage {
 			xml = stringBuilder.toString();
 			return xml;
 		}
+
+		
+		public String toHTML() {
+			String html = null;
+			StringBuilder stringBuilder = new StringBuilder("");
+			 
+			if (sourceURL.isEmpty()) {
+				stringBuilder.append(sourceTitle);
+			}
+			else {
+				stringBuilder.append(String.format("<a class='searchsubcat' href='%s'>%s</a>", sourceURL, sourceTitle));
+			}
+
+			html = stringBuilder.toString();
+			return html;
+		}
+
 	}
 	
 	
@@ -601,6 +618,23 @@ public class DataPackage {
 			xml = stringBuilder.toString();
 			return xml;
 		}
+
+		
+		public String toHTML() {
+			String html = null;
+			StringBuilder stringBuilder = new StringBuilder("");
+			 
+			if (derivedURL.isEmpty()) {
+				stringBuilder.append(derivedTitle);
+			}
+			else {
+				stringBuilder.append(String.format("<a class='searchsubcat' href='%s'>%s</a>", derivedURL, derivedTitle));
+			}
+
+			html = stringBuilder.toString();
+			return html;
+		}
+
 	}
 	
 }

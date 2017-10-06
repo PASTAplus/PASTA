@@ -25,6 +25,7 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,12 +37,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.xpath.CachedXPathAPI;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.common.EmlPackageId;
@@ -49,6 +57,7 @@ import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.ScaledNumberFormat;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.common.eml.DataPackage;
+import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.Entity;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
@@ -721,70 +730,34 @@ public class MapBrowseServlet extends DataPortalServlet {
 								+ "\">How to cite this data package</a>\n");
 				citationLinkHTML = citationHTMLBuilder.toString();
 
-				String dataSourcesStr = dpmClient.listDataSources(scope, id, revision);
+				String dataSourcesXML = dpmClient.listDataSources(scope, id, revision);
 				
-				String source = null;
-				String derived = null;
-				StringBuffer sourcesHTMLBuilder = new StringBuffer("");
-				int nSources = 0;
-				
-				if (dataSourcesStr != null &&
-                    dataSourcesStr.length() > 0) {
-					derived = packageId;
-					String[] dataSources = dataSourcesStr.split("\n");
-					if (dataSources.length > 0) {
-						String dataSource = dataSources[0];
-						if (dataSource != null && dataSource.length() > 0) {
-							provenanceHTMLBuilder.append("This data package is derived from the following sources:<br/>");
-							provenanceHTMLBuilder.append("<ol>\n");
-							for (String uri : dataSources) {
-								String mapbrowseURL = mapbrowseURL(uri);
-								source = packageIdFromPastaId(uri);
-								String listItem = String.format("<li>%s</li>", mapbrowseURL);
-								provenanceHTMLBuilder.append(listItem);
-								sourcesHTMLBuilder.append(String.format("%s<br/>", source));
-								nSources++;
-							}
-							provenanceHTMLBuilder.append("</ol>\n");
-							provenanceHTMLBuilder.append("<br/>");
+				if ((dataSourcesXML != null) && (dataSourcesXML.length() > 0)) {
+					ArrayList<DataPackage.DataSource> dataSources = xmlToDataSources(dataSourcesXML);
+					if ((dataSources != null) && (dataSources.size() > 0)) {
+						provenanceHTMLBuilder.append("This data package is derived from the following sources:<br/>");
+						provenanceHTMLBuilder.append("<ol>\n");
+						for (DataPackage.DataSource dataSource : dataSources) {
+							provenanceHTMLBuilder.append(String.format("<li>%s</li>", dataSource.toHTML()));
 						}
+						provenanceHTMLBuilder.append("</ol>\n");
+						provenanceHTMLBuilder.append("<br/>");
 					}
 				}
 				
-				String dataDescendantsStr = dpmClient.listDataDescendants(scope, id, revision);
+				String dataDescendantsXML = dpmClient.listDataDescendants(scope, id, revision);
 				
-				if (dataDescendantsStr != null &&
-						dataDescendantsStr.length() > 0) {
-					source = packageId;
-					String[] dataDescendants = dataDescendantsStr.split("\n");
-					if (dataDescendants.length > 0) {
-						String dataDescendant = dataDescendants[0];
-						if (dataDescendant != null && dataDescendant.length() > 0) {
-							provenanceHTMLBuilder.append("This data package is a source for the following derived data packages:<br/>");
-							provenanceHTMLBuilder.append("<ol>\n");
-							for (String uri : dataDescendants) {
-								String mapbrowseURL = mapbrowseURL(uri);
-								if (derived == null) { derived = packageIdFromPastaId(uri); }
-								String listItem = String.format("<li>%s</li>", mapbrowseURL);
-								provenanceHTMLBuilder.append(listItem);
-							}
-							provenanceHTMLBuilder.append("</ol>\n");
-							provenanceHTMLBuilder.append("<br/>");
+				if ((dataDescendantsXML != null) && (dataDescendantsXML.length() > 0)) {
+					ArrayList<DataPackage.DataDescendant> dataDescendants = xmlToDataDescendants(dataDescendantsXML);
+					if ((dataDescendants != null) && (dataDescendants.size() > 0)) {
+						provenanceHTMLBuilder.append("This data package is a source for the following data sets:<br/>");
+						provenanceHTMLBuilder.append("<ol>\n");
+						for (DataPackage.DataDescendant dataDescendant : dataDescendants) {
+							provenanceHTMLBuilder.append(String.format("<li>%s</li>", dataDescendant.toHTML()));
 						}
+						provenanceHTMLBuilder.append("</ol>\n");
+						provenanceHTMLBuilder.append("<br/>");
 					}
-				}
-				
-				/*
-				 * Provenance graph
-				 */
-				if ((nSources > 0) && (source != null) && (derived != null)) {
-					String sourcesHTML = sourcesHTMLBuilder.toString();
-					String graphString = 
-						String.format("View a <a class=\"searchsubcat\" href=\"./provenanceGraph?nSources=%d&sourcesHTML=%s&derived=%s\">"
-									+ "provenance graph</a> of this data package",
-									nSources, sourcesHTML, derived);
-					provenanceHTMLBuilder.append(graphString);
-					provenanceHTMLBuilder.append("<br/><br/>");
 				}
 				
 				/*
@@ -852,6 +825,139 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(forward);
 		requestDispatcher.forward(request, response);
+	}
+	
+	
+	private ArrayList<DataPackage.DataSource> xmlToDataSources(String xml) {
+		ArrayList<DataPackage.DataSource> dataSources = new ArrayList<DataPackage.DataSource>();
+		
+  		if (xml != null) {
+  			InputStream inputStream = null;
+  			try {
+  				inputStream = IOUtils.toInputStream(xml, "UTF-8");
+  				DocumentBuilder documentBuilder = 
+  	              DocumentBuilderFactory.newInstance().newDocumentBuilder();
+  				CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+  				Document document = null;
+  				document = documentBuilder.parse(inputStream);
+  	      
+  				if (document != null) { 	        
+  					NodeList dataSourceNodes = xpathapi.selectNodeList(document, "//dataSource");
+  					
+  					for (int i = 0; i < dataSourceNodes.getLength(); i++) {
+  						String packageId = null; 
+  						String title = null;
+  						String url = null;
+  						Node dataSourceNode = dataSourceNodes.item(i);
+  					    packageId = xpathapi.selectSingleNode(dataSourceNode, "packageId").getTextContent();
+  					    title = xpathapi.selectSingleNode(dataSourceNode, "title").getTextContent();
+  					    url = xpathapi.selectSingleNode(dataSourceNode, "url").getTextContent();
+  					    url = convertToDataPortalURL(url, packageId);
+  					  	DataPackage dp = new DataPackage();
+  						DataPackage.DataSource dataSource = dp.new DataSource(packageId, title, url);
+  						dataSources.add(dataSource);
+  					}
+  				}
+			}
+			catch (Exception e) {
+		        logger.error("Error parsing search result set: " + e.getMessage());
+			}
+			finally {
+				if (inputStream != null) {
+					try {
+						inputStream.close();
+					}
+					catch (IOException e) {
+						;
+					}
+				}
+			}
+  		}
+		
+		return dataSources;
+	}
+	
+	
+	/*
+	 * Convert a PASTA metadata URL to a Data Portal URL. This is done as a convenience to
+	 * the user, since it is easier to view a data package in the Data Portal as opposed
+	 * to opening the raw XML metadata in a browser window.
+	 */
+	private String convertToDataPortalURL(String url, String packageId) {
+		String dataPortalURL = url;
+		
+		if (packageId != null ) {
+			EmlPackageIdFormat epif = new EmlPackageIdFormat();
+			try {
+				EmlPackageId epi = epif.parse(packageId);
+				if (epi != null) {
+					String scope = epi.getScope();
+					Integer identifier = epi.getIdentifier();
+					Integer revision = epi.getRevision();
+					if ((scope != null) && (identifier != null) && (revision != null)) {
+						dataPortalURL = String.format("mapbrowse?scope=%s&identifier=%d&revision=%d",
+												      scope, identifier, revision);
+					}
+				}
+			}
+			catch (Exception e) {
+				// No action needed; not a valid packageId so use the original url
+			}
+		}
+		
+		return dataPortalURL;
+	}
+	
+	
+	private ArrayList<DataPackage.DataDescendant> xmlToDataDescendants(String xml) {
+		ArrayList<DataPackage.DataDescendant> dataDescendants = new ArrayList<DataPackage.DataDescendant>();
+		
+  		if (xml != null) {
+  			InputStream inputStream = null;
+  			try {
+  				inputStream = IOUtils.toInputStream(xml, "UTF-8");
+  				DocumentBuilder documentBuilder = 
+  	              DocumentBuilderFactory.newInstance().newDocumentBuilder();
+  				CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+  				Document document = null;
+  				document = documentBuilder.parse(inputStream);
+  	      
+  				if (document != null) { 	        
+  					NodeList dataDescendantNodes = xpathapi.selectNodeList(document, "//dataDescendant");
+  					
+  					for (int i = 0; i < dataDescendantNodes.getLength(); i++) {
+  						String packageId = null; 
+  						String title = null;
+  						String url = null;
+  						Node dataDescendantNode = dataDescendantNodes.item(i);
+  					    packageId = xpathapi.selectSingleNode(dataDescendantNode, "packageId").getTextContent();
+  					    title = xpathapi.selectSingleNode(dataDescendantNode, "title").getTextContent();
+  					    url = xpathapi.selectSingleNode(dataDescendantNode, "url").getTextContent();
+  					    url = convertToDataPortalURL(url, packageId);
+  						DataPackage dp = new DataPackage();
+  						DataPackage.DataDescendant dataDescendant = dp.new DataDescendant(packageId, title, url);
+  						dataDescendants.add(dataDescendant);
+  					}
+  				}
+			}
+			catch (Exception e) {
+		        logger.error("Error parsing search result set: " + e.getMessage());
+			}
+			finally {
+				if (inputStream != null) {
+					try {
+						inputStream.close();
+					}
+					catch (IOException e) {
+						;
+					}
+				}
+			}
+  		}
+		
+		return dataDescendants;
 	}
 	
 	
