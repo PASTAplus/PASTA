@@ -8,6 +8,7 @@
 
   String wasDeletedHTML = (String) request.getAttribute("wasDeletedHTML");
   String titleHTML = (String) request.getAttribute("dataPackageTitleHTML");
+  String viewFullMetadataHTML = (String) request.getAttribute("viewFullMetadataHTML");
   String creatorsHTML = (String) request.getAttribute("dataPackageCreatorsHTML");
   String abstractHTML = (String) request.getAttribute("abstractHTML");
   String intellectualRightsHTML = (String) request.getAttribute("intellectualRightsHTML");
@@ -123,15 +124,17 @@
                             <c:choose>
                                 <c:when test="${showWasDeleted}">
                                 <span class="nis-banner-msg">&nbsp;&nbsp;<%= wasDeletedHTML %>&nbsp;&nbsp;</span>
+                                <span class="row-fluid separator_border"></span>
                                 </c:when>
                             </c:choose>
 
+                            <div class="recent_title">
+                                <h2>Data Package Summary&nbsp;&nbsp;&nbsp;<small><small><%= viewFullMetadataHTML %></small></small></h2>
+                            </div>      
+                                
+
                             <span class="row-fluid separator_border"></span>
  
-                            <div class="recent_title">
-                                <h2>Data Package Summary</h2>
-                            </div>      
-
 						</div>
 						<div class="row-fluid">
 							<div class="span12">

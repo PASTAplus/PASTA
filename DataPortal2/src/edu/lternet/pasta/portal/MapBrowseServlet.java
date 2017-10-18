@@ -174,6 +174,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 		HttpSession httpSession = request.getSession();
 		String titleHTML = "";
+		String viewFullMetadataHTML = "";
 		String citationHTML = "";
 		String creatorsHTML = "";
 		String abstractHTML = "";
@@ -508,6 +509,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				String packageIdListItem = null;
 				String metadata = null;
+				String viewFullMetadata = null;
 				String report = null;
 				String data = "";
 				String doiId = null;
@@ -519,10 +521,11 @@ public class MapBrowseServlet extends DataPortalServlet {
 					resource = tokens.nextToken();
 
 					if (resource.contains(metadataUri)) {
-
 						metadata = "<li><a class=\"searchsubcat\" href=\"./metadataviewer?packageid="
-								+ packageId + "\">Metadata</a></li>\n";
-
+								+ packageId + "\">Metadata</a></li>\n";	
+						viewFullMetadataHTML = String.format(
+	                               "<a class=\"searchsubcat\" href=\"./metadataviewer?packageid=%s\">View Full Metadata</a>",
+	                               packageId);
 					}
 					else
 						if (resource.contains(reportUri)) {
@@ -807,6 +810,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 		
 		request.setAttribute("wasDeletedHTML", wasDeletedHTML);
+		request.setAttribute("viewFullMetadataHTML", viewFullMetadataHTML);
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("abstractHTML", abstractHTML);
