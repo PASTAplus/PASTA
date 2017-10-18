@@ -16,6 +16,9 @@ public class PageControl {
 	 */
 	
 	private final String SPACER = "&nbsp;&nbsp;&nbsp;";
+	private final String ASCENDING = "  <big>&#42779;</big>";  // up arrow character
+	private final String DESCENDING = "  <big><big><big><sub>&#42780;</sub></big></big></big>"; // down arrow character
+	private final String UNSORTED = "  &#8597;";    // updown arrow character
 	
 	
 	/*
@@ -30,12 +33,21 @@ public class PageControl {
 	boolean isSavedDataPage; // true if displaying saved data packages, else false
 	String sort = null;
 	
-	String titleSort = null;
-	String creatorsSort = null;
-	String pubDateSort = null;
-	String packageIdSort = null;
+	String titleSortAscending = null;
+	String creatorsSortAscending = null;
+	String pubDateSortAscending = null;
+	String packageIdSortAscending = null;
 	String relevanceSort = null;
 	
+	String titleSortDescending = null;
+	String creatorsSortDescending = null;
+	String pubDateSortDescending = null;
+	String packageIdSortDescending = null;
+
+	String titleDirection = "";
+	String creatorsDirection = "";
+	String pubDateDirection = "";
+	String packageIdDirection = "";
 
 	/*
 	 * Constructor
@@ -261,28 +273,49 @@ public class PageControl {
 	
 	
 	public String getTitleSort() {
-		return titleSort;
+		return titleSortAscending;
 	}
 	
 	
 	public String getCreatorsSort() {
-		return creatorsSort;
+		return creatorsSortAscending;
 	}
 	
 	
 	public String getPubDateSort() {
-		return pubDateSort;
+		return pubDateSortAscending;
 	}
 	
 	
 	public String getPackageIdSort() {
-		return packageIdSort;
+		return packageIdSortAscending;
 	}
 	
 	
 	public String getRelevanceSort() {
 		return relevanceSort;
 	}
+	
+	
+	public String getTitleDirection() {
+		return titleDirection;
+	}
+	
+	
+	public String getCreatorsDirection() {
+		return creatorsDirection;
+	}
+	
+	
+	public String getPubDateDirection() {
+		return pubDateDirection;
+	}
+	
+	
+	public String getPackageIdDirection() {
+		return packageIdDirection;
+	}
+	
 	
 	
 	/**
@@ -302,23 +335,53 @@ public class PageControl {
 	
 	
 	private void initSortValues(String sort) {
-		titleSort = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_ASC);
-		creatorsSort = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_ASC);
-		pubDateSort = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_ASC);
-		packageIdSort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+		titleSortAscending = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_ASC);
+		creatorsSortAscending = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_ASC);
+		pubDateSortAscending = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_ASC);
+		packageIdSortAscending = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
 		relevanceSort = Search.DEFAULT_SORT;
 		
-		if (sort.equals(titleSort)) {
-			titleSort = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_DESC);
+		titleSortDescending = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_DESC);
+		creatorsSortDescending = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_DESC);
+		pubDateSortDescending = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_DESC);
+		packageIdSortDescending = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_DESC);
+
+		titleDirection = UNSORTED;
+		creatorsDirection = UNSORTED;
+		pubDateDirection = UNSORTED;
+		packageIdDirection = UNSORTED;
+		
+		if (sort.equals(titleSortAscending)) {
+			titleSortAscending = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_DESC);
+			titleDirection = ASCENDING;
 		}
-		else if (sort.equals(creatorsSort)) {
-			creatorsSort = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_DESC);
+		else if (sort.equals(creatorsSortAscending)) {
+			creatorsSortAscending = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_DESC);
+			creatorsDirection = ASCENDING;
 		}
-		else if (sort.equals(pubDateSort)) {
-			pubDateSort = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_DESC);
+		else if (sort.equals(pubDateSortAscending)) {
+			pubDateSortAscending = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_DESC);
+			pubDateDirection = ASCENDING;
 		}
-		else if (sort.equals(packageIdSort)) {
-			packageIdSort = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_DESC);
+		else if (sort.equals(packageIdSortAscending)) {
+			packageIdSortAscending = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_DESC);
+			packageIdDirection = ASCENDING;
+		}
+		else if (sort.equals(titleSortDescending)) {
+			titleSortDescending = String.format("%s,%s", Search.TITLE_SORT, Search.SORT_ORDER_ASC);
+			titleDirection = DESCENDING;
+		}
+		else if (sort.equals(creatorsSortDescending)) {
+			creatorsSortDescending = String.format("%s,%s", Search.CREATORS_SORT, Search.SORT_ORDER_ASC);
+			creatorsDirection = DESCENDING;
+		}
+		else if (sort.equals(pubDateSortDescending)) {
+			pubDateSortDescending = String.format("%s,%s", Search.PUBDATE_SORT, Search.SORT_ORDER_ASC);
+			pubDateDirection = DESCENDING;
+		}
+		else if (sort.equals(packageIdSortDescending)) {
+			packageIdSortDescending = String.format("%s,%s", Search.PACKAGEID_SORT, Search.SORT_ORDER_ASC);
+			packageIdDirection = DESCENDING;
 		}
 	}
 	

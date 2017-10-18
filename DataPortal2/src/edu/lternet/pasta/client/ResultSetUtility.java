@@ -312,6 +312,11 @@ public class ResultSetUtility {
 		String pubDateSort = pageControl.getPubDateSort();
 		String packageIdSort = pageControl.getPackageIdSort();
 		
+		String titleDirection = pageControl.getTitleDirection();
+		String creatorsDirection = pageControl.getCreatorsDirection();
+		String pubDateDirection = pageControl.getPubDateDirection();
+		String packageIdDirection = pageControl.getPackageIdDirection();
+
 		String servlet = isSavedDataPage ? "savedDataServlet" : "simpleSearch";
 		String titleWidth = showSavedData ? "45%" : "50%";
 		String creatorsWidth = showSavedData ? "20%" : "25%";
@@ -323,10 +328,10 @@ public class ResultSetUtility {
 		 * Only provide column-sort links if there's more than one data package
 		 */
 		if (numFound > 1) {
-			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Title</a></th>\n", titleWidth, servlet, titleSort));
-			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Creators</a></th>\n", creatorsWidth, servlet, creatorsSort));
-			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Publication Date</a></th>\n", pubDateWidth, servlet, pubDateSort));
-			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Package Id</a></th>\n", packageIdWidth, servlet, packageIdSort));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Title</a>%s</th>\n", titleWidth, servlet, titleSort, titleDirection));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Creators</a>%s</th>\n", creatorsWidth, servlet, creatorsSort, creatorsDirection));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Publication Date</a>%s</th>\n", pubDateWidth, servlet, pubDateSort, pubDateDirection));
+			html.append(String.format("            <th class=\"nis\" width=\"%s\"><a class='searchsubcat' href='%s?start=0&rows=10&sort=%s'>Package Id</a>%s</th>\n", packageIdWidth, servlet, packageIdSort, packageIdDirection));
 		}
 		else {
 			html.append(String.format("            <th class=\"nis\" width=\"%s\">Title</th>\n", titleWidth));
