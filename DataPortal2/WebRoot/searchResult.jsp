@@ -12,6 +12,12 @@
   String termsListHTML = (String) session.getAttribute("termsListHTML");
   if (termsListHTML == null)
     termsListHTML = "";
+  
+  String queryText = (String) session.getAttribute("queryText");
+  String queryURL = "";
+  if (!queryText.isEmpty()) {
+    queryURL = String.format("%ssimpleSearch?%s", basePath, queryText);
+  }
 
   String mapButtonHTML = (String) request.getAttribute("mapButtonHTML");
   if (mapButtonHTML == null)
@@ -58,6 +64,7 @@
 <script src="js/mediaelement-and-player.min68b368b3.js?ver=1" type="text/javascript"></script>-->
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="js/data-shelf-ajax.js" type="text/javascript"></script>
+<script src="js/clipboard.min.js"></script>
 
 <!-- Mobile Device CSS -->
 <link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
@@ -67,8 +74,21 @@
 
 <body>
 
+
 <jsp:include page="header.jsp" />
 
+    <script>
+    var clipboard = new Clipboard('.btn');
+
+    clipboard.on('success', function(e) {
+        console.log(e);
+    });
+
+    clipboard.on('error', function(e) {
+        console.log(e);
+    });
+    </script>
+ 
   <div class="row-fluid ">
 		<div class="container">
 			<div class="row-fluid distance_1">
@@ -85,20 +105,39 @@
 							<div class="span12">
 								<!-- Content -->
 	<table>
-		<tr>
+   		<tr>
 			<td>			
 				<%=mapButtonHTML%>
 			</td>
-			<td>&nbsp;</td>
 			<td>
 				<%=relevanceHTML%>
 			</td>
-		</tr>
+  		</tr>
 	</table>
-			    
-			    <%=termsListHTML%>
-			          
-			    <%=searchResult%>
+    <table>
+        <tr>
+            <td><label class="labelBold">Query URL:</label><br/></td>
+            <td>&nbsp;</td>
+            <td>
+              <input id="queryURL" type="url" value="<%=queryURL%>">
+            </td>
+            <td>&nbsp;&nbsp;</td>
+            <td>
+              <table>
+                <tr>
+                  <td><button class="btn btn-info btn-default" data-clipboard-action="copy" data-clipboard-target="#queryURL">Copy Query URL</button></td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+        </tr>
+    </table>
+
+
+                <%=termsListHTML%>
+				<%=searchResult%>
 			    
 						  </div>
 		 		    </div>
