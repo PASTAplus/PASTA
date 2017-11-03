@@ -15,8 +15,12 @@
   
   String queryText = (String) session.getAttribute("queryText");
   String queryURL = "";
+  int textBoxSize = 100;
+  String textBoxSizeStr = "100";
   if (!queryText.isEmpty()) {
     queryURL = String.format("%ssimpleSearch?%s", basePath, queryText);
+    textBoxSize = Math.min(textBoxSize, queryURL.length());
+    textBoxSizeStr = String.format("%d", textBoxSize);
   }
 
   String mapButtonHTML = (String) request.getAttribute("mapButtonHTML");
@@ -116,12 +120,6 @@
 	</table>
     <table>
         <tr>
-            <td><label class="labelBold">Query URL:</label><br/></td>
-            <td>&nbsp;</td>
-            <td>
-              <input id="queryURL" type="url" value="<%=queryURL%>">
-            </td>
-            <td>&nbsp;&nbsp;</td>
             <td>
               <table>
                 <tr>
@@ -131,6 +129,10 @@
                   <td>&nbsp;</td>
                 </tr>
               </table>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+              <input id="queryURL" type="url" value="<%=queryURL%>" size="<%=textBoxSizeStr%>">
             </td>
         </tr>
     </table>
