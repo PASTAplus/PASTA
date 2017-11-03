@@ -2891,10 +2891,16 @@ p.cite cite {
 	width: 60px;
 }
 
+#datacite-img {
+    /* Original dimensions of DataCite-Logo.png are 558 X 1700 (H X W) */
+    height: 39px;
+    width: 119px;
+}
+
 #dataone-img {
 	/* Original dimensions of DataONE_Logo.jpg are 95 X 400 (H X W) */
-	height: 20px;
-	width: 84px;
+	height: 24px;
+	width: 100px;
 }
 
 #esip-img {
@@ -2911,8 +2917,8 @@ p.cite cite {
 
 #re3data-img {
 	/* Original dimensions of re3data_Logo_CMYK_72dpi.png are 163 X 555 (H X W) */
-	height: 25px;
-	width: 84px;
+	height: 33px;
+	width: 111px;
 }
 
 #map-canvas {
