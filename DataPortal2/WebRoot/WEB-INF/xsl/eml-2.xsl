@@ -8626,7 +8626,7 @@
     </xsl:for-each>
 	</xsl:template>
 
-  <!-- 'step' refers to ProcedureStepType, ie, methodStep (w/o optional dataSource)
+  <!-- 'step' refers to ProcedureStepType, i.e., methodStep (w/o optional dataSource)
 	     (called from method.xsl, and here, from nested subStep)
 	     mob added the table element to box each step -->
   <xsl:template name="step">
@@ -8635,14 +8635,20 @@
     <xsl:if test="boolean(number($debugmessages))"><xsl:message><xsl:text>TEMPLATE: step</xsl:text></xsl:message></xsl:if>
     <table class="{$tabledefaultStyle}">
       <xsl:for-each select="description">
+        <xsl:variable name="title" select="../dataSource/title"/>
         <tr>
           <td class="{$protocolfirstColStyle}">Description:</td>
           <td>
+          <xsl:if test="($title) and normalize-space($title) != ''">
+            <h4>Provenance Metadata - The following data source was used in the creation of this product:</h4>
+          </xsl:if>
+          <xsl:variable name="url" select="../dataSource/distribution/online/url"/>
           <xsl:choose>
             <xsl:when test="(./para/literalLayout[1] = $prov-stmt) or (./para[1] = $prov-stmt)">
-              <xsl:variable name="url" select="../dataSource/distribution/online/url"/>
-              <h4>Provenance Metadata - The following data package was used in the creation of this product:</h4>
-              <p class="eml"><xsl:value-of select="../dataSource/title"/> (<a href="./metadataviewer?url={$url}" target="_blank">Click here to view metadata</a>)</p>
+               <p class="eml"><xsl:value-of select="../dataSource/title"/> (<a href="./metadataviewer?url={$url}" target="_blank">Click here to view metadata</a>)</p>
+            </xsl:when>
+            <xsl:when test="($url) and normalize-space($url) != ''">
+               <p class="eml"><xsl:value-of select="../dataSource/title"/> (<a href="{$url}" target="_blank">Click here to view data source</a>)</p>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="text">
