@@ -252,6 +252,14 @@ public final class KnbLdap extends Ldap {
 		// Default LDAPS port
 		Integer port = 636;
 
+		// TODO: a more robust solution for multiple LDAP hosts is required.
+		if (user.contains("o=EDI")) {
+			host = "ldap.edirepository.org";
+		}
+
+		System.err.println("Using host: " + host);
+		System.err.println("User: " + user);
+
 		try {
 			
 			connection = makeLdapsConnection(host, port);
