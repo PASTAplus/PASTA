@@ -60,6 +60,7 @@ public class DataPackageArchiveTest {
 	private static final Integer revision = 1;
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static String testArchive = null;
+	private static String xslDir = null;
 
 	/*
 	 * Instance variables
@@ -95,7 +96,14 @@ public class DataPackageArchiveTest {
 		tmpDir = options.getOption("datapackagemanager.tmpDir");
 
 		if (tmpDir == null || tmpDir.isEmpty()) {
-			String gripe = "Error directory property not set!";
+			String gripe = "Error: property 'tmpDir' not set!";
+			throw new Exception(gripe);
+		}
+
+		xslDir = options.getOption("datapackagemanager.xslDir");
+
+		if (xslDir == null || xslDir.isEmpty()) {
+			String gripe = "Error: property 'xslDir' not set!";
 			throw new Exception(gripe);
 		}
 
@@ -177,7 +185,7 @@ public class DataPackageArchiveTest {
 		// Test for successful creation of test archive
 		try {
 			archive = dpA.createDataPackageArchive(scope, identifier, revision,
-			    testUser, authToken, transaction);
+			    testUser, authToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -208,7 +216,7 @@ public class DataPackageArchiveTest {
 		// Test for successful creation of test archive
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
-			    authToken, transaction);
+			    authToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -245,7 +253,7 @@ public class DataPackageArchiveTest {
 		// Test for successful creation of test archive
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
-			    authToken, transaction);
+			    authToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();

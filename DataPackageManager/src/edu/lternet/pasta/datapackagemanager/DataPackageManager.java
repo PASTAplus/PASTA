@@ -3570,19 +3570,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	    throws Exception {
 
 		String archiveName = null;
-		DataPackageArchive archive = null;
+		DataPackageArchive dataPackageArchive = null;
 
 		try {
-			archive = new DataPackageArchive();
+			dataPackageArchive = new DataPackageArchive();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
 
-		if (archive != null) {
+		if (dataPackageArchive != null) {
 			try {
-				archiveName = archive.createDataPackageArchive(scope, identifier, revision, userId,
-				    authToken, transaction);
+				archiveName = dataPackageArchive.createDataPackageArchive(scope, identifier, revision, userId,
+				    authToken, transaction, xslDir);
 			} catch (Exception e) {
 				throw e;
 			}
@@ -3647,7 +3647,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		archive.deleteDataPackageArchive(transaction);
-
 	}
 	
 	
