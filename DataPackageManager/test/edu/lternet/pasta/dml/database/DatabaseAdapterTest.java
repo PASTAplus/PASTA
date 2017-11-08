@@ -77,7 +77,8 @@ public class DatabaseAdapterTest extends TestCase {
 	    			"YYYYMM",
 	    			"YYYYDDD",
 	    			"YYYYMMDD",
-	    			"yyyymmdd"
+	    			"yyyymmdd",
+	    			"MM/DD/YYYY"
 	        };
 	      
 	    String[] dataValues = 
@@ -100,7 +101,8 @@ public class DatabaseAdapterTest extends TestCase {
 				  "197609",
 				  "1976189",
 				  "19760923",
-				  "19760923"
+				  "19760923",
+				  "09/23/1976"
 		  };
 	    
 	    for (int i = 0; i < formatStrings.length; i++) {

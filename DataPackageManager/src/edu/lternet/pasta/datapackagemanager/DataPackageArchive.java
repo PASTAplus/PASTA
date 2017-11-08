@@ -206,6 +206,7 @@ public class DataPackageArchive {
 				FileInputStream txtFileInputStream = null;  // For the text rendering of the EML file
 				String objectName = null;
 				String txtObjectName = null;
+				File txtFile = null;
 				String line = mapScanner.nextLine();
 
 				if (line.contains(URI_MIDDLE_METADATA)) {
@@ -223,7 +224,7 @@ public class DataPackageArchive {
 								manifestStringBuffer.append(objectName + " (" + size.toString() +" bytes)\n");
 								
 								String xslPath = String.format("%s/%s", xslDir, XSLT_FILE_NAME);								
-								File txtFile = transformMetadata(metadataFile, xslPath, txtObjectName);
+								txtFile = transformMetadata(metadataFile, xslPath, txtObjectName);
 								
 								if (txtFile != null) {
 									txtFileInputStream = new FileInputStream(txtFile);
@@ -320,54 +321,11 @@ public class DataPackageArchive {
 						e.printStackTrace();
 					}
 				}
-
-				if (objectName != null && fileInputStream != null) {
-
-					ZipEntry zipEntry = new ZipEntry(objectName);
-
-					try {
-						zipOutputStream.putNextEntry(zipEntry);
-
-						int length;
-						byte[] buffer = new byte[1024];
-
-						while ((length = fileInputStream.read(buffer)) > 0) {
-							zipOutputStream.write(buffer, 0, length);
-						}
-
-						zipOutputStream.closeEntry();
-						fileInputStream.close();
-
-					} catch (IOException e) {
-						logger.error(e.getMessage());
-						e.printStackTrace();
-					}
-
-			    }
-
-				if (txtObjectName != null && txtFileInputStream != null) {
-
-					ZipEntry zipEntry = new ZipEntry(txtObjectName);
-
-					try {
-						zipOutputStream.putNextEntry(zipEntry);
-
-						int length;
-						byte[] buffer = new byte[1024];
-
-						while ((length = txtFileInputStream.read(buffer)) > 0) {
-							zipOutputStream.write(buffer, 0, length);
-						}
-
-						zipOutputStream.closeEntry();
-						txtFileInputStream.close();
-						txtFileInputStream = null;
-
-					} catch (IOException e) {
-						logger.error(e.getMessage());
-						e.printStackTrace();
-					}
-			    }
+				
+				processZipEntry(fileInputStream, zipOutputStream, objectName);
+				processZipEntry(txtFileInputStream, zipOutputStream, txtObjectName);
+				txtObjectName = null; // prevent it from being processed more than once
+				if (txtFile != null) { FileUtils.forceDelete(txtFile); }
 			}
 			
 			if (mapScanner != null) {
@@ -375,40 +333,21 @@ public class DataPackageArchive {
 			}
 			
 			// Create ZIP archive manifest
+			String manifestObjectName = "manifest.txt";
 			String manifestPath = String.format("%s/%s.txt", tmpDir, transaction);
 			File manifestFile = new File(manifestPath);
 			FileUtils.writeStringToFile(manifestFile, manifestStringBuffer.toString());
-			ZipEntry zipEntry = new ZipEntry("manifest.txt");
-			
-			try {
-				FileInputStream manifestFileInputStream = new FileInputStream(manifestFile);
-				zipOutputStream.putNextEntry(zipEntry);
-				int length;
-				byte[] buffer = new byte[1024];
+			FileInputStream manifestFileInputStream = new FileInputStream(manifestFile);
+			processZipEntry(manifestFileInputStream, zipOutputStream, manifestObjectName);
 
-				while ((length = manifestFileInputStream.read(buffer)) > 0) {
-					zipOutputStream.write(buffer, 0, length);
-				}
-
-				zipOutputStream.closeEntry();
-				manifestFileInputStream.close();
-			} 
-			catch (IOException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-			}
-
-			// Close ZIP archive
-			zipOutputStream.close();
-			
 			FileUtils.forceDelete(manifestFile);
-
+			zipOutputStream.close();
 		}
 
 		String zipPath = String.format("%s/%s", tmpDir, zipName);
 		File zipFile = new File(zipPath);
 
-		// Copy hidden ZIP archive to visible ZIP archive, thus making available
+		// Rename hidden ZIP archive to visible ZIP archive, thus making available
 		if (!tmpZipFile.renameTo(zipFile)) {
 			String gripe = String.format("Error renaming %s to %s.", tmpZipFileName, zipName);
 			throw new IOException(gripe);
@@ -416,7 +355,34 @@ public class DataPackageArchive {
 
 		return zipName;
 	}
+	
+	
+	private void processZipEntry(FileInputStream fileInputStream, 
+			                     ZipOutputStream zipOutputStream, 
+			                     String objectName) {
+		if (objectName != null && fileInputStream != null) {
+			ZipEntry zipEntry = new ZipEntry(objectName);
 
+			try {
+				zipOutputStream.putNextEntry(zipEntry);
+
+				int length;
+				byte[] buffer = new byte[1024];
+
+				while ((length = fileInputStream.read(buffer)) > 0) {
+					zipOutputStream.write(buffer, 0, length);
+				}
+
+				zipOutputStream.closeEntry();
+				fileInputStream.close();
+
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+	    }
+	}
+	
 	
 	private File transformMetadata(File emlFile, String xslPath, String txtObjectName) {
 		File txtFile = null;
