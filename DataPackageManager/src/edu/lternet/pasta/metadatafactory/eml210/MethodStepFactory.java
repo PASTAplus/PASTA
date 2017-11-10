@@ -191,6 +191,18 @@ public final class MethodStepFactory {
 
         // Appending nodes from parent EML document to dataSource
 
+        for (Node title : parentEml.getTitles()) {
+            title = emlDoc.adoptNode(title.cloneNode(true));
+            dataSource.appendChild(title);
+        }
+
+        for (Node creator : parentEml.getCreators()) {
+            creator = emlDoc.adoptNode(creator.cloneNode(true));
+            dataSource.appendChild(creator);
+        }
+
+        appendDistribution(emlDoc, parentEml, dataSource);
+
         for (Node contact : parentEml.getContacts()) {
             contact = emlDoc.adoptNode(contact.cloneNode(true));
             /*
@@ -202,19 +214,7 @@ public final class MethodStepFactory {
                 dataSource.appendChild(contact);
             }
         }
-
-        appendDistribution(emlDoc, parentEml, dataSource);
-
-        for (Node creator : parentEml.getCreators()) {
-            creator = emlDoc.adoptNode(creator.cloneNode(true));
-            dataSource.insertBefore(creator, dataSource.getFirstChild());
-        }
-
-        for (Node title : parentEml.getTitles()) {
-            title = emlDoc.adoptNode(title.cloneNode(true));
-            dataSource.insertBefore(title, dataSource.getFirstChild());
-        }
-
+        
     }
     
     
@@ -241,8 +241,7 @@ public final class MethodStepFactory {
                                     Node dataSource) {
 
         Element distribution = emlDoc.createElement(DISTRIBUTION);
-        dataSource.insertBefore(distribution, dataSource.getFirstChild());
-
+ 
         Element onlineElement = emlDoc.createElement(ONLINE);
         distribution.appendChild(onlineElement);
 
@@ -263,7 +262,9 @@ public final class MethodStepFactory {
 
         Text urlText = emlDoc.createTextNode(parentUrl);
         urlElement.appendChild(urlText);
-    }
+ 
+        dataSource.appendChild(distribution);
+   }
     
     
     /**
