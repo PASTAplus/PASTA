@@ -90,7 +90,7 @@
                         <br/>
                     </div>
                     <div class="table-cell">
-                        <span><big><strong>LTER Data Portal</strong></big><%= tierHTML %></span>
+                        <span><%= tierHTML %></span>
                     </div>
                 </div>
             </div>
