@@ -1,4 +1,5 @@
 <%@ page import="edu.lternet.pasta.portal.Tooltip" %>
+<%@ page import="edu.lternet.pasta.client.DataPackageManagerClient" %>
 
 <!-- Header -->
 <%
@@ -13,10 +14,24 @@
 		identity = "<a href='./login.jsp'>Login</a>";
 		uname = "";
 		welcomeBack = "";
-	} else {
-    identity = "<a id=\"login\" href=\"./logout\">Log Out</a>";
+		uid = "public";
+	} 
+	else {
+        identity = "<a id=\"login\" href=\"./logout\">Log Out</a>";
 		uname = uid;
 		welcomeBack = "Welcome Back";
+	}
+
+	DataPackageManagerClient dpmc = new DataPackageManagerClient(uid);
+	String pastaHost = dpmc.getPastaHost();
+	String tierHTML = "";
+	if (pastaHost.startsWith("pasta-d") || 
+	    pastaHost.startsWith("localhost")
+	   ) {
+	  tierHTML = " - Development Testing Environment";
+	}
+	else if (pastaHost.startsWith("pasta-s")) {
+	  tierHTML = " - Staging Testing Environment";
 	}
 
   final String currentClass = " class='current-menu-item current_page_item'";
@@ -67,12 +82,22 @@
 </div>
 <div class="container">
 	<div class="row-fluid header_container">
-		<div class="span3">
-			<a href="home.jsp">
-			  <img alt="LTER Network Data Portal logo" src="images/nis_logo.png" title="LTER : Network">
-			</a>
-	 </div>
-			<div class="span9 menu">
+		<div class="span6">
+            <div class="display-table">
+                <div class="table-row">
+                    <div class="table-cell">
+                        <a href="home.jsp"><img alt="LTER Network Data Portal logo" src="images/nis_logo.png" title="LTER : Network"></a>
+                        <br/>
+                    </div>
+                    <div class="table-cell">
+                        <span><big><strong>LTER Data Portal</strong></big><%= tierHTML %></span>
+                    </div>
+                </div>
+            </div>
+	    </div>
+	    
+	    
+			<div class="span6 menu">
 			<nav role="navigation">
 			<ul id="menu-nav" class="menu">
 				<li<%= homeClass %>><a href="home.jsp">Home</a></li>
