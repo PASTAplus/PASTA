@@ -28,10 +28,10 @@
 	if (pastaHost.startsWith("pasta-d") || 
 	    pastaHost.startsWith("localhost")
 	   ) {
-	  tierHTML = " - Development Testing Environment";
+	  tierHTML = "Development Testing Environment";
 	}
 	else if (pastaHost.startsWith("pasta-s")) {
-	  tierHTML = " - Staging Testing Environment";
+	  tierHTML = "Staging Testing Environment";
 	}
 
   final String currentClass = " class='current-menu-item current_page_item'";
