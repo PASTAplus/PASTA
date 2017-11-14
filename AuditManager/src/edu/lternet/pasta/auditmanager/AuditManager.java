@@ -306,7 +306,7 @@ public class AuditManager {
   }
   
   
-	private String composeWhereClause(Map<String, List<String>> queryParams) {
+	private String composeWhereClause(Map<String, List<String>> queryParams, boolean orderBy) {
 		String whereClause = null;
 		String limit = null;
 
@@ -342,6 +342,12 @@ public class AuditManager {
 						}
 			}
 		}
+		
+		/*
+		 * If orderBy is true, the audit records will be ordered by oid (identifier) value in
+		 * ascending order.
+		 */
+		if (orderBy) { stringBuffer.append(" ORDER BY oid ASC"); }
 
 		/*
 		 * Append a record limit value if specified
@@ -480,10 +486,10 @@ public class AuditManager {
       String selectString = 
         "SELECT oid, entrytime, service, category, servicemethod," +
         " entrytext, resourceid, statuscode, userid, groups, authsystem " +
-        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
-        composeWhereClause(queryParams);
-      
-      logger.debug(selectString);
+        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
+      boolean orderBy = true;
+      selectString += composeWhereClause(queryParams, orderBy);
+      logger.info("WHERE clause: " + selectString);
       
       Statement stmt = null;
      
@@ -710,10 +716,10 @@ public class AuditManager {
 			Connection connection = null;
 
 			String selectString = "SELECT count(*) FROM "
-					+ AUDIT_MANAGER_TABLE_QUALIFIED
-					+ composeWhereClause(queryParams);
-
-			logger.warn(selectString);
+					+ AUDIT_MANAGER_TABLE_QUALIFIED;
+			boolean orderBy = false;
+		    selectString += composeWhereClause(queryParams, orderBy);
+		    logger.info("WHERE clause: " + selectString);
 
 			Statement stmt = null;
 
@@ -770,10 +776,11 @@ public class AuditManager {
       String selectString = 
         "SELECT oid, entrytime, service, category, servicemethod," +
         " entrytext, resourceid, statuscode, userid, groups, authsystem " +
-        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED + 
-        composeWhereClause(queryParams);
-      
-      logger.warn(selectString);
+        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
+        
+      boolean orderBy = true;
+      selectString += composeWhereClause(queryParams, orderBy);
+      logger.info("WHERE clause: " + selectString);
       
       Statement stmt = null;
      
