@@ -96,8 +96,9 @@ public class ResultSetUtility {
    */
   public ResultSetUtility(String xml, String sort, SavedData savedData, boolean isSavedDataPage) throws ParseException {
 
-    if (xml == null || xml.isEmpty()) {
-      throw new ParseException("Result Set is empty", 0);
+    if (xml == null || xml.isEmpty() || !xml.isEmpty()) {
+    	String msg = "An error prevented this search from completing successfully and no search results are available. A network connection may have failed or one of the servers may be unavailable.";
+        throw new ParseException(msg, 0);
     }
 
     this.resultSet = xml;
