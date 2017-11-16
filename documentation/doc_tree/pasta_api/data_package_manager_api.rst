@@ -469,6 +469,34 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/eml <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml>`_
 
+*List User Data Packages*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List all data packages (including their revision values) uploaded to the repository by
+a particular user, specified by a distinguished name. Data packages that were uploaded
+by the specified user but have since been deleted are excluded from the list.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/user/{dn} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/eml/deleted>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to list all (undeleted) data packages uploaded by user ucarroll with distinguished name uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org::
+
+     curl -X GET https://pasta.lternet.edu/package/user/uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org
+     
+     knb-lter-lno.1.1
+     knb-lter-nwk.1865.1
+     knb-lter-nwk.1865.2
+     knb-lter-nwk.3135.1
+
+
 *List Deleted Data Packages*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

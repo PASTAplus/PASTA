@@ -9045,6 +9045,138 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * <strong>List User Data Packages</strong> operation, returning all
+	 * packageId values (including revision values) where the principal
+	 * owner (i.e. the user who uploaded the data package) matches the
+	 * specified distinguished name value.
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/user/uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The list request was successful</td>
+	 * <td align=center>An ordered list of all packageId values (including revision value) 
+	 * of all (non-deleted) data packages in the resource registry where the principal
+	 * owner value matches the specified distinguished name value. </td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * knb-lter-lno.1.1
+	 * knb-lter-lno.1.2
+	 * knb-lter-lno.2.1
+	 * knb-lter-lno.2.2
+	 * knb-lter-xyz.1.1
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response, containing a newline separated list of packageId values (including revision)
+	 */
+	@GET
+	@Path("/user/{dn}")
+	@Produces("text/plain")
+	public Response listUserDataPackages(@Context HttpHeaders headers,
+			                             @PathParam("dn") String dn) {
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "listUserDataPackages";
+		Rule.Permission permission = Rule.Permission.read;
+		AuthToken authToken = null;
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+
+			String packageList = dataPackageManager.listUserDataPackages(dn);
+
+			if (packageList != null) {
+				responseBuilder = Response.ok(packageList.trim());
+				response = responseBuilder.build();
+			}
+			else {
+				String message = "An unknown error occurred";
+				throw new Exception(message);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		response = stampHeader(response);
+		return response;
+	}
+
+
+	/**
 	 * <strong>List Working On</strong> operation, lists the set of data 
 	 * packages that PASTA is currently working on inserting or updating. 
 	 * Note that data packages that are being evaluated by PASTA are not 

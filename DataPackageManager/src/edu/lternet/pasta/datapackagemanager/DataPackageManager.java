@@ -2028,6 +2028,33 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	
 	/**
+	 * List the data packages in the resource registry where the principal_owner matches 
+	 * the specified distinguished name value.
+	 * 
+	 * @param distinguishedName
+	 *          the user distinguished name, e.g. "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org"
+	 * @return a newline-separated list of packageId values (including the revision value)
+	 */
+	public String listUserDataPackages(String distinguishedName)
+	    throws ClassNotFoundException, SQLException, IllegalArgumentException,
+	    ResourceNotFoundException {
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+		    dbURL, dbUser, dbPassword);
+		String dataPackageListStr = null;
+		StringBuffer stringBuffer = new StringBuffer("");
+		ArrayList<String> dataPackageList = 
+				dataPackageRegistry.listUserDataPackages(distinguishedName);
+
+		for (String identifier : dataPackageList) {
+			stringBuffer.append(identifier + "\n");
+		}
+
+		dataPackageListStr = stringBuffer.toString();
+		return dataPackageListStr;
+	}
+
+	
+	/**
 	 * Lists all data packages that are actively being worked on.
 	 * 
 	 * @return An XML string, as composed by the DataPackageRegistry class.

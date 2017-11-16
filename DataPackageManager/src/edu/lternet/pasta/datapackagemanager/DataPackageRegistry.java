@@ -3755,6 +3755,58 @@ public class DataPackageRegistry {
 	
 	
 	/**
+	 * List the data packages in the resource registry where the principal_owner matches 
+	 * the specified distinguished name value.
+	 * 
+	 * @param distinguishedName
+	 *          the user distinguished name value, e.g. "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org"
+	 * @return A list of data package ID values
+	 */
+	public ArrayList<String> listUserDataPackages(String distinguishedName)
+			throws ClassNotFoundException, SQLException, IllegalArgumentException {
+		ArrayList<String> packageIdList = new ArrayList<String>();
+
+		if (distinguishedName != null) {
+			Connection connection = null;
+			Statement stmt = null;
+
+			String selectString = String.format(
+					"SELECT package_id, scope, identifier, revision FROM %s WHERE resource_type='dataPackage' AND principal_owner='%s'",
+					RESOURCE_REGISTRY, distinguishedName);
+			selectString += "  AND date_deactivated IS NULL"; // exclude deleted
+																// data packages
+			selectString += "  ORDER BY scope ASC, identifier ASC, revision ASC";
+
+			try {
+				connection = getConnection();
+				stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery(selectString);
+
+				while (rs.next()) {
+					String packageId = rs.getString("package_id");
+					packageIdList.add(packageId);
+				}
+			} catch (ClassNotFoundException e) {
+				logger.error("ClassNotFoundException: " + e.getMessage());
+				throw (e);
+			} catch (SQLException e) {
+				logger.error("SQLException: " + e.getMessage());
+				throw (e);
+			} finally {
+				if (stmt != null)
+					stmt.close();
+				returnConnection(connection);
+			}
+		} else {
+			String message = "'distinguishedName' value is null";
+			throw new IllegalArgumentException(message);
+		}
+
+		return packageIdList;
+	}
+	
+	
+	/**
 	 * Returns an XML formatted list of data packages that are currently
 	 * being worked on in PASTA, as determined by the contents of the
 	 * datapackagemanager.working_on table.
