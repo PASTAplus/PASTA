@@ -60,10 +60,10 @@
 								<!-- Content -->
 								<h3>People</h3>
 <ul>
-	<li><a class="searchsubcat" href="http://environmentaldatainitiative.org/people/corinna_gries">Corinna Gries</a>, 
+	<li><a class="searchsubcat" href="https://environmentaldatainitiative.org/team/corinna-gries/">Corinna Gries</a>, 
 	    Principal Investigator, University of Wisconsin
 	</li>
-	<li><a class="searchsubcat" href="http://environmentaldatainitiative.org/people/mark_servilla">Mark Servilla</a>, 
+	<li><a class="searchsubcat" href="https://environmentaldatainitiative.org/team/mark-servilla-pi/">Mark Servilla</a>, 
 		Principal Investigator, University of New Mexico
 	</li>
 </ul>
