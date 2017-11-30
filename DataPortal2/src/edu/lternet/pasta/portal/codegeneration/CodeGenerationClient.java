@@ -54,7 +54,7 @@ public class CodeGenerationClient extends PastaClient {
 	 * The statistical file types supported by the VCR web service
 	 */
 	public enum StatisticalFileType {
-		m, r, sas, sps, spss;
+		m, r, rtidy, sas, sps, spss;
 	}
 
 
@@ -113,6 +113,11 @@ public class CodeGenerationClient extends PastaClient {
 			this.downloadFilename = String.format("%s.r", packageId);
 			urlFilename = this.downloadFilename;
 			break;
+        case rtidy:
+            this.statisticalPackageName = "tidyr";
+            this.downloadFilename = String.format("%s.rtidy", packageId);
+            urlFilename = this.downloadFilename;
+            break;
 		case sas:
 			this.statisticalPackageName = "SAS";
 			this.downloadFilename = String.format("%s.sas", packageId);
