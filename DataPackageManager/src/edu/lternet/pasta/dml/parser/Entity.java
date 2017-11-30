@@ -32,7 +32,6 @@
 
 package edu.lternet.pasta.dml.parser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -831,7 +830,7 @@ public class Entity extends DataObjectDescription
 						if (metadataHashValue != null) {
 							qualityCheck.setExpected(actualHashValue);
 							qualityCheck.setFound(metadataHashValue);
-							if (actualHashValue.equals(metadataHashValue)) {
+							if (actualHashValue.equalsIgnoreCase(metadataHashValue)) {
 								congruent = true;
 							}
 						}
