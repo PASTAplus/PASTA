@@ -28,10 +28,10 @@
 	if (pastaHost.startsWith("pasta-d") || 
 	    pastaHost.startsWith("localhost")
 	   ) {
-	  tierHTML = "Development Testing Environment";
+	  tierHTML = "<font color='darkorange'>Development Environment</font>";
 	}
 	else if (pastaHost.startsWith("pasta-s")) {
-	  tierHTML = "Staging Testing Environment";
+	  tierHTML = "<font color='darkorange'>Staging Environment</font>";
 	}
 
   final String currentClass = " class='current-menu-item current_page_item'";
@@ -90,7 +90,7 @@
                         <br/>
                     </div>
                     <div class="table-cell">
-                        <span><%= tierHTML %></span>
+                        <span><big><strong><%= tierHTML %></strong></big></span>
                     </div>
                 </div>
             </div>
