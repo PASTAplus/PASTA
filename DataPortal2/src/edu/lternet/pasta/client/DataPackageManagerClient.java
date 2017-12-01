@@ -130,13 +130,16 @@ public class DataPackageManagerClient extends PastaClient {
 		 */
 		TreeSet<String> deletedSet = new TreeSet<String>();
 		String deletedDataPackages = dpmClient.listDeletedDataPackages();
-		String[] deletedArray = deletedDataPackages.split("\n");
-		for (int i = 0; i < deletedArray.length; i++) {
-			if (deletedArray[i] != null && !deletedArray[i].equals("")
-			    && deletedArray[i].startsWith(scope)) {
-				deletedSet.add(deletedArray[i]);
-			}
-		}
+
+        if (deletedDataPackages != null && !deletedDataPackages.isEmpty()) {
+            String[] deletedArray = deletedDataPackages.split("\n");
+            for (int i = 0; i < deletedArray.length; i++) {
+                if (deletedArray[i] != null && !deletedArray[i].equals("") && 
+                    deletedArray[i].startsWith(scope)) {
+                    deletedSet.add(deletedArray[i]);
+                }
+            }
+        }
 
 		TreeSet<String> identifierSet = new TreeSet<String>();
 		String dataPackageIdentifiers = dpmClient.listDataPackageIdentifiers(scope);

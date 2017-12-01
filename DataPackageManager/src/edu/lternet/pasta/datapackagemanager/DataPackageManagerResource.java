@@ -3309,13 +3309,6 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td align=center><code>Error message</code></td>
 	 * </tr>
 	 * <tr>
-	 * <td align=center>404 Not Found</td>
-	 * <td align=center>No deleted data packages are found</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
 	 * <td align=center>405 Method Not Allowed</td>
 	 * <td align=center>The specified HTTP method is not allowed for the
 	 * requested resource</td>
@@ -3377,10 +3370,6 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (IllegalArgumentException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
-		}
-		catch (ResourceNotFoundException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		}
 		catch (UnauthorizedException e) {
 			entryText = e.getMessage();

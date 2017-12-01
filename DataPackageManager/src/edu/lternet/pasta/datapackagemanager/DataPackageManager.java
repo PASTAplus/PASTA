@@ -2009,14 +2009,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		    dbURL, dbUser, dbPassword);
 		String packageListString = null;
 		StringBuffer stringBuffer = new StringBuffer("");
-		ArrayList<String> packageList = dataPackageRegistry
-		    .listDeletedDataPackages();
-
-		// Throw a ResourceNotFoundException if the list is empty
-		if (packageList == null || packageList.size() == 0) {
-			String message = "No resources found\n\n";
-			throw new ResourceNotFoundException(message);
-		}
+		ArrayList<String> packageList = dataPackageRegistry.listDeletedDataPackages();
 
 		for (String dataPackage : packageList) {
 			stringBuffer.append(dataPackage + "\n");
