@@ -15,6 +15,7 @@ CREATE TABLE datapackagemanager.resource_registry (
   principal_owner VARCHAR(250) NOT NULL,                    -- the principal who owns this resource
   date_created TIMESTAMP NOT NULL,                          -- creation date/time
   date_deactivated TIMESTAMP,                               -- deactivation date/time; NULL indicates still active
+  filename TEXT,                                            -- the filename of this resource
   md5_checksum CHAR(32),                                    -- MD5 checksum of this resource, a 32-character hexadecimal string
   sha1_checksum CHAR(40),                                   -- SHA-1 checksum of this resource, a 40-character hexadecimal string
   format_type VARCHAR(100),                                 -- the metadata format type, e.g. 'eml://ecoinformatics.org/eml-2.1.1'
