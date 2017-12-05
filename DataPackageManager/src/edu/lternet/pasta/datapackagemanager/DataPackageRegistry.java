@@ -3337,6 +3337,65 @@ public class DataPackageRegistry {
 	}
 
 	
+    /**
+     * Returns an array list of resources that are lacking filename values in
+     * the resource registry.
+     * 
+     * @return Array list of resources
+     * @throws SQLException
+     */
+    public ArrayList<Resource> listFilenamelessResources() throws SQLException {
+
+        ArrayList<Resource> resourceList = new ArrayList<Resource>();
+
+        Connection conn = null;
+        try {
+            conn = this.getConnection();
+        } catch (ClassNotFoundException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
+            + " FROM datapackagemanager.resource_registry WHERE"
+            + " resource_type != 'dataPackage' AND filename IS NULL;";
+
+        Statement stat = null;
+        try {
+            stat = conn.createStatement();
+            ResultSet result = stat.executeQuery(queryString);
+
+            while (result.next()) {
+                Resource resource = new Resource();
+                String resourceId = result.getString("resource_id");
+                String resourceType = result.getString("resource_type");
+                String scope = result.getString("scope");
+                Integer identifier = new Integer(result.getInt("identifier"));
+                Integer revision = new Integer(result.getInt("revision"));
+                String packageId = scope + "." + identifier + "." + revision;
+                String entityId = result.getString("entity_id");
+                resource.setResourceId(resourceId);
+                resource.setResourceType(resourceType);
+                resource.setScope(scope);
+                resource.setIdentifier(identifier);
+                resource.setRevision(revision);
+                resource.setPackageId(packageId);
+                resource.setEntityId(entityId);
+                resourceList.add(resource);
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            returnConnection(conn);
+        }
+
+        return resourceList;
+
+    }
+
+    
 	/**
 	 * Returns an array list of resources that are accessible for a 
 	 * particular data package. We expect the list to contain zero or one Resource
@@ -3690,6 +3749,55 @@ public class DataPackageRegistry {
   }
 
 
+  /**
+   * Update the filename of a resource to the resource registry.
+   * 
+   * @param resourceId
+   *            The resource identifier of the resource to be updated
+   * @param filename
+   *            The filename to be stored for this resource
+   * @throws SQLException
+   */
+  public void updateResourceFilename(String resourceId, String filename)
+          throws ClassNotFoundException, SQLException {
+      Connection conn = null;
+
+      try {
+          conn = this.getConnection();
+      }
+      catch (ClassNotFoundException e) {
+          logger.error(e.getMessage());
+          e.printStackTrace();
+          throw (e);
+      }
+
+      String queryString = String.format(
+              "UPDATE datapackagemanager.resource_registry " + 
+              "SET filename='%s' WHERE resource_id='%s'", 
+              filename, resourceId);
+
+      try {
+          Statement statement = conn.createStatement();
+          int rowCount = statement.executeUpdate(queryString);
+          if (rowCount != 1) {
+              String msg = String.format(
+                  "When updating resource 'filename' field, expected 1 row updated, instead %d row(s) were updated.",
+                  rowCount);
+              throw new SQLException(msg);
+          }
+      }
+      catch (SQLException e) {
+          logger.error(e.getMessage());
+          e.printStackTrace();
+          throw (e);
+      }
+      finally {
+          returnConnection(conn);
+      }
+
+  }
+  
+  
 	/**
 	 * Update the size of a resource to the resource registry.
 	 * 

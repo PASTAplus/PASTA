@@ -3354,6 +3354,30 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+    /**
+     * Stores the filename of a PASTA resource in the data package registry.
+     * 
+     * @param resourceId  the PASTA resource identifier string
+     * @param filename    the filename value to be stored
+     */
+    public void storeResourceFilename(String resourceId, String filename) {
+        try {
+            if (filename != null) {
+                DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+                        dbDriver, dbURL, dbUser, dbPassword);
+                dataPackageRegistry.updateResourceFilename(resourceId, filename);
+            }
+            else {
+                throw new Exception("filename null for resource: " + resourceId);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    
 	/**
 	 * Update a data package in PASTA and return a resource map of the created
 	 * resources.
@@ -3702,5 +3726,61 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     
     return objectName;
   }
+
+  
+  /**
+   * For a given packageId and entityName, find the corresponding objectName value as documented in the EML.
+   * 
+   * @param emlPackageId    the EML packageId object
+   * @param entityName      the entity name value
+   * @return objectName     the corresponding objectName value for that data entity, if it exists
+   */
+    public String getEntityObjectName(EmlPackageId emlPackageId, String entityName) {
+        String xml = null;
+        String objectName = null;
+        EMLParser emlParser = new EMLParser();
+
+        if (emlPackageId != null && entityName != null) {
+            try {
+                xml = getMetadataXML(emlPackageId);
+                InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
+                edu.lternet.pasta.common.eml.DataPackage dataPackage = emlParser.parseDocument(inputStream);
+
+                if (dataPackage != null) {
+                    objectName = dataPackage.findObjectName(entityName);
+                }
+            } 
+            catch (Exception e) {
+                logger.error(String.format("Error parsing EML metacdata for %s: %s",
+                                           emlPackageId.toString(), e.getMessage()));
+            }
+        }
+
+        return objectName;
+    }  
+  
+    
+    /*
+     * Read and return the metadata XML string for the specified packageId.
+     */
+    private String getMetadataXML(EmlPackageId emlPackageId) throws IOException {
+        String metadataXML = null;
+        DataPackageMetadata dataPackageMetadata = new DataPackageMetadata(emlPackageId);
+
+        if (dataPackageMetadata != null) {
+            boolean evaluateMode = false;
+            File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
+            try {
+                metadataXML = FileUtils.readFileToString(levelOneEMLFile);
+            } 
+            catch (IOException e) {
+                logger.error("Error reading Level-1 metadata file: " + e.getMessage());
+                e.printStackTrace();
+                throw (e);
+            }
+        }
+
+        return metadataXML;
+    }
 
 }

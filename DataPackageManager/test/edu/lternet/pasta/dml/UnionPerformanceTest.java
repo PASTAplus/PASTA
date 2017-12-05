@@ -71,8 +71,8 @@ public class UnionPerformanceTest extends TestCase {
 	public static Test suite() {
 		TestSuite testSuite = new TestSuite();
 
-		testSuite.addTest(new UnionPerformanceTest("initialize"));
-		testSuite.addTest(new UnionPerformanceTest("testSelectData"));
+		//testSuite.addTest(new UnionPerformanceTest("initialize"));
+		//testSuite.addTest(new UnionPerformanceTest("testSelectData"));
 
 		return testSuite;
 	}
