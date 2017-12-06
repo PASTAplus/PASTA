@@ -378,13 +378,14 @@ public class DataPackageRegistry {
 	 * 
 	 * @param resourceId   The full resource identifier value
 	 * @param resourceType The resource type, one of a fixed set of values
-   * @param resourceLocation The resource location, may be null
+     * @param resourceLocation The resource location, may be null
 	 * @param packageId    The packageId value
 	 * @param scope        The scope value
 	 * @param identifier   The identifier integer value
 	 * @param revision     The revision value
 	 * @param entityId     The entityId value (may be null if this is not a data entity resource)
 	 * @param entityName   The entityName value (may be null if this is not a data entity resource)
+     * @param fileName     The fileName value (may be null if there is no associated file for the resource)
 	 * @param principalOwner The user (principal) who owns the the resource 
 	 * @param formatType   The format type, currently used for metadata resources only,
 	 *                       may be null, e.g. "eml://ecoinformatics.org/eml-2.1.1"
@@ -398,7 +399,7 @@ public class DataPackageRegistry {
  	   DataPackageManager.ResourceType resourceType,
  	   String resourceLocation,
  	   String packageId, String scope, Integer identifier, Integer revision,
- 	   String entityId, String entityName, String principalOwner, String formatType,
+ 	   String entityId, String entityName, String fileName, String principalOwner, String formatType,
  	   boolean mayOverwrite)
           throws ClassNotFoundException, SQLException {
     Connection connection = null;
@@ -441,8 +442,8 @@ public class DataPackageRegistry {
                                                 "(");
       if (resourceType == ResourceType.data) {
         insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                         "revision, resource_location, entity_id, entity_name, principal_owner, date_created) " + 
-                         "VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+                         "revision, resource_location, entity_id, entity_name, filename, principal_owner, date_created) " + 
+                         "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
       }
       else {
         insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
@@ -465,8 +466,9 @@ public class DataPackageRegistry {
           pstmt.setString(7, resourceLocation);
           pstmt.setString(8, entityId);
           pstmt.setString(9, entityName);
-          pstmt.setString(10, principalOwner);
-          pstmt.setTimestamp(11, ts);
+          pstmt.setString(10, fileName);
+          pstmt.setString(11, principalOwner);
+          pstmt.setTimestamp(12, ts);
         }
         else {
           pstmt.setString(7, principalOwner);

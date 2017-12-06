@@ -793,6 +793,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision.toString());
 		WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
 		File levelOneEMLFile = null;
+		String levelZeroXML = null;
 		
 		try {
 		if (!isEvaluate) {
@@ -861,7 +862,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		    try {
 		        Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(emlFile);
 		        Node documentElement = levelZeroEMLDocument.getDocumentElement();
-		        String levelZeroXML = XMLUtilities.getDOMTreeAsString(documentElement);
+		        levelZeroXML = XMLUtilities.getDOMTreeAsString(documentElement);
 
 		        boolean isLevelZero = true;
 		        storeMetadata(emlPackageId, levelZeroXML, isLevelZero);
@@ -945,10 +946,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				String entityId = emlEntity.getEntityId();
 				String entityName = emlEntity.getEntityName();
 				String entityURI = emlEntity.getEntityURI();
+				String objectName = findObjectName(levelZeroXML, entityName);
 
 				dataPackageRegistry.addDataPackageResource(entityURI,
 				    ResourceType.data, entityDir, packageId, scope, identifier,
-				    revision, entityId, entityName, user, formatType, mayOverwrite);
+				    revision, entityId, entityName, objectName, user, formatType, mayOverwrite);
 				
 				// Store the checksums of the data entity resource
 				File file = getDataEntityFile(scope, identifier,
@@ -981,7 +983,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			
 			dataPackageRegistry.addDataPackageResource(metadataURI,
 			    ResourceType.metadata, resourceLocation, packageId, scope,
-			    identifier, revision, null, null, user, metadataFormatType, mayOverwrite);
+			    identifier, revision, null, null, null, user, metadataFormatType, mayOverwrite);
 			
 			/*
 			 * Store the access control rules for the metadata resource
@@ -999,7 +1001,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			dataPackageRegistry.addDataPackageResource(reportURI,
 			    ResourceType.report, resourceLocation, packageId, scope, identifier,
-			    revision, null, null, user, formatType, mayOverwrite);
+			    revision, null, null, null, user, formatType, mayOverwrite);
 
 			// Store the checksum of the report resource
 			File file = readDataPackageReport(scope, identifier,
@@ -1036,7 +1038,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				
 				dataPackageRegistry.addDataPackageResource(dataPackageURI,
 				    ResourceType.dataPackage, resourceLocation, packageId, scope,
-				    identifier, revision, null, null, user, formatType, mayOverwrite);
+				    identifier, revision, null, null, null, user, formatType, mayOverwrite);
 
 				resourceMap = generateDataPackageResourceGraph(dataPackageURI,
 				    metadataURI, entityURIList, reportURI);
