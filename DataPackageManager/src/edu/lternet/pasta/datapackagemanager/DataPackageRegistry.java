@@ -36,8 +36,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -49,7 +47,6 @@ import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.common.DataPackageUpload;
 import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
@@ -1389,6 +1386,65 @@ public class DataPackageRegistry {
     return accessXML;
   }
   
+  
+    /**
+     * Composes a resource metadata XML string for a given resourceId
+     * 
+     * @param resourceId
+     *            the resource identifier
+     * @return An XML string representing the 'resource_registry' table entry
+     *         matching the specified resourceId.
+     */
+    public String getResourceMetadata(ResourceType resourceType, String resourceId)
+            throws ClassNotFoundException, SQLException {
+        String rmdXML = "";
+
+        Connection conn = null;
+        try {
+            conn = this.getConnection();
+        } catch (ClassNotFoundException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        String queryString = "SELECT resource_type, scope, identifier, revision, "
+                + " date_created, doi, resource_location, entity_id, sha1_checksum, resource_size "
+                + "FROM datapackagemanager.resource_registry " + "WHERE resource_id='" + resourceId + "'";
+
+        Statement stat = null;
+
+        try {
+
+            Resource resource = new Resource();
+            stat = conn.createStatement();
+            ResultSet result = stat.executeQuery(queryString);
+
+            while (result.next()) {
+                resourceId = result.getString("resource_id");
+                String packageId = result.getString("package_id");
+                String resource_type = result.getString("resource_type");
+                resource.setResourceId(resourceId);
+                resource.setResourceType(resource_type);
+                resource.setDateCreate(result.getString("date_created"));
+                resource.setPackageId(packageId);
+                resource.setDoi(result.getString("doi"));
+
+                if (resourceType != null && resourceType.equals("data")) {
+                    resource.setResourceLocation(result.getString("resource_location"));
+                    resource.setEntityId(result.getString("entity_id"));
+                    resource.setSha1Checksum(result.getString("sha1_checksum"));
+                    resource.setSize(result.getLong("resource_size"));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            returnConnection(conn);
+        }
+
+        return rmdXML;
+    }
   
   /*
    * Composes an 'allow' or 'deny' XML element.

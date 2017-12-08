@@ -469,6 +469,22 @@
         </access>
     </pasta:service-method>
 
+    <pasta:service-method name="readDataEntityRmd">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
     <pasta:service-method name="readDataEntityChecksum">
         <access
             system="https://pasta.edirepository.edu"
@@ -625,6 +641,22 @@
         </access>
     </pasta:service-method>
     
+    <pasta:service-method name="readDataPackageRmd">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
     <pasta:service-method name="readDataPackageArchive">
         <access
             system="https://pasta.edirepository.edu"
@@ -721,6 +753,22 @@
         </access>
     </pasta:service-method>
 
+    <pasta:service-method name="readDataPackageReportRmd">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
     <pasta:service-method name="readDataPackageReportChecksum">
         <access
             system="https://pasta.edirepository.edu"
@@ -837,6 +885,22 @@
         </access>
     </pasta:service-method>
 
+    <pasta:service-method name="readMetadataRmd">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
     <pasta:service-method name="readMetadataChecksum">
         <access
             system="https://pasta.edirepository.edu"

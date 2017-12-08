@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="resourceMetadata">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element name="resourceId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="doi" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="resourceType" type="ResourceType" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="resourceLocation" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="packageId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="scope" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="identifier" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="revision" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="entityId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="entityName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="principalOwner" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="dateCreated" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="dateDeactivated" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="sha1Checksum" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="formatType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="mimeType" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="resourceSize" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="dataFormat" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="md5Checksum" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="filename" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="ResourceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dataPackage"> </xs:enumeration>
+      <xs:enumeration value="metadata"> </xs:enumeration>
+      <xs:enumeration value="data"> </xs:enumeration>
+      <xs:enumeration value="report"> </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

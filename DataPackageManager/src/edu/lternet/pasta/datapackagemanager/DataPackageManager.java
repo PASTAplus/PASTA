@@ -2913,6 +2913,53 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+    /**
+     * Returns the resource metadata for the given resource identifier if
+     * it exists; otherwise, throw a ResourceNotFoundException.
+     * 
+     * @param resourceType    The type of resource whose resource metadata is to be retrieved
+     * @param resourceId      The resource identifier
+     * @return  an XML string representing the resource metadata for the specified resourceId.
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws UnauthorizedException
+     * @throws ResourceNotFoundException
+     * @throws Exception
+     */
+    public String readResourceMetadata(ResourceType resourceType, String resourceId)
+        throws ClassNotFoundException, SQLException, UnauthorizedException,
+        ResourceNotFoundException, Exception {
+
+        String resourceMetadataXML = null;
+
+        try {
+            DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
+                dbDriver, dbURL, dbUser, dbPassword);
+
+            boolean hasResource = dataPackageRegistry.hasResource(resourceId);
+            if (!hasResource) {
+                String gripe = "Resource not found: " + resourceId;
+                throw new ResourceNotFoundException(gripe);
+            }
+
+            resourceMetadataXML = dataPackageRegistry.getResourceMetadata(resourceType, resourceId);
+            if (resourceMetadataXML == null) {
+                String gripe = "Resource metadata does not exist for this resource: " + resourceId;
+                throw new ResourceNotFoundException(gripe);
+            }
+        } catch (ClassNotFoundException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            throw (e);
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+
+        return resourceMetadataXML;
+    }
+
+    
 	/**
 	 * For the specified data package, returns a newline-separated 
 	 * list of strings, where each string contains an entity id followed by a

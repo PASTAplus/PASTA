@@ -228,5 +228,14 @@ public class Resource {
 	public void setSize(Long size) {
 		this.size = size;
 	}
+	
+	
+	public String toXML() {
+	    StringBuffer xmlBuffer = new StringBuffer("");
+	    xmlBuffer.append("");
+	    
+	    String xml = xmlBuffer.toString();
+	    return xml;
+	}
 		
 }
