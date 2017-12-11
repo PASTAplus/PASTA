@@ -4154,8 +4154,8 @@ public class DataPackageManagerResource extends PastaWebService {
     /**
      * 
      * <strong>Read Data Entity Resource Metadata</strong> operation, specifying the scope,
-     * identifier, and revision of the data entity object whose resource metadata is to be read in the URI, 
-     * returning an XML string representing the resource metadata for the data entity.
+     * identifier, revision, and entity identifier of the data entity object whose resource metadata is to be read in 
+     * the URI, returning an XML string representing the resource metadata for the data entity.
      * 
      * <h4>Requests:</h4>
      * <table border="1" cellspacing="0" cellpadding="3">
@@ -4168,7 +4168,7 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>none</td>
      * <td align=center>none</td>
      * <td><code>curl -i -X GET
-     * https://pasta.lternet.edu/package/data/rmd/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code>
+     * https://pasta.lternet.edu/package/data/rmd/eml/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2</code>
      * </td>
      * </tr>
      * </table>
@@ -4189,20 +4189,25 @@ public class DataPackageManagerResource extends PastaWebService {
      * for the data entity</td>
      * <td align=center><code>application/xml</code></td>
      * <td><code><pre>
-     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
-       &lt;allow&gt;
-         &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal&gt;uid=NIN,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal>public&lt;/principal&gt;
-         &lt;permission>read&lt;/permission&gt;
-       &lt;/allow&gt;
-     &lt;/access&gt;
+       &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+       &lt;resourceMetadata&gt;
+           &lt;dataFormat&gt;text/csv&lt;/dataFormat&gt;
+           &lt;dateCreated&gt;2016-12-06 13:59:15.696&lt;/dateCreated&gt;
+           &lt;entityId&gt;67e99349d1666e6f4955e9dda42c3cc2&lt;/entityId&gt;
+           &lt;entityName&gt;DailyWaterSample-NIN-LTER-1978-1992&lt;/entityName&gt;
+           &lt;fileName&gt;LTER.NIN.DWS.csv&lt;/fileName&gt;
+           &lt;identifier&gt;1&lt;/identifier&gt;
+           &lt;md5Checksum&gt;699f0409577b9b8d194480310fed2dbb&lt;/md5Checksum&gt;
+           &lt;packageId&gt;knb-lter-nin.1.1&lt;/packageId&gt;
+           &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+           &lt;resourceId&gt;https://pasta.lternet.edu/package/data/eml/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2&lt;/resourceId&gt;
+           &lt;resourceLocation&gt;/home/pasta/local/data&lt;/resourceLocation&gt;
+           &lt;resourceSize&gt;924291&lt;/resourceSize&gt;
+           &lt;resourceType&gt;data&lt;/resourceType&gt;
+           &lt;revision&gt;1&lt;/revision&gt;
+           &lt;scope&gt;knb-lter-nin&lt;/scope&gt;
+           &lt;sha1Checksum&gt;7a47318b5a6baec54e24c6b3b698e5b4fa207ac4&lt;/sha1Checksum&gt;
+       &lt;/resourceMetadata&gt;
      * </pre></code></td>
      * </tr>
      * <tr>
@@ -5868,7 +5873,7 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>none</td>
      * <td align=center>none</td>
      * <td><code>curl -i -X GET
-     * https://pasta.lternet.edu/package/rmd/eml/knb-lter-lno/1/3</code></td>
+     * https://pasta.lternet.edu/package/rmd/eml/knb-lter-nin/1/1</code></td>
      * </tr>
      * </table>
      * 
@@ -5887,20 +5892,18 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>An XML string representing the resource metadata for the data package resource</td>
      * <td align=center><code>application/xml</code></td>
      * <td><code><pre>
-     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
-       &lt;allow&gt;
-         &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal&gt;uid=NIN,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal>public&lt;/principal&gt;
-         &lt;permission>read&lt;/permission&gt;
-       &lt;/allow&gt;
-     &lt;/access&gt;
+       &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+       &lt;resourceMetadata&gt;
+           &lt;dateCreated&gt;2016-12-06 13:59:17.257&lt;/dateCreated&gt;
+           &lt;doi&gt;doi:10.5072/FK2/2a97391f89ea8519e09a6365fe993da7&lt;/doi&gt;
+           &lt;identifier&gt;1&lt;/identifier&gt;
+           &lt;packageId&gt;knb-lter-nin.1.1&lt;/packageId&gt;
+           &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+           &lt;resourceId&gt;https://pasta.lternet.edu/package/eml/knb-lter-nin/1/1&lt;/resourceId&gt;
+           &lt;resourceType&gt;dataPackage&lt;/resourceType&gt;
+           &lt;revision&gt;1&lt;/revision&gt;
+           &lt;scope&gt;knb-lter-nin&lt;/scope&gt;
+       &lt;/resourceMetadata&gt;
      * </pre></code></td>
      * </tr>
      * <tr>
@@ -7027,7 +7030,7 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>none</td>
      * <td align=center>none</td>
      * <td><code>curl -i -X GET
-     * https://pasta.lternet.edu/package/report/rmd/eml/knb-lter-lno/1/3</code></td>
+     * https://pasta.lternet.edu/package/report/rmd/eml/knb-lter-nin/1/1</code></td>
      * </tr>
      * </table>
      * 
@@ -7048,20 +7051,20 @@ public class DataPackageManagerResource extends PastaWebService {
      * for the data package report resource</td>
      * <td align=center><code>application/xml</code></td>
      * <td><code><pre>
-     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
-       &lt;allow&gt;
-         &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal&gt;uid=NIN,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal>public&lt;/principal&gt;
-         &lt;permission>read&lt;/permission&gt;
-       &lt;/allow&gt;
-     &lt;/access&gt;
+       &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+       &lt;resourceMetadata&gt;
+           &lt;dateCreated&gt;2016-12-06 13:59:16.796&lt;/dateCreated&gt;
+           &lt;fileName&gt;quality_report.xml&lt;/fileName&gt;
+           &lt;identifier&gt;1&lt;/identifier&gt;
+           &lt;md5Checksum&gt;2a544e93585029114b85c83a8081cac8&lt;/md5Checksum&gt;
+           &lt;packageId&gt;knb-lter-nin.1.1&lt;/packageId&gt;
+           &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+           &lt;resourceId&gt;https://pasta.lternet.edu/package/report/eml/knb-lter-nin/1/1&lt;/resourceId&gt;
+           &lt;resourceType&gt;report&lt;/resourceType&gt;
+           &lt;revision&gt;1&lt;/revision&gt;
+           &lt;scope&gt;knb-lter-nin&lt;/scope&gt;
+           &lt;sha1Checksum&gt;393c3b336579b3954392d5867d59abfd2c8101c8&lt;/sha1Checksum&gt;
+       &lt;/resourceMetadata&gt;
      * </pre></code></td>
      * </tr>
      * <tr>
@@ -8488,7 +8491,7 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>none</td>
      * <td align=center>none</td>
      * <td><code>curl -i -X GET
-     * https://pasta.lternet.edu/package/metadata/rmd/eml/knb-lter-lno/1/3</code>
+     * https://pasta.lternet.edu/package/metadata/rmd/eml/knb-lter-nin/1/1</code>
      * </td>
      * </tr>
      * </table>
@@ -8508,20 +8511,21 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>An XML string representing the resource metadata for the metadata resource</td>
      * <td align=center><code>application/xml</code></td>
      * <td><code><pre>
-     &lt;access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" system="https://pasta.edirepository.org"&gt;
-       &lt;allow&gt;
-         &lt;principal role="owner"&gt;uid=dcosta,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal&gt;uid=NIN,o=LTER,dc=ecoinformatics,dc=org&lt;/principal&gt;
-         &lt;permission&gt;changePermission&lt;/permission&gt;
-       &lt;/allow&gt;
-       &lt;allow&gt;
-         &lt;principal>public&lt;/principal&gt;
-         &lt;permission>read&lt;/permission&gt;
-       &lt;/allow&gt;
-     &lt;/access&gt;
+       &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+       &lt;resourceMetadata&gt;
+           &lt;dateCreated&gt;2016-12-06 13:59:16.378&lt;/dateCreated&gt;
+           &lt;fileName&gt;Level-1-EML.xml&lt;/fileName&gt;
+           &lt;formatType&gt;eml://ecoinformatics.org/eml-2.1.0&lt;/formatType&gt;
+           &lt;identifier&gt;1&lt;/identifier&gt;
+           &lt;md5Checksum&gt;92f6674ace73e79d9de79871ecb36f4f&lt;/md5Checksum&gt;
+           &lt;packageId&gt;knb-lter-nin.1.1&lt;/packageId&gt;
+           &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+           &lt;resourceId&gt;https://pasta.lternet.edu/package/metadata/eml/knb-lter-nin/1/1&lt;/resourceId&gt;
+           &lt;resourceType&gt;metadata&lt;/resourceType&gt;
+           &lt;revision&gt;1&lt;/revision&gt;
+           &lt;scope&gt;knb-lter-nin&lt;/scope&gt;
+           &lt;sha1Checksum&gt;406b48590973622b0681d123c8a8443d6d00d13c&lt;/sha1Checksum&gt;
+       &lt;/resourceMetadata&gt;
      * </pre></code></td>
      * </tr>
      * <tr>

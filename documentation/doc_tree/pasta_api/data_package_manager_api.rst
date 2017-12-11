@@ -651,7 +651,7 @@ REST API
 Description
 """""""""""
 
-Read Data Entity ACL operation, specifying the scope, identifier, and revision of the data entity object 
+Read Data Entity ACL operation, specifying the scope, identifier, revision, and entity identifier of the data entity object 
 whose Access Control List (ACL) is to be read in the URI, returning an XML string representing the ACL 
 for the data entity. Please note: only a very limited set of users are authorized to use this service method.
 
@@ -666,7 +666,7 @@ REST API
 Description
 """""""""""
 
-Read Data Entity Checksum operation, specifying the scope, identifier, and revision of the data entity 
+Read Data Entity Checksum operation, specifying the scope, identifier, revision, and entity identifier of the data entity 
 object whose checksum is to be read in the URI, returning a 40-character SHA-1 checksum value.
 
 REST API
@@ -704,6 +704,21 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/name/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/name/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Data Entity Resource Metadata*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Entity Resource Metadata operation, specifying the scope, identifier, revision, and entity identifier of the data entity object 
+whose resource metadata is to be read in the URI, returning an XML string representing the resource metadata 
+for the data entity.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/data/rmd/eml/{scope}/{identifier}/{revision}/{entityId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/data/rmd/eml/{scope}/{identifier}/{revision}/{entityId}>`_
 
 *Read Data Entity Size*
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -887,6 +902,21 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/error/eml/{transaction} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/error/eml/{transaction}>`_
 
+*Read Data Package Resource Metadata*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Resource Metadata operation, specifying the scope, identifier, and revision of the data package 
+whose resource metadata is to be read in the URI, returning an XML string representing the 
+resource metadata for the data package.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/rmd/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/rmd/eml/{scope}/{identifier}/{revision}>`_
+
 *Read Data Package Report*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -935,6 +965,21 @@ REST API
 `GET : https://pasta.lternet.edu/package/report/checksum/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/checksum/eml/{scope}/{identifier}/{revision}>`_
 
 .. _read-evaluate-report:
+
+*Read Data Package Report Resource Metadata*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package Report Resource Metadata operation, specifying the scope, identifier, and revision of the data 
+package report whose resource metadata is to be read in the URI, returning an XML string 
+representing the resource metadata for the data package report resource.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/report/rmd/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/report/rmd/eml/{scope}/{identifier}/{revision}>`_
 
 *Read Evaluate Report*
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -1029,6 +1074,21 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/package/metadata/format/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/format/eml/{scope}/{identifier}/{revision}>`_
+
+*Read Metadata Resource Metadata*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Metadata Resource Metadata operation, specifying the scope, identifier, and revision of the data package metadata 
+whose resource metadata is to be read in the URI, returning an XML string representing the resource metadata
+for the data package metadata resource.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/metadata/rmd/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/rmd/eml/{scope}/{identifier}/{revision}>`_
 
 .. _provenance:
 
