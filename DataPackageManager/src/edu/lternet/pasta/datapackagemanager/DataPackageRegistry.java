@@ -1398,43 +1398,67 @@ public class DataPackageRegistry {
     public String getResourceMetadata(ResourceType resourceType, String resourceId)
             throws ClassNotFoundException, SQLException {
         String rmdXML = "";
+        
+        if (resourceType == null || resourceId == null) { return rmdXML; }
 
         Connection conn = null;
         try {
             conn = this.getConnection();
-        } catch (ClassNotFoundException e) {
+        } 
+        catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
 
-        String queryString = "SELECT resource_type, scope, identifier, revision, "
-                + " date_created, doi, resource_location, entity_id, sha1_checksum, resource_size "
-                + "FROM datapackagemanager.resource_registry " + "WHERE resource_id='" + resourceId + "'";
+        String queryString = 
+                String.format("SELECT * FROM datapackagemanager.resource_registry WHERE resource_id='%s'",
+                              resourceId);
 
-        Statement stat = null;
+        Statement stmt = null;
 
         try {
 
             Resource resource = new Resource();
-            stat = conn.createStatement();
-            ResultSet result = stat.executeQuery(queryString);
+            resource.setResourceId(resourceId);
+            resource.setResourceType(resourceType.toString());
+            stmt = conn.createStatement();
+            ResultSet result = stmt.executeQuery(queryString);
 
             while (result.next()) {
-                resourceId = result.getString("resource_id");
-                String packageId = result.getString("package_id");
-                String resource_type = result.getString("resource_type");
-                resource.setResourceId(resourceId);
-                resource.setResourceType(resource_type);
-                resource.setDateCreate(result.getString("date_created"));
-                resource.setPackageId(packageId);
-                resource.setDoi(result.getString("doi"));
+                resource.setDateCreated(result.getString("date_created"));
+                resource.setDateDeactivated(result.getString("date_deactivated"));
+                resource.setIdentifier(result.getInt("identifier"));
+                resource.setPackageId(result.getString("package_id"));
+                resource.setPrincipalOwner(result.getString("principal_owner"));
+                resource.setRevision(result.getInt("revision"));
+                resource.setScope(result.getString("scope"));
 
-                if (resourceType != null && resourceType.equals("data")) {
-                    resource.setResourceLocation(result.getString("resource_location"));
-                    resource.setEntityId(result.getString("entity_id"));
-                    resource.setSha1Checksum(result.getString("sha1_checksum"));
-                    resource.setSize(result.getLong("resource_size"));
+                if (resourceType.equals(ResourceType.dataPackage)) {
+                    resource.setDoi(result.getString("doi"));
                 }
+                else {
+                    resource.setMd5Checksum(result.getString("md5_checksum"));
+                    resource.setSha1Checksum(result.getString("sha1_checksum"));
+                    
+                    if (resourceType.equals(ResourceType.metadata)) {
+                        resource.setFileName("Level-1-EML.xml");
+                        resource.setFormatType(result.getString("format_type"));
+                    }
+                    else if (resourceType.equals(ResourceType.report)) {
+                        resource.setFileName("quality_report.xml");
+                    }
+                    else if (resourceType.equals(ResourceType.data)) {
+                        resource.setFileName(result.getString("filename"));
+                        resource.setDataFormat(result.getString("data_format"));
+                        resource.setEntityId(result.getString("entity_id"));
+                        resource.setEntityName(result.getString("entity_name"));
+                        resource.setMimeType(result.getString("mime_type"));
+                        resource.setResourceLocation(result.getString("resource_location"));
+                        resource.setResourceSize(result.getLong("resource_size"));
+                    }                    
+               }
+
+                rmdXML = resource.toXML();
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
@@ -3315,7 +3339,7 @@ public class DataPackageRegistry {
 					
 					resource.setResourceId(resourceId);
 					resource.setResourceType(result.getString("resource_type"));
-					resource.setDateCreate(result.getString("date_created"));
+					resource.setDateCreated(result.getString("date_created"));
 					resource.setPackageId(packageId);
 
 					resourceList.add(resource);
@@ -3503,7 +3527,7 @@ public class DataPackageRegistry {
 					String resourceType = result.getString("resource_type");
 					resource.setResourceId(resourceId);
 					resource.setResourceType(resourceType);
-					resource.setDateCreate(result.getString("date_created"));
+					resource.setDateCreated(result.getString("date_created"));
 					resource.setPackageId(packageId);
 					resource.setDoi(result.getString("doi"));
 					
@@ -3511,7 +3535,7 @@ public class DataPackageRegistry {
 						resource.setResourceLocation(result.getString("resource_location"));
 						resource.setEntityId(result.getString("entity_id"));
 						resource.setSha1Checksum(result.getString("sha1_checksum"));
-						resource.setSize(result.getLong("resource_size"));
+						resource.setResourceSize(result.getLong("resource_size"));
 					}
 
 					resourceList.add(resource);
