@@ -104,8 +104,15 @@ public class DataPackageManagerResourceTest {
   
   private static final String ACL_START_TEXT = "<access:access";
   private static final String ACL_END_TEXT = "</access:access>";
+  private static final String RMD_START_TEXT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<resourceMetadata>";
+  private static final String RMD_END_TEXT = "</resourceMetadata>";
   private static final String METADATA_FORMAT_START_TEXT = "eml://ecoinformatics.org/eml-2.1.";
   private static final String SOLR_QUERY = "LTER";
+  private static final String RMD_TEST_SCOPE = "knb-lter-nin";
+  private static final Integer RMD_TEST_IDENTIFIER = new Integer(1);
+  private static final Integer RMD_TEST_REVISION = new Integer(1);
+  private static final String RMD_TEST_ENTITY_ID = "67e99349d1666e6f4955e9dda42c3cc2";
+  
 
   
   /*
@@ -286,9 +293,8 @@ public class DataPackageManagerResourceTest {
   }
   
   
-  @Test public void runAllTests() {
+  @Test public void runOrderedTests() {
 	  testEvaluateDataPackage();
-	  /*
 	  testCreateDataPackage();
 	  testListDataPackageScopes();
 	  testListDataPackageIdentifiers();
@@ -298,21 +304,16 @@ public class DataPackageManagerResourceTest {
 	  testListDataPackageRevisions();
 	  testListDataEntities();
 	  testReadDataPackage();
-	  testReadDataPackageAcl();
 	  testReadMetadata();
 	  testReadMetadataDublinCore();
-	  testReadMetadataAcl();
 	  testReadMetadataFormat();
 	  testReadDataEntity();
 	  testReadDataEntityName();
 	  testReadDataEntityNames();
 	  testReadDataEntitySize();
 	  testReadDataEntitySizes();
-	  testReadDataEntityAcl();
 	  testReadDataPackageReport();
-	  testReadDataPackageReportAcl();
-	  */
-  }
+ }
   
   
   /**
@@ -888,11 +889,11 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Entity ACL operation
    */
-  private void testReadDataEntityAcl() {
+  @Test public void testReadDataEntityAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScope, testIdentifier, testRevision.toString(), testEntityId);
+    Response response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString(), RMD_TEST_ENTITY_ID);
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -905,7 +906,7 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString(), testEntityId);
+    response = dataPackageManagerResource.readDataEntityAcl(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString(), RMD_TEST_ENTITY_ID);
     assertEquals(404, response.getStatus());
   }
     
@@ -913,11 +914,11 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package ACL operation
    */
-  private void testReadDataPackageAcl() {
+  @Test public void testReadDataPackageAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    Response response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -930,7 +931,7 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     assertEquals(404, response.getStatus());
   }
     
@@ -938,11 +939,11 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Data Package Report ACL operation
    */
-  private void testReadDataPackageReportAcl() {
+  @Test public void testReadDataPackageReportAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    Response response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -955,7 +956,7 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    response = dataPackageManagerResource.readDataPackageReportAcl(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     assertEquals(404, response.getStatus());
   }
     
@@ -963,11 +964,11 @@ public class DataPackageManagerResourceTest {
   /**
    * Test the status and message body of the Read Metadata ACL operation
    */
-  private void testReadMetadataAcl() {
+  @Test public void testReadMetadataAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUserAcl);
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScope, testIdentifier, testRevision.toString());
+    Response response = dataPackageManagerResource.readMetadataAcl(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -980,7 +981,107 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for NOT FOUND status with a bogus package id
-    response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScopeBogus, testIdentifier, testRevision.toString());
+    response = dataPackageManagerResource.readMetadataAcl(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Entity Resource Metadata operation
+   */
+  @Test public void testReadDataEntityRmd() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataEntityRmd(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString(), RMD_TEST_ENTITY_ID);
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith(RMD_START_TEXT));
+      assertTrue(entityString.trim().endsWith(RMD_END_TEXT));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataEntityRmd(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString(), RMD_TEST_ENTITY_ID);
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Package Resource Metadata operation
+   */
+  @Test public void testReadDataPackageRmd() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataPackageRmd(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith(RMD_START_TEXT));
+      assertTrue(entityString.trim().endsWith(RMD_END_TEXT));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataPackageRmd(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Data Package Report Resource Metadata operation
+   */
+  @Test public void testReadDataPackageReportRmd() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readDataPackageReportRmd(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith(RMD_START_TEXT));
+      assertTrue(entityString.trim().endsWith(RMD_END_TEXT));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readDataPackageReportRmd(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    assertEquals(404, response.getStatus());
+  }
+    
+
+  /**
+   * Test the status and message body of the Read Metadata Resource Metadata operation
+   */
+  @Test public void testReadMetadataRmd() {
+    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    
+    // Test READ for OK status
+    Response response = dataPackageManagerResource.readMetadataRmd(httpHeaders, RMD_TEST_SCOPE, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
+    int statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+    
+    String entityString = (String) response.getEntity();
+    assertFalse(entityString == null);
+    if (entityString != null) {
+      assertFalse(entityString.isEmpty());
+      assertTrue(entityString.trim().startsWith(RMD_START_TEXT));
+      assertTrue(entityString.trim().endsWith(RMD_END_TEXT));
+    }
+
+    // Test for NOT FOUND status with a bogus package id
+    response = dataPackageManagerResource.readMetadataRmd(httpHeaders, testScopeBogus, RMD_TEST_IDENTIFIER, RMD_TEST_REVISION.toString());
     assertEquals(404, response.getStatus());
   }
     
