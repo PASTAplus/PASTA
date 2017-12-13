@@ -64,6 +64,16 @@ CREATE TABLE datapackagemanager.prov_matrix (
 );
 
 
+CREATE TABLE datapackagemanager.journal_citation (
+  ARTICLE_DOI     VARCHAR(256) NOT NULL,              -- digital object identifier (DOI) of the journal article
+  ARTICLE_TITLE   TEXT,                               -- title of the journal article
+  PRINCIPAL_OWNER VARCHAR(250) NOT NULL,              -- distinguished name of the creator of this entry
+  DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
+  JOURNAL_NAME    TEXT,                               -- name of the journal
+  PACKAGE_ID      VARCHAR(100) NOT NULL               -- packageId of source data package in PASTA
+);
+
+
 CREATE TABLE datapackagemanager.working_on (
   scope VARCHAR(100) NOT NULL,                        -- the scope
   identifier INT8 NOT NULL,                           -- the identifier
