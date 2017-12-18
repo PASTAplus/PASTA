@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
@@ -87,6 +88,8 @@ public class DataPackageRegistry {
   private final String ACCESS_MATRIX_TABLE = "ACCESS_MATRIX";
   private final String ACCESS_MATRIX = "datapackagemanager.ACCESS_MATRIX";
   private final String DATA_PACKAGE_MANAGER_SCHEMA = "datapackagemanager";
+  private final String JOURNAL_CITATION_TABLE = "JOURNAL_CITATION";
+  private final String JOURNAL_CITATION = "datapackagemanager.JOURNAL_CITATION";
   private final String PROV_MATRIX = "datapackagemanager.PROV_MATRIX";
   private final String RESOURCE_REGISTRY = "datapackagemanager.RESOURCE_REGISTRY";
   private final String RESOURCE_REGISTRY_TABLE = "RESOURCE_REGISTRY";
@@ -368,8 +371,87 @@ public class DataPackageRegistry {
 				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
     	reservationManager.addDataPackageReservation(scope, identifier, principal);
     }
+    
+    
+    
+    /**
+     * Add a journal citation entry to the journal_citation table.
+     * 
+     * @param journalCitation            An object that represents the content of a journal citation
+     * 
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
+    public void addJournalCitation(JournalCitation journalCitation) 
+            throws ClassNotFoundException, SQLException {
+        Connection connection = null;
+        int journalCitationId = 0;
 
+        if (journalCitation != null) {
+            String packageId = journalCitation.getPackageId();
+            String principalOwner = journalCitation.getPrincipalOwner();
+            String articleDoi = journalCitation.getArticleDoi();
+            String articleTitle = journalCitation.getArticleTitle();
+            LocalDateTime dateCreated = journalCitation.getDateCreated();
+            String journalTitle = journalCitation.getJournalTitle();
+
+            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?)",
+                    JOURNAL_CITATION, "package_id", "principal_owner", "article_doi", "article_title", "date_created",
+                    "journal_title");
+            logger.debug("insertSQL: " + insertSQL);
+
+            try {
+                connection = getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, packageId);
+                pstmt.setString(2, principalOwner);
+                
+                if (articleDoi == null) { 
+                    pstmt.setNull(3, java.sql.Types.VARCHAR); 
+                } 
+                else { 
+                    pstmt.setString(3, articleDoi); 
+                }
+                
+                if (articleTitle == null) { 
+                    pstmt.setNull(4, java.sql.Types.BLOB); 
+                } 
+                else { 
+                    pstmt.setString(4, articleTitle); 
+                }
+                
+                java.sql.Timestamp ts = Timestamp.valueOf(dateCreated);
+                pstmt.setTimestamp(5, ts);
+                
+                if (journalTitle == null) { 
+                    pstmt.setNull(6, java.sql.Types.BLOB); 
+                } 
+                else { 
+                    pstmt.setString(6, journalTitle); 
+                }
+                
+                pstmt.executeUpdate();
+                
+                ResultSet rs = pstmt.getGeneratedKeys();
+                while (rs.next()) {
+                    journalCitationId = rs.getInt(1);
+                }
+                
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Error inserting JOURNAL_CITATION record for JournalCitation object:\n"
+                        + journalCitation.toXML(true));
+                throw (e);
+            } finally {
+                journalCitation.setJournalCitationId(journalCitationId); // set the id value of the journal citation
+                returnConnection(connection);
+            }
+        }
+    }
   
+    
 	/**
 	 * Adds a new resource to the data package resource registry.
 	 * 
@@ -2648,6 +2730,50 @@ public class DataPackageRegistry {
 	  }
 
 	  
+    public ArrayList<JournalCitation> listDataPackageCitations(String packageId)
+            throws ClassNotFoundException, SQLException, IllegalArgumentException {
+        ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
+
+        Connection connection = null;
+        String selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY package_id",
+                JOURNAL_CITATION, packageId);
+        Statement stmt = null;
+
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectString);
+
+            while (rs.next()) {
+                String principalOwner = rs.getString("principal_owner");
+                String articleDoi = rs.getString("article_doi");
+                String articleTitle = rs.getString("article_title");
+                String journalTitle = rs.getString("journal_title");
+                Timestamp ts = rs.getTimestamp("date_created");
+                LocalDateTime dateCreated = ts.toLocalDateTime();
+                JournalCitation journalCitation = new JournalCitation();
+                journalCitation.setPackageId(packageId);
+                journalCitation.setPrincipalOwner(principalOwner);
+                journalCitation.setArticleDoi(articleDoi);
+                journalCitation.setArticleTitle(articleTitle);
+                journalCitation.setJournalTitle(journalTitle);
+                journalCitation.setDateCreated(dateCreated);
+                journalCitations.add(journalCitation);
+            }
+        } catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            throw (e);
+        } catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            throw (e);
+        } finally {
+            if (stmt != null) { stmt.close(); }
+            returnConnection(connection);
+        }
+
+        return journalCitations;
+    }
+          
 	  /**
 	   * Lists all data entities for a given data package.
 	   * 

@@ -64,12 +64,14 @@ CREATE TABLE datapackagemanager.prov_matrix (
 );
 
 
+CREATE SEQUENCE datapackagemanager.journal_citation_id_seq;
 CREATE TABLE datapackagemanager.journal_citation (
+  JOURNAL_CITATION_ID NUMERIC  DEFAULT NEXTVAL('datapackagemanager.journal_citation_id_seq') PRIMARY KEY,
   ARTICLE_DOI     VARCHAR(256) NOT NULL,              -- digital object identifier (DOI) of the journal article
   ARTICLE_TITLE   TEXT,                               -- title of the journal article
   PRINCIPAL_OWNER VARCHAR(250) NOT NULL,              -- distinguished name of the creator of this entry
   DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
-  JOURNAL_NAME    TEXT,                               -- name of the journal
+  JOURNAL_TITLE   TEXT,                               -- name of the journal
   PACKAGE_ID      VARCHAR(100) NOT NULL               -- packageId of source data package in PASTA
 );
 

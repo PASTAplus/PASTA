@@ -34,6 +34,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1166,6 +1167,23 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
+    public JournalCitation createJournalCitation(String userId, String xml) 
+            throws ClassNotFoundException, SQLException {
+        LocalDateTime now = LocalDateTime.now();
+        JournalCitation journalCitation = new JournalCitation(xml);
+
+        if (journalCitation != null) {
+            journalCitation.setPrincipalOwner(userId);
+            journalCitation.setDateCreated(now);
+        }
+        
+        DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        dpr.addJournalCitation(journalCitation);
+        
+        return journalCitation;
+    }
+    
+    
 	/**
 	 * Creates a new reservation for the specified user and scope. The
 	 * next reservable identifier is determined, the reservation is placed,
@@ -1839,6 +1857,35 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	    dataSourcesString = stringBuilder.toString();
 		return dataSourcesString;
 	}
+
+
+    public String listDataPackageCitations(String scope, Integer identifier, Integer revision, AuthToken authToken) 
+            throws Exception {
+        boolean includeDeclaration = false;
+        String journalCitationsXML = null;
+        StringBuilder stringBuilder = new StringBuilder("");
+        EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+        EmlPackageIdFormat epif = new EmlPackageIdFormat();
+        String packageId = epif.format(epi);
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+                dbURL, dbUser, dbPassword);
+        
+        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+                dataPackageRegistry.listDataPackageCitations(packageId);
+        
+        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        stringBuilder.append("<journalCitations>\n");
+
+        for (JournalCitation journalCitation : journalCitations) {
+            stringBuilder.append(journalCitation.toXML(includeDeclaration));
+        }
+
+        stringBuilder.append("</journalCitations>\n");
+
+        journalCitationsXML = stringBuilder.toString();
+        return journalCitationsXML;
+    }
 
 
 	/**

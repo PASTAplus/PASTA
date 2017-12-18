@@ -2724,6 +2724,101 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+    @GET
+    @Path("/citations/eml/{scope}/{identifier}/{revision}")
+    @Produces("application/xml")
+    public Response listDataPackageCitations(@Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") String revision) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "listDataPackageCitations";
+        Rule.Permission permission = Rule.Permission.read;
+        AuthToken authToken = null;
+        String resourceId = null;
+        String entryText = null;
+
+        try {
+            authToken = getAuthToken(headers);
+            String userId = authToken.getUserId();
+
+            // Is user authorized to run the service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+                    serviceMethodName, permission, authToken);
+            if (!serviceMethodAuthorized) {
+                throw new UnauthorizedException("User " + userId
+                        + " is not authorized to execute service method "
+                        + serviceMethodName);
+            }
+
+            DataPackageManager dataPackageManager = new DataPackageManager();
+
+            /*
+             * Handle symbolic revisions such as "newest" and "oldest".
+             */
+            if (revision != null) {
+                if (revision.equals("newest")) {
+                    Integer newest = dataPackageManager.getNewestRevision(
+                            scope, identifier);
+                    if (newest != null) {
+                        revision = newest.toString();
+                    }
+                }
+                else
+                    if (revision.equals("oldest")) {
+                        Integer oldest = dataPackageManager.getOldestRevision(
+                                scope, identifier);
+                        if (oldest != null) {
+                            revision = oldest.toString();
+                        }
+                    }
+            }
+
+            Integer revisionInt = new Integer(revision);
+            String journalCitationsXML = dataPackageManager.listDataPackageCitations(scope,
+                    identifier, revisionInt, authToken);
+
+            if (journalCitationsXML != null) {
+                responseBuilder = Response.ok(journalCitationsXML.trim());
+                response = responseBuilder.build();
+            }
+            else {
+                String message = "An unknown error occurred";
+                throw new Exception(message);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+        catch (ResourceNotFoundException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (UserErrorException e) {
+            entryText = e.getMessage();
+            response = WebResponseFactory.makeBadRequest(e);
+        }
+        catch (Exception e) {
+            entryText = e.getMessage();
+            WebApplicationException webApplicationException = WebExceptionFactory
+                    .make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+
+        // audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+        response = stampHeader(response);
+        return response;
+    }
+
+
 	/**
 	 * <strong>List Data Package Identifiers</strong> operation, specifying the
 	 * scope value to match in the URI.
@@ -10544,6 +10639,84 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		return response;
 	}
+
+
+    @POST
+    @Path("/citation/eml")
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response createJournalCitation(@Context HttpHeaders headers, String requestBody) {
+        ResponseBuilder responseBuilder = null;
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.write;
+        Response response = null;
+        final String serviceMethodName = "createJournalCitation";
+
+        try {
+            authToken = getAuthToken(headers);
+            String userId = authToken.getUserId();
+
+            // Is user authorized to run the 'createJournalCitation' service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+                    serviceMethodName, permission, authToken);
+
+            if (!serviceMethodAuthorized) {
+                throw new UnauthorizedException("User " + userId
+                        + " is not authorized to execute service method "
+                        + serviceMethodName);
+            }
+
+            DataPackageManager dpm = new DataPackageManager();
+
+            JournalCitation journalCitation = dpm.createJournalCitation(userId, requestBody);
+            
+            if (journalCitation != null) {
+                int journalCitationId = journalCitation.getJournalCitationId();
+                URI uri = URI.create(String.format("%d", journalCitationId));
+                msg = String.format(
+                    "Created journal citation with journalCitationId value: %d",
+                    journalCitationId);
+                response = Response.created(uri).build();
+            }
+            else {
+                throw new Exception(
+                    String.format("An error occurred while attempting to create journal citation entry for request: %s",
+                                  requestBody));
+            }
+        }
+        catch (XmlParsingException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (ResourceNotFoundException e) {
+            msg = e.getMessage();
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (ResourceDeletedException e) {
+            msg = e.getMessage();
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        }
+        catch (UserErrorException e) {
+            msg = e.getMessage();
+            response = WebResponseFactory.makeBadRequest(e);
+        }
+        catch (Exception e) {
+            WebApplicationException webApplicationException = WebExceptionFactory
+                    .make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+            msg = e.getMessage();
+        }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
+    }
 
 
 	/**
