@@ -4076,11 +4076,12 @@ public class DataPackageRegistry {
             String principalOwner = journalCitation.getPrincipalOwner();
             String articleDoi = journalCitation.getArticleDoi();
             String articleTitle = journalCitation.getArticleTitle();
+            String articleUrl = journalCitation.getArticleUrl();
             LocalDateTime dateCreated = journalCitation.getDateCreated();
             String journalTitle = journalCitation.getJournalTitle();
 
-            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?)",
-                    JOURNAL_CITATION, "package_id", "principal_owner", "article_doi", "article_title", "date_created",
+            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?,?)",
+                    JOURNAL_CITATION, "package_id", "principal_owner", "article_doi", "article_title", "article_url", "date_created",
                     "journal_title");
             logger.debug("insertSQL: " + insertSQL);
 
@@ -4104,14 +4105,21 @@ public class DataPackageRegistry {
                     pstmt.setString(4, articleTitle); 
                 }
                 
-                java.sql.Timestamp ts = Timestamp.valueOf(dateCreated);
-                pstmt.setTimestamp(5, ts);
-                
-                if (journalTitle == null) { 
-                    pstmt.setNull(6, java.sql.Types.BLOB); 
+                if (articleUrl == null) { 
+                    pstmt.setNull(5, java.sql.Types.BLOB); 
                 } 
                 else { 
-                    pstmt.setString(6, journalTitle); 
+                    pstmt.setString(5, articleUrl); 
+                }
+                
+                java.sql.Timestamp ts = Timestamp.valueOf(dateCreated);
+                pstmt.setTimestamp(6, ts);
+                
+                if (journalTitle == null) { 
+                    pstmt.setNull(7, java.sql.Types.BLOB); 
+                } 
+                else { 
+                    pstmt.setString(7, journalTitle); 
                 }
                 
                 pstmt.executeUpdate();
@@ -4200,6 +4208,7 @@ public class DataPackageRegistry {
                 String packageId = rs.getString("package_id");
                 String articleDoi = rs.getString("article_doi");
                 String articleTitle = rs.getString("article_title");
+                String articleUrl = rs.getString("article_url");
                 String journalTitle = rs.getString("journal_title");
                 String principalOwner = rs.getString("principal_owner");
                 Timestamp ts = rs.getTimestamp("date_created");
@@ -4210,6 +4219,7 @@ public class DataPackageRegistry {
                 journalCitation.setPrincipalOwner(principalOwner);
                 journalCitation.setArticleDoi(articleDoi);
                 journalCitation.setArticleTitle(articleTitle);
+                journalCitation.setArticleUrl(articleUrl);
                 journalCitation.setJournalTitle(journalTitle);
                 journalCitation.setDateCreated(dateCreated);
                 journalCitations.add(journalCitation);
@@ -4335,6 +4345,7 @@ public class DataPackageRegistry {
                   String principalOwner = rs.getString("principal_owner");
                   String articleDoi = rs.getString("article_doi");
                   String articleTitle = rs.getString("article_title");
+                  String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
@@ -4344,6 +4355,7 @@ public class DataPackageRegistry {
                   journalCitation.setPrincipalOwner(principalOwner);
                   journalCitation.setArticleDoi(articleDoi);
                   journalCitation.setArticleTitle(articleTitle);
+                  journalCitation.setArticleUrl(articleUrl);
                   journalCitation.setJournalTitle(journalTitle);
                   journalCitation.setDateCreated(dateCreated);
                   journalCitations.add(journalCitation);
@@ -4382,6 +4394,7 @@ public class DataPackageRegistry {
                   String packageId = rs.getString("package_id");
                   String articleDoi = rs.getString("article_doi");
                   String articleTitle = rs.getString("article_title");
+                  String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
@@ -4391,6 +4404,7 @@ public class DataPackageRegistry {
                   journalCitation.setPrincipalOwner(principalOwner);
                   journalCitation.setArticleDoi(articleDoi);
                   journalCitation.setArticleTitle(articleTitle);
+                  journalCitation.setArticleUrl(articleUrl);
                   journalCitation.setJournalTitle(journalTitle);
                   journalCitation.setDateCreated(dateCreated);
                   journalCitations.add(journalCitation);

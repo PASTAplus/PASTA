@@ -32,6 +32,7 @@ public class JournalCitation {
     int journalCitationId;
     String articleTitle;
     String articleDoi;
+    String articleUrl;
     String principalOwner;
     LocalDateTime dateCreated;
     String packageId;
@@ -50,9 +51,10 @@ public class JournalCitation {
             String userId = "uid=LNO,o=LTER,dc=ecoinformatics,dc=org";
             StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append("<journalCitation>\n");    
-            sb.append("    <packageId>edi.1000.1</packageId>\n"); 
+            sb.append("    <packageId>edi.0.3</packageId>\n"); 
             sb.append("    <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>\n"); 
             sb.append("    <articleTitle>Tree Survey in Rio Rico, Arizona</articleTitle>\n"); 
+            sb.append("    <articleUrl>http://myscience.com/articles/12345</articleUrl>\n"); 
             sb.append("    <journalTitle>Arizona Highways</journalTitle>\n"); 
             sb.append("</journalCitation>\n");
             String requestXML = sb.toString();
@@ -160,6 +162,12 @@ public class JournalCitation {
               setArticleTitle(articleTitle);
             }
 
+            Node articleUrlNode = xpathapi.selectSingleNode(document, "//articleUrl");
+            if (articleUrlNode != null) {
+              String articleUrl = articleUrlNode.getTextContent();
+              setArticleUrl(articleUrl);
+            }
+
             Node journalTitleNode = xpathapi.selectSingleNode(document, "//journalTitle");
             if (journalTitleNode != null) {
               String journalTitle = journalTitleNode.getTextContent();
@@ -202,11 +210,16 @@ public class JournalCitation {
         sb.append(String.format("    <packageId>%s</packageId>\n", this.packageId)); 
         sb.append(String.format("    <principalOwner>%s</principalOwner>\n", this.principalOwner)); 
         sb.append(String.format("    <dateCreated>%s</dateCreated>\n", getDateCreatedStr())); 
-        sb.append(String.format("    <articleDoi>%s</articleDoi>\n", this.articleDoi));
+        
+        if (this.articleDoi != null)
+            { sb.append(String.format("    <articleDoi>%s</articleDoi>\n", this.articleDoi)); }
         
         if (this.articleTitle != null)
             { sb.append(String.format("    <articleTitle>%s</articleTitle>\n", this.articleTitle)); } 
         
+        if (this.articleUrl != null)
+            { sb.append(String.format("    <articleUrl>%s</articleUrl>\n", this.articleUrl)); } 
+    
         if (this.journalTitle != null)
             { sb.append(String.format("    <journalTitle>%s</journalTitle>\n", this.journalTitle)); } 
         
@@ -245,6 +258,14 @@ public class JournalCitation {
 
     public void setArticleDoi(String articleDoi) {
         this.articleDoi = articleDoi;
+    }
+    
+    public String getArticleUrl() {
+        return articleUrl;
+    }
+
+    public void setArticleUrl(String articleUrl) {
+        this.articleUrl = articleUrl;
     }
     
     public int getJournalCitationId() {
