@@ -1169,36 +1169,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
-    public JournalCitation createJournalCitation(String userId, String xml) 
-            throws ClassNotFoundException, SQLException {
-        LocalDateTime now = LocalDateTime.now();
-        JournalCitation journalCitation = new JournalCitation(xml);
-
-        if (journalCitation != null) {
-            journalCitation.setPrincipalOwner(userId);
-            journalCitation.setDateCreated(now);
-        }
-        
-        DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-        dpr.addJournalCitation(journalCitation);
-        
-        return journalCitation;
-    }
-    
-    
-    public Integer deleteJournalCitation(Integer id, String userId) 
-            throws ClassNotFoundException, SQLException {
-        Integer deletedId = null;
-        
-        if (id != null && userId != null) {
-            DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-            deletedId = dpr.deleteJournalCitation(id, userId);
-        }
-        
-        return deletedId;
-    }
-    
-    
 	/**
 	 * Creates a new reservation for the specified user and scope. The
 	 * next reservable identifier is determined, the reservation is placed,
@@ -1874,35 +1844,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 
-    public String listDataPackageCitations(String scope, Integer identifier, Integer revision, AuthToken authToken) 
-            throws Exception {
-        boolean includeDeclaration = false;
-        String journalCitationsXML = null;
-        StringBuilder stringBuilder = new StringBuilder("");
-        EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
-        EmlPackageIdFormat epif = new EmlPackageIdFormat();
-        String packageId = epif.format(epi);
-
-        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
-                dbURL, dbUser, dbPassword);
-        
-        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
-                dataPackageRegistry.listDataPackageCitations(packageId);
-        
-        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        stringBuilder.append("<journalCitations>\n");
-
-        for (JournalCitation journalCitation : journalCitations) {
-            stringBuilder.append(journalCitation.toXML(includeDeclaration));
-        }
-
-        stringBuilder.append("</journalCitations>\n");
-
-        journalCitationsXML = stringBuilder.toString();
-        return journalCitationsXML;
-    }
-
-
 	/**
 	 * Generates an XML string listing data package changes, supporting the
 	 * listDataPackageChanges web service method.
@@ -2084,58 +2025,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
-    public String listPrincipalOwnerCitations(String principalOwner, AuthToken authToken) 
-            throws Exception {
-        boolean includeDeclaration = false;
-        String journalCitationsXML = null;
-        StringBuilder stringBuilder = new StringBuilder("");
-
-        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
-                dbURL, dbUser, dbPassword);
-        
-        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
-                dataPackageRegistry.listPrincipalOwnerCitations(principalOwner);
-        
-        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        stringBuilder.append("<journalCitations>\n");
-
-        for (JournalCitation journalCitation : journalCitations) {
-            stringBuilder.append(journalCitation.toXML(includeDeclaration));
-        }
-
-        stringBuilder.append("</journalCitations>\n");
-
-        journalCitationsXML = stringBuilder.toString();
-        return journalCitationsXML;
-    }
-
-
-    public String getCitationWithId(Integer journalCitationId, AuthToken authToken) 
-            throws Exception {
-        boolean includeDeclaration = true;
-        String journalCitationsXML = null;
-        StringBuilder stringBuilder = new StringBuilder("");
-
-        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
-                dbURL, dbUser, dbPassword);
-        
-        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
-                dataPackageRegistry.getCitationWithId(journalCitationId);
-        
-        if (journalCitations.size() == 0) {
-            String msg = String.format("No journal citations found for id value %d", journalCitationId);
-            throw new ResourceNotFoundException(msg);
-        }
-        
-        for (JournalCitation journalCitation : journalCitations) {
-            stringBuilder.append(journalCitation.toXML(includeDeclaration));
-        }
-
-        journalCitationsXML = stringBuilder.toString();
-        return journalCitationsXML;
-    }
-
-
 	/**
 	 * List the data packages in the resource registry where the principal_owner matches 
 	 * the specified distinguished name value.
@@ -3945,5 +3834,121 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
         return metadataXML;
     }
+    
+    
+    /*
+     * Journal citation methods
+     */
+
+    public JournalCitation createJournalCitation(String userId, String xml) 
+            throws ClassNotFoundException, SQLException {
+        LocalDateTime now = LocalDateTime.now();
+        JournalCitation journalCitation = new JournalCitation(xml);
+
+        if (journalCitation != null) {
+            journalCitation.setPrincipalOwner(userId);
+            journalCitation.setDateCreated(now);
+        }
+        
+        DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        dpr.addJournalCitation(journalCitation);
+        
+        return journalCitation;
+    }
+    
+    
+    public Integer deleteJournalCitation(Integer id, String userId) 
+            throws ClassNotFoundException, SQLException {
+        Integer deletedId = null;
+        
+        if (id != null && userId != null) {
+            DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+            deletedId = dpr.deleteJournalCitation(id, userId);
+        }
+        
+        return deletedId;
+    }
+    
+    
+   public String getCitationWithId(Integer journalCitationId, AuthToken authToken) 
+            throws Exception {
+        boolean includeDeclaration = true;
+        String journalCitationsXML = null;
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+                dbURL, dbUser, dbPassword);
+        
+        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+                dataPackageRegistry.getCitationWithId(journalCitationId);
+        
+        if (journalCitations.size() == 0) {
+            String msg = String.format("No journal citations found for id value %d", journalCitationId);
+            throw new ResourceNotFoundException(msg);
+        }
+        
+        for (JournalCitation journalCitation : journalCitations) {
+            stringBuilder.append(journalCitation.toXML(includeDeclaration));
+        }
+
+        journalCitationsXML = stringBuilder.toString();
+        return journalCitationsXML;
+    }
+
+
+   public String listDataPackageCitations(String scope, Integer identifier, Integer revision, AuthToken authToken) 
+           throws Exception {
+       boolean includeDeclaration = false;
+       String journalCitationsXML = null;
+       StringBuilder stringBuilder = new StringBuilder("");
+       EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+       EmlPackageIdFormat epif = new EmlPackageIdFormat();
+       String packageId = epif.format(epi);
+
+       DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+               dbURL, dbUser, dbPassword);
+       
+       ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+               dataPackageRegistry.listDataPackageCitations(packageId);
+       
+       stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+       stringBuilder.append("<journalCitations>\n");
+
+       for (JournalCitation journalCitation : journalCitations) {
+           stringBuilder.append(journalCitation.toXML(includeDeclaration));
+       }
+
+       stringBuilder.append("</journalCitations>\n");
+
+       journalCitationsXML = stringBuilder.toString();
+       return journalCitationsXML;
+   }
+
+
+   public String listPrincipalOwnerCitations(String principalOwner, AuthToken authToken) 
+           throws Exception {
+       boolean includeDeclaration = false;
+       String journalCitationsXML = null;
+       StringBuilder stringBuilder = new StringBuilder("");
+
+       DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+               dbURL, dbUser, dbPassword);
+       
+       ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+               dataPackageRegistry.listPrincipalOwnerCitations(principalOwner);
+       
+       stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+       stringBuilder.append("<journalCitations>\n");
+
+       for (JournalCitation journalCitation : journalCitations) {
+           stringBuilder.append(journalCitation.toXML(includeDeclaration));
+       }
+
+       stringBuilder.append("</journalCitations>\n");
+
+       journalCitationsXML = stringBuilder.toString();
+       return journalCitationsXML;
+   }
+
 
 }

@@ -61,22 +61,6 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="createJournalCitation">
-        <access
-            system="https://pasta.edirepository.edu"
-            authSystem="https://pasta.edirepository.edu/authentication"
-            order="allowFirst">
-            <allow>
-                <principal>pasta</principal>
-                <permission>write</permission>
-            </allow>
-            <allow>
-                <principal>authenticated</principal>
-                <permission>write</permission>
-            </allow>
-        </access>
-    </pasta:service-method>
-
     <pasta:service-method name="createReservation">
         <access
             system="https://pasta.edirepository.edu"
@@ -269,26 +253,6 @@
         </access>
     </pasta:service-method>
     
-    <pasta:service-method name="listDataPackageCitations">
-        <access
-            system="https://pasta.edirepository.edu"
-            authSystem="https://pasta.edirepository.edu/authentication"
-            order="allowFirst">
-            <allow>
-                <principal>pasta</principal>
-                <permission>write</permission>
-            </allow>
-            <allow>
-                <principal>authenticated</principal>
-                <permission>read</permission>
-            </allow>
-            <allow>
-                <principal>public</principal>
-                <permission>read</permission>
-            </allow>
-        </access>
-    </pasta:service-method>
-    
     <pasta:service-method name="listDataPackageIdentifiers">
         <access
             system="https://pasta.edirepository.edu"
@@ -350,26 +314,6 @@
     </pasta:service-method>
     
     <pasta:service-method name="listDeletedDataPackages">
-        <access
-            system="https://pasta.edirepository.edu"
-            authSystem="https://pasta.edirepository.edu/authentication"
-            order="allowFirst">
-            <allow>
-                <principal>pasta</principal>
-                <permission>write</permission>
-            </allow>
-            <allow>
-                <principal>authenticated</principal>
-                <permission>read</permission>
-            </allow>
-            <allow>
-                <principal>public</principal>
-                <permission>read</permission>
-            </allow>
-        </access>
-    </pasta:service-method>
-    
-    <pasta:service-method name="listPrincipalOwnerCitations">
         <access
             system="https://pasta.edirepository.edu"
             authSystem="https://pasta.edirepository.edu/authentication"
@@ -1072,22 +1016,6 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="deleteJournalCitation">
-        <access
-            system="https://pasta.edirepository.edu"
-            authSystem="https://pasta.edirepository.edu/authentication"
-            order="allowFirst">
-            <allow>
-                <principal>pasta</principal>
-                <permission>write</permission>
-            </allow>
-            <allow>
-                <principal>authenticated</principal>
-                <permission>write</permission>
-            </allow>
-        </access>
-    </pasta:service-method>
-
     <pasta:service-method name="deleteSubscription">
         <access
             system="https://pasta.edirepository.edu"
@@ -1136,26 +1064,6 @@
         </access>
     </pasta:service-method>
 
-    <pasta:service-method name="getCitationWithId">
-        <access
-            system="https://pasta.edirepository.edu"
-            authSystem="https://pasta.edirepository.edu/authentication"
-            order="allowFirst">
-            <allow>
-                <principal>pasta</principal>
-                <permission>read</permission>
-            </allow>
-            <allow>
-                <principal>authenticated</principal>
-                <permission>read</permission>
-            </allow>
-            <allow>
-                <principal>public</principal>
-                <permission>read</permission>
-            </allow>
-        </access>
-    </pasta:service-method>
-
     <pasta:service-method name="getSubscriptionWithId">
         <access
             system="https://pasta.edirepository.edu"
@@ -1187,5 +1095,99 @@
             </allow>
         </access>
     </pasta:service-method>
+    
+    <!-- Journal Citation web services -->
 
+    <pasta:service-method name="createJournalCitation">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="deleteJournalCitation">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="getCitationWithId">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="listDataPackageCitations">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
+    <pasta:service-method name="listPrincipalOwnerCitations">
+        <access
+            system="https://pasta.edirepository.edu"
+            authSystem="https://pasta.edirepository.edu/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>authenticated</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+    
 </pasta:service>
