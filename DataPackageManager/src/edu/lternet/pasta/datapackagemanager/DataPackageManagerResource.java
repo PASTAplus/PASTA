@@ -2819,6 +2819,76 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
 
+    @GET
+    @Path("/citations/eml/{principalOwner}")
+    @Produces("application/xml")
+    public Response listPrincipalOwnerCitations(@Context HttpHeaders headers,
+            @PathParam("principalOwner") String principalOwner) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "listPrincipalOwnerCitations";
+        Rule.Permission permission = Rule.Permission.read;
+        AuthToken authToken = null;
+        String resourceId = null;
+        String entryText = null;
+
+        try {
+            authToken = getAuthToken(headers);
+            String userId = authToken.getUserId();
+
+            // Is user authorized to run the service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+                    serviceMethodName, permission, authToken);
+            if (!serviceMethodAuthorized) {
+                throw new UnauthorizedException("User " + userId
+                        + " is not authorized to execute service method "
+                        + serviceMethodName);
+            }
+
+            DataPackageManager dataPackageManager = new DataPackageManager();
+
+            String journalCitationsXML = dataPackageManager.listPrincipalOwnerCitations(principalOwner, authToken);
+
+            if (journalCitationsXML != null) {
+                responseBuilder = Response.ok(journalCitationsXML.trim());
+                response = responseBuilder.build();
+            }
+            else {
+                String message = "An unknown error occurred";
+                throw new Exception(message);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+        catch (ResourceNotFoundException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (UserErrorException e) {
+            entryText = e.getMessage();
+            response = WebResponseFactory.makeBadRequest(e);
+        }
+        catch (Exception e) {
+            entryText = e.getMessage();
+            WebApplicationException webApplicationException = WebExceptionFactory
+                    .make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+
+        // audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+        response = stampHeader(response);
+        return response;
+    }
+
+
 	/**
 	 * <strong>List Data Package Identifiers</strong> operation, specifying the
 	 * scope value to match in the URI.
@@ -10848,6 +10918,74 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+    @DELETE
+    @Path("/citation/eml/{journalCitationId}")
+    public Response deleteJournalCitation(@Context HttpHeaders headers,
+            @PathParam("journalCitationId") String journalCitationId) {
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.write;
+        Response response = null;
+        final String serviceMethodName = "deleteJournalCitation";
+
+        try {
+            authToken = getAuthToken(headers);
+            String userId = authToken.getUserId();
+
+            // Is user authorized to run the 'deleteSubscription' service
+            // method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+                    serviceMethodName, permission, authToken);
+
+            if (!serviceMethodAuthorized) {
+                throw new UnauthorizedException("User " + userId
+                        + " is not authorized to execute service method "
+                        + serviceMethodName);
+            }
+
+            Integer id = parseJournalCitationId(journalCitationId);
+            DataPackageManager dpm = new DataPackageManager();
+
+            Integer deletedId = dpm.deleteJournalCitation(id, userId);
+            msg = String.format("Deleted subscription with id = '%d'.",
+                                deletedId);
+            response = Response.ok().build();
+        }
+        catch (IllegalArgumentException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (ResourceDeletedException e) {
+            response = WebExceptionFactory.makeGone(e).getResponse();
+            msg = e.getMessage();
+        }
+        catch (WebApplicationException e) {
+            response = e.getResponse();
+            msg = e.getMessage();
+        }
+        catch (Exception e) {
+            WebApplicationException webApplicationException = WebExceptionFactory
+                    .make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+            msg = e.getMessage();
+        }
+        finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
+    }
+
+
 	/**
 	 * <strong>Execute Event Subscription</strong> operation, specifying the
 	 * ID of the event subscription whose URL is to be executed.
@@ -11192,6 +11330,76 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
+    @GET
+    @Path("/citation/eml/{journalCitationId}")
+    @Produces(value = { MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN })
+    public Response getCitationWithId(@Context HttpHeaders headers,
+            @PathParam("journalCitationId") Integer journalCitationId) {
+            ResponseBuilder responseBuilder = null;
+            Response response = null;
+            final String serviceMethodName = "getCitationWithId";
+            Rule.Permission permission = Rule.Permission.read;
+            AuthToken authToken = null;
+            String resourceId = null;
+            String entryText = null;
+
+            try {
+                authToken = getAuthToken(headers);
+                String userId = authToken.getUserId();
+
+                // Is user authorized to run the service method?
+                boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+                        serviceMethodName, permission, authToken);
+                if (!serviceMethodAuthorized) {
+                    throw new UnauthorizedException("User " + userId
+                            + " is not authorized to execute service method "
+                            + serviceMethodName);
+                }
+
+                DataPackageManager dataPackageManager = new DataPackageManager();
+
+                String journalCitationsXML = dataPackageManager.getCitationWithId(journalCitationId, authToken);
+
+                if (journalCitationsXML != null) {
+                    responseBuilder = Response.ok(journalCitationsXML.trim());
+                    response = responseBuilder.build();
+                }
+                else {
+                    String message = "An unknown error occurred";
+                    throw new Exception(message);
+                }
+            }
+            catch (IllegalArgumentException e) {
+                entryText = e.getMessage();
+                response = WebExceptionFactory.makeBadRequest(e).getResponse();
+            }
+            catch (ResourceNotFoundException e) {
+                entryText = e.getMessage();
+                response = WebExceptionFactory.makeNotFound(e).getResponse();
+            }
+            catch (UnauthorizedException e) {
+                entryText = e.getMessage();
+                response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            }
+            catch (UserErrorException e) {
+                entryText = e.getMessage();
+                response = WebResponseFactory.makeBadRequest(e);
+            }
+            catch (Exception e) {
+                entryText = e.getMessage();
+                WebApplicationException webApplicationException = WebExceptionFactory
+                        .make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                                e.getMessage());
+                response = webApplicationException.getResponse();
+            }
+
+            // audit(serviceMethodName, authToken, response, resourceId, entryText);
+
+            response = stampHeader(response);
+            return response;
+        }
+
+
 	/**
 	 * <strong>Get Event Subscription</strong> operation, returns the event subscription with the specified ID.
 	 * 
@@ -11342,6 +11550,19 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		return response;
 	}
+
+
+    private Integer parseJournalCitationId(String s) {
+        try {
+            return new Integer(s);
+        }
+        catch (NumberFormatException e) {
+            String err = String
+                    .format("The provided journal citation ID '%s' cannot be parsed as an integer.",
+                            s);
+            throw new IllegalArgumentException(err);
+        }
+    }
 
 
 	private Integer parseSubscriptionId(String s) {

@@ -47,7 +47,7 @@ public class JournalCitation {
             configurationListener.initialize(dirPath);
             DataPackageManager dpm = new DataPackageManager();
             DataPackageRegistry dpr = DataPackageManager.makeDataPackageRegistry();
-            String userId = "uid=LNO,o=LTER,dc=ecoinformations,dc=org";
+            String userId = "uid=LNO,o=LTER,dc=ecoinformatics,dc=org";
             StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append("<journalCitation>\n");    
             sb.append("    <packageId>edi.1000.1</packageId>\n"); 

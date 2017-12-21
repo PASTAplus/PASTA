@@ -42,6 +42,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
+import com.sun.jersey.api.NotFoundException;
+
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
@@ -51,6 +53,7 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
+import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
@@ -372,6 +375,51 @@ public class DataPackageRegistry {
     	reservationManager.addDataPackageReservation(scope, identifier, principal);
     }
     
+    
+    public Integer deleteJournalCitation(Integer id, String userId)
+            throws ClassNotFoundException, SQLException, NotFoundException {
+        Integer deletedId = null;
+        Connection connection = null;
+        Statement stmt = null;
+        Integer rowCount = null;
+
+        try {
+            if (hasJournalCitation(id)) {
+                if (isJournalCitationOwner(id, userId)) {
+                    connection = getConnection();
+                    String updateSQL = String.format(
+                            "DELETE FROM %s WHERE journal_citation_id=%d and principal_owner='%s'", JOURNAL_CITATION,
+                            id, userId);
+                    stmt = connection.createStatement();
+                    rowCount = stmt.executeUpdate(updateSQL);
+
+                    if (rowCount < 1) {
+                        String gripe = "Delete failed: " + updateSQL;
+                        throw new SQLException(gripe);
+                    }
+                    else {
+                        deletedId = id;
+                    }
+                } 
+                else {
+                    throw new UnauthorizedException(String
+                            .format("Journal citation with id value '%d' is not owned by user '%s'.", id, userId));
+                }
+            } 
+            else {
+                throw new NotFoundException(String.format("No journal citation with id value '%d' was found.", id));
+            }
+        } 
+        catch (SQLException e) {
+            logger.error("Error deleting JOURNAL_CITATION record: " + e.getMessage());
+            throw (e);
+        } 
+        finally {
+            returnConnection(connection);
+        }
+
+        return deletedId;
+    }    
     
     
     /**
@@ -2160,7 +2208,94 @@ public class DataPackageRegistry {
   }
   
 
-	/**
+  /**
+   * Boolean to determine whether the specified journal citation entry is present in the
+   * JOURNAL_CITATION table based on a specified identifier.
+   * 
+   * @param identifier   the identifier value, e.g. "1"
+   */
+    public boolean hasJournalCitation(Integer identifier) throws ClassNotFoundException, SQLException {
+        boolean hasJournalCitation = false;
+        Connection connection = null;
+        String selectString = String.format("SELECT count(*) FROM %s WHERE journal_citation_id=%d", 
+                                            JOURNAL_CITATION, identifier);
+        Statement stmt = null;
+
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectString);
+
+            while (rs.next()) {
+                int count = rs.getInt("count");
+                hasJournalCitation = (count > 0);
+            }
+
+            if (stmt != null) { stmt.close(); }
+        } 
+        catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            throw (e);
+        } 
+        catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            throw (e);
+        } 
+        finally {
+            returnConnection(connection);
+        }
+
+        return hasJournalCitation;
+    }
+ 
+    
+    /**
+     * Boolean to determine whether the specified journal citation entry is owned
+     * by the specified user.
+     * 
+     * @param identifier   the identifier value, e.g. "1"
+     * @param userId       the user distinguished name, e.g. "uid=LNO,o=LTER,dc=ecoinformatics,dc=org"  
+     */
+    public boolean isJournalCitationOwner(Integer identifier, String userId)
+            throws ClassNotFoundException, SQLException {
+        boolean isOwner = false;
+        Connection connection = null;
+
+        if (identifier != null && userId != null && !userId.isEmpty()) {
+            String selectString = String.format("SELECT principal_owner FROM %s WHERE journal_citation_id=%d",
+                    JOURNAL_CITATION, identifier);
+            Statement stmt = null;
+
+            try {
+                connection = getConnection();
+                stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(selectString);
+
+                while (rs.next()) {
+                    String principalOwner = rs.getString("principal_owner");
+                    if (userId.equals(principalOwner)) {
+                        isOwner = true;
+                    }
+                }
+
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (ClassNotFoundException e) {
+                logger.error("ClassNotFoundException: " + e.getMessage());
+                throw (e);
+            } catch (SQLException e) {
+                logger.error("SQLException: " + e.getMessage());
+                throw (e);
+            } finally {
+                returnConnection(connection);
+            }
+        }
+
+        return isOwner;
+    }   
+      
+  /**
 	 * Boolean to determine whether the specified data package is present in the
 	 * Data Package Registry  based on a specified scope, identifier, and
 	 * revision.
@@ -2728,7 +2863,7 @@ public class DataPackageRegistry {
 
 	    return dataSources;
 	  }
-
+	  
 	  
     public ArrayList<JournalCitation> listDataPackageCitations(String packageId)
             throws ClassNotFoundException, SQLException, IllegalArgumentException {
@@ -2745,6 +2880,7 @@ public class DataPackageRegistry {
             ResultSet rs = stmt.executeQuery(selectString);
 
             while (rs.next()) {
+                int journalCitationId = rs.getInt("journal_citation_id");
                 String principalOwner = rs.getString("principal_owner");
                 String articleDoi = rs.getString("article_doi");
                 String articleTitle = rs.getString("article_title");
@@ -2752,6 +2888,7 @@ public class DataPackageRegistry {
                 Timestamp ts = rs.getTimestamp("date_created");
                 LocalDateTime dateCreated = ts.toLocalDateTime();
                 JournalCitation journalCitation = new JournalCitation();
+                journalCitation.setJournalCitationId(journalCitationId);
                 journalCitation.setPackageId(packageId);
                 journalCitation.setPrincipalOwner(principalOwner);
                 journalCitation.setArticleDoi(articleDoi);
@@ -2774,7 +2911,102 @@ public class DataPackageRegistry {
         return journalCitations;
     }
           
-	  /**
+
+    public ArrayList<JournalCitation> listPrincipalOwnerCitations(String principalOwner)
+            throws ClassNotFoundException, SQLException, IllegalArgumentException {
+        ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
+
+        Connection connection = null;
+        String selectString = String.format("SELECT * FROM %s WHERE principal_owner='%s' ORDER BY journal_citation_id",
+                JOURNAL_CITATION, principalOwner);
+        Statement stmt = null;
+
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectString);
+
+            while (rs.next()) {
+                int journalCitationId = rs.getInt("journal_citation_id");
+                String packageId = rs.getString("package_id");
+                String articleDoi = rs.getString("article_doi");
+                String articleTitle = rs.getString("article_title");
+                String journalTitle = rs.getString("journal_title");
+                Timestamp ts = rs.getTimestamp("date_created");
+                LocalDateTime dateCreated = ts.toLocalDateTime();
+                JournalCitation journalCitation = new JournalCitation();
+                journalCitation.setJournalCitationId(journalCitationId);
+                journalCitation.setPackageId(packageId);
+                journalCitation.setPrincipalOwner(principalOwner);
+                journalCitation.setArticleDoi(articleDoi);
+                journalCitation.setArticleTitle(articleTitle);
+                journalCitation.setJournalTitle(journalTitle);
+                journalCitation.setDateCreated(dateCreated);
+                journalCitations.add(journalCitation);
+            }
+        } catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            throw (e);
+        } catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            throw (e);
+        } finally {
+            if (stmt != null) { stmt.close(); }
+            returnConnection(connection);
+        }
+
+        return journalCitations;
+    }
+          
+
+    public ArrayList<JournalCitation> getCitationWithId(Integer journalCitationId)
+            throws ClassNotFoundException, SQLException, IllegalArgumentException {
+        ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
+
+        Connection connection = null;
+        String selectString = String.format("SELECT * FROM %s WHERE journal_citation_id='%d'",
+                JOURNAL_CITATION, journalCitationId);
+        Statement stmt = null;
+
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectString);
+
+            while (rs.next()) {
+                String packageId = rs.getString("package_id");
+                String articleDoi = rs.getString("article_doi");
+                String articleTitle = rs.getString("article_title");
+                String journalTitle = rs.getString("journal_title");
+                String principalOwner = rs.getString("principal_owner");
+                Timestamp ts = rs.getTimestamp("date_created");
+                LocalDateTime dateCreated = ts.toLocalDateTime();
+                JournalCitation journalCitation = new JournalCitation();
+                journalCitation.setJournalCitationId(journalCitationId);
+                journalCitation.setPackageId(packageId);
+                journalCitation.setPrincipalOwner(principalOwner);
+                journalCitation.setArticleDoi(articleDoi);
+                journalCitation.setArticleTitle(articleTitle);
+                journalCitation.setJournalTitle(journalTitle);
+                journalCitation.setDateCreated(dateCreated);
+                journalCitations.add(journalCitation);
+            }
+        } catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            throw (e);
+        } catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            throw (e);
+        } finally {
+            if (stmt != null) { stmt.close(); }
+            returnConnection(connection);
+        }
+
+        return journalCitations;
+    }
+
+    
+    /**
 	   * Lists all data entities for a given data package.
 	   * 
 	   * @param scope        the data package scope value

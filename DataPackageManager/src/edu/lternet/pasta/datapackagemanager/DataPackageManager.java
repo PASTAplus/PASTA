@@ -57,6 +57,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.sun.jersey.api.NotFoundException;
+
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
 import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
@@ -1184,6 +1186,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     }
     
     
+    public Integer deleteJournalCitation(Integer id, String userId) 
+            throws ClassNotFoundException, SQLException {
+        Integer deletedId = null;
+        
+        if (id != null && userId != null) {
+            DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+            deletedId = dpr.deleteJournalCitation(id, userId);
+        }
+        
+        return deletedId;
+    }
+    
+    
 	/**
 	 * Creates a new reservation for the specified user and scope. The
 	 * next reservable identifier is determined, the reservation is placed,
@@ -2069,6 +2084,58 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
 	
+    public String listPrincipalOwnerCitations(String principalOwner, AuthToken authToken) 
+            throws Exception {
+        boolean includeDeclaration = false;
+        String journalCitationsXML = null;
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+                dbURL, dbUser, dbPassword);
+        
+        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+                dataPackageRegistry.listPrincipalOwnerCitations(principalOwner);
+        
+        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        stringBuilder.append("<journalCitations>\n");
+
+        for (JournalCitation journalCitation : journalCitations) {
+            stringBuilder.append(journalCitation.toXML(includeDeclaration));
+        }
+
+        stringBuilder.append("</journalCitations>\n");
+
+        journalCitationsXML = stringBuilder.toString();
+        return journalCitationsXML;
+    }
+
+
+    public String getCitationWithId(Integer journalCitationId, AuthToken authToken) 
+            throws Exception {
+        boolean includeDeclaration = true;
+        String journalCitationsXML = null;
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+                dbURL, dbUser, dbPassword);
+        
+        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
+                dataPackageRegistry.getCitationWithId(journalCitationId);
+        
+        if (journalCitations.size() == 0) {
+            String msg = String.format("No journal citations found for id value %d", journalCitationId);
+            throw new ResourceNotFoundException(msg);
+        }
+        
+        for (JournalCitation journalCitation : journalCitations) {
+            stringBuilder.append(journalCitation.toXML(includeDeclaration));
+        }
+
+        journalCitationsXML = stringBuilder.toString();
+        return journalCitationsXML;
+    }
+
+
 	/**
 	 * List the data packages in the resource registry where the principal_owner matches 
 	 * the specified distinguished name value.
