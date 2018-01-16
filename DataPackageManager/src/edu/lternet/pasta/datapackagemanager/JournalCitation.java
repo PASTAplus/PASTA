@@ -261,7 +261,26 @@ public class JournalCitation {
     }
     
     public String getArticleUrl() {
-        return articleUrl;
+        String url = null;
+        
+        if (this.articleUrl != null) {
+            url = articleUrl;
+        }
+        else {
+            url = deriveUrlFromDoi();
+        }
+        
+        return url;
+    }
+    
+    private String deriveUrlFromDoi() {
+        String url = null;
+        
+        if (this.articleDoi != null) {
+            url = String.format("https://dx.doi.org/%s", this.articleDoi);
+        }
+            
+        return url;
     }
 
     public void setArticleUrl(String articleUrl) {
