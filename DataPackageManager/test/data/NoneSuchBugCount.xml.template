@@ -72,7 +72,7 @@ for technical assistance regarding this web site or the LTER Network.</para>
                 </dataFormat>
                 <distribution>
                     <online>
-                        <url function="download">http://magma.lternet.edu/gitweb/?p=NIS.git;a=blob_plain;f=DataPackageManager/test/data/NoneSuchBugCount.txt;hb=development</url>
+                        <url function="download">https://raw.githubusercontent.com/PASTAplus/PASTA/development/DataPackageManager/test/data/NoneSuchBugCount.txt</url>
                     </online>
                     <access authSystem="knb" order="allowFirst">
                         <allow>
@@ -176,7 +176,7 @@ for technical assistance regarding this web site or the LTER Network.</para>
                 </dataFormat>
                 <distribution>
                     <online>
-                        <url function="download">http://magma.lternet.edu/gitweb/?p=NIS.git;a=blob_plain;f=DataPackageManager/test/data/AnySuchBugCount.txt;hb=development</url>
+                        <url function="download">https://raw.githubusercontent.com/PASTAplus/PASTA/development/DataPackageManager/test/data/AnySuchBugCount.txt</url>
                     </online>
                 </distribution>
             </physical>
