@@ -11723,11 +11723,76 @@ public class DataPackageManagerResource extends PastaWebService {
  */
 	
 	
+    /**
+     * <strong>Create Journal Citation</strong> operation, creates a new
+     * journal citation entry in PASTA.
+     * 
+     * <h4>Request entity:</h4>
+     * 
+     * <p>
+     * The request entity should be an XML document (MIME type
+     * <code>application/xml</code>) that contains the journal citation metadata.
+     * For example:
+     * </p>
+     * 
+     * <pre>
+            &lt;journalCitation&gt;    
+                &lt;packageId&gt;edi.0.3&lt;/packageId&gt;
+                &lt;articleDoi&gt;10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae&lt;/articleDoi&gt;
+                &lt;articleTitle&gt;Tree Survey in Southern Arizona&lt;/articleTitle&gt;
+                &lt;articleUrl&gt;http://swtrees.com/articles/12345&lt;/articleUrl&gt;
+                &lt;journalTitle&gt;Journal of Southwestern Trees&lt;/journalTitle&gt;
+            &lt;/journalCitation&gt;
+     * </pre>
+     *
+     * <h4>Responses:</h4>
+     * 
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <td><b>Status</b></td>
+     * <td><b>Reason</b></td>
+     * <td><b>Entity</b></td>
+     * <td><b>MIME type</b></td>
+     * </tr>
+     * <tr>
+     * <td>201 Created</td>
+     * <td>If the request was successful.</td>
+     * <td>None</td>
+     * <td>N/A</td>
+     * </tr>
+     * <tr>
+     * <td>400 Bad Request</td>
+     * <td>If the request entity contains an error, such as improperly formatted
+     * XML, EML packageId, or URL.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>401 Unauthorized</td>
+     * <td>If the requesting user is not authorized to create journal citations.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>409 Conflict</td>
+     * <td>If a journal citation already exists with the same creator and attributes.</td>
+     * <td>
+     * An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * </table>
+     * 
+     * @param headers
+     *            the HTTP request headers containing the authorization token.
+     * @param requestBody
+     *            the POST request's body, containing XML.
+     * 
+     * @return an appropriate HTTP response.
+     */
     @POST
     @Path("/citation/eml")
     @Consumes(MediaType.APPLICATION_XML)
     public Response createJournalCitation(@Context HttpHeaders headers, String requestBody) {
-        ResponseBuilder responseBuilder = null;
         AuthToken authToken = null;
         String msg = null;
         Rule.Permission permission = Rule.Permission.write;
@@ -11801,6 +11866,56 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
 
+    /**
+     * <strong>Delete Journal Citation</strong> operation, deletes the journal citation entry
+     * with the specified ID from the journal citation
+     * database.
+     * 
+     * <h4>Responses:</h4>
+     * 
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <td><b>Status</b></td>
+     * <td><b>Reason</b></td>
+     * <td><b>Entity</b></td>
+     * <td><b>MIME type</b></td>
+     * </tr>
+     * <tr>
+     * <td>200 OK</td>
+     * <td>If the request was successful.</td>
+     * <td>None</td>
+     * <td>N/A</td>
+     * </tr>
+     * <tr>
+     * <td>400 Bad Request</td>
+     * <td>If the specified identification number cannot be parsed as an integer.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>401 Unauthorized</td>
+     * <td>If the requesting user is not authorized to delete the specified journal citation entry.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>404 Not Found</td>
+     * <td>If a journal citation entry does not exist in the database with
+     * the specified identification number.</td>
+     * <td>
+     * An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * </table>
+     * 
+     * @param headers
+     *            the HTTP request headers containing the authorization token.
+     * 
+     * @param journalCitationId
+     *            the ID of the journal citation to be deleted.
+     * 
+     * @return an appropriate HTTP response.
+     */
     @DELETE
     @Path("/citation/eml/{journalCitationId}")
     public Response deleteJournalCitation(@Context HttpHeaders headers,
@@ -11815,7 +11930,7 @@ public class DataPackageManagerResource extends PastaWebService {
             authToken = getAuthToken(headers);
             String userId = authToken.getUserId();
 
-            // Is user authorized to run the 'deleteSubscription' service
+            // Is user authorized to run the 'deleteJournalCitation' service
             // method?
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(
                     serviceMethodName, permission, authToken);
@@ -11830,7 +11945,7 @@ public class DataPackageManagerResource extends PastaWebService {
             DataPackageManager dpm = new DataPackageManager();
 
             Integer deletedId = dpm.deleteJournalCitation(id, userId);
-            msg = String.format("Deleted subscription with id = '%d'.",
+            msg = String.format("Deleted journal citation with id = '%d'.",
                                 deletedId);
             response = Response.ok().build();
         }
@@ -11869,6 +11984,77 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
 
+    /**
+     * <strong>Get Journal Citation</strong> operation, returns metadata for a journal citation with the specified ID.
+     * 
+     * <h4>Responses:</h4>
+     * 
+     * <p>
+     * If the request is successful, the response will contain an XML entity
+     * with the following syntax:
+     * </p>
+     * 
+     * <pre>
+            &lt;journalCitation&gt;    
+                &lt;journalCitationId&gt;15&lt;/journalCitationId&gt;
+                &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+                &lt;packageId&gt;edi.0.3&lt;/packageId&gt;
+                &lt;articleDoi&gt;10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae&lt;/articleDoi&gt;
+                &lt;articleTitle&gt;Tree Survey in Southern Arizona&lt;/articleTitle&gt;
+                &lt;articleUrl&gt;http://swtrees.com/articles/12345&lt;/articleUrl&gt;
+                &lt;journalTitle&gt;Journal of Southwestern Trees&lt;/journalTitle&gt;
+            &lt;/journalCitation&gt;
+     * </pre>
+     * 
+     * <p>
+     * The difference between this response entity and the request entity used
+     * to create the citation is the addition of the <code>journalCitationId</code> and
+     * <code>principalOwner</code> elements, which are determined upon journal citation creation.
+     * </p>
+     * 
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <td><b>Status</b></td>
+     * <td><b>Reason</b></td>
+     * <td><b>Entity</b></td>
+     * <td><b>MIME type</b></td>
+     * </tr>
+     * <tr>
+     * <td>200 OK</td>
+     * <td>If the request was successful.</td>
+     * <td>The specified journal citation's attributes.</td>
+     * <td><code>application/xml</code></td>
+     * </tr>
+     * <tr>
+     * <td>400 Bad Request</td>
+     * <td>If the specified identification number cannot be parsed as an integer.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>401 Unauthorized</td>
+     * <td>If the requesting user is not authorized to read the specified journal citation.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>404 Not Found</td>
+     * <td>If a journal citation entry does not exist in the database with
+     * the specified identification number.</td>
+     * <td>
+     * An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * </table>
+     * 
+     * @param headers
+     *            the HTTP request headers containing the authorization token.
+     * 
+     * @param journalCitationId
+     *            the ID of the journal citation entry to be returned.
+     * 
+     * @return an appropriate HTTP response.
+     */
     @GET
     @Path("/citation/eml/{journalCitationId}")
     @Produces(value = { MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN })
@@ -11939,6 +12125,109 @@ public class DataPackageManagerResource extends PastaWebService {
         }
 
 
+    /**
+     * 
+     * <strong>List Data Package Citations</strong> operation, specifying the scope,
+     * identifier, and revision values to match in the URI.
+     * 
+     * <h4>Requests:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Request</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>none</td>
+     * <td align=center>none</td>
+     * <td align=center>
+     * <code>curl -i -X GET https://pasta.lternet.edu/package/citations/eml/edi/1/1</code>
+     * </td>
+     * </tr>
+     * </table>
+     * 
+     * <h4>Responses:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Status</b></th>
+     * <th><b>Reason</b></th>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Message Body</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>200 OK</td>
+     * <td align=center>The list request was successful</td>
+     * <td align=center>An XML-formatted list representing journal citations</td>
+     * <td align=center><code>application/xml</code></td>
+     * <td>
+     * <pre>
+         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+         &lt;journalCitations&gt;
+           &lt;journalCitation&gt;
+             &lt;journalCitationId&gt;15&lt;/journalCitationId&gt;
+             &lt;packageId&gt;edi.0.3&lt;/packageId&gt;
+             &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+             &lt;dateCreated&gt;2017-12-21T14:28:26.235&lt;/dateCreated&gt;
+             &lt;articleDoi&gt;10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae&lt;/articleDoi&gt;
+             &lt;articleTitle&gt;Tree Survey in Rio Rico, Arizona&lt;/articleTitle&gt;
+             &lt;articleUrl&gt;http://myscience.com/articles/12345&lt;/articleUrl&gt;
+             &lt;journalTitle&gt;Arizona Highways&lt;/journalTitle&gt;
+           &lt;/journalCitation&gt;
+         &lt;/journalCitations&gt;     
+     * </pre>
+     * </td>
+     * </tr>
+     * <tr>
+     * <td align=center>400 Bad Request</td>
+     * <td align=center>The request contains an error, such as an illegal
+     * identifier or revision value</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>401 Unauthorized</td>
+     * <td align=center>The requesting user is not authorized to access a list
+     * of journal citations for the specified data package</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>404 Not Found</td>
+     * <td align=centerThe specified data package was not found</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>405 Method Not Allowed</td>
+     * <td align=center>The specified HTTP method is not allowed for the
+     * requested resource</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>500 Internal Server Error</td>
+     * <td align=center>The server encountered an unexpected condition which
+     * prevented it from fulfilling the request</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * </table>
+     * 
+     * @param scope
+     *            The scope of the data package
+     * @param identifier
+     *            The identifier of the data package. A string that represents a whole number.
+     * @param revision
+     *            The revision of the data package. A string that represents a
+     *            whole number, or, the symbolic values "oldest" or "newest".
+     * @return a Response, containing an XML-formatted list of journal citations.
+     */
     @GET
     @Path("/citations/eml/{scope}/{identifier}/{revision}")
     @Produces("application/xml")
@@ -12034,6 +12323,96 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
 
+    /**
+     * 
+     * <strong>List Principal Owner Citations</strong> operation, specifying the principal owner of the citations
+     * to be listed.
+     * 
+     * <h4>Requests:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Request</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>none</td>
+     * <td align=center>none</td>
+     * <td align=center>
+     * <code>curl -i -X GET https://pasta.lternet.edu/package/citations/eml/principalOwner</code>
+     * </td>
+     * </tr>
+     * </table>
+     * 
+     * <h4>Responses:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Status</b></th>
+     * <th><b>Reason</b></th>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Message Body</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>200 OK</td>
+     * <td align=center>The list request was successful</td>
+     * <td align=center>An XML-formatted list representing journal citations created by the specified
+     * principal owner</td>
+     * <td align=center><code>application/xml</code></td>
+     * <td>
+     * <pre>
+         &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+         &lt;journalCitations&gt;
+           &lt;journalCitation&gt;
+             &lt;journalCitationId&gt;15&lt;/journalCitationId&gt;
+             &lt;packageId&gt;edi.0.3&lt;/packageId&gt;
+             &lt;principalOwner&gt;uid=LNO,o=LTER,dc=ecoinformatics,dc=org&lt;/principalOwner&gt;
+             &lt;dateCreated&gt;2017-12-21T14:28:26.235&lt;/dateCreated&gt;
+             &lt;articleDoi&gt;10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae&lt;/articleDoi&gt;
+             &lt;articleTitle&gt;Tree Survey in Rio Rico, Arizona&lt;/articleTitle&gt;
+             &lt;articleUrl&gt;http://myscience.com/articles/12345&lt;/articleUrl&gt;
+             &lt;journalTitle&gt;Arizona Highways&lt;/journalTitle&gt;
+           &lt;/journalCitation&gt;
+         &lt;/journalCitations&gt;     
+     * </pre>
+     * </td>
+     * </tr>
+     * <tr>
+     * <td align=center>400 Bad Request</td>
+     * <td align=center>The request contains an error</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>401 Unauthorized</td>
+     * <td align=center>The requesting user is not authorized to access a list
+     * of journal citations for the specified principal owner</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>405 Method Not Allowed</td>
+     * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>500 Internal Server Error</td>
+     * <td align=center>The server encountered an unexpected condition which
+     * prevented it from fulfilling the request</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * </table>
+     * 
+     * @param principalOwner
+     *            The principal owner of the journal citations
+     * @return a Response, containing an XML-formatted list of journal citations.
+     */
     @GET
     @Path("/citations/eml/{principalOwner}")
     @Produces("application/xml")
