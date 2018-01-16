@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="journalCitation">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element name="articleDoi" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="articleTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="articleUrl" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="journalName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="packageId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="principalOwner" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

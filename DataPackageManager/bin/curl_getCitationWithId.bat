@@ -1,0 +1,5 @@
+@ECHO OFF
+SET SERVICE_HOST=http://localhost:8888
+SET JOURNAL_CITATION_ID=%1
+
+curl -i -G %SERVICE_HOST%/package/citation/eml/%JOURNAL_CITATION_ID%
