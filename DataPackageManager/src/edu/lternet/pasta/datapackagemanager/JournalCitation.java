@@ -41,25 +41,28 @@ public class JournalCitation {
 
     
     public static void main(String[] args) {
+        String packageId = args[0];
         String dirPath = "WebRoot/WEB-INF/conf";
         boolean includeDeclaration = true;
         try {
-            ConfigurationListener configurationListener = new ConfigurationListener();
-            configurationListener.initialize(dirPath);
-            DataPackageManager dpm = new DataPackageManager();
-            DataPackageRegistry dpr = DataPackageManager.makeDataPackageRegistry();
-            String userId = "uid=LNO,o=LTER,dc=ecoinformatics,dc=org";
-            StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            sb.append("<journalCitation>\n");    
-            sb.append("    <packageId>edi.0.3</packageId>\n"); 
-            sb.append("    <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>\n"); 
-            sb.append("    <articleTitle>Tree Survey in Rio Rico, Arizona</articleTitle>\n"); 
-            sb.append("    <articleUrl>http://myscience.com/articles/12345</articleUrl>\n"); 
-            sb.append("    <journalTitle>Arizona Highways</journalTitle>\n"); 
-            sb.append("</journalCitation>\n");
-            String requestXML = sb.toString();
-            JournalCitation journalCitation = dpm.createJournalCitation(userId, requestXML);
-            System.out.println(journalCitation.toXML(includeDeclaration));
+            if (args != null && args.length >= 1) {
+                ConfigurationListener configurationListener = new ConfigurationListener();
+                configurationListener.initialize(dirPath);
+                DataPackageManager dpm = new DataPackageManager();
+                String userId = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+                StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                sb.append("<journalCitation>\n");
+                sb.append(
+            String.format("    <packageId>%s</packageId>\n", packageId));
+                sb.append("    <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>\n");
+                sb.append("    <articleTitle>Mesquite Tree Survey in Southern Arizona</articleTitle>\n");
+                sb.append("    <articleUrl>http://swtreejournal.com/articles/12345</articleUrl>\n");
+                sb.append("    <journalTitle>Journal of Southwest Tress</journalTitle>\n");
+                sb.append("</journalCitation>\n");
+                String requestXML = sb.toString();
+                JournalCitation journalCitation = dpm.createJournalCitation(userId, requestXML);
+                System.out.println(journalCitation.toXML(includeDeclaration));
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
