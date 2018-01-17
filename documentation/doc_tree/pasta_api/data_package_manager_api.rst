@@ -10,6 +10,7 @@ The Data Package Manager API consists of six groups of PASTA web services:
 #. :ref:`Provenance <provenance>` tracking and metadata
 #. Data package :ref:`Event Notifications <event-notifications>`
 #. Data package :ref:`Identifier Reservations <reservations>`
+#. :ref:`Journal Citations <journal-citations>` services
 #. :ref:`System Monitoring <system-monitoring>` services
 #. :ref:`Miscellaneous <miscellaneous>` data package services
 
@@ -1408,6 +1409,196 @@ Examples
          <startDate>2017-01-24 13:37:29.09</startDate>
        </dataPackage>
      </workingOn>
+
+.. _journal-citations:
+
+
+Journal Citation Services
+--------------------------
+
+Web service methods for creating, reading, and deleting journal citation entries associated with data packages.
+
+
+*Create Journal Citation*
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Create Journal Citation operation, creates a new journal citation entry in PASTA. An XML document containing metadata for the journal citation must be supplied in the HTTP request body.
+
+REST API
+""""""""
+
+`POST : https://pasta.lternet.edu/package/citation/eml <https://pasta.lternet.edu/package/docs/api#POST%20:%20/citation/eml>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to create a journal citation with the XML metadata stored in a file::  
+  
+    curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
+       -H "Content-Type: application/xml" --data-binary @journalCitation.xml \
+       -X POST https://pasta.lternet.edu/package/eml
+
+  Where file journalCitation.xml contains the following XML: ::
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <journalCitation>   
+        <packageId>edi.1000.1</packageId>
+        <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>
+        <articleTitle>Tree Survey in Southern Arizona</articleTitle>
+        <articleUrl>http://treejournal.com/articles/12345</articleUrl>
+        <journalTitle>The Tree Journal</journalTitle>
+    </journalCitation>
+
+
+*Delete Journal Citation*
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Delete Journal Citation operation, deletes the journal citation entry with the specified ID from the journal citation table.
+Requires authentication by the owner of the journal citation entry.
+
+REST API
+""""""""
+
+`DELETE : https://pasta.lternet.edu/package/citation/eml/{journalCitationId} <https://pasta.lternet.edu/package/docs/api#DELETE%20:%20/citation/eml/{journalCitationId}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to delete the journal citation with identifier value 15, owned by user "ucarroll"::  
+
+    curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
+         -X DELETE https://pasta.lternet.edu/package/citation/eml/15
+
+
+*Get Journal Citation*
+^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Get Journal Citation operation, returns an XML metadata document for the journal citation with the specified integer ID value.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/citation/eml/{journalCitationId} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{journalCitationId}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to access the journal citation with identifier value 15::  
+
+    curl -X GET https://pasta.lternet.edu/package/citation/eml/15
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <journalCitation>
+        <journalCitationId>15</journalCitationId>
+        <principalOwner>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</principalOwner>
+        <dateCreated>2017-12-21T14:28:26.235</dateCreated>
+        <packageId>edi.1000.1</packageId>
+        <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>
+        <articleTitle>Tree Survey in Southern Arizona</articleTitle>
+        <articleUrl>http://treejournal.com/articles/12345</articleUrl>
+        <journalTitle>The Tree Journal</journalTitle>
+    </journalCitation>
+
+
+*List Data Package Citations*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Data Package Citations operation, specifying the data package scope, identifier, and revision values to match in the URI.
+Returns a list of journal citations as an XML metadata document.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/citation/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{scope}/{identifier}/{revision}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to access the list of journal citations for the data package with package ID "edi.1000.1" ::  
+
+    curl -X GET https://pasta.lternet.edu/package/citation/eml/edi/1000/1
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <journalCitations>
+        <journalCitation>
+            <journalCitationId>15</journalCitationId>
+            <principalOwner>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</principalOwner>
+            <dateCreated>2017-12-21T14:28:26.235</dateCreated>
+            <packageId>edi.1000.1</packageId>
+            <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>
+            <articleTitle>Tree Survey in Southern Arizona</articleTitle>
+            <articleUrl>http://treejournal.com/articles/12345</articleUrl>
+            <journalTitle>The Tree Journal</journalTitle>
+        </journalCitation>
+        <journalCitation>
+            <journalCitationId>18</journalCitationId>
+            <principalOwner>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</principalOwner>
+            <dateCreated>2017-12-26T14:28:26.235</dateCreated>
+            <packageId>edi.1000.1</packageId>
+            <articleDoi>10.5072/FK2/07bccc7b0cb2a2d5f6fe672cb4b36dea</articleDoi>
+            <articleTitle>Mesquites of the Southwest</articleTitle>
+            <articleUrl>http://swtrees.com/articles/68999</articleUrl>
+            <journalTitle>Trees of the Southwest</journalTitle>
+        </journalCitation>
+    </journalCitations>
+
+
+*List Principal Owner Citations*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+List Principal Owner Citations operation, returns journal citations metadata for all entries owned by the specified principal owner.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/citation/eml/{principalOwner} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{principalOwner}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to access the list of journal citations owned by user "ucarroll" ::  
+
+    curl -X GET https://pasta.lternet.edu/package/citation/eml/uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <journalCitations>
+        <journalCitation>
+            <journalCitationId>15</journalCitationId>
+            <principalOwner>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</principalOwner>
+            <dateCreated>2017-12-21T14:28:26.235</dateCreated>
+            <packageId>edi.1000.1</packageId>
+            <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>
+            <articleTitle>Tree Survey in Southern Arizona</articleTitle>
+            <articleUrl>http://treejournal.com/articles/12345</articleUrl>
+            <journalTitle>The Tree Journal</journalTitle>
+        </journalCitation>
+        <journalCitation>
+            <journalCitationId>18</journalCitationId>
+            <principalOwner>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</principalOwner>
+            <dateCreated>2017-12-26T14:28:26.235</dateCreated>
+            <packageId>edi.1000.1</packageId>
+            <articleDoi>10.5072/FK2/07bccc7b0cb2a2d5f6fe672cb4b36dea</articleDoi>
+            <articleTitle>Mesquites of the Southwest</articleTitle>
+            <articleUrl>http://swtrees.com/articles/68999</articleUrl>
+            <journalTitle>Trees of the Southwest</journalTitle>
+        </journalCitation>
+    </journalCitations>
+
 
 .. _miscellaneous:
 
