@@ -56,8 +56,8 @@ public class JournalCitation {
             String.format("    <packageId>%s</packageId>\n", packageId));
                 sb.append("    <articleDoi>10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae</articleDoi>\n");
                 sb.append("    <articleTitle>Mesquite Tree Survey in Southern Arizona</articleTitle>\n");
-                sb.append("    <articleUrl>http://swtreejournal.com/articles/12345</articleUrl>\n");
-                sb.append("    <journalTitle>Journal of Southwest Tress</journalTitle>\n");
+                //sb.append("    <articleUrl>http://swtreejournal.com/articles/12345</articleUrl>\n");
+                sb.append("    <journalTitle>Journal of Southwest Trees</journalTitle>\n");
                 sb.append("</journalCitation>\n");
                 String requestXML = sb.toString();
                 JournalCitation journalCitation = dpm.createJournalCitation(userId, requestXML);
