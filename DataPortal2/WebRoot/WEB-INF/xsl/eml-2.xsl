@@ -7446,7 +7446,7 @@
       <tr>
         <td class="{$methodfirstColStyle}">Sampling Unit Location:</td>
         <td width="${secondColWidth}">
-          <xsl:call-template name="coverage"></xsl:call-template>
+          <xsl:call-template name="geographicCoverage"></xsl:call-template>
         </td>
       </tr>
     </xsl:for-each>
@@ -7589,7 +7589,7 @@
     <xsl:for-each select="coverage">
       <tr>
         <td class="{$methodfirstColStyle}">Sampling Unit Location:</td>
-        <td width="${secondColWidth}"><xsl:call-template name="coverage"></xsl:call-template></td>
+        <td width="${secondColWidth}"><xsl:call-template name="geographicCoverage"></xsl:call-template></td>
       </tr>
     </xsl:for-each>
   </xsl:template>
