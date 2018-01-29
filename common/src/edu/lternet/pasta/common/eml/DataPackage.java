@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.Entity.EntityType;
 
 
@@ -532,7 +533,7 @@ public class DataPackage {
 		
 		
 		public String getSourceTitle() {
-			return sourceTitle;
+			return XmlUtility.xmlEncode(sourceTitle);
 		}
 		
 		
@@ -553,7 +554,7 @@ public class DataPackage {
 			
 			stringBuilder.append("    <dataSource>\n");			
 			stringBuilder.append(String.format("        <packageId>%s</packageId>\n", sourceId));
-			stringBuilder.append(String.format("        <title>%s</title>\n", sourceTitle));
+			stringBuilder.append(String.format("        <title>%s</title>\n", getSourceTitle()));
 			stringBuilder.append(String.format("        <url>%s</url>\n", sourceURL));		
 			stringBuilder.append("    </dataSource>\n");
 
@@ -589,7 +590,7 @@ public class DataPackage {
 		
 		
 		public String getDerivedTitle() {
-			return derivedTitle;
+			return XmlUtility.xmlEncode(derivedTitle);
 		}
 		
 		
@@ -611,7 +612,7 @@ public class DataPackage {
 			
 			stringBuilder.append("    <dataDescendant>\n");			
 			stringBuilder.append(String.format("        <packageId>%s</packageId>\n", derivedId));
-			stringBuilder.append(String.format("        <title>%s</title>\n", derivedTitle));
+			stringBuilder.append(String.format("        <title>%s</title>\n", getDerivedTitle()));
 			stringBuilder.append(String.format("        <url>%s</url>\n", derivedURL));		
 			stringBuilder.append("    </dataDescendant>\n");
 
