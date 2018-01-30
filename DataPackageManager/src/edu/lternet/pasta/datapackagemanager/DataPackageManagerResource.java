@@ -11774,6 +11774,13 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td><code>text/plain</code></td>
      * </tr>
      * <tr>
+     * <tr>
+     * <td>404 Not Found</td>
+     * <td>A data package with the specified package identifier was not found in the repository.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
      * <td>409 Conflict</td>
      * <td>If a journal citation already exists with the same creator and attributes.</td>
      * <td>

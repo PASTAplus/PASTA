@@ -226,16 +226,16 @@ public final class EmlPackageIdFormat {
         String[] elements = packageId.split(delimiter.getRegex());
 
         if (elements.length > 3) {
-            String s = "The EML packageId '" + packageId
-                    + "' does not conform to the standard "
-                    + format("<scope>", "<identifier>", "<revision>")
-                    + " syntax.";
+            String s = String.format(
+                "The EML packageId value '%s' does not conform to the standard scope.identifier.revision syntax", 
+                packageId);
             throw new IllegalArgumentException(s);
         }
 
         return parse(elements);
     }
 
+    
     private EmlPackageId parse(String[] elements) {
 
         EmlPackageId epi = null;
