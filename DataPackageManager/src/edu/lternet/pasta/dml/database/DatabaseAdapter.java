@@ -146,6 +146,24 @@ public abstract class DatabaseAdapter {
   }
   
   
+  
+  public static void main(String[] args) {
+        if (args != null && args.length == 2) {
+            String formatStr = args[0];
+            String dateStr = args[1];
+            String msg = formatStringMatchesDataValue(formatStr, dateStr);
+            if (msg == null) {
+                System.out.println("Parses successfully");
+            } else {
+                System.err.println(msg);
+            }
+        } else {
+            System.err.println("Supply two arguments: formatString and datetime value");
+        }
+    }
+
+  
+  
   /*
    * Use Java 8 DateTimeFormatter class to parse the date value based on the specified formatString.
    */
@@ -156,41 +174,52 @@ public abstract class DatabaseAdapter {
 			log.debug("pattern: " + formatStr);
 			String javaPattern = formatStr.replace("T", "'T'")
 					                      .replace("Z", "'Z'")
-					                      .replace(".sss", ".SSS");
+					                      .replace(".sss", ".SSS")
+					                      .replace("YYYYMMDD", "YYYYMMdd");
+			
 			DateTimeFormatter df = DateTimeFormatter.ofPattern(javaPattern);
+			
 			try {
 				TemporalAccessor ta = df.parse(dateStr);
 			}
 			catch (DateTimeParseException e) {
-				if (javaPattern.contains("YYYYMMDD")) {
-					// Try again using "YYYYMMdd" instead of "YYYYMMDD"
-					msg = formatStringMatchesDataValue(javaPattern.replace("YYYYMMDD", "YYYYMMdd"), dateStr);
-				}
-				else if (javaPattern.contains("YYYY")) {
-					// Try again using "uuuu" instead of "YYYY"
-					msg = formatStringMatchesDataValue(javaPattern.replace("YYYY", "uuuu"), dateStr);
-				}
-				else {
-					/*
-					 * Restore any strings that may have been replaced with alternate formats
-					 * before composing the warning message to the user.
-					 */
-					msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
-	                                    dateStr, 
-	                                    formatStr.replace("uuuu", "YYYY")
-	                                             .replace("YYYYMMdd", "YYYYMMDD"));
-				}
+				msg = formatStringMatchesDataValueAux(formatStr, javaPattern, dateStr);
 			}
 		}
 		catch (IllegalArgumentException e) {
-			msg = String.format("Data value '%s' could not be parsed using formatString '%s'.",
-		                        dateStr, formatStr);
+			msg = String.format("An error occurred while applying datetime formatString '%s': %s",
+		                        formatStr, e.getMessage());
 		}
 		
 		return msg;
 	}
 
-	
+
+    private static String formatStringMatchesDataValueAux(String original, String formatStr, String dateStr) {
+        String msg = null;
+
+        try {
+            log.debug("pattern: " + formatStr);
+            String javaPattern = formatStr.replace("YYYY", "uuuu");            
+            DateTimeFormatter df = DateTimeFormatter.ofPattern(javaPattern);
+            
+            try {
+                TemporalAccessor ta = df.parse(dateStr);
+            }
+            catch (DateTimeParseException e) {
+                msg = String.format("Data value '%s' could not be parsed using formatString '%s': %s",
+                                    dateStr, original, e.getMessage());
+            }
+        }
+        catch (IllegalArgumentException e) {
+            msg = String.format("An error occurred while applying datetime formatString '%s': %s",
+                                formatStr, e.getMessage());
+        }
+        
+        return msg;
+    }
+
+
   /*
    * Instance methods
    */
