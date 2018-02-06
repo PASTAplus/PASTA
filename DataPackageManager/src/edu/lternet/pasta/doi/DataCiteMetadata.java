@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
+import edu.lternet.pasta.doi.RelatedIdentifier.RelatedIdentifierType;
 
 /**
  * @author servilla
@@ -42,6 +43,7 @@ public class DataCiteMetadata extends CitationMetadata {
 
 	private static final String PUBLISHER = "Environmental Data Initiative";
 
+
 	/*
 	 * Instance variables
 	 */
@@ -52,18 +54,22 @@ public class DataCiteMetadata extends CitationMetadata {
 	private ResourceType resourceType = null;
 	private AlternateIdentifier alternateIdentifier = null;
 
+	
 	/*
 	 * Constructors
 	 */
 
+	
 	/*
 	 * Class methods
 	 */
 
+	
 	/*
 	 * Instance methods
 	 */
 
+	
 	/**
 	 * Set the DataCite digital object identifier for the PASTA resource.
 	 * 
@@ -73,6 +79,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		this.digitalObjectIdentifier = doi;
 	}
 
+	
 	/**
 	 * Set the DataCite resource type for the PASTA resource.
 	 * 
@@ -82,6 +89,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		this.resourceType = resourceType;
 	}
 
+	
 	/**
 	 * Set the DataCite alternate identifier for the PASTA resource.
 	 * 
@@ -91,6 +99,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		this.alternateIdentifier = alternateIdentifier;
 	}
 
+	
 	/**
 	 * Get the DataCite digital object identifier for the PASTA resource.
 	 * 
@@ -100,6 +109,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		return this.digitalObjectIdentifier;
 	}
 
+	
 	/**
 	 * Get the DataCite resource type for the PASTA resource.
 	 * 
@@ -109,6 +119,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		return this.resourceType;
 	}
 
+	
 	/**
 	 * Get the DataCite alternate identifier for the PASTA resource.
 	 * 
@@ -118,6 +129,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		return this.alternateIdentifier;
 	}
 
+	
 	/**
 	 * Generate and return the DataCite metadata package as XML.
 	 * 
@@ -131,7 +143,7 @@ public class DataCiteMetadata extends CitationMetadata {
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		sb.append("<resource xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
 		sb.append("          xmlns=\"http://datacite.org/schema/kernel-4\"\n");
-		sb.append("          xsi:schemaLocation=\"http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd\">\n");
+		sb.append("          xsi:schemaLocation=\"http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd\">\n");
 
 		// The DOI identifier, woo-hoo
 		if (this.digitalObjectIdentifier != null) {
@@ -198,15 +210,33 @@ public class DataCiteMetadata extends CitationMetadata {
 			sb.append("    </alternateIdentifiers>\n");
 		}
 
-		sb.append("    <language>eng</language>\n");
+        // Related identifiers section
+        if (this.relatedIdentifiers != null && this.relatedIdentifiers.size() > 0) {
+            sb.append("    <relatedIdentifiers>\n");
 
-		sb.append("</resource>\n");
+            for (RelatedIdentifier ri : this.relatedIdentifiers) {
+                String relatedIdentifier = ri.getRelatedIdentifier();
+                sb.append(String.format(
+                    "        <relatedIdentifier relatedIdentifierType=\"%s\" relationType=\"%s\">",
+                    ri.getRelatedIdentifierType(), 
+                    ri.getRelationType()));
+                sb.append(relatedIdentifier);
+                sb.append("</relatedIdentifier>\n");
+            }
+
+            sb.append("    </relatedIdentifiers>\n");
+        }
+
+        sb.append("    <language>eng</language>\n");
+
+        sb.append("</resource>\n");
 
 		//return DataCiteMetadata.escape(xml.toString());
 		String xml = sb.toString();
 		return xml;
 	}
-	
+
+
 	/**
 	 * EZID percent decoding of reserved characters: '%', '\n', '\r', and ':'.
 	 * 
@@ -226,13 +256,19 @@ public class DataCiteMetadata extends CitationMetadata {
 	  return b.toString();
 	  
 	}
-	
+
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		DataCiteMetadata dcm = new DataCiteMetadata();
+		RelatedIdentifier ri1 = new RelatedIdentifier("http://x.y.z", RelatedIdentifierType.URL);
+		RelatedIdentifier ri2 = new RelatedIdentifier("doi:blahblahblah", RelatedIdentifierType.DOI);
+		dcm.addRelatedIdentifier(ri1);
+		dcm.addRelatedIdentifier(ri2);
+		String xml = dcm.toDataCiteXml();
+		System.out.println(xml);
 	}
 
 }

@@ -125,8 +125,4 @@ public abstract class Registrar {
 		return this.protocol + "://" + this.host + url;
 	}
 
-	
-	public void registerDataCiteMetadata() throws RegistrarException {
-
-	}
 }

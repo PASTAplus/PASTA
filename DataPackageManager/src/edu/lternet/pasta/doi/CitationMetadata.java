@@ -45,6 +45,7 @@ public abstract class CitationMetadata {
 	protected String publicationYear = null;
 	protected ArrayList<ResponsibleParty> creators = null;
 	protected ArrayList<Title> titles = null;
+    protected ArrayList<RelatedIdentifier> relatedIdentifiers = new ArrayList<RelatedIdentifier>();
 	
 	/*
 	 * Constructors
@@ -130,4 +131,27 @@ public abstract class CitationMetadata {
 		return this.titles;
 	}
 	
+	
+	/**
+	 * Adds a relatedIdentifier object to the list. For example, when a new
+	 * journal citation article that cites a data package is created, we
+	 * add a new relatedIdentifier with the article DOI or URL.
+	 * 
+	 * @param relatedIdentifier
+	 */
+	public void addRelatedIdentifier(RelatedIdentifier relatedIdentifier) {
+	    relatedIdentifiers.add(relatedIdentifier);
+	}
+	
+	
+    /**
+     * Get the list of related identifiers. Typically, this is a list of
+     * journal article DOIs or URLs that cite the data package resource.
+     * 
+     * @return List of related identifier objects.
+     */
+    public ArrayList<RelatedIdentifier> getRelatedIdentifiers() {
+        return this.relatedIdentifiers;
+    }
+    
 }
