@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
+import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
+import edu.lternet.pasta.datapackagemanager.JournalCitation;
 import edu.lternet.pasta.doi.RelatedIdentifier.RelatedIdentifierType;
 
 /**
@@ -127,6 +129,53 @@ public class DataCiteMetadata extends CitationMetadata {
 	 */
 	public AlternateIdentifier getAlternateIdentifier() {
 		return this.alternateIdentifier;
+	}
+	
+	
+	
+	/**
+	 * Accept a list of journal citations and add them to this DataCite metadata
+	 * as related identifier.
+	 * 
+	 * @param citations       the list of journal citation objects
+	 */
+	public void addJournalCitations(ArrayList<JournalCitation> citations) {
+	    if (citations != null) {
+	        for (JournalCitation journalCitation : citations) {
+	            RelatedIdentifier relatedIdentifier = journalCitationToRelatedIdentifier(journalCitation);
+	            if (relatedIdentifier != null) {
+	                this.addRelatedIdentifier(relatedIdentifier);
+	            }
+	        }
+	    }
+	}
+	
+	
+	/*
+	 * Converts a journal citation to a related identifier
+	 */
+	private RelatedIdentifier journalCitationToRelatedIdentifier(JournalCitation journalCitation) {
+	    RelatedIdentifier relatedIdentifier = null;
+	    RelatedIdentifierType relatedIdentifierType = null;
+	    String relatedIdentifierStr = null;
+	    
+	    String doi = journalCitation.getArticleDoi();
+        String url = journalCitation.getArticleUrl();
+	    
+	    if (doi != null && !doi.isEmpty()) {
+	        relatedIdentifierStr = doi;
+	        relatedIdentifierType = RelatedIdentifierType.DOI;
+	    }
+	    else if (url != null && !url.isEmpty()) {
+            relatedIdentifierStr = url;
+	        relatedIdentifierType = RelatedIdentifierType.URL;
+	    }
+	    
+	    if (relatedIdentifierType != null) {
+	        relatedIdentifier = new RelatedIdentifier(relatedIdentifierStr, relatedIdentifierType);
+	    }
+	    
+	    return relatedIdentifier;
 	}
 
 	
@@ -261,14 +310,28 @@ public class DataCiteMetadata extends CitationMetadata {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		DataCiteMetadata dcm = new DataCiteMetadata();
-		RelatedIdentifier ri1 = new RelatedIdentifier("http://x.y.z", RelatedIdentifierType.URL);
-		RelatedIdentifier ri2 = new RelatedIdentifier("doi:blahblahblah", RelatedIdentifierType.DOI);
-		dcm.addRelatedIdentifier(ri1);
-		dcm.addRelatedIdentifier(ri2);
-		String xml = dcm.toDataCiteXml();
-		System.out.println(xml);
-	}
+    public static void main(String[] args) {
+        try {
+            DOIScanner doiScanner = new DOIScanner();
+            DataPackageRegistry dpr = doiScanner.getDataPackageRegistry();
+            DataCiteMetadata dcm = new DataCiteMetadata();
+            RelatedIdentifier ri1 = new RelatedIdentifier("http://x.y.z", RelatedIdentifierType.URL);
+            RelatedIdentifier ri2 = new RelatedIdentifier("doi:blahblahblah", RelatedIdentifierType.DOI);
+            dcm.addRelatedIdentifier(ri1);
+            dcm.addRelatedIdentifier(ri2);
+
+            if (dpr != null) {
+                String packageId = "edi.0.3";
+                ArrayList<JournalCitation> citations = dpr.listDataPackageCitations(packageId);
+                dcm.addJournalCitations(citations);
+            }
+
+            String xml = dcm.toDataCiteXml();
+            System.out.println(xml);
+        } 
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
 
 }

@@ -32,7 +32,7 @@ import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
-
+import edu.lternet.pasta.datapackagemanager.JournalCitation;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -146,6 +146,11 @@ public class DOIScanner {
 	/*
 	 * Instance methods
 	 */
+	
+	
+	public DataPackageRegistry getDataPackageRegistry() {
+	    return this.dataPackageRegistry;
+	}
 
 	/**
 	 * Loads Data Manager options from a configuration file.
@@ -316,6 +321,13 @@ public class DOIScanner {
 				dataCiteMetadata.setDigitalObjectIdentifier(digitalObjectIdentifier);
 				dataCiteMetadata.setResourceType(resourceType);
 				dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
+				
+				/*
+				 * Find all the journal citations for this data package and tell the
+				 * DataCite metadata object to include them as relatedIdentifiers.
+				 */
+				ArrayList<JournalCitation> journalCitations = dataPackageRegistry.listDataPackageCitations(packageId);
+				dataCiteMetadata.addJournalCitations(journalCitations);
 
 				try {
 					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
