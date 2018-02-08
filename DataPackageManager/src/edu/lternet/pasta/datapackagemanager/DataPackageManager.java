@@ -3860,7 +3860,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                 boolean hasDataPackage = dpr.hasDataPackage(scope, identifier, revision.toString());
                 if (hasDataPackage) {
                     dpr.addJournalCitation(journalCitation);
-                    updateDataCiteMetadata(dpr, journalCitation);
+                    updateDataCiteMetadata(dpr, packageId);
                 }
                 else {
                     throw new ResourceNotFoundException(
@@ -3882,9 +3882,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     
     
     private void updateDataCiteMetadata(DataPackageRegistry dataPackageRegistry,
-                                        JournalCitation journalCitation) 
+                                        String packageId) 
             throws SQLException {
-        String packageId = journalCitation.getPackageId();
         boolean publicOnly = true;
         ArrayList<Resource> resourceList = 
                 dataPackageRegistry.listDataPackageResources(packageId, publicOnly);
@@ -3912,7 +3911,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         
         if (id != null && userId != null) {
             DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-            deletedId = dpr.deleteJournalCitation(id, userId);
+            ArrayList<JournalCitation> journalCitations = dpr.getCitationWithId(id);
+            if (journalCitations != null && journalCitations.size() > 0) {
+                JournalCitation journalCitation = journalCitations.get(0);
+                String packageId = journalCitation.getPackageId();
+                deletedId = dpr.deleteJournalCitation(id, userId);
+                if (deletedId != null) {
+                    updateDataCiteMetadata(dpr, packageId);
+                }
+            }
         }
         
         return deletedId;
