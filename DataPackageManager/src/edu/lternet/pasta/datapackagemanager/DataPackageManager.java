@@ -3860,6 +3860,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                 boolean hasDataPackage = dpr.hasDataPackage(scope, identifier, revision.toString());
                 if (hasDataPackage) {
                     dpr.addJournalCitation(journalCitation);
+                    updateDataCiteMetadata(dpr, journalCitation);
                 }
                 else {
                     throw new ResourceNotFoundException(
@@ -3879,6 +3880,31 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         return journalCitation;
     }
     
+    
+    private void updateDataCiteMetadata(DataPackageRegistry dataPackageRegistry,
+                                        JournalCitation journalCitation) 
+            throws SQLException {
+        String packageId = journalCitation.getPackageId();
+        boolean publicOnly = true;
+        ArrayList<Resource> resourceList = 
+                dataPackageRegistry.listDataPackageResources(packageId, publicOnly);
+        if (resourceList != null) {
+            for (Resource resource : resourceList) {
+                if (resource.getResourceType().equals("dataPackage") &&
+                    resource.getDoi() != null
+                   ) {
+                    try {
+                        String doi = doiScanner.processOneResource(resource);
+                    }
+                    catch (Exception e) {
+                        logger.error(e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
     
     public Integer deleteJournalCitation(Integer id, String userId) 
             throws ClassNotFoundException, SQLException {

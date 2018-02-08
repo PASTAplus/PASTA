@@ -50,37 +50,38 @@ public class DigitalObjectIdentifier {
 
   private String prefix;
   private String context;
-	private String pastaId = null;
 	private String md5Id = null;
 
 	/*
 	 * Constructors
 	 */
 
-  /**
-   * Return a new Digital Object Identifier object for the given PASTA
-   * identifier.
-   *
-   * @param pastaId The PASTA identifier
-   * @throws ConfigurationException
-   */
-	public DigitalObjectIdentifier(String pastaId) throws ConfigurationException {
+    /**
+     * Return a new Digital Object Identifier object for the given PASTA
+     * identifier and MD5 string. This version of the constructor is called
+     * when we already know the MD5 string and so don't need to regenerate it.
+     * This is typically the case when we are updating metadata for an
+     * existing DOI instead of minting a new DOI.
+     *
+     * @param md5Id
+     *            The generated MD5 string
+     * @throws ConfigurationException
+     */
+    public DigitalObjectIdentifier(String md5Id) throws ConfigurationException {
+        Options options = ConfigurationListener.getOptions();
 
-    Options options = ConfigurationListener.getOptions();
+        if (options == null) {
+            ConfigurationListener configurationListener = new ConfigurationListener();
+            configurationListener.initialize(dirPath);
+            options = ConfigurationListener.getOptions();
+        }
 
-    if (options == null) {
-      ConfigurationListener configurationListener = new ConfigurationListener();
-      configurationListener.initialize(dirPath);
-      options = ConfigurationListener.getOptions();
-    }
+        loadOptions(options);
 
-    loadOptions(options);
-
-    this.pastaId = pastaId;
-		md5Id = DigestUtils.md5Hex(pastaId);
-		
-	}
-	
+        this.md5Id = md5Id;
+    }    
+    
+    
 	/*
 	 * Class methods
 	 */
@@ -117,15 +118,6 @@ public class DigitalObjectIdentifier {
 	}
 	
 	/**
-	 * Get DOI PASTA identifier.
-	 * 
-	 * @return DOI PASTA identifier
-	 */
-	public String getPastaId() {
-		return this.pastaId;
-	}
-	
-	/**
 	 * Get DOI MD5 identifier (opaque identifier).
 	 * 
 	 * @return DOI MD5 identifier
@@ -155,6 +147,7 @@ public class DigitalObjectIdentifier {
 		return identifier;
 	}
 
+
   /*
    * Load local properties from identity.properties
    */
@@ -182,22 +175,20 @@ public class DigitalObjectIdentifier {
   /**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		
-		String pastaId = "https://pasta.lternet.edu/package/metadata/eml/knb-lter-nin/1/1";
+    public static void main(String[] args) {
+        String resourceId = "https://pasta.lternet.edu/package/metadata/eml/knb-lter-nin/1/1";
+        String md5Id = DigestUtils.md5Hex(resourceId);
+        DigitalObjectIdentifier doi = null;
 
-    DigitalObjectIdentifier doi = null;
+        try {
+            doi = new DigitalObjectIdentifier(md5Id);
+        } 
+        catch (ConfigurationException e) {
+            logger.error("DigitalObjectIdentifier: " + e.getMessage());
+            e.printStackTrace();
+        }
 
-    try{
-      doi = new DigitalObjectIdentifier(pastaId);
+        System.out.println(doi.getDoi());
     }
-    catch (ConfigurationException e) {
-      logger.error("DigitalObjectIdentifier: " + e.getMessage());
-      e.printStackTrace();
-    }
-		
-		System.out.println(doi.getDoi());
-
-	}
 
 }

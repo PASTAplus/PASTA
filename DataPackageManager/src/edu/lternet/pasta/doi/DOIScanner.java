@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.eml.EmlObject;
@@ -250,6 +251,18 @@ public class DOIScanner {
 		
 		return scope;
 	}
+	
+	
+	
+	private String md5IdFromDoi(String doi) {
+	    String md5Id = null;
+	    
+	    if (doi != null) {
+	        md5Id = doi.substring(doi.lastIndexOf('/') + 1);
+	    }
+	    
+	    return md5Id;
+	}
 
 	
 	/**
@@ -264,7 +277,7 @@ public class DOIScanner {
 
 		File emlFile = null;
 		EmlObject emlObject = null;
-		String resourceUrl = null;
+		String resourceId = null;
 		String doiUrl = null;
 		String publicationYear = null;
 		ArrayList<ResponsibleParty> creators = null;
@@ -273,18 +286,18 @@ public class DOIScanner {
 		ResourceType resourceType = null;
 		AlternateIdentifier alternateIdentifier = null;
 		Date time = null;
-		String doi = null;
+		String doi = resource.getDoi();
+        String packageId = resource.getPackageId();
 
 			// Build EML document object
-			emlFile = new File(this.getEmlFilePath(resource.getPackageId()));
+			emlFile = new File(this.getEmlFilePath(packageId));
 			
 			if (emlFile.exists()) {
 				emlObject = new EmlObject(emlFile);
 
 				// Set local metadata attributes
-				resourceUrl = resource.getResourceId();
+				resourceId = resource.getResourceId();
 				String doiUrlHead = this.doiUrlHeadEDI;
-				String packageId = resource.getPackageId();
 				String scope = scopeFromPackageId(packageId);
 				if (isLTERScope(scope)) {
 					doiUrlHead = this.doiUrlHeadLTER;
@@ -295,21 +308,29 @@ public class DOIScanner {
 				creators = emlObject.getCreators();
 				titles = emlObject.getTitles();
 
-				// If DOI testing, add salt to resource identifier to create unique DOI
-				// so subsequent tests will not result in DOI create errors.
-				if (this.isDoiTest) {
-					time = new Date();
-					Long salt = time.getTime();
-					digitalObjectIdentifier = new DigitalObjectIdentifier(resource.getResourceId()
-					    + salt.toString());
-				} else {
-					digitalObjectIdentifier = new DigitalObjectIdentifier(resource.getResourceId());
+				String md5Id = null;
+				if (doi != null) {
+				    md5Id = md5IdFromDoi(doi);
+				} 
+				else {
+				    // If DOI testing, add salt to resource identifier to create unique DOI
+                    // so subsequent tests will not result in DOI create errors.
+				    if (this.isDoiTest) {
+				        time = new Date();
+				        Long salt = time.getTime();
+				        md5Id = DigestUtils.md5Hex(resourceId + salt.toString());
+				    } 
+				    else {
+				        md5Id = DigestUtils.md5Hex(resourceId);
+				    }
 				}
+				
+                digitalObjectIdentifier = new DigitalObjectIdentifier(md5Id);
 
 				resourceType = new ResourceType(ResourceType.DATASET);
 				resourceType.setResourceType(resource.getResourceType());
 				alternateIdentifier = new AlternateIdentifier(AlternateIdentifier.URL);
-				alternateIdentifier.setAlternateIdentifier(resource.getResourceId());
+				alternateIdentifier.setAlternateIdentifier(resourceId);
 
 				// Create and populate the DataCite metadata object
 				DataCiteMetadata dataCiteMetadata = new DataCiteMetadata();
@@ -332,9 +353,8 @@ public class DOIScanner {
 				try {
 					doi = dataCiteMetadata.getDigitalObjectIdentifier().getDoi();
 					registrar.registerDataCiteMetadata(dataCiteMetadata);
-
-				} catch (RegistrarException e) {
-
+				} 
+				catch (RegistrarException e) {
 					/*
 					 * In the event that a DOI registration succeeded, but
 					 * failed to be recorded in the resource registry, the following
@@ -348,26 +368,27 @@ public class DOIScanner {
                             doi, resource.getPackageId()
                         );
 						logger.warn(msg + "  Proceeding with resource registry update...");
-					} else {
+					} 
+					else {
 						logger.error(e.getMessage());
 						e.printStackTrace();
 						doi = null;
 					}
-
 				}
 
 				if (doi != null) {
 					// Update Data Package Manager resource registry with DOI
 					try {
-						dataPackageRegistry.addResourceDoi(resourceUrl, doi);
-					} catch (SQLException e) {
+						dataPackageRegistry.addResourceDoi(resourceId, doi);
+					} 
+					catch (SQLException e) {
 						logger.error(e.getMessage());
 						e.printStackTrace();
 						throw new DOIException(e.getMessage());
 					}
 				}
-			
-			} else {
+			} 
+			else {
 				String gripe = "doScanToRegister: Level-1-EML.xml file does not exist for "
 				    + resource.getPackageId();
 				logger.error(gripe);
