@@ -108,6 +108,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     // previously these were constants, now member variables with defaults
     protected String packageIdPath = null;
     protected String pubDatePath = null;
+    protected String fundingPath = null;
     protected String dataTableEntityPath = null;
     protected String spatialRasterEntityPath = null;
     protected String spatialVectorEntityPath  = null;
@@ -180,7 +181,8 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 			String dataTableEntityPath,
 			String spatialRasterEntityPath, String spatialVectorEntityPath,
 			String storedProcedureEntityPath, String viewEntityPath,
-			String otherEntityPath, String entityPhysicalAuthenticationPath) {
+			String otherEntityPath, String entityPhysicalAuthenticationPath,
+			String fundingPath) {
 		
 		//set default so that caller can pass nulls for some params
 		this.initDefaultXPaths();
@@ -192,6 +194,9 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		if (pubDatePath != null) {
 			this.pubDatePath = pubDatePath;
 		}
+        if (fundingPath != null) {
+            this.fundingPath = fundingPath;
+        }
 		if (dataTableEntityPath != null) {
 			this.dataTableEntityPath = dataTableEntityPath;
 		}
@@ -237,6 +242,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		entityAccessPath = "physical/distribution/access";
 		entityPhysicalAuthenticationPath = "physical/authentication";
 		alternateIdentifierPath = "//dataset/alternateIdentifier";
+		fundingPath = "//dataset/project/funding";
 	}
 
 	
@@ -378,6 +384,14 @@ public class GenericDataPackageParser implements DataPackageParserInterface
               emlDataPackage.setTitle(titleText);
             }
             
+            // Store the funding
+            Node fundingNode = xpathapi.selectSingleNode(doc, fundingPath);
+            String fundingText = null;
+            if (fundingNode != null) {
+                fundingText = fundingNode.getTextContent();
+            }
+            emlDataPackage.setFunding(fundingText);
+           
             // Store the dataset creators
             NodeList datasetCreatorNodeList = xpathapi.selectNodeList(doc, datasetCreatorPath);
             if (datasetCreatorNodeList != null) {

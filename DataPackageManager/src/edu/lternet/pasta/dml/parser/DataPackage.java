@@ -92,6 +92,7 @@ public class DataPackage
   private String accessXML = null;       // <access> element XML string
   private String emlNamespace = null;    // e.g. "eml://ecoinformatics.org/eml-2.1.0"
   private Entity[] entityList = null;
+  private String funding = null;
   private boolean parserValid = false;
   private boolean schemaValid = false;
   private int numberOfKeywordElements = 0;
@@ -1077,6 +1078,42 @@ public class DataPackage
   }
   
   
+    /**
+     * Sets the value of the 'funding' element to the specified String value.
+     * Runs the quality check on funding presence.
+     * 
+     * @param fundingText
+     *            the 'funding' value to set
+     */
+    public void setFunding(String fundingText) {
+        this.funding = fundingText;
+
+        /*
+         * Do a quality check on pubDate presence
+         */
+        String identifier = "fundingPresence";
+        QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(identifier);
+        QualityCheck qualityCheck = new QualityCheck(identifier, qualityCheckTemplate);
+
+        if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+            boolean hasFunding = ((fundingText != null) && (fundingText.length() >= 1));
+            String found = fundingText;
+
+            if (hasFunding) {
+                qualityCheck.setStatus(Status.valid);
+                qualityCheck.setExplanation("");
+                qualityCheck.setSuggestion("");
+            } 
+            else {
+                found = "funding not found";
+                qualityCheck.setFailedStatus();
+            }
+            qualityCheck.setFound(found);
+            addDatasetQualityCheck(qualityCheck);
+        }
+    }  
+  
+    
   /**
    * Sets the value of the 'system' to the specified String 
    * value.
