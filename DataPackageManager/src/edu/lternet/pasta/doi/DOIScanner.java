@@ -307,6 +307,7 @@ public class DOIScanner {
 				publicationYear = this.getResourceCreateYear(resource.getDateCreated());
 				creators = emlObject.getCreators();
 				titles = emlObject.getTitles();
+				String abstractText = emlObject.getAbstractText();
 
 				String md5Id = null;
 				if (doi != null) {
@@ -342,6 +343,7 @@ public class DOIScanner {
 				dataCiteMetadata.setDigitalObjectIdentifier(digitalObjectIdentifier);
 				dataCiteMetadata.setResourceType(resourceType);
 				dataCiteMetadata.setAlternateIdentifier(alternateIdentifier);
+				dataCiteMetadata.setDescription(abstractText);
 				
 				/*
 				 * Find all the journal citations for this data package and tell the

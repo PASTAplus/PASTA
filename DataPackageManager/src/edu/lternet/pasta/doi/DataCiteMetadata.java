@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
@@ -55,6 +56,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	private DigitalObjectIdentifier digitalObjectIdentifier = null;
 	private ResourceType resourceType = null;
 	private AlternateIdentifier alternateIdentifier = null;
+	private String description = null;
 
 	
 	/*
@@ -70,6 +72,11 @@ public class DataCiteMetadata extends CitationMetadata {
 	/*
 	 * Instance methods
 	 */
+	
+	
+	public void setDescription(String text) {
+	    this.description = text;
+	}
 
 	
 	/**
@@ -245,6 +252,8 @@ public class DataCiteMetadata extends CitationMetadata {
 			    + this.resourceType.getResourceType() + "</resourceType>\n");
 		}
 
+        sb.append("    <language>eng</language>\n");
+
 		// Alternate identifier section
 		if (this.alternateIdentifier != null) {
 
@@ -275,8 +284,15 @@ public class DataCiteMetadata extends CitationMetadata {
 
             sb.append("    </relatedIdentifiers>\n");
         }
-
-        sb.append("    <language>eng</language>\n");
+        
+        if (this.description != null && !this.description.isEmpty()) {
+            String encodedText = XmlUtility.xmlEncode(this.description);
+            sb.append("    <descriptions>\n");
+            sb.append("        <description xml:lang=\"en-US\" descriptionType=\"Abstract\">");
+            sb.append(encodedText);
+            sb.append("</description>\n");
+            sb.append("    </descriptions>\n");
+        }
 
         sb.append("</resource>\n");
 
