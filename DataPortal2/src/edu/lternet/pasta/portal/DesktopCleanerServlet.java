@@ -29,7 +29,10 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -38,13 +41,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.log4j.Logger;
 
 /**
  * Servlet implementation class ArchiveCleanerServlet
  */
-@WebServlet(urlPatterns = { "/desktopcleaner" })
+@WebServlet(urlPatterns = { "/desktopcleaner" }, loadOnStartup=10)
 public class DesktopCleanerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -53,6 +57,8 @@ public class DesktopCleanerServlet extends HttpServlet {
 			.getLogger(DesktopCleanerServlet.class);
 	
 	private static final String TTL_IN_MINUTES = "180";
+	private static String desktopDataPath = null;
+	private static long desktopDataTTL;  // desktop data time to live in milliseconds
 
 	
 	/**
@@ -71,51 +77,39 @@ public class DesktopCleanerServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		HttpSession httpSession = request.getSession();
-		ServletContext servletContext = httpSession.getServletContext();
-		String dataPath = servletContext.getRealPath(HarvesterServlet.DESKTOP_DATA_DIR);
-		String ttlString = TTL_IN_MINUTES; // number of minutes for desktop data to live
-
-		if (ttlString != null && !ttlString.isEmpty()) {
-			Long ttl = Long.valueOf(ttlString) * 60000L; // Convert minutes to ms
-			cleanExpiredData(dataPath, ttl);
-		}
-
+        executeDesktopDataManager();
 	}
 
 
-	/**
-	 * Removes any archive file that is older than the specified time-to-live
-	 * (ttl).
-	 * 
-	 * @param ttl
-	 *            The time-to-live value in milliseconds.
-	 */
-	public void cleanExpiredData(String dataPath, Long ttl) {
-		int depthLimit = 2;
-		Date now = new Date();
-		Date expirationDate = new Date(now.getTime() - ttl);
-		boolean acceptOlder = true;
-		File desktopDataDir = new File(dataPath);
-		logger.info(String.format("Cleaning expired desktop data directories under: %s", dataPath));
-		FileFilter ageFileFilter = FileFilterUtils.ageFileFilter(expirationDate, acceptOlder);
-		DesktopCleaner desktopCleaner = new DesktopCleaner(ageFileFilter, depthLimit);
+    /*
+     * Spawns off a thread to execute the desktop data manager
+     * to purge old desktop data directories at start-up.
+     */
+    private void executeDesktopDataManager() {
+        DesktopDataManager desktopDataManager = new DesktopDataManager(desktopDataPath, desktopDataTTL);
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        executorService.execute(desktopDataManager);
+        executorService.shutdown();
+    }
+  
+  
+    /**
+     * Initialization of the servlet. <br>
+     * 
+     * @throws ServletException
+     *             if an error occurs
+     */
+    public void init(ServletConfig conf) throws ServletException {
+        super.init(conf);
+        //Configuration options = ConfigurationListener.getOptions();
+        ServletContext servletContext = conf.getServletContext();     
+        desktopDataPath = servletContext.getRealPath(HarvesterServlet.DESKTOP_DATA_DIR);
+        desktopDataTTL = Long.valueOf(TTL_IN_MINUTES) * 60000L; // Convert minutes to ms
 
-		try {
-			List<File> cleanedFiles = desktopCleaner.clean(desktopDataDir);
-			int dirCount = 0;
-			for (File file : cleanedFiles) {
-				String pathname = file.getPath();
-				logger.info(String.format("  Cleaned directory: %s", pathname));
-				dirCount++;
-			}
-			String nounVerb = (dirCount == 1) ? "directory was" : "directories were";
-		    logger.info(String.format("%d %s cleaned on this pass.", dirCount, nounVerb));
-		}
-		catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	
+        /*
+         * Purge old desktop data directories
+         */     
+        executeDesktopDataManager();
+    }
+
 }
