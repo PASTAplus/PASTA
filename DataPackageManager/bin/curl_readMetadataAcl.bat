@@ -1,8 +1,10 @@
 @ECHO OFF
-SET SERVICE_HOST=http://localhost:8080
-SET AUTH_TOKEN_GMN_PASTA=dWlkPWdtbi1wYXN0YSxvPUxURVIsZGM9ZWNvaW5mb3JtYXRpY3MsZGM9b3JnKmh0dHBzOi8vcGFzdGEubHRlcm5ldC5lZHUvYXV0aGVudGljYXRpb24qMTM3MTA4NzE5ODQ3OSphdXRoZW50aWNhdGVk
+
+SET PASSWORD=%1
+
+SET SERVICE_HOST=http://localhost:8888
 SET SCOPE=knb-lter-nin
 SET IDENTIFIER=1
 SET REVISION=1
 
-curl -i -b auth-token=%AUTH_TOKEN_GMN_PASTA% -G %SERVICE_HOST%/package/metadata/acl/eml/%SCOPE%/%IDENTIFIER%/%REVISION%
+curl -i --user uid=LNO,o=LTER,dc=ecoinformatics,dc=org:%PASSWORD% -G %SERVICE_HOST%/package/metadata/acl/eml/%SCOPE%/%IDENTIFIER%/%REVISION%
