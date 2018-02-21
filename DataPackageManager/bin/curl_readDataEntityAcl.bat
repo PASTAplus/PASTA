@@ -8,4 +8,4 @@ SET IDENTIFIER=1
 SET REVISION=1
 SET ENTITY_ID=67e99349d1666e6f4955e9dda42c3cc2
 
-curl -i --user uid=LNO,o=LTER,dc=ecoinformatics,dc=org:%PASSWORD% -G %SERVICE_HOST%/package/data/acl/eml/%SCOPE%/%IDENTIFIER%/%REVISION%/%ENTITY_ID%
+curl -i --user uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org:%PASSWORD% -G %SERVICE_HOST%/package/data/acl/eml/%SCOPE%/%IDENTIFIER%/%REVISION%/%ENTITY_ID%
