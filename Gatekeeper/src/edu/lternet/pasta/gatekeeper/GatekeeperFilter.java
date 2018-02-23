@@ -321,7 +321,7 @@ public final class GatekeeperFilter implements Filter
             if (!knb.authenticate(user, password)) {
                 String s = 
                 	String.format(
-                		"The user '%s' could not be authenticated using the LTER LDAP server.",
+                		"The user '%s' could not be authenticated.",
                 		user);
                 throw new UnauthorizedException(s); // Handle this better
             }
