@@ -191,18 +191,15 @@ public final class GatekeeperFilter implements Filter
         }
         catch (IllegalStateException e) {
             httpServletResponse.setStatus(BAD_REQUEST_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e);
+            logger.error(e.getMessage());
         }
         catch (UnauthorizedException e) {
             httpServletResponse.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         catch (IllegalArgumentException e) {
             httpServletResponse.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
     }
@@ -324,7 +321,7 @@ public final class GatekeeperFilter implements Filter
             if (!knb.authenticate(user, password)) {
                 String s = 
                 	String.format(
-                		"The user '%s' could not be authenticated using the LTER LDAP server.",
+                		"The user '%s' could not be authenticated.",
                 		user);
                 throw new UnauthorizedException(s); // Handle this better
             }
@@ -349,7 +346,8 @@ public final class GatekeeperFilter implements Filter
         if (use == CookieUse.EXTERNAL) {
           // Generate digital signature and add to token string
           byte[] signature = generateSignature(cookieValue);
-          cookieValue = cookieValue + "-" + Base64.encodeBase64String(signature);
+          cookieValue = cookieValue + "-" + ((Base64.encodeBase64String(signature)).
+                  replace("\r", "")).replace("\n","");
         }
 
         logger.debug("Cookie value: " + cookieValue);
