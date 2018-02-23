@@ -349,7 +349,8 @@ public final class GatekeeperFilter implements Filter
         if (use == CookieUse.EXTERNAL) {
           // Generate digital signature and add to token string
           byte[] signature = generateSignature(cookieValue);
-          cookieValue = cookieValue + "-" + Base64.encodeBase64String(signature);
+          cookieValue = cookieValue + "-" + ((Base64.encodeBase64String(signature)).
+                  replace("\r", "")).replace("\n","");
         }
 
         logger.debug("Cookie value: " + cookieValue);
