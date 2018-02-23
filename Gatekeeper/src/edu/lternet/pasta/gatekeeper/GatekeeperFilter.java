@@ -191,18 +191,15 @@ public final class GatekeeperFilter implements Filter
         }
         catch (IllegalStateException e) {
             httpServletResponse.setStatus(BAD_REQUEST_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e);
+            logger.error(e.getMessage());
         }
         catch (UnauthorizedException e) {
             httpServletResponse.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         catch (IllegalArgumentException e) {
             httpServletResponse.setStatus(UNAUTHORIZED_CODE);
-            PrintWriter out = httpServletResponse.getWriter();
-            out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
 
     }
