@@ -20,45 +20,28 @@
 
 package edu.lternet.pasta.gatekeeper;
 
-import java.io.*;
-import java.security.*;
-import java.security.cert.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import edu.lternet.pasta.common.security.auth.AuthSystemDef;
+import edu.lternet.pasta.common.security.auth.KnbAuthSystem;
+import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.security.token.AuthTokenFactory;
+import edu.lternet.pasta.common.security.token.AuthTokenWithPassword;
+import edu.lternet.pasta.common.security.token.BasicAuthToken;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-
-import org.apache.log4j.Logger;
-
-import org.apache.commons.codec.binary.Base64;
-
-import edu.lternet.pasta.common.security.access.UnauthorizedException;
-import edu.lternet.pasta.common.security.auth.AuthSystemDef;
-import edu.lternet.pasta.common.security.auth.KnbAuthSystem;
-import edu.lternet.pasta.common.security.auth.SymmetricEncrypter;
-import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.common.security.token.AuthTokenWithPassword;
-import edu.lternet.pasta.common.security.token.BasicAuthToken;
+import java.io.*;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
 /**
  * <p>
