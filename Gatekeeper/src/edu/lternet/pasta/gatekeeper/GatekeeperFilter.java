@@ -475,8 +475,7 @@ public final class GatekeeperFilter implements Filter
       signature = rsa.sign();
 
     } catch (Exception e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
+      logger.error(String.format("generateSignature %s: %s", e.getClass().getSimpleName(), e.getMessage()));
     }
 
     return signature;
@@ -495,14 +494,8 @@ public final class GatekeeperFilter implements Filter
       sigFOS = new java.io.FileOutputStream(signatureFile);
       sigFOS.write(signature);
       sigFOS.close();
-    }
-    catch (FileNotFoundException e) {
-      logger.error("Gatekeeper.writeSignature: " + e.getMessage());
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      logger.error("Gatekeeper.writeSignature: " + e.getMessage());
-      e.printStackTrace();
+    } catch (IOException e) {
+      logger.error(String.format("writeSignature %s: %s", e.getClass().getSimpleName(), e.getMessage()));
     }
 
   }
@@ -528,24 +521,12 @@ public final class GatekeeperFilter implements Filter
         sig.update(tokenString.getBytes());
         isValid = sig.verify(signature);
 
-    } catch (FileNotFoundException e) {
-        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
-        e.printStackTrace();
-    } catch (CertificateException e) {
-        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
-        e.printStackTrace();
-    }  catch (NoSuchAlgorithmException e) {
-        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
-        e.printStackTrace();
-    } catch (InvalidKeyException e) {
-        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
-        e.printStackTrace();
-    } catch (SignatureException e) {
-        logger.error("Gatekeeper.validateSignature :" + e.getMessage());
-        e.printStackTrace();
+    } catch (FileNotFoundException | CertificateException | InvalidKeyException | NoSuchAlgorithmException |
+            SignatureException e) {
+      logger.error(String.format("isValidSignature %s: %s", e.getClass().getSimpleName(), e.getMessage()));
     }
 
-    return isValid;
+      return isValid;
 
   }
   
