@@ -46,7 +46,7 @@ public class LdapsConnector {
         }
     }
 
-    public Boolean isAuthenticated(String userDn, String password) throws LDAPException {
+    public Boolean authenticateDn(String userDn, String password) throws LDAPException {
 
         Boolean authenticated = false;
         Boolean validDn = DN.isValidDN(userDn);

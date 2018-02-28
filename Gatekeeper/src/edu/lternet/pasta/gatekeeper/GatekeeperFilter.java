@@ -31,7 +31,6 @@ import edu.lternet.pasta.common.security.token.BasicAuthToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
-import javax.lang.model.element.UnknownAnnotationValueException;
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -324,7 +323,8 @@ public final class GatekeeperFilter implements Filter
 
             try {
                 LdapsConnector ldaps = new LdapsConnector(host);
-                if (!ldaps.isAuthenticated(user, password)) {
+                Boolean isAuthenticated = ldaps.authenticateDn(user, password);
+                if (!isAuthenticated) {
                     String msg = String.format("User %s could not be authenticated at %s", user, host);
                     logger.error(msg);
                     throw new UnauthorizedException(msg);

@@ -78,7 +78,7 @@ public class LdapsConnectorTest {
     public void testIsLterLdapsAuthenticated() {
         try {
             ldaps = new LdapsConnector(LTER_LDAP);
-            Boolean isAuthenticated = ldaps.isAuthenticated(lterDn, lterDnPasswd);
+            Boolean isAuthenticated = ldaps.authenticateDn(lterDn, lterDnPasswd);
             assertEquals(isAuthenticated, Boolean.TRUE);
         }
         catch (IllegalStateException e) {
@@ -121,7 +121,7 @@ public class LdapsConnectorTest {
     public void testIsEdiLdapsAuthenticated() {
         try {
             ldaps = new LdapsConnector(EDI_LDAP);
-            Boolean isAuthenticated = ldaps.isAuthenticated(ediDn, ediDnPasswd);
+            Boolean isAuthenticated = ldaps.authenticateDn(ediDn, ediDnPasswd);
             assertEquals(isAuthenticated, Boolean.TRUE);
         }
         catch (IllegalStateException e) {
