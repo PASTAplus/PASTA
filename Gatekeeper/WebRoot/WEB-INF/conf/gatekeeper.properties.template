@@ -11,3 +11,7 @@ lter.keystore.alias = lternet
 lter.store.passwd = SECRET_PASSWORD
 lter.key.passwd = SECRET_PASSWORD
 signature.dir = /home/pasta/local/signatures/
+lter.dn = uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org
+lter.dn.passwd = SECRET_PASSWORD
+edi.dn = uid=msobol,o=EDI,dc=edirepository,dc=org
+edi.dn.passwd = SECRET_PASSWORD
