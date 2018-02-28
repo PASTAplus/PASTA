@@ -40,11 +40,7 @@ public class LdapsConnector {
             conn = new LDAPConnection(sslSocketFactory, options);
             conn.connect(ldapHost, PORT);
         }
-        catch (GeneralSecurityException e) {
-            logger.error(e.getMessage());
-            throw new IllegalStateException(e);
-        }
-        catch (LDAPException e) {
+        catch (GeneralSecurityException | LDAPException e) {
             logger.error(e.getMessage());
             throw new IllegalStateException(e);
         }
