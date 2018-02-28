@@ -62,6 +62,10 @@ public class ConfigurationListener implements ServletContextListener
     public static final String LTER_STORE_PASSWD = "lter.store.passwd";
     public static final String LTER_KEY_PASSWD = "lter.key.passwd";
     public static final String SIGNATURE_DIR = "signature.dir";
+    public static final String LTER_DN = "lter.dn";
+    public static final String LTER_DN_PASSWD = "lter.dn.passwd";
+    public static final String EDI_DN = "edi.dn";
+    public static final String EDI_DN_PASSWD = "edi.dn.passwd";
 
 
     private static String tokenName = null;
@@ -78,6 +82,10 @@ public class ConfigurationListener implements ServletContextListener
     private static String lterStorePasswd = null;
     private static String lterKeyPasswd = null;
     private static String signatureDir = null;
+    private static String lterDn = null;
+    private static String lterDnPasswd = null;
+    private static String ediDn = null;
+    private static String ediDnPasswd = null;
 
 
     private static File configDir;
@@ -224,6 +232,15 @@ public class ConfigurationListener implements ServletContextListener
       return signatureDir;
     }
 
+
+    public static String getLterDn() { return lterDn; }
+
+    public static String getLterDnPasswd() { return lterDnPasswd; }
+
+    public static String getEdiDn() { return ediDn; }
+    
+    public static String getEdiDnPasswd() { return ediDnPasswd; }
+
   /**
      * This method can be used to execute code when the web application shuts
      * down.
@@ -291,6 +308,10 @@ public class ConfigurationListener implements ServletContextListener
         setLterStorePasswd(prop);
         setLterKeyPasswd(prop);
         setSignatureDir(prop);
+        setLterDn(prop);
+        setLterDnPasswd(prop);
+        setEdiDn(prop);
+        setEdiDnPasswd(prop);
     }
 
     private Properties loadPropertiesFile() {
@@ -414,7 +435,35 @@ public class ConfigurationListener implements ServletContextListener
       if (signatureDir == null)
         throw new IllegalArgumentException(signatureDir + " not specified");
     }
- 
+    
+    private void setLterDn(java.util.Properties p) {
+        lterDn = p.getProperty(LTER_DN);
+        if (lterDn == null) {
+            throw new IllegalArgumentException(lterDn + " not specified");
+        }
+    }
+
+    private void setLterDnPasswd(java.util.Properties p) {
+        lterDnPasswd = p.getProperty(LTER_DN_PASSWD);
+        if (lterDnPasswd == null) {
+            throw new IllegalArgumentException(lterDnPasswd + " not specified");
+        }
+    }
+
+    private void setEdiDn(java.util.Properties p) {
+        ediDn = p.getProperty(EDI_DN);
+        if (ediDn == null) {
+            throw new IllegalArgumentException(ediDn + " not specified");
+        }
+    }
+
+    private void setEdiDnPasswd(java.util.Properties p) {
+        ediDnPasswd = p.getProperty(EDI_DN_PASSWD);
+        if (ediDnPasswd == null) {
+            throw new IllegalArgumentException(ediDnPasswd + " not specified");
+        }
+    }
+
     private void setLog4jProperties() {
 
         File properties = new File(getConfigDir(), "log4j.properties");
