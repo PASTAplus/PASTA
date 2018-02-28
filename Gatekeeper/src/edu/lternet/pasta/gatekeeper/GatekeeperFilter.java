@@ -20,6 +20,7 @@
 
 package edu.lternet.pasta.gatekeeper;
 
+import com.unboundid.ldap.sdk.LDAPException;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
 import edu.lternet.pasta.common.security.auth.KnbAuthSystem;
@@ -30,6 +31,7 @@ import edu.lternet.pasta.common.security.token.BasicAuthToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import javax.lang.model.element.UnknownAnnotationValueException;
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -74,9 +76,15 @@ public final class GatekeeperFilter implements Filter
 	 * Class variables
 	 */
     private static Logger logger = Logger.getLogger(GatekeeperFilter.class);
+
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
-    
+
+    private static final String LTER_HOST = "ldap.lternet.edu";
+    private static final String EDI_HOST = "ldap.edirepository.org";
+
+    private static final String LTER_ORG = "o=LTER";
+    private static final String EDI_ORG = "o=EDI";
     
     /*
      * Instance variables
@@ -292,25 +300,51 @@ public final class GatekeeperFilter implements Filter
         AuthTokenWithPassword basicToken =
                 AuthTokenFactory.makeAuthTokenWithPassword(tmpHeader);
         String user = basicToken.getUserId();
-        // Remove whitespace from the user string
+
+        // Remove whitespace from the user DN string
         if (user != null) {
         	user = user.replace(" ", "").trim();
         }
+
         String password = basicToken.getPassword();
 
         Set<String> groups = new HashSet<String>();
+
         if (!user.equals(ConfigurationListener.getPublicUser())) {
 
-            if (!knb.authenticate(user, password)) {
-                String s = 
-                	String.format(
-                		"The user '%s' could not be authenticated.",
-                		user);
-                throw new UnauthorizedException(s); // Handle this better
+            String host;
+            if (user.contains(LTER_ORG)) {
+                host = LTER_HOST;
+            } else if (user.contains(EDI_ORG)) {
+                host = EDI_HOST;
+            } else {
+                String msg = String.format("Unknown LDAPS server for user %s", user);
+                throw new UnauthorizedException(msg);
             }
+
+            try {
+                LdapsConnector ldaps = new LdapsConnector(host);
+                if (!ldaps.isAuthenticated(user, password)) {
+                    String msg = String.format("User %s could not be authenticated at %s", user, host);
+                    logger.error(msg);
+                    throw new UnauthorizedException(msg);
+                }
+            }
+            catch (IllegalStateException e) {
+                logger.error(e.getMessage());
+                String msg = String.format("Could not connect to LDAPS server: %s", host);
+                throw new UnauthorizedException(msg);
+            }
+            catch (LDAPException e) {
+                logger.error(e.getMessage());
+                String msg = String.format("Error while authenticating %s at %s", user, host);
+                throw new UnauthorizedException(msg);
+            }
+
             // groups = knb.getGroups(user); // No groups currently stored here
             groups.add(ConfigurationListener.getAuthGroup());
         }
+
         AuthSystemDef authSystem = knb.getAuthSystemDef();
         long expirationDate =
                 new Date().getTime() + ConfigurationListener.getTokenTtl();
@@ -329,8 +363,10 @@ public final class GatekeeperFilter implements Filter
         if (use == CookieUse.EXTERNAL) {
           // Generate digital signature and add to token string
           byte[] signature = generateSignature(cookieValue);
-          cookieValue = cookieValue + "-" + ((Base64.encodeBase64String(signature)).
-                  replace("\r", "")).replace("\n","");
+          cookieValue = cookieValue + "-" +
+                  ((Base64.encodeBase64String(signature)).
+                  replace("\r", "")).
+                  replace("\n","");
         }
 
         logger.debug("Cookie value: " + cookieValue);
