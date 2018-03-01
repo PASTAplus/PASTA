@@ -321,8 +321,9 @@ public final class GatekeeperFilter implements Filter
                 throw new UnauthorizedException(msg);
             }
 
+            LdapsConnector ldaps = null;
             try {
-                LdapsConnector ldaps = new LdapsConnector(host);
+                ldaps = new LdapsConnector(host);
                 Boolean isAuthenticated = ldaps.authenticateDn(user, password);
                 if (!isAuthenticated) {
                     String msg = String.format("User %s could not be authenticated at %s", user, host);
@@ -339,6 +340,11 @@ public final class GatekeeperFilter implements Filter
                 logger.error(e.getMessage());
                 String msg = String.format("Error while authenticating %s at %s", user, host);
                 throw new UnauthorizedException(msg);
+            }
+            finally {
+                if (ldaps != null) {
+                    ldaps.closeConn();
+                }
             }
 
             // groups = knb.getGroups(user); // No groups currently stored here
