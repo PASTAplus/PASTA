@@ -40,6 +40,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -871,4 +872,299 @@ public class AuditManagerResource extends PastaWebService
         return ConfigurationListener.getWebServiceVersion();
     }
 
+    
+    /**
+     * <strong>Get DocId Reads</strong> operation, returns an XML-formatted list that
+     * summarizes all the successful reads (total reads and non-robot reads) for all the resources of
+     * a given PASTA document ID, where a document ID is of the format "scope.identifier"
+     * (excludes revision).
+     *
+     * <h4>Responses:</h4>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     *   <tr>
+     *     <td><b>Status</b></td>
+     *     <td><b>Reason</b></td>
+     *     <td><b>Entity</b></td>
+     *     <td><b>MIME type</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>200 OK</td>
+     *     <td>If the request was successful.</td>
+     *     <td>The XML-formatted list of resource reads for the specified scope and identifier.</td>
+     *     <td><code>application/xml</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>400 Bad Request</td>
+     *     <td>If the specified identifier number cannot be parsed as an integer.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>401 Unauthorized</td>
+     *     <td>If the requesting user is not authorized to retrieve this information.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     * </table>
+
+     * <p>If the request is successful, the response will contain XML text. For example,
+     * when scope is "edi" and identifier is "0", the XML returned might look as follows:
+     * <pre>
+     *   &lt;resourceReads&gt;
+     *     &lt;resource&gt;
+     *       &lt;resourceId&gt;https://pasta-d.lternet.edu/package/eml/edi/0/0&lt;/resourceId&gt;
+     *       &lt;resourceType&gt;dataPackage&lt;/resourceType&gt;
+     *       &lt;scope&gt;edi&lt;/scope&gt;
+     *       &lt;identifier&gt;0&lt;/identifier&gt;
+     *       &lt;revision&gt;0&lt;/revision&gt;
+     *       &lt;totalReads&gt;29&lt;/totalReads&gt;
+     *       &lt;nonRobotReads&gt;22&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/metadata/eml/edi/0/0&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;metadata&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;0&lt;/revision&gt;
+     *        &lt;totalReads&gt;41&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;34&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/report/eml/edi/0/0&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;report&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;0&lt;/revision&gt;
+     *        &lt;totalReads&gt;1&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;1&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/report/eml/edi/0/1&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;report&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;1&lt;/revision&gt;
+     *        &lt;totalReads&gt;1&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;1&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/eml/edi/0/1&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;dataPackage&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;1&lt;/revision&gt;
+     *        &lt;totalReads&gt;7&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;7&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *   &lt;/resourceReads&gt;
+     * </pre>
+     * </p>
+     *
+     * @param headers  the HTTP request headers containing the authorization token.
+     * @param uriInfo  a UriInfo object containing the GET's query parameters
+     * @param scope  the specified scope value, e.g. "edi"
+     * @param identifier the specified identifier value, e.g. "1"
+     * @return an appropriate HTTP response.
+     */
+    @GET
+    @Path("reads/{scope}/{identifier}")
+    @Produces("application/xml")
+    public Response getDocIdReads(@Context HttpHeaders headers,
+                                  @Context UriInfo uriInfo,
+                                  @PathParam("scope") String scope,
+                                  @PathParam("identifier") Integer identifier) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+
+        try {
+            Properties properties = ConfigurationListener.getProperties();
+            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+            ReadsManager readsManager = new ReadsManager(properties);
+            String xml = readsManager.getDocIdReads(scope, identifier);
+            responseBuilder = Response.ok(xml);
+            response = responseBuilder.build();
+            return response;
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (ResourceNotFoundException e) {
+          return WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            return WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (WebApplicationException e) {
+            return e.getResponse();
+        }
+        catch (IllegalStateException e) {
+            return WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+    }
+    
+    
+    /**
+     * <strong>Get PackageId Reads</strong> operation, returns an XML-formatted list that
+     * summarizes all the successful reads (total reads and non-robot reads) for all the resources of
+     * a given PASTA package ID, where a package ID is of the format "scope.identifier.revision".
+     *
+     * <h4>Responses:</h4>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     *   <tr>
+     *     <td><b>Status</b></td>
+     *     <td><b>Reason</b></td>
+     *     <td><b>Entity</b></td>
+     *     <td><b>MIME type</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>200 OK</td>
+     *     <td>If the request was successful.</td>
+     *     <td>The XML-formatted list of resource reads for the specified scope, identifier, and revision.</td>
+     *     <td><code>application/xml</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>400 Bad Request</td>
+     *     <td>If the specified identifier or revision value cannot be parsed as an integer.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>401 Unauthorized</td>
+     *     <td>If the requesting user is not authorized to retrieve this information.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     * </table>
+
+     * <p>If the request is successful, the response will contain XML text. For example,
+     * when scope is "edi" and identifier is "0" and revision is "0", the XML returned might look as follows:
+     * <pre>
+     *   &lt;resourceReads&gt;
+     *     &lt;resource&gt;
+     *       &lt;resourceId&gt;https://pasta-d.lternet.edu/package/eml/edi/0/0&lt;/resourceId&gt;
+     *       &lt;resourceType&gt;dataPackage&lt;/resourceType&gt;
+     *       &lt;scope&gt;edi&lt;/scope&gt;
+     *       &lt;identifier&gt;0&lt;/identifier&gt;
+     *       &lt;revision&gt;0&lt;/revision&gt;
+     *       &lt;totalReads&gt;29&lt;/totalReads&gt;
+     *       &lt;nonRobotReads&gt;22&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/metadata/eml/edi/0/0&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;metadata&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;0&lt;/revision&gt;
+     *        &lt;totalReads&gt;41&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;34&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *     &lt;resource&gt;
+     *        &lt;resourceId&gt;https://pasta-d.lternet.edu/package/report/eml/edi/0/0&lt;/resourceId&gt;
+     *        &lt;resourceType&gt;report&lt;/resourceType&gt;
+     *        &lt;scope&gt;edi&lt;/scope&gt;
+     *        &lt;identifier&gt;0&lt;/identifier&gt;
+     *        &lt;revision&gt;0&lt;/revision&gt;
+     *        &lt;totalReads&gt;1&lt;/totalReads&gt;
+     *        &lt;nonRobotReads&gt;1&lt;/nonRobotReads&gt;
+     *     &lt;/resource&gt;
+     *   &lt;/resourceReads&gt;
+     * </pre>
+     * </p>
+     *
+     * @param headers  the HTTP request headers containing the authorization token.
+     * @param uriInfo  a UriInfo object containing the GET's query parameters
+     * @param scope  the specified scope value, e.g. "edi"
+     * @param identifier the specified identifier value, e.g. "1"
+     * @param revision the specified revision value, e.g. "1"
+     * @return an appropriate HTTP response.
+     */
+    @GET
+    @Path("reads/{scope}/{identifier}/{revision}")
+    @Produces("application/xml")
+    public Response getPackageIdReads(@Context HttpHeaders headers,
+                                      @Context UriInfo uriInfo,
+                                      @PathParam("scope") String scope,
+                                      @PathParam("identifier") Integer identifier,
+                                      @PathParam("revision") Integer revision
+                                      ) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+
+        try {
+            Properties properties = ConfigurationListener.getProperties();
+            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+            ReadsManager readsManager = new ReadsManager(properties);
+            String xml = readsManager.getPackageIdReads(scope, identifier, revision);
+            responseBuilder = Response.ok(xml);
+            response = responseBuilder.build();
+            return response;
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (ResourceNotFoundException e) {
+          return WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            return WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (WebApplicationException e) {
+            return e.getResponse();
+        }
+        catch (IllegalStateException e) {
+            return WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+    }
+    
+
+    /*
+     * Implemented but commented-out for now. We are uncertain as to whether we want to support this
+     * web service method. 
+     *
+    @GET
+    @Path("reads/{resourceId}")
+    @Produces("application/xml")
+    public Response getResourceIdReads(@Context HttpHeaders headers,
+                                       @Context UriInfo uriInfo,
+                                       @PathParam("resourceId") String resourceId) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+
+        try {
+            Properties properties = ConfigurationListener.getProperties();
+            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+            ReadsManager readsManager = new ReadsManager(properties);
+            String xml = readsManager.getResourceIdReads(resourceId);
+            responseBuilder = Response.ok(xml);
+            response = responseBuilder.build();
+            return response;
+        }
+        catch (ClassNotFoundException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (ResourceNotFoundException e) {
+          return WebExceptionFactory.makeNotFound(e).getResponse();
+        }
+        catch (SQLException e) {
+          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
+        }
+        catch (UnauthorizedException e) {
+            return WebExceptionFactory.makeUnauthorized(e).getResponse();
+        }
+        catch (WebApplicationException e) {
+            return e.getResponse();
+        }
+        catch (IllegalStateException e) {
+            return WebExceptionFactory.makeBadRequest(e).getResponse();
+        }
+    } */
+    
 }

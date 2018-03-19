@@ -75,6 +75,7 @@ public class AuditManager {
   private final String AUDIT_MANAGER_SCHEMA = "auditmanager";
   private final String AUDIT_MANAGER_TABLE = "EVENTLOG";
   private final String AUDIT_MANAGER_TABLE_QUALIFIED = AUDIT_MANAGER_SCHEMA + "." + AUDIT_MANAGER_TABLE;
+  private Properties properties = null;
 
   /*
    *  Temporary directory for storing audit query XML results file. 
@@ -101,7 +102,8 @@ public class AuditManager {
    * @return  an EMLDataCache object
    */
   public AuditManager(Properties p) 
-         throws ClassNotFoundException, SQLException {  
+         throws ClassNotFoundException, SQLException {
+    this.properties = p;
     this.dbDriver = ConfigurationListener.getProperty(p, "dbDriver");
     this.dbURL = ConfigurationListener.getProperty(p, "dbURL");
     this.dbUser = ConfigurationListener.getProperty(p, "dbUser");
@@ -273,6 +275,19 @@ public class AuditManager {
       }
     finally {
         returnConnection(connection);
+    }
+    
+    /*
+     * If the service method matches one of the resource read types and the read succeeded with a 200 status,
+     * then register this resource read with the ReadsManager.
+     */
+    if (statusCode == 200) {
+        ReadsManager rm = new ReadsManager(this.properties);
+        ReadsManager.ResourceType resourceType = rm.resourceTypeFromServiceMethod(serviceMethod);
+        if (resourceType != null) {
+            boolean isNonRobotRead = rm.isNonRobotRead(userId);
+            rm.registerResourceRead(resourceId, resourceType, isNonRobotRead);
+        }
     }
     
     return auditId;

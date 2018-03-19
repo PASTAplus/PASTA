@@ -19,3 +19,17 @@ CREATE INDEX resourceid_idx ON auditmanager.eventlog ( resourceId );
 CREATE INDEX userid_idx ON auditmanager.eventlog ( userid );
 CREATE INDEX statuscode_idx ON auditmanager.eventlog ( statusCode );
 CREATE INDEX category_idx ON auditmanager.eventlog ( category );
+
+CREATE TYPE auditmanager.resource_type AS ENUM ('archive', 'data', 'dataPackage', 'metadata', 'report');
+CREATE TABLE auditmanager.resource_reads (
+   resource_id varchar(128) primary key,
+   resource_type auditmanager.resource_type NOT NULL,        -- resource type
+   scope VARCHAR(100) NOT NULL,                              -- the scope
+   identifier INT8 NOT NULL,                                 -- the identifier
+   revision INT8 NOT NULL,                                   -- the revision
+   total_reads INT8 default 0,                               -- the total number of reads
+   non_robot_reads INT8 default 0                            -- reads not by a robot
+);
+CREATE INDEX resource_id_idx ON auditmanager.resource_reads ( resource_id );
+CREATE INDEX scope_idx ON auditmanager.resource_reads ( scope );
+
