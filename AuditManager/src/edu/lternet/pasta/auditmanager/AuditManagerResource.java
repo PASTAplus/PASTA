@@ -911,6 +911,7 @@ public class AuditManagerResource extends PastaWebService
      * <p>If the request is successful, the response will contain XML text. For example,
      * when scope is "edi" and identifier is "0", the XML returned might look as follows:
      * <pre>
+     *   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
      *   &lt;resourceReads&gt;
      *     &lt;resource&gt;
      *       &lt;resourceId&gt;https://pasta-d.lternet.edu/package/eml/edi/0/0&lt;/resourceId&gt;
@@ -1044,6 +1045,7 @@ public class AuditManagerResource extends PastaWebService
      * <p>If the request is successful, the response will contain XML text. For example,
      * when scope is "edi" and identifier is "0" and revision is "0", the XML returned might look as follows:
      * <pre>
+     *   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
      *   &lt;resourceReads&gt;
      *     &lt;resource&gt;
      *       &lt;resourceId&gt;https://pasta-d.lternet.edu/package/eml/edi/0/0&lt;/resourceId&gt;

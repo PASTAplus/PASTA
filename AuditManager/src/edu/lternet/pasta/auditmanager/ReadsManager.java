@@ -58,6 +58,7 @@ public class ReadsManager {
    * Class fields
    */
  
+  public static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"; 
   public static final String READS_OPENING_TAG = "<resourceReads>\n"; 
   public static final String READS_CLOSING_TAG = "</resourceReads>\n";
   private static Logger logger = Logger.getLogger(ReadsManager.class);
@@ -472,7 +473,8 @@ public class ReadsManager {
    */
   public String getDocIdReads(String scope, Integer identifier)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-      StringBuffer stringBuffer = new StringBuffer(READS_OPENING_TAG);
+      StringBuffer stringBuffer = new StringBuffer(XML_DECLARATION);
+      stringBuffer.append(READS_OPENING_TAG);
       String xmlString = null;
       Connection connection = null;
      
@@ -529,7 +531,8 @@ public class ReadsManager {
    */
   public String getPackageIdReads(String scope, Integer identifier, Integer revision)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-      StringBuffer stringBuffer = new StringBuffer(READS_OPENING_TAG);
+      StringBuffer stringBuffer = new StringBuffer(XML_DECLARATION);
+      stringBuffer.append(READS_OPENING_TAG);
       String xmlString = null;
       Connection connection = null;
      
@@ -583,7 +586,8 @@ public class ReadsManager {
    */
   public String getResourceIdReads(String resourceId)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-      StringBuffer stringBuffer = new StringBuffer(READS_OPENING_TAG);
+      StringBuffer stringBuffer = new StringBuffer(XML_DECLARATION);
+      stringBuffer.append(READS_OPENING_TAG);
       String xmlString = null;
       Connection connection = null;
      

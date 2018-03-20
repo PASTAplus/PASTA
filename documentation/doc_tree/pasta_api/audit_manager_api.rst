@@ -77,6 +77,7 @@ Examples
 
      curl -X GET https://pasta.lternet.edu/audit/reads/edi/0
 
+     <?xml version="1.0" encoding="UTF-8"?>
      <resourceReads>
      <resource>
         <resourceId>https://pasta.lternet.edu/package/report/eml/knb-lter-nwk/3120/1</resourceId>
@@ -173,6 +174,7 @@ Examples
 
      curl -X GET https://pasta.lternet.edu/audit/reads/edi/0/1
 
+     <?xml version="1.0" encoding="UTF-8"?>
      <resourceReads>
      <resource>
         <resourceId>https://pasta.lternet.edu/package/data/eml/knb-lter-nwk/3120/2/a9201a0755fc45ae514abb12469c03a0</resourceId>
