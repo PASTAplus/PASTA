@@ -280,6 +280,76 @@ public class AuditManagerResourceTest {
 	}
 
 
+    /**
+     * Test the status and message body of the getDocIdResourceReads() service method.
+     */
+    @Test
+    public void testGetDocIdReads() {
+        final String testScope = "knb-lter-nin";
+        final Integer testIdentifier = new Integer(1);
+        Map<String, String> query = Collections.singletonMap("user", testUser);
+        UriInfo uriInfo = new DummyUriInfo(query);
+        HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+
+        // Test READ for OK status
+        Response response = auditManagerResource.getDocIdReads(httpHeaders, uriInfo, testScope, testIdentifier);
+        int statusCode = response.getStatus();
+        assertEquals(200, statusCode);
+
+        // Check the message body
+        try {
+            String entityString = (String) response.getEntity();
+            String readsReport = entityString.trim();
+            assertTrue(readsReport.length() > 1);
+            assertTrue(readsReport.startsWith("<resourceReads>"));
+            assertTrue(readsReport.contains("<resource>"));
+            assertTrue(readsReport.contains(String.format("<scope>%s</scope>", testScope)));
+            assertTrue(readsReport.contains(String.format("<identifier>%d</identifier>", testIdentifier)));
+            assertTrue(readsReport.contains("</resource>"));
+            assertTrue(readsReport.endsWith("</resourceReads>"));
+        }
+        catch (Exception e) {
+            fail("Error reading resource reads XML file");
+        }
+    }
+
+
+    /**
+     * Test the status and message body of the getPackageIdResourceReads() service method.
+     */
+    @Test
+    public void testGetPackageIdReads() {
+        final String testScope = "knb-lter-nin";
+        final Integer testIdentifier = new Integer(1);
+        final Integer testRevision = new Integer(1);
+        Map<String, String> query = Collections.singletonMap("user", testUser);
+        UriInfo uriInfo = new DummyUriInfo(query);
+        HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+
+        // Test READ for OK status
+        Response response = auditManagerResource.getPackageIdReads(httpHeaders, uriInfo, testScope, testIdentifier, testRevision);
+        int statusCode = response.getStatus();
+        assertEquals(200, statusCode);
+
+        // Check the message body
+        try {
+            String entityString = (String) response.getEntity();
+            String readsReport = entityString.trim();
+            assertTrue(readsReport.length() > 1);
+            assertTrue(readsReport.startsWith("<resourceReads>"));
+            assertTrue(readsReport.contains("<resource>"));
+            assertTrue(readsReport.contains(String.format("<scope>%s</scope>", testScope)));
+            assertTrue(readsReport.contains(String.format("<identifier>%d</identifier>", testIdentifier)));
+            assertTrue(readsReport.contains(String.format("<revision>%d</revision>", testRevision)));
+            assertTrue(readsReport.contains("</resource>"));
+            assertTrue(readsReport.endsWith("</resourceReads>"));
+        }
+        catch (Exception e) {
+            fail("Error reading resource reads XML file");
+        }
+    }
+
+
 	/**
 	 * Clean up and release any objects after each test is complete.
 	 */
