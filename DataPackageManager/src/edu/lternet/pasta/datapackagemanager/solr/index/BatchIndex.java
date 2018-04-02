@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageMetadata;
@@ -44,69 +45,76 @@ public class BatchIndex {
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 
 
-	public static void indexAllPastaMetadata() {
-		ConfigurationListener configurationListener = new ConfigurationListener();
-		configurationListener.initialize(dirPath);
-		Options options = ConfigurationListener.getOptions();
-		dbDriver = options.getOption("dbDriver");
-		dbURL = options.getOption("dbURL");
-		dbUser = options.getOption("dbUser");
-		dbPassword = options.getOption("dbPassword");
-		String solrUrl = options.getOption("datapackagemanager.metadatacatalog.solrUrl");
-		SolrIndex solrIndex = new SolrIndex(solrUrl);
+    public static void indexAllPastaMetadata(Options options, DataPackageManager dpm) {
+        try {
+            List<EmlPackageId> emlPackageIds = getAllLatestEML(dpm);
+            indexPastaMetadata(options, emlPackageIds);
+        }
+        catch (ClassNotFoundException | SQLException e) {
+            logger.error("Exception getting all latest data packages: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-		try {
-			DataPackageManager dpm = new DataPackageManager();
-			DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-			List<EmlPackageId> emlPackageIds = getAllLatestEML(dpm);
 
-			int i = 1;
-			for (EmlPackageId emlPackageId : emlPackageIds) {
-				String emlDocument = null;
-				DataPackageMetadata dataPackageMetadata = new DataPackageMetadata(
-					    emlPackageId);
-				if (dataPackageMetadata != null) {
-					boolean evaluateMode = false;
-					File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
-					emlDocument = FileUtils.readFileToString(levelOneEMLFile);
-				}
+    public static void indexPastaMetadata(Options options, List<EmlPackageId> emlPackageIds) {
+        dbDriver = options.getOption("dbDriver");
+        dbURL = options.getOption("dbURL");
+        dbUser = options.getOption("dbUser");
+        dbPassword = options.getOption("dbPassword");
+        String solrUrl = options.getOption("datapackagemanager.metadatacatalog.solrUrl");
+        SolrIndex solrIndex = new SolrIndex(solrUrl);
 
-				try {
-					solrIndex.indexEmlDocument(emlPackageId, emlDocument);
-					
-					String resourceId = getResourceId(dpr, emlPackageId);
-					String doi = dpr.getDoi(resourceId);
-					if (doi != null && !doi.equals("")) {
-						solrIndex.indexDoi(emlPackageId, doi);
-					}
-					
-					boolean commit = (i % COMMIT_FREQUENCY == 0);
-					
-					if (commit) {
-						System.err.println(String.format("Executing Solr commit after document %d: %s",
-												         i, emlPackageId));
-						solrIndex.commit();
-					}
-					
-					i++;
-				}
-				catch (Exception e) {
-					logger.error(String.format("Error indexing datapackage %s: %s", emlPackageId.toString(), e.getMessage()));
-					e.printStackTrace();
-					return;
-				}
-			}
-			
-			System.err.println(String.format("Executing Solr commit after final document in batch: %d", i));
-			solrIndex.commit();
-		}
-		catch (Exception e) {
-			logger.error("Exception getting all latest data packages: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	
+        try {
+            DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+
+            int i = 1;
+            for (EmlPackageId emlPackageId : emlPackageIds) {
+                String emlDocument = null;
+                DataPackageMetadata dataPackageMetadata = new DataPackageMetadata(
+                        emlPackageId);
+                if (dataPackageMetadata != null) {
+                    boolean evaluateMode = false;
+                    File levelOneEMLFile = dataPackageMetadata.getMetadata(evaluateMode);
+                    emlDocument = FileUtils.readFileToString(levelOneEMLFile);
+                }
+
+                try {
+                    solrIndex.indexEmlDocument(emlPackageId, emlDocument);
+                    
+                    String resourceId = getResourceId(dpr, emlPackageId);
+                    String doi = dpr.getDoi(resourceId);
+                    if (doi != null && !doi.equals("")) {
+                        solrIndex.indexDoi(emlPackageId, doi);
+                    }
+                    
+                    boolean commit = (i % COMMIT_FREQUENCY == 0);
+                    
+                    if (commit) {
+                        System.err.println(String.format("Executing Solr commit after document %d: %s",
+                                                         i, emlPackageId));
+                        solrIndex.commit();
+                    }
+                    
+                    i++;
+                }
+                catch (Exception e) {
+                    logger.error(String.format("Error indexing datapackage %s: %s", emlPackageId.toString(), e.getMessage()));
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            
+            System.err.println(String.format("Executing Solr commit after final document in batch (%d)", i-1));
+            solrIndex.commit();
+        }
+        catch (Exception e) {
+            logger.error("Exception getting all latest data packages: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    
 	private static String getResourceId(DataPackageRegistry dpr, EmlPackageId epid) {
 		String resourceId = null;
 		
@@ -167,8 +175,76 @@ public class BatchIndex {
 	}
 	
 	
-	public static void main(String[] args) {
-		indexAllPastaMetadata();
-	}
+    private static List<EmlPackageId> docidsToEmlPackageIds(DataPackageManager dpm, String[] docIds) 
+            throws ClassNotFoundException, SQLException {
+        List<EmlPackageId> emlPackageIdList = new ArrayList<EmlPackageId>();
+        
+        if (docIds != null && docIds.length > 0) {
+            for (String docid : docIds) {
+                if (docid != null && docid.contains(".")) {
+                    String[] elements = docid.split("\\.");
+                    if (elements.length != 2) {
+                        String msg = 
+                            String.format(
+                                    "The docid '%s' does not conform to the standard format <scope>.<identifier>", 
+                                    docid); 
+                        throw new IllegalArgumentException(msg);
+                    }
+                    else {
+                        String scope = elements[0];
+                        Integer identifier = new Integer(elements[1]);
+                        try {
+                            Integer revision = dpm.getNewestRevision(scope, identifier);
+                            EmlPackageId emlPackageId = 
+                                new EmlPackageId(scope, identifier, revision);
+                            emlPackageIdList.add(emlPackageId);
+                        }
+                        catch (ResourceNotFoundException e) {
+                            logger.warn(String.format("No resource found for data package: '%s'", docid));
+                        }
+                    }
+                }
+            }
+        }
+        
+        return emlPackageIdList;
+    }
+	
+	
+	/**
+	 * If no command line arguments are passed, all data packages are re-indexed.
+	 * Optionally, a comma-separated list of specific data package identifiers (scope.identifier, excluding revision)
+	 * may be passed as a single command-line argument.
+	 * 
+	 * @param args      Optionally, a comma-separated list of data package identifiers 
+	 *                  (scope.identifier, excluding revision)
+	 */
+    public static void main(String[] args) {
+        try {
+            ConfigurationListener configurationListener = new ConfigurationListener();
+            configurationListener.initialize(dirPath);
+            Options options = ConfigurationListener.getOptions();
+            DataPackageManager dpm = new DataPackageManager();
+
+            if ((args != null) && (args.length == 1)) {
+                String dataPackages = args[0];
+                String[] docIds = dataPackages.split(",");
+                List<EmlPackageId> emlPackageIds = docidsToEmlPackageIds(dpm, docIds);
+                indexPastaMetadata(options, emlPackageIds);
+            } 
+            else if ((args != null) && (args.length > 1)) {
+                System.err.println("Too many command-line parameters.");
+                System.err.println(
+                    "Optionally, specify a comma-separated list of data package identifiers as a single parameter.");
+            } 
+            else {
+                indexAllPastaMetadata(options, dpm );
+            }
+        } 
+        catch (Exception e) {
+            logger.error("Error getting list of data packages: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
 }
