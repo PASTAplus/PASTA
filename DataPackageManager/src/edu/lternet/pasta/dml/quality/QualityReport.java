@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -404,12 +405,24 @@ public class QualityReport {
 					String line;
 					int count = 0;
 					while ((line = is.readLine()) != null) {
-						String formatString = line.trim();
-						Entity.addPreferredFormatString(formatString);
-						count++;
+						String formatStringWithRegex = line.trim();
+						String[] pair = formatStringWithRegex.split(",");
+						if ((pair != null) && (pair.length > 1)) {
+						    String formatString = pair[0];
+						    String regex = pair[1];
+						    Entity.addFormatString(formatString, regex);
+						    count++;
+						}
 					}
-					logger.info(String.format("%d datetime format strings added from URL: %s",
+					logger.warn(String.format("%d datetime format strings added from URL: %s",
 							                  count, preferredFormatStringsURL));
+					Set<String> formatStrings = Entity.getPreferredFormatStrings();
+					int setSize = formatStrings.size();
+					if (count != setSize) {
+					    logger.error(String.format(
+	                    "%d format strings in set does not match the number loaded (%d). Check for duplicate entries.",
+	                    setSize, count));
+					}
 				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();

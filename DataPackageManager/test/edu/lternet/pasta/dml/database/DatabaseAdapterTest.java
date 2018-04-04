@@ -1,11 +1,34 @@
 package edu.lternet.pasta.dml.database;
 
+import java.util.ResourceBundle;
+
+import edu.lternet.pasta.dml.quality.QualityReport;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
 public class DatabaseAdapterTest extends TestCase {
+
+    private static final String CONFIG_NAME = "datapackagemanager";
+    private static ResourceBundle options = null;
+    private static String preferredFormatStringsURL = null;
+
+    /**
+     * Loads Data Manager options from a configuration file.
+     */
+    private static void loadOptions() {
+      try {
+        // Load options
+        options = ResourceBundle.getBundle(CONFIG_NAME);
+        // URL for the CSV list of preferred format strings and corresponding regular expressions
+        preferredFormatStringsURL = options.getString("dml.preferredFormatStringsURL");
+      }
+      catch (Exception e) {
+        System.err.println("Error in loading options: " + e.getMessage());
+      }
+    }
+
 
   /**
    * Constructor 
@@ -20,8 +43,8 @@ public class DatabaseAdapterTest extends TestCase {
    * Establish a testing framework by initializing appropriate objects.
    */
   protected void setUp() throws Exception {
-    super.setUp();
-
+      loadOptions();
+      QualityReport.setPreferredFormatStrings(preferredFormatStringsURL);
   }
 
 
@@ -63,22 +86,16 @@ public class DatabaseAdapterTest extends TestCase {
 	    			"YYYY-MM-DD hh:mm:ss.sss",
 	    			"YYYY-MM-DDThh:mm:ss.sss",
 	    			"YYYY-MM-DD hh:mm:ss.sssZ",
-	    			"YYYY-MM-DD hh:mm:ss.sss+HH",
+	    			"YYYY-MM-DD hh:mm:ss.sss+hh",
 	    			"YYYY",
-	    			"hh:mm",
 	    			"YYYY-MM-DD hh:mm:ss",
-	    			"hhmm",
 	    			"YYYY-MM-DDThh:mm",
-	    			"hh:mm:ss",
-	    			"hh",
 	    			"YYYY-MM-DDThh:mm:ss",
 	    			"YYYY-MM",
 	    			"YYYY-MM-DD hh:mm",
 	    			"YYYYMM",
 	    			"YYYYDDD",
 	    			"YYYYMMDD",
-	    			"yyyymmdd",
-	    			"MM/DD/YYYY"
 	        };
 	      
 	    String[] dataValues = 
@@ -89,12 +106,8 @@ public class DatabaseAdapterTest extends TestCase {
 				  "1976-09-23 12:30:30.000Z",
 				  "1976-09-23 10:30:30.000+10",
 				  "1976",
-				  "12:30",
 				  "1976-09-23 12:30:30",
-				  "1230",
 				  "1976-09-23T12:30",
-				  "12:30:46",
-				  "08",
 				  "1976-09-23T12:59:50",
 				  "1976-09",
 				  "1976-09-23 12:30",
@@ -102,7 +115,6 @@ public class DatabaseAdapterTest extends TestCase {
 				  "1976189",
 				  "19760923",
 				  "19760923",
-				  "09/23/1976"
 		  };
 	    
 	    for (int i = 0; i < formatStrings.length; i++) {

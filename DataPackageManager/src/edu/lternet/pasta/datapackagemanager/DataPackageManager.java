@@ -57,8 +57,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.NotFoundException;
-
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
 import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;

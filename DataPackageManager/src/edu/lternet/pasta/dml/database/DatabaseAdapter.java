@@ -38,7 +38,10 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +49,7 @@ import edu.lternet.pasta.dml.parser.Attribute;
 import edu.lternet.pasta.dml.parser.AttributeList;
 import edu.lternet.pasta.dml.parser.DateTimeDomain;
 import edu.lternet.pasta.dml.parser.Domain;
+import edu.lternet.pasta.dml.parser.Entity;
 import edu.lternet.pasta.dml.parser.StorageType;
 import edu.lternet.pasta.dml.quality.QualityCheck;
 
@@ -165,57 +169,26 @@ public abstract class DatabaseAdapter {
   
   
   /*
-   * Use Java 8 DateTimeFormatter class to parse the date value based on the specified formatString.
+   * Use a regular expression to parse the date value based on the specified formatString.
    */
-	public static String formatStringMatchesDataValue(String formatStr, String dateStr) {
-		String msg = null;
-
-		try {
-			log.debug("pattern: " + formatStr);
-			String javaPattern = formatStr.replace("T", "'T'")
-					                      .replace("Z", "'Z'")
-					                      .replace(".sss", ".SSS")
-					                      .replace("YYYYMMDD", "YYYYMMdd");
-			
-			DateTimeFormatter df = DateTimeFormatter.ofPattern(javaPattern);
-			
-			try {
-				TemporalAccessor ta = df.parse(dateStr);
-			}
-			catch (DateTimeParseException e) {
-				msg = formatStringMatchesDataValueAux(formatStr, javaPattern, dateStr);
-			}
-		}
-		catch (IllegalArgumentException e) {
-			msg = String.format("An error occurred while applying datetime formatString '%s': %s",
-		                        formatStr, e.getMessage());
-		}
-		
-		return msg;
-	}
-
-
-    private static String formatStringMatchesDataValueAux(String original, String formatStr, String dateStr) {
+    public static String formatStringMatchesDataValue(String formatStr, String dateStr) {
         String msg = null;
+        Set<String> preferredFormatStrings = Entity.getPreferredFormatStrings();
+        if (preferredFormatStrings.contains(formatStr)) {
+            String regex = Entity.getFormatStringRegex(formatStr);
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(dateStr);
+            if (!matcher.matches()) {
+                msg = String.format("'%s' is not congruent with the formatString '%s' as specified in the metadata. regex: %s",
+                                    dateStr, formatStr, regex);
+            }
+        }
+        else {
+            msg = String.format(
+                    "%s is not a preferred format string. The datetime value was not checked for congruency",
+                    formatStr);
+        }
 
-        try {
-            log.debug("pattern: " + formatStr);
-            String javaPattern = formatStr.replace("YYYY", "uuuu");            
-            DateTimeFormatter df = DateTimeFormatter.ofPattern(javaPattern);
-            
-            try {
-                TemporalAccessor ta = df.parse(dateStr);
-            }
-            catch (DateTimeParseException e) {
-                msg = String.format("Data value '%s' could not be parsed using formatString '%s': %s",
-                                    dateStr, original, e.getMessage());
-            }
-        }
-        catch (IllegalArgumentException e) {
-            msg = String.format("An error occurred while applying datetime formatString '%s': %s",
-                                formatStr, e.getMessage());
-        }
-        
         return msg;
     }
 
@@ -392,14 +365,28 @@ public abstract class DatabaseAdapter {
       		String msg = formatStringMatchesDataValue(formatString, value);
       		
       		if (msg != null) {
+      		    /*
+      		     * If the formatString was not a preferred format, then the datetime value was not checked
+      		     * against a regular expression.
+      		     */
+      		    boolean notPreferred = msg.contains("not a preferred");
       			dateFormatMatchesQualityCheck.setFailedStatus();
       			String found = dateFormatMatchesQualityCheck.getFound();
       			if (found == null || found.isEmpty()) {
-      				dateFormatMatchesQualityCheck.setFound(msg + "\\n");
-      				String explanation = "One or more dates found in the data do not match the given format string.";
+      				String explanation = null;
+      				if (notPreferred) {
+                        dateFormatMatchesQualityCheck.setFound("Not checked.");
+      				    explanation = 
+      				      String.format("'%s' is not a preferred format string and was not checked for congruency with the datetime values.",
+      				                    formatString);
+      				}
+      				else {
+                        dateFormatMatchesQualityCheck.setFound(msg);
+      				    explanation = "One or more datetime values found in the data do not match the format string specified in the metadata.";
+      				}
       		    	this.dateFormatMatchesQualityCheck.setExplanation(explanation);
       			}
-      			else if (found.length() <= 300) {
+      			else if (!notPreferred && found.length() <= 300) {
       				String newFound = found + msg + "\\n";
       				dateFormatMatchesQualityCheck.setFound(newFound);
       			}

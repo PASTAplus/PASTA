@@ -33,6 +33,7 @@
 package edu.lternet.pasta.dml.parser;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeSet;
 
 import edu.lternet.pasta.dml.database.DelimitedReader;
@@ -78,10 +79,10 @@ public class Entity extends DataObjectDescription
     public static String VIEWENTITY = "VIEWENTITY";
     public static String OTHERENTITY = "OTHERENTITY";
     
-    public static TreeSet<String> preferredFormatStrings;
+    public static HashMap<String, String> formatStringRegexes;
     
     static {
-    	preferredFormatStrings = new TreeSet<String>();
+    	formatStringRegexes = new HashMap<String, String>();
     }
     
     
@@ -217,7 +218,24 @@ public class Entity extends DataObjectDescription
      */
     
     public static boolean isPreferredFormatString(String formatString) {
-    	return preferredFormatStrings.contains(formatString);
+        Set<String> preferredFormatStrings = getPreferredFormatStrings();
+        return preferredFormatStrings.contains(formatString);
+    }
+    
+    
+    public static Set<String> getPreferredFormatStrings() {
+        return formatStringRegexes.keySet();
+    }
+    
+    
+    public static String getFormatStringRegex(String formatString) { 
+        String regex = null;
+        
+        if (formatString != null && getPreferredFormatStrings().contains(formatString)) {
+            regex = formatStringRegexes.get(formatString);
+        }
+        
+        return regex;
     }
     
     
@@ -236,8 +254,9 @@ public class Entity extends DataObjectDescription
      */
     public static String caseMismatchFormatString(String formatString) {
     	String caseMismatch = null;
+        Set<String> preferredFormatStrings = getPreferredFormatStrings();
     	
-		if (formatString != null) {
+		if (formatString != null && preferredFormatStrings != null) {
 			for (String preferred : preferredFormatStrings) {
 				if (!formatString.equals(preferred) && 
 					formatString.equalsIgnoreCase(preferred)
@@ -266,12 +285,13 @@ public class Entity extends DataObjectDescription
      */
     public static String slashMismatchFormatString(String formatString) {
     	String slashMismatch = null;
+        Set<String> preferredFormatStrings = getPreferredFormatStrings();
     	
     	/*
     	 * Only go through the list of preferred when the formatString
     	 * contains one or more slashes.
     	 */
-		if (formatString != null && formatString.contains("/")) {
+		if (preferredFormatStrings != null && formatString != null && formatString.contains("/")) {
 			for (String preferred : preferredFormatStrings) {
 				if (!formatString.equals(preferred) && 
 					formatString.replace('/', '-').equals(preferred)
@@ -286,13 +306,13 @@ public class Entity extends DataObjectDescription
     }
     
     
-   public static void addPreferredFormatString(String formatString) {
-    	if (formatString != null) {
-    		preferredFormatStrings.add(formatString);
-    	}
+   public static void addFormatString(String formatString, String regex) {
+        if (formatString != null) {
+            formatStringRegexes.put(formatString, regex);
+        }
     }
-
-    
+   
+  
     /*
      * Instance methods
      */

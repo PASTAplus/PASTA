@@ -37,16 +37,16 @@ public class DataManagerTest extends TestCase {
   private DataManager dataManager;
   private EcogridEndPointInterfaceTest endPointInfo = new EcogridEndPointInterfaceTest();
 
-  private final String COLUMN_1 = "\"site\"";
+  private final String COLUMN_1 = "\"fld\"";
   private final String COLUMN_2 = "\"year\"";
-  private final String ENTITY_NAME = "INS-GCEM-0011_1_3.TXT";
+  private final String ENTITY_NAME = "NoneSuchBugCount";
   private final int    ENTITY_NUMBER_EXPECTED = 1;
-  private final int    NUMBER_OF_COLUMNS = 7;
-  private final String QUERY_TEST_DOCUMENT = "knb-lter-gce.1.9.xml";
+  private final int    NUMBER_OF_COLUMNS = 3;
+  private final String QUERY_TEST_DOCUMENT = "NoneSuchBugCount.xml";
   private final String QUERY_TEST_SERVER = "http://svn.lternet.edu/svn/NIS/master/DataPackageManager/test/data/";
-  private final String TABLE_NAME = "INS_GCEM_0011_1_3_TXT";
-  private final String TEST_DOCUMENT = "knb-lter-gce.1.9.xml";
-  private final String TEST_PACKAGE_ID = "knb-lter-gce.1.9";
+  private final String TABLE_NAME = "NoneSuchBugCount";
+  private final String TEST_DOCUMENT = "NoneSuchBugCount.xml";
+  private final String TEST_PACKAGE_ID = "knb-lter-xyz.10044.1";
   private final String TEST_SERVER = "http://svn.lternet.edu/svn/NIS/master/DataPackageManager/test/data/";
   
   
@@ -372,7 +372,7 @@ public class DataManagerTest extends TestCase {
     InputStream inputStream = null;
     String operator = ">";
     boolean success;
-    Integer value = new Integer(2);
+    Float value = new Float(2.0);
     ResultSet resultSet = null;
     URL url;
   
@@ -387,7 +387,7 @@ public class DataManagerTest extends TestCase {
       attributeList = entity.getAttributeList();
       Attribute[] attributes = attributeList.getAttributes();
       attribute = attributes[0];
-      countAttribute = attributes[6];
+      countAttribute = attributes[2];
     }
     catch (MalformedURLException e) {
       e.printStackTrace();
@@ -424,9 +424,9 @@ public class DataManagerTest extends TestCase {
       System.out.println("Query SQL = " + query.toSQLString());
       assertEquals("Unexpected value for query.toSQLString()",
                    sqlString,
-                   "SELECT INS_GCEM_0011_1_3_TXT.\"Site\" " +
-                   "FROM INS_GCEM_0011_1_3_TXT  " +
-                   "where INS_GCEM_0011_1_3_TXT.\"Count\" > 2;");
+                   "SELECT NoneSuchBugCount.\"fld\" " +
+                   "FROM NoneSuchBugCount  " +
+                   "where NoneSuchBugCount.\"sppm2\" > 2.0;");
 
       try {
         resultSet = dataManager.selectData(query, dataPackages);
@@ -436,8 +436,8 @@ public class DataManagerTest extends TestCase {
           int i = 1;
 
           while (resultSet.next()) {
-            int site = resultSet.getInt(1);
-            System.out.println("resultSet[" + i + "], site =  " + site);
+            String field = resultSet.getString(1);
+            System.out.println("resultSet[" + i + "], field =  " + field);
             
             /*
              * Compare values in the result set to known values in the 
@@ -445,14 +445,17 @@ public class DataManagerTest extends TestCase {
              */
             switch (i) {
               case 1:
-                assertEquals(site, 1);
+                assertEquals(field, "Blue Field");
                 break;
               case 2:
-                assertEquals(site, 3);
+                assertEquals(field, "Yellow Field");
                 break;
-              default:
-                assertEquals(site, 6);
-                break;
+              case 3:
+                  assertEquals(field, "Red Field");
+                  break;
+              case 4:
+                  assertEquals(field, "Blue Field");
+                  break;
             }
             i++;
           }
