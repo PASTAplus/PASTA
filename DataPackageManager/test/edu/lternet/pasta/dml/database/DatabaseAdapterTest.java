@@ -1,69 +1,73 @@
 package edu.lternet.pasta.dml.database;
 
-import java.util.ResourceBundle;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.dml.quality.QualityReport;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import edu.ucsb.nceas.utilities.Options;
 
 
-public class DatabaseAdapterTest extends TestCase {
+public class DatabaseAdapterTest {
 
-    private static final String CONFIG_NAME = "datapackagemanager";
-    private static ResourceBundle options = null;
+    private static ConfigurationListener configurationListener = null;
+    private static final String dirPath = "WebRoot/WEB-INF/conf";
+    private static Options options = null;
     private static String preferredFormatStringsURL = null;
 
     /**
-     * Loads Data Manager options from a configuration file.
+     * Initialize objects before any tests are run.
      */
-    private static void loadOptions() {
-      try {
-        // Load options
-        options = ResourceBundle.getBundle(CONFIG_NAME);
-        // URL for the CSV list of preferred format strings and corresponding regular expressions
-        preferredFormatStringsURL = options.getString("dml.preferredFormatStringsURL");
+    @BeforeClass
+    public static void setUpClass() {
+      configurationListener = new ConfigurationListener();
+      configurationListener.initialize(dirPath);
+      options = ConfigurationListener.getOptions();
+      
+      if (options == null) {
+        fail("Failed to load DataPackageManager properties file");
       }
-      catch (Exception e) {
-        System.err.println("Error in loading options: " + e.getMessage());
+      else {
+          preferredFormatStringsURL = options.getOption("dml.preferredFormatStringsURL");
+        if (preferredFormatStringsURL == null) {
+            fail("No value found for DataPackageManager property 'dml.preferredFormatStringsURL'");
+        }
       }
     }
-
-
+    
+    
   /**
-   * Constructor 
-   * @param name The name of testing
+   * Initialize objects before each test is run.
    */
-  public DatabaseAdapterTest(String name) {
-    super(name);
+  @Before
+  public void setUpTest() {
+    try {
+        QualityReport.setPreferredFormatStrings(preferredFormatStringsURL);
+    }
+    catch (MalformedURLException e) {
+        fail("MalformedURLException while loading preferred datetime format strings: " + e.getMessage());
+      }
+    catch (IOException e) {
+        fail("IOException while loading preferred datetime format strings: " + e.getMessage());
+    }
   }
 
-
-  /**
-   * Establish a testing framework by initializing appropriate objects.
-   */
-  protected void setUp() throws Exception {
-      loadOptions();
-      QualityReport.setPreferredFormatStrings(preferredFormatStringsURL);
-  }
-
-
-  /**
-   * Release any objects and closes database connections after tests 
-   * are complete.
-   */
-  protected void tearDown() throws Exception {
-
-    super.tearDown();
-  }
-
-
+  
   /**
    * Test DatabaseAdapter.getLegalDBTableName() method. For each string in a 
    * list of bad (i.e. illegal) table names, ensure that the method returns 
    * the expected (i.e. legal) table name.
    */
-  public void testGetLegalDBTableName() {
+  @Test public void testGetLegalDBTableName() {
     String[] badNames = 
       {"table name", "table-name", "table.name", "1040 Forms"};
     
@@ -78,62 +82,43 @@ public class DatabaseAdapterTest extends TestCase {
   }
   
   
-  
-    public void testFormatStringMatchesDataValue() {
-	    String[] formatStrings =
+  @Test public void testFormatStringMatchesDataValue() {
+	    String[] testData =
 	    	{
-	    			"YYYY-MM-DD",
-	    			"YYYY-MM-DD hh:mm:ss.sss",
-	    			"YYYY-MM-DDThh:mm:ss.sss",
-	    			"YYYY-MM-DD hh:mm:ss.sssZ",
-	    			"YYYY-MM-DD hh:mm:ss.sss+hh",
-	    			"YYYY",
-	    			"YYYY-MM-DD hh:mm:ss",
-	    			"YYYY-MM-DDThh:mm",
-	    			"YYYY-MM-DDThh:mm:ss",
-	    			"YYYY-MM",
-	    			"YYYY-MM-DD hh:mm",
-	    			"YYYYMM",
-	    			"YYYYDDD",
-	    			"YYYYMMDD",
+	    			"YYYY-MM-DD,1976-09-23",
+	    			"YYYY-MM-DD hh:mm:ss.sss,1976-09-23 12:30:30.000",
+	    			"YYYY-MM-DDThh:mm:ss.sss,1976-09-23T12:30:30.000",
+	    			"YYYY-MM-DD hh:mm:ss.sssZ,1976-09-23 12:30:30.000Z",
+	    			"YYYY-MM-DD hh:mm:ss.sss+hh,1976-09-23 10:30:30.000+10",
+	    			"YYYY,1976",
+	    			"YYYY-MM-DD hh:mm:ss,1976-09-23 12:30:30",
+	    			"YYYY-MM-DDThh:mm,1976-09-23T12:30",
+	    			"YYYY-MM-DDThh:mm:ss,1976-09-23T12:59:50",
+	    			"YYYY-MM,1976-09",
+	    			"YYYY-MM-DD hh:mm,1976-09-23 12:30",
+	    			"YYYYMM,197609",
+	    			"YYYYDDD,1976189",
+	    			"YYYYMMDD,19760923"
 	        };
 	      
-	    String[] dataValues = 
-		  {
-				  "1976-09-23",
-				  "1976-09-23 12:30:30.000",
-				  "1976-09-23T12:30:30.000",
-				  "1976-09-23 12:30:30.000Z",
-				  "1976-09-23 10:30:30.000+10",
-				  "1976",
-				  "1976-09-23 12:30:30",
-				  "1976-09-23T12:30",
-				  "1976-09-23T12:59:50",
-				  "1976-09",
-				  "1976-09-23 12:30",
-				  "197609",
-				  "1976189",
-				  "19760923",
-				  "19760923",
-		  };
-	    
-	    for (int i = 0; i < formatStrings.length; i++) {
-	    	String formatStr = formatStrings[i];
-	    	String dateStr = dataValues[i];
-	        String msg = DatabaseAdapter.formatStringMatchesDataValue(formatStr, dateStr);
-	        assertTrue(msg, (msg == null));
-	    }
- }
+        for (int i = 0; i < testData.length; i++) {
+            String[] pair = testData[i].split(",");
+            assertTrue("Bad test data value: " + testData[i], (pair != null && pair.length == 2));
+            String formatStr = pair[0];
+            String dateStr = pair[1];
+            String msg = DatabaseAdapter.formatStringMatchesDataValue(formatStr, dateStr);
+            assertTrue(msg, (msg == null));
+        }
+     }
 
 
   /**
-   * Create a suite of tests to be run together
+   * Release any objects after all tests are complete.
    */
-  public static Test suite() {
-    TestSuite suite = new TestSuite();
-    suite.addTest(new DatabaseAdapterTest("testGetLegalDBTableName"));
-    suite.addTest(new DatabaseAdapterTest("testFormatStringMatchesDataValue"));
-    return suite;
+  @AfterClass
+  public static void tearDownClass() {
+    configurationListener = null;
+    options = null;
   }
   
 }
