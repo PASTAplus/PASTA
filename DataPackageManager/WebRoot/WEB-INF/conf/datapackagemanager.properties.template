@@ -12,7 +12,7 @@ anonymousFtpPasswd=pasta@LTERnet.edu
 qualityReporting=true
 qualityReportTemplate=/home/pasta/local/apache-tomcat/webapps/package/xml/qualityReportTemplate.xml
 emlDereferencerXSLT=/home/pasta/local/apache-tomcat/webapps/package/xsl/id-ref.xsl
-dml.preferredFormatStringsURL=file:///home/pasta/git/NIS/DataPackageManager/WebRoot/WEB-INF/conf/preferredFormatStrings.txt
+dml.preferredFormatStringsURL=https://github.com/EDIorg/ECC/raw/development/practices/dateTimeFormatString/dateTimeFormatString_regex.csv
 
 #
 # Database connection properties
