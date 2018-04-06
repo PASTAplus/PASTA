@@ -334,9 +334,18 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
                                                         rowVector);
           if (insertSQL != null)
           {
-      	    PreparedStatement statement = connection.prepareStatement(insertSQL);
-      	    statement.execute();
-      	    statement.close();
+              PreparedStatement pstmt = null;
+              try {
+                  pstmt = connection.prepareStatement(insertSQL);
+                  pstmt.execute();
+              }
+              catch (SQLException e) {
+                  log.error(String.format("Insert SQL failed: %s", insertSQL));
+                  throw(e);
+              }
+              finally {
+                  pstmt.close();
+              }
             rowCount++;
             if (rowCount % 1000000 == 0) {
             	log.info(String.format("%s row count: %d", tableName, rowCount));

@@ -237,10 +237,10 @@ public class PostgresAdapter extends DatabaseAdapter {
     Map<String, String> map = new HashMap<String, String>();
 
     map.put("string", "TEXT");
-    map.put("integer", "INTEGER");
+    map.put("integer", "BIGINT");
     map.put("real", "FLOAT");
-    map.put("whole", "INTEGER");
-    map.put("natural", "INTEGER");
+    map.put("whole", "BIGINT");
+    map.put("natural", "BIGINT");
     map.put("datetime", "TIMESTAMP");
 
     dbDataType = map.get(attributeType.toLowerCase());

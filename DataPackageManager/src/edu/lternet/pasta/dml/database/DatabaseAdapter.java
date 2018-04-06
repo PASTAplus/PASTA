@@ -441,9 +441,16 @@ public abstract class DatabaseAdapter {
             sqlDataPart.append(floatNum);
           } 
           else {
-            Integer integerObj = new Integer(value);
-            int integerNum = integerObj.intValue();
-            sqlDataPart.append(integerNum);
+              try {
+                  Integer integerObj = new Integer(value);
+                  int integerNum = integerObj.intValue();
+                  sqlDataPart.append(integerNum);
+              }
+              catch (NumberFormatException e) {
+                  Long longObj = new Long(value);
+                  long longNum = longObj.longValue();
+                  sqlDataPart.append(longNum);
+              }
           }
         } 
         catch (Exception e) {
