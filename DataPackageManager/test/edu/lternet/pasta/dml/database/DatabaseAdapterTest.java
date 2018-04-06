@@ -4,8 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -13,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.lternet.pasta.dml.parser.Entity;
 import edu.lternet.pasta.dml.quality.QualityReport;
 import edu.ucsb.nceas.utilities.Options;
 
@@ -112,6 +118,46 @@ public class DatabaseAdapterTest {
      }
 
 
+    @Test
+    public void testFormatStringMatchesDataValueFromURL() {
+        if (preferredFormatStringsURL != null) {
+            try {
+                URLConnection conn = new URL(preferredFormatStringsURL).openConnection();
+                try (BufferedReader is = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                    String line;
+                    int count = 1;
+                    while ((line = is.readLine()) != null) {
+                        System.err.println("Processing line: " + count);
+                        String formatStringWithRegex = line.trim();
+                        String[] tokens = formatStringWithRegex.split(",");
+                        if ((tokens != null) && (tokens.length > 1)) {
+                            String formatStr = tokens[0]; // the format string is always the first value
+                            String dateStr = tokens[1]; // the test data is always the second value
+                            String msg = DatabaseAdapter.formatStringMatchesDataValue(formatStr, dateStr);
+                            assertTrue(msg, (msg == null));
+                        } 
+                        else {
+                            fail("Malformed line in datetime format strings file");
+                        }
+                        count++;
+                    }
+                }
+            } 
+            catch (MalformedURLException e) {
+                e.printStackTrace();
+                fail("MalformedURLException");
+            } 
+            catch (IOException e) {
+                e.printStackTrace();
+                fail("IOException");
+            }
+        }
+        else {
+            fail("No preferredFormatStringsURL was specified in the properties file.");
+        }
+    }
+
+    
   /**
    * Release any objects after all tests are complete.
    */

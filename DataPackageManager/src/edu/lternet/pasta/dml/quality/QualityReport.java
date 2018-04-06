@@ -406,10 +406,11 @@ public class QualityReport {
 					int count = 0;
 					while ((line = is.readLine()) != null) {
 						String formatStringWithRegex = line.trim();
-						String[] pair = formatStringWithRegex.split(",");
-						if ((pair != null) && (pair.length > 1)) {
-						    String formatString = pair[0];
-						    String regex = pair[1];
+						String[] tokens = formatStringWithRegex.split(",");
+						if ((tokens != null) && (tokens.length > 1)) {
+						    int nTokens = tokens.length;
+						    String formatString = tokens[0];     // the format string is always the first value
+						    String regex = tokens[nTokens - 1];  // the regex is always the last value
 						    Entity.addFormatString(formatString, regex);
 						    count++;
 						}
