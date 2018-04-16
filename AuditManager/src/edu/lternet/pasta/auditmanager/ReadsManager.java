@@ -66,13 +66,20 @@ public class ReadsManager {
   
   /*
    * Class methods
-   */
+readDataEntity' OR " +
+              "       servicemethod='readDataPackage' OR " +
+              "       servicemethod='readDataPackageArchive' OR " +
+              "       servicemethod='readDataPackageReport' OR " +
+              "       servicemethod='readMetadata') " +   */
   
   public static void main(String[] args) 
           throws ClassNotFoundException, SQLException {
        ConfigurationListener.loadPropertiesFile("auditmanager.properties");
        Properties properties = ConfigurationListener.getProperties();
        ReadsManager readsManager = new ReadsManager(properties);
+       
+       // First, drop all rows in the table
+       readsManager.deleteAllRows();
        readsManager.initializeResourceReads();
    }
 
@@ -266,49 +273,94 @@ public class ReadsManager {
   public void initializeResourceReads() 
           throws ClassNotFoundException, SQLException {
       Connection connection = null;
-      
-      deleteAllRows();
-      
+      ArrayList<String> resourceIds = new ArrayList<String>();
+           
       final String SQL_STRING =
-              "SELECT servicemethod, resourceId, userid " +
-              "FROM auditmanager.eventlog " +
-              "WHERE (servicemethod='readDataEntity' OR " +
-              "       servicemethod='readDataPackage' OR " +
-              "       servicemethod='readDataPackageArchive' OR " +
-              "       servicemethod='readDataPackageReport' OR " +
-              "       servicemethod='readMetadata') " +
-              "      AND statuscode=200 " +
-              "ORDER BY resourceId ASC";
-      
+          "SELECT DISTINCT resourceId " +
+          "FROM auditmanager.eventlog " +
+          "WHERE (servicemethod='readDataEntity' OR " +
+          "       servicemethod='readDataPackage' OR " +
+          "       servicemethod='readDataPackageArchive' OR " +
+          "       servicemethod='readDataPackageReport' OR " +
+          "       servicemethod='readMetadata') " +
+          "      AND statuscode=200 " +
+          "      AND resourceId like 'http%' " +
+          "ORDER BY resourceId ASC";   
       Statement stmt = null;
       
       try {
-        connection = getConnection();
-        stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(SQL_STRING);
-       
-        while (rs.next()) {
-          String serviceMethod = rs.getString("servicemethod");
-          String resourceId = rs.getString("resourceId");                  
-          String userId = rs.getString("userid");
-          ReadsManager.ResourceType resourceType = resourceTypeFromServiceMethod(serviceMethod);
-          boolean isNonRobotRead = isNonRobotRead(userId);
-          registerResourceRead(resourceId, resourceType, isNonRobotRead);
+          connection = getConnection();
+          stmt = connection.createStatement();
+          ResultSet rs = stmt.executeQuery(SQL_STRING);
+         
+          while (rs.next()) {
+            String resourceId = rs.getString("resourceId");
+            resourceIds.add(resourceId);
+          }
+          
+          System.err.println(String.format("Processing %d resourceIds", resourceIds.size()));
         }
+        catch(ClassNotFoundException e) {
+          System.err.println("ClassNotFoundException: " + e.getMessage());
+          throw(e);
+        }
+        catch(SQLException e) {
+          System.err.println("SQLException: " + e.getMessage());
+          throw(e);
+        }
+        finally {
+          if (stmt != null) stmt.close();
+          returnConnection(connection);
       }
-      catch(ClassNotFoundException e) {
-        logger.error("ClassNotFoundException: " + e.getMessage());
-        throw(e);
-      }
-      catch(SQLException e) {
-        logger.error("SQLException: " + e.getMessage());
-        throw(e);
+      
+      try {
+          connection = getConnection();
+          int i = 0;
+          
+          for (String resourceId : resourceIds) {
+              i++;
+              System.err.println(String.format("(%d) Processing resourceId: %s", i, resourceId));
+          
+              String SQL_STRING_RESOURCE = String.format(
+              "SELECT servicemethod, userid " +
+              "FROM auditmanager.eventlog " +
+              "WHERE resourceid='%s' AND " +
+              " (servicemethod='readDataEntity' OR " +
+              "  servicemethod='readDataPackage' OR " +
+              "  servicemethod='readDataPackageArchive' OR " +
+              "  servicemethod='readDataPackageReport' OR " +
+              "  servicemethod='readMetadata') AND " +
+              " statuscode=200 ",
+              resourceId);
+
+              try {
+                  stmt = connection.createStatement();
+                  ResultSet rs = stmt.executeQuery(SQL_STRING_RESOURCE);
+       
+                  while (rs.next()) {
+                      String serviceMethod = rs.getString("servicemethod");
+                      String userId = rs.getString("userid");
+                      ReadsManager.ResourceType resourceType = resourceTypeFromServiceMethod(serviceMethod);
+                      boolean isNonRobotRead = isNonRobotRead(userId);
+                      registerResourceRead(resourceId, resourceType, isNonRobotRead);
+                  }
+              }
+              catch(ClassNotFoundException e) {
+                  System.err.println("ClassNotFoundException: " + e.getMessage());
+                  throw(e);
+              }
+              catch(SQLException e) {
+                  System.err.println("SQLException: " + e.getMessage());
+                  throw(e);
+              }
+              finally {
+                  if (stmt != null) stmt.close();
+              }
+          }
       }
       finally {
-        if (stmt != null) stmt.close();
-        returnConnection(connection);
+          returnConnection(connection);
       }
-   
   }
   
   
