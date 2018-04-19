@@ -59,7 +59,7 @@ ContentSmartz
 convera
 core
 CoverScout
-###curl\/
+curl\/
 cursor
 custo
 DataCha0s\/2\.0
@@ -80,7 +80,6 @@ EmailSiphon
 EmailWolf
 Embedly
 EThOS\+\(British\+Library\)
-EZID(\s|\+)link(\s|\+)checker
 facebookexternalhit\/
 favorg
 FDM(\s|\+)\d
@@ -114,7 +113,7 @@ htdig
 htmlparser
 HttpComponents\/1.1
 HTTPFetcher
-###http.?client
+http.?client
 httpget
 httrack
 ia_archiver
@@ -127,7 +126,7 @@ internetseer
 intute
 iSiloX
 iskanie
-###^java\/\d{1,2}.\d
+^java\/\d{1,2}.\d
 jeeves
 jobo
 kyluka
