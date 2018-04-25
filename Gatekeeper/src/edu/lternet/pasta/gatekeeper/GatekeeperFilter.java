@@ -2,7 +2,7 @@
  *
  * $Date$ $Author$ $Revision$
  *
- * Copyright 2010 the University of New Mexico.
+ * Copyright 2010-2018 the University of New Mexico.
  *
  * This work was supported by National Science Foundation Cooperative Agreements
  * #DEB-0832652 and #DEB-0936498.
@@ -151,9 +151,6 @@ public final class GatekeeperFilter implements Filter
         // Output bot detection information
         String robot = BotMatcher.findRobot(httpServletRequest);
         boolean isBot = robot != null;
-        String botDetected = isBot ? robot : "none";
-		logger.info(String.format("Bot detected: %s", botDetected));
-        
 
         try {
         	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
@@ -173,7 +170,8 @@ public final class GatekeeperFilter implements Filter
 
         	PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
             if (isBot) {
-            	pastaRequestWrapper.putHeader("Robot", robot);
+                logger.info(String.format("Bot detected: %s", robot));
+                pastaRequestWrapper.putHeader("Robot", robot);
             }
 
             doDiagnostics(pastaRequestWrapper);

@@ -1,3 +1,23 @@
+/*
+ *
+ * $Author: dcosta $
+ *
+ * Copyright 2010-2018 the University of New Mexico.
+ *
+ * This work was supported by National Science Foundation Cooperative Agreements
+ * #DEB-0832652 and #DEB-0936498.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package edu.lternet.pasta.gatekeeper;
 
 import java.io.BufferedReader;
@@ -9,11 +29,17 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-
+/**
+ * @author Duane Costa
+ * 
+ * Class to detect bots by matching the User-Agent header to a set of regular expression patterns.
+ *
+ */
 public class BotMatcher {
 	
     private static Logger logger = Logger.getLogger(BotMatcher.class);
@@ -65,18 +91,41 @@ public class BotMatcher {
 	public static String findRobot(HttpServletRequest httpServletRequest) {
 		String robot = null;
 
-		final String headerName = "User-Agent";
-		Enumeration<?> values = httpServletRequest.getHeaders(headerName);
+		/*
+		 * The Data Portal sets a "robot" cookie value whenever it checks for robots.
+		 * If the cookie value is set to "No robot" then we know that the request has 
+		 * already been cleared by the Data Portal so we don't need to re-check here,
+		 * we can just return null.
+		 */
+	    Cookie[] cookies = httpServletRequest.getCookies();
+	    if (cookies != null) {
+	        for (Cookie cookie : cookies) {
+	            if (cookie.getName().equals("robot")) {
+	                String cookieValue = cookie.getValue();
+	                if (!cookieValue.equalsIgnoreCase("No robot")) {
+                        logger.info(String.format("Data Portal matched bot pattern to User-Agent value '%s'",
+                                                  cookieValue));
+	                    robot = cookieValue;
+	                }
+	                return robot;
+	            }
+	        }
+	    }
+	    // Otherwise check the User-Agent field
+	    else {
+	        final String headerName = "User-Agent";
+		    Enumeration<?> values = httpServletRequest.getHeaders(headerName);
 
-		if (values != null) {
-			while (values.hasMoreElements()) {
-				String value = (String) values.nextElement();
-				for (Pattern botPattern : regexPatterns) {
-					if (botPattern.matcher(value).matches()) {
-						logger.info(String.format("Matched pattern: %s to User-Agent value: %s",
+		    if (values != null) {
+			    while (values.hasMoreElements()) {
+				    String value = (String) values.nextElement();
+				    for (Pattern botPattern : regexPatterns) {
+					    if (botPattern.matcher(value).matches()) {
+						    logger.info(String.format("Gatekeeper matched bot pattern '%s' to User-Agent value '%s'",
 								                  botPattern.pattern(), value));
-						return value;
-					}
+						    return value;
+					    }
+				    }
 				}
 			}
 		}
