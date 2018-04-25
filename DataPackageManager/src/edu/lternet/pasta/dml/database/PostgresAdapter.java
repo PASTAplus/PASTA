@@ -92,7 +92,8 @@ public class PostgresAdapter extends DatabaseAdapter {
 	    {"YYYY-WWW-DD", "YYYY-Mon-DD"},
 	    {"YYYY/WWW/DD", "YYYY/Mon/DD"},
 	    {"DD WWW YYYY", "DD Mon YYYY"},
-	    {"YYYYWWWDD", "YYYYMonDD"}
+	    {"YYYYWWWDD", "YYYYMonDD"},
+	    {"MM/DD/YYYY hh:mm", "MM/DD/YYYY HH24:MI"}
 	  };
  
   
