@@ -3733,7 +3733,11 @@ public class DataPackageManagerResource extends PastaWebService {
 			robot = getRobot(headers);
 
 			// Is user a bot?
-			if ((robot != null) && (!robot.equalsIgnoreCase("No robot"))) {
+			if ((userId != null) &&
+			    (userId.equals("public")) &&
+				(robot != null) && 
+				(!robot.equals("No robot"))
+			   ) {
 				throw new UnauthorizedException(
 					String.format("Robots are not authorized access to data objects. Robot detected: %s",
 					              robot));
