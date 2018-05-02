@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
+import java.io.NotActiveException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -40,6 +41,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
+import com.sun.jersey.api.NotFoundException;
+
+import edu.lternet.pasta.common.ResourceNotFoundException;
+import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.ucsb.nceas.utilities.Options;
 
 
@@ -161,7 +166,7 @@ public class ReservationManager {
 			word = isActive ? "" : "NOT ";
 			System.out.println(String.format("%s.%d IS %sACTIVE.", scope, identifier, word));
 			
-			reservationManager.deleteDataPackageReservation(scope, identifier);
+			reservationManager.deleteDataPackageReservation(scope, identifier, principal);
 
 			identifiers = reservationManager.listReservationIdentifiers(scope);
 			System.out.println(String.format("\nIdentifiers reserved for scope %s:", scope));
@@ -231,7 +236,7 @@ public class ReservationManager {
 			returnConnection(connection);
 		}
 	}
-
+	
 	
 	/**
 	 * Deletes a data package identifier reservation from the reservation table. 
@@ -243,10 +248,33 @@ public class ReservationManager {
 	 * @param identifier
 	 *            The identifier integer value
 	 */
-	public void deleteDataPackageReservation(String scope, Integer identifier)
-			throws ClassNotFoundException, SQLException {
+	public void deleteDataPackageReservation(String scope, Integer identifier, String principal)
+			throws ClassNotFoundException, SQLException, 
+			       ResourceNotFoundException, NotActiveException, UnauthorizedException {
 		Connection connection = null;
 		String packageId = String.format("%s.%d", scope, identifier);
+		
+		if (!hasReservation(scope, identifier)) {
+			String msg = String.format("No reservation found for '%s'", 
+					                   packageId);
+			throw new ResourceNotFoundException(msg);
+		}
+		else if (!isActiveReservation(scope, identifier)) {
+			String msg = String.format(
+		        "The data package for '%s' was uploaded. Its reservation record will " +
+			    "be retained in the reservations table", 
+	            packageId);
+            throw new NotActiveException(msg);
+		}
+		else {
+			String userId = getReservationUserId(scope, identifier);
+			if (!userId.equals(principal)) {
+				String msg = String.format(
+						"%s is not authorized to delete reservation for '%s'",
+						principal, packageId);
+			    throw new UnauthorizedException(msg);
+			}
+		}
 
 		StringBuilder deleteSQL = new StringBuilder("DELETE FROM " + RESERVATION + 
 				" WHERE scope=? AND identifier=?");
@@ -507,6 +535,51 @@ public class ReservationManager {
 		}
 
 		return isActiveIdentifier;
+	}  
+
+	
+	/**
+	 * Boolean to determine whether the specified data package identifier
+	 * reservation is present in PASTA, based on a specified scope and identifier.
+	 * 
+	 * @param scope
+	 *            the scope value, e.g. "edi"
+	 * @param identifier
+	 *            the identifier value, e.g. 1
+	 */
+	public boolean hasReservation(String scope, Integer identifier)
+			throws ClassNotFoundException, SQLException {
+		boolean hasReservation = false;
+		Connection connection = null;
+		String selectString = String.format(
+				"SELECT count(*) FROM %s WHERE scope='%s' AND identifier=%d", 
+				RESERVATION, scope, identifier);
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				int count = rs.getInt("count");
+				hasReservation = (count > 0);
+			}
+
+			if (stmt != null)
+				stmt.close();
+		} catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			throw (e);
+		} catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			throw (e);
+		} finally {
+			returnConnection(connection);
+		}
+
+		return hasReservation;
 	}  
 
 	

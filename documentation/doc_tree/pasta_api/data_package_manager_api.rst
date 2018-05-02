@@ -1254,6 +1254,39 @@ Examples
      data packages with identifier "edi.12".
 
 
+*Delete Reservation*
+^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Delete Reservation operation, deletes an existing reservation from PASTA. The same
+user who originally authenticated to create the reservation must authenticate to delete it,
+otherwise a "401 Unauthorized" response is returned. When successfully deleted,
+a "200 OK" response is returned, and the integer value of the deleted 
+reservation identifier value is returned in the web service response body.
+
+REST API
+""""""""
+
+`DELETE : https://pasta.lternet.edu/package/reservations/eml/{scope}/{identifier} <https://pasta.lternet.edu/package/docs/api#DELETE%20:%20/reservations/eml/{scope}/{identifier}>`_
+
+Examples
+""""""""
+  
+1. Using :command:`curl` to delete an existing reservation for scope ("edi") and identifier ("12")::
+
+     curl -i -u uid=jsmith,o=LTER,dc=ecoinformatics,dc=org:SOME_PASSWORD -X DELETE "https://pasta.lternet.edu/package/reservations/eml/edi/12"
+
+     HTTP/1.1 200 OK
+
+     12
+
+     In the example above, user "jsmith" deletes a reservation on document
+     identifier "edi.12". Because user "jsmith" previously created this
+     reservation, only user "jsmith" is allowed to delete it.
+
+
 *List Active Reservations*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
