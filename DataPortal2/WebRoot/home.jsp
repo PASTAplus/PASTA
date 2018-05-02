@@ -187,7 +187,7 @@
 							ecological data packages contributed by past and present 
 							LTER sites. Please review the
 							<a class="searchsubcat" href="https://lternet.edu/data-access-policy/" target="_blank">
-							LTER Data Policy</a> before downloading any data product. 
+							LTER Network Data Access Policy</a> before downloading any data product. 
 							We request that you cite data sources in your published 
 							and unpublished works whenever possible. Digital object 
 							identifiers (DOI) are provided for each dataset to facilitate 
