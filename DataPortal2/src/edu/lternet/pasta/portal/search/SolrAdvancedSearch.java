@@ -338,7 +338,8 @@ public class SolrAdvancedSearch extends Search  {
 				&& (westValue != null) && (!(westValue.equals("")))
 			) {
 
-			if (Integer.valueOf(boundsChangedCount) == 1) {
+			boolean changed = boundsWereChanged(boundsChangedCount, northValue, southValue, eastValue, westValue);
+			if (!changed) {
 				return;
 			}
 
@@ -358,6 +359,41 @@ public class SolrAdvancedSearch extends Search  {
 			String encodedSpatialFilter = URLEncoder.encode(spatialFilter, "UTF-8");
 			updateFQString(encodedSpatialFilter);
 		}
+	}
+  
+
+	/*
+	 * Boolean to determine whether the user changed the boundary values. Google Maps
+	 * makes this very hard to determine since they seem to keep changing the default
+	 * values from underneath us. Even when the map isn't touched, we register a
+	 * boundsChangedCount value of 2, so we need to check for 3 changes or greater to ensure
+	 * that the user actually changed the value. Google sets the north to 84.67
+	 * and south to -84.67. Very problematic, so the best we can hope for is a kludge
+	 * that will work most of the time.
+	 */
+	private boolean boundsWereChanged(String boundsChangedCount, 
+			                          String northValue,
+			                          String southValue,
+			                          String eastValue,
+			                          String westValue) {
+		boolean changed = false;
+		
+		int count = Integer.valueOf(boundsChangedCount);
+		float north = Float.valueOf(northValue);
+		float south = Float.valueOf(southValue);
+		float east = Float.valueOf(eastValue);
+		float west = Float.valueOf(westValue);
+		
+		if ((count >= 3) ||
+			(north < 84.0) || 
+			(south > -84.0) || 
+			(east < 180.0) || 
+			(west > -180.0)
+		   ) {
+			changed = true;
+		}
+
+		return changed;
 	}
   
 

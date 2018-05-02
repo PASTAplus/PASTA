@@ -119,7 +119,7 @@
         if (trim(form.subjectValue.value) == "" &&
             trim(form.creatorName.value) == "" &&
             trim(form.creatorOrganization.value) == "" &&
-            trim(form.boundsChangedCount.value) == "1" &&
+            boundsChangedCount <= 2 &&
             trim(form.locationName.value) == "" &&
             trim(form.taxon.value) == "" &&
             trim(form.identifier.value) == "" &&
