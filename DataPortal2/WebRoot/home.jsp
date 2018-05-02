@@ -186,7 +186,7 @@
 							<p>The LTER Network Information System Data Portal contains 
 							ecological data packages contributed by past and present 
 							LTER sites. Please review the
-							<a class="searchsubcat" href="http://www.lternet.edu/data/netpolicy.html" target="_blank">
+							<a class="searchsubcat" href="https://lternet.edu/data-access-policy/" target="_blank">
 							LTER Data Policy</a> before downloading any data product. 
 							We request that you cite data sources in your published 
 							and unpublished works whenever possible. Digital object 
