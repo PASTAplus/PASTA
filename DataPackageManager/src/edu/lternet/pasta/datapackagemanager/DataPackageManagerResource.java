@@ -1185,7 +1185,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * <tr>
 	 * <td>401 Unauthorized</td>
-	 * <td>If the requesting user is not authorized to create subscriptions.</td>
+	 * <td>If the requesting user is not authorized to delete the specified reservation.</td>
 	 * <td>An error message.</td>
 	 * <td><code>text/plain</code></td>
 	 * </tr>
