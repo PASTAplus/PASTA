@@ -27,6 +27,7 @@ package edu.lternet.pasta.datapackagemanager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.NotActiveException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
@@ -86,6 +87,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sun.jersey.api.NotFoundException;
 
 import edu.ucsb.nceas.utilities.Options;
 import edu.lternet.pasta.common.EmlPackageId;
@@ -1051,30 +1054,6 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * reservation in PASTA on the next reservable identifier for the
 	 * specified scope.
 	 * 
-	 * <h4>Request entity:</h4>
-	 * 
-	 * <p>
-	 * The request entity should be an XML document (MIME type
-	 * <code>application/xml</code>) that contains the subscription's EML
-	 * packageId, and URL, with the syntax:
-	 * </p>
-	 * 
-	 * <pre>
-	 *    &lt;subscription type="eml"&gt;
-	 *       &lt;packageId&gt;<em>packageId</em>&lt;/packageId&gt;
-	 *       &lt;url&gt;<em>url</em>&lt;/url&gt;
-	 *    &lt;/subscription&gt;
-	 * </pre>
-	 * 
-	 * <p>
-	 * The packageId can be either complete or partial. The URL must have 'http'
-	 * as its scheme and must be able to receive POST requests with MIME type
-	 * <code>text/plain</code>. Note that some characters must be escaped in
-	 * XML, such as ampersands (&amp;) in the query string of the URL, from
-	 * <code>&amp;</code> to <code>&amp;amp;</code>.
-	 * </p>
-	 * 
-	 * 
 	 * <h4>Responses:</h4>
 	 * 
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -1086,9 +1065,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * <tr>
 	 * <td>201 Created</td>
-	 * <td>If the request was successful.</td>
-	 * <td>None, but the <code>Location</code> header will contain a URL that
-	 * references the new subscription.</td>
+	 * <td>If the create reservation request was successful.</td>
+	 * <td>The integer value of the reserved identifier</td>
 	 * <td>N/A</td>
 	 * </tr>
 	 * <tr>
@@ -1104,22 +1082,10 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td>An error message.</td>
 	 * <td><code>text/plain</code></td>
 	 * </tr>
-	 * <tr>
-	 * <td>409 Conflict</td>
-	 * <td>If a subscription already exists with the same creator, EML
-	 * packageId, and URL attributes.</td>
-	 * <td>
-	 * An error message.</td>
-	 * <td><code>text/plain</code></td>
-	 * </tr>
 	 * </table>
-	 * 
 	 * 
 	 * @param headers
 	 *            the HTTP request headers containing the authorization token.
-	 * @param requestBody
-	 *            the POST request's body, containing XML.
-	 * 
 	 * @return an appropriate HTTP response.
 	 */
 	@POST
@@ -1180,6 +1146,113 @@ public class DataPackageManagerResource extends PastaWebService {
 			WebApplicationException webApplicationException = WebExceptionFactory
 					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
 							e.getMessage());
+			response = webApplicationException.getResponse();
+			msg = e.getMessage();
+		}
+		finally {
+			audit(serviceMethodName, authToken, response, null, msg);
+		}
+
+		return response;
+	}
+
+
+	/**
+	 * <strong>Delete Reservation</strong> operation, deletes an existing
+	 * reservation in PASTA for the specified scope and identifier.
+	 * 
+	 * <h4>Responses:</h4>
+	 * 
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <td><b>Status</b></td>
+	 * <td><b>Reason</b></td>
+	 * <td><b>Entity</b></td>
+	 * <td><b>MIME type</b></td>
+	 * </tr>
+	 * <tr>
+	 * <td>200 OK</td>
+	 * <td>If the delete request was successful.</td>
+	 * <td>The integer value of the deleted identifier.</td>
+	 * <td>N/A</td>
+	 * </tr>
+	 * <tr>
+	 * <td>400 Bad Request</td>
+	 * <td>If the request entity contains an error, such as improperly formatted
+	 * XML, EML packageId, or URL.</td>
+	 * <td>An error message.</td>
+	 * <td><code>text/plain</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td>401 Unauthorized</td>
+	 * <td>If the requesting user is not authorized to create subscriptions.</td>
+	 * <td>An error message.</td>
+	 * <td><code>text/plain</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param headers
+	 *            the HTTP request headers containing the authorization token.
+	 * 
+	 * @return an appropriate HTTP response.
+	 */
+	@DELETE
+	@Path("/reservations/eml/{scope}/{identifier}")
+	public Response deleteReservation(@Context HttpHeaders headers,
+            @PathParam("scope") String scope, 
+            @PathParam("identifier") Integer identifier) {
+		ResponseBuilder responseBuilder = null;
+		AuthToken authToken = null;
+		String msg = null;
+		Rule.Permission permission = Rule.Permission.write;
+		Response response = null;
+		final String serviceMethodName = "deleteReservation";
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the 'deleteReservation' service
+			// method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+			
+			DataPackageManager dpm = new DataPackageManager();
+
+			Integer deletedIdentifier = dpm.deleteReservation(userId, scope, identifier);
+			msg = String.format(
+					"Deleted reservation for data package: %s.%d",
+					scope, deletedIdentifier);
+			responseBuilder = Response.status(Response.Status.OK);
+			responseBuilder.entity(deletedIdentifier.toString());
+			response = responseBuilder.build();
+			response = stampHeader(response);
+		}
+		catch (NotActiveException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (ResourceNotFoundException e) {
+			msg = e.getMessage();
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (UserErrorException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+			msg = e.getMessage();
+		}
+		catch (Exception e) {
+			WebApplicationException webApplicationException = WebExceptionFactory
+				.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		}

@@ -1197,6 +1197,31 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
+	/**
+	 * Deletes a reservation for the specified user and document identifier.
+	 * 
+	 * @param userId    The user who is making the reservation
+	 * @param scope     The scope of the data package to be deleted, e.g. "edi"
+	 * @return identifier  The integer value of the reserved identifier that is to be deleted
+	 * @throws Exception
+	 */
+	public Integer deleteReservation(String userId, String scope, Integer identifier) 
+			throws Exception {
+		boolean isValidScope = isValidScope(scope);
+		if (!isValidScope) {
+			String msg = 
+					String.format("Attempting to delete a data package identifier reservation for an unknown scope: %s",
+					              scope);
+			throw new UserErrorException(msg);
+		}
+		
+		ReservationManager reservationManager = new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+		reservationManager.deleteDataPackageReservation(scope, identifier, userId);
+		
+		return identifier;
+	}
+	
+	
 	/*
 	 * Determine the next reservable identifier value for the specified scope.
 	 * Three lists must be checked:
