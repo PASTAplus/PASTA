@@ -272,22 +272,22 @@ public class SolrAdvancedSearch extends Search  {
    * An author query will search on the creator name and/or creator organization.
    */
   private void buildQueryAuthor(TermsList termsList) 
-  		throws UnsupportedEncodingException {
+          throws UnsupportedEncodingException {
 
     if (this.creatorName != null && !this.creatorName.equals("")) {
-    	termsList.addTerm(this.creatorName);
-    	String searchName = this.creatorName;
+        termsList.addTerm(this.creatorName);
+        String searchName = this.creatorName;
         String escapedSearchName = Search.escapeQueryChars(searchName);
-		String authorQuery = String.format("author:(%s)", escapedSearchName);
+        String authorQuery = "author:(\"" + escapedSearchName + "\")";
         String encodedValue = URLEncoder.encode(authorQuery, "UTF-8");
         updateQString(encodedValue);
     }
 
     if (this.creatorOrganization != null && !this.creatorOrganization.equals("")) {
-    	termsList.addTerm(this.creatorOrganization);
-    	String searchName = this.creatorOrganization;
+        termsList.addTerm(this.creatorOrganization);
+        String searchName = this.creatorOrganization;
         String escapedSearchName = Search.escapeQueryChars(searchName);
-		String organizationQuery = String.format("organization:(%s)", escapedSearchName);
+        String organizationQuery = "organization:(\"" + escapedSearchName + "\")";
         String encodedValue = URLEncoder.encode(organizationQuery, "UTF-8");
         updateQString(encodedValue);
     }
