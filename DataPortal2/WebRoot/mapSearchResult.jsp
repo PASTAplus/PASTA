@@ -1,10 +1,13 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms" %>
 
 <%
   final String pageTitle = "Search Results Map";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
+  final String googleMapsKey = (String) ConfigurationListener.getOptions().getProperty("maps.google.key");
+
   String path = request.getContextPath();
   String basePath = request.getScheme() + "://" + request.getServerName()
       + ":" + request.getServerPort() + path + "/";
@@ -46,7 +49,7 @@
 	<link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 	<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" >
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>&sensor=false" type="text/javascript"></script>
 	<script type="text/javascript" src="js/markerclusterer.js"></script>
     <script src="js/oms.min.js"></script>
 

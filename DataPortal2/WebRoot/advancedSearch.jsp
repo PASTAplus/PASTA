@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 <%@ page import="edu.lternet.pasta.portal.search.LTERSite" %>
@@ -7,6 +8,7 @@
 <%
   final String pageTitle = "Advanced Search";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
+  final String googleMapsKey = (String) ConfigurationListener.getOptions().getProperty("maps.google.key");
 
   final String indent = "              ";
   boolean includeNIN = true;      // include North Inlet in the options list
@@ -197,7 +199,7 @@
 												  <div>
 													  <!-- <h3 class="separator_border labelBolder span12">Spatial Criteria</h3> -->
 													  <input name="boundsChangedCount" type="hidden" value="0" />
-													  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcbgq4MRleYDjHPQoQazyHMAiavmj0s0U&sensor=false" type="text/javascript"></script>
+													  <script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>&sensor=false" type="text/javascript"></script>
 													  <script src="./js/map_functions.js" type="text/javascript"></script>
 													  <script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/keydragzoom/src/keydragzoom.js" type="text/javascript"></script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);</script>
