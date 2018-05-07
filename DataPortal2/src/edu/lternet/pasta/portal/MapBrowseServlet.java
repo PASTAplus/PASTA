@@ -85,7 +85,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	private static String pastaUriHead;
 	private static final String forward = "./dataPackageSummary.jsp";
 	private static final String PUBLISHER = "Environmental Data Initiative. ";
-	private static final String DxDoiOrg = "http://dx.doi.org/";
+	private static final String DoiOrg = "https://doi.org/";
 	private static final String wasDeletedMsg = 
 	"This data package has been deleted by the metadata provider. It remains accessible for archival purposes only.";
 
@@ -1175,7 +1175,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 			try {
 				citationId = dpmClient.readDataPackageDoi(scope, identifier, revision);
-				citationId = citationId.replace("doi:", DxDoiOrg);
+				citationId = citationId.replace("doi:", DoiOrg);
 			} 
 			catch (Exception e) {
 				logger.error(e.getMessage());

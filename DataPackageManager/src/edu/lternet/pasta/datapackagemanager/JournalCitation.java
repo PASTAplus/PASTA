@@ -280,7 +280,7 @@ public class JournalCitation {
         String url = null;
         
         if (this.articleDoi != null) {
-            url = String.format("https://dx.doi.org/%s", this.articleDoi);
+            url = String.format("https://doi.org/%s", this.articleDoi);
         }
             
         return url;
