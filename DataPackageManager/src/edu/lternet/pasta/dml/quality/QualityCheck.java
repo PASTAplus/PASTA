@@ -65,6 +65,7 @@ public class QualityCheck {
   
   public static Log log = LogFactory.getLog(QualityCheck.class);
 
+  private static final String defaultEmlVersion = null;
   private static final QualityType defaultQualityType = QualityType.congruency;
   private static final StatusType defaultStatusType = StatusType.error;
   private static final String defaultSystem = "knb";
@@ -87,6 +88,9 @@ public class QualityCheck {
 	
 	// The relevant XPath in the EML schema 
 	private String emlPath = "";
+	
+	// The EML version that this quality check applies to. If null, applies to all versions.
+	private String emlVersion = null;
 	
 	// The expected result 
 	private String expected = "";
@@ -129,6 +133,7 @@ public class QualityCheck {
 	 * Constructs a QualityCheck object, initializing its 'identifier' value.
 	 */
   public QualityCheck(String identifier) {
+    this.emlVersion = defaultEmlVersion;
     this.identifier = identifier;
     this.qualityType = defaultQualityType;
     this.statusType = defaultStatusType;
@@ -206,8 +211,9 @@ public class QualityCheck {
     shouldRunCheck = QualityReport.isQualityReporting() &&
                      dataPackage != null &&
                      qualityCheck != null &&
-            		 qualityCheck.identifierFoundInTemplate &&
-                     qualityCheck.isIncluded();
+                     qualityCheck.identifierFoundInTemplate &&
+                     qualityCheck.isIncluded() &&
+                     qualityCheck.appliesToEmlVersion(dataPackage);
     
     return shouldRunCheck;
   }
@@ -400,6 +406,27 @@ public class QualityCheck {
   }
   
   
+  public boolean appliesToEmlVersion(DataPackage dataPackage) {
+    boolean applies = true;
+    
+    if (this.emlVersion != null) {
+        String emlNamespace = dataPackage.getEmlNamespace();
+        if (emlNamespace != null) {
+            applies = false;
+            String[] versions = emlVersion.split(",");
+            for (String v : versions) {
+                if (emlNamespace.contains(v)) {
+                    applies = true;
+                }
+            }
+        }
+    }
+    
+    return applies;
+  }
+  
+
+  
   public void setDescription(String description) {
     this.description = description;
   }
@@ -447,6 +474,11 @@ public class QualityCheck {
   }
 
   
+  public void setEmlVersion(String emlVersion) {
+      this.emlVersion = emlVersion;
+  }
+
+	  
   public void setExplanation(String explanation) {
     this.explanation = checkForEmbeddedCDATA(explanation);
   }

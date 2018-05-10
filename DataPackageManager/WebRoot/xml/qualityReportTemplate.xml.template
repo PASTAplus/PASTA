@@ -10,7 +10,7 @@
   <includeSystem>knb</includeSystem>
   <includeSystem>lter</includeSystem>
   <datasetReport>
-    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
+    <qualityCheck emlVersion="2.1" qualityType="metadata" system="lter" statusType="warn" >
       <identifier>fundingPresence</identifier>
       <name>check to see if funding element is present</name>
       <description>Checks to see if the funding element is included.</description>

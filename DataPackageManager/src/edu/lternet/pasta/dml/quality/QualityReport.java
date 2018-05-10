@@ -209,6 +209,13 @@ public class QualityReport {
 	            QualityCheck qualityCheck = new QualityCheck();
 	            Node qualityCheckNode = qualityCheckList.item(i);
 	          
+	            // Process emlVersion attribute
+	            Node emlVersionNode = xpathapi.selectSingleNode(qualityCheckNode, "@emlVersion");
+	            if (emlVersionNode != null) {
+	              String emlVersion = emlVersionNode.getNodeValue();
+	              qualityCheck.setEmlVersion(emlVersion);
+	            }
+	            
 	            // Process qualityType attribute
 	            Node qualityTypeNode = xpathapi.selectSingleNode(qualityCheckNode, "@qualityType");
 	            if (qualityTypeNode != null) {

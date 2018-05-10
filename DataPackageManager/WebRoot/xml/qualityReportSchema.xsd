@@ -65,6 +65,14 @@
         <xs:element ref="suggestion"   minOccurs="0" />
         <xs:element ref="reference"    minOccurs="0" />
       </xs:sequence>
+      <xs:attribute name="emlVersion" use="optional" default="eml-2.1">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="eml-2.1"/>
+            <xs:enumeration value="eml-2.2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="qualityType" use="optional" default="congruency">
         <xs:simpleType>
           <xs:restriction base="xs:string">
