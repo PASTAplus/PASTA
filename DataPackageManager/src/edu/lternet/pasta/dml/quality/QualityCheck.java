@@ -156,6 +156,9 @@ public class QualityCheck {
     	
       this.identifierFoundInTemplate = true;
       
+      String emlVersion = qualityCheckTemplate.getEmlVersion();
+      setEmlVersion(emlVersion);
+      
       String system = qualityCheckTemplate.getSystem();
       setSystem(system);
       
@@ -207,13 +210,18 @@ public class QualityCheck {
    */
   public static boolean shouldRunQualityCheck(DataPackage dataPackage, QualityCheck qualityCheck) {
     boolean shouldRunCheck;
+    String emlNamespace = null;
     
+    if (dataPackage != null) {
+        emlNamespace = dataPackage.getEmlNamespace();
+    }
+
     shouldRunCheck = QualityReport.isQualityReporting() &&
                      dataPackage != null &&
                      qualityCheck != null &&
                      qualityCheck.identifierFoundInTemplate &&
                      qualityCheck.isIncluded() &&
-                     qualityCheck.appliesToEmlVersion(dataPackage);
+                     qualityCheck.appliesToEmlVersion(emlNamespace);
     
     return shouldRunCheck;
   }
@@ -225,12 +233,18 @@ public class QualityCheck {
    */
   public static boolean shouldRunQualityCheck(Entity entity, QualityCheck qualityCheck) {
     boolean shouldRunCheck;
+    String emlNamespace = null;
+    
+    if (entity != null) {
+        emlNamespace = entity.getEmlNamespace();
+    }
     
     shouldRunCheck = QualityReport.isQualityReporting() &&
                      entity != null &&
                      qualityCheck != null &&
                      qualityCheck.identifierFoundInTemplate &&
-                     qualityCheck.isIncluded();
+                     qualityCheck.isIncluded() &&
+                     qualityCheck.appliesToEmlVersion(emlNamespace);
     
     return shouldRunCheck;
   }
@@ -315,6 +329,11 @@ public class QualityCheck {
   }
 
   
+  public String getEmlVersion() {
+      return emlVersion;
+  }
+
+	  
   public String getExpected() {
     return expected;
   }
@@ -406,16 +425,28 @@ public class QualityCheck {
   }
   
   
-  public boolean appliesToEmlVersion(DataPackage dataPackage) {
+  /**
+   * Boolean to determine whether a quality check applies to a data package with
+   * a given EML version. The determination is made by comparing the emlVersion 
+   * attribute value of the check (if any) to the emlNamespace string declared in 
+   * the EML document. The the quality check does not contain an emlVersion
+   * attribute value, then the check is assumed to apply to all versions of
+   * EML by default.
+   * 
+   * @param dataPackage    The dataPackage object that represents the EML document.
+   * @return  true if this check applies to the EML namespace value declared in
+   *          the data package, else false.
+   */
+  public boolean appliesToEmlVersion(String emlNamespace) {
     boolean applies = true;
     
     if (this.emlVersion != null) {
-        String emlNamespace = dataPackage.getEmlNamespace();
         if (emlNamespace != null) {
             applies = false;
             String[] versions = emlVersion.split(",");
             for (String v : versions) {
-                if (emlNamespace.contains(v)) {
+                String testStr = String.format("eml-%s", v);
+                if (emlNamespace.contains(testStr)) {
                     applies = true;
                 }
             }
@@ -426,7 +457,6 @@ public class QualityCheck {
   }
   
 
-  
   public void setDescription(String description) {
     this.description = description;
   }

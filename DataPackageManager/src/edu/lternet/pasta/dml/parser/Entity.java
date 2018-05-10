@@ -92,6 +92,7 @@ public class Entity extends DataObjectDescription
     
     private AttributeList attributeList = new AttributeList();
     private Boolean      caseSensitive;
+    private String       emlNamespace = null;
     private String       orientation;
     private int          numRecords      = 0;
     private Integer      numHeaderLines  = null;
@@ -151,6 +152,41 @@ public class Entity extends DataObjectDescription
      */
     
     
+    /**
+     * Constructs this object with some extra parameters.
+     * 
+     * @param name          the name of the Entity
+     * @param description   the description of the Entity
+     * @param caseSensitive indicates whether this Entity is caseSensitive
+     * @param orientation   indicates whether this Entity is column or row
+     *                      major
+     * @param numRecords    the number of records in this Entity
+     * @param emlNamespace  the EML namespace value, e.g. 
+     *                      "eml://ecoinformatics.org/eml-2.1.1"
+     */
+    public Entity(String id, String name, String description,
+                       Boolean caseSensitive, String orientation,
+                       int numRecords, String emlNamespace)
+    {
+        this(id, name, description, null);
+        attributeList = new AttributeList();
+        
+        if (caseSensitive != null) {
+            this.caseSensitive = caseSensitive;
+        }
+        
+        if (emlNamespace != null) {
+            this.emlNamespace = emlNamespace;
+        }
+        
+        if (orientation != null) {
+            this.orientation = orientation;
+        }
+        
+        this.numRecords = numRecords;
+    }
+    
+
     /**
      * Constructs this object with some extra parameters.
      * 
@@ -1584,6 +1620,14 @@ public class Entity extends DataObjectDescription
     public void setHasTarDataFile(boolean hasTarDataFile)
     {
       this.hasTarDataFile = hasTarDataFile;
+    }
+    
+    
+    /*
+     * Gets the EML namespace value, e.g. "eml://ecoinformatics.org/eml-2.1.1"
+     */
+    public String getEmlNamespace() {
+        return emlNamespace;
     }
     
     

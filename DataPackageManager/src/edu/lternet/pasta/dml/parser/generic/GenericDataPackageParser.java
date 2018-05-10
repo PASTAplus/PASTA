@@ -300,6 +300,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         NodeList viewEntities;
         CachedXPathAPI xpathapi = new CachedXPathAPI();
         String packageId = null;
+        String emlNamespace = null;
         
         try {
           // process packageid
@@ -313,7 +314,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         	
           emlDataPackage        = new DataPackage(packageId);
           
-          String emlNamespace = parseEmlNamespace(doc);
+          emlNamespace = parseEmlNamespace(doc);
           if (emlDataPackage != null) {
             emlDataPackage.setEmlNamespace(emlNamespace);
           }
@@ -444,21 +445,37 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         }
         
         try {
-            //log.debug("Processing entities");
-            processEntities(xpathapi, dataTableEntities, dataTableEntityPath, packageId);
-            //TODO: current we still treat them as TableEntity java object, 
-            //in future we need add new SpatialRasterEntity and SpatialVector
-            // object for them
+            processEntities(xpathapi, 
+                            dataTableEntities, 
+                            dataTableEntityPath, 
+                            packageId, 
+                            emlNamespace);
+
             processEntities(xpathapi, 
                             spatialRasterEntities, 
-                            spatialRasterEntityPath, packageId);
+                            spatialRasterEntityPath, 
+                            packageId, 
+                            emlNamespace);
+            
             processEntities(xpathapi, 
                             spatialVectorEntities, 
-                            spatialVectorEntityPath, packageId);
-            processEntities(xpathapi, otherEntities, otherEntityPath, packageId);
-            processEntities(xpathapi, viewEntities, viewEntityPath, packageId);
-            //log.debug("Done processing entities");
-        } catch (Exception e) {
+                            spatialVectorEntityPath, 
+                            packageId, 
+                            emlNamespace);
+            
+            processEntities(xpathapi, 
+                            otherEntities, 
+                            otherEntityPath, 
+                            packageId, 
+                            emlNamespace);
+            
+            processEntities(xpathapi, 
+                            viewEntities, 
+                            viewEntityPath, 
+                            packageId, 
+                            emlNamespace);
+        } 
+        catch (Exception e) {
             throw new Exception("Error processing entities: " + e.getMessage(), e);
         }
     }
@@ -1172,7 +1189,8 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     private void processEntities(CachedXPathAPI xpathapi, 
                                  NodeList entitiesNodeList, 
                                  String xpath, 
-                                 String packageId)
+                                 String packageId,
+                                 String emlNamespace)
             throws SAXException,
                    javax.xml.transform.TransformerException, 
                    Exception
@@ -1591,10 +1609,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
               compressionMethod = 
                 compressionMethodNodeList.item(0).getFirstChild().getNodeValue();
               
-          	  if (isDebugging) {
-                  //log.debug("Compression method is "+compressionMethod);
-        	    }
-              
               if (compressionMethod != null && 
                   compressionMethod.equals(Entity.GZIP))
               {
@@ -1617,10 +1631,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
               encodingMethod = 
                 encodingMethodNodeList.item(0).getFirstChild().getNodeValue();
             
-        	    if (isDebugging) {
-        		      //log.debug("encoding method is "+encodingMethod);
-        	    }
-            
               if (encodingMethod != null && encodingMethod.equals(Entity.TAR))
               {
                   isTarDataFile = true;
@@ -1642,12 +1652,12 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           System.err.println(String.format("Package ID: %s  Entity: %s", packageId, entityName));
 
           entityObject = new Entity(id, 
-        		  					entityName == null ? null: entityName.trim(),
+                                    entityName == null ? null: entityName.trim(),
                                     entityDescription == null ? null: entityDescription.trim(), 
                                     new Boolean(entityCaseSensitive),
                                     entityOrientation, 
-                                    new Integer(entityNumberOfRecords).
-                                                           intValue());
+                                    new Integer(entityNumberOfRecords).intValue(),
+                                    emlNamespace);
           
           entityObject.setExternallyDefinedFormat(isExternallyDefinedFormat);
           entityObject.setNumHeaderLines(numHeaderLines);
@@ -1655,14 +1665,12 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setSimpleDelimited(isSimpleDelimited);
           entityObject.setTextFixed(isTextFixed);
             
-          if (quoteCharacter != null)
-          {
-        	  entityObject.setQuoteCharacter(quoteCharacter);
+          if (quoteCharacter != null) {
+              entityObject.setQuoteCharacter(quoteCharacter);
           }
           
-          if (literalCharacter != null)
-          {
-        	  entityObject.setLiteralCharacter(literalCharacter);
+          if (literalCharacter != null) {
+              entityObject.setLiteralCharacter(literalCharacter);
           }
           
           entityObject.setCollapseDelimiters(isCollapseDelimiters);         
@@ -1745,11 +1753,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
               String fieldWidthStr = childNode.getFirstChild().getNodeValue();          
               int fieldWidth = (new Integer(fieldWidthStr)).intValue();
               
-          	  if (isDebugging) {
-        		    //log.debug("The filed width for fix width in eml is "
-                //          + fieldWidth);
-        	    }
-              
               textWidthFixedDataFormat = new TextWidthFixedDataFormat(fieldWidth);
            }
            else if (elementName != null && 
@@ -1757,12 +1760,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
                     textWidthFixedDataFormat != null)
            {
                String startColumnStr = childNode.getFirstChild().getNodeValue();
-               int startColumn  = (new Integer(startColumnStr)).intValue();
-               
-           	   if (isDebugging) {
-        		     //log.debug("The start column is " + startColumn);
-        	     }
-               
+               int startColumn  = (new Integer(startColumnStr)).intValue();               
                textWidthFixedDataFormat.setFieldStartColumn(startColumn);
            }
            else if (elementName != null && 
@@ -1771,11 +1769,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
            {
                String lineNumberStr = childNode.getFirstChild().getNodeValue();
                int lineNumber  = (new Integer(lineNumberStr)).intValue();
-               
-           	   if (isDebugging) {
-        		     //log.debug("The start column is " + lineNumber);
-        	     }
-               
                textWidthFixedDataFormat.setLineNumber(lineNumber);
            }
        }

@@ -3,7 +3,7 @@
   xmlns="eml://ecoinformatics.org/qualityReport" 
   xmlns:qr="eml://ecoinformatics.org/qualityReport" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xsi:schemaLocation="eml://ecoinformatics.org/qualityReport http://svn.lternet.edu/svn/NIS/documents/schemas/quality/qualityReportSchema.xsd"
+  xsi:schemaLocation="eml://ecoinformatics.org/qualityReport file:///home/pasta/git/NIS/DataPackageManager/WebRoot/xml/qualityReportSchema.xsd"
   >
   <creationDate>2011-12-01T12:00:00</creationDate>
   <packageId></packageId>
