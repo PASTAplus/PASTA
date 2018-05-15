@@ -249,6 +249,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
         if (entity.isSimpleDelimited()) {
           delimitedReader = new DelimitedReader(
                                   inputStream,
+                                  entity,
                                   entity.getAttributes().length, 
                                   entity.getFieldDelimiter(), 
                                   entity.getNumHeaderLines(),
@@ -256,7 +257,6 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
                                   entity.getNumRecords(),
                                   stripHeaderLine
                                  );
-          delimitedReader.setEntity(entity);
           delimitedReader.setCollapseDelimiters(entity.getCollapseDelimiters());
           delimitedReader.setNumFooterLines(entity.getNumFooterLines());
           if (entity.getQuoteCharacter() != null)
@@ -504,14 +504,43 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
         catch (Exception ee) {
           log.error(ee.getMessage());
         }
-      } 
+      }
       finally {
-    	  if (QualityCheck.shouldRunQualityCheck(entity, dateFormatMatchesQualityCheck)) {
-    		  String found = this.dateFormatMatchesQualityCheck.getFound();
-    		  if (found == null || found.isEmpty()) {
-    			  this.dateFormatMatchesQualityCheck.setFound("Data values matched the specified formatString.");
-    		      this.dateFormatMatchesQualityCheck.setExplanation("");
-    		  }
+          String headerRowAttributeNamesIdentifier = "headerRowAttributeNames";
+          QualityCheck headerRowAttributeNamesTemplate = QualityReport.getQualityCheckTemplate(headerRowAttributeNamesIdentifier);
+          QualityCheck headerRowAttributeNamesQualityCheck = new QualityCheck(headerRowAttributeNamesIdentifier, headerRowAttributeNamesTemplate);
+          if (QualityCheck.shouldRunQualityCheck(entity, headerRowAttributeNamesQualityCheck)) {
+              final String headerRowsBanner = "*** HEADER ROWS ***\n";
+              final String attributesBanner = "*** ATTRIBUTE LIST ***\n";
+              String found = "";
+              String headerText = entity.getHeaderText();
+              if (headerText == null || headerText.isEmpty()) {
+                  found = headerRowsBanner + "No header rows were found.";
+              }
+              else {
+                  found = String.format("%s%s", 
+                                        headerRowsBanner, 
+                                        QualityCheck.embedInCDATA(headerText));
+              }
+              
+              found += attributesBanner;
+              String attributeListStr = "";
+              if (attributeList != null) {
+                  attributeListStr = attributeList.prettyPrintAttributes();
+              }
+              found += attributeListStr;
+              
+              headerRowAttributeNamesQualityCheck.setFound(found);
+              headerRowAttributeNamesQualityCheck.setStatus(Status.info);
+              entity.addQualityCheck(headerRowAttributeNamesQualityCheck);
+          }
+          
+          if (QualityCheck.shouldRunQualityCheck(entity, dateFormatMatchesQualityCheck)) {
+              String found = this.dateFormatMatchesQualityCheck.getFound();
+              if (found == null || found.isEmpty()) {
+                  this.dateFormatMatchesQualityCheck.setFound("Data values matched the specified formatString.");
+                  this.dateFormatMatchesQualityCheck.setExplanation("");
+              }
               entity.addQualityCheck(dateFormatMatchesQualityCheck);
           }
           

@@ -91,6 +91,31 @@ public class AttributeList
   
   
   /**
+   * Pretty prints the attribute list.
+   * 
+   * @return   a pretty-print string for the attribute list
+   */
+  public String prettyPrintAttributes() {
+      String prettyPrintStr = "";
+      Attribute[] attributeList = getAttributes();
+      StringBuffer sb = new StringBuffer("");
+      
+      if (attributeList != null) {
+          int i = 0;
+          for (Attribute attribute : attributeList) {
+              String name = attribute.getName();
+              sb.append(name);
+              if (i < attributeList.length) { sb.append(", "); }
+          }
+          prettyPrintStr = sb.toString();
+      }
+      
+      return prettyPrintStr;
+  }
+
+  
+  
+  /**
    * @param attributes   The attributes to set.
    */
   /*

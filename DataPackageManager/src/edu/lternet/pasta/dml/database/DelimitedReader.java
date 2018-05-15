@@ -103,113 +103,10 @@ public class DelimitedReader extends TextDataReader
    */
 
   /**
-   * Constructor. Reads the csv (comma-separated values) stream.
-   * 
-   * @param data           the delimited stream to read as a string
-   * @param numCols        the number of columns in the stream
-   * @param delimiter      the delimiter string to tokenize on
-   * @param numHeaderLines the number of lines to skip at the top of the file
-   * @param lineEnding     the line ending char(s)...either "\n" (Unix),
-   *                       "\r\n" (Windows) or "\r" (Mac)
-   * @param numRecords     the number of rows in the data string
-   */
-  public DelimitedReader(String data, int numCols, String delimiter,
-                         int numHeaderLines, String lineEnding, int numRecords) 
-          throws Exception
-  {
-    this.numHeaderLines = numHeaderLines;
-    this.data = data;
-    this.numCols = numCols;
-    this.numRecords = numRecords;    
-    //log.debug("Delimiter is: " + delimiter);
-    this.fieldDelimiter = unescapeDelimiter(delimiter);
-    //log.debug("LineEnding is: " + lineEnding);
-    this.lineEnding = unescapeDelimiter(lineEnding);
-    
-    //lines = new Vector[numRecords + numHeaderLines + 1];
-    linesVector = new Vector();
-
-    int begin = 0;
-    int end = 0;
-//    int i = 0;
-    
-    while(end < data.length())
-    { //add each line of the string as an element in a vector
-      end = data.indexOf(this.lineEnding, begin); //DFH 'this.' added
-      
-      if(end == -1)
-      {
-        end = data.length();
-      }
-      
-      String line = data.substring(begin, end);
-      
-      if(!line.trim().equals(""))
-      {
-        //take off the line ending
-        // MBJ: I commented out the next line as it was improperly truncating 
-        // lines. I'm not sure why it was there in the first place, as the 
-        // previous substring removed the delimiter
-        //line = line.substring(0, line.length() - lineEnding.length());
-
-        //split the line based on the delimiter
-        Vector v = splitDelimitedRowStringIntoVector(line);
-        /*String[] s = line.split(delimiter.trim(), numCols);
-        Vector v = new Vector();
-        
-        for(int j=0; j<s.length; j++)
-        {
-          v.addElement(s[j]);
-        }
-
-        if(v.size()  < numCols)
-        {
-          int vsize = v.size();
-          for(int j=0; j<numCols - vsize; j++)
-          { //add any elements that aren't there so that all the records have the
-            //same number of cols
-            v.addElement("");
-          }
-        }*/
-        
-        //lines[i] = v;
-        linesVector.add(v);
-//        i++;
-      }
-      
-      //go to the next line
-      begin = end + this.lineEnding.length();   //DFH  'this.' added
-    }
-    
-    int records = linesVector.size();
-    
-    if (records != this.numRecords) {
-        this.numRecords = records;
-        //log.warn("Metadata disagrees with actual data. Changing number of records to: " + records);
-    }
-    
-    lines = new Vector[records];
-    
-    for (int k=0; k < records; k++) {
-        lines[k] = (Vector)linesVector.get(k);
-    }
-/*
-    for(int j=0; j<lines.length; j++)
-    {
-      if(lines[j] == null)
-      {
-        lines[j] = new Vector();
-      }
-    }
-*/
-    
-  }
-  
-  
-  /**
    * This constructor will read delimited data from stream rather a string.
    * 
-   * @param dataStream     InputStream  The input stream
+   * @param dataStream     The input stream
+   * @param enity          the entity metadata to describe the data stream
    * @param numCols        int the number of columns
    * @param fieldDelimiter String the field delimiter to tokenize on
    * @param numHeaderLines int numHeaderLines the number of lines to skip at the
@@ -218,11 +115,13 @@ public class DelimitedReader extends TextDataReader
    *                       "\n" (Unix),"\r\n" (Windows) or "\r" (Mac)
    * @param numRecords     int number of rows in the input stream
    */
-  public DelimitedReader(InputStream dataStream, int numCols, String fieldDelimiter,
-                         int numHeaderLines, String lineEnding, int numRecords, 
+  public DelimitedReader(InputStream dataStream, Entity entity, int numCols, 
+                         String fieldDelimiter, int numHeaderLines, 
+                         String lineEnding, int numRecords, 
                          boolean stripHeader)
   {
     this.dataReader = new InputStreamReader(dataStream);
+    this.entity = entity;
     this.numHeaderLines = numHeaderLines;
     this.numCols = numCols;
     this.numRecords = numRecords;    
@@ -602,23 +501,25 @@ public class DelimitedReader extends TextDataReader
               
           // Check for a line ending character in the row data   
           if (rowBuffer.indexOf(lineEnding) != -1) {
-	          // Strip the header lines
-            if (stripHeader && 
-                numHeaderLines > 0 && 
-                headLineNumberCount < numHeaderLines) {
-	            // Reset string buffer (discard the header line)
-              rowBuffer = null;
-              rowBuffer = new StringBuffer();  
-	          }
-	          else {
-              rowDataString = rowBuffer.toString();
-              hasRecordDelimiter = true;
-              break;
-            }
+              // Strip the header lines
+              if (stripHeader && 
+                  numHeaderLines > 0 &&
+                  headLineNumberCount < numHeaderLines
+                 ) {
+                  entity.addHeaderLine(rowBuffer.toString());
+                  // Reset string buffer (discard the header line)
+                  rowBuffer = null;
+                  rowBuffer = new StringBuffer();
+              } 
+              else {
+                  rowDataString = rowBuffer.toString();
+                  hasRecordDelimiter = true;
+                  break;
+              }
 
-            headLineNumberCount++;
+              headLineNumberCount++;
           }
-	          
+          
           // Read the next character before looping back
           singleCharacter = dataReader.read();
         }
@@ -1187,13 +1088,5 @@ public class DelimitedReader extends TextDataReader
     return sb.toString();
   }
   
-  
-  /**
-   * Sets the entity value for this 
-   * @param entity
-   */
-  public void setEntity(Entity entity) {
-    this.entity = entity;
-  }
-  
+
 }

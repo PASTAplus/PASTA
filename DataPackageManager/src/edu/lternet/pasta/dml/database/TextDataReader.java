@@ -36,7 +36,7 @@ import java.util.Vector;
 
 /**
  * 
- * An abract class which can read row data from a text data input stream.
+ * An abstract class which can read row data from a text data input stream.
  *
  */
 public abstract class TextDataReader {

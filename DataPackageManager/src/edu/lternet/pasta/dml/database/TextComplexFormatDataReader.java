@@ -396,14 +396,4 @@ public class TextComplexFormatDataReader extends TextDataReader
     }
 
     
-    /**
-     * Sets the value of the entity field to the specified Entity object.
-     * 
-     * @param entity  The Entity value to set.
-     */
-    public void setEntity(Entity entity)
-    {
-        this.entity = entity;
-    }
-    
 }

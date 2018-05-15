@@ -204,6 +204,14 @@ public class QualityCheck {
    * Class methods
    */
   
+  /*
+   * Embeds a string value inside CDATA opening and closing tags.
+   */
+  public static String embedInCDATA(String value) {
+    return "<![CDATA[" + value + "]]>";
+  }
+  
+  
   /**
    * Boolean to determine whether a given quality check should be run for
    * a given data package.

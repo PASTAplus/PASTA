@@ -146,6 +146,7 @@ public class Entity extends DataObjectDescription
     
     private String md5HashValue = null;
     private String sha1HashValue = null;
+    private StringBuffer headerBuffer = new StringBuffer();
     
     /* 
      * Constructors 
@@ -1220,29 +1221,6 @@ public class Entity extends DataObjectDescription
     }
     
     
-    /*
-    public String toString()
-    {
-      StringBuffer sb = new StringBuffer();
-      sb.append("name: ").append(name).append("\n");
-      sb.append("dataType: ").append(dataType).append("\n");
-      sb.append("description: ").append(description).append("\n");
-      sb.append("numRecords: ").append(numRecords).append("\n");
-      sb.append("caseSensitive: ").append(caseSensitive).append("\n");
-      sb.append("orientation: ").append(orientation).append("\n");
-      sb.append("numHeaderLines: ").append(numHeaderLines).append("\n");
-      sb.append("delimiter: ").append(delimiter).append("\n");
-      sb.append("attributes: {");
-      for(int i=0; i<attributes.size(); i++)
-      {
-        sb.append(((Attribute)attributes.elementAt(i)).toString());
-      }
-      sb.append("\n}");
-      return sb.toString();
-    }
-    */
-
-    
     /**
      * Gets the file name for this entity.
      * 
@@ -1263,33 +1241,6 @@ public class Entity extends DataObjectDescription
     {
       this.fileName = fileName;
     }
-
-    
-    /**
-     * Serializes the data item in XML format.
-     */
-    /*public String toXml()
-    {
-        StringBuffer x = new StringBuffer();
-        x.append("<table-entity id=\"");
-        x.append(getId());
-        x.append("\"");
-        if( multiple == true )
-        {
-          x.append(" multiple=\"true\"");
-        }
-        x.append(">\n");
-        appendElement(x, "entityName", getName());
-        //appendElement(x, "entityType", getDataType());
-        appendElement(x, "entityDescription", getDefinition());
-        Attribute[] atts = getAttributes();
-        for (int i = 0; i < atts.length; i++) {
-            x.append(atts[i].toXml());
-        }
-        x.append("</table-entity>\n");
-
-        return x.toString();
-    }*/
 
     
     /**
@@ -1316,14 +1267,6 @@ public class Entity extends DataObjectDescription
     //-- DSTableIFace
     //-----------------------------------------------------------------
     
-    
-    /**
-     * Returns the name of the table
-     * @return name as string 
-     */
-    // This is imlemented in the base class
-    //public String getName();
-
     
     /**
      * Gets the database table name for this entity.
@@ -1566,6 +1509,23 @@ public class Entity extends DataObjectDescription
     public boolean getHasZipDataFile()
     {
       return this.hasZipDataFile;
+    }
+    
+    
+    /**
+     * Gets the value of the headerText field.
+     * 
+     * @return headerText the text of the entity's header lines
+     */
+    public String getHeaderText() {
+        return this.headerBuffer.toString();
+    }
+    
+    
+    public void addHeaderLine(String line) {
+        if (line != null) {
+            this.headerBuffer.append(line);
+        }
     }
     
     
