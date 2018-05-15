@@ -206,6 +206,17 @@
   </datasetReport>
   <entityReport>
     <entityName></entityName>
+    <qualityCheck qualityType="congruency" system="lter" statusType="info" >
+      <identifier>headerRowAttributeNames</identifier>
+      <name>Header row is displayed alongside attribute names</name>
+      <description>Compare tne content of the data header row to the content of EML attribute names.</description>
+      <expected>No expectation, information only</expected>
+      <found></found>
+      <status>notChecked</status>
+      <explanation></explanation>    
+      <suggestion>Customer should evaluate the findings</suggestion>
+      <reference></reference>
+    </qualityCheck>
     <qualityCheck qualityType="metadata" system="knb" statusType="warn" >
       <identifier>dateTimeFormatString</identifier>
       <name>dateTime/formatString specified in metadata is from a preferred set of values</name>
