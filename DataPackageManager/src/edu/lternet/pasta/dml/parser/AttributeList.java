@@ -101,11 +101,12 @@ public class AttributeList
       StringBuffer sb = new StringBuffer("");
       
       if (attributeList != null) {
-          int i = 0;
+          int i = 1;
           for (Attribute attribute : attributeList) {
               String name = attribute.getName();
               sb.append(name);
               if (i < attributeList.length) { sb.append(", "); }
+              i++;
           }
           prettyPrintStr = sb.toString();
       }
