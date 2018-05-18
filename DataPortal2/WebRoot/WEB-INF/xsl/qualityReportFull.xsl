@@ -30,8 +30,36 @@
 
     <xsl:template match="/">
       
-        <!-- tabular framework for each quality report -->
+<head>
 
+<meta charset="UTF-8" />
+<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+
+<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+
+<!-- Google Fonts CSS -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,300italic" rel="stylesheet" type="text/css"/>
+
+<!-- Page Layout CSS MUST LOAD BEFORE bootstap.css -->
+<link href="css/style_slate.css" media="all" rel="stylesheet" type="text/css"/>
+
+<!-- JS -->
+<script src="js/jqueryba3a.js?ver=1.7.2" type="text/javascript"></script>
+<script src="bootstrap/js/bootstrap68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/jquery.easing.1.368b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/jquery.flexslider-min68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/themeple68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/jquery.pixel68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/jquery.mobilemenu68b368b3.js?ver=1" type="text/javascript"></script>
+<script src="js/mediaelement-and-player.min68b368b3.js?ver=1" type="text/javascript"></script>
+
+<!-- Mobile Device CSS -->
+<link href="bootstrap/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css"/>
+<link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css"/>
+
+</head>
+
+        <!-- tabular framework for each quality report -->
         <table>
             <tbody>
                 <tr>
@@ -52,7 +80,7 @@
                     <td class="header" align="center"> # </td>
                     <td class="header" align="center"> Identifier </td>
                     <td class="header" align="center"> Status </td>
-                    <td class="header" align="center" width="180px"> Quality Check </td>
+                    <td class="header" align="center"> Quality Check </td>
                     <td class="header" align="center"> Name </td>
                     <td class="header" align="center"> Description </td>
                     <td class="header" align="center"> Expected </td>
@@ -96,7 +124,7 @@
                         <td class="header" align="center"> # </td>
                         <td class="header" align="center"> Identifier </td>
                         <td class="header" align="center"> Status </td>
-                        <td class="header" align="center" width="180px"> Quality Check </td>
+                        <td class="header" align="center"> Quality Check </td>
                         <td class="header" align="center"> Name </td>
                         <td class="header" align="center"> Description </td>
                         <td class="header" align="center"> Expected </td>
@@ -173,9 +201,11 @@
 
     <xsl:template match="qr:qualityCheck">
         <td class="data" align="left" valign="top" title="qualitycheck">
-        <pre> Type: <xsl:value-of select="@qualityType"/>
- System: <xsl:value-of select="@system"/>
- On Failure: <xsl:value-of select="@statusType"/></pre>
+        <table class="inner">
+          <tr><td>Type:</td><td><xsl:value-of select="@qualityType"/></td></tr> 
+          <tr><td>System:</td><td><xsl:value-of select="@system"/></td></tr> 
+          <tr><td>On failure:</td><td><xsl:value-of select="@statusType"/></td></tr> 
+        </table>
         </td>
     </xsl:template>
 
@@ -200,16 +230,42 @@
     <xsl:template match="qr:found">
         <td class="data" align="left" valign="top" title="found">
             <xsl:variable name="found" select="."/>
-            <xsl:if test="string-length($found) &gt; 200">
-                <xsl:element name="a">
-                    <xsl:attribute name="href">#</xsl:attribute>
-                    <!-- flatten white space to single space character -->
-                    <xsl:attribute name="onclick">confirm("<xsl:value-of
-                            select="normalize-space($found)"/>");</xsl:attribute> click here to view
-                    content </xsl:element>
-            </xsl:if>
             <xsl:if test="string-length($found) &lt;= 200">
                 <xsl:value-of select="$found"/>
+            </xsl:if>
+            <xsl:if test="string-length($found) &gt; 200">
+                <xsl:variable name="modalId" select="../qr:identifier"/>
+                <!-- Trigger the modal with a button -->
+                <button type="button" 
+                        class="btn btn-info btn-lg" 
+                        data-toggle="modal" 
+                        data-target="#{$modalId}">Click to view content</button>
+                <!-- Modal -->
+                <div id="{$modalId}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" 
+                                        class="close" 
+                                        data-dismiss="modal">Modal Button</button>
+                                <h4 class="modal-title">Found for <xsl:value-of select="../qr:identifier"/> check</h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre>
+                                <xsl:value-of select="$found"/>
+                                </pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn btn-default" 
+                                        data-dismiss="modal">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </xsl:if>
         </td>
     </xsl:template>

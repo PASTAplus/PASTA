@@ -36,6 +36,9 @@ input {
 	line-height: 18px;
 	color: #666666;
 }
+#affiliation-select {
+	height: 58px;
+}
 .banner_font {
 	font-family: Georgia, "Times New Roman",Times, serif !important;
 	line-height: 28px;
@@ -2968,27 +2971,36 @@ code.nis {
 
 .nis-banner-msg {
     padding: 7px;
-	color: white;
+    color: white;
     background-color: #5990bd;
     font-size: 1.1em;
     text-align: center;
 }
 
-.nis-error {
-    background-color: #F7F7F7;
+.nis-input-error {
+    color: red;
+    background-color: Azure;
     font-family: monospace;
-	font-weight: bold;
+    font-weight: bold;
+}
+
+.nis-error {
+    color: red;
+    background-color: Azure;
+    font-family: monospace;
+    font-weight: bold;
 }
 
 .nis-warn {
-	font-style: italic;
+    background-color: Azure;
+    font-family: monospace;
     font-weight: bold;
 }
 
 .nis-info {
-    background-color: #F7F7F7;
+    background-color: Azure;
     font-family: monospace;
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .nis-title {
@@ -3064,8 +3076,8 @@ div.qualityreport table {
 }
 
 div.qualityreport table pre {
-    font-size: 0.9em;
-	  font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
+    font-size: 1.0em;
+    font-family: Arial, Geneva, Verdana, Helvetica, sans-serif;
 }
 
 div.qualityreport td.header {
@@ -3082,6 +3094,10 @@ div.qualityreport td.data {
     border: solid;
     border-width: 1px;
     padding: 5px;
+}
+
+div.qualityreport table.inner {
+    border: none;
 }
 
 div.valid {
