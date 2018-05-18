@@ -9363,7 +9363,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			                           @Context UriInfo uriInfo) {
 		AuthToken authToken = null;
 		String resourceId = null;
-		String entryText = null;
+		String entryText = "";
 		String resultsetXML = null;
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
@@ -9385,6 +9385,11 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
+			URI uri = uriInfo.getRequestUri();
+			if (uri != null) {
+				entryText = uri.getQuery();
+			}
+
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resultsetXML = dataPackageManager.searchDataPackages(uriInfo,
 					userId, authToken);
@@ -9396,26 +9401,26 @@ public class DataPackageManagerResource extends PastaWebService {
 			else {
 				ResourceNotFoundException e = new ResourceNotFoundException(
 						"No search results returned");
-				entryText = e.getMessage();
+				entryText += "; " + e.getMessage();
 				WebApplicationException webApplicationException = WebExceptionFactory
 						.makeNotFound(e);
 				response = webApplicationException.getResponse();
 			}
 		}
 		catch (IllegalArgumentException e) {
-			entryText = e.getMessage();
+			entryText += "; " + e.getMessage();
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 		}
 		catch (UnauthorizedException e) {
-			entryText = e.getMessage();
+			entryText += "; " + e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 		}
 		catch (UserErrorException e) {
-			entryText = e.getMessage();
+			entryText += "; " + e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
 		}
 		catch (Exception e) {
-			entryText = e.getMessage();
+			entryText += "; " + e.getMessage();
 			WebApplicationException webApplicationException = WebExceptionFactory
 					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
 							e.getMessage());
