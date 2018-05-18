@@ -9385,9 +9385,18 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-			URI uri = uriInfo.getRequestUri();
-			if (uri != null) {
-				entryText = uri.getQuery();
+			try {
+				URI uri = uriInfo.getRequestUri();
+				if (uri != null) {
+					entryText = uri.getQuery();
+				}
+			}
+			catch (UnsupportedOperationException e) {
+				/*
+				 * DummyUriInfo doesn't support the getRequestUri() method but it's only
+				 * used during testing so we don't really care
+				 */
+				;
 			}
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
