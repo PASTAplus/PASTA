@@ -128,9 +128,43 @@
   </xsl:template>
   
   <xsl:template match="entryText">
-    <td class="nis">
-      <xsl:value-of select="."/>
-    </td>
+        <td class="nis">
+            <xsl:variable name="entry-text" select="."/>
+            <xsl:if test="string-length($entry-text) &lt;= 200">
+                <xsl:value-of select="$entry-text"/>
+            </xsl:if>
+            <xsl:if test="string-length($entry-text) &gt; 200">
+                <xsl:variable name="modalId" select="../oid"/>
+                <!-- Trigger the modal with a button -->
+                <button type="button" 
+                        class="btn btn-info btn-lg" 
+                        data-toggle="modal" 
+                        data-target="#{$modalId}">Click to view content</button>
+                <!-- Modal -->
+                <div id="{$modalId}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Entry text for audit id #<xsl:value-of select="../oid"/></h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre>
+                                <xsl:value-of select="$entry-text"/>
+                                </pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn btn-default" 
+                                        data-dismiss="modal">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xsl:if>
+        </td>
   </xsl:template>
   
 </xsl:stylesheet>
