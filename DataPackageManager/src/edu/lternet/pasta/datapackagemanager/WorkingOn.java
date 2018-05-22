@@ -137,10 +137,10 @@ public class WorkingOn {
 
 		try {
 			workingOn = new WorkingOn(dbDriver, dbURL, dbUser, dbPassword);
-			Map<String, String> active = workingOn.listActiveDataPackages();
-			System.out.println("Package ID       Start Date");
-			for (String key : active.keySet()) {
-				System.out.println(String.format("  %s  %s", key, active.get(key)));
+			ArrayList<String> active = workingOn.listActiveDataPackages();
+			System.out.println("Package ID, Service Method, Start Date");
+			for (String workingOnEntry : active) {
+				System.out.println(workingOnEntry);
 			}
 			
 			boolean isActive = workingOn.isActive("knb-lter-xyz", new Integer(1), new Integer(1));
@@ -183,14 +183,14 @@ public class WorkingOn {
 	 * @param revision
 	 *            The revision value
 	 */
-	public void addDataPackage(String scope, Integer identifier, Integer revision)
+	public void addDataPackage(String scope, Integer identifier, Integer revision, String serviceMethod)
 			throws ClassNotFoundException, SQLException {
 		Connection connection = null;
 		java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
 		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 
 		StringBuilder insertSQL = new StringBuilder("INSERT INTO " + WORKING_ON + "(");
-		insertSQL.append("scope, identifier, revision, start_date) " + "VALUES(?,?,?,?)");
+		insertSQL.append("scope, identifier, revision, service_method, start_date) " + "VALUES(?,?,?,?,?)");
 
 		String insertString = insertSQL.toString();
 		logger.debug("insertString: " + insertString);
@@ -201,13 +201,15 @@ public class WorkingOn {
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.setInt(3, revision);
-			pstmt.setTimestamp(4, ts);
+			pstmt.setString(4, serviceMethod);
+			pstmt.setTimestamp(5, ts);
 
 			pstmt.executeUpdate();
 			if (pstmt != null) {
 				pstmt.close();
 			}
-			logger.info(String.format("Work on data package %s has been started.", packageId));
+			logger.info(String.format("Work for '%s' on data package '%s' has been started.", 
+					                  serviceMethod, packageId));
 		} 
 		catch (SQLException e) {
 			logger.error("Error inserting data package " + packageId + " into table " + WORKING_ON);
@@ -427,15 +429,14 @@ public class WorkingOn {
 	 *            package ID and the value is the timestamp as of when
 	 *            activity on the data package started.
 	 */
-	public Map<String, String> listActiveDataPackages() throws Exception {
+	public ArrayList<String> listActiveDataPackages() throws Exception {
 		Connection conn = null;
-		Map<String, String> activeDataPackages = new HashMap<String, String>();
+		ArrayList<String> activeDataPackages = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
-		TreeSet<String> docids = new TreeSet<String>();
 
-		sb.append("SELECT scope, identifier, revision, start_date FROM ");
+		sb.append("SELECT scope, identifier, revision, service_method, start_date FROM ");
 		sb.append(WORKING_ON);
-		sb.append(" WHERE start_date IS NOT NULL  AND ");
+		sb.append(" WHERE start_date IS NOT NULL AND ");
 		sb.append("   end_date IS NULL AND ");
 		sb.append("   interrupted=false ");
 		sb.append("ORDER BY start_date ASC;");
@@ -452,10 +453,13 @@ public class WorkingOn {
 					String scope = rs.getString(1);
 					Integer identifier = rs.getInt(2);
 					Integer revision = rs.getInt(3);
-					java.sql.Timestamp startDate = rs.getTimestamp(4);
+					String serviceMethod = rs.getString(4).trim();
+					java.sql.Timestamp startDate = rs.getTimestamp(5);
 					String uploadDate = startDate.toString();
 					String packageId = String.format("%s.%d.%d", scope, identifier, revision);
-					activeDataPackages.put(packageId, uploadDate);
+					String workingOnEntry = String.format("%s,%s,%s",
+							                              packageId, serviceMethod, uploadDate);
+					activeDataPackages.add(workingOnEntry);
 				}
 			}
 		}

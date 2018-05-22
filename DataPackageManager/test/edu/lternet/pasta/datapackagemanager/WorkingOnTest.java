@@ -26,6 +26,7 @@ package edu.lternet.pasta.datapackagemanager;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.junit.After;
@@ -111,25 +112,24 @@ public class WorkingOnTest {
 
 	  
 	  /*
-	   * Test whether PASTA will insert an intellectualRights element
-	   * in a Level-0 document that has none.
+	   * Test for when a data package is being actively worked on.
 	   */
 	  @Test public void testIsActive() {
 		try {
-		    workingOn.addDataPackage(TEST_SCOPE, TEST_IDENTIFIER, TEST_REVISION);
-		    Map<String, String> active = workingOn.listActiveDataPackages();
-			System.out.println("Package ID       Start Date");
-			for (String key : active.keySet()) {
-				System.out.println(String.format("  %s  %s", key, active.get(key)));
-			}			
+		    workingOn.addDataPackage(TEST_SCOPE, TEST_IDENTIFIER, TEST_REVISION, "createDataPackage");
+		    ArrayList<String> active = workingOn.listActiveDataPackages();
+			System.out.println("Package ID, Service Method, Start Date");
+			for (String workingOnEntry : active) {
+				System.out.println(workingOnEntry);
+			}
 			boolean isActive = workingOn.isActive(TEST_SCOPE, TEST_IDENTIFIER, TEST_REVISION);
 			assertTrue(isActive);
 
 			workingOn.updateEndDate(TEST_SCOPE, TEST_IDENTIFIER, TEST_REVISION);
 		    active = workingOn.listActiveDataPackages();
-			System.out.println("Package ID       Start Date");
-			for (String key : active.keySet()) {
-				System.out.println(String.format("  %s  %s", key, active.get(key)));
+			System.out.println("Package ID, Service Method, Start Date");
+			for (String workingOnEntry : active) {
+				System.out.println(workingOnEntry);
 			}
 			isActive = workingOn.isActive(TEST_SCOPE, TEST_IDENTIFIER, TEST_REVISION);
 			assertFalse(isActive);

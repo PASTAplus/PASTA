@@ -1,5 +1,6 @@
 package edu.lternet.pasta.datapackagemanager;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -46,11 +47,11 @@ public class WorkingOnServlet extends HttpServlet {
 
 		try {
 			WorkingOn workingOn = new WorkingOn(dbDriver, dbURL, dbUser, dbPassword);
-			Map<String, String> active = workingOn.listActiveDataPackages();
+			ArrayList<String> active = workingOn.listActiveDataPackages();
 			logger.info("The following data packages were still active at the time of last shutdown:");
-			System.out.println("  Package ID       Start Date");
-			for (String key : active.keySet()) {
-				System.out.println(String.format("    %s  %s", key, active.get(key)));
+			System.out.println("Package ID, Service Method, Start Date");
+			for (String workingOnEntry : active) {
+				System.out.println(workingOnEntry);
 			}
 			workingOn.detectInterrupted();
 		} 

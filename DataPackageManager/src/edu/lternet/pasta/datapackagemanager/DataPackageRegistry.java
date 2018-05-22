@@ -4014,20 +4014,20 @@ public class DataPackageRegistry {
 		throws Exception {
 		StringBuilder sb = new StringBuilder("<workingOn>\n");
 		String xmlString = "";
-		
-		
+
 		WorkingOn workingOn = makeWorkingOn();
-		Map<String, String> activeList = workingOn.listActiveDataPackages();
-		TreeMap<String, String> sortedList = new TreeMap<String, String>(activeList);
-		for (String key : sortedList.keySet()) {
-			String value = sortedList.get(key);
-			sb.append(String.format("  <dataPackage>\n"));
-			sb.append(String.format("    <packageId>%s</packageId>\n", key));
-			sb.append(String.format("    <startDate>%s</startDate>\n", value));
-			sb.append(String.format("  </dataPackage>\n"));
+		ArrayList<String> activeList = workingOn.listActiveDataPackages();
+		for (String workingOnEntry : activeList) {
+			String[] values = workingOnEntry.split(",");
+			if (values != null && values.length == 3) {
+                sb.append(String.format("  <dataPackage>\n"));
+                sb.append(String.format("    <packageId>%s</packageId>\n", values[0]));
+                sb.append(String.format("    <serviceMethod>%s</serviceMethod>\n", values[1]));
+                sb.append(String.format("    <startDate>%s</startDate>\n", values[2]));
+                sb.append(String.format("  </dataPackage>\n"));
+			}
 		}
-		
-		
+
 		sb.append("</workingOn>\n");
 		xmlString = sb.toString();
 		return xmlString;

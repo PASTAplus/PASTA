@@ -632,18 +632,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new ResourceExistsException(message);
 			}
 
-			// Is this data package actively being worked on in PASTA?
-			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
-			boolean isActive = workingOn.isActive(scope, identifier, revision);
-
-			/*
-			 * If this data package is already active in PASTA, throw an exception
-			 */
-			if (isActive) {
-				String message = "Attempting to insert a data package that is currently being processed in PASTA: "
-				    + levelZeroDataPackage.getDocid();
-				throw new UserErrorException(message);
-			}
+            // Is this data package actively being worked on in PASTA?
+            checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
+                    scope, identifier, revision);
 
 			boolean isUpdate = false;
 			boolean useChecksum = false;
@@ -796,26 +787,36 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		File levelOneEMLFile = null;
 		String levelZeroXML = null;
 		
-		try {
-		if (!isEvaluate) {
-			workingOn.addDataPackage(scope, identifier, revision);
-		}
-		
-		ReservationManager reservationManager = 
-				new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
-		String reservationUserId = reservationManager.getReservationUserId(scope, identifier);
-		if (reservationUserId != null && !reservationUserId.equals(user)) {
-			String msg = String.format(
-					"%s.%d is currently reserved by user %s. You should be logged in as user %s to evaluate or upload this data package. Alternatively, you could change the packageId of this data package to a value that does not conflict with the reserved identifier %s.%d",
-					scope, identifier, reservationUserId, reservationUserId, scope, identifier);
-			throw new Exception(msg);
-		}
+        String serviceMethod = "createDataPackage";
+        if (isEvaluate) {
+            serviceMethod = "evaluateDataPackage";
+        }
+        else if (isUpdate) {
+            serviceMethod = "updateDataPackage";
+        }
 
-		/*
-		 * Is the metadata for this data package valid?
-		 */
-		boolean isMetadataValid = levelZeroDataPackage.isMetadataValid();
-		isDataPackageValid = isMetadataValid;
+        try {
+            workingOn.addDataPackage(scope, identifier, revision, serviceMethod);
+
+            ReservationManager reservationManager = 
+                new ReservationManager(dbDriver, dbURL, dbUser, dbPassword);
+            String reservationUserId = reservationManager.getReservationUserId(scope, identifier);
+            if (reservationUserId != null && !reservationUserId.equals(user)) {
+                String msg = String.format(
+                    "%s.%d is currently reserved by user %s. You should be " +
+                    "logged in as user %s to evaluate or upload this data " +
+                    "package. Alternatively, you could change the packageId " +
+                    "of this data package to a value that does not conflict " +
+                    "with the reserved identifier %s.%d",
+                    scope, identifier, reservationUserId, reservationUserId, scope, identifier);
+                throw new Exception(msg);
+            }
+
+            /*
+             * Is the metadata for this data package valid?
+             */
+            boolean isMetadataValid = levelZeroDataPackage.isMetadataValid();
+            isDataPackageValid = isMetadataValid;
 
 			if (isDataPackageValid || isEvaluate) {
 
@@ -1158,9 +1159,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * the end date in the working_on table. This should occur
 			 * regardless of whether the upload succeeded or failed.
 			 */
-			if (!isEvaluate) {
-				workingOn.updateEndDate(scope, identifier, revision);
-			}
+			workingOn.updateEndDate(scope, identifier, revision);
 		}
 
 		return resourceMap;
@@ -1469,15 +1468,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new UserErrorException(message);
 			}
 
-			// Do we already have this data package in PASTA?
 			String scope = levelZeroDataPackage.getScope();
 			Integer identifier = levelZeroDataPackage.getIdentifier();
 			Integer revision = levelZeroDataPackage.getRevision();
 			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
 			    dbDriver, dbURL, dbUser, dbPassword);
 
+            // Is this data package actively being worked on in PASTA?
+            checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
+                    scope, identifier, revision);
+
 			/*
-			 * Create the quality report
+			 * Evaluate the data package and create the quality report
 			 */
 			boolean isUpdate = false;
 			xmlString = createDataPackageAux(emlFile, levelZeroDataPackage,
@@ -3587,19 +3589,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    + resourceId;
 				throw new UnauthorizedException(message);
 			}
-
-			// Is this data package actively being worked on in PASTA?
-			WorkingOn workingOn = dataPackageRegistry.makeWorkingOn();
-			boolean isActive = workingOn.isActive(scope, identifier, revision);
-
-			/*
-			 * If this data package is already active in PASTA, throw an exception
-			 */
-			if (isActive) {
-				String message = "Attempting to update a data package that is currently being processed in PASTA: "
-				    + levelZeroDataPackage.getDocid();
-				throw new UserErrorException(message);
-			}
+			
+            // Is this data package actively being worked on in PASTA?
+            checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
+                           scope, identifier, revision);
 
 			boolean isUpdate = true;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
@@ -3611,7 +3604,31 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return resourceMap;
 	}
 
-	
+
+    /*
+     * Checks whether the data package being submitted for evaluate, insert, or
+     * update is already being actively worked on in PASTA. If is it, a
+     * UserErrorException is thrown.
+     */
+    private void checkWorkingOn(DataPackageRegistry dpr, String docid,
+                                String scope, Integer identifier, Integer revision)
+            throws ClassNotFoundException, SQLException, UserErrorException {
+        // Is this data package actively being worked on in PASTA?
+        WorkingOn workingOn = dpr.makeWorkingOn();
+        boolean isActive = workingOn.isActive(scope, identifier, revision);
+
+        /*
+         * If this data package is already active in PASTA, throw an exception
+         */
+        if (isActive) {
+            String message = String.format(
+                "Attempting to submit a data package that is currently being processed in PASTA: %s",
+                docid);
+            throw new UserErrorException(message);
+        }
+    }
+
+
 	/**
 	 * Writes the data package error message to the system.
 	 * 

@@ -82,6 +82,7 @@ CREATE TABLE datapackagemanager.working_on (
   identifier INT8 NOT NULL,                           -- the identifier
   revision INT8 NOT NULL,                             -- the revision
   start_date TIMESTAMP NOT NULL,                      -- initiated date/time
+  service_method VARCHAR(32),                         -- service method, e.g. 'evaluateDataPackage'
   end_date TIMESTAMP,                                 -- completed date/time
   interrupted BOOLEAN default false   -- set to true if end_date is NULL at server startup 
 );
