@@ -105,7 +105,7 @@ public class AttributeList
           for (Attribute attribute : attributeList) {
               String name = attribute.getName();
               sb.append(name);
-              if (i < attributeList.length) { sb.append(", "); }
+              if (i < attributeList.length) { sb.append(","); }
               i++;
           }
           prettyPrintStr = sb.toString();
