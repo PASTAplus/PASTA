@@ -107,8 +107,8 @@
                     </tr>
                 </xsl:for-each>
                 <xsl:for-each select="/qr:qualityReport/qr:entityReport">
-
-                    <tr>
+                   <xsl:variable name="entityNumber" select="position()"/>
+                   <tr>
                         <td class="header" colspan="11" align="center">Entity Report</td>
                     </tr>
                     <tr>
@@ -144,7 +144,9 @@
                             <xsl:apply-templates select="qr:name"/>
                             <xsl:apply-templates select="qr:description"/>
                             <xsl:apply-templates select="qr:expected"/>
-                            <xsl:apply-templates select="qr:found"/>
+                            <xsl:apply-templates select="qr:found">
+                                <xsl:with-param name="entityNumber" select="$entityNumber"></xsl:with-param>
+                            </xsl:apply-templates>
                             <xsl:apply-templates select="qr:explanation"/>
                             <xsl:apply-templates select="qr:suggestion"/>
                             <xsl:apply-templates select="qr:reference"/>
@@ -228,13 +230,13 @@
     </xsl:template>
 
     <xsl:template match="qr:found">
+        <xsl:param name="entityNumber"></xsl:param>
         <td class="data" align="left" valign="top" title="found">
-            <xsl:variable name="found" select="."/>
-            <xsl:if test="string-length($found) &lt;= 200">
-                <xsl:value-of select="$found"/>
-            </xsl:if>
-            <xsl:if test="string-length($found) &gt; 200">
-                <xsl:variable name="modalId" select="../qr:identifier"/>
+            <xsl:variable name="identifier" select="../qr:identifier"/>
+            <xsl:variable name="modalId" select="concat($identifier, $entityNumber)" />
+            <xsl:variable name="foundContent" select="."/>
+            <xsl:choose>
+            <xsl:when test="$identifier = 'headerRowAttributeNames' or string-length($foundContent) &gt; 200">
                 <!-- Trigger the modal with a button -->
                 <button type="button" 
                         class="btn btn-info btn-lg" 
@@ -250,7 +252,7 @@
                             </div>
                             <div class="modal-body">
                                 <pre>
-                                <xsl:value-of select="$found"/>
+                                <xsl:value-of select="$foundContent"/>
                                 </pre>
                             </div>
                             <div class="modal-footer">
@@ -263,7 +265,11 @@
                         </div>
                     </div>
                 </div>
-            </xsl:if>
+            </xsl:when>
+            <xsl:when test="string-length($foundContent) &lt;= 200">
+                <xsl:value-of select="$foundContent"/>
+            </xsl:when>
+            </xsl:choose>
         </td>
     </xsl:template>
 
