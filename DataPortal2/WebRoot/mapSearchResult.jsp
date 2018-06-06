@@ -49,7 +49,7 @@
 	<link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 	<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" >
-	<script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>&sensor=false" type="text/javascript"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>" type="text/javascript"></script>
 	<script type="text/javascript" src="js/markerclusterer.js"></script>
     <script src="js/oms.min.js"></script>
 

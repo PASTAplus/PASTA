@@ -199,7 +199,7 @@
 												  <div>
 													  <!-- <h3 class="separator_border labelBolder span12">Spatial Criteria</h3> -->
 													  <input name="boundsChangedCount" type="hidden" value="0" />
-													  <script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>&sensor=false" type="text/javascript"></script>
+													  <script src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsKey %>" type="text/javascript"></script>
 													  <script src="./js/map_functions.js" type="text/javascript"></script>
 													  <script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/keydragzoom/src/keydragzoom.js" type="text/javascript"></script>
 													  <script type="text/javascript">google.maps.event.addDomListener(window, 'load', initialize);</script>
