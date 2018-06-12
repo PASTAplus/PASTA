@@ -3100,20 +3100,65 @@ div.qualityreport table.inner {
     border: none;
 }
 
-div.valid {
-    color: green;   
+
+td.identifier {
+    vertical-align: middle;
 }
 
-div.warn {
-    color: orange;
+td.valid {
+    font-weight: bold;
+    background-color: lightgreen;
+    align: center;
+    vertical-align: middle;
 }
 
-div.error {
-    color: red;
+td.warn {
+    font-weight: bold;
+    background-color: orange;
+    align: center;
+    vertical-align: middle;
 }
 
-div.info {
-    color: blue;
+td.error {
+    font-weight: bold;
+    background-color: red;
+    align: center;
+    vertical-align: middle;
+}
+
+td.info {
+    font-weight: bold;
+    background-color: lightskyblue;
+    align: center;
+    vertical-align: middle;
+}
+
+span.valid {
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    padding: 2px 6px 2px 6px;
+}
+
+span.warn {
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    padding: 2px 6px 2px 6px;
+}
+
+span.error {
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    padding: 2px 6px 2px 6px;
+}
+
+span.info {
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    padding: 2px 10px 2px 10px;
 }
 
 /* End -- Styling for the quality report table */

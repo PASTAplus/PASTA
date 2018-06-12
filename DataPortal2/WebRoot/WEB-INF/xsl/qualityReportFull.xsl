@@ -177,27 +177,21 @@
     </xsl:template>
 
     <xsl:template match="qr:identifier">
-        <td class="data" align="center" valign="top" title="identifier">
+        <td class="data identifier" align="center" valign="top" title="identifier">
             <xsl:value-of select="."/>
         </td>
     </xsl:template>
 
     <xsl:template match="qr:status">
-        <td class="data" align="center" valign="top" title="status">
-            <xsl:variable name="status" select="."/>
+        <xsl:variable name="status" select="."/>
+        <td class="data {$status}" align="center" valign="top" title="status">
             <!-- color code status value -->
-            <xsl:if test="$status = 'info'">
-                <div class="info">info</div>
-            </xsl:if>
-            <xsl:if test="$status = 'valid'">
-                <div class="valid">valid</div>
-            </xsl:if>
-            <xsl:if test="$status = 'warn'">
-                <div class="warn">warn</div>
-            </xsl:if>
-            <xsl:if test="$status = 'error'">
-                <div class="error">error</div>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$status='info'"><span class='info'>info</span></xsl:when>
+                <xsl:when test="$status='valid'"><span class='valid'>valid</span></xsl:when>
+                <xsl:when test="$status='warn'"><span class='warn'>warn</span></xsl:when>
+                <xsl:when test="$status='error'"><span class='error'>error</span></xsl:when>
+            </xsl:choose>
         </td>
     </xsl:template>
 
