@@ -51,29 +51,24 @@
 					<div class="row-fluid">
 						<div class="span12">
 							<div class="recent_title">
-								<h2>LTER Resources</h2>
+								<h2>Additional Resources</h2>
 							</div>
 							<span class="row-fluid separator_border"></span>
 						</div>
 						<div class="row-fluid">
 							<div class="span12">
 								<!-- Content -->
-								<h3 align="left">Websites</h3>
+								<h3 align="left">EDI Resources</h3>
 								<ul>
-									<li><a class="searchsubcat" href="http://www.lternet.edu">LTER Network</a></li>
-									<!--
-									<li><a class="searchsubcat" href="http://lno.lternet.edu">LTER Network Office</a></li>
-									<li>
-									  <a class="searchsubcat" href="https://nis.lternet.edu:8443/x/agBP">
-								  	  <abbr title="Network Information System">NIS</abbr> Guides</a>
-								    </li> 
-								    -->
+									<li><a class="searchsubcat" href="http://environmentaldatainitiative.org/">Environmental Data Initiative</a></li>
+                                    <li><a class="searchsubcat" href="https://dashboard.edirepository.org/dashboard/">EDI Dashboard</a></li>
 								</ul>
-								<h3 align="left">Tools</h3>
+								<h3 align="left">LTER Resources</h3>
 								<ul>
+                                    <li><a class="searchsubcat" href="http://www.lternet.edu">LTER Network</a></li>
 									<li><a class="searchsubcat" href="http://vocab.lternet.edu/vocab/vocab/index.php">LTER Network Controlled Vocabulary</a></li>
 									<li><a class="searchsubcat" href="http://unit.lternet.edu/unitregistry/">LTER Network Unit Registry</a></li>
-									<li><a class="searchsubcat" href="https://lter.dev.gios.asu.edu/lter/html/index.php">LTER Network Information System Reporting Tool</a>
+									<!-- <li><a class="searchsubcat" href="https://lter.dev.gios.asu.edu/lter/html/index.php">LTER Network Information System Reporting Tool</a> -->
 								  </li>
 								</ul>
 								<!-- /Content -->
