@@ -110,7 +110,8 @@ public final class DesktopEMLFactory {
 	 * @throws TransformerException
 	 */
 	public Document makePastaReady(Document desktopEMLDocument,
-			ArrayList<Entity> entityList) throws TransformerException {
+			ArrayList<Entity> entityList)
+			throws TransformerException {
 		if (desktopEMLDocument == null) {
 			throw new TransformerException(
 					"A null Document object was passed to the makePastaReady() method");
@@ -166,8 +167,15 @@ public final class DesktopEMLFactory {
 					{
 						final String objectName = 
 							objectNameNodeList.item(0).getTextContent();
+						
+						/* 
+						 * Support spaces in object names during desktop upload.
+						 * However, we are considering adding a quality check to 
+						 * discourage this practice
+						 */
+						final String objectNameEscaped = objectName.replace(" ", "%20");
 						final String portalUrl = String.format("%s/%s",
-								                               urlHead, objectName);
+								                               urlHead, objectNameEscaped);
 						// Get the distribution online url information
 						NodeList urlNodeList = 
 								xpathapi.selectNodeList(entityNode, ONLINE_URL);

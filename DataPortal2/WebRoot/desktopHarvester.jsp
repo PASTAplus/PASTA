@@ -94,8 +94,6 @@
 										please select the data file from your desktop's
 										file system corresponding to the <b>objectName</b>
 										value documented in the EML file.</p>
-									<p><strong>Please note</strong>:<em> An object name containing
-									spaces cannot be processed and will result in an error.</em></p>
 									<div class="section">
 										<form id="desktopUpload" name="desktopUpload" method="post"
 											enctype="multipart/form-data" action="./harvester">
