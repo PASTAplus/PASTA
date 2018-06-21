@@ -277,24 +277,29 @@ public class DataCiteRegistrar extends Registrar {
 			mintDOI(doi, landingPageUrl);
 		}
 		else {
-			String msg = null;
+			String msgHeader = "";
 
 			// Test for DOI collision or DOI registration failure
 			if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-				msg = "Bad request. Identifier already exists: ";
+				msgHeader = "Bad request. Identifier already exists: ";
 			} 
 			else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-				msg = "Unauthorized request to mint DOI: ";
+				msgHeader = "Unauthorized request to mint DOI: ";
 			}
 			else if (statusCode == HttpStatus.SC_FORBIDDEN) {
-				msg = "Forbidden: login problem, quota exceeded: ";
+				msgHeader = "Forbidden: login problem, quota exceeded: ";
 			}
 			else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-				msg = "Internal server error: ";
+				msgHeader = "Internal server error: ";
+			}
+			else if (statusCode == HttpStatus.SC_GATEWAY_TIMEOUT) {
+				msgHeader = "Gateway Timeout error: ";
 			}
 		
-			if (msg == null) msg = "Creation of metadata failed for unknown reason: ";
-			msg += doi;
+            String msg = String.format(
+               "%sCreation of DataCite metadata for DOI '%s' failed with status code '%d'",
+               msgHeader, doi, statusCode);
+            
 			throw new RegistrarException(msg);
 		}
 	}
