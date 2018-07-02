@@ -47,6 +47,7 @@
   if (pageName.equals("browse") ||
            pageName.equals("packageIdentifier") ||
            pageName.equals("advancedSearch") ||
+           pageName.equals("previewMetadata") ||
            pageName.equals("savedData")
           ) {
     dataClass = currentClass;
@@ -114,7 +115,8 @@
 					<li><a href="advancedSearch.jsp">Advanced Search</a> </li>
 					<p class="smallmenu pull-left nis-navigation-submenu">
 					  <img class="mini-arrow-margin" alt="" src="images/mini_arrow.png" title="LTER : Network"> 
-					Store Data:</p>
+					View Your Data:</p>
+                    <li><a href="metadataPreviewer.jsp">Preview Your Metadata</a> </li>
 					<li><a href="savedDataServlet">Your Data Shelf</a> </li>
 				</ul>
 				</li>
