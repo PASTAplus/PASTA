@@ -1,13 +1,14 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <%@ page import="edu.lternet.pasta.portal.ConfigurationListener"%>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
+<%@ page import="edu.lternet.pasta.client.DataPackageManagerClient" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
+  final String googleMapsKey = (String) ConfigurationListener.getOptions().getProperty("maps.google.key");
   final String pageTitle = "Data Package Summary";
   final String titleText = DataPortalServlet.getTitleText(pageTitle);
-  final String googleMapsKey = (String) ConfigurationListener.getOptions().getProperty("maps.google.key");
-
+ 
   String wasDeletedHTML = (String) request.getAttribute("wasDeletedHTML");
   String titleHTML = (String) request.getAttribute("dataPackageTitleHTML");
   String viewFullMetadataHTML = (String) request.getAttribute("viewFullMetadataHTML");
@@ -48,6 +49,39 @@
   if ((wasDeletedHTML == null) || (wasDeletedHTML.equals(""))) { 
     showWasDeleted = "false";
   }
+
+    HttpSession httpSession = request.getSession();
+    if ((uid == null) || (uid.equals(""))) {
+        uid = "public";
+    } 
+    String tier = null;
+    String testHTML = "";
+    String watermarkClass = "";
+    String watermarkId = "";
+    String watermarkText = "";
+    String showTestHTML = "false";
+    DataPackageManagerClient dpmc = new DataPackageManagerClient(uid);
+    String pastaHost = dpmc.getPastaHost();
+
+    if (pastaHost.startsWith("pasta-d") || 
+        pastaHost.startsWith("localhost")
+       ) {
+       tier = "development";
+    }
+    else if (pastaHost.startsWith("pasta-s")) {
+       tier = "staging";
+    }
+    
+    if (tier != null) {
+        showTestHTML = "true";
+        watermarkClass = "watermarked";
+        watermarkId = "watermarked-background-text";
+        watermarkText = "Test Data Package";
+        String fontColor = "darkorange";
+        testHTML = String.format("<font color='%s'>This test data package was submitted to a %s environment. It is not considered production ready.</font>", 
+                                 fontColor, tier);
+    }
+
 %>
 
 <!DOCTYPE html>
@@ -115,6 +149,8 @@
 
 <jsp:include page="header.jsp" />
 
+<div id="<%= watermarkId %>" class="<%= watermarkClass %>"><%= watermarkText %></div>
+
 <div class="row-fluid ">
 	<div>
 		<div class="container">
@@ -122,6 +158,17 @@
 				<div class="box_shadow box_layout">
 					<div class="row-fluid">
 						<div class="span12">
+
+
+                            <c:set var="showTestHTML" value="<%= showTestHTML %>"/>
+                            <c:choose>
+                                <c:when test="${showTestHTML}">
+                                    <div>
+                                        <h2><%= testHTML %></h2>
+                                    </div>
+                                </c:when>
+                            </c:choose>
+
                             <c:set var="showWasDeleted" value="<%= showWasDeleted %>"/>
                             <c:choose>
                                 <c:when test="${showWasDeleted}">

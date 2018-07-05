@@ -3200,3 +3200,31 @@ span.info {
     display: block;
 }   
 /* End -- Styles to support "Show more" and "Show less" in combination with jQuery code */
+
+/* Styles to watermark test data packages */
+#watermarked-background-text {
+    top: 10px;
+    left: 300px;
+    color: darkorange;
+    font-size: 60px;
+    transform: rotate(320deg);
+    -webkit-transform: rotate(320deg);
+    opacity: 0.3;
+}
+
+.watermarked {
+  position: relative;
+}
+
+.watermarked:after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 400px;
+  background-size: 100px 100px;
+}
+
+/* End -- Styles to watermark test data packages */
