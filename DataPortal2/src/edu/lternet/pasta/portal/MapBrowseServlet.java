@@ -523,7 +523,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 					if (resource.contains(metadataUri)) {
 						metadata = "<li><a class=\"searchsubcat\" href=\"./metadataviewer?packageid="
-								+ packageId + "\">Metadata</a></li>\n";	
+								+ packageId + "\">View Full Metadata</a></li>\n";	
 						viewFullMetadataHTML = String.format(
 	                               "<a class=\"searchsubcat\" href=\"./metadataviewer?packageid=%s\">View Full Metadata</a>",
 	                               packageId);
