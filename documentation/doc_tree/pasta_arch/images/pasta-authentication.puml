@@ -1,0 +1,29 @@
+@startuml
+actor User
+participant client
+participant gatekeeper
+participant PASTA_service
+entity LDAP
+
+User->client: request:credentials
+client->gatekeeper: request:credentials
+gatekeeper->LDAP: bind(credentials)
+LDAP->gatekeeper: success
+gatekeeper->gatekeeper: generate auth_token
+gatekeeper->gatekeeper: sign(auth_token)
+gatekeeper->PASTA_service: request:auth_token
+PASTA_service->gatekeeper: response:auth_token
+gatekeeper->client: response:auth_token
+client->User: response
+...
+== time delta ==
+...
+User->client: request
+client->gatekeeper: request:auth_token
+gatekeeper->gatekeeper: verify sign(auth_token)
+gatekeeper->gatekeeper: verify ttl(auth_token)
+gatekeeper->PASTA_service: request:auth_token
+PASTA_service->gatekeeper: response:auth_token
+gatekeeper->client: response:auth_token
+client->User: response
+@enduml

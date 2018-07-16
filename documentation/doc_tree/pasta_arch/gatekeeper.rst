@@ -1,0 +1,8 @@
+==========
+Gatekeeper
+==========
+
+.. toctree::
+    :hidden:
+
+    authentication
