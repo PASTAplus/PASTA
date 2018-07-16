@@ -1,3 +1,8 @@
 **********************
-PASTA Developers Guide
+PASTAplus Architecture
 **********************
+
+.. toctree::
+   :hidden:
+
+   overview
