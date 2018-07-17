@@ -28,7 +28,7 @@ Manager search API.
 
 .. image:: images/PASTAplus_SOA.png
 
-Locally developed PASTA+ services (excluding Apache Solr) are written in Java and expose their REST web-service interface through either Tomcat or Jetty servlet containers.
+Locally developed PASTA+ services (excluding Apache Solr) are written in Java and expose their REST web-service interface through either Tomcat or Jetty servlet web-interfaces.
 
 .. toctree::
     :hidden:

@@ -1,0 +1,35 @@
+@startuml
+actor User
+participant client
+participant gatekeeper
+participant PASTA_service
+entity LDAP
+
+User->client: request:credentials
+client->gatekeeper: request:credentials
+gatekeeper->LDAP: bind(credentials)
+LDAP->gatekeeper: success
+gatekeeper->gatekeeper: generate internal_auth_token
+gatekeeper->PASTA_service: request:internal_auth_token
+PASTA_service->PASTA_service: authorize(internal_auth_token)
+PASTA_service->PASTA_service: do_service
+PASTA_service->gatekeeper: response
+gatekeeper->gatekeeper: generate external_auth_token
+gatekeeper->gatekeeper: response:add_cookie(external_auth_token)
+gatekeeper->client: response:external_auth_token
+client->User: response
+...
+== time delta ==
+...
+User->client: request
+client->gatekeeper: request:external_auth_token
+gatekeeper->gatekeeper: verify_signature(external_auth_token)
+gatekeeper->gatekeeper: verify_ttl(external_auth_token)
+gatekeeper->gatekeeper: remove_signature(external_auth_token):internal_auth_token
+gatekeeper->PASTA_service: request:internal_auth_token
+PASTA_service->PASTA_service: authorize(internal_auth_token)
+PASTA_service->PASTA_service: do_service
+PASTA_service->gatekeeper: response
+gatekeeper->client: response
+client->User: response
+@enduml
