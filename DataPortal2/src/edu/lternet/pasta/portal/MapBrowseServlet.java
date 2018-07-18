@@ -507,6 +507,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 				URLCodec urlCodec = new URLCodec();
 
+				boolean downloadableData = false;
 				String packageIdListItem = null;
 				String metadata = null;
 				String viewFullMetadata = null;
@@ -522,7 +523,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 					if (resource.contains(metadataUri)) {
 						metadata = "<li><a class=\"searchsubcat\" href=\"./metadataviewer?packageid="
-								+ packageId + "\">Metadata</a></li>\n";	
+								+ packageId + "\">View Full Metadata</a></li>\n";	
 						viewFullMetadataHTML = String.format(
 	                               "<a class=\"searchsubcat\" href=\"./metadataviewer?packageid=%s\">View Full Metadata</a>",
 	                               packageId);
@@ -532,7 +533,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 
 							report = "<li><a class=\"searchsubcat\" href=\"./reportviewer?packageid="
 									+ packageId
-									+ "\" target=\"_blank\">Report</a></li>\n";
+									+ "\" target=\"_blank\">View Data Package Report</a></li>\n";
 
 						}
 						else if (resource.contains(dataUri)) {
@@ -576,15 +577,16 @@ public class MapBrowseServlet extends DataPortalServlet {
 								}
 
 								if (isAuthorized) {
-									data += "<li><a class=\"searchsubcat\" href=\"./dataviewer?packageid="
-											+ packageId
-											+ "&entityid="
-											+ entityId
-											+ "\" target=\"_blank\">"
-											+ entityName 
-											+ "</a>" 
-											+ entitySizeStr
-											+ "</li>\n";
+									downloadableData = true;
+									String objectName = emlObject.getDataPackage().findObjectName(entityName);
+									String fileInfo = (objectName == null) ? entityName : objectName;
+									String href = String.format("./dataviewer?packageid=%s&entityid=%s",
+											                    packageId, entityId);
+									String downloadLink = 
+											String.format("<a class='searchsubcat' href='%s' />%s</a>",
+			                                              href, fileInfo);
+									data += String.format("<li><em>Name</em>: %s<br/><em>File</em>: %s %s</li>\n",
+                                                          entityName, downloadLink, entitySizeStr); 
 								}
 								else {
 									entityName = "Data object";
@@ -683,7 +685,8 @@ public class MapBrowseServlet extends DataPortalServlet {
 				}
 
 				String listOrder = "ol";
-				resourcesHTMLBuilder.append("<li>Data\n");
+				String downloadStr = downloadableData ? "Download Data" : "Data";
+				resourcesHTMLBuilder.append(String.format("<li>%s\n", downloadStr));
 				resourcesHTMLBuilder.append(String.format("<%s>\n", listOrder));
 				resourcesHTMLBuilder.append(data);
 				resourcesHTMLBuilder.append(String.format("</%s>\n", listOrder));
