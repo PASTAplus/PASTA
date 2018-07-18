@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PASTA+'
-copyright = u'2016, PASTAplus'
+copyright = u'2018, PASTAplus'
 author = u'PASTAplus'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -145,7 +145,7 @@ html_theme_options = {
 #html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = "PASTAplau Core Documentation"
+html_short_title = "PASTAplus Core Documentation"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -159,7 +159,7 @@ html_static_path = ['_static']
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'favicon.png'
+html_favicon = '_static/favicon.ico'
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -289,7 +289,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   (master_doc, 'PASTA+', u'PASTAplus Documentation',
-   author, 'PASTA', 'PASTAplust Data Repository documentation',
+   author, 'PASTA', 'PASTAplus Data Repository documentation',
    'Miscellaneous'),
 ]
 

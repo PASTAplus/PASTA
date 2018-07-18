@@ -1,6 +1,6 @@
-*********
-PASTA API
-*********
+*************
+PASTAplus API
+*************
 
 .. toctree::
    :hidden:
