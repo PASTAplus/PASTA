@@ -17,14 +17,12 @@ To assist the weary web traveler in deciding what category to peruse, a short sy
 
 #. **EDI Data Portal Users Guide:** The EDI Data Portal is the official web-browser interface for users to upload, search, and download EDI data products. The Data Portal is considered a reference implementation of an application that utilizes the PASTA Application Program Interface (API).
 
-#. **PASTA API:** Documentation for the PASTA API and general information and suggestions for software developers who would like to build an application that interacts with the PASTA API.
+#. **PASTA+ API:** Documentation for the PASTA API and general information and suggestions for software developers who would like to build an application that interacts with the PASTA API.
 
-#. **PASTA Developers Guide:** Design documentation of the PASTA framework for developers who plan on extending, fixing, or refactoring the core components of PASTA and their associated web-services. Documentation for `DataONE`_'s Generic Member Node deployment and GMN's adapter for harvesting data from PASTA.
+#. **PASTA+ Architecture:** Design documentation of the PASTA+ architecture and software development principles.
 
 #. **General FAQ:** A list of the most commonly asked questions and their answers about the EDI Data Repository and PASTA.
 
-
-.. _DataONE: https://dataone.org
 
 .. toctree::
    :hidden:
