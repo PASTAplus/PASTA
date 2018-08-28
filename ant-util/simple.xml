@@ -204,6 +204,7 @@
         <include name="**/*.png"/>
         <include name="**/*.jpg"/>
         <include name="**/*.gif"/>
+        <include name="**/*.ico" />
         <include name="**/*.xml"/>
       	<include name="data"/>
       </fileset>
