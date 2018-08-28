@@ -1,17 +1,32 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page import="edu.lternet.pasta.common.CalendarUtility" %>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener" %>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.Tooltip" %>
 
 <%
-  final String pageTitle = "Evaluate/Upload Data Packages";
-  final String titleText = DataPortalServlet.getTitleText(pageTitle);
+    final String pageTitle = "Evaluate/Upload Data Packages";
+    final String titleText = DataPortalServlet.getTitleText(pageTitle);
+    final String downtime = (String) ConfigurationListener.getOptions().getProperty("dataportal.downtime.dayOfWeek");
+    HttpSession httpSession = request.getSession();
+    String downtimeHTML = "";
+    
+    if (downtime != null && !downtime.isEmpty()) {
+        String today = CalendarUtility.todaysDayOfWeek();
+        if (today != null && today.equalsIgnoreCase(downtime)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("The system will be down on %s evening from 7-9 pm Mountain Time. ",
+                                    downtime));
+            sb.append("Processing of data packages submitted prior to this time may be interrupted.");
+            downtimeHTML = String.format("<em>Please Note: </em>%s",
+                                         sb.toString());
+        }
+    }
+    
+    String uid = (String) httpSession.getAttribute("uid");
+    String warningMessage = (String) request.getAttribute("message");
 
-	HttpSession httpSession = request.getSession();
-
-	String uid = (String) httpSession.getAttribute("uid");
-  String warningMessage = (String) request.getAttribute("message");
-
-	if (uid == null || uid.isEmpty()) {
+    if (uid == null || uid.isEmpty()) {
 		request.setAttribute("from", "./harvester.jsp");
 		String loginWarning = DataPortalServlet.getLoginWarning();
 		request.setAttribute("message", loginWarning);
@@ -19,11 +34,10 @@
 		    .getRequestDispatcher("./login.jsp");
 		requestDispatcher.forward(request, response);
 	}
-	else {
-    if (warningMessage == null) {
+	else if (warningMessage == null) {
       warningMessage = "";
     }
-  }
+
 %>
 
 <!DOCTYPE html>
@@ -80,13 +94,13 @@
 							<div class="span12">
 
 								<!-- Content -->
-
-								<p class="nis-warn"><%= warningMessage %></p>								
+								<p class="nis-warn"><%= warningMessage %></p>
+                                <p class="nis-warn"><%= downtimeHTML %></p>                               
 
 								<p>Data packages may be evaluated without uploading 
-								them to the <abbr title="Network Information System">NIS</abbr> by selecting <b>Evaluate</b>. Once you 
+								them to the repository by selecting <b>Evaluate</b>. Once you 
 								are satisfied that data packages are ready to be 
-								uploaded to the <abbr title="Network Information System">NIS</abbr>, you may do so by selecting 
+								uploaded to the repository, you may do so by selecting 
 								<b>Upload</b>. Several methods for supplying the 
 								EML metadata for your data packages are available below.</p>
 
@@ -106,7 +120,7 @@
 										<input accept="application/xml" name="emlfile" required="required" size="60" type="file" />
 									</div>
 								</div>
-								<div class="table-row">
+                                <div class="table-row">
 									<div class="table-cell">
                                         <label class="labelBold">Data Upload Options:</label>
                                     </div>

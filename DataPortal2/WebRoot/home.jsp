@@ -17,6 +17,8 @@
   -->
 
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.common.CalendarUtility" %>
+<%@ page import="edu.lternet.pasta.portal.ConfigurationListener" %>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
 <%@ page import="edu.lternet.pasta.portal.PastaStatistics"%>
 <%@ page import="edu.lternet.pasta.portal.search.LTERTerms"%>
@@ -63,6 +65,20 @@
 
     String hover = "New user registration for non-LTER members coming soon!";
 
+    final String downtime = (String) ConfigurationListener.getOptions().getProperty("dataportal.downtime.dayOfWeek");
+    HttpSession httpSession = request.getSession();
+    String downtimeHTML = "";
+    
+    if (downtime != null && !downtime.isEmpty()) {
+        String today = CalendarUtility.todaysDayOfWeek();
+        if (today != null && today.equalsIgnoreCase(downtime)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("The Data Portal and PASTA+ services will be unavailable on %s evening from 7-9 pm Mountain Time. ",
+                                    downtime));
+            downtimeHTML = String.format("<em>Please Note: </em>%s",
+                                         sb.toString());
+        }
+    }
 %>
 
 <!DOCTYPE html>
@@ -168,6 +184,7 @@
 				<div class="span8 box_shadow box_layout">
 					<div class="row-fluid">
 						<div class="span12">
+                            <p class="nis-warn"><%= downtimeHTML %></p>                               
 							<div class="recent_title">
 								<h2>Welcome to the LTER Network Data Portal</h2>
 							</div>
