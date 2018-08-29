@@ -73,7 +73,7 @@
         String today = CalendarUtility.todaysDayOfWeek();
         if (today != null && today.equalsIgnoreCase(downtime)) {
             StringBuilder sb = new StringBuilder();
-            sb.append(String.format("The Data Portal and PASTA+ services will be unavailable on %s evening from 7-9 pm Mountain Time. ",
+            sb.append(String.format("The Data Portal and PASTA+ services will be unavailable on %s evening from 7-9 pm Mountain Time for scheduled weekly maintenance.",
                                     downtime));
             downtimeHTML = String.format("<em>Please Note: </em>%s",
                                          sb.toString());
