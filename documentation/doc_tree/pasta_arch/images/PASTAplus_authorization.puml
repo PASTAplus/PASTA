@@ -1,0 +1,14 @@
+@startuml
+participant gatekeeper
+participant PASTA_service
+
+gatekeeper->PASTA_service: request(internal_auth_token, method, object)
+PASTA_service->PASTA_service: get_user_id(internal_auth_token):user_id
+PASTA_service->PASTA_service: get_ACR(method,sevice.xml):method_ACR
+PASTA_service->PASTA_service: is_authorized(user_id, method, method_ACR)
+PASTA_service->PASTA_service: get_ACR(object,access_database):object_ACR
+PASTA_service->PASTA_service: is_authorized(user_id, method, object_ACR)
+PASTA_service->PASTA_service: do_service
+PASTA_service->gatekeeper: response
+
+@enduml

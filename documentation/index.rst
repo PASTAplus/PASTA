@@ -1,38 +1,27 @@
-.. PASTA documentation master file, created by
-   sphinx-quickstart on Fri Jun  5 12:05:43 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+####################################
+Welcome! Bienvenido!  أهلا بك! 欢迎!
+####################################
 
-############################
-User/Developer Documentation
-############################
-
-This website is the official documentation of the *EDI Data Repository* and, more specifically, 
-the *Provenance Aware Synthesis Tracking Architecture* (PASTA). The site is divided into *five* primary 
-categories designed to inform the user of different aspects of the EDI Data Repository and PASTA.
+This is the official documentation tree of the *PASTA+* data
+repository software. PASTA+ is a service oriented software system written in Java and uses Java Servlet containers for REST web-services. Services can be deployed on separate servers for performance or deployed onto a single server for simplicity, testing, and development. Deployments have been tested on Linux, OS X, and Windows. 
 
 To assist the weary web traveler in deciding what category to peruse, a short synopsis of each section follows:
 
-#. **EDI Data Repository:** Overview and motivation for the EDI Data Repository, data producers, and data consumers.
+#. **About:** A short history of PASTA+ and how it is being used in a production environment.
 
-#. **EDI Data Portal Users Guide:** The EDI Data Portal is the official web-browser interface for users to upload, search, and download EDI data products. The Data Portal is considered a reference implementation of an application that utilizes the PASTA Application Program Interface (API).
+#. **Design and Architecture:** Design documentation of the PASTA+ architecture and software development principles.
 
-#. **PASTA+ API:** Documentation for the PASTA API and general information and suggestions for software developers who would like to build an application that interacts with the PASTA API.
-
-#. **PASTA+ Architecture:** Design documentation of the PASTA+ architecture and software development principles.
+#. **REST API:** Documentation for the PASTA API and general information and suggestions for software developers who would like to build an application that interacts with the PASTA API.
 
 #. **General FAQ:** A list of the most commonly asked questions and their answers about the EDI Data Repository and PASTA.
 
 
 .. toctree::
    :hidden:
-   :numbered: 4
-   :maxdepth: 3
    
-   EDI Data Repository </doc_tree/lter_nis/index>
-   EDI Data Portal </doc_tree/portal/index>
-   /doc_tree/pasta_api/index
+   /doc_tree/about
    /doc_tree/pasta_arch/index
+   /doc_tree/pasta_api/index
    /doc_tree/help/index
    
 :ref:`search`

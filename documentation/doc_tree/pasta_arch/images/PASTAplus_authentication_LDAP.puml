@@ -7,9 +7,11 @@ entity LDAP
 
 User->client: request:credentials
 client->gatekeeper: request:credentials
+gatekeeper->gatekeeper: process_HTTP_header()
 gatekeeper->LDAP: bind(credentials)
 LDAP->gatekeeper: success
-gatekeeper->gatekeeper: generate:internal_auth_token
+gatekeeper->gatekeeper: get_user_id(DN):user_id
+gatekeeper->gatekeeper: generate_token(user_id):internal_auth_token
 gatekeeper->gatekeeper: request:add_cookie(internal_auth_token)
 gatekeeper->PASTA_service: request:internal_auth_token
 PASTA_service->PASTA_service: authorize(internal_auth_token)
@@ -19,22 +21,6 @@ gatekeeper->gatekeeper: generate:external_auth_token
 gatekeeper->gatekeeper: response:add_cookie(external_auth_token)
 gatekeeper->client: response:external_auth_token
 client->client: to_cache(external_auth_token)
-client->User: response
-...
-== time delta ==
-...
-User->client: request
-client->client: from_cache:external_auth_token
-client->gatekeeper: request:external_auth_token
-gatekeeper->gatekeeper: verify_signature(external_auth_token)
-gatekeeper->gatekeeper: verify_ttl(external_auth_token)
-gatekeeper->gatekeeper: create_internal_auth_token(external_auth_token)
-gatekeeper->gatekeeper: request:add_cookie(internal_auth_token)
-gatekeeper->PASTA_service: request:internal_auth_token
-PASTA_service->PASTA_service: authorize(internal_auth_token)
-PASTA_service->PASTA_service: do_service
-PASTA_service->gatekeeper: response
-gatekeeper->client: response
 client->User: response
 
 @enduml
