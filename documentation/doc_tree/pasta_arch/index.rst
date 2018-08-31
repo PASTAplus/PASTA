@@ -1,6 +1,6 @@
-**********************
-PASTAplus Architecture
-**********************
+***********************
+Design and Architecture
+***********************
 
 PASTA+ is based on a `Service Oriented Architecture (SOA)
 <https://en.wikipedia.org/wiki/Service-oriented_architecture>`_ design
@@ -33,7 +33,5 @@ Locally developed PASTA+ services (excluding Apache Solr) are written in Java an
 .. toctree::
     :hidden:
 
-    audit_manager
-    data_package_manager
-    gatekeeper
-    common_services
+    use_cases
+    architecture
