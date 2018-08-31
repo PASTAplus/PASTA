@@ -1,6 +1,6 @@
-******************************
-PASTA+ Design and Architecture
-******************************
+***********************
+Design and Architecture
+***********************
 
 PASTA+ is based on a `Service Oriented Architecture (SOA)
 <https://en.wikipedia.org/wiki/Service-oriented_architecture>`_ design
