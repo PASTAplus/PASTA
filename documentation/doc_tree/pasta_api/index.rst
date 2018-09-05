@@ -1,5 +1,5 @@
 *************
-PASTAplus API
+REST API
 *************
 
 .. toctree::
