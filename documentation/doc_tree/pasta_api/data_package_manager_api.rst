@@ -211,9 +211,11 @@ Search results are returned in XML format. (See examples below.)
 Examples
 """"""""
   
-1. Using :command:`curl` to query PASTA for all documents containing the term "Vernberg".
-   In this example, all fields for matching documents are included in the search results
-   (``fl=*``).
+1. Using :command:`curl` to query PASTA for all documents containing the term "Vernberg",
+   excluding documents with scope "ecotrends" (``fq=-scope:ecotrends``) and also
+   excluding documents with a scope that begins with the substring "lter-landsat" 
+   (``fq=-scope:lter-landsat*``). In this example, all fields for matching documents 
+   are included in the search results (``fl=*``).
      
    (Note: *For brevity, only one document is displayed in the search results shown below 
    and some of its content has been truncated.*)::
@@ -273,70 +275,93 @@ Examples
          </document>
      </resultset>
 
-2. Using :command:`curl` to query PASTA for all documents containing the term "Vernberg"
-   and limiting the returned fields to the "packageid" and "doi" fields (``fl=packageid,doi``)::
+2. Using :command:`curl` to query PASTA for all documents with scope "knb-lter-nwt"
+   containing the terms "plant" and "nitrogen" as keywords, and limiting the returned fields 
+   to the "packageid", "doi", and "keyword" fields and only the first two
+   matches (``rows=2``). Note that because the ``keyword`` field is a multi-value
+   field, its elements are nested inside a parent ``keywords`` element.::
  
      curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
-       &q=Vernberg&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=packageid,doi\
-       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+       &q=keyword:plant+AND+keyword:nitrogen&fq=scope:knb-lter-nwt\
+       &fl=packageid,doi,keyword&rows=2"
 
-     <resultset numFound='3' start='0' rows='10'>
-         <document>
-             <packageid>knb-lter-nin.1.1</packageid>
-             <doi>doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961</doi>
-         </document>
-         <document>
-             <packageid>knb-lter-nin.5.1</packageid>
-             <doi>doi:10.6073/pasta/3b69d867d7f6620bd2f47794804363d2</doi>
-         </document>
-         <document>
-             <packageid>knb-lter-nin.8.1</packageid>
-             <doi>doi:10.6073/pasta/2b809c045fdd74a7cc12e8f31fc191eb</doi>
-         </document>
-     </resultset>
-
-3. Using :command:`curl` to query PASTA for all documents containing the term "sediment"
-   in the keyword field (``q=keyword:sediment``) and limiting the returned fields to the 
-   keyword field (``fl=keyword``). Note that because the ``keyword`` field is a multi-value
+    <resultset numFound='3' start='0' rows='2'>
+    <document>
+        <packageid>knb-lter-nwt.50.1</packageid>
+        <doi></doi>
+        <keywords>
+            <keyword>aboveground</keyword>
+            <keyword>nitrogen pool</keyword>
+            <keyword>plant nitrogen concentration</keyword>
+            <keyword>tissue nitrogen</keyword>
+            <keyword>Biogeochemistry</keyword>
+            <keyword>plant production</keyword>
+            <keyword>live</keyword>
+            <keyword>dead</keyword>
+            <keyword>saddle</keyword>
+            <keyword>dry meadow</keyword>
+            <keyword>moist meadow</keyword>
+            <keyword>wet meadow</keyword>
+            <keyword>Niwot Ridge LTER</keyword>
+            <keyword>NWT</keyword>
+            <keyword>biomass</keyword>
+            <keyword>vegetation</keyword>
+            <keyword>litter</keyword>
+        </keywords>
+    </document>
+    <document>
+        <packageid>knb-lter-nwt.137.2</packageid>
+        <doi>doi:10.6073/pasta/571f5c624b400498563be31e9a41e74f</doi>
+        <keywords>
+            <keyword>NWT</keyword>
+            <keyword>Niwot Ridge LTER Site</keyword>
+            <keyword>LTER</keyword>
+            <keyword>Colorado</keyword>
+            <keyword>K+</keyword>
+            <keyword>Krummholz</keyword>
+            <keyword>leeward</keyword>
+            <keyword>nitrogen</keyword>
+            <keyword>plant species</keyword>
+            <keyword>plant species richne</keyword>
+            <keyword>tree island</keyword>
+            <keyword>tundra</keyword>
+            <keyword>windward</keyword>
+        </keywords>
+    </document>
+    </resultset>   
+       
+3. Using :command:`curl` to query PASTA for all documents containing the term "sediment" in the
+   title or the term "disturbance" in the keyword field (``q=title:sediment+OR+keyword:disturbance``) 
+   and limiting the returned fields to the packageid and keyword (``fl=packageid,keyword``) with up to
+   1000 matches (``rows=1000``). Note that because the ``keyword`` field is a multi-value
    field, its elements are nested inside a parent ``keywords`` element.
      
-   (Note: *For brevity, only two documents are displayed in the search results shown below.*)::
+   (Note: *For brevity, only two matching documents are displayed in the search results shown below.*)::
 
      curl -X GET "https://pasta.lternet.edu/package/search/eml?defType=edismax\
-       &q=keyword:sediment&fq=-scope:ecotrends&fq=-scope:lter-landsat*&fl=keyword\
-       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=10"
+       &q=title:sediment+OR+keyword:disturbance&fl=packageid,keyword\
+       &sort=score,desc&sort=packageid,asc&debug=false&start=0&rows=1000"
 
-     <resultset numFound='71' start='0' rows='10'>
-         <document>
-             <keywords>
-                 <keyword>sedimentation</keyword>
-                 <keyword>NTL LTER</keyword>
-                 <keyword>North Temperate Lakes - LTER</keyword>
-                 <keyword>sediment</keyword>
-                 <keyword>sediment deposition</keyword>
-             </keywords>
-         </document>
-         <document>
-             <keywords>
-                 <keyword>Georgia</keyword>
-                 <keyword>Sapelo Island</keyword>
-                 <keyword>USA</keyword>
-                 <keyword>GCE</keyword>
-                 <keyword>Georgia Coastal Ecosystems</keyword>
-                 <keyword>LTER</keyword>
-                 <keyword>Sediment Monitoring</keyword>
-                 <keyword>accumulation</keyword>
-                 <keyword>elevation</keyword>
-                 <keyword>erosion</keyword>
-                 <keyword>freshwater</keyword>
-                 <keyword>marshes</keyword>
-                 <keyword>sea level</keyword>
-                 <keyword>sediment elevation table</keyword>
-                 <keyword>sediments</keyword>
-                 <keyword>soils</keyword>
-                 <keyword>Organic Matter</keyword>
-             </keywords>
-         </document>
+     <resultset numFound='12248' start='0' rows='1000'>
+        <document>
+           <packageid>knb-lter-jrn.210228001.53</packageid>
+           <keywords>
+              <keyword>LTAR</keyword>
+              <keyword>LTER</keyword>
+              <keyword>Disturbance</keyword>
+              <keyword>Soil</keyword>
+              <keyword>ongoing</keyword>
+              <keyword>Aeolian (Wind Related)</keyword>
+              <keyword>wind</keyword>
+           </keywords>
+        </document>
+        <document>
+           <packageid>knb-lter-vcr.241.2</packageid>
+           <keywords>
+              <keyword>Disturbance</keyword>
+              <keyword>System State/Condition</keyword>
+           </keywords>
+        </document>     
      </resultset>
 
 .. _listing:

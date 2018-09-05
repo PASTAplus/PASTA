@@ -618,13 +618,24 @@
 											  <div class="row-fluid text_bar_pattern themeple_sc">
 
 												  <div>
-												  Types of data package identifiers that you can search include:
+												  <p>Enter a data package identifier excluding its revision number.</p>
+												  <p>Examples:
+												  <ul>
+												    <li><strong>edi.1</strong></li>
+												    <li><strong>knb-lter-and.2719</strong></li>
+												    <li><strong>knb-lter-jrn.210001001</strong></li>
+												  </ul>
+												  </p>
+												  <p><em>Please note: Only the most current revision of the data package 
+												  will appear in the search results.</em></p>
+												  <!-- 
 												  <ul>
 												  	<li>Digital Object Identifier (DOI), e.g., <strong>doi:10.6073/pasta/397e0bba0f8aeac013d01fc982a74ea8</strong></li>
 												  	<li>Package Identifier, e.g., <strong>knb-lter-and.2719.6</strong></li>
 												  	<li>Package Identifier, excluding its revision value, e.g., <strong>knb-lter-and.2719</strong></li>
 												  	<li>PASTA Identifier, e.g., <strong>https://pasta.lternet.edu/package/eml/knb-lter-and/2719/6</strong></li>
 												  </ul>
+												   -->
 												  </div>
 												  
 												  <br/>

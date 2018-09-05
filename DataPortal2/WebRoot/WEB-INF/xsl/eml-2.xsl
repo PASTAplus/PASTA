@@ -285,6 +285,12 @@
         </xsl:call-template>
       </div> <!-- end collapsible -->
 
+      <h3 id="toggleMethods" class="toggleButton"><button>+/-</button> Project</h3>
+      <div class="collapsible">
+         <xsl:call-template name="datasetproject">
+         </xsl:call-template>
+      </div> <!-- end collapsible -->
+      
       <xsl:if test="maintenance">
       <h3 id="toggleMaintenance" class="toggleButton"><button>+/-</button> Maintenance</h3>
       <div class="collapsible">
@@ -6230,27 +6236,44 @@
       </tr>
     </xsl:if>
     <!-- added the request-data button oct 2012 mob -->
+    <xsl:variable name="email1" select="//dataset/contact[1]/electronicMailAddress"/>
+    <!-- Exclude email to the now obsolete tech-support@lternet.edu -->
+    <xsl:if test="$email1 != 'tech-support@lternet.edu'">
     <tr>
       <td class="{$disfirstColStyle}"><xsl:text>Request data:</xsl:text></td>
       <td class="{$secondColStyle}">   
-        <!-- as a form button. -->
         <form method="GET" >
-          <xsl:attribute name="action">
-            mailto:<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/>
-          </xsl:attribute>          
+          <xsl:attribute name="action">mailto:<xsl:value-of select="//dataset/contact[1]/electronicMailAddress"/></xsl:attribute>          
           <input type="hidden">
-            <xsl:attribute name="value">
-              <xsl:value-of select="../../../entityName"/> 
-            </xsl:attribute>       
+            <xsl:attribute name="value"><xsl:value-of select="../../../entityName"/></xsl:attribute>       
             <xsl:attribute name="name" >subject</xsl:attribute>        
           </input>   
           <input type="submit">
-            <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" />
-            </xsl:attribute>       
+            <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[1]/electronicMailAddress" /></xsl:attribute>       
           </input> 
         </form>
       </td>
     </tr>
+    </xsl:if>
+    <xsl:variable name="email2" select="//dataset/contact[2]/electronicMailAddress"/>
+    <!-- Exclude email to the now obsolete tech-support@lternet.edu -->
+    <xsl:if test="$email2 and $email2 != 'tech-support@lternet.edu'">
+    <tr>
+      <td class="{$disfirstColStyle}"><xsl:text>Request data:</xsl:text></td>
+      <td class="{$secondColStyle}">   
+        <form method="GET" >
+          <xsl:attribute name="action">mailto:<xsl:value-of select="//dataset/contact[2]/electronicMailAddress"/></xsl:attribute>          
+          <input type="hidden">
+            <xsl:attribute name="value"><xsl:value-of select="../../../entityName"/></xsl:attribute>       
+            <xsl:attribute name="name" >subject</xsl:attribute>        
+          </input>   
+          <input type="submit">
+            <xsl:attribute name="value">Request data via email to <xsl:value-of select="//dataset/contact[2]/electronicMailAddress" /></xsl:attribute>       
+          </input> 
+        </form>
+      </td>
+    </tr>
+    </xsl:if>
   </xsl:template>
 
   <!-- *******************************  Inline data  *********************** -->

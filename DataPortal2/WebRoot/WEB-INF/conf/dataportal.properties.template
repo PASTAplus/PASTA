@@ -11,7 +11,10 @@ db.User=pasta
 db.Password=HIDEPASSWORD
 db.MaxConnections=10
 
-# Junit properties
+# Data Portal properties
+dataportal.downtime.dayOfWeek=Wednesday
+
+# Junit test properties
 dataportal.test.emlFileName=NoneSuchBugCount.xml
 dataportal.test.path=test/data
 dataportal.test.scope=knb-lter-nwk
