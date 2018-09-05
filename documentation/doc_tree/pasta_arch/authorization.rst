@@ -63,7 +63,7 @@ It is common practice to set access rules only at the data package level, which 
 
 The following are example access control rules that may be found in use within PASTA+.
 
-1. A single individual principal with **all** permission; no other access allowed:
+1. An access control rule for a physical object with a single individual principal with **all** permission; no other access is allowed:
 
 .. code-block:: xml
     :linenos:
@@ -75,7 +75,7 @@ The following are example access control rules that may be found in use within P
         </allow>
      </access>
 
-2. Multiple individual principals with **all** access and the role `public` with **read** access:
+2. An access control rule for a physical object with multiple individual principals with **all** access and the role `public` with **read** access:
 
 .. code-block:: xml
     :linenos:
@@ -92,7 +92,7 @@ The following are example access control rules that may be found in use within P
         </allow>
      </access>
 
-3. A single individual principal with **all** access, the group `authenticated` with **read** access, and the role `public` explicitly denied **all** access:
+3. An access control rule for a physical object with a single individual principal with **all** access, the group `authenticated` with **read** access, and the role `public` explicitly denied **all** access:
 
 .. code-block:: xml
     :linenos:
@@ -112,16 +112,14 @@ The following are example access control rules that may be found in use within P
         </deny>
      </access>
 
-4. An API service method access control rule with the `pasta` role and `authenticated` group both having **write** access (note the additional XML element that declares the specific service method):
+4. An access control rule for a PASTA+ service API method with the `pasta` role and `authenticated` group both having **write** access; the role `public` is forbidden from executing this API method (note the additional XML element that declares this is a service method access control rule, along with the `name` attribute defining the method name):
 
 .. code-block:: xml
     :linenos:
 
     <pasta:service-method name="createDataPackage">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
-            order="allowFirst">
+            order="allowFirst" authSystem="EDI">
             <allow>
                 <principal>pasta</principal>
                 <permission>write</permission>
@@ -135,4 +133,11 @@ The following are example access control rules that may be found in use within P
 
 Authorization Processing
 ------------------------
+
+Performing the authorization of a service request in PASTA+ is a simple two-step procedure: (1) determine if the user making the request is authorized to perform the service API method operation, and if allowed, (2) determine if the user making the request is authorized to perform the operation against the physical object that is the subject of the request. This procedure is displayed in the following UML sequence diagram:
+
+.. figure:: images/PASTAplus_authorization.png
+   :align: center
+
+   Authorization processing UML sequence diagram.
 
