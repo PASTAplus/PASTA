@@ -301,7 +301,7 @@ public class AuditManagerResourceTest {
             String entityString = (String) response.getEntity();
             String readsReport = entityString.trim();
             assertTrue(readsReport.length() > 1);
-            assertTrue(readsReport.startsWith("<resourceReads>"));
+            assertTrue(readsReport.contains("<resourceReads>"));
             assertTrue(readsReport.contains("<resource>"));
             assertTrue(readsReport.contains(String.format("<scope>%s</scope>", testScope)));
             assertTrue(readsReport.contains(String.format("<identifier>%d</identifier>", testIdentifier)));
@@ -336,7 +336,7 @@ public class AuditManagerResourceTest {
             String entityString = (String) response.getEntity();
             String readsReport = entityString.trim();
             assertTrue(readsReport.length() > 1);
-            assertTrue(readsReport.startsWith("<resourceReads>"));
+            assertTrue(readsReport.contains("<resourceReads>"));
             assertTrue(readsReport.contains("<resource>"));
             assertTrue(readsReport.contains(String.format("<scope>%s</scope>", testScope)));
             assertTrue(readsReport.contains(String.format("<identifier>%d</identifier>", testIdentifier)));
