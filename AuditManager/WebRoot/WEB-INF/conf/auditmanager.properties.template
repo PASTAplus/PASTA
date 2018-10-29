@@ -20,3 +20,6 @@ tutorial.document=../doc/tutorial.html
 demo.directory=../demo
 
 auditmanager.tmpDir=/home/pasta/local/tmp/audit
+
+auditmanagerresource.test.testResourceId=https://pasta-d.lternet.edu/package/data/eml/knb-lter-nwk
+auditmanagerresource.test.testUser=uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org

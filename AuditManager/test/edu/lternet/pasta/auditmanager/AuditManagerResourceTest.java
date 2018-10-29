@@ -32,6 +32,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -65,8 +66,8 @@ public class AuditManagerResourceTest {
 	 */
 
 	private static AuditManagerResource auditManagerResource;
-	private static final String testResourceId = "https://pasta-d.lternet.edu/package/data/eml/knb-lter-nwk";
-	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
+	private static String testResourceId = "https://pasta-d.lternet.edu/package/data/eml/knb-lter-nwk";
+	private static String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static final Integer badAuditId = new Integer(-999);
 
 	/*
@@ -93,6 +94,16 @@ public class AuditManagerResourceTest {
 		auditManagerResource = new AuditManagerResource();
 		ConfigurationListener configurationListener = new ConfigurationListener();
 		configurationListener.setContextSpecificProperties();
+		Properties properties = ConfigurationListener.getProperties();
+
+		try {
+			testResourceId = ConfigurationListener.getProperty(properties, "auditmanagerresource.test.testResourceId");
+			testUser = ConfigurationListener.getProperty(properties, "auditmanagerresource.test.testUser");
+		}
+		catch (NullPointerException e) {
+			fail("Property not set: " + e.getMessage());
+		}
+
 	}
 
 
