@@ -28,12 +28,15 @@ import java.util.Date;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
+import edu.lternet.pasta.common.EmlPackageIdFormat;
+import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.eml.EmlObject;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
 import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 import edu.lternet.pasta.datapackagemanager.JournalCitation;
+import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
 import edu.ucsb.nceas.utilities.Options;
 
 /**
@@ -72,6 +75,7 @@ public class DOIScanner {
 	private String doiUrlHeadLTER = null;
 	private String doiTest = null;
 	private Boolean isDoiTest = null;
+	private String solrUrl = null;
 	
 	private DataPackageRegistry dataPackageRegistry = null;
 	
@@ -138,6 +142,7 @@ public class DOIScanner {
 		try {
 			DOIScanner doiScanner = new DOIScanner();
 			doiScanner.doScanToRegister();
+			logger.info("Finished DOIScanner main program.");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -175,7 +180,7 @@ public class DOIScanner {
 
 			// Load PASTA service options
 			this.metadataDir = options.getOption("datapackagemanager.metadataDir");
-
+			this.solrUrl = options.getOption("datapackagemanager.metadatacatalog.solrUrl");
 		} else {
 			throw new ConfigurationException("Configuration options failed to load.");
 		}
@@ -205,9 +210,17 @@ public class DOIScanner {
 
 		// For all resources without a registered DOI
 		for (Resource resource : resourceList) {
-			processOneResource(resource);
+			String packageId = resource.getPackageId();
+			if (packageId != null) {
+				EmlPackageIdFormat epidf = new EmlPackageIdFormat();
+				EmlPackageId epid = epidf.parse(packageId);
+				String doi = processOneResource(resource);
+				if (epid != null && doi != null) {
+					SolrMetadataCatalog solrCatalog = new SolrMetadataCatalog(this.solrUrl);
+					solrCatalog.indexDoi(epid, doi);
+				}
+			}
 		}
-
 	}
 	
 	

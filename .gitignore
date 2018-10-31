@@ -35,3 +35,4 @@ common/test/edu/lternet/pasta/common/security/auth/UserCreds.properties
 */documents/javadoc
 /shell/env.sh
 /documentation/_build/*
+/documentation/deprecated

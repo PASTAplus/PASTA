@@ -9,9 +9,12 @@ and then dispatches them to the appropriate PASTA+ end-point service and 2) it
 performs authentication processing on all inbound requests. These two
 functions are performed in tandem as part of the normal request/authentication
 life-cycle of fulfilling a PASTA+ service request as displayed in the
-following sequence diagram:
+following UML sequence diagram:
 
-.. image:: images/PASTAplus_authentication.png
+.. figure:: images/PASTAplus_authentication.png
+   :align: center
+
+   Authentication processing UML sequence diagram.
 
 The *reverse proxy* function of the Gatekeeper is implemented using the Jetty
 Java class ``org.eclipse.jetty.proxy.ProxyServlet``, and specifically looks for
