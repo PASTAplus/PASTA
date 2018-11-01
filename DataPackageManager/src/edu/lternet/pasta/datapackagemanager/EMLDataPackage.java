@@ -280,7 +280,7 @@ public class EMLDataPackage {
 	 * EML namespace value of the data package.
 	 * 
 	 * @return  the metadata format type, 
-	 *          e.g. "eml://ecoinformatics.org/eml-2.1.1"
+	 *          e.g. "eml://ecoinformatics.org/eml-2.2.0"
 	 */
 	public String getFormatType() {
 		return dataPackage.getEmlNamespace();
