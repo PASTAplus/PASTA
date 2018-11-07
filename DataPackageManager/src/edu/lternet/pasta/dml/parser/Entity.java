@@ -163,7 +163,7 @@ public class Entity extends DataObjectDescription
      *                      major
      * @param numRecords    the number of records in this Entity
      * @param emlNamespace  the EML namespace value, e.g. 
-     *                      "eml://ecoinformatics.org/eml-2.1.1"
+     *                      "eml://ecoinformatics.org/eml-2.2.0"
      */
     public Entity(String id, String name, String description,
                        Boolean caseSensitive, String orientation,
@@ -1584,7 +1584,7 @@ public class Entity extends DataObjectDescription
     
     
     /*
-     * Gets the EML namespace value, e.g. "eml://ecoinformatics.org/eml-2.1.1"
+     * Gets the EML namespace value, e.g. "eml://ecoinformatics.org/eml-2.2.0"
      */
     public String getEmlNamespace() {
         return emlNamespace;

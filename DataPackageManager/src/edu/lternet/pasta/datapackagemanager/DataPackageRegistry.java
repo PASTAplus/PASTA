@@ -391,7 +391,7 @@ public class DataPackageRegistry {
      * @param fileName     The fileName value (may be null if there is no associated file for the resource)
 	 * @param principalOwner The user (principal) who owns the the resource 
 	 * @param formatType   The format type, currently used for metadata resources only,
-	 *                       may be null, e.g. "eml://ecoinformatics.org/eml-2.1.1"
+	 *                       may be null, e.g. "eml://ecoinformatics.org/eml-2.2.0"
 	 * @param mayOverwrite If true, an existing resource with the same resourceId may
 	 *                     be overwritten by the new resource by updating its creation date.
 	 *                     This would be typically be set true only for evaluation resources

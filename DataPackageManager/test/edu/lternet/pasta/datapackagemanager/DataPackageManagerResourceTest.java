@@ -106,7 +106,7 @@ public class DataPackageManagerResourceTest {
   private static final String ACL_END_TEXT = "</access:access>";
   private static final String RMD_START_TEXT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<resourceMetadata>";
   private static final String RMD_END_TEXT = "</resourceMetadata>";
-  private static final String METADATA_FORMAT_START_TEXT = "eml://ecoinformatics.org/eml-2.1.";
+  private static final String METADATA_FORMAT_START_TEXT = "eml://ecoinformatics.org/eml-2.";
   private static final String SOLR_QUERY = "LTER";
   private static final String RMD_TEST_SCOPE = "knb-lter-nin";
   private static final Integer RMD_TEST_IDENTIFIER = new Integer(1);
