@@ -43,6 +43,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -147,6 +148,8 @@ public final class GatekeeperFilter implements Filter
 		logger.info(String.format("Request URL: %s - %s",
  		    		              httpServletRequest.getMethod(), 
  		    		              httpServletRequest.getRequestURL().toString()));
+		
+		String originatingUserAgent = originatingUserAgent(httpServletRequest);
 
         // Output bot detection information
         String robot = BotMatcher.findRobot(httpServletRequest);
@@ -169,7 +172,12 @@ public final class GatekeeperFilter implements Filter
         	}
 
         	PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
-            if (isBot) {
+
+        	if (originatingUserAgent != null && !originatingUserAgent.equals("")) {
+            	pastaRequestWrapper.putHeader("Originating-User-Agent", originatingUserAgent);
+        	}
+        	
+        	if (isBot) {
                 logger.info(String.format("Bot detected: %s", robot));
                 pastaRequestWrapper.putHeader("Robot", robot);
             }
@@ -226,6 +234,18 @@ public final class GatekeeperFilter implements Filter
 
     }
 
+    private String originatingUserAgent(HttpServletRequest httpServletRequest) {
+    	String originatingUserAgent = null;
+    	
+    	if (httpServletRequest != null) {
+    		final String headerName = "Originating-User-Agent";
+    		originatingUserAgent = httpServletRequest.getHeader(headerName);
+
+		}
+    	
+        return originatingUserAgent;
+    }
+    
     
     /*
      *  Process incoming basic-authentication header or "public" user

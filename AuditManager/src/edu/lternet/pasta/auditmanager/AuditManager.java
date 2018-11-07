@@ -216,6 +216,7 @@ public class AuditManager {
    * @param resourceId  
    * @param statusCode   
    * @param userId 
+   * @param userAgent
    * @param groups 
    * @param authSystem 
    */
@@ -227,6 +228,7 @@ public class AuditManager {
      String resourceId,
      int statusCode,
      String userId,
+     String userAgent,
      String groups,
      String authSystem
      )
@@ -239,8 +241,8 @@ public class AuditManager {
                                               AUDIT_MANAGER_TABLE_QUALIFIED + 
                                               "(");
     insertSQL.append("entrytime, service, category, servicemethod, " + 
-                     "entrytext, resourceid, statuscode, userid, groups, authsystem) " + 
-                     "VALUES(?,?,?,?,?,?,?,?,?,?)");
+                     "entrytext, resourceid, statuscode, userid, userAgent, groups, authsystem) " + 
+                     "VALUES(?,?,?,?,?,?,?,?,?,?,?)");
     String insertString = insertSQL.toString();
     logger.debug("insertString: " + insertString);
 
@@ -255,8 +257,9 @@ public class AuditManager {
         pstmt.setString(6, resourceId);
         pstmt.setInt(7, statusCode);
         pstmt.setString(8, userId);
-        pstmt.setString(9, groups);
-        pstmt.setString(10, authSystem);
+        pstmt.setString(9, userAgent);
+        pstmt.setString(10, groups);
+        pstmt.setString(11, authSystem);
         pstmt.executeUpdate();
         ResultSet rs = pstmt.getGeneratedKeys();
         while (rs.next()) {
@@ -464,13 +467,14 @@ public class AuditManager {
     String resourceId = auditRecord.getResourceId();
     int statusCode = auditRecord.getResponseStatus();
     String userId = auditRecord.getUser();
+    String userAgent = auditRecord.getUserAgent();
     String groups = auditRecord.getGroups();
     String authSystem = auditRecord.getAuthSystem();
 
     try {
       auditId = addAuditEntry (service, category, serviceMethod, 
                      entryText, resourceId, statusCode, userId,
-                     groups, authSystem);
+                     userAgent, groups, authSystem);
     }
     finally {
 
@@ -499,8 +503,8 @@ public class AuditManager {
       Connection connection = null;
      
       String selectString = 
-        "SELECT oid, entrytime, service, category, servicemethod," +
-        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
+        "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
+        " resourceid, statuscode, userid, userAgent, groups, authsystem " +
         "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
       boolean orderBy = true;
       selectString += composeWhereClause(queryParams, orderBy);
@@ -523,8 +527,9 @@ public class AuditManager {
           String resourceId = rs.getString(7);
           int statusCode = rs.getInt(8);
           String userId = rs.getString(9);
-          String groups = rs.getString(10);
-          String authSystem = rs.getString(11);
+          String userAgent = rs.getString(10);
+          String groups = rs.getString(11);
+          String authSystem = rs.getString(12);
           AuditRecord auditRecord = new AuditRecord();
           auditRecord.setOid(oid);
           java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
@@ -536,6 +541,7 @@ public class AuditManager {
           auditRecord.setResourceId(resourceId);
           auditRecord.setResponseStatus(new Integer(statusCode));
           auditRecord.setUser(userId);
+          auditRecord.setUserAgent(userAgent);
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
           stringBuffer.append(auditRecord.toXML());
