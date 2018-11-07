@@ -33,6 +33,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.codec.binary.Base64;
+
 
 /**
  * @author Duane Costa
@@ -101,11 +103,12 @@ public class BotMatcher {
 	    if (cookies != null) {
 	        for (Cookie cookie : cookies) {
 	            if (cookie.getName().equals("robot")) {
-	                String cookieValue = cookie.getValue();
+	                byte[] cookieValueBytes = Base64.decodeBase64((cookie.getValue()).getBytes());
+	                String cookieValue = new String(cookieValueBytes);
 	                if (!cookieValue.equalsIgnoreCase("No robot")) {
                         logger.info(String.format("Data Portal matched bot pattern to User-Agent value '%s'",
                                                   cookieValue));
-	                    robot = cookieValue;
+                        robot = cookieValue;
 	                }
 	                return robot;
 	            }

@@ -270,23 +270,29 @@ public class ResponsibleParty {
    * 
    * @return Creator name.
    */
-  public String getCreatorName() {
-    String creatorName = null;
+	public String getCreatorName() {
+		String creatorName = null;
 
-    if (isPerson()) {
-      creatorName = this.surName + ", " + getGivenName();
-    } 
-    else if (isOrganization()) {
-      creatorName = this.organizationName;
-    } 
-    else {
-      creatorName = this.positionName;
-    }
+		if (isPerson()) {
+			String givenName = getGivenName();
+			if ((givenName != null) && (!givenName.equals(""))) {
+				creatorName = this.surName + ", " + getGivenName();
+			}
+			else {
+				creatorName = this.surName;
+			}
+		} 
+		else if (isOrganization()) {
+			creatorName = this.organizationName;
+		} 
+		else {
+			creatorName = this.positionName;
+		}
 
-    return creatorName;
-  }
+		return creatorName;
+	}
 
-  
+
   public String getPhone() {
     return phone;
   }

@@ -7938,7 +7938,7 @@
         <td class="{$secondColStyle}">
           <xsl:value-of select="."/><xsl:text> </xsl:text>
           <xsl:if test="./@method">
-            Caculated By<xsl:text> </xsl:text><xsl:value-of select="./@method"/>
+            Calculated By<xsl:text> </xsl:text><xsl:value-of select="./@method"/>
           </xsl:if>
         </td>
       </tr>

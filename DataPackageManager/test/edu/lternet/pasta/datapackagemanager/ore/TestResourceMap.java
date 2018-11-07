@@ -54,8 +54,7 @@ public class TestResourceMap {
 		private static Integer testIdentifier = new Integer(1);
 		private static Integer testRevision = new Integer(1);
 		private static String testRevisionStr;
-		private static final String testString =
-				"<rdf:Description rdf:about=\"https://pasta-d.lternet.edu/package/eml/knb-lter-nin/1/1\">";
+		private static String testString = null;
 	
 		static {
 			testRevisionStr = testRevision.toString();
@@ -79,6 +78,10 @@ public class TestResourceMap {
 		      if (testPath == null) {
 		          fail("No value found for DataPackageManager property 'datapackagemanager.test.path'");
 		      }
+		      testString = options.getOption("datapackagemanager.test.string");
+		      if (testString == null) {
+				  fail("No value found for DataPackageManager property 'datapackagemanager.test.string'");
+			  }
 		    }
 		}
 
