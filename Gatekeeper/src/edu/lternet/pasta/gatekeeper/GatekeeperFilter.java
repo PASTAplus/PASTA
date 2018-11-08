@@ -148,9 +148,6 @@ public final class GatekeeperFilter implements Filter
  		    		              httpServletRequest.getMethod(), 
  		    		              httpServletRequest.getRequestURL().toString()));
 
-        // Output bot detection information
-        String robot = BotMatcher.findRobot(httpServletRequest);
-        boolean isBot = robot != null;
 
         try {
         	boolean hasAuthToken = hasAuthToken(httpServletRequest.getCookies());
@@ -169,7 +166,11 @@ public final class GatekeeperFilter implements Filter
         	}
 
         	PastaRequestWrapper pastaRequestWrapper = new PastaRequestWrapper(httpServletRequest, internalCookie);
-            if (isBot) {
+
+            // Output bot detection information
+            String robot = BotMatcher.findRobot(httpServletRequest);
+
+            if (robot != null) {
                 logger.info(String.format("Bot detected: %s", robot));
                 pastaRequestWrapper.putHeader("Robot", robot);
             }
