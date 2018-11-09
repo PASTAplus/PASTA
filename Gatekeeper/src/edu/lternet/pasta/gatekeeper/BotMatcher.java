@@ -92,8 +92,6 @@ public class BotMatcher {
 	
 	public static String findRobot(HttpServletRequest httpServletRequest) {
 
-		final String headerName = "User-Agent";
-		Enumeration<?> values = httpServletRequest.getHeaders(headerName);
 		String userAgent = httpServletRequest.getHeader("User-Agent");
 
 		for (Pattern botPattern : regexPatterns) {
