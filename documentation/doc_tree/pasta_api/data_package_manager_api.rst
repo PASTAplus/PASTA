@@ -1579,14 +1579,14 @@ Returns a list of journal citations as an XML metadata document.
 REST API
 """"""""
 
-`GET : https://pasta.lternet.edu/package/citation/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{scope}/{identifier}/{revision}>`_
+`GET : https://pasta.lternet.edu/package/citations/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{scope}/{identifier}/{revision}>`_
 
 Examples
 """"""""
   
 1. Using :command:`curl` to access the list of journal citations for the data package with package ID "edi.1000.1" ::  
 
-    curl -X GET https://pasta.lternet.edu/package/citation/eml/edi/1000/1
+    curl -X GET https://pasta.lternet.edu/package/citations/eml/edi/1000/1
 
     <?xml version="1.0" encoding="UTF-8"?>
     <journalCitations>
@@ -1624,14 +1624,14 @@ List Principal Owner Citations operation, returns journal citations metadata for
 REST API
 """"""""
 
-`GET : https://pasta.lternet.edu/package/citation/eml/{principalOwner} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{principalOwner}>`_
+`GET : https://pasta.lternet.edu/package/citations/eml/{principalOwner} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/citation/eml/{principalOwner}>`_
 
 Examples
 """"""""
   
 1. Using :command:`curl` to access the list of journal citations owned by user "ucarroll" ::  
 
-    curl -X GET https://pasta.lternet.edu/package/citation/eml/uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org
+    curl -X GET https://pasta.lternet.edu/package/citations/eml/uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org
 
     <?xml version="1.0" encoding="UTF-8"?>
     <journalCitations>
