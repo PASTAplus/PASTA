@@ -391,10 +391,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
 		
 		if (requestHeaders != null) {
-			userAgentHeader = requestHeaders.getFirst("Originating-User-Agent");
-			if (userAgentHeader == null || userAgentHeader.equals("")) {
-				userAgentHeader = requestHeaders.getFirst("User-Agent");
-			}
+			userAgentHeader = requestHeaders.getFirst("User-Agent");
 		}
 		
 		return userAgentHeader;
@@ -3834,8 +3831,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user a bot?
 			if ((userId != null) &&
 			    (userId.equals("public")) &&
-				(robot != null) && 
-				(!robot.equals("No robot"))
+				(robot != null)
 			   ) {
 				throw new UnauthorizedException(
 					String.format("Robots are not authorized access to data objects. Robot detected: %s",

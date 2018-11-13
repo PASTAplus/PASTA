@@ -77,8 +77,7 @@ public class AuditRecord {
     	  this.user.equals("public") && 
     	  (robot != null)
     	 ) {
-    	  String robotText = String.format("robot: %s", robot);
-    	  this.user = robotText;
+    	  this.user = "robot";
       }
       Set<String> groupsSet = authToken.getGroups();
       this.groups = groupsSetToGroupsString(groupsSet);
