@@ -59,33 +59,29 @@ public class BotMatcher {
 					BufferedReader br = new BufferedReader(isr);
 					String line = null;
 					while ((line = br.readLine()) != null) {
+						
+						/*
+						 * We need to correct entries in the COUNTER Robots
+						 * list that have a forward slash that is escaped
+						 * by a backslash. We need to remove the backslash
+						 * escape character in order for the pattern to work.
+						 */
+						line = line.replace("\\/", "/");
+						
 						String regexStr = line.trim();
+						
 						if (!regexStr.startsWith("^")) {
 							regexStr = ".*" + regexStr;
 						}
 						if (!regexStr.endsWith("$")) {
 							regexStr = regexStr + ".*";
 						}
+						
 						Pattern p = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
 						
-						regexPatterns.add(p);
-						
-						// Add a second pattern for regex with the backslashes removed
-						// This might be the best way to go for all patterns
-						String modifiedLine = line.replace("\\/", "/");
-						if (!modifiedLine.equals(line)) {
-							String modifiedRegexStr = modifiedLine.trim();
-							if (!modifiedRegexStr.startsWith("^")) {
-								modifiedRegexStr = ".*" + modifiedRegexStr;
-							}
-							if (!modifiedRegexStr.endsWith("$")) {
-								modifiedRegexStr = modifiedRegexStr + ".*";
-							}
-							Pattern modifiedP = Pattern.compile(modifiedRegexStr, Pattern.CASE_INSENSITIVE);
-						
-							regexPatterns.add(modifiedP);
-						}
+						regexPatterns.add(p);						
 					}
+					
 					String absolutePath = regexFile.getAbsolutePath();
 					logger.info(String.format("Loaded %d robot patterns from file %s.", 
 							regexPatterns.size(), absolutePath));
@@ -107,11 +103,23 @@ public class BotMatcher {
 	
 	
 	public static String findRobot(HttpServletRequest httpServletRequest) {
-
 		final String headerName = "User-Agent";
-		Enumeration<?> values = httpServletRequest.getHeaders(headerName);
-		String userAgent = httpServletRequest.getHeader("User-Agent");
-
+		String userAgent = httpServletRequest.getHeader(headerName);
+		return findRobotAux(userAgent);
+	}
+	
+	
+	/**
+	 * This auxiliary method to the findRobot() method makes it easier to
+	 * do JUnit testing because the method can be called by the unit test
+	 * without having to deal with an HttpServletRequest object.
+	 * 
+	 * @param userAgent   
+	 *            The User-Agent header value
+	 * @return  The userAgent value if it was matched to a robot pattern,
+	 *          else null
+	 */
+	public static String findRobotAux(String userAgent) {
 		for (Pattern botPattern : regexPatterns) {
 			if (botPattern.matcher(userAgent).matches()) {
 				logger.info(String.format("Gatekeeper matched bot pattern '%s' to User-Agent value '%s'",
@@ -121,7 +129,6 @@ public class BotMatcher {
 		}
 
 		return null;
-
 	}
 	
 }
