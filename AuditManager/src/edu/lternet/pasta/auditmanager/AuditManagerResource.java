@@ -87,6 +87,7 @@ import edu.lternet.pasta.common.security.access.UnauthorizedException;
  *   <li><b>responseStatus</b>: the HTTP response status code from the service method, e.g. '200'</li>
  *   <li><b>resourceId</b>: the resource ID related to audit log entry, if applicable, e.g. 'https://pasta.lternet.edu/package/metadata/eml/knb-lter-nwk/1416/1'</li>
  *   <li><b>user</b>: the user distinguished name on whose behalf the service method was executed, e.g. 'uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org'</li>
+ *   <li><b>userAgent</b>: the userAgent value of the request</li>
  *   <li><b>groups</b>: a comma-separated list of groups that the user is a member of, e.g. 'authenticated'</li>
  *   <li><b>authSystem</b>: the authentication system, e.g. 'https://pasta.edirepository.org/authentication'</li>
  *   <li><b>entryText</b>: auxiliary information to accompany the audit log entry</li>
@@ -120,13 +121,15 @@ public class AuditManagerResource extends PastaWebService
     public static final String SERVICEMETHOD = "serviceMethod";
     // Query parameter for user
     public static final String USER = "user";
+    // Query parameter for userAgent
+    public static final String USER_AGENT = "userAgent";
     // Query parameter for groups
     public static final String GROUP = "group";
     // Query parameter for authSystem
     public static final String AUTHSYSTEM = "authSystem";
     // Query parameter for status
     public static final String STATUS_CODE = "status";
-    // Query parameter for user
+    // Query parameter for resourceId
     public static final String RESOURCE_ID = "resourceId";
     
     //Query parameter for record limit
@@ -146,6 +149,7 @@ public class AuditManagerResource extends PastaWebService
         set.add(SERVICE);
         set.add(SERVICEMETHOD);
         set.add(USER);
+        set.add(USER_AGENT);
         set.add(GROUP);
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
@@ -236,6 +240,7 @@ public class AuditManagerResource extends PastaWebService
      *       &lt;responseStatus&gt;<em>HTTP response status code</em>&lt;/responseStatus&gt;
      *       &lt;resourceId&gt;<em>resource identifier</em>&lt;/resourceId&gt;
      *       &lt;user&gt;<em>user distinguished name</em>&lt;/user&gt;
+     *       &lt;userAgent&gt;<em>userAgent field of the web service request</em>&lt;/userAgent&gt;
      *       &lt;groups&gt;<em>groups list</em>&lt;/groups&gt;
      *       &lt;authSystem&gt;<em>authentication system</em>&lt;/authSystem&gt;
      *       &lt;entryTextt&gt;<em>auxiliary info text</em>&lt;/entryText&gt;
@@ -254,6 +259,7 @@ public class AuditManagerResource extends PastaWebService
            &lt;responseStatus&gt;404&lt;/responseStatus&gt;
            &lt;resourceId&gt;&lt;/resourceId&gt;
            &lt;user&gt;uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org&lt;/user&gt;
+           &lt;userAgent&gt;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&lt;/userAgent&gt;
            &lt;groups&gt;authenticated&lt;/groups&gt;
            &lt;authSystem&gt;https://pasta.edirepository.org/authentication&lt;/authSystem&gt;
            &lt;entryText&gt;No entity resources found for scope abc&lt;/entryText&gt;

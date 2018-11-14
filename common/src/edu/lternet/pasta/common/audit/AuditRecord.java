@@ -8,8 +8,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.owasp.esapi.codecs.XMLEntityCodec;
-
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
@@ -42,6 +40,7 @@ public class AuditRecord {
   private int responseStatus;
   private String resourceId;
   private String user;
+  private String userAgent;
   private String groups;
   private String authSystem;
   private String entryText;
@@ -65,7 +64,7 @@ public class AuditRecord {
   public AuditRecord(
       Date date, String service, String entryText,
       AuthToken authToken, int httpStatusCode, String serviceMethod,
-      String resourceId, String robot) {
+      String resourceId, String robot, String userAgent) {
     super();
     this.entryTime = ISO8601Utility.formatDateTime(date);
     this.category = categoryFromStatusCode(httpStatusCode);
@@ -78,8 +77,7 @@ public class AuditRecord {
     	  this.user.equals("public") && 
     	  (robot != null)
     	 ) {
-    	  String robotText = String.format("robot: %s", robot);
-    	  this.user = robotText;
+    	  this.user = "robot";
       }
       Set<String> groupsSet = authToken.getGroups();
       this.groups = groupsSetToGroupsString(groupsSet);
@@ -89,6 +87,7 @@ public class AuditRecord {
     this.responseStatus = httpStatusCode;
     this.resourceId = resourceId;
     this.entryText = entryText;
+    this.userAgent = userAgent;
   }
   
   
@@ -103,6 +102,7 @@ public class AuditRecord {
     this.service = parseElement(auditRecordXML, "service");
     this.serviceMethod = parseElement(auditRecordXML, "serviceMethod");
     this.user = parseElement(auditRecordXML, "user");
+    this.userAgent = parseElement(auditRecordXML, "userAgent");
     this.groups = parseElement(auditRecordXML, "groups");
     this.authSystem = parseElement(auditRecordXML, "authSystem");
     String responseStatusStr = parseElement(auditRecordXML, "responseStatus");
@@ -220,6 +220,15 @@ public class AuditRecord {
   }
 
   
+  /**
+   * Returns the userAgent value of this audit record.
+   * @return the userAgent value of this audit record.
+   */
+  public String getUserAgent() {
+    return userAgent;
+  }
+
+  
   /* Setter methods */
 
   public void setAuthSystem(String s) {
@@ -299,6 +308,15 @@ public class AuditRecord {
   }
 
   
+  public void setUserAgent(String s) {
+	  String userAgent = "";
+	  if (s != null && !s.equalsIgnoreCase("null")) {
+	   userAgent = s;
+	  }
+	  this.userAgent = userAgent;
+  }
+
+	  
   private String categoryFromStatusCode(int statusCode) {
     String category = "error";
     
@@ -352,13 +370,6 @@ public class AuditRecord {
     String xmlString = null;
     StringBuffer stringBuffer = new StringBuffer("");
     
-    /*if (authToken != null) {
-      user = authToken.getUserId();
-      Set<String> groupsSet = authToken.getGroups();
-      String groups = groupsSetToGroupsString(groupsSet);
-      authSystem = AuthSystemDef.KNB.getCanonicalName();
-    }*/
-    
     stringBuffer.append("<auditRecord>\n");
     stringBuffer.append(String.format("  <oid>%d</oid>\n", oid));
     stringBuffer.append(String.format("  <entryTime>%s</entryTime>\n", entryTime));
@@ -368,6 +379,7 @@ public class AuditRecord {
     stringBuffer.append(String.format("  <responseStatus>%d</responseStatus>\n", responseStatus));
     stringBuffer.append(String.format("  <resourceId>%s</resourceId>\n", resourceId));
     stringBuffer.append(String.format("  <user>%s</user>\n", user));
+    stringBuffer.append(String.format("  <userAgent>%s</userAgent>\n", userAgent));
     stringBuffer.append(String.format("  <groups>%s</groups>\n", groups));
     stringBuffer.append(String.format("  <authSystem>%s</authSystem>\n", authSystem));
     stringBuffer.append(String.format("  <entryText>%s</entryText>\n", entryText));
