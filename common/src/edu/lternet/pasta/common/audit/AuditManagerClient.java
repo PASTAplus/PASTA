@@ -145,10 +145,7 @@ public class AuditManagerClient implements Runnable {
  /**
   * Logs an audit record with the Audit Manager.
   * 
-  * @param scope       The data package scope value, e.g. "knb-lter-lno"
-  * @param identifier  The data package identifier value
-  * @param revision    The data package revision value
-  * @param user        The user
+  * @param auditRecord  an object holding the audit record information
   * 
   */
  public void logAudit(AuditRecord auditRecord) {

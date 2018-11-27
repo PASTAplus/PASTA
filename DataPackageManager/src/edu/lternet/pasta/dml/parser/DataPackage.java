@@ -54,7 +54,6 @@ import edu.lternet.pasta.dml.quality.QualityReport;
 import edu.lternet.pasta.dml.quality.QualityCheck;
 import edu.lternet.pasta.dml.quality.QualityCheck.Status;
 import org.ecoinformatics.eml.EMLParser;
-import org.ecoinformatics.eml.SAXValidate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -90,7 +89,7 @@ public class DataPackage
    */
   
   private String accessXML = null;       // <access> element XML string
-  private String emlNamespace = null;    // e.g. "eml://ecoinformatics.org/eml-2.1.0"
+  private String emlNamespace = null;    // e.g. "eml://ecoinformatics.org/eml-2.2.0"
   private Entity[] entityList = null;
   private String funding = null;
   private boolean parserValid = false;
@@ -681,7 +680,7 @@ public class DataPackage
    * Setter method for emlNamespace field.
    * 
    * @param emlNamespace  the emlNamespace value to set,
-   *                      e.g. "eml://ecoinformatics.org/eml-2.1.0"
+   *                      e.g. "eml://ecoinformatics.org/eml-2.2.0"
    */
   public void setEmlNamespace(String emlNamespace) {
     this.emlNamespace = emlNamespace;

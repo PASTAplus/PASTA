@@ -6,6 +6,7 @@
   <responseStatus>404</responseStatus>
   <resourceId></resourceId>
   <user>uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org</user>
+  <userAgent>curl/7.55.1</userAgent>
   <groups>authenticated</groups>
   <authSystem>https://pasta.lternet.edu/authentication</authSystem>
   <entryText>No entity resources found for scope abc</entryText>

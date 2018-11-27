@@ -59,17 +59,29 @@ public class BotMatcher {
 					BufferedReader br = new BufferedReader(isr);
 					String line = null;
 					while ((line = br.readLine()) != null) {
+						
+						/*
+						 * We need to correct entries in the COUNTER Robots
+						 * list that have a forward slash that is escaped
+						 * by a backslash. We need to remove the backslash
+						 * escape character in order for the pattern to work.
+						 */
+						line = line.replace("\\/", "/");
+						
 						String regexStr = line.trim();
+						
 						if (!regexStr.startsWith("^")) {
 							regexStr = ".*" + regexStr;
 						}
 						if (!regexStr.endsWith("$")) {
 							regexStr = regexStr + ".*";
 						}
+						
 						Pattern p = Pattern.compile(regexStr, Pattern.CASE_INSENSITIVE);
 						
-						regexPatterns.add(p);
+						regexPatterns.add(p);						
 					}
+					
 					String absolutePath = regexFile.getAbsolutePath();
 					logger.info(String.format("Loaded %d robot patterns from file %s.", 
 							regexPatterns.size(), absolutePath));
@@ -91,49 +103,32 @@ public class BotMatcher {
 	
 	
 	public static String findRobot(HttpServletRequest httpServletRequest) {
-		String robot = null;
-
-		/*
-		 * The Data Portal sets a "robot" cookie value whenever it checks for robots.
-		 * If the cookie value is set to "No robot" then we know that the request has 
-		 * already been cleared by the Data Portal so we don't need to re-check here,
-		 * we can just return null.
-		 */
-	    Cookie[] cookies = httpServletRequest.getCookies();
-	    if (cookies != null) {
-	        for (Cookie cookie : cookies) {
-	            if (cookie.getName().equals("robot")) {
-	                byte[] cookieValueBytes = Base64.decodeBase64((cookie.getValue()).getBytes());
-	                String cookieValue = new String(cookieValueBytes);
-	                if (!cookieValue.equalsIgnoreCase("No robot")) {
-                        logger.info(String.format("Data Portal matched bot pattern to User-Agent value '%s'",
-                                                  cookieValue));
-                        robot = cookieValue;
-	                }
-	                return robot;
-	            }
-	        }
-	    }
-	    // Otherwise check the User-Agent field
-	    else {
-	        final String headerName = "User-Agent";
-		    Enumeration<?> values = httpServletRequest.getHeaders(headerName);
-
-		    if (values != null) {
-			    while (values.hasMoreElements()) {
-				    String value = (String) values.nextElement();
-				    for (Pattern botPattern : regexPatterns) {
-					    if (botPattern.matcher(value).matches()) {
-						    logger.info(String.format("Gatekeeper matched bot pattern '%s' to User-Agent value '%s'",
-								                  botPattern.pattern(), value));
-						    return value;
-					    }
-				    }
-				}
+		final String headerName = "User-Agent";
+		String userAgent = httpServletRequest.getHeader(headerName);
+		return findRobotAux(userAgent);
+	}
+	
+	
+	/**
+	 * This auxiliary method to the findRobot() method makes it easier to
+	 * do JUnit testing because the method can be called by the unit test
+	 * without having to deal with an HttpServletRequest object.
+	 * 
+	 * @param userAgent   
+	 *            The User-Agent header value
+	 * @return  The userAgent value if it was matched to a robot pattern,
+	 *          else null
+	 */
+	public static String findRobotAux(String userAgent) {
+		for (Pattern botPattern : regexPatterns) {
+			if (botPattern.matcher(userAgent).matches()) {
+				logger.info(String.format("Gatekeeper matched bot pattern '%s' to User-Agent value '%s'",
+									  botPattern.pattern(), userAgent));
+				return userAgent;
 			}
 		}
 
-		return robot;
+		return null;
 	}
 	
 }

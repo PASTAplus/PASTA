@@ -566,7 +566,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     /*
      * Parses the "xmlns:eml" attribute value from the
      * "eml:eml" element. This value indicates the version of
-     * EML, e.g. "eml://ecoinformatics.org/eml-2.1.0"
+     * EML, e.g. "eml://ecoinformatics.org/eml-2.2.0"
      */
     private String parseEmlNamespace(Document doc) {
       String namespaceURI = null;

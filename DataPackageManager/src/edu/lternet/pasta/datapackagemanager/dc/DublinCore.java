@@ -29,7 +29,7 @@ public class DublinCore {
 			.getLogger(edu.lternet.pasta.datapackagemanager.dc.DublinCore.class);
 	
 	
-	public enum EmlVersion { eml200,  eml201, eml210, eml211};
+	public enum EmlVersion { eml200,  eml201, eml210, eml211, eml220};
 
 	
 	public void transformMetadata(String xslDir, String metadataChildDir) {
@@ -69,6 +69,9 @@ public class DublinCore {
 			else if (eml.contains("eml://ecoinformatics.org/eml-2.1.0")) {
 				v = EmlVersion.eml210;
 			}
+			else if (eml.contains("eml://ecoinformatics.org/eml-2.2.0")) {
+				v = EmlVersion.eml220;
+			}
 		}
 		
 		return v;
@@ -96,8 +99,12 @@ public class DublinCore {
 			xslFile = "eml211toDublinCore.xsl";
 			break;
 
+		case eml220:
+			xslFile = "eml220toDublinCore.xsl";
+			break;
+
 		default:
-			xslFile = "eml211toDublinCore.xsl";
+			xslFile = "eml220toDublinCore.xsl";
 			break;
 		}
 

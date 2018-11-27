@@ -78,6 +78,7 @@ public final class LevelOneEMLFactory {
   private static final String VIEW_ENTITY = "view";
   
   private static final String DISTRIBUTION_PATH = "//dataset/distribution";
+  private static final String LICENSED_PATH = "//dataset/licensed";
   private static final String COVERAGE_PATH = "//dataset/coverage";
   private static final String PURPOSE_PATH = "//dataset/purpose";
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
@@ -434,7 +435,10 @@ public final class LevelOneEMLFactory {
 		 * depends on the presence of nearby optional elements.
 		 */
 		String insertBefore = null;
-		if (hasElement(doc, DISTRIBUTION_PATH)) {
+		if (hasElement(doc, LICENSED_PATH)) {
+			insertBefore = LICENSED_PATH;
+		}
+		else if (hasElement(doc, DISTRIBUTION_PATH)) {
 			insertBefore = DISTRIBUTION_PATH;
 		}
 		else if (hasElement(doc, COVERAGE_PATH)) {

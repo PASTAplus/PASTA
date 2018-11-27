@@ -88,8 +88,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.NotFoundException;
-
 import edu.ucsb.nceas.utilities.Options;
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.EmlPackageIdFormat;
@@ -254,9 +252,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
 	
 	// time-to-live default for tempoary data files, in milliseconds
-	private static final long TTL_DEFAULT = 3600000L;  
-
-
+	private static final long TTL_DEFAULT = 3600000L;
+	
 	private static Logger logger = Logger
 			.getLogger(DataPackageManagerResource.class);
 
@@ -382,6 +379,26 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
+	 * Gets the UserAgent header value, if provided in the headers as set
+	 * by the Gatekeeper.
+	 * 
+	 * @param headers
+	 *            the HttpHeaders object
+	 * @return the UserAgent header string, possibly null
+	 */
+	public static String getUserAgent(HttpHeaders headers) {
+		String userAgentHeader = null;
+		MultivaluedMap<String, String> requestHeaders = headers.getRequestHeaders();
+		
+		if (requestHeaders != null) {
+			userAgentHeader = requestHeaders.getFirst("User-Agent");
+		}
+		
+		return userAgentHeader;
+	}
+
+
+	/**
 	 * Get the method name for a depth in call stack. <br />
 	 * Utility function
 	 * 
@@ -429,22 +446,26 @@ public class DataPackageManagerResource extends PastaWebService {
 	private void audit(String serviceMethodName, AuthToken authToken,
 			           Response response, String resourceId, String entryText) {
 		String robot = null;
+		String userAgent = null;
 		
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+			  robot, userAgent);
 	}
 
 
 	private void audit(String serviceMethodName, AuthToken authToken,
 			           Response response, String resourceId, String entryText,
-			           String robot) {
+			           String robot, String userAgent) {
 		String auditHost = getAuditHost();
 		String serviceName = getVersionString();
 
 		try {
 			int status = response.getStatus();
 			Date date = new Date();
-			AuditRecord auditRecord = new AuditRecord(date, serviceName,
-					entryText, authToken, status, serviceMethodName, resourceId, robot);
+			AuditRecord auditRecord = 
+					new AuditRecord(date, serviceName, entryText, authToken, 
+							        status, serviceMethodName, resourceId, 
+							        robot, userAgent);
 			AuditManagerClient auditManagerClient = new AuditManagerClient(
 					auditHost);
 			auditManagerClient.logAudit(auditRecord);
@@ -3799,17 +3820,18 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
 		String entryText = null;
 		String robot = null;
+		String userAgent = null;
 
 		try {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 			robot = getRobot(headers);
+			userAgent = getUserAgent(headers);
 
 			// Is user a bot?
 			if ((userId != null) &&
 			    (userId.equals("public")) &&
-				(robot != null) && 
-				(!robot.equals("No robot"))
+				(robot != null)
 			   ) {
 				throw new UnauthorizedException(
 					String.format("Robots are not authorized access to data objects. Robot detected: %s",
@@ -3946,7 +3968,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		cleanTemporaryDir();
 		
 		response = stampHeader(response);
@@ -5675,12 +5698,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "readDataPackage";
 		Rule.Permission permission = Rule.Permission.read;
 		String robot = null;
+		String userAgent = null;
 		boolean oreFormat = (oreParam != null);
 
 		try {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 			robot = getRobot(headers);
+			userAgent = getUserAgent(headers);
 
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
@@ -5739,7 +5764,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		String resourceId = resourceIdFromResourceMap(resourceMap);
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 
 		response = stampHeader(response);
 		return response;
@@ -6239,6 +6265,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 		String robot = getRobot(headers);
+		String userAgent = getUserAgent(headers);
+
 
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
@@ -6311,7 +6339,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		cleanTemporaryDir();
 
 		response = stampHeader(response);
@@ -6803,6 +6832,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 		String robot = getRobot(headers);
+		String userAgent = getUserAgent(headers);
 
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
@@ -6897,7 +6927,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		response = stampHeader(response);
 		return response;
 	}
@@ -7791,6 +7822,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 		String robot = getRobot(headers);
+		String userAgent = getUserAgent(headers);
 
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
@@ -7866,7 +7898,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		response = stampHeader(response);
 		return response;
 	}
@@ -8011,11 +8044,13 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
 		String entryText = null;
 		String robot = null;
+		String userAgent = null;
 
 		try {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 			robot = getRobot(headers);
+			userAgent = getUserAgent(headers);
 
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
@@ -8110,7 +8145,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		response = stampHeader(response);
 		return response;
 	}
@@ -8259,6 +8295,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
 		String entryText = null;
 		String robot = null;
+		String userAgent = getUserAgent(headers);
 
 		try {
 			authToken = getAuthToken(headers);
@@ -8358,7 +8395,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		response = stampHeader(response);
 		return response;
 	}
@@ -9370,6 +9408,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "searchDataPackages";
 		Rule.Permission permission = Rule.Permission.read;
 		String robot = null;
+		String userAgent = getUserAgent(headers);
 
 		try {
 			authToken = getAuthToken(headers);
@@ -9436,7 +9475,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
 		response = stampHeader(response);
 		return response;
 	}
