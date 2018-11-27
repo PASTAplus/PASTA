@@ -41,6 +41,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
+import edu.ucsb.nceas.utilities.Options;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -56,18 +59,7 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
   public final static String
                DEFAULT_PARSER = "org.apache.xerces.parsers.SAXParser";
   
-  public final static String NAMESPACES =
-	"eml://ecoinformatics.org/eml-2.0.0 http://nis.lternet.edu/schemas/eml/eml-2.0.0/eml.xsd " +
-	"eml://ecoinformatics.org/eml-2.0.1 http://nis.lternet.edu/schemas/eml/eml-2.0.1/eml.xsd " +
-	"eml://ecoinformatics.org/eml-2.1.0 http://nis.lternet.edu/schemas/eml/eml-2.1.0/eml.xsd " +
-	"eml://ecoinformatics.org/eml-2.1.1 http://nis.lternet.edu/schemas/eml/eml-2.1.1/eml.xsd " +
-	"eml://ecoinformatics.org/eml-2.2.0 https://raw.githubusercontent.com/NCEAS/eml/BRANCH_EML_2_2/xsd/eml.xsd " +
-	"eml://ecoinformatics.org/literature-2.1.0 http://nis.lternet.edu/schemas/eml/eml-2.1.0/eml-literature.xsd " +
-	"eml://ecoinformatics.org/project-2.1.0 http://nis.lternet.edu/schemas/eml/eml-2.1.0/eml-project.xsd " +
-	"eml://ecoinformatics.org/literature-2.1.1 http://nis.lternet.edu/schemas/eml/eml-2.1.1/eml-literature.xsd " +
-	"eml://ecoinformatics.org/project-2.1.1 http://nis.lternet.edu/schemas/eml/eml-2.1.1/eml-project.xsd " +
-	"http://www.xml-cml.org/schema/stmml-1.1 http://nis.lternet.edu/schemas/eml/eml-2.1.0/stmml.xsd " +
-	"http://www.xml-cml.org/schema/stmml http://nis.lternet.edu/schemas/eml/eml-2.0.1/stmml.xsd";
+  public static String namespaces = null;
 
 
   /**
@@ -75,8 +67,44 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
    *
    * @param validateschema  Description of Parameter
    */
-  public SAXValidate(boolean validateschema) {
-    this.schemavalidate = validateschema;
+    public SAXValidate(boolean validateschema) 
+            throws Exception {
+	  if (namespaces == null) {
+		 namespaces = initializeNamespaces(); 
+	  }
+	  
+      this.schemavalidate = validateschema;
+  }
+  
+  
+  private static String initializeNamespaces() 
+          throws Exception {
+      Options options = ConfigurationListener.getOptions();
+
+      if (options != null) {
+	      String emlDir = options.getOption("datapackagemanager.emlDir");
+
+	      if (emlDir == null || emlDir.isEmpty()) {
+	          String gripe = "'datapackagemanager.emlDir' directory property not set";
+		      throw new Exception(gripe);
+	      }
+
+		  String urlHead = String.format("file://%s", emlDir);
+          namespaces = String.format(
+		  "eml://ecoinformatics.org/eml-2.1.0 %s/eml-2.1.0/eml.xsd " +
+          "eml://ecoinformatics.org/eml-2.1.1 %s/eml-2.1.1/eml.xsd " +
+          "eml://ecoinformatics.org/eml-2.2.0 %s/eml-2.2.0/xsd/eml.xsd " +
+          "eml://ecoinformatics.org/literature-2.1.0 %s/eml-2.1.0/eml-literature.xsd " +
+          "eml://ecoinformatics.org/project-2.1.0 %s/eml-2.1.0/eml-project.xsd " +
+          "eml://ecoinformatics.org/literature-2.1.1 %s/eml-2.1.1/eml-literature.xsd " +
+          "eml://ecoinformatics.org/project-2.1.1 %s/eml-2.1.1/eml-project.xsd " +
+          "http://www.xml-cml.org/schema/stmml-1.1 %s/eml-2.1.0/stmml.xsd " +
+          "http://www.xml-cml.org/schema/stmml %s/eml-2.0.1/stmml.xsd",
+          urlHead, urlHead, urlHead, urlHead, urlHead, 
+          urlHead, urlHead, urlHead, urlHead);
+	  }
+	  
+	  return namespaces;
   }
 
   
@@ -124,7 +152,7 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
   public void runTest(Reader xml, String parserName, String namespaceIndoc)
 		  throws IOException, ClassNotFoundException,
                  SAXException, SAXParseException {
-    runTest(xml, parserName, NAMESPACES, namespaceIndoc);
+    runTest(xml, parserName, namespaces, namespaceIndoc);
   }
 
   
@@ -200,7 +228,7 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
 	    }
 
 	    String emlfile = "";
-	    String schemaLocation = NAMESPACES;
+	    String schemaLocation = namespaces;
 
 	    if (args.length == 2) {
 	      emlfile = args[0];

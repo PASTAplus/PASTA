@@ -722,7 +722,8 @@ public class DataPackage
    * @param doc            the XML DOM document object
    * @param namespaceInDoc the namespace value specified in the document
    */
-  public void checkSchemaValid(Document doc, String namespaceInDoc) {
+  public void checkSchemaValid(Document doc, String namespaceInDoc) 
+          throws Exception {
     String schemaValidIdentifier = "schemaValid";
     QualityCheck schemaValidTemplate = 
       QualityReport.getQualityCheckTemplate(schemaValidIdentifier);
@@ -807,7 +808,8 @@ public class DataPackage
    * @param doc            the XML DOM document object
    * @param namespaceInDoc the namespace value specified in the document
    */
-  public void checkSchemaValidDereferenced(Document doc, String namespaceInDoc) {
+  public void checkSchemaValidDereferenced(Document doc, String namespaceInDoc) 
+          throws Exception {
     String identifier = "schemaValidDereferenced";
     QualityCheck qualityCheckTemplate = 
       QualityReport.getQualityCheckTemplate(identifier);
@@ -829,13 +831,15 @@ public class DataPackage
     
       try {
         saxValidate.runTest(stringReader, parserName, namespaceInDoc);
-        found = "Dereferenced document validated for namespace: '" + namespaceInDoc + "'";
+        found = "Dereferenced document validated for namespace: '" + 
+                namespaceInDoc + "'";
         qualityCheck.setStatus(Status.valid);
         qualityCheck.setSuggestion("");
         this.schemaValid = true;
       }
       catch (Exception e) {
-        found = "Failed to validate dereferenced document for namespace: '" + namespaceInDoc + 
+        found = "Failed to validate dereferenced document for namespace: '" + 
+                namespaceInDoc + 
                 "'; " + e.getMessage();
         qualityCheck.setFailedStatus();
       }
