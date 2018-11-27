@@ -59,7 +59,7 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
   public final static String
                DEFAULT_PARSER = "org.apache.xerces.parsers.SAXParser";
   
-  public static String namespaces = null;
+  private static String namespaces = null;
 
 
   /**
