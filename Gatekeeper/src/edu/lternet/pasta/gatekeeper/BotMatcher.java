@@ -105,6 +105,9 @@ public class BotMatcher {
 	public static String findRobot(HttpServletRequest httpServletRequest) {
 		final String headerName = "User-Agent";
 		String userAgent = httpServletRequest.getHeader(headerName);
+		if (userAgent == null) {
+			return "null User-Agent";
+		}
 		return findRobotAux(userAgent);
 	}
 	
