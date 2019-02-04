@@ -52,14 +52,10 @@ public class DownloadHandlerTest extends TestCase
          suite.addTest(new DownloadHandlerTest("initialize"));
          suite.addTest(new DownloadHandlerTest("testDownloadFailed"));
          suite.addTest(new DownloadHandlerTest("testDownloadSuccess"));  
-         suite.addTest(new DownloadHandlerTest("testEcogridDownloadFailed"));
-         suite.addTest(new DownloadHandlerTest("testEcogridDownloadSuccess"));
          suite.addTest(new DownloadHandlerTest("tesDownloadHandlerWithSameUrl"));
          suite.addTest(new DownloadHandlerTest("testDownloadFromIncorrectURL"));
          suite.addTest(new DownloadHandlerTest("testCorrectURLByDownload"));
          suite.addTest(new DownloadHandlerTest("testInCorrectURLByDownload"));
-         suite.addTest(new DownloadHandlerTest("testCorrectEcogridURLByDownload"));
-         //suite.addTest(new DownloadHandlerTest("testInCorrectEcogridURLByDownload"));
          suite.addTest(new DownloadHandlerTest("testSameURLByDownload"));
          return suite;
        }
@@ -131,29 +127,6 @@ public class DownloadHandlerTest extends TestCase
 	  }
       
       
-	  /**
-	   * Tests downloading from ecogrid protocol with failed result.
-	   * 
-	   */
-	  public void testEcogridDownloadFailed()
-	  {
-		  String url = "ecogrid://knb/tao.2.1";
-		  //String identifier = "tao.2.1";
-		  testDownloadByThread(false, url, url, false);
-	  }
-	  
-      
-	  /**
-	   * Tests downloading from ecogrid protocol with successful result.
-	   * 
-	   */
-	  public void testEcogridDownloadSuccess()
-	  {
-		  String url = "ecogrid://knb/tao.2.1";
-		  testDownloadByThread(true, url, url, true);
-	  }
-	  
-	  
 	  /*
 	   * Tests download process by creating a thread which initalizes from 
        * download handler.
@@ -308,30 +281,6 @@ public class DownloadHandlerTest extends TestCase
 	  public void testInCorrectURLByDownload() throws Exception
 	  {
 		  String url = INCORRECT_METADATA_URL;
-		  testDownloadMethod(false, url);
-	  }
-	  
-      
-	  /**
-	   * Test download method by a correct ecogrid url.
-       * 
-	   * @throws Exception
-	   */
-	  public void testCorrectEcogridURLByDownload() throws Exception
-	  {
-		  String url = "ecogrid://knb/tao.1.1";
-		  testDownloadMethod(true, url);
-	  }
-	  
-      
-	  /**
-	   * Tests download method by a incorrect ecogrid url.
-       * 
-	   * @throws Exception
-	   */
-	  public void testInCorrectEcogridURLByDownload() throws Exception
-	  {
-		  String url = "ecogrid://knb/tao.0.1";
 		  testDownloadMethod(false, url);
 	  }
 	  

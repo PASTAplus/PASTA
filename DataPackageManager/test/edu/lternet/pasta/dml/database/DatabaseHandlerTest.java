@@ -33,8 +33,8 @@ public class DatabaseHandlerTest extends TestCase {
   private Connection dbConnection  = null;            // the database connection
   private DatabaseConnectionPoolInterfaceTest connectionPool = null;
   private String dbAdapterName = null;
-  private final String TEST_DOCUMENT = "tao.12061.1";
-  private final String TEST_SERVER = "https://knb.ecoinformatics.org/knb/metacat";
+  private final String TEST_DOCUMENT = "knb-lter-nin/1/1";
+  private final String TEST_SERVER = "https://pasta-d.lternet.edu/package/metadata/eml/";
   
   
     
@@ -126,8 +126,7 @@ public class DatabaseHandlerTest extends TestCase {
          throws MalformedURLException, IOException, SQLException, Exception {
     DataPackage dataPackage = null;
     InputStream metadataInputStream;
-    String documentURL = TEST_SERVER + "?action=read&qformat=xml&docid="
-        + TEST_DOCUMENT;
+    String documentURL = TEST_SERVER + TEST_DOCUMENT;
     URL url;
 
     /*
@@ -191,8 +190,7 @@ public class DatabaseHandlerTest extends TestCase {
           throws IOException, MalformedURLException, SQLException, Exception {
     DataPackage dataPackage = null;
     InputStream metadataInputStream;
-    String documentURL = TEST_SERVER + "?action=read&qformat=xml&docid="
-        + TEST_DOCUMENT;
+    String documentURL = TEST_SERVER + TEST_DOCUMENT;
     URL url;
 
     /*
@@ -255,8 +253,7 @@ public class DatabaseHandlerTest extends TestCase {
 	    EcogridEndPointInterfaceTest endPointInfo = new EcogridEndPointInterfaceTest();
 	    DataPackage dataPackage = null;
 	    InputStream metadataInputStream;
-	    String documentURL = TEST_SERVER + "?action=read&qformat=xml&docid="
-	        + TEST_DOCUMENT;
+	    String documentURL = TEST_SERVER + TEST_DOCUMENT;
 	    URL url;
 
 	    /*
@@ -318,7 +315,7 @@ public class DatabaseHandlerTest extends TestCase {
 		  result.close();
 		  statement.close();
 		  connectionPool.returnConnection(connection);
-		  assertTrue (col1==1);
+		  assertTrue (col1==0.0);
 	      boolean successDrop = databaseHandler.dropTable(entity);
 	      assertTrue("Couldn't drop table, but it shoud be sucessful", successDrop);
 	    }
