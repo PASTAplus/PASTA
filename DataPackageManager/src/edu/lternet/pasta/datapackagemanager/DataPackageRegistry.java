@@ -1036,6 +1036,58 @@ public class DataPackageRegistry {
     
   }
 
+  
+	/**
+	 * Gets the package ID from the DOI value.
+	 * 
+	 * @param doi
+	 *                the DOI value
+	 * @return the package identifier, or null if none was found
+	 */
+	public String getPackageIdFromDoi(String doi) 
+			throws ClassNotFoundException, SQLException {
+
+		String packageId = null;
+		String doiValue = doi;
+
+		if (doiValue != null && !doiValue.startsWith("doi:")) {
+			doiValue = "doi:" + doiValue;
+		}
+
+		Connection connection = null;
+		String selectString = 
+				"SELECT package_id FROM " + RESOURCE_REGISTRY + 
+				"  WHERE doi='" + doiValue + "'";
+		logger.debug("selectString: " + selectString);
+
+		Statement stmt = null;
+
+		try {
+			connection = getConnection();
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(selectString);
+
+			while (rs.next()) {
+				packageId = rs.getString(1);
+			}
+
+			if (stmt != null)
+				stmt.close();
+		} catch (ClassNotFoundException e) {
+			logger.error("ClassNotFoundException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} catch (SQLException e) {
+			logger.error("SQLException: " + e.getMessage());
+			e.printStackTrace();
+			throw (e);
+		} finally {
+			returnConnection(connection);
+		}
+
+		return packageId;
+	}
+
 
 	/**
 	 * Gets the format type value for a given resourceId.

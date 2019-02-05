@@ -5007,188 +5007,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
 	/**
-	 * 
-	 * <strong>Read Data Entity DOI</strong> operation, specifying the scope,
-	 * identifier, and revision of the data entity DOI to be read in the URI,
-	 * returning the canonical Digital Object Identifier.
-	 * 
-	 * <h4>Requests:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Request</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>none</td>
-	 * <td align=center>none</td>
-	 * <td><code>curl -i -X GET
-	 * https://pasta.lternet.edu/package/data/doi/eml/knb-lter-lno/1/3/67e99349d1666e6f4955e9dda42c3cc2</code>
-	 * </td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * <h4>Responses:</h4>
-	 * <table border="1" cellspacing="0" cellpadding="3">
-	 * <tr>
-	 * <th><b>Status</b></th>
-	 * <th><b>Reason</b></th>
-	 * <th><b>Message Body</b></th>
-	 * <th><b>MIME type</b></th>
-	 * <th><b>Sample Message Body</b></th>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>200 OK</td>
-	 * <td align=center>The request to read the data entity DOI was successful</td>
-	 * <td align=center>The canonical Digital Object Identifier of the data
-	 * entity.</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td><code>doi:10.6073/pasta/7a39bd7694dc0473a6ae7a7d7520ff2e</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>400 Bad Request</td>
-	 * <td align=center>The request contains an error, such as an illegal
-	 * identifier or revision value</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>401 Unauthorized</td>
-	 * <td align=center>The requesting user is not authorized to read the data
-	 * entity</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>404 Not Found</td>
-	 * <td align=center>No DOI associated with the specified data entity is
-	 * found</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>405 Method Not Allowed</td>
-	 * <td align=center>The specified HTTP method is not allowed for the
-	 * requested resource</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * <tr>
-	 * <td align=center>500 Internal Server Error</td>
-	 * <td align=center>The server encountered an unexpected condition which
-	 * prevented it from fulfilling the request</td>
-	 * <td align=center>An error message</td>
-	 * <td align=center><code>text/plain</code></td>
-	 * <td align=center><code>Error message</code></td>
-	 * </tr>
-	 * </table>
-	 * 
-	 * @param scope
-	 *            The scope of the data package
-	 * @param identifier
-	 *            The identifier of the data package
-	 * @param revision
-	 *            The revision of the data package
-	 * @param entityId
-	 *            The entity identifier
-	 * @return a Response object containing a data entity DOI if found, else
-	 *         returns a 404 Not Found response
-	 *
-
-	@GET
-	@Path("/data/doi/eml/{scope}/{identifier}/{revision}/{entityId}")
-	@Produces("text/plain")
-	public Response readDataEntityDoi(@Context HttpHeaders headers,
-			@PathParam("scope") String scope,
-			@PathParam("identifier") Integer identifier,
-			@PathParam("revision") String revision,
-			@PathParam("entityId") String entityId) {
-		AuthToken authToken = null;
-		String doi = null;
-		String entryText = null;
-		String resourceId = null;
-		ResponseBuilder responseBuilder = null;
-		Response response = null;
-		final String serviceMethodName = "readDataEntityDoi";
-		Rule.Permission permission = Rule.Permission.read;
-
-		try {
-			authToken = getAuthToken(headers);
-			String userId = authToken.getUserId();
-
-			// Is user authorized to run the service method?
-			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-					serviceMethodName, permission, authToken);
-			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException("User " + userId
-						+ " is not authorized to execute service method "
-						+ serviceMethodName);
-			}
-
-			resourceId = DataPackageManager.composeResourceId(
-					ResourceType.data, scope, identifier,
-					Integer.valueOf(revision), entityId);
-
-			DataPackageManager dataPackageManager = new DataPackageManager();
-			doi = dataPackageManager.readResourceDoi(resourceId, authToken);
-
-			if (doi != null) {
-				responseBuilder = Response.ok(doi);
-				response = responseBuilder.build();
-				entryText = doi;
-			}
-			else {
-				Exception e = new Exception(
-						"Read resource DOI operation failed for unknown reason");
-				throw (e);
-			}
-
-		}
-		catch (IllegalArgumentException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeBadRequest(e).getResponse();
-		}
-		catch (UnauthorizedException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-		}
-		catch (ResourceNotFoundException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeNotFound(e).getResponse();
-		}
-		catch (ResourceDeletedException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeConflict(e).getResponse();
-		}
-		catch (ResourceExistsException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeConflict(e).getResponse();
-		}
-		catch (UserErrorException e) {
-			entryText = e.getMessage();
-			response = WebResponseFactory.makeBadRequest(e);
-		}
-		catch (Exception e) {
-			entryText = e.getMessage();
-			WebApplicationException webApplicationException = WebExceptionFactory
-					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-							e.getMessage());
-			response = webApplicationException.getResponse();
-		}
-
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
-
-		response = stampHeader(response);
-		return response;
-	}
-	*/
-
-
-	/**
 	 * <strong>Read Data Entity Name</strong> operation, specifying the scope,
 	 * identifier, revision, and entity identifier of the data entity whose name
 	 * is to be read in the URI.
@@ -6686,6 +6504,207 @@ public class DataPackageManagerResource extends PastaWebService {
 		response = stampHeader(response);
 		return response;
 
+	}
+
+
+	/**
+	 * <strong>Read Data Package From DOI</strong> operation, specifying the
+	 * DOI of the data package to be read in the URI, returning a resource graph 
+	 * with reference URLs to each of the metadata, data, and quality report 
+	 * resources that comprise the data package.
+	 * 
+	 * <p>
+	 * The doi is specified in a query parameter, for example:
+	 * <pre>
+	 *   <code>doi=doi:10.5072/FK2/6a802085339299736d2a9eec4877029e</code>
+	 * </pre>
+	 * </p>
+	 * 
+	 * <p>
+	 * When the "ore" query parameter is appended to the request URL, an OAI-ORE 
+	 * compliant resource map in RDF-XML format is returned, for example:
+	 * <pre>
+	 *   <code>doi=doi:10.5072/FK2/6a802085339299736d2a9eec4877029e&ore</code>
+	 * </pre>
+	 * </p>
+	 * 
+	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/doi/eml?doi=doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * <h4>Responses:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request to read the data package was successful</td>
+	 * <td align=center>A resource map with reference URLs to each of the
+	 * metadata, data, and quality report resources that comprise the data
+	 * package.</td>
+	 * <td align=center><code>'text/plain'</code></td>
+	 * <td>
+	 * 
+	 * <pre>
+	 * https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/1/67e99349d1666e6f4955e9dda42c3cc2
+	 * https://pasta.lternet.edu/package/metadata/eml/knb-lter-lno/1/1
+	 * https://pasta.lternet.edu/package/report/eml/knb-lter-lno/1/1
+	 * https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1
+	 * </pre>
+	 * 
+	 * </td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>400 Bad Request</td>
+	 * <td align=center>The request contains an error, such as a missing 'doi' query parameter</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to read the data
+	 * package</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>404 Not Found</td>
+	 * <td align=center>No data package associated with the specified DOI value
+	 * is found</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the
+	 * requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>500 Internal Server Error</td>
+	 * <td align=center>The server encountered an unexpected condition which
+	 * prevented it from fulfilling the request</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @return a Response object containing a data package resource graph if
+	 *         found, else returns a 404 Not Found response
+	 */
+	@GET
+	@Path("/doi/eml")
+	@Produces({ "application/rdf+xml", "text/plain" })
+	public Response readDataPackageFromDoi(@Context HttpHeaders headers,
+			@QueryParam("doi") String doi,
+			@QueryParam("ore") String oreParam) {
+		AuthToken authToken = null;
+		String resourceMap = null;
+		String entryText = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "readDataPackageFromDoi";
+		Rule.Permission permission = Rule.Permission.read;
+		String robot = null;
+		String userAgent = null;
+		boolean oreFormat = (oreParam != null);
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+			robot = getRobot(headers);
+			userAgent = getUserAgent(headers);
+
+			// Is user authorized to run the service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+			
+			if (doi == null) {
+				String msg = "Missing 'doi' query parameter";
+				throw new UserErrorException(msg);
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			resourceMap = dataPackageManager.readDataPackageFromDoi(doi,
+					authToken, userId, oreFormat);
+
+			if (resourceMap != null) {
+				String mediaType = oreFormat ? "application/rdf+xml" : MediaType.TEXT_PLAIN;
+				responseBuilder = Response.ok(resourceMap, mediaType);
+				response = responseBuilder.build();
+			}
+			else {
+				String msg = String.format("No data package found for DOI %s", 
+						                   doi);
+				throw new ResourceNotFoundException(msg);
+			}
+		}
+		catch (IllegalArgumentException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ResourceNotFoundException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		}
+		catch (ResourceDeletedException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (ResourceExistsException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeConflict(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText = e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText = e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		String resourceId = resourceIdFromResourceMap(resourceMap);
+		audit(serviceMethodName, authToken, response, resourceId, entryText, 
+				robot, userAgent);
+
+		response = stampHeader(response);
+		return response;
 	}
 
 

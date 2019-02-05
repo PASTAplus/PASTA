@@ -87,6 +87,7 @@ datapackagemanager.auditmanager.host=audit.lternet.edu
 datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=LTER,dc=ecoinformatics,dc=org
 datapackagemanager.metadatacatalog.solrUrl=http://solr.lternet.edu:8983/solr
 datapackagemanager.pastaUriHead=https://pasta.lternet.edu/package/
+datapackagemanager.test.doi=doi:10.6073/pasta/3bcc89b2d1a410b7a2c678e3c55055e1
 datapackagemanager.test.emlFileName=NoneSuchBugCount.xml
 datapackagemanager.test.path=test/data
 datapackagemanager.test.scope=knb-lter-nwk

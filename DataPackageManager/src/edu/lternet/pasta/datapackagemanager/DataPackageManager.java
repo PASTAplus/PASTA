@@ -2417,6 +2417,49 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 	
 	
+	
+	/**
+	 * Reads a data package based on its DOI and returns it as a string 
+	 * representing a resource map. The specified user must be authorized to 
+	 * read the data package resource.
+	 * 
+	 * @param doi
+	 *          The data package DOI value
+	 * @param authToken
+	 * 			The authorization token
+	 * @param user
+	 *          The user name
+	 * @param oreFormat
+	 *          If true, return the resource map in ORE formatted
+	 *          as application/rdf+xml
+	 */
+	public String readDataPackageFromDoi(String doi, AuthToken authToken, 
+	                              String user, boolean oreFormat)
+			throws Exception {
+		String resourceMapStr = null;
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
+			    dbURL, dbUser, dbPassword);
+		String packageId = dataPackageRegistry.getPackageIdFromDoi(doi);
+		
+		if (packageId != null) {
+			EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
+			EmlPackageId emlPackageId = emlPackageIdFormat.parse(packageId);
+			
+			if (emlPackageId != null) {
+				String scope = emlPackageId.getScope();
+				Integer identifier = emlPackageId.getIdentifier();
+				Integer revision = emlPackageId.getRevision();
+				String revisionStr = revision.toString();
+		
+				resourceMapStr = readDataPackage(scope, identifier, revisionStr,
+				                         authToken, user, oreFormat);
+			}
+		}
+		
+		return resourceMapStr;
+	}
+	
+	
 	/**
 	 * Reads a data package and returns it as a string representing a resource
 	 * map. The specified user must be authorized to read the data package
