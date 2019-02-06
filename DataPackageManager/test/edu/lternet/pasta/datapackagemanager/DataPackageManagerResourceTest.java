@@ -597,9 +597,16 @@ public class DataPackageManagerResourceTest {
   @Test
   public void testReadDataPackageFromDoi() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+    String[] doiParts = testDoi.split("/");
+    
+    assertEquals(doiParts.length, 3);
+    
+    String shoulder = doiParts[0];
+    String pasta = doiParts[1];
+    String md5 = doiParts[2];
     
     // Test READ for OK status
-    Response response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, testDoi, null);
+    Response response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, shoulder, pasta, md5, null);
     int statusCode = response.getStatus();
     assertEquals(200, statusCode);
     
@@ -615,12 +622,11 @@ public class DataPackageManagerResourceTest {
     }
 
     // Test for BAD REQUEST status with a null DOI value.
-    response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, null, null);
+    response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, null, null, null, null);
     assertEquals(400, response.getStatus());
 
     // Test for NOT FOUND status with a bogus DOI value.
-    String bogusTestDoi = testDoi.replace('1', '2');
-    response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, bogusTestDoi, null);
+    response = dataPackageManagerResource.readDataPackageFromDoi(httpHeaders, "a", "b", "c", null);
     assertEquals(404, response.getStatus());
   }
     

@@ -6514,17 +6514,10 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * resources that comprise the data package.
 	 * 
 	 * <p>
-	 * The doi is specified in a query parameter, for example:
-	 * <pre>
-	 *   <code>doi=doi:10.5072/FK2/6a802085339299736d2a9eec4877029e</code>
-	 * </pre>
-	 * </p>
-	 * 
-	 * <p>
 	 * When the "ore" query parameter is appended to the request URL, an OAI-ORE 
 	 * compliant resource map in RDF-XML format is returned, for example:
 	 * <pre>
-	 *   <code>doi=doi:10.5072/FK2/6a802085339299736d2a9eec4877029e&ore</code>
+	 * <code>https://pasta.lternet.edu/package/doi/doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961?ore</code>
 	 * </pre>
 	 * </p>
 	 * 
@@ -6539,7 +6532,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td align=center>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/doi/eml?doi=doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961</code>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/doi/doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961</code>
 	 * </td>
 	 * </tr>
 	 * </table>
@@ -6612,15 +6605,28 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * </table>
 	 * 
+	 * @param shoulder
+	 *            The DOI shoulder, including the 'doi:' protocol,
+	 *            for example: "doi:10.6073". If the "doi:" protocol is left
+	 *            off, the code will prepend it as a convenience to the user.
+	 * @param pasta
+	 *            Ususally the literal string "pasta", but also be "FK2"
+	 *            for test DOIs.
+	 * @param md5
+	 *            The portion of the PASTA DOI that equates to an MD5 value.
+	 *            For example: "0675d3602ff57f24838ca8d14d7f3961"
 	 * @return a Response object containing a data package resource graph if
 	 *         found, else returns a 404 Not Found response
 	 */
 	@GET
-	@Path("/doi/eml")
+	@Path("/doi/{shoulder}/{pasta}/{md5}")
 	@Produces({ "application/rdf+xml", "text/plain" })
 	public Response readDataPackageFromDoi(@Context HttpHeaders headers,
-			@QueryParam("doi") String doi,
+			@PathParam("shoulder") String shoulder,
+			@PathParam("pasta") String pasta,
+			@PathParam("md5") String md5,
 			@QueryParam("ore") String oreParam) {
+		String doi = null;
 		AuthToken authToken = null;
 		String resourceMap = null;
 		String entryText = null;
@@ -6646,9 +6652,17 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ " is not authorized to execute service method "
 						+ serviceMethodName);
 			}
-			
-			if (doi == null) {
-				String msg = "Missing 'doi' query parameter";
+
+			if (shoulder != null && !shoulder.isEmpty()) {
+				if (!shoulder.startsWith("doi:")) {
+					doi = String.format("doi:%s/%s/%s", shoulder, pasta, md5);
+				}
+				else {
+					doi = String.format("%s/%s/%s", shoulder, pasta, md5);
+				}
+			}
+			else {
+				String msg = "Missing DOI shoulder value";
 				throw new UserErrorException(msg);
 			}
 
