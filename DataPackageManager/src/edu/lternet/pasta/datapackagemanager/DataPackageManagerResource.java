@@ -6171,7 +6171,7 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <td align=center>none</td>
 	 * <td align=center>none</td>
 	 * <td align=center>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/archive/eml/1364521882823</code>
+	 * <code>curl -s -X GET https://pasta.lternet.edu/package/archive/eml/knb-lter-nin/1/1/archive_knb-lter-nin.1.1_15494687022457218 > knb-lter-nin.1.1.zip</code>
 	 * </td>
 	 * </tr>
 	 * </table>
