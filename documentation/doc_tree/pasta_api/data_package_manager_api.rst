@@ -867,6 +867,43 @@ Examples
      </rdf:RDF>
 
 
+*Read Data Package From DOI*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+
+Read Data Package From DOI operation, specifying the DOI of the data package to 
+be read in the URI, returning a resource map with reference URLs to each of the metadata, data, 
+and quality report resources that comprise the data package.
+
+The DOI is specified in the "shoulder", "pasta", and "md5" path segments of the URI (see example below).
+
+When the "?ore" query parameter is appended to the request URL, an OAI-ORE compliant resource map in RDF-XML format is returned.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/package/doi/{shoulder}/{pasta}/{md5} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/doi/{shoulder}/{pasta}/{md5}>`_
+
+Examples
+""""""""
+
+1. Using :command:`curl` to read a data package resource map by specifying the DOI
+as three path segments in the URL::
+
+     curl -X GET https://pasta.lternet.edu/package/doi/doi:10.6073/pasta/0675d3602ff57f24838ca8d14d7f3961
+
+     https://pasta.lternet.edu/package/data/eml/knb-lter-nin/1/1/67e99349d1666e6f4955e9dda42c3cc2
+     https://pasta.lternet.edu/package/metadata/eml/knb-lter-nin/1/1
+     https://pasta.lternet.edu/package/report/eml/knb-lter-nin/1/1
+     https://pasta.lternet.edu/package/eml/knb-lter-nin/1/1
+     
+     The three path segments of the DOI are separated by forward slashes. In the above example, they are:
+     a. shoulder value, in this example, "doi:10.6073". (For test DOIs, the shoulder is "doi:10.5072".)
+     b. pasta literal, in this example, "pasta". (For test DOIs, the pasta literal is "FK2".)
+     c. md5 value, in this example, "0675d3602ff57f24838ca8d14d7f3961". Each data package has a unique md5 value.
+
 *Read Data Package ACL*
 ^^^^^^^^^^^^^^^^^^^^^^^
 
