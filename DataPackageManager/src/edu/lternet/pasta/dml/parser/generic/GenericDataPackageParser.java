@@ -122,21 +122,16 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     protected String datasetAbstractPath = null;
     protected String entityAccessPath = null;
     protected String entityPhysicalAuthenticationPath = null;
+    protected String entityPhysicalSizePath = null;
     protected String alternateIdentifierPath = null;
     
-    //private Hashtable entityHash = new Hashtable();
-    //private Hashtable fileHash = new Hashtable();
     private int numEntities = 0;
-    //private int numRecords = -1;
     private Entity entityObject = null;
-    //private DataTypeResolver dtr = DataTypeResolver.instanceOf();
     private int elementId = 0;
-    //private boolean hasImageEntity = false;
     private int numberOfComplexFormats = 0;
     // Associates attributeList id values with attributeList objects
     private Hashtable<String, AttributeList> attributeListIdHash = 
                                      new Hashtable<String, AttributeList>();
-    //private boolean hasMissingValue = false;
     private DataPackage emlDataPackage = null;
     private final String DEFAULT_RECORD_DELIMITER = "\\r\\n";
     
@@ -166,62 +161,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 
     
     /**
-     * Constructor that accepts xpath input strings 
-     * for many more datapackage element locations
-	 * @param packageIdPath
-	 * @param pubDatePath
-	 * @param dataTableEntityPath
-	 * @param spatialRasterEntityPath
-	 * @param spatialVectorEntityPath
-	 * @param storedProcedureEntityPath
-	 * @param viewEntityPath
-	 * @param otherEntityPath
-	 */
-	public GenericDataPackageParser(String packageIdPath, String pubDatePath, 
-			String dataTableEntityPath,
-			String spatialRasterEntityPath, String spatialVectorEntityPath,
-			String storedProcedureEntityPath, String viewEntityPath,
-			String otherEntityPath, String entityPhysicalAuthenticationPath,
-			String fundingPath) {
-		
-		//set default so that caller can pass nulls for some params
-		this.initDefaultXPaths();
-		
-		//set the paths that are provided (not null)
-		if (packageIdPath != null) {
-			this.packageIdPath = packageIdPath;
-		}
-		if (pubDatePath != null) {
-			this.pubDatePath = pubDatePath;
-		}
-        if (fundingPath != null) {
-            this.fundingPath = fundingPath;
-        }
-		if (dataTableEntityPath != null) {
-			this.dataTableEntityPath = dataTableEntityPath;
-		}
-		if (spatialRasterEntityPath != null) {	
-			this.spatialRasterEntityPath = spatialRasterEntityPath;
-		}
-		if (spatialVectorEntityPath != null) {	
-			this.spatialVectorEntityPath = spatialVectorEntityPath;
-		}
-		if (storedProcedureEntityPath != null) {	
-			this.storedProcedureEntityPath = storedProcedureEntityPath;
-		}
-		if (viewEntityPath != null) {	
-			this.viewEntityPath = viewEntityPath;
-		}
-		if (otherEntityPath != null) {	
-			this.otherEntityPath = otherEntityPath;
-		}	
-		if (entityPhysicalAuthenticationPath != null) {	
-			this.entityPhysicalAuthenticationPath = entityPhysicalAuthenticationPath;
-		}	
-	}
-
-	
-	/**
 	 * sets the default xpath strings for locating data package elements
 	 * note that root element can be anything with a packageId attribute
 	 */
@@ -241,6 +180,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		datasetAbstractPath = "//dataset/abstract";
 		entityAccessPath = "physical/distribution/access";
 		entityPhysicalAuthenticationPath = "physical/authentication";
+		entityPhysicalSizePath = "physical/size";
 		alternateIdentifierPath = "//dataset/alternateIdentifier";
 		fundingPath = "//dataset/project/funding";
 	}
@@ -481,16 +421,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     }
 
     
-    /**
-     * Returns a hashtable of entity names hashed to the entity description
-     * metadata that goes with each entity.
-     */
-    /*public Hashtable getEntityHash()
-    {
-        return entityHash;
-    }*/
-    
-    
     /* (non-Javadoc)
 	 * @see edu.lternet.pasta.dml.parser.generic.GenericDatasetParserInterface#getDataPackage()
 	 */
@@ -499,69 +429,6 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     	return emlDataPackage;
     }
 
-    
-    /**
-     * Gets the number of records in this dataItem.
-     *
-     * @param   entityId the id of the entity object to get the record count for
-     * @return  the number of records in the entity object
-     */
-    /*public int getRecordCount(String entityId)
-    {
-        return ((Entity) entityHash.get(entityId)).getNumRecords();
-    }*/
-
-    
-    /**
-     * Gets the total number of entities in the data item collection that was
-     * passed to this class when the object was created.
-     * 
-     * @return  the number of entities in the data item collection
-     */
-    /*public int getEntityCount()
-    {
-        return numEntities;
-    }*/
-
-    
-    /**
-     * Gets the number of attributes in the given entity.
-     *
-     * @param  entityId the id of the entity object that you want the attribute
-     *         count for
-     * @return the number of attributes in the entity
-     */
-    /*public int getAttributeCount(String entityId)
-    {
-        Attribute[] attArray = ((Entity) entityHash.get(entityId))
-                        .getAttributes();
-        return attArray.length;
-    }*/
-    
-    
-    /**
-     * Boolean to determine whether the entity has a missing value declaration.
-     * 
-     * @return value of hasMissingValue, a boolean
-     */
-    /*public boolean hasMissingValue()
-    {
-    	return hasMissingValue;
-    }*/
-    
-    
-    /**
-     * Method to get the boolean hasImageEntity. If the eml document has
-     * SpatialRaster or SpatialVector entity, this variable should be true.
-     * 
-     * @return boolean, the value of the hasImageEntity field
-     */
-    /*public boolean getHasImageEntity()
-    {
-      return this.hasImageEntity;
-      
-    }*/
-    
     
     /*
      * Parses the "xmlns:eml" attribute value from the
@@ -1240,6 +1107,8 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             boolean isSimpleDelimited = true;
             boolean isTextFixed = false;
             boolean isCollapseDelimiters = false;
+            String sizeString = null;
+            String unitString = null;
             HashMap<String,String> integrityMap = new HashMap<String,String>();
 
             if (xpath != null) {
@@ -1517,6 +1386,24 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         	   
            }
            
+           // Store the entity access XML since some applications may need it
+           Node entityPhysicalSizeNode = xpathapi.selectSingleNode(
+                                              entityNode, 
+                                              entityPhysicalSizePath);
+           if (entityPhysicalSizeNode != null) {
+               sizeString = entityPhysicalSizeNode.getTextContent();
+    		   NamedNodeMap sizeAttributes = entityPhysicalSizeNode.getAttributes();
+    		   int nAttributes = sizeAttributes.getLength();
+    		   for (int k = 0; k < nAttributes; k++) {
+    			   Node attributeNode = sizeAttributes.item(k);
+    			   String nodeName = attributeNode.getNodeName();
+    			   if (nodeName.equals("unit")) {
+    				   unitString = attributeNode.getNodeValue();
+    			   }
+    		   }
+               
+           }
+           
            NodeList onlineNodeList = xpathapi.selectNodeList(
                                               entityNode,
                                               "physical/distribution/online");
@@ -1694,6 +1581,15 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           entityObject.setMetadataRecordDelimiter(metadataRecordDelimiter);        
           entityObject.setHasNumberOfRecords(hasNumberOfRecords);
           entityObject.setHasPhysicalAuthentication(hasPhysicalAuthentication);
+          
+          if (sizeString != null) { 
+        	  entityObject.setPhysicalSize(sizeString);
+          }
+          
+          if (unitString != null) {
+        	  entityObject.setPhysicalSizeUnit(unitString);
+          }
+          entityObject.checkEntitySizePresence();
           
           /*
            * If any physical/authentication nodes were parsed, store the

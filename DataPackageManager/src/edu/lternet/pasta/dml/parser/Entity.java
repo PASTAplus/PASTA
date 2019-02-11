@@ -148,6 +148,9 @@ public class Entity extends DataObjectDescription
     private String sha1HashValue = null;
     private StringBuffer headerBuffer = new StringBuffer();
     
+    private String physicalSize = null;
+    private String physicalSizeUnit = null;
+    
     /* 
      * Constructors 
      */
@@ -822,6 +825,52 @@ public class Entity extends DataObjectDescription
 
 
 	/**
+	 * Do a quality check for the presence of a size element in this entity.
+	 */
+	public void checkEntitySizePresence() {
+		String qualityCheckIdentifier = "entitySizePresence";
+		QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			String physicalSize = this.getPhysicalSize();
+			Boolean hasPhysicalSize = (physicalSize != null) && 
+					                  !physicalSize.isEmpty();
+			String physicalSizeUnit = this.getPhysicalSizeUnit();
+			Boolean isValid = new Boolean(false);
+			if (hasPhysicalSize) {
+				isValid = true;
+			}
+			if (isValid) {
+				String foundMsg = String.format(
+					"Found entity size element with value of %s ",
+					physicalSize);
+				if (physicalSizeUnit != null && !physicalSizeUnit.isEmpty()) {
+					foundMsg += "and size unit specified as '" + 
+				                physicalSizeUnit + "'.";
+					if (!physicalSizeUnit.equals("byte")) {
+						foundMsg += 
+						" Please note that a size element specified with a unit" +
+						" other than 'byte' will not be tested for congruence.";
+					}
+				}
+				else {
+					foundMsg += "with no unit specified (defaults to 'byte').";
+				}
+				qualityCheck.setFound(foundMsg);
+				qualityCheck.setStatus(Status.valid);
+			} 
+			else {
+				qualityCheck.setFound("No entity size value was found.");
+				qualityCheck.setFailedStatus();
+			}
+
+			addQualityCheck(qualityCheck);
+		}
+	}   
+	
+	
+	/**
 	 * Do a quality check for the presence of a least one
 	 * physical/authentication element in this entity that
 	 * specifies a method attribute with a value of MD5
@@ -1298,6 +1347,30 @@ public class Entity extends DataObjectDescription
     public Constraint getPrimaryKey()
     {
       return null;
+    }
+    
+    
+    /**
+     * Gets the physical size string value that was found 
+     * in the metadata (if any).
+     * 
+     * @return physicalSize The physicalSize string
+     */
+    public String getPhysicalSize()
+    {
+        return this.physicalSize;
+    }
+    
+    
+    /**
+     * Gets the physical size unit string value that was found 
+     * in the metadata (if any).
+     * 
+     * @return physicalSizeUnit The physicalSizeUnit string
+     */
+    public String getPhysicalSizeUnit()
+    {
+        return this.physicalSizeUnit;
     }
     
     
@@ -1920,6 +1993,30 @@ public class Entity extends DataObjectDescription
     public void setPhysicalLineDelimiter(String physicalLineDelimiter)
     {
         this.physicalLineDelimiter = physicalLineDelimiter;
+    }
+    
+    
+    /**
+     * Sets the physical size string value that was found 
+     * in the metadata.
+     * 
+     * @param physicalSize The physicalSize string to set.
+     */
+    public void setPhysicalSize(String physicalSize)
+    {
+        this.physicalSize = physicalSize;
+    }
+    
+    
+    /**
+     * Sets the physical size unit string value that was found 
+     * in the metadata.
+     * 
+     * @param physicalSizeUnit The physicalSizeUnit string to set.
+     */
+    public void setPhysicalSizeUnit(String physicalSizeUnit)
+    {
+        this.physicalSizeUnit = physicalSizeUnit;
     }
     
     
