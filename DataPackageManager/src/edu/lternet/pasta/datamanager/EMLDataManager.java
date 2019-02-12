@@ -576,7 +576,11 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		  catch (IOException e) {
 			  logger.warn("Unable to determine SHA-1from entityfile: " + e.getMessage());
 		  }
+		  
+		  long fileSize = entityFile.length();
+		  entity.setFileSize(fileSize);
 	  }
+	  
 	}
 
 	

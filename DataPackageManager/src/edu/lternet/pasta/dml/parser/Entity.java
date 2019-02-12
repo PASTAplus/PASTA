@@ -150,6 +150,7 @@ public class Entity extends DataObjectDescription
     
     private String physicalSize = null;
     private String physicalSizeUnit = null;
+    private Long fileSize = null;
     
     /* 
      * Constructors 
@@ -824,6 +825,66 @@ public class Entity extends DataObjectDescription
     }
 
 
+    /**
+     * Do a quality check matching the congruency of an actual entity size
+     * (in bytes) to the value (if any) documented in the metadata.
+     * 
+     */
+	public void checkEntitySize(Long actualSize) {
+		String qualityCheckIdentifier = "entitySizeCongruence";
+		QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(qualityCheckIdentifier);
+		QualityCheck qualityCheck = new QualityCheck(qualityCheckIdentifier, qualityCheckTemplate);
+
+		if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
+			Long fileSize = getDocumentedSize();
+			if (fileSize != null) {
+				boolean congruent = false;
+
+				qualityCheck.setExpected(fileSize.toString());
+				qualityCheck.setFound(actualSize.toString());
+				if (actualSize.equals(fileSize)) {
+					congruent = true;
+				}
+
+				if (congruent) {
+					qualityCheck.setStatus(Status.valid);
+				} 
+				else {
+					qualityCheck.setExplanation(qualityCheck.getExplanation());
+					qualityCheck.setSuggestion(qualityCheck.getSuggestion());
+					qualityCheck.setFailedStatus();
+				}
+
+				addQualityCheck(qualityCheck);
+			}
+		}
+	}
+	
+	
+	private Long getDocumentedSize() {
+		Long entitySize = null;
+		
+		String physicalSize = getPhysicalSize();
+		String physicalSizeUnit = getPhysicalSizeUnit();
+		
+		if (physicalSize != null) {
+			if (physicalSizeUnit == null ||
+				physicalSizeUnit.isEmpty() ||
+				physicalSizeUnit.equalsIgnoreCase("byte") ||
+				physicalSizeUnit.equalsIgnoreCase("bytes")) {
+				try {
+					entitySize = Long.parseLong(physicalSize);
+				}
+				catch (NumberFormatException e) {
+					; // Can't parse, so entitySize just remains null
+				}
+			}
+		}
+		
+		return entitySize;
+	}
+
+	
 	/**
 	 * Do a quality check for the presence of a size element in this entity.
 	 */
@@ -1289,6 +1350,30 @@ public class Entity extends DataObjectDescription
     public void setFileName(String fileName)
     {
       this.fileName = fileName;
+    }
+
+    
+    /**
+     * Gets the file size in bytes for this entity.
+     * 
+     * @return   the file size
+     */
+    public Long getFileSize()
+    {
+      return this.fileSize;
+    }
+    
+    
+    /**
+     * Sets the fileSize value for this entity.
+     * 
+     * @param fileSizse   The fileSize value to set
+     */
+   public void setFileSize(long size) {
+    	this.fileSize = new Long(size);
+    	
+    	// Check whether the file size is congruent with the metadata value
+    	checkEntitySize(size);
     }
 
     
