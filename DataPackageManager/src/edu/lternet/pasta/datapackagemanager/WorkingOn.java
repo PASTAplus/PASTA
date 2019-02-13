@@ -293,21 +293,26 @@ public class WorkingOn {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
-
+		
 		String updateSQL = "UPDATE datapackagemanager.WORKING_ON " + 
 		"SET end_date=? WHERE scope=? AND identifier=? AND revision=? AND interrupted=?";
 
 		Integer rowCount = null;
 
 		try {
-			PreparedStatement pstmt = conn.prepareStatement(updateSQL);
-	        pstmt.setTimestamp(1, ts);          // The field to be updated
-	        pstmt.setString(2, scope);          // Set WHERE scope value
-	        pstmt.setInt(3, identifier);        // Set WHERE identifier value
-	        pstmt.setInt(4, revision);          // Set WHERE revision value
-	        pstmt.setBoolean(5, false);         // Set WHERE interrupted value
-	        rowCount = pstmt.executeUpdate();
-	        pstmt.close();
+			if (conn != null) {
+				PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+				pstmt.setTimestamp(1, ts); // The field to be updated
+				pstmt.setString(2, scope); // Set WHERE scope value
+				pstmt.setInt(3, identifier); // Set WHERE identifier value
+				pstmt.setInt(4, revision); // Set WHERE revision value
+				pstmt.setBoolean(5, false); // Set WHERE interrupted value
+				rowCount = pstmt.executeUpdate();
+				pstmt.close();
+			}
+			else {
+				throw new SQLException("Unable to get database connection.");
+			}
 		} 
 		catch (SQLException e) {
 			logger.error(e.getMessage());
