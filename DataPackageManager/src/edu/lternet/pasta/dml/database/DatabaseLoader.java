@@ -520,7 +520,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
               else {
                   found = String.format("%s%s", 
                                         headerRowsBanner, 
-                                        QualityCheck.embedInCDATA(headerText));
+                                        headerText);
               }
               
               found += attributesBanner;
@@ -529,7 +529,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
                   attributeListStr = attributeList.prettyPrintAttributes();
               }
               found += attributeListStr;
-              
+              found = QualityCheck.embedInCDATA(found);
               headerRowAttributeNamesQualityCheck.setFound(found);
               headerRowAttributeNamesQualityCheck.setStatus(Status.info);
               entity.addQualityCheck(headerRowAttributeNamesQualityCheck);
