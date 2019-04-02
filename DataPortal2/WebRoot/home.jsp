@@ -129,15 +129,18 @@
       ]);
         
       var options = {
+        'title':'Data Package Growth',
         'width' :  400,
-        'height' : 250,
+        'height' : 350,
         hAxis: {
           title: 'Date'
         },
         vAxis: {
           title: 'Data Packages (Cumulative)'
         },
-        backgroundColor: '#f7f7f7'
+        colors: ['#a52714'],      
+        //backgroundColor: '#f7f7f7'  This matches the gray background
+        backgroundColor: '#ffffff'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
