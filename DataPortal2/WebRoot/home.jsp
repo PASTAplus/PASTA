@@ -78,7 +78,7 @@
             downtimeHTML = String.format("<em>Please Note: </em>%s",
                                          sb.toString());
         }
-    }
+    }   
 %>
 
 <!DOCTYPE html>
@@ -114,61 +114,35 @@
 <link href="bootstrap/css/bootstrap-responsive.css" media="screen" rel="stylesheet" type="text/css">
 
 <!-- Google Chart for NIS Data Package and Site Growth -->
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-	// Load the Visualization API and the piechart package.
-	google.load('visualization', '1.0', {
-		'packages' : [ 'corechart' ]
-	});
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawChart);
 
-	// Set a callback to run when the Google Visualization API is loaded.
-	google.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', 'Site-Contributed Data Packages');
 
-	// Callback that creates and populates a data table,
-	// instantiates the pie chart, passes in the data and
-	// draws it.
-	function drawChart() {
+      data.addRows([
+          <%=googleChartJson%>
+      ]);
+        
+      var options = {
+        'width' :  400,
+        'height' : 250,
+        hAxis: {
+          title: 'Date'
+        },
+        vAxis: {
+          title: 'Data Packages (Cumulative)'
+        },
+        backgroundColor: '#f7f7f7'
+      };
 
-		// Create the data table.
-		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Month');
-		data.addColumn('number', 'Packages');
-		data.addColumn('number', 'Sites');
-		data.addRows([
-            <%=googleChartJson%>
-		]);
-
-		// Set chart options
-		var options = {
-			'title' : 'Site/Data Package Growth',
-			'width' :  400,
-			'height' : 250,
-
-			'vAxes' : {
-				0 : {
-					logScale : false
-				},
-				1 : {
-					logScale : false,
-					maxValue : 27
-				}
-			},
-			'series' : {
-				0 : {
-					targetAxisIndex : 0,
-                    type : "line"
-				},
-				1 : {
-					targetAxisIndex : 1
-				}
-			}
-		};
-
-		// Instantiate and draw our chart, passing in some options.
-		var chart = new google.visualization.ColumnChart(document
-				.getElementById('chart_div'));
-		chart.draw(data, options);
-	}
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
 </script>
 
 </head>
@@ -234,9 +208,9 @@
 					<div class="row-fluid">
 						<div class="row-fluid">
 								    <div id="chart_div"></div>
-								    <p id="nis-growth">Site contributed data packages: <b><%= numDataPackagesSites %></b><br />
-									     Total data packages: <b><%= numDataPackages %></b>
-								    </p>
+<p id="nis-growth">Site contributed data packages: <b><%= numDataPackagesSites %></b><br />
+Total data packages: <b><%= numDataPackages %></b></p>
+
 						</div>
 					</div>
 				</div>
@@ -244,7 +218,7 @@
 		</div>
 	</div>
         
-		<jsp:include page="footer.jsp" />
+<jsp:include page="footer.jsp" />
 		
 </div>
 

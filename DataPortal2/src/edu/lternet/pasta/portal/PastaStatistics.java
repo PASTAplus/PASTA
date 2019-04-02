@@ -50,6 +50,7 @@ public class PastaStatistics {
 	private String uid = null;
 	private DataPackageManagerClient dpmClient = null;
 
+	
 	/*
 	 * Constructors
 	 */
@@ -63,17 +64,16 @@ public class PastaStatistics {
 	 */
 	public PastaStatistics(String uid) throws PastaAuthenticationException,
 	    PastaConfigurationException {
-
 		this.uid = uid;
-
 		this.dpmClient = new DataPackageManagerClient(uid);
-
 	}
 
+	
 	/*
 	 * Class methods
 	 */
 
+	
 	/*
 	 * Instance methods
 	 */
@@ -85,100 +85,82 @@ public class PastaStatistics {
 	 * @return The number of data packages.
 	 */
 	public Integer getNumDataPackages() {
-
 		Integer numDataPackages = 0;
 		String scopeList = null;
-		
-		try {
-	    scopeList = this.dpmClient.listDataPackageScopes();
-    } catch (Exception e) {
-	    logger.error("PastaStatistics: " + e.getMessage());
-	    e.printStackTrace();
-    }
-		
-    StrTokenizer scopes = new StrTokenizer(scopeList);
 
-    while (scopes.hasNext()) {
-    	String scope = scopes.nextToken();
-    	
-    	String idList = null;
-    	
-    	try {
-	      idList = this.dpmClient.listDataPackageIdentifiers(scope);
-      } catch (Exception e) {
-  	    logger.error("PastaStatistics: " + e.getMessage());
-	      e.printStackTrace();
-      }
-    	
-    	StrTokenizer identifiers = new StrTokenizer(idList);
-    	
-    	numDataPackages += identifiers.size();
-    	
-    }
+		try {
+			scopeList = this.dpmClient.listDataPackageScopes();
+		} catch (Exception e) {
+			logger.error("PastaStatistics: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		StrTokenizer scopes = new StrTokenizer(scopeList);
+
+		while (scopes.hasNext()) {
+			String scope = scopes.nextToken();
+
+			String idList = null;
+
+			try {
+				idList = this.dpmClient.listDataPackageIdentifiers(scope);
+			} catch (Exception e) {
+				logger.error("PastaStatistics: " + e.getMessage());
+				e.printStackTrace();
+			}
+
+			StrTokenizer identifiers = new StrTokenizer(idList);
+
+			numDataPackages += identifiers.size();
+		}
 
 		return numDataPackages;
-
 	}
-
+	
+	
 	/**
 	 * Iterates through the list of scopes and identifiers of site contributed
 	 * data packages to calculate the total number of site contributed data
-	 * packages in PASTA.
+	 * packages in PASTA (i.e., excludes EcoTrends and LTER Landsat data
+	 * packages).
 	 * 
 	 * @return The number of site contributed data packages.
 	 */
 	public Integer getNumDataPackagesSites() {
-
 		Integer numDataPackages = 0;
-		String[] scopeList =
-			{"knb-lter-and",
-			 "knb-lter-arc",
-			 "knb-lter-bes",
-			 "knb-lter-bnz",
-			 "knb-lter-cce",
-			 "knb-lter-cdr",
-			 "knb-lter-cap",
-			 "knb-lter-cwt",
-			 "knb-lter-fce",
-			 "knb-lter-gce",
-			 "knb-lter-hfr",
-			 "knb-lter-hbr",
-			 "knb-lter-jrn",
-			 "knb-lter-kbs",
-			 "knb-lter-knz",
-			 "knb-lter-luq",
-			 "knb-lter-mcm",
-			 "knb-lter-mcr",
-			 "knb-lter-nes",
-			 "knb-lter-nin",
-			 "knb-lter-nwt",
-			 "knb-lter-ntl",
-			 "knb-lter-pal",
-			 "knb-lter-pie",
-			 "knb-lter-sbc",
-			 "knb-lter-sev",
-			 "knb-lter-sgs",
-			 "knb-lter-vcr"};
-		
-    for (String scope: scopeList) {
-    	
-    	String idList = null;
-    	
-    	try {
-	      idList = this.dpmClient.listDataPackageIdentifiers(scope);
-      } catch (Exception e) {
-  	    logger.error("PastaStatistics: " + e.getMessage());
-	      e.printStackTrace();
-      }
-    	
-    	StrTokenizer identifiers = new StrTokenizer(idList);
-    	
-    	numDataPackages += identifiers.size();
-    	
-    }
+		String scopeList = null;
+
+		try {
+			scopeList = this.dpmClient.listDataPackageScopes();
+		} catch (Exception e) {
+			logger.error("PastaStatistics: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		StrTokenizer scopes = new StrTokenizer(scopeList);
+
+		while (scopes.hasNext()) {
+			String scope = scopes.nextToken();
+
+			if (!scope.equals("ecotrends") && 
+				!scope.startsWith("lter-landsat")
+			   ) {
+				String idList = null;
+
+				try {
+					idList = this.dpmClient.listDataPackageIdentifiers(scope);
+				} catch (Exception e) {
+					logger.error("PastaStatistics: " + e.getMessage());
+					e.printStackTrace();
+				}
+
+				StrTokenizer identifiers = new StrTokenizer(idList);
+
+				numDataPackages += identifiers.size();
+			}
+		}
 
 		return numDataPackages;
-
 	}
 	
 }
