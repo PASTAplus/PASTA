@@ -25,6 +25,7 @@
 package edu.lternet.pasta.portal;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -98,6 +99,11 @@ public class DynamicContentServlet extends HttpServlet {
 			se.initCause(e);
 			throw se;		
 		}
+        catch (SQLException e) {
+			ServletException se = new ServletException("SQL Exception");
+			se.initCause(e);
+			throw se;		
+        }
 
         GrowthStats gs = new GrowthStats();
         String googleChartJson = gs.getGoogleChartJson(new GregorianCalendar(), Calendar.MONTH);

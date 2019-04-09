@@ -20,11 +20,17 @@
 
 package edu.lternet.pasta.portal;
 
-import edu.lternet.pasta.client.DataPackageManagerClient;
 import edu.lternet.pasta.client.PastaAuthenticationException;
 import edu.lternet.pasta.client.PastaConfigurationException;
+import edu.lternet.pasta.portal.ConfigurationListener;
+import edu.lternet.pasta.portal.database.DatabaseClient;
 
-import org.apache.commons.lang3.text.StrTokenizer;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,15 +46,30 @@ public class PastaStatistics {
 	 * Class variables
 	 */
 
-	private static final Logger logger = Logger
-      .getLogger(edu.lternet.pasta.portal.PastaStatistics.class);
+	private static final Logger logger = 
+		Logger.getLogger(edu.lternet.pasta.portal.PastaStatistics.class);
+	
+	
+    private static final String RESOURCE_REGISTRY = "datapackagemanager.resource_registry";
+    
+	private static final String QUERY_CONTRIBUTED_UNIQUE = String.format(
+			"SELECT DISTINCT scope, identifier FROM %s WHERE resource_type='dataPackage' AND date_deactivated IS NULL AND scope != 'ecotrends' AND scope NOT LIKE 'lter-landsat%%'",
+			RESOURCE_REGISTRY);
+	private static final String QUERY_CONTRIBUTED_ALL = String.format(
+			"SELECT DISTINCT scope, identifier, revision FROM %s WHERE resource_type='dataPackage' AND date_deactivated IS NULL AND scope != 'ecotrends' AND scope NOT LIKE 'lter-landsat%%'",
+			RESOURCE_REGISTRY);
+	private static final String QUERY_TOTAL_UNIQUE = String.format(
+			"SELECT DISTINCT scope, identifier FROM %s WHERE resource_type='dataPackage' AND date_deactivated IS NULL",
+			RESOURCE_REGISTRY);
+	private static final String QUERY_TOTAL_ALL = String.format(
+			"SELECT DISTINCT scope, identifier, revision FROM %s WHERE resource_type='dataPackage' AND date_deactivated IS NULL",
+			RESOURCE_REGISTRY);
 
 	/*
 	 * Instance variables
 	 */
 
-	private String uid = null;
-	private DataPackageManagerClient dpmClient = null;
+	private DatabaseClient databaseClient = null;
 
 	
 	/*
@@ -62,10 +83,15 @@ public class PastaStatistics {
 	 * @throws PastaAuthenticationException
 	 * @throws PastaConfigurationException
 	 */
-	public PastaStatistics(String uid) throws PastaAuthenticationException,
-	    PastaConfigurationException {
-		this.uid = uid;
-		this.dpmClient = new DataPackageManagerClient(uid);
+	public PastaStatistics(String uid) 
+			throws PastaAuthenticationException, PastaConfigurationException {
+	    Configuration options = ConfigurationListener.getOptions();
+
+	    String dbDriver = options.getString("db.pkg.Driver");
+	    String dbUrl = options.getString("db.pkg.URL");
+	    String dbUser = options.getString("db.pkg.User");
+	    String dbPassword = options.getString("db.pkg.Password");
+		this.databaseClient = new DatabaseClient(dbDriver, dbUrl, dbUser, dbPassword);
 	}
 
 	
@@ -78,9 +104,34 @@ public class PastaStatistics {
 	 * Instance methods
 	 */
 	
+	private Integer countDataPackages(String sql) throws SQLException {
+		Integer packageCount = null;
+		Connection conn = databaseClient.getConnection();
+
+		if (conn != null) {
+			try {
+				Statement stmnt = conn.createStatement();
+				ResultSet rs = stmnt.executeQuery(sql);
+
+				int i = 0;
+				while (rs.next()) {
+					i++;
+				}
+				packageCount = new Integer(i);
+			} 
+			finally {
+				databaseClient.closeConnection(conn);
+			}
+		}
+
+		return packageCount;
+	}
+		 
+	
 	/**
 	 * Iterates through the list of scopes and identifiers to calculate
-	 * the number of data packages in PASTA.
+	 * the number of unique data packages in PASTA (i.e., doesn't count
+	 * multiple revisions of the same data package.)
 	 * 
 	 * @param includeEcotrendsAndLandsat  
 	 *          if true, include Ecotrends and Landsat data packages
@@ -88,42 +139,17 @@ public class PastaStatistics {
 	 * 
 	 * @return The number of data packages.
 	 */
-	public Integer getNumDataPackages(boolean includeEcotrendsAndLandsat) {
+	public Integer getNumDataPackages(boolean includeEcotrendsAndLandsat) 
+		    throws SQLException {
 		Integer numDataPackages = 0;
-		String scopeList = null;
-
-		try {
-			scopeList = this.dpmClient.listDataPackageScopes();
-		} 
-		catch (Exception e) {
-			logger.error("PastaStatistics: " + e.getMessage());
-			e.printStackTrace();
+		
+		if (includeEcotrendsAndLandsat) {
+			numDataPackages = countDataPackages(QUERY_TOTAL_UNIQUE);
 		}
-
-		StrTokenizer scopes = new StrTokenizer(scopeList);
-
-		while (scopes.hasNext()) {
-			String scope = scopes.nextToken();
-
-			if (includeEcotrendsAndLandsat || 
-				(!scope.equals("ecotrends") && !scope.startsWith("lter-landsat"))
-			   ) {
-				String idList = null;
-
-				try {
-					idList = this.dpmClient.listDataPackageIdentifiers(scope);
-				} 
-				catch (Exception e) {
-					logger.error("PastaStatistics: " + e.getMessage());
-					e.printStackTrace();
-				}
-
-				StrTokenizer identifiers = new StrTokenizer(idList);
-
-				numDataPackages += identifiers.size();
-			}
+		else {
+			numDataPackages = countDataPackages(QUERY_CONTRIBUTED_UNIQUE);
 		}
-
+		
 		return numDataPackages;
 	}
 	
@@ -137,54 +163,32 @@ public class PastaStatistics {
 
 	 * @return The number of data packages.
 	 */
-	public Integer getNumDataPackagesAllRevisions(boolean includeEcotrendsAndLandsat) {
+	public Integer getNumDataPackagesAllRevisions(boolean includeEcotrendsAndLandsat)
+		    throws SQLException {
 		Integer numDataPackages = 0;
-		String scopeList = null;
+		
+		if (includeEcotrendsAndLandsat) {
+			numDataPackages = countDataPackages(QUERY_TOTAL_ALL);
+		}
+		else {
+			numDataPackages = countDataPackages(QUERY_CONTRIBUTED_ALL);
+		}
+		
+		return numDataPackages;
+	}
+	
+	
+	public static void main(String[] args) {
+		ConfigurationListener.configure();
 
 		try {
-			scopeList = this.dpmClient.listDataPackageScopes();
+			PastaStatistics pastaStatistics = new PastaStatistics("public");
+			Integer totalUnique = pastaStatistics.getNumDataPackages(true);
+			System.out.println("totalUnique: " + totalUnique);
 		} 
 		catch (Exception e) {
-			logger.error("PastaStatistics: " + e.getMessage());
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
-
-		StrTokenizer scopes = new StrTokenizer(scopeList);
-
-		while (scopes.hasNext()) {
-			String scope = scopes.nextToken();
-
-			if (includeEcotrendsAndLandsat || 
-				(!scope.equals("ecotrends") && !scope.startsWith("lter-landsat"))
-			   ) {
-				String idList = null;
-
-				try {
-					idList = this.dpmClient.listDataPackageIdentifiers(scope);
-				} 
-				catch (Exception e) {
-					logger.error("PastaStatistics: " + e.getMessage());
-					e.printStackTrace();
-				}
-
-				StrTokenizer identifiers = new StrTokenizer(idList);
-				while (identifiers.hasNext()) {
-					String idStr = identifiers.next();
-					Integer id = Integer.parseInt(idStr);
-					try {
-						String revList = this.dpmClient.listDataPackageRevisions(scope, id, null);
-						StrTokenizer revisions = new StrTokenizer(revList);
-						numDataPackages += revisions.size();
-					} 
-					catch (Exception e) {
-						logger.error("PastaStatistics: " + e.getMessage());
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
-		return numDataPackages;
 	}
 
 }
