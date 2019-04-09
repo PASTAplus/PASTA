@@ -88,7 +88,7 @@ public class PastaStatistics {
 	    Configuration options = ConfigurationListener.getOptions();
 
 	    String dbDriver = options.getString("db.Driver");
-	    String dbUrl = options.getString("db.URL");
+	    String dbUrl = options.getString("db.pkg.URL");
 	    String dbUser = options.getString("db.User");
 	    String dbPassword = options.getString("db.Password");
 		this.databaseClient = new DatabaseClient(dbDriver, dbUrl, dbUser, dbPassword);
