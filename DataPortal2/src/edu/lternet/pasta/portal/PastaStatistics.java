@@ -82,15 +82,20 @@ public class PastaStatistics {
 	 * Iterates through the list of scopes and identifiers to calculate
 	 * the number of data packages in PASTA.
 	 * 
+	 * @param includeEcotrendsAndLandsat  
+	 *          if true, include Ecotrends and Landsat data packages
+	 *    
+	 * 
 	 * @return The number of data packages.
 	 */
-	public Integer getNumDataPackages() {
+	public Integer getNumDataPackages(boolean includeEcotrendsAndLandsat) {
 		Integer numDataPackages = 0;
 		String scopeList = null;
 
 		try {
 			scopeList = this.dpmClient.listDataPackageScopes();
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			logger.error("PastaStatistics: " + e.getMessage());
 			e.printStackTrace();
 		}
@@ -100,56 +105,15 @@ public class PastaStatistics {
 		while (scopes.hasNext()) {
 			String scope = scopes.nextToken();
 
-			String idList = null;
-
-			try {
-				idList = this.dpmClient.listDataPackageIdentifiers(scope);
-			} catch (Exception e) {
-				logger.error("PastaStatistics: " + e.getMessage());
-				e.printStackTrace();
-			}
-
-			StrTokenizer identifiers = new StrTokenizer(idList);
-
-			numDataPackages += identifiers.size();
-		}
-
-		return numDataPackages;
-	}
-	
-	
-	/**
-	 * Iterates through the list of scopes and identifiers of site contributed
-	 * data packages to calculate the total number of site contributed data
-	 * packages in PASTA (i.e., excludes EcoTrends and LTER Landsat data
-	 * packages).
-	 * 
-	 * @return The number of site contributed data packages.
-	 */
-	public Integer getNumDataPackagesSites() {
-		Integer numDataPackages = 0;
-		String scopeList = null;
-
-		try {
-			scopeList = this.dpmClient.listDataPackageScopes();
-		} catch (Exception e) {
-			logger.error("PastaStatistics: " + e.getMessage());
-			e.printStackTrace();
-		}
-
-		StrTokenizer scopes = new StrTokenizer(scopeList);
-
-		while (scopes.hasNext()) {
-			String scope = scopes.nextToken();
-
-			if (!scope.equals("ecotrends") && 
-				!scope.startsWith("lter-landsat")
+			if (includeEcotrendsAndLandsat || 
+				(!scope.equals("ecotrends") && !scope.startsWith("lter-landsat"))
 			   ) {
 				String idList = null;
 
 				try {
 					idList = this.dpmClient.listDataPackageIdentifiers(scope);
-				} catch (Exception e) {
+				} 
+				catch (Exception e) {
 					logger.error("PastaStatistics: " + e.getMessage());
 					e.printStackTrace();
 				}
@@ -163,4 +127,64 @@ public class PastaStatistics {
 		return numDataPackages;
 	}
 	
+	
+	/**
+	 * Iterates through the list of scopes and identifiers and revisions to 
+	 * calculate the number of data packages in PASTA (including all revisions).
+	 * 
+	 * @param includeEcotrendsAndLandsat  
+	 *          if true, include Ecotrends and Landsat data packages
+
+	 * @return The number of data packages.
+	 */
+	public Integer getNumDataPackagesAllRevisions(boolean includeEcotrendsAndLandsat) {
+		Integer numDataPackages = 0;
+		String scopeList = null;
+
+		try {
+			scopeList = this.dpmClient.listDataPackageScopes();
+		} 
+		catch (Exception e) {
+			logger.error("PastaStatistics: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		StrTokenizer scopes = new StrTokenizer(scopeList);
+
+		while (scopes.hasNext()) {
+			String scope = scopes.nextToken();
+
+			if (includeEcotrendsAndLandsat || 
+				(!scope.equals("ecotrends") && !scope.startsWith("lter-landsat"))
+			   ) {
+				String idList = null;
+
+				try {
+					idList = this.dpmClient.listDataPackageIdentifiers(scope);
+				} 
+				catch (Exception e) {
+					logger.error("PastaStatistics: " + e.getMessage());
+					e.printStackTrace();
+				}
+
+				StrTokenizer identifiers = new StrTokenizer(idList);
+				while (identifiers.hasNext()) {
+					String idStr = identifiers.next();
+					Integer id = Integer.parseInt(idStr);
+					try {
+						String revList = this.dpmClient.listDataPackageRevisions(scope, id, null);
+						StrTokenizer revisions = new StrTokenizer(revList);
+						numDataPackages += revisions.size();
+					} 
+					catch (Exception e) {
+						logger.error("PastaStatistics: " + e.getMessage());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return numDataPackages;
+	}
+
 }

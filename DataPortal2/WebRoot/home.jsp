@@ -40,19 +40,37 @@
 
 	String numDataPackages = null;
 	String numDataPackagesSites = null;
+    String numDataPackagesAll = null;
+    String numDataPackagesSitesAll = null;
 	PastaStatistics pastaStats = new PastaStatistics("public");
 
+    // Unique data packages, includes EcoTrends and Landsat
 	numDataPackages = (String) application.getAttribute("numDataPackages");
 	if (numDataPackages == null) {
-		numDataPackages = pastaStats.getNumDataPackages().toString();
+		numDataPackages = pastaStats.getNumDataPackages(true).toString();
 		application.setAttribute("numDataPackages", numDataPackages);
 	}
 
+    // Unique data packages, excludes EcoTrends and Landsat
 	numDataPackagesSites = (String) application.getAttribute("numDataPackagesSites");
 	if (numDataPackagesSites == null) {
-		numDataPackagesSites = pastaStats.getNumDataPackagesSites().toString();
+		numDataPackagesSites = pastaStats.getNumDataPackages(false).toString();
 		application.setAttribute("numDataPackagesSites", numDataPackagesSites);
 	}
+
+    // All revisions, includes EcoTrends and Landsat
+    numDataPackagesAll = (String) application.getAttribute("numDataPackagesAll");
+    if (numDataPackagesAll == null) {
+        numDataPackagesAll = pastaStats.getNumDataPackagesAllRevisions(true).toString();
+        application.setAttribute("numDataPackagesAll", numDataPackagesAll);
+    }
+
+    // All revisions, excludes EcoTrends and Landsat
+    numDataPackagesSitesAll = (String) application.getAttribute("numDataPackagesSitesAll");
+    if (numDataPackagesSitesAll == null) {
+        numDataPackagesSitesAll = pastaStats.getNumDataPackagesAllRevisions(false).toString();
+        application.setAttribute("numDataPackagesSitesAll", numDataPackagesSitesAll);
+    }
 
     GregorianCalendar now = new GregorianCalendar();
 
@@ -122,25 +140,22 @@
     function drawChart() {
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Month');
-      data.addColumn('number', 'Site-Contributed Data Packages');
+      data.addColumn('number', 'Unique');
+      data.addColumn('number', 'All Revisions');
 
       data.addRows([
           <%=googleChartJson%>
       ]);
         
       var options = {
-        'title':'Data Package Growth\n\n',
+        'title':'Contributed Data Package Growth\n\n',
         'width' :  450,
         'height' : 350,
         'legend': { position: 'top' },
-        //hAxis: {
-        //  title: 'Date'
-        //},
         vAxis: {
           title: 'Data Packages (Cumulative)'
         },
-        colors: ['#a52714'],      
-        //backgroundColor: '#f7f7f7'  This matches the gray background
+        //colors: ['#a52714'],      // red
         backgroundColor: '#ffffff'
       };
 
@@ -212,8 +227,11 @@
 					<div class="row-fluid">
 						<div class="row-fluid">
 								    <div id="chart_div"></div>
-<p id="nis-growth">Site-contributed data packages: <b><%= numDataPackagesSites %></b><br />
-Total data packages: <b><%= numDataPackages %></b></p>
+<p id="nis-growth">
+<b>Contributed Data Packages</b><br/>Unique:&nbsp;<b><%= numDataPackagesSites %></b>;&nbsp;All Revisions:&nbsp;<b><%= numDataPackagesSitesAll %></b><br/>
+<br/>
+<b>Total Data Packages</b><br/>Unique:&nbsp;<b><%= numDataPackages %></b>;&nbsp;All Revisions:&nbsp;<b><%= numDataPackagesAll %></b>
+</p>
 
 						</div>
 					</div>
