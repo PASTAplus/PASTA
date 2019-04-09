@@ -81,13 +81,17 @@ public class DynamicContentServlet extends HttpServlet {
         ServletContext servletContext = getServletContext();
 		String numDataPackages = null;
 		String numDataPackagesSites = null;
+		String numDataPackagesAll = null;
+		String numDataPackagesSitesAll = null;
 				
         logger.info("Refreshing PASTA data package growth stats.");
 
         try {
 			PastaStatistics pastaStats = new PastaStatistics("public");
-			numDataPackages = pastaStats.getNumDataPackages().toString();
-			numDataPackagesSites = pastaStats.getNumDataPackagesSites().toString();
+			numDataPackages = pastaStats.getNumDataPackages(true).toString();
+			numDataPackagesSites = pastaStats.getNumDataPackages(false).toString();
+			numDataPackagesAll = pastaStats.getNumDataPackagesAllRevisions(true).toString();
+			numDataPackagesSitesAll = pastaStats.getNumDataPackagesAllRevisions(false).toString();
 		}
 		catch (PastaConfigurationException | PastaAuthenticationException e) {
 			ServletException se = new ServletException("Pasta statistics exception");
@@ -107,6 +111,12 @@ public class DynamicContentServlet extends HttpServlet {
         	
         	if (numDataPackagesSites != null) 
         		servletContext.setAttribute("numDataPackagesSites", numDataPackagesSites);
+        	
+        	if (numDataPackagesAll != null) 
+        		servletContext.setAttribute("numDataPackagesAll", numDataPackagesAll);
+        	
+        	if (numDataPackagesSitesAll != null) 
+        		servletContext.setAttribute("numDataPackagesSitesAll", numDataPackagesSitesAll);
         	
         	if (googleChartJson != null) 
         		servletContext.setAttribute("googleChartJson", googleChartJson);

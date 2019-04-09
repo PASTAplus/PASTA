@@ -54,7 +54,10 @@ public class GrowthStats {
                               "  date_deactivated IS NULL AND" +
 		                      "  scope != 'ecotrends' AND" +
                               "  scope NOT LIKE 'lter-landsat%' ";
-  
+  final String SELECT_CLAUSE_UNIQUE = 
+      "SELECT scope || '.' || identifier,date_created FROM ";
+  final String SELECT_CLAUSE_ALL = 
+	  "SELECT scope || '.' || identifier || '.' || revision,date_created FROM ";
 
  /* Class variables */
 
@@ -82,23 +85,33 @@ public class GrowthStats {
   public String getGoogleChartJson(GregorianCalendar now, int scale) {
 
     StringBuilder pkgSql = new StringBuilder();
-    pkgSql.append("SELECT scope || '.' || identifier,date_created FROM ");
+    pkgSql.append(SELECT_CLAUSE_UNIQUE);
     pkgSql.append(RESOURCE_REGISTRY);
     pkgSql.append(WHERE_CLAUSE);
     pkgSql.append("ORDER BY date_created ASC;");
 
+    StringBuilder pkgSqlAll = new StringBuilder();
+    pkgSqlAll.append(SELECT_CLAUSE_ALL);
+    pkgSqlAll.append(RESOURCE_REGISTRY);
+    pkgSqlAll.append(WHERE_CLAUSE);
+    pkgSqlAll.append("ORDER BY date_created ASC;");
+
     HashMap<String, Long> pkgMap;
+    HashMap<String, Long> pkgMapAll;
 
     try {
       pkgMap = buildHashMap(pkgSql.toString());
+      pkgMapAll = buildHashMap(pkgSqlAll.toString());
     }
     catch (SQLException e) {
       logger.error("getGoogleChartJson: " + e.getMessage());
       e.printStackTrace();
       pkgMap = new HashMap<String, Long>(); // Create empty package map
+      pkgMapAll = new HashMap<String, Long>(); // Create empty package map
     }
 
     Long[] pkgList = buildSortedList(pkgMap);
+    Long[] pkgListAll = buildSortedList(pkgMapAll);
 
     /* 
     StringBuilder siteSql = new StringBuilder();
@@ -122,9 +135,11 @@ public class GrowthStats {
 
     ArrayList<String> labels = buildLabels(origin, now, scale);
     ArrayList<Integer> pkgFreq = buildFrequencies(origin, now, scale, pkgList);
+    ArrayList<Integer> pkgFreqAll = buildFrequencies(origin, now, scale, pkgListAll);
     //ArrayList<Integer> siteFreq = buildFrequencies(origin, now, scale, siteList);
 
     Integer pkgCDist = 0;
+    Integer pkgAllCDist = 0;
     //Integer siteCDist = 0;
     int i;
 
@@ -134,15 +149,17 @@ public class GrowthStats {
     
     for (i = 0; i < nLabels - 1; i++) {
       pkgCDist += pkgFreq.get(i);
+      pkgAllCDist += pkgFreqAll.get(i);
       //siteCDist += siteFreq.get(i);
-      json.append(String.format("['%s',%d],%n", labels.get(i), pkgCDist));
+      json.append(String.format("['%s',%d, %d],%n", labels.get(i), pkgCDist, pkgAllCDist));
     }
 
     i = nLabels - 1;
 	if (i >= 0) {
 		pkgCDist += pkgFreq.get(i);
+		pkgAllCDist += pkgFreqAll.get(i);
 		//siteCDist += siteFreq.get(i);
-		json.append(String.format("['%s',%d]%n", labels.get(i), pkgCDist));
+		json.append(String.format("['%s',%d, %d]%n", labels.get(i), pkgCDist, pkgAllCDist));
 	}
 
     return json.toString();
@@ -153,8 +170,8 @@ public class GrowthStats {
 	Connection conn = databaseClient.getConnection();
     HashMap<String, Long> map = new HashMap<String, Long>();
 
-	try {
-		if (conn != null) {
+	if (conn != null) {
+		try {
 			Statement stmnt = conn.createStatement();
 			ResultSet rs = stmnt.executeQuery(sql);
 
@@ -165,14 +182,12 @@ public class GrowthStats {
 					map.put(key, date_created);
 				}
 			}
+		} finally {
+			databaseClient.closeConnection(conn);
 		}
-	}
-	finally {
-		databaseClient.closeConnection(conn);
 	}
 
     return map;
-
   }
 
   
