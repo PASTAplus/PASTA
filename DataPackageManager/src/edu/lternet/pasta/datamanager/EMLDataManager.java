@@ -74,8 +74,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
    * Class fields
    */
   
-  private static String metadataDir = null;
-  private static final String METADATA_DIR_DEFAULT = "/home/pasta/local/metadata";
   private static String entityDir = null;
   private static final String ENTITY_DIR_DEFAULT = "/home/pasta/local/data";
   private static String evaluateReportDir = null;
@@ -152,23 +150,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
     }
     else {
       return ENTITY_DIR_DEFAULT;
-    }
-  }
-  
-  
-  /** 
-   * Gets the value of the metadata directory. Returns
-   * the configured property value if set, else
-   * returns the default value.
-   * 
-   * @return  the path of the metadata directory
-   */
-  public static String getMetadataDir() {
-    if (metadataDir != null) {
-      return metadataDir;
-    }
-    else {
-      return METADATA_DIR_DEFAULT;
     }
   }
   
@@ -688,9 +669,8 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
       databaseAdapterName = options.getOption("dbAdapter");
       
       // Directory paths for entities and entity reports
-      metadataDir = options.getOption("datapackagemanager.metadataDir");      
-      entityDir = options.getOption("datapackagemanager.entityDir");    
-      evaluateReportDir = options.getOption("datapackagemanager.reportDir");     
+      entityDir = options.getOption("datapackagemanager.entityDir");
+      evaluateReportDir = options.getOption("datapackagemanager.reportDir");  
     } 
     catch (Exception e) {
       logger.error("Error in loading options: " + e.getMessage());

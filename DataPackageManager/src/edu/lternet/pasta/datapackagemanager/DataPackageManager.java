@@ -231,7 +231,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 */
 
 	private static String resourceDir = null;
-	private static String entityDir = null;
 	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
 
 	private static final String SLASH = "/";
@@ -2116,7 +2115,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
-			entityDir = options.getOption("datapackagemanager.entityDir");
 			xslDir = options.getOption("datapackagemanager.xslDir");
 
 			
