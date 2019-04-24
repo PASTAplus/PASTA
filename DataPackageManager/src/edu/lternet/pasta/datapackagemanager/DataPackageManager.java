@@ -2615,7 +2615,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 */
 	public File readDataPackageReport(String scope, Integer identifier,
 	    String revision, EmlPackageId emlPackageId, AuthToken authToken,
-	    String user) throws ClassNotFoundException, SQLException {
+	    String user) 
+	    		throws ClassNotFoundException, SQLException, IOException {
 		boolean evaluate = false;
 		File xmlFile = null;
 		String transaction = null;
@@ -2668,7 +2669,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					xmlFile = dataPackageReport.getReport(evaluate, transaction);
 				}
 			}
-		} finally {
+		} 
+		finally {
 		}
 
 		return xmlFile;

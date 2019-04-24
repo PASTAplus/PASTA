@@ -26,6 +26,7 @@ package edu.lternet.pasta.datapackagemanager;
 
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -99,27 +100,6 @@ public class DataPackageReport {
   */
 
  /**
-  * Deletes a report from the file system.
-  * 
-  * @return  true if the quality report was successfully deleted, else false
-  */
- public boolean deleteReport(){
-   boolean success = false;
-   
-   // We only delete quality reports in non-evaluate mode
-   boolean evaluate = false;
-   String transaction = null;
-   
-   File reportFile = getReport(evaluate, transaction);
-   
-   if (reportFile != null) {
-     success = reportFile.delete();
-   }
-   
-   return success;
- }
- 
- /**
   * Return the evaluate quality report for the given transaction identifier.
   * 
   * @param transaction The evaluate quality report transaction identifier.
@@ -149,7 +129,8 @@ public class DataPackageReport {
   *                      (should always be non-null when evaluate is true)
   * @return the quality report XML file, or null if it doesn't exist
   */
- public File getReport(boolean evaluate, String transaction) {
+ public File getReport(boolean evaluate, String transaction) 
+         throws IOException {
    String reportFilename = null;
    File xmlFile = null;
    
@@ -166,6 +147,12 @@ public class DataPackageReport {
        if (qualityReportFile != null && qualityReportFile.exists()) {
          xmlFile = qualityReportFile;
        }
+       else {
+      	 String msg = String.format("Report file %s/%s does not exist.",
+      			                    dirPath, reportFilename);
+      	 throw new IOException(msg);
+       }
+       
      }
    }
      
