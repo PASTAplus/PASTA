@@ -26,6 +26,7 @@ package edu.lternet.pasta.datapackagemanager;
 
 
 import java.io.File;
+import java.io.IOException;
 
 import edu.lternet.pasta.common.EmlPackageId;
 
@@ -83,7 +84,8 @@ public class DataPackageMetadata {
   * @param  evaluateMode   true if this is evaluate mode
   * @return the Level-1 EML metadata file, or null if it doesn't exist
   */
- public File getMetadata(boolean evaluateMode) {
+ public File getMetadata(boolean evaluateMode) 
+         throws IOException {
    File xmlFile = null;
    
    if (this.emlPackageId != null) {
@@ -96,6 +98,11 @@ public class DataPackageMetadata {
      
      if (metadataFile != null && metadataFile.exists()) {
        xmlFile = metadataFile;
+     }
+     else {
+    	 String msg = String.format("Metadata file %s/%s does not exist.",
+    			                    dirPath, metadataFilename);
+    	 throw new IOException(msg);
      }
    }
      
