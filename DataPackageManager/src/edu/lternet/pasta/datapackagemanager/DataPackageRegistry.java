@@ -448,6 +448,12 @@ public class DataPackageRegistry {
                          "revision, resource_location, entity_id, entity_name, filename, principal_owner, date_created) " + 
                          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
       }
+      else if (resourceType == ResourceType.metadata ||
+    		   resourceType == ResourceType.report) {
+          insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
+                  "revision, resource_location, principal_owner, date_created, format_type) " + 
+                  "VALUES(?,?,?,?,?,?,?,?,?,?)");
+        }
       else {
         insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
                          "revision, principal_owner, date_created, format_type) " + 
@@ -472,6 +478,13 @@ public class DataPackageRegistry {
           pstmt.setString(10, fileName);
           pstmt.setString(11, principalOwner);
           pstmt.setTimestamp(12, ts);
+        }
+        else if (resourceType == ResourceType.metadata ||
+        		 resourceType == ResourceType.report) {
+            pstmt.setString(7, resourceLocation);
+            pstmt.setString(8, principalOwner);
+            pstmt.setTimestamp(9, ts);
+            pstmt.setString(10, formatType);
         }
         else {
           pstmt.setString(7, principalOwner);

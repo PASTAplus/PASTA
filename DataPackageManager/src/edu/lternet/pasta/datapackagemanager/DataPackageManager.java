@@ -777,7 +777,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		String metadataURI = pastaUriHead + URI_MIDDLE_METADATA + uriDocidPart;
 		String reportURI = pastaUriHead + URI_MIDDLE_REPORT + uriDocidPart;
 		String qualityReportXML = null;
-		String resourceLocation = null;
+		String resourceLocation = getResourceDir();
 		String datasetAccessXML = levelZeroDataPackage.getAccessXML();
 		AccessMatrix datasetAccessMatrix = new AccessMatrix(datasetAccessXML);
 		EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
