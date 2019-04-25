@@ -40,14 +40,14 @@ public class DataManagerTest extends TestCase {
   private final String COLUMN_1 = "\"fld\"";
   private final String COLUMN_2 = "\"year\"";
   private final String ENTITY_NAME = "NoneSuchBugCount";
-  private final int    ENTITY_NUMBER_EXPECTED = 1;
+  private final int    ENTITY_NUMBER_EXPECTED = 2;
   private final int    NUMBER_OF_COLUMNS = 3;
-  private final String QUERY_TEST_DOCUMENT = "NoneSuchBugCount.xml";
-  private final String QUERY_TEST_SERVER = "http://svn.lternet.edu/svn/NIS/master/DataPackageManager/test/data/";
+  private final String QUERY_TEST_DOCUMENT = "NoneSuchBugCount.xml.template";
+  private final String QUERY_TEST_SERVER = "https://raw.githubusercontent.com/PASTAplus/PASTA/master/DataPackageManager/test/data/";
   private final String TABLE_NAME = "NoneSuchBugCount";
-  private final String TEST_DOCUMENT = "NoneSuchBugCount.xml";
-  private final String TEST_PACKAGE_ID = "knb-lter-xyz.10044.1";
-  private final String TEST_SERVER = "http://svn.lternet.edu/svn/NIS/master/DataPackageManager/test/data/";
+  private final String TEST_DOCUMENT = "NoneSuchBugCount.xml.template";
+  private final String TEST_PACKAGE_ID = "knb-lter-nwk.1454.1";
+  private final String TEST_SERVER = "https://raw.githubusercontent.com/PASTAplus/PASTA/master/DataPackageManager/test/data/";
   
   
   /*

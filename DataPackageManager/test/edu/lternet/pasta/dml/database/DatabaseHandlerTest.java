@@ -33,7 +33,7 @@ public class DatabaseHandlerTest extends TestCase {
   private Connection dbConnection  = null;            // the database connection
   private DatabaseConnectionPoolInterfaceTest connectionPool = null;
   private String dbAdapterName = null;
-  private final String TEST_DOCUMENT = "knb-lter-nwk/999/1";
+  private final String TEST_DOCUMENT = "edi/3/2";
   private final String TEST_SERVER = "https://pasta-d.lternet.edu/package/metadata/eml/";
   
   

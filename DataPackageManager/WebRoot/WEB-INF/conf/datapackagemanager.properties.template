@@ -56,7 +56,7 @@ scopeRegistry=edi,ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-ble,
 #
 testDocument=knb-lter-gce.1.9
 testServer=http://metacat.lternet.edu/knb/metacat
-documentURL=http://svn.lternet.edu/svn/NIS/trunk/DataPackageManager/test/data/NoneSuchBugCount.xml
+documentURL=https://raw.githubusercontent.com/PASTAplus/PASTA/master/DataPackageManager/test/data/NoneSuchBugCount.xml.template
 entityName=INS-GCEM-0011_1_3.TXT
 packageID=knb-lter-gce.1.9
 
