@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.datamanager.EMLQualityReport;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.ucsb.nceas.utilities.Options;
 
 
@@ -129,34 +130,47 @@ public class DataPackageReport {
   *                      (should always be non-null when evaluate is true)
   * @return the quality report XML file, or null if it doesn't exist
   */
- public File getReport(boolean evaluate, String transaction) 
-         throws IOException {
-   String reportFilename = null;
-   File xmlFile = null;
-   
-   if (this.emlPackageId != null) {
-     FileSystemResource reportResource = new FileSystemResource(emlPackageId);
-     reportResource.setEvaluateMode(evaluate);
-     boolean isReportResource = true;
-     String dirPath = reportResource.getDirPath(isReportResource);
-     EMLQualityReport emlQualityReport = new EMLQualityReport(this.emlPackageId);
-     if (emlQualityReport != null) {
-       reportFilename = emlQualityReport.composeQualityReportFilename(evaluate, transaction);
-       File qualityReportFile = new File(dirPath, reportFilename);
-     
-       if (qualityReportFile != null && qualityReportFile.exists()) {
-         xmlFile = qualityReportFile;
-       }
-       else {
-      	 String msg = String.format("Report file %s/%s does not exist.",
-      			                    dirPath, reportFilename);
-      	 throw new IOException(msg);
-       }
-       
-     }
-   }
-     
-   return xmlFile;
- }
+	public File getReport(boolean evaluate, String transaction) throws IOException {
+		String reportFilename = null;
+		File qualityReportFile = null; // The XML quality report file
+
+		if (this.emlPackageId != null) {
+			try {
+				String baseDir =
+						DataPackageManager.getMetadataResourceLocation(
+								             emlPackageId, ResourceType.report);
+				FileSystemResource reportResource = 
+						new FileSystemResource(baseDir, emlPackageId);
+				reportResource.setEvaluateMode(evaluate);
+				boolean isReportResource = true;
+				String dirPath = reportResource.getDirPath(isReportResource);
+				EMLQualityReport emlQualityReport = 
+						new EMLQualityReport(this.emlPackageId);
+				if (emlQualityReport != null) {
+					reportFilename = 
+						  emlQualityReport.composeQualityReportFilename(
+								                         evaluate, transaction);
+					qualityReportFile = new File(dirPath, reportFilename);
+
+					if (qualityReportFile == null || !qualityReportFile.exists()) {
+						String msg = 
+								String.format("Report file %s/%s does not exist.", 
+										      dirPath, reportFilename);
+						throw new IOException(msg);
+					}
+				}
+			} 
+			catch (Exception e) {
+				throw new IOException(
+						"Report resource location could not be determined.");
+			}
+		} 
+		else {
+			throw new IOException(
+					"No packageId was specified for the report resource.");
+		}
+
+		return qualityReportFile;
+	}
  
 }

@@ -63,8 +63,9 @@ public class FileSystemResource {
   * 
   * @param  emlPackageId   an EMLPackageId object
   */
- public FileSystemResource(EmlPackageId emlPackageId) {
-   this.baseDir = DataPackageManager.getResourceDir();
+ public FileSystemResource(String baseDir, EmlPackageId emlPackageId) {
+   this.baseDir = baseDir;
+   
    EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
    if (emlPackageIdFormat != null) {
      this.packageId = emlPackageIdFormat.format(emlPackageId);

@@ -33,6 +33,7 @@ import edu.lternet.pasta.dml.parser.DataPackage;
 import edu.lternet.pasta.dml.quality.QualityReport;
 
 import edu.lternet.pasta.common.EmlPackageId;
+import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.EMLDataPackage;
 import edu.lternet.pasta.datapackagemanager.FileSystemResource;
 import edu.ucsb.nceas.utilities.IOUtil;
@@ -111,13 +112,16 @@ public class EMLQualityReport {
 	  boolean success = false;
 	  
 	  if (this.emlPackageId != null) {
-	    FileSystemResource fileSystemResource = new FileSystemResource(emlPackageId);
+		String baseDir = DataPackageManager.getResourceDir();
+	    FileSystemResource fileSystemResource = 
+	    		new FileSystemResource(baseDir, emlPackageId);
 	    fileSystemResource.setEvaluateMode(evaluateMode);
 	    boolean isReportResource = true;
 	    String dirPath = fileSystemResource.getDirPath(isReportResource);   
 	    File dirFile = new File(dirPath);	 
 	    if (dirFile != null && !dirFile.exists()) { dirFile.mkdirs(); }
-      String qualityReportFilename = composeQualityReportFilename(evaluateMode, transaction);
+        String qualityReportFilename = 
+        		composeQualityReportFilename(evaluateMode, transaction);
 	    File qualityReportFile = new File(dirPath, qualityReportFilename);
 	    FileWriter fileWriter;
 	    if (emlDataPackage != null) {

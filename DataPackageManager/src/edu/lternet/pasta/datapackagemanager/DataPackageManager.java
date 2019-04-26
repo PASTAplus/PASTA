@@ -230,8 +230,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Class fields
 	 */
 
-	private static String resourceDir = null;
-	private static final String RESOURCE_DIR_DEFAULT = "/home/pasta/local/metadata";
+	private static String metadataDir = null;
+	private static final String METADATA_DIR_DEFAULT = "/home/pasta/local/data";
 
 	private static final String SLASH = "/";
 	private static final String URI_MIDDLE_ARCHIVE = "archive/eml/";
@@ -339,10 +339,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return the path of the resource directory
 	 */
 	public static String getResourceDir() {
-		if (resourceDir != null) {
-			return resourceDir;
+		if (metadataDir != null) {
+			return metadataDir;
 		} else {
-			return RESOURCE_DIR_DEFAULT;
+			return METADATA_DIR_DEFAULT;
 		}
 	}
 
@@ -724,8 +724,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	   File emlFile = null;
 	   
 	   if (emlPackageId != null) {
+		 String baseDir = DataPackageManager.getResourceDir();
 	     FileSystemResource metadataResource = 
-	         new FileSystemResource(emlPackageId);
+	         new FileSystemResource(baseDir, emlPackageId);
 	     boolean isReportResource = false;
 	     String dirPath = metadataResource.getDirPath(isReportResource);   
 	     File dirFile = new File(dirPath);  
@@ -2109,7 +2110,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			DataPackage.setScopeRegistry(scopeRegistry);
 
 			// Load PASTA service options
-			resourceDir = options.getOption("datapackagemanager.metadataDir");
+			metadataDir = options.getOption("datapackagemanager.metadataDir");
 			solrUrl = options
 				 .getOption("datapackagemanager.metadatacatalog.solrUrl");
 			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
@@ -2414,6 +2415,78 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 	}
 	
+
+	/**
+	 * Get the resource location for a metadata or report resource as stored
+	 * in the resource_location field of the resource registry table.
+	 * 
+	 * @param emlPackageId
+	 *          object holding packageId information
+	 * @param resourceType
+	 *          Determines which type of metadata resource (metadata or report)
+	 *          whose resource location we are accessing: 
+	 *          ResourceType.metadata | ResourceType.report
+	 * @return  a String value representing the resource location for this
+	 *          resource as stored in the resource_location field in the
+	 *          resource registry.
+	 */
+	public static String getMetadataResourceLocation(EmlPackageId emlPackageId, 
+			                                         ResourceType resourceType)
+			throws ClassNotFoundException, 
+			       SQLException, 
+			       ResourceNotFoundException {
+		String resourceLocation = null;
+		String entityId = null;
+
+		if (emlPackageId != null) {
+			String scope = emlPackageId.getScope();
+			Integer identifier = emlPackageId.getIdentifier();
+			Integer revision = emlPackageId.getRevision();
+			String revisionStr = null;
+			if (revision != null) {
+				revisionStr = revision.toString();
+			}
+
+			boolean hasDataPackage = false;
+			String resourceId = 
+					composeResourceId(resourceType, scope, 
+							          identifier, revision, entityId);
+
+			try {
+				DataPackageRegistry dataPackageRegistry = 
+				  new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+
+				hasDataPackage = 
+				  dataPackageRegistry.hasDataPackage(scope, 
+						                             identifier, revisionStr);
+
+				if (hasDataPackage) {
+					resourceLocation = 
+							dataPackageRegistry.getResourceLocation(resourceId);
+				} 
+				else {
+					String msg = String.format(
+						"Attempting to read a data entity that " + 
+					    "does not exist in PASTA: %s",
+					    resourceId);
+					throw new ResourceNotFoundException(msg);
+				}
+			} 
+			catch (ClassNotFoundException | SQLException e) {
+				logger.error("Error connecting to Data Package Registry: " + 
+			                 e.getMessage());
+				e.printStackTrace();
+				throw (e);
+			}
+		} 
+		else {
+			String msg = 
+				"No packageId was specified for the metadata/report resource.";
+			throw new ResourceNotFoundException(msg);
+		}
+		
+		return resourceLocation;
+	}
 	
 	
 	/**
