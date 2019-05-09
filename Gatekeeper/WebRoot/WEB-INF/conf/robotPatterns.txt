@@ -241,7 +241,6 @@ ultraseek
 ^unknown$
 URL2File
 urlaliasbuilder
-urllib
 ^user.?agent$
 validator
 virus.detector
