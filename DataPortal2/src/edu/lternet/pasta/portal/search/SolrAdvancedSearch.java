@@ -485,16 +485,18 @@ public class SolrAdvancedSearch extends Search  {
     	String temporalFilter = null;
     	String collectionFilter = null;
     	String pubDateFilter = null;
+    	String LEFT_BRACKET = "%5B";
+    	String RIGHT_BRACKET = "%5D";
 
       if (dateField.equals("ALL") || dateField.equals("COLLECTION")) {
-    	  String singleDateQuery = String.format("singledate:[%s+TO+%s]", startDate, endDate);
-    	  String startDateQuery = String.format("begindate:[*+TO+%s]", endDate);
-    	  String endDateQuery = String.format("enddate:[%s+TO+NOW]", startDate);
+    	  String singleDateQuery = String.format("singledate:%s%s+TO+%s%s", LEFT_BRACKET, startDate, endDate, RIGHT_BRACKET);
+    	  String startDateQuery = String.format("begindate:%s*+TO+%s%s", LEFT_BRACKET, endDate, RIGHT_BRACKET);
+    	  String endDateQuery = String.format("enddate:%s%s+TO+NOW%s", LEFT_BRACKET, startDate, RIGHT_BRACKET);
     	  collectionFilter = String.format("(%s+OR+(%s+AND+%s))", singleDateQuery, startDateQuery, endDateQuery);
       }
       
       if (dateField.equals("ALL") || dateField.equals("PUBLICATION")) {
-    	  pubDateFilter = String.format("pubdate:[%s+TO+%s]", startDate, endDate);
+    	  pubDateFilter = String.format("pubdate:%s%s+TO+%s%s", LEFT_BRACKET, startDate, endDate, RIGHT_BRACKET);
       }
       
       if (dateField.equals("ALL")) {
