@@ -54,7 +54,7 @@ public class CodeGenerationClient extends PastaClient {
 	 * The statistical file types supported by the VCR web service
 	 */
 	public enum StatisticalFileType {
-		m, r, tidyr, sas, sps, spss;
+		m, py, r, tidyr, sas, sps, spss;
 	}
 
 
@@ -107,6 +107,11 @@ public class CodeGenerationClient extends PastaClient {
 			packageId = packageId.replace('-', '_');
 			this.statisticalPackageName = "Matlab";
 			this.downloadFilename = String.format("%s.m", packageId);
+			break;
+		case py:
+			this.statisticalPackageName = "Python";
+			this.downloadFilename = String.format("%s.py", packageId);
+			urlFilename = this.downloadFilename;
 			break;
 		case r:
 			this.statisticalPackageName = "R";
