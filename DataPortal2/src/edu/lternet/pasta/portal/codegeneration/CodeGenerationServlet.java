@@ -26,6 +26,7 @@ package edu.lternet.pasta.portal.codegeneration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.owasp.esapi.codecs.XMLEntityCodec;
 
 import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient;
 import edu.lternet.pasta.portal.codegeneration.CodeGenerationClient.StatisticalFileType;
@@ -52,6 +52,13 @@ public class CodeGenerationServlet extends DataPortalServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String forward = "./codeGeneration.jsp";
 	
+    private static final String pythonInstructions =
+        "Download the Python program and run it as you would any other Python program. Alternatively, you can " +
+        "copy and paste the program code into the Python IDLE editor and run it from there.<br/><br/>" +
+        "For datasets that require authenticated access to data tables, you may need to download the " +
+        "data separately and alter the<br/><code class='nis'>infile <-</code> lines to reflect where the data " +
+        "is stored on your computer.<br/>&nbsp;";
+     
     private static final String rInstructions =
         "Download the R program and open it in R to run. Alternatively, you can " +
         "copy and paste the program code into the R console.<br/><br/>For datasets that " +
@@ -123,18 +130,41 @@ public class CodeGenerationServlet extends DataPortalServlet {
 		ArrayList<String> programLinks = new ArrayList<String>();
 		
 		String mLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=m'>Matlab</a>", packageId);
+		String pyLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=py'>Python</a>", packageId);
 		String rLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=r'>R</a>", packageId);
         String tidyrLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=tidyr'>tidyr</a>", packageId);
 		String sasLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=sas'>SAS</a>", packageId);
 		String spssLink = String.format("<a class='searchsubcat' href='./codeGeneration?packageId=%s&statisticalFileType=spss'>SPSS</a>", packageId);
 		
 		programLinks.add(mLink);
+		programLinks.add(pyLink);
 		programLinks.add(rLink);
         programLinks.add(tidyrLink);
 		programLinks.add(sasLink);
 		programLinks.add(spssLink);
 		
 		return programLinks;
+	}
+	
+	
+	public static TreeMap<String, String> getProgramDict(String packageId) {
+		TreeMap<String, String> programDict = new TreeMap<String, String>();
+		
+		String mLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=m", packageId);
+		String pyLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=py", packageId);
+		String rLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=r", packageId);
+        String tidyrLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=tidyr", packageId);
+		String sasLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=sas", packageId);
+		String spssLink = String.format("./codeGeneration?packageId=%s&statisticalFileType=spss", packageId);
+		
+		programDict.put("MatLab", mLink);
+		programDict.put("Python", pyLink);
+		programDict.put("R", rLink);
+		programDict.put("tidyr", tidyrLink);
+		programDict.put("SAS", sasLink);
+		programDict.put("SPSS", spssLink);
+		
+		return programDict;
 	}
 	
 	
@@ -204,6 +234,10 @@ public class CodeGenerationServlet extends DataPortalServlet {
 			case "m":
 				statisticalFileType = StatisticalFileType.m;
 				instructions = CodeGenerationServlet.matlabInstructions;
+				break;
+			case "py":
+				statisticalFileType = StatisticalFileType.py;
+				instructions = CodeGenerationServlet.pythonInstructions;
 				break;
 			case "r":
 				statisticalFileType = StatisticalFileType.r;
