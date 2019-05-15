@@ -591,7 +591,7 @@ public class QualityReport {
     stringBuffer.append("  xmlns=\"eml://ecoinformatics.org/qualityReport\"\n");
     stringBuffer.append("  xmlns:qr=\"eml://ecoinformatics.org/qualityReport\"\n");
     stringBuffer.append("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-    stringBuffer.append("  xsi:schemaLocation=\"eml://ecoinformatics.org/qualityReport http://svn.lternet.edu/svn/NIS/documents/schemas/quality/qualityReportSchema.xsd\"\n");
+    stringBuffer.append("  xsi:schemaLocation=\"eml://ecoinformatics.org/qualityReport https://raw.githubusercontent.com/PASTAplus/PASTA/master/DataPackageManager/WebRoot/xml/qualityReportSchema.xsd\"\n");
     stringBuffer.append("  >\n");
     stringBuffer.append("  <creationDate>" + dateCreated + "</creationDate>\n");
     stringBuffer.append("  <packageId>" + packageId + "</packageId>\n");
