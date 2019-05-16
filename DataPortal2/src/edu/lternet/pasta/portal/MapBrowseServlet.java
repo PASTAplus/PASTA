@@ -615,11 +615,20 @@ public class MapBrowseServlet extends DataPortalServlet {
 									e.printStackTrace();
 								}
 
+								String uploadDateHTML = "";
+								try {
+									uploadDateHTML = composeUploadDateHTML(dpmClient, scope, id, revision);
+								}
+								catch (Exception e) {
+									logger.error(e.getMessage());
+									e.printStackTrace();
+								}
+
 								pastaDataObjectIdentifier = dpmClient
 										.getPastaPackageUri(scope, id, revision);
 
 								packageIdListItem = 
-										"<li>" + packageId  + "&nbsp;&nbsp;" + savedDataHTML + "</li>\n";
+										"<li>" + packageId  + uploadDateHTML + "&nbsp;&nbsp;" + savedDataHTML + "</li>\n";
 
 								if (predecessor != null) {
 									previous = "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope="
@@ -1249,6 +1258,28 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 		
 		return isDeleted;
+	}
+	
+	
+	private String composeUploadDateHTML(DataPackageManagerClient dpmClient, 
+			                       String scope, Integer id, String revision) 
+	        throws Exception {
+		String html = "";
+		String resourceMetadata = dpmClient.readResourceMetadata(scope, id, revision);
+		
+		if (resourceMetadata != null) {
+			// <dateCreated>2013-01-10 15:56:22.264</dateCreated>
+			String[] lines = resourceMetadata.split("\\n");
+			for (String line : lines) {
+				String trimmedLine = line.trim();
+				if (trimmedLine != null && trimmedLine.startsWith("<dateCreated>")) {
+                    String dateStr = trimmedLine.substring(13, 23);
+                    html = String.format("&nbsp;&nbsp;(<em>Uploaded %s</em>)", dateStr);
+				}
+			}
+		}
+		
+		return html;			
 	}
 	
 }

@@ -1711,6 +1711,47 @@ public class DataPackageManagerClient extends PastaClient {
 	}
 	
 	
+	/**
+	 * Executes the 'readResourceMetadata' web service method for a
+	 * "dataPackage" resource.
+	 * 
+	 * @param scope
+	 *          the scope value, e.g. "knb-lter-lno"
+	 * @param identifier
+	 *          the identifier value, e.g. 10
+	 * @param revision
+	 *          the revision value, e.g. "1"
+	 * @return an XML document containing the data package resource metadata
+	 * 
+	 * @see <a target="top"
+	 *      href="http://package.lternet.edu/package/docs/api">Data Package
+	 *      Manager web service API</a>
+	 */
+	public String readResourceMetadata(String scope, Integer identifier, String revision)
+	    throws Exception {
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		String urlTail = makeUrlTail(scope, identifier.toString(), revision, null);
+		String url = BASE_URL + "/rmd/eml" + urlTail;
+		String entityString = null;
+
+		HttpGet httpGet = new HttpGet(url);
+
+		try {
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			HttpEntity httpEntity = httpResponse.getEntity();
+			entityString = EntityUtils.toString(httpEntity, "UTF-8");
+			if (statusCode != HttpStatus.SC_OK) {
+				handleStatusCode(statusCode, entityString);
+			}
+		} finally {
+			closeHttpClient(httpClient);
+		}
+
+		return entityString;
+	}
+
+
 	private void logIdleTime(String methodName, String packageId, Integer idleTime) {
 		logger.info(String.format("%s: %s; Idle Time: %d", methodName, packageId, idleTime));
 	}
