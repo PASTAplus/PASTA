@@ -36,8 +36,6 @@ import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.client.DataPackageManagerClient;
-import edu.lternet.pasta.client.PastaAuthenticationException;
-import edu.lternet.pasta.client.PastaConfigurationException;
 import edu.lternet.pasta.common.UserErrorException;
 
 public class RevisionBrowseServlet extends DataPortalServlet {
@@ -128,11 +126,26 @@ public class RevisionBrowseServlet extends DataPortalServlet {
 				html = "<ol>\n";
 
 				while (tokens.hasNext()) {
-					String revision = tokens.nextToken();
-					html += "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope=" + scope
-							+ "&identifier=" + identifier + "&revision="
-							+ revision + "\">" + scope + "." + identifier
-							+ "." + revision + "</a></li>\n";
+					String revision = tokens.nextToken();					
+					String resourceMetadata = dpmClient.readResourceMetadata(scope, id, revision);
+					String dateCreated = "";
+					
+					if (resourceMetadata != null) {
+						// <dateCreated>2013-01-10 15:56:22.264</dateCreated>
+						String[] lines = resourceMetadata.split("\\n");
+						for (String line : lines) {
+							String trimmedLine = line.trim();
+							if (trimmedLine != null && trimmedLine.startsWith("<dateCreated>")) {
+                                String dateStr = trimmedLine.substring(13, 23);
+								dateCreated = String.format("&nbsp;&nbsp;(<small><em>Uploaded %s</em></small>)", dateStr);
+							}
+						}
+					}
+					
+					html += String.format("<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope=%s" +
+							"&identifier=%s&revision=%s\">%s.%s.%s</a>%s</li>\n",
+							scope, identifier, revision, scope, identifier, revision, dateCreated);
+					
 					count++;
 				}
 

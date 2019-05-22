@@ -175,6 +175,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		HttpSession httpSession = request.getSession();
 		String titleHTML = "";
 		String viewFullMetadataHTML = "";
+        String moreRecentRevisionHTML = "";
 		String citationHTML = "";
 		String creatorsHTML = "";
 		String abstractHTML = "";
@@ -298,8 +299,16 @@ public class MapBrowseServlet extends DataPortalServlet {
 					revUtil = new RevisionUtility(revisionList);
 					size = revUtil.getSize();
 
+					String newestRevisionValue = revUtil.getNewest().toString();
 					if (revision.equals("newest"))
-						revision = revUtil.getNewest().toString();
+						revision = newestRevisionValue;
+
+					if (!newestRevisionValue.equals(revision)) {
+		                String displayText = "(View Newest Revision)";
+		                String href = String.format("mapbrowse?scope=%s&identifier=%s&revision=%s", scope, identifier, newestRevisionValue);
+		                String url = String.format("<a class=\"searchsubcat\" href=\"%s\">%s</a>", href, displayText);    
+					    moreRecentRevisionHTML = String.format("&nbsp;&nbsp;%s", url);
+					}
 
 					packageId = scope + "." + id.toString() + "." + revision;
 					predecessor = revUtil.getPredecessor(Integer
@@ -615,11 +624,20 @@ public class MapBrowseServlet extends DataPortalServlet {
 									e.printStackTrace();
 								}
 
+								String uploadDateHTML = "";
+								try {
+									uploadDateHTML = composeUploadDateHTML(dpmClient, scope, id, revision);
+								}
+								catch (Exception e) {
+									logger.error(e.getMessage());
+									e.printStackTrace();
+								}
+
 								pastaDataObjectIdentifier = dpmClient
 										.getPastaPackageUri(scope, id, revision);
 
 								packageIdListItem = 
-										"<li>" + packageId  + "&nbsp;&nbsp;" + savedDataHTML + "</li>\n";
+										"<li>" + packageId  + uploadDateHTML + "&nbsp;&nbsp;" + savedDataHTML + "</li>\n";
 
 								if (predecessor != null) {
 									previous = "<li><a class=\"searchsubcat\" href=\"./mapbrowse?scope="
@@ -814,6 +832,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		
 		request.setAttribute("wasDeletedHTML", wasDeletedHTML);
 		request.setAttribute("viewFullMetadataHTML", viewFullMetadataHTML);
+        request.setAttribute("moreRecentRevisionHTML", moreRecentRevisionHTML);
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("abstractHTML", abstractHTML);
@@ -1092,7 +1111,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	 * 
 	 * @param scope
 	 *          The data package scope (namespace) value
-	 * @param id
+	 * @param identifier
 	 *          The data package identifier (accession number) value
 	 * @param revision
 	 *          The data package revision value
@@ -1249,6 +1268,28 @@ public class MapBrowseServlet extends DataPortalServlet {
 		}
 		
 		return isDeleted;
+	}
+	
+	
+	private String composeUploadDateHTML(DataPackageManagerClient dpmClient, 
+			                       String scope, Integer id, String revision) 
+	        throws Exception {
+		String html = "";
+		String resourceMetadata = dpmClient.readResourceMetadata(scope, id, revision);
+		
+		if (resourceMetadata != null) {
+			// <dateCreated>2013-01-10 15:56:22.264</dateCreated>
+			String[] lines = resourceMetadata.split("\\n");
+			for (String line : lines) {
+				String trimmedLine = line.trim();
+				if (trimmedLine != null && trimmedLine.startsWith("<dateCreated>")) {
+                    String dateStr = trimmedLine.substring(13, 23);
+                    html = String.format("&nbsp;&nbsp;(<em>Uploaded %s</em>)", dateStr);
+				}
+			}
+		}
+		
+		return html;			
 	}
 	
 }
