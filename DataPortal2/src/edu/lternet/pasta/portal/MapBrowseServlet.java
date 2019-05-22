@@ -175,6 +175,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		HttpSession httpSession = request.getSession();
 		String titleHTML = "";
 		String viewFullMetadataHTML = "";
+        String moreRecentRevisionHTML = "";
 		String citationHTML = "";
 		String creatorsHTML = "";
 		String abstractHTML = "";
@@ -298,8 +299,16 @@ public class MapBrowseServlet extends DataPortalServlet {
 					revUtil = new RevisionUtility(revisionList);
 					size = revUtil.getSize();
 
+					String newestRevisionValue = revUtil.getNewest().toString();
 					if (revision.equals("newest"))
-						revision = revUtil.getNewest().toString();
+						revision = newestRevisionValue;
+
+					if (!newestRevisionValue.equals(revision)) {
+		                String displayText = "(View Newest Revision)";
+		                String href = String.format("mapbrowse?scope=%s&identifier=%s&revision=%s", scope, identifier, newestRevisionValue);
+		                String url = String.format("<a class=\"searchsubcat\" href=\"%s\">%s</a>", href, displayText);    
+					    moreRecentRevisionHTML = String.format("&nbsp;&nbsp;%s", url);
+					}
 
 					packageId = scope + "." + id.toString() + "." + revision;
 					predecessor = revUtil.getPredecessor(Integer
@@ -823,6 +832,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 		
 		request.setAttribute("wasDeletedHTML", wasDeletedHTML);
 		request.setAttribute("viewFullMetadataHTML", viewFullMetadataHTML);
+        request.setAttribute("moreRecentRevisionHTML", moreRecentRevisionHTML);
 		request.setAttribute("dataPackageTitleHTML", titleHTML);
 		request.setAttribute("dataPackageCreatorsHTML", creatorsHTML);
 		request.setAttribute("abstractHTML", abstractHTML);
@@ -1101,7 +1111,7 @@ public class MapBrowseServlet extends DataPortalServlet {
 	 * 
 	 * @param scope
 	 *          The data package scope (namespace) value
-	 * @param id
+	 * @param identifier
 	 *          The data package identifier (accession number) value
 	 * @param revision
 	 *          The data package revision value

@@ -12,6 +12,7 @@
   String wasDeletedHTML = (String) request.getAttribute("wasDeletedHTML");
   String titleHTML = (String) request.getAttribute("dataPackageTitleHTML");
   String viewFullMetadataHTML = (String) request.getAttribute("viewFullMetadataHTML");
+  String moreRecentRevisionHTML = (String) request.getAttribute("moreRecentRevisionHTML");
   String creatorsHTML = (String) request.getAttribute("dataPackageCreatorsHTML");
   String abstractHTML = (String) request.getAttribute("abstractHTML");
   String intellectualRightsHTML = (String) request.getAttribute("intellectualRightsHTML");
@@ -178,7 +179,7 @@
                             </c:choose>
 
                             <div class="recent_title">
-                                <h2>Data Package Summary&nbsp;&nbsp;&nbsp;<small><small><%= viewFullMetadataHTML %></small></small></h2>
+                                <h2>Data Package Summary&nbsp;&nbsp;&nbsp;<small><small><%= viewFullMetadataHTML %> <%= moreRecentRevisionHTML %></small></small></h2>
                             </div>      
                                 
 
