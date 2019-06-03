@@ -358,7 +358,8 @@ public final class GatekeeperFilter implements Filter
                 }
             }
 
-            // groups = knb.getGroups(user); // No groups currently stored here
+            // Add user to both the 'vetted' and 'authenticated' groups
+            groups.add(ConfigurationListener.getVettedGroup());
             groups.add(ConfigurationListener.getAuthGroup());
         }
 

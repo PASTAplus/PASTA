@@ -64,6 +64,7 @@ public class DummyCookieHttpHeaders implements HttpHeaders {
     public Map<String, Cookie> getCookies() {
       Map<String, Cookie> m = new HashMap<String, Cookie>();
       Set<String> s = new HashSet<String>();
+      s.add("vetted");
       s.add("authenticated");
       AuthToken attr =
         AuthTokenFactory.makeCookieAuthToken(user, AuthSystemDef.KNB, EXPIRATION, s);

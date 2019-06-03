@@ -35,7 +35,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -71,7 +71,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -87,7 +87,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -103,7 +103,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -1027,7 +1027,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -1144,7 +1144,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
@@ -1160,7 +1160,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
+                <principal>vetted</principal>
                 <permission>write</permission>
             </allow>
         </access>
