@@ -138,6 +138,8 @@
     <field name="geographicdescription" type="text_pasta" indexed="true" stored="true" multiValued="false"/>
     <field name="projectTitle" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
     <field name="relatedProjectTitle" type="text_pasta" indexed="true" stored="true" multiValued="true"/>
+    <!--  The timespan of the study in years -->
+    <field name="timespan" type="float" indexed="true" stored="true" multiValued="false"/>
     <!-- <field name="projectAbstract" type="text_pasta" indexed="true" stored="true" multiValued="false"/> -->
 
     <!-- tdate fields -->

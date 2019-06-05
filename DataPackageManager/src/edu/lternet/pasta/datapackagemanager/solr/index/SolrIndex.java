@@ -1,6 +1,9 @@
 package edu.lternet.pasta.datapackagemanager.solr.index;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -180,20 +183,29 @@ public class SolrIndex {
 				solrInputDocument.setField("pubdate", pubDateTimestamp);
 			}
 
+			String beginDate = null;
+			String beginDateTimestamp = null;
 			if (beginDates != null && beginDates.size() > 0) {
-				String beginDate = determineBeginDate(beginDates);
+				beginDate = determineBeginDate(beginDates);
 				if (beginDate != null) {
-					String beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
+					beginDateTimestamp = ISO8601Utility.formatTimestamp(beginDate, DATE_GRANULARITY);
 					solrInputDocument.setField("begindate", beginDateTimestamp);
 				}
 			}
 
+			String endDate = null;
+			String endDateTimestamp = null;
 			if (endDates != null && endDates.size() > 0) {
-				String endDate = determineEndDate(endDates);
+				endDate = determineEndDate(endDates);
 				if (endDate != null) {
-					String endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
+					endDateTimestamp = ISO8601Utility.formatTimestamp(endDate, DATE_GRANULARITY);
 					solrInputDocument.setField("enddate", endDateTimestamp);
 				}
+			}
+			
+			if (beginDateTimestamp != null && endDateTimestamp != null) {
+				double timespan = calculateTimeSpan(beginDateTimestamp, endDateTimestamp);
+				solrInputDocument.setField("timespan", timespan);
 			}
 
 			for (String singleDate : singleDateTimes) {
@@ -398,6 +410,35 @@ public class SolrIndex {
 		}
     	
     	return result;
+    }
+    
+    
+    private double calculateTimeSpan(String beginDateTimestamp, 
+    		                         String endDateTimestamp) {
+    	double timespan = 0.0;
+    	String beginDate = stripGranularity(beginDateTimestamp);
+    	String endDate = stripGranularity(endDateTimestamp);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final LocalDate firstDate = LocalDate.parse(beginDate, formatter);
+        final LocalDate secondDate = LocalDate.parse(endDate, formatter);
+        final long days = ChronoUnit.DAYS.between(firstDate, secondDate);
+    	timespan = days / 365.2425; // Calculate timespan in years
+    	return(timespan);
+    }
+    
+    
+    // Strip off the granularity substring such as "/DAY" from the end
+    private String stripGranularity(String timestamp) {
+    	String stripped = timestamp;
+    	
+    	if (timestamp != null) {
+    		int hyphenIndex = timestamp.indexOf('/');
+    		if (hyphenIndex > 0) {
+    			stripped = timestamp.substring(0, hyphenIndex);
+    		}
+    	}
+    	
+    	return(stripped);
     }
     
     
