@@ -422,7 +422,7 @@ public class SolrIndex {
         final LocalDate firstDate = LocalDate.parse(beginDate, formatter);
         final LocalDate secondDate = LocalDate.parse(endDate, formatter);
         final long days = ChronoUnit.DAYS.between(firstDate, secondDate);
-    	timespan = days / 365.2425; // Calculate timespan in years
+    	timespan = days / 365.0; // Calculate timespan in years
     	return(timespan);
     }
     
