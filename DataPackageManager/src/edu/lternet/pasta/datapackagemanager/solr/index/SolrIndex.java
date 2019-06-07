@@ -204,8 +204,8 @@ public class SolrIndex {
 			}
 			
 			if (beginDateTimestamp != null && endDateTimestamp != null) {
-				double timespan = calculateTimeSpan(beginDateTimestamp, endDateTimestamp);
-				solrInputDocument.setField("timespan", timespan);
+				double duration = calculateTimeSpan(beginDateTimestamp, endDateTimestamp);
+				solrInputDocument.setField("duration", duration);
 			}
 
 			for (String singleDate : singleDateTimes) {
