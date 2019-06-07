@@ -2152,6 +2152,10 @@
                           <xsl:value-of select="../positionName"/>
                         </xsl:when>
                       </xsl:choose>
+                      <xsl:if test="../role">
+                        <xsl:text>,&#160;</xsl:text>
+                        <xsl:value-of select="../role"/>
+                      </xsl:if>
                       <xsl:text>)</xsl:text>
                     </xsl:if>
                   </xsl:for-each>
