@@ -8666,7 +8666,7 @@
         <tr>
           <td class="{$protocolfirstColStyle}">Description:</td>
           <td>
-          <xsl:if test="($title) and normalize-space($title) != ''">
+          <xsl:if test="($title) and normalize-space($title[1]) != ''">
             <h4>Provenance Metadata - The following data source was used in the creation of this product:</h4>
           </xsl:if>
           <xsl:variable name="url" select="../dataSource/distribution/online/url"/>
@@ -8674,7 +8674,7 @@
             <xsl:when test="(./para/literalLayout[1] = $prov-stmt) or (./para[1] = $prov-stmt)">
                <p class="eml"><xsl:value-of select="../dataSource/title"/> (<a href="./metadataviewer?url={$url}" target="_blank">Click here to view metadata</a>)</p>
             </xsl:when>
-            <xsl:when test="($url) and normalize-space($url) != ''">
+            <xsl:when test="($url) and normalize-space($url[1]) != ''">
                <p class="eml"><xsl:value-of select="../dataSource/title"/> (<a href="{$url}" target="_blank">Click here to view data source</a>)</p>
             </xsl:when>
             <xsl:otherwise>
