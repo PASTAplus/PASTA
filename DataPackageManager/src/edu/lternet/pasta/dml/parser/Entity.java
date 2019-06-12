@@ -32,6 +32,7 @@
 
 package edu.lternet.pasta.dml.parser;
 
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1190,8 +1191,14 @@ public class Entity extends DataObjectDescription
      * @param url    the url string value to be set
      */
     public void setURL(String url)
-    {
-      this.url = url;
+            throws MalformedURLException {
+    	if (url == null || url.equals("")) {
+    		String msg = "No online URL was specified. Check metadata for unintended use of function='information'.";
+    		throw new MalformedURLException(msg);
+    	}
+    	else {
+    		this.url = url;
+    	}
     }
 
     

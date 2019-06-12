@@ -1078,7 +1078,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             String entityDescription = "";
             String entityOrientation = "";
             String entityCaseSensitive = "";
-            String onlineUrl = "";
+            String onlineUrl = null;
             String onlineUrlFunction = null;
             String format = null;
             Integer numHeaderLines = null;
