@@ -1193,7 +1193,8 @@ public class Entity extends DataObjectDescription
     public void setURL(String url)
             throws MalformedURLException {
     	if (url == null || url.equals("")) {
-    		String msg = "No online URL was specified. Check metadata for unintended use of function='information'.";
+    		String msg = "No online URL was specified for a data entity. " +
+    	        "Check metadata for unintended use of function='information'.";
     		throw new MalformedURLException(msg);
     	}
     	else {
