@@ -131,7 +131,7 @@ datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/q
 #datapackagemanager.doiContext=pasta
 #datapackagemanager.doiUrlHead.edi=https://portal.edirepository.org/nis/mapbrowse?packageid=
 #datapackagemanager.doiUrlHead.lter=https://portal.lternet.edu/nis/mapbrowse?packageid=
-datapackagemanager.doiPrefix=10.5072
+datapackagemanager.doiPrefix=10.0311
 datapackagemanager.doiContext=FK2
 datapackagemanager.doiTest=true
 datapackagemanager.doiUrlHead.edi=https://portal-d.edirepository.org/nis/mapbrowse?packageid=
