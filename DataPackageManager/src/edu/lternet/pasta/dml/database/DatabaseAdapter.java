@@ -433,7 +433,7 @@ public abstract class DatabaseAdapter {
       else {
     	
         String dataType = mapDataType(attributeType);
-
+        
         try {
           if (dataType.equals("FLOAT")) {
             Float floatObj = new Float(value);
@@ -454,13 +454,13 @@ public abstract class DatabaseAdapter {
           }
         } 
         catch (Exception e) {
-          log.error("Error determining numeric value: " + 
-                    e.getMessage());
-          throw new DataNotMatchingMetadataException(
-              "Data value '" + value + 
-              "' is NOT the expected data type of '" +
-        		  dataType + "'");
+          String msg = String.format(
+        	         "Data value %s is not the expected data type of '%s': %s", 
+        	         value, dataType, e.getMessage());
+          log.error(msg);
+          throw new DataNotMatchingMetadataException(msg);
         }
+        
         hasValueCounter++;
       }
 
@@ -512,7 +512,7 @@ public abstract class DatabaseAdapter {
    * 
    * @param attribute
    * @param className
-   * @return
+   * @return the attribute type
    */
   protected String getAttributeTypeFromStorageType(Attribute attribute,
                                                    String className) {
@@ -520,16 +520,24 @@ public abstract class DatabaseAdapter {
     
     if (attribute != null) {
       ArrayList<StorageType> storageTypes = attribute.getStorageTypeArray();
+      
       for (StorageType storageType : storageTypes) {
         if (storageType != null) {
           String textValue = storageType.getTextValue();
+          
           if ((textValue != null) && (!textValue.equals(""))) {
             String typeSystem = storageType.getTypeSystem();
-            if ((typeSystem != null) && (!typeSystem.equals(""))) {
-              if (typeSystem.equals(XML_SCHEMA_DATATYPES))
-              {
-                // If one of the storageType element's uses XMLSchema-datatypes,
-                // for its typeSystem, use this to determine the attributeType
+            
+            /*
+             * If one of the storageType elements uses XML Schema datatypes
+             * for its typeSystem attribute (the default value if left
+             * unspecified), use this to determine the attributeType.
+             */
+            if (typeSystem == null || 
+            	typeSystem.equals("") ||
+                typeSystem.equals(XML_SCHEMA_DATATYPES)
+               )
+            {
                 if (textValue.equalsIgnoreCase("string")) {
                   attributeType = "string";
                 }
@@ -551,23 +559,27 @@ public abstract class DatabaseAdapter {
                 else {
                   attributeType = "string";
                 }
+                
                 return attributeType;
-              }
-              else if (textValue.equalsIgnoreCase("integer") ||
-                       textValue.equalsIgnoreCase("datetime") ||
-                       textValue.equalsIgnoreCase("natural") ||
-                       textValue.equalsIgnoreCase("string") ||
-                       textValue.equalsIgnoreCase("real") ||
-                       textValue.equalsIgnoreCase("whole")
-                      ) {
-                attributeType = textValue.toLowerCase();
-              }
+            }
+            /*
+             * If the typeSystem attribute value is anything other XML Schema, 
+             * all we can do is map known attribute types.
+             */
+            else if (textValue.equalsIgnoreCase("integer") ||
+                     textValue.equalsIgnoreCase("datetime") ||
+                     textValue.equalsIgnoreCase("natural") ||
+                     textValue.equalsIgnoreCase("string") ||
+                     textValue.equalsIgnoreCase("real") ||
+                     textValue.equalsIgnoreCase("whole")
+                    ) {
+              attributeType = textValue.toLowerCase();
             }
           }
         }
       }
-    } 
-    
+    }
+
     return attributeType;
   }
   
