@@ -1,5 +1,7 @@
 package edu.lternet.pasta.dml.parser;
 
+import java.net.MalformedURLException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -106,7 +108,14 @@ public class EntityTest extends TestCase
   public void testURLSetterAndGetter()
   {
 	  String url="http;//knb.ecoinformatics.org";
-	  entity.setURL(url);
+	  
+	  try {
+		  entity.setURL(url);
+	  }
+	  catch (MalformedURLException e) {
+		  fail(String.format("URL %s is considered malformed", url));
+	  }
+	  
 	  String gotURL = entity.getURL();
 	  assertEquals(url, gotURL);
   }

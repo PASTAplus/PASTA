@@ -51,6 +51,7 @@ public class ConfigurationListener implements ServletContextListener
 
     public static final String TOKEN_NAME = "token.name";
     public static final String TOKEN_TTL = "token.ttl";
+    public static final String VETTED_GROUP = "token.vettedgroup";
     public static final String AUTH_GROUP = "token.authgroup";
     public static final String PUBLIC_USER = "token.publicuser";
     public static final String LDAP_KEY_STORE = "ldap.keystore";
@@ -70,6 +71,7 @@ public class ConfigurationListener implements ServletContextListener
 
     private static String tokenName = null;
     private static long tokenTtl = new Long(-1);
+    private static String vettedGroup = null;
     private static String authGroup = null;
     private static String publicUser = null;
     private static File ldapKeyStore = null;
@@ -131,6 +133,15 @@ public class ConfigurationListener implements ServletContextListener
      */
     public static String getWebServiceVersion() {
         return webServiceVersion;
+    }
+
+    /**
+     * Getter for the vettedGroup class field.
+     * 
+     * @return the vettedGroup class field.
+     */
+    public static String getVettedGroup() {
+        return vettedGroup;
     }
 
     /**
@@ -298,6 +309,7 @@ public class ConfigurationListener implements ServletContextListener
         setTokenName(prop);
         setTokenTtl(prop);
         setVersionString(prop);
+        setVettedGroup(prop);
         setAuthGroup(prop);
         setPublicUser(prop);
         setLdapKeyStore(prop);
@@ -346,6 +358,13 @@ public class ConfigurationListener implements ServletContextListener
         if (webServiceVersion == null)
             throw new IllegalArgumentException(WEB_SERVICE_VERSION
                                                + " not specified");
+    }
+
+    private void setVettedGroup(Properties p) {
+
+        vettedGroup = p.getProperty(VETTED_GROUP);
+        if (vettedGroup == null)
+            throw new IllegalArgumentException(VETTED_GROUP + " not specified");
     }
 
     private void setAuthGroup(Properties p) {
