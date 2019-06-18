@@ -87,7 +87,7 @@ public class DelimitedReader extends TextDataReader
    * Maximum length of a record. Exceeding this limit usually indicates incongruency between the
    * record delimiter declared in the metadata versus the actual record delimiter in the data entity.
    */
-  private final int recordLengthLimit = 10000; 
+  private final int recordLengthLimit = 20000; 
   private boolean exceedsRecordLengthLimit = false; // When true, indicates that maximum record length has been exceeded
 	  
   
