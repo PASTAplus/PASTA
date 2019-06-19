@@ -311,7 +311,7 @@ public class DataManager {
    */
   public boolean downloadData(Entity entity, EcogridEndPointInterface endPointInfo,
                               DataStorageInterface[] dataStorageList, boolean preserveFormat) {
-    log.debug(String.format("***** Downloading data for: %s, entity: %s\n", entity.getPackageId(), entity.getName()));
+    log.info(String.format("***** Downloading data for: %s, entity: %s\n", entity.getPackageId(), entity.getName()));
     DownloadHandler downloadHandler = entity.getDownloadHandler(endPointInfo, preserveFormat);
     boolean success = false;
     

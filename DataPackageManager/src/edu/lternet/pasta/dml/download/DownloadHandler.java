@@ -335,22 +335,18 @@ public class DownloadHandler implements Runnable
     	    }
     	    
     	    success = handler.isSuccess();
-    	    //System.out.println("after setting success "+success);
     	    busy =false;
     	    completed = true;
-    		//System.out.println(" don't need download");
     		return;
     	}
     	else
     	{
     		// if no handler which points same url, put the handler into hash table for tracking
-    		//System.out.println("need download");
     		putDownloadHandlerIntoHash(this);
     	}
         
     	busy = true;
     	completed = false;
-    	//System.out.println("start get source"+url);
         
     	try
     	{
