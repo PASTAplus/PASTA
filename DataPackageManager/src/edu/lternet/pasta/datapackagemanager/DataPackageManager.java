@@ -128,15 +128,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	   * @return true if the data source is hosted by PASTA, else false.
 	   */
 	public static boolean isPastaDataSource(String dataSourceURL) {
-		if (dataSourceURL == null) {
+		if (dataSourceURL == null || pastaUriHead == null) {
 			return false;
 		}
-		final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
+		//final String patternString = "http[s]?\\://pasta[-]?[ds]?\\.lternet\\.edu/.*";
+		final String patternString = String.format("^%s.*", pastaUriHead);
 		Pattern pattern = Pattern.compile(patternString);
 		Matcher matcher = pattern.matcher(dataSourceURL);
 		return (matcher.matches());
 	}	  
 	  
+	
 	  /*
 	   * Composes a data package metadata resource identifier based on the PASTA URI
 	   * head value and a specific packageId value.
