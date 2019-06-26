@@ -88,14 +88,25 @@ public class DataPackageManagerTest {
   @Test 
   public void testIsPastaDataSource() {
     final String valid1 = "https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
-    final String valid2 = "http://pasta.lternet.edu/package/eml/knb-lter-hbr/58/5";
     final String invalid1 = "https:/pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
-    final String invalid2 = "http://pasta.lternet.ed";
+    final String invalid2 = "http://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    final String invalid3 = "https://pasta.lternet.edu/package/eml/knb-lter-hbr/58/5";
     
-    assertTrue(String.format("Expected %s to validate", valid1), DataPackageManager.isPastaDataSource(valid1));
-    assertTrue(String.format("Expected %s to validate", valid2), DataPackageManager.isPastaDataSource(valid2));
-    assertTrue(String.format("Expected %s to invalidate", invalid1), !DataPackageManager.isPastaDataSource(invalid1));
-    assertTrue(String.format("Expected %s to invalidate", invalid2), !DataPackageManager.isPastaDataSource(invalid2));
+    assertTrue(String.format("Expected %s to validate", 
+    		   valid1), 
+    		   DataPackageManager.isPastaDataSource(valid1));
+    
+    assertTrue(String.format("Expected %s to invalidate because single slash not double slash", 
+    		                 invalid1), 
+    		   !DataPackageManager.isPastaDataSource(invalid1));
+    
+    assertTrue(String.format("Expected %s to invalidate because 'http' not 'https'", 
+    		                 invalid2), 
+    		   !DataPackageManager.isPastaDataSource(invalid2));
+    
+    assertTrue(String.format("Expected %s to invalidate because different tier", 
+    		                 invalid2), 
+    		   !DataPackageManager.isPastaDataSource(invalid3));
   }
 
   

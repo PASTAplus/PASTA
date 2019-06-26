@@ -452,11 +452,12 @@ public abstract class DatabaseAdapter {
                   sqlDataPart.append(longNum);
               }
           }
+          
         } 
         catch (Exception e) {
           String msg = String.format(
-        	         "Data value %s is not the expected data type of '%s': %s", 
-        	         value, dataType, e.getMessage());
+        	         "For attribute name %s, data value %s is not the expected data type of '%s': %s", 
+        	         name, value, dataType, e.getMessage());
           log.error(msg);
           throw new DataNotMatchingMetadataException(msg);
         }
