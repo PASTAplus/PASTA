@@ -4398,7 +4398,7 @@ public class DataPackageRegistry {
           ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
 
           Connection connection = null;
-          String selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY package_id",
+          String selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY journal_citation_id",
                   JOURNAL_CITATION, packageId);
           Statement stmt = null;
 
