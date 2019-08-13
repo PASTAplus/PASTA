@@ -3506,13 +3506,6 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <code>curl -i -X GET https://pasta.lternet.edu/package/service-methods</code>
 	 * </td>
 	 * </tr>
-	 * <tr>
-	 * <td align=center>none</td>
-	 * <td align=center>none</td>
-	 * <td>
-	 * <code>curl -i -X GET https://pasta.lternet.edu/package/eml/knb-lter-lno/1?filter=newest</code>
-	 * </td>
-	 * </tr>
 	 * </table>
 	 *
 	 * <h4>Responses:</h4>
