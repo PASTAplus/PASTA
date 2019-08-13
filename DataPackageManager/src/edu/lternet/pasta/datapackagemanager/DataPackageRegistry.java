@@ -1688,7 +1688,8 @@ public class DataPackageRegistry {
 			Connection connection = null;
 			String selectString = String.format(
 				"SELECT entity_id,entity_name FROM %s " +
-			    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d",
+			    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d" +
+                        "ORDER BY date_created ASC",
 			    RESOURCE_REGISTRY, scope, identifier, revision);
 			logger.debug("selectString: " + selectString);
 
