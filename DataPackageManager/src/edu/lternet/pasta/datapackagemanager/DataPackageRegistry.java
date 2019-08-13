@@ -1611,7 +1611,7 @@ public class DataPackageRegistry {
 	 *            the data package scope value
 	 * @param identifier
 	 *            the data package identifier value
-	 * @param revison
+	 * @param revision
 	 *            the data package revision value
 	 * @return a String value separated by newlines, where each line has
 	 *         a data entity resource id followed by a comma followed by
@@ -1626,7 +1626,8 @@ public class DataPackageRegistry {
 		Connection connection = null;
 		String selectString = String.format(
 			"SELECT entity_id,resource_size FROM %s " +
-		    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d",
+		    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
+                "ORDER BY date_created ASC",
 		    RESOURCE_REGISTRY, scope, identifier, revision);
 		logger.debug("selectString: " + selectString);
 
