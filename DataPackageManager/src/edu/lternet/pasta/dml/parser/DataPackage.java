@@ -698,7 +698,7 @@ public class DataPackage
         emlVersionQualityCheck.setFound(emlNamespace);
         if (emlNamespace.equals("eml://ecoinformatics.org/eml-2.1.0") ||
             emlNamespace.equals("eml://ecoinformatics.org/eml-2.1.1") ||
-            emlNamespace.equals("eml://ecoinformatics.org/eml-2.2.0")
+            emlNamespace.equals("https://eml.ecoinformatics.org/eml-2.2.0")
            ) {
           isValidNamespace = true;
         }

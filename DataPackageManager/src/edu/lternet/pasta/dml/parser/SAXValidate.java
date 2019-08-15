@@ -93,7 +93,7 @@ public class SAXValidate extends DefaultHandler implements ErrorHandler {
           namespaces = String.format(
 		  "eml://ecoinformatics.org/eml-2.1.0 %s/eml-2.1.0/eml.xsd " +
           "eml://ecoinformatics.org/eml-2.1.1 %s/eml-2.1.1/eml.xsd " +
-          "eml://ecoinformatics.org/eml-2.2.0 %s/eml-2.2.0/xsd/eml.xsd " +
+          "https://eml.ecoinformatics.org/eml-2.2.0 %s/eml-2.2.0/xsd/eml.xsd " +
           "eml://ecoinformatics.org/literature-2.1.0 %s/eml-2.1.0/eml-literature.xsd " +
           "eml://ecoinformatics.org/project-2.1.0 %s/eml-2.1.0/eml-project.xsd " +
           "eml://ecoinformatics.org/literature-2.1.1 %s/eml-2.1.1/eml-literature.xsd " +

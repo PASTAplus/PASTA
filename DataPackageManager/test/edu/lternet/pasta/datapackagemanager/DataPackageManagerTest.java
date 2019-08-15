@@ -87,7 +87,12 @@ public class DataPackageManagerTest {
    */
   @Test 
   public void testIsPastaDataSource() {
-    final String valid1 = "https://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
+    String pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
+    if (pastaUriHead == null) {
+        fail("No value found for DataPackageManager property 'datapackagemanager.pastaUriHead'");
+    }
+
+    final String valid1 =  pastaUriHead + "eml/knb-lter-hbr/58/5";
     final String invalid1 = "https:/pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
     final String invalid2 = "http://pasta-d.lternet.edu/package/eml/knb-lter-hbr/58/5";
     final String invalid3 = "https://pasta.lternet.edu/package/eml/knb-lter-hbr/58/5";
@@ -105,7 +110,7 @@ public class DataPackageManagerTest {
     		   !DataPackageManager.isPastaDataSource(invalid2));
     
     assertTrue(String.format("Expected %s to invalidate because different tier", 
-    		                 invalid2), 
+    		                 invalid3),
     		   !DataPackageManager.isPastaDataSource(invalid3));
   }
 

@@ -50,7 +50,7 @@ public class MetadataFormatBackfiller {
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String EML_2_1_0 = "eml://ecoinformatics.org/eml-2.1.0";
 	private static final String EML_2_1_1 = "eml://ecoinformatics.org/eml-2.1.1";
-	private static final String EML_2_2_0 = "eml://ecoinformatics.org/eml-2.2.0";
+	private static final String EML_2_2_0 = "https://eml.ecoinformatics.org/eml-2.2.0";
 
 
 	/**

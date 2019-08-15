@@ -69,7 +69,7 @@ public class DublinCore {
 			else if (eml.contains("eml://ecoinformatics.org/eml-2.1.0")) {
 				v = EmlVersion.eml210;
 			}
-			else if (eml.contains("eml://ecoinformatics.org/eml-2.2.0")) {
+			else if (eml.contains("https://eml.ecoinformatics.org/eml-2.2.0")) {
 				v = EmlVersion.eml220;
 			}
 		}

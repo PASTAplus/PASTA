@@ -259,6 +259,7 @@ public class DatabaseHandlerTest extends TestCase {
 	    /*
 	     * First get a test data package and parse it.
 	     */
+	    //TODO: the test data package should be part of the test data resources, not dependent on one in pasta-d
 	    try {
 	      url = new URL(documentURL);
 	      metadataInputStream = url.openStream();
@@ -298,24 +299,23 @@ public class DatabaseHandlerTest extends TestCase {
 	      boolean isPresent = databaseHandler.isTableInDB(tableName);
 	      assertTrue("Could not find table " + tableName +" but it should be in db", 
 	                 isPresent);
-	      
 	      boolean successLoadingData = databaseHandler.loadDataToDB(dataPackage, endPointInfo);
-	      assertTrue("Couldn't load data, but it shoud be sucessful", successLoadingData);
-	      String sql = "select \"Column1\" from header_footer_consecutive_data where \"Column2\"=2;";
+	      assertTrue("Couldn't load data, but it should be successful", successLoadingData);
+	      String sql = "select \"count\" from public.sbcmbon_integrated_benthic_cov where \"replicate_id\"='2';";
 		  Connection connection = connectionPool.getConnection();
 		  Statement statement = connection.createStatement();
 		  ResultSet result = statement.executeQuery(sql);
 		  boolean next = result.next();
-		  float col1 = 0;
+		  int count = 0;
 		  if (next)
 		  {
-		     col1 = result.getFloat(1);
+		     count = result.getInt(1);
 		    
 		  }
 		  result.close();
 		  statement.close();
 		  connectionPool.returnConnection(connection);
-		  assertTrue (col1==0.0);
+            assertEquals(4, count);
 	      boolean successDrop = databaseHandler.dropTable(entity);
 	      assertTrue("Couldn't drop table, but it shoud be sucessful", successDrop);
 	    }
