@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import edu.lternet.pasta.common.PastaResource;
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.NotFoundException;
@@ -80,9 +81,10 @@ public class DataPackageRegistry {
   private static Logger logger = Logger.getLogger(DataPackageRegistry.class);
   
   private static final String PUBLIC = "public";
-  private static final String EML_VERSION = "2.1.0";
+  private static final String DEFAULT_EML_VERSION = "2.2.0";
+  private static final String DEFAULT_EML_NAMESPACE_PREFIX = "https://eml.";
   
-  
+
   /*
    * Instance variables
    */
@@ -1152,6 +1154,56 @@ public class DataPackageRegistry {
 	}
 
 
+    /**
+     * Gets the metadata format type value for a given resourceId.
+     *
+     * @param resourceId
+     *            the resource identifier
+     * @return the value of the 'format_type' field for the metadata
+     *         matching the specified resourceId ('resource_id') value's
+     *         packageId
+     */
+    public String getMetadataFormatType(String resourceId)
+            throws ClassNotFoundException, SQLException {
+
+        String formatType = null;
+
+        Connection connection = null;
+        String selectString = "SELECT format_type FROM " + RESOURCE_REGISTRY
+                + "  WHERE resource_id='" + resourceId + "'";
+
+        Statement stmt = null;
+
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(selectString);
+
+            while (rs.next()) {
+                formatType = rs.getString(1);
+                if (formatType != null) { formatType = formatType.trim(); }
+            }
+
+            if (stmt != null)
+                stmt.close();
+        }
+        catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            throw (e);
+        }
+        catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            e.printStackTrace();
+            throw (e);
+        }
+        finally {
+            returnConnection(connection);
+        }
+
+        return formatType;
+    }
+
   /**
    * Gets the entityName value for a given data entity resource identifier
    * 
@@ -1362,7 +1414,7 @@ public class DataPackageRegistry {
    *          as stored in the 'resource_registry' table.
    */
   public String getResourceAcl(String resourceId) 
-          throws ClassNotFoundException, SQLException {
+          throws ClassNotFoundException, SQLException, IllegalArgumentException {
 	boolean isOwner = true;
 	String principalOwner = null;
     String principal = null;
@@ -1370,10 +1422,30 @@ public class DataPackageRegistry {
     String access_order = null;
     String permission = null;
     boolean allowFirst = true;
-      StringBuffer accessXmlBuffer =
+
+    // Get the EML version
+    String emlVersion = null;
+    String emlNamespacePrefix = null;
+    String metadataResourceId = PastaResource.getMetadataResourceId(resourceId);
+    String formatType = getFormatType(metadataResourceId);
+    String[] segments = formatType.split("-");
+    if (segments.length > 1) {
+        emlVersion = segments[segments.length - 1];
+        segments = segments[0].split("ecoinformatics.org");
+        if (segments.length > 0) {
+            emlNamespacePrefix = segments[0];
+        }
+    }
+    if (emlVersion == null || emlNamespacePrefix == null) {
+        logger.error("Unexpected formatType for " + resourceId + ": " + formatType);
+        emlVersion = DEFAULT_EML_VERSION;
+        emlNamespacePrefix = DEFAULT_EML_NAMESPACE_PREFIX;
+    }
+
+    StringBuffer accessXmlBuffer =
           new StringBuffer("<access:access " +
-                               "xmlns:access=\"eml://ecoinformatics" +
-                               ".org/access-" + EML_VERSION + "\" " +
+                               "xmlns:access=" + emlNamespacePrefix +
+                               "ecoinformatics.org/access-" + emlVersion + "\" " +
                                "authSystem=\"https://pasta.edirepository.org" +
                                "/authentication\" " +
                                "order=\"allowFirst\" " +
