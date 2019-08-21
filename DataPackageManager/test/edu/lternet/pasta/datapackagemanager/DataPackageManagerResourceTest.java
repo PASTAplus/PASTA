@@ -80,11 +80,14 @@ public class DataPackageManagerResourceTest {
   private static Options options = null;
   private static String testDoi = null;
   private static File testEmlFile = null;
+  private static File testEmlFile_2_2 = null;
   private static String testEmlFileName = null;
+  private static String testEmlFileName_2_2 = null;
   private static String testPath = null;
   private static String testScope = null;
   private static String testScopeBogus = null;
   private static Integer testIdentifier = null;
+  private static Integer testIdentifier_2_2 = null;
   private static String testIdentifierStr = null;
   private static Integer testRevision = null;
   private static String testRevisionStr = null;
@@ -95,15 +98,17 @@ public class DataPackageManagerResourceTest {
   private static String testEntityName2 = null; // a second test entity
   private static String testEntitySize = null;
   private static String testEntitySize2 = null;
-	private static String testMaxIdleTimeStr = null;
-	private static Integer testMaxIdleTime = null;
-	private static String testIdleSleepTimeStr = null;
-	private static Integer testIdleSleepTime = null;
-	private static String testInitialSleepTimeStr = null;
-	private static Integer testInitialSleepTime = null;
-	private static String testPackageId = null;
-  
+  private static String testMaxIdleTimeStr = null;
+  private static Integer testMaxIdleTime = null;
+  private static String testIdleSleepTimeStr = null;
+  private static Integer testIdleSleepTime = null;
+  private static String testInitialSleepTimeStr = null;
+  private static Integer testInitialSleepTime = null;
+  private static String testPackageId = null;
+  private static String testPackageId_2_2 = null;
+
   private static final String ACL_START_TEXT = "<access:access";
+  private static final String ACL_START_TEXT_2_2 = "<access:access xmlns:access=\"https://eml.ecoinformatics.org/access-2.2.0\"";
   private static final String ACL_END_TEXT = "</access:access>";
   private static final String RMD_START_TEXT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<resourceMetadata>";
   private static final String RMD_END_TEXT = "</resourceMetadata>";
@@ -113,7 +118,8 @@ public class DataPackageManagerResourceTest {
   private static final Integer RMD_TEST_IDENTIFIER = new Integer(1);
   private static final Integer RMD_TEST_REVISION = new Integer(1);
   private static final String RMD_TEST_ENTITY_ID = "67e99349d1666e6f4955e9dda42c3cc2";
-  
+
+  private static final Integer ACL_TEST_IDENTIFIER_OFFSET = 1000000;
 
   
   /*
@@ -122,8 +128,8 @@ public class DataPackageManagerResourceTest {
   
   private String transaction = null;
   private String transactionBogus = "1000000000000";
-  
-  
+
+
   /*
    * Constructors
    */
@@ -227,6 +233,13 @@ public class DataPackageManagerResourceTest {
         else {
           testEmlFile = new File(testPath, testEmlFileName);
         }
+        testEmlFileName_2_2 = options.getOption("datapackagemanager.test.emlFileName.eml.2.2");
+        if (testEmlFileName_2_2 == null) {
+          fail("No value found for DataPackageManager property 'datapackagemanager.test.emlFileName.eml.2.2'");
+        }
+        else {
+          testEmlFile_2_2 = new File(testPath, testEmlFileName_2_2);
+        }
       }
       
       testMaxIdleTimeStr = options.getOption("datapackagemanager.test.maxidletime");
@@ -250,9 +263,9 @@ public class DataPackageManagerResourceTest {
       testRevision = new Integer(testRevisionStr);
       testUpdateRevision = testRevision + 1;
       testPackageId = testScope + "." + testIdentifier + "." + testRevision;
-		testMaxIdleTime = new Integer(testMaxIdleTimeStr);
-		testIdleSleepTime = new Integer(testIdleSleepTimeStr);
-		testInitialSleepTime = new Integer(testInitialSleepTimeStr);
+      testMaxIdleTime = new Integer(testMaxIdleTimeStr);
+      testIdleSleepTime = new Integer(testIdleSleepTimeStr);
+      testInitialSleepTime = new Integer(testInitialSleepTimeStr);
 
       dataPackageManagerResource = new DataPackageManagerResource();
       try {
@@ -279,9 +292,33 @@ public class DataPackageManagerResourceTest {
              e.getMessage());       		
       }
 
-      String testPackageId = testScope + "." + testIdentifier + "." + testRevision;
+      testPackageId = testScope + "." + testIdentifier + "." + testRevision;
       System.err.println("testPackageId: " + testPackageId);
-      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);       
+      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile, testPackageId);
+
+      Integer newestRevision_2_2 = null;
+      testIdentifier_2_2 = testIdentifier + ACL_TEST_IDENTIFIER_OFFSET;
+
+      try {
+        newestRevision_2_2 = dataPackageManager.getNewestRevision(testScope, testIdentifier_2_2);
+        while (newestRevision_2_2 != null) {
+          testIdentifier_2_2 += 1;
+          newestRevision_2_2 = dataPackageManager.getNewestRevision(testScope, testIdentifier_2_2);
+        }
+      }
+      catch (ResourceNotFoundException e) {
+        newestRevision_2_2 = null;
+      }
+      catch (Exception e) {
+        fail("Error encountered while initializing identifier value prior to running JUnit test: " +
+                e.getMessage());
+      }
+
+      testPackageId_2_2 = testScope + "." + testIdentifier_2_2 + "." + testRevision;
+      System.err.println("testPackageId_2_2: " + testPackageId_2_2);
+
+      DataPackageManagerResourceTest.modifyTestEmlFile(testScope, testEmlFile_2_2, testPackageId_2_2);
+
     }
   }
   
@@ -299,6 +336,7 @@ public class DataPackageManagerResourceTest {
   
   
   @Test public void runOrderedTests() {
+      testGetResourceAcl();
 	  testEvaluateDataPackage();
 	  testCreateDataPackage();
 	  testListDataPackageScopes();
@@ -373,31 +411,70 @@ public class DataPackageManagerResourceTest {
 
     testReadDataPackageError(testRevision.toString(), errorSnippet);
   }
-  
+
 
   /**
-   * Test the status and message body of the Create Data Package use case when
-   * attempting to create a data package that is already Level-1 (should fail)
-   *
-   * @TODO: For this test to work, need to re-implement EMLDataPackage.isLevelOne()
-   *        Current implementation is based on the old criteria for a Level-1 data package.
-  @Test public void testCreateDataPackageLevelOne() {
+   * Test getResourceAcl
+   */
+  private void testGetResourceAcl() {
     HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
-    String testEntityIdLevelOne = "knb-lter-lno.11111.1";
-    
-    // Test CREATE for 400 status
-    Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFileLevelOne);
+    String errorSnippet = "Attempting to insert a data package that already exists in PASTA";
+
+    // Test CREATE for OK status
+    Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile_2_2);
     int statusCode = response.getStatus();
-    assertTrue(statusCode == 400);
-    
+    assertEquals(202, statusCode);
+
     // Check the message body
     String entityString = (String) response.getEntity();
+    assertTrue(entityString != null);
+    assertTrue(entityString.startsWith("create_"));
+    this.transaction = entityString;
+    waitForPastaUpload_2_2(testRevision);
+
+    // Test readDataPackage for OK status
+    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier_2_2, testRevision.toString(), null);
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+
+    // Check the ACL
+    response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScope, testIdentifier_2_2, testRevision.toString());
+    statusCode = response.getStatus();
+    assertEquals(200, statusCode);
+
+    entityString = (String) response.getEntity();
     assertFalse(entityString == null);
     if (entityString != null) {
       assertFalse(entityString.isEmpty());
-      assertTrue(entityString.contains(testEntityIdLevelOne));
+      assertTrue(entityString.trim().startsWith(ACL_START_TEXT_2_2));
+      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
     }
-  }*/
+
+  }
+
+    /**
+     * Test the status and message body of the Create Data Package use case when
+     * attempting to create a data package that is already Level-1 (should fail)
+     *
+     * @TODO: For this test to work, need to re-implement EMLDataPackage.isLevelOne()
+     *        Current implementation is based on the old criteria for a Level-1 data package.
+    @Test public void testCreateDataPackageLevelOne() {
+      HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
+      String testEntityIdLevelOne = "knb-lter-lno.11111.1";
+
+      // Test CREATE for 400 status
+      Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFileLevelOne);
+      int statusCode = response.getStatus();
+      assertTrue(statusCode == 400);
+
+      // Check the message body
+      String entityString = (String) response.getEntity();
+      assertFalse(entityString == null);
+      if (entityString != null) {
+        assertFalse(entityString.isEmpty());
+        assertTrue(entityString.contains(testEntityIdLevelOne));
+      }
+    }*/
   
 
   /**
@@ -1401,8 +1478,29 @@ public class DataPackageManagerResourceTest {
       e.printStackTrace();
     }
   }
-  
-  
+
+
+  private void waitForPastaUpload_2_2(Integer revision) {
+    try {
+      // Ensure that the test data package has been successfully created
+      PastaUtility.waitForPastaUpload(
+              dataPackageManager,
+              this.transaction,
+              testInitialSleepTime,
+              testMaxIdleTime,
+              testIdleSleepTime,
+              testPackageId_2_2,
+              testScope,
+              testIdentifier_2_2,
+              revision
+      );
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+
   /**
    * Clean up and release any objects after each test is complete.
    */

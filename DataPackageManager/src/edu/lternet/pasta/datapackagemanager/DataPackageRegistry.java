@@ -1444,7 +1444,7 @@ public class DataPackageRegistry {
 
     StringBuffer accessXmlBuffer =
           new StringBuffer("<access:access " +
-                               "xmlns:access=" + emlNamespacePrefix +
+                               "xmlns:access=\"" + emlNamespacePrefix +
                                "ecoinformatics.org/access-" + emlVersion + "\" " +
                                "authSystem=\"https://pasta.edirepository.org" +
                                "/authentication\" " +
