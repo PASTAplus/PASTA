@@ -336,7 +336,6 @@ public class DataPackageManagerResourceTest {
   
   
   @Test public void runOrderedTests() {
-      testGetResourceAcl();
 	  testEvaluateDataPackage();
 	  testCreateDataPackage();
 	  testListDataPackageScopes();
@@ -410,46 +409,6 @@ public class DataPackageManagerResourceTest {
     }
 
     testReadDataPackageError(testRevision.toString(), errorSnippet);
-  }
-
-
-  /**
-   * Test getResourceAcl
-   */
-  private void testGetResourceAcl() {
-    HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
-    String errorSnippet = "Attempting to insert a data package that already exists in PASTA";
-
-    // Test CREATE for OK status
-    Response response = dataPackageManagerResource.createDataPackage(httpHeaders, testEmlFile_2_2);
-    int statusCode = response.getStatus();
-    assertEquals(202, statusCode);
-
-    // Check the message body
-    String entityString = (String) response.getEntity();
-    assertTrue(entityString != null);
-    assertTrue(entityString.startsWith("create_"));
-    this.transaction = entityString;
-    waitForPastaUpload_2_2(testRevision);
-
-    // Test readDataPackage for OK status
-    response = dataPackageManagerResource.readDataPackage(httpHeaders, testScope, testIdentifier_2_2, testRevision.toString(), null);
-    statusCode = response.getStatus();
-    assertEquals(200, statusCode);
-
-    // Check the ACL
-    response = dataPackageManagerResource.readDataPackageAcl(httpHeaders, testScope, testIdentifier_2_2, testRevision.toString());
-    statusCode = response.getStatus();
-    assertEquals(200, statusCode);
-
-    entityString = (String) response.getEntity();
-    assertFalse(entityString == null);
-    if (entityString != null) {
-      assertFalse(entityString.isEmpty());
-      assertTrue(entityString.trim().startsWith(ACL_START_TEXT_2_2));
-      assertTrue(entityString.trim().endsWith(ACL_END_TEXT));
-    }
-
   }
 
     /**
