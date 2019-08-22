@@ -61,7 +61,7 @@ public class PastaResource {
 	 */
 	static public String getPackageId(String resourceId)
 		throws IllegalArgumentException {
-		
+
 		String packageId = null;
 
 		String[] canonicalSubstrings = { "/package/data/eml/", "/package/report/eml/", "/package/eml/", "/package/metadata/eml/" };
@@ -87,7 +87,6 @@ public class PastaResource {
 		}
 
 		return packageId;
-		
 	}
 
 
@@ -111,6 +110,7 @@ public class PastaResource {
 			throws IllegalArgumentException {
 
 		String metadataResourceId = null;
+		String packageId = getPackageId(resourceId).replace('.', '/');
 
 		String[] canonicalSubstrings = { "/package/data/eml/", "/package/report/eml/", "/package/eml/", "/package/metadata/eml/" };
 		int index = -1;
@@ -119,13 +119,7 @@ public class PastaResource {
 			index = resourceId.indexOf(canonicalSubstrings[i]);
 			if (index > -1) {
 				String head = resourceId.substring(0, index);
-				String tail = resourceId.substring(index + canonicalSubstrings[i].length());
-				if (head != null && tail != null) {
-					String[] pathParts = tail.split("/");
-					String scope = pathParts[0];
-					String identifier = pathParts[1];
-					String revision = pathParts[2];
-					String packageId = scope + "/" + identifier + "/" + revision;
+				if (head != null) {
 					metadataResourceId = head + "/package/metadata/eml/" + packageId;
 				}
 				break;
@@ -137,7 +131,6 @@ public class PastaResource {
 		}
 
 		return metadataResourceId;
-
 	}
 
 	/*
