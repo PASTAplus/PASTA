@@ -26,6 +26,7 @@ common/test/edu/lternet/pasta/common/security/auth/UserCreds.properties
 /Gatekeeper/WebRoot/WEB-INF/web.xml
 /Gatekeeper/WebRoot/index.jsp
 /DataPackageManager/test/data/NoneSuchBugCount.xml
+/DataPackageManager/test/data/NoneSuchBugCountEml2.2.xml
 /DataPackageManager/WebRoot/xml/qualityReportTemplate.xml
 /DataPackageManager/WebRoot/WEB-INF/conf/ezidstage.jks
 /DataPortal2/test/data/NoneSuchBugCount.xml
