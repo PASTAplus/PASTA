@@ -1407,6 +1407,9 @@ public class DataPackageManagerResource extends PastaWebService {
 					+ serviceMethodName);
 		}
 
+		String msg = String.format("Evaluate (transaction: %s)", transaction);
+		logger.info(msg);
+
 		// Perform evaluateDataPackage in new thread
 		Evaluator evaluator = new Evaluator(emlFile, userId, authToken,
 				transaction, useChecksum);
