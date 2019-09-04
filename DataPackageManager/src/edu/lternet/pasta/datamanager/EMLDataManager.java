@@ -468,14 +468,16 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	 * Downloads and stores a data entity, or hard links to an existing data entity if
 	 * useChecksum is enabled and a matching entity from a previous revision can be
 	 * found.
-	 * 
-	 * @param emlPackageId     an EmlPackageId object
-	 * @param entityId         the entity id
-	 * @param entity           an Entity object
-	 * @param evaluateMode     boolean to determine whether the downloadEntity
-	 *                         operation should be run in evaluate mode.
+	 *
+	 * @param dataPackageRegistry an DataPackageRegistry object
+	 * @param emlPackageId     	  an EmlPackageId object
+	 * @param emlEntity           an EMLEntity object
+	 * @param evaluateMode     	  boolean to determine whether the downloadEntity
+	 *                            operation should be run in evaluate mode.
 	 * @throws IllegalStateException if the Data Manager Library indicates
 	 *         that the entity failed to download successfully
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
 	 */
 	public void downloadEntity(DataPackageRegistry dataPackageRegistry,
 			                      EmlPackageId emlPackageId,
