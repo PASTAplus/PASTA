@@ -1480,6 +1480,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
                     scope, identifier, revision);
 
+			String msg = String.format("Evaluate (transaction, package, user, skip download: %s, %s, %s, %s)",
+					transaction, packageId, user, useChecksum);
+			logger.info(msg);
+
 			/*
 			 * Evaluate the data package and create the quality report
 			 */
