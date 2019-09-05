@@ -31,14 +31,11 @@
  */
 package edu.lternet.pasta.dml.download;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.Hashtable;
 
 import org.apache.commons.logging.Log;
@@ -582,9 +579,18 @@ public class DownloadHandler implements Runnable
                      responseMessage = httpURLConnection.getResponseMessage();
                    }
                    else if (resourceName.startsWith("file")) {
-                     URLConnection urlConnection= url.openConnection();
-                     urlConnection.connect();
-                     contentType = urlConnection.getContentType();
+                     String filePath = resourceName.replace("file://", "");
+                     File file = new File(filePath);
+                     try
+                     {
+                       contentType = Files.probeContentType(file.toPath());
+                     }
+                     catch (IOException ioException)
+                     {
+                       log.error(String.format("Unable to determine file type for: %s", filePath));
+                       log.error(ioException);
+                       contentType = "content/unknown";
+                     }
                    }
                    else { // FTP
                 	 isFTP = true;
