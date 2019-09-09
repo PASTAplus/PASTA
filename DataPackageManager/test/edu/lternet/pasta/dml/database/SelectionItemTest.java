@@ -22,6 +22,7 @@ public class SelectionItemTest extends TestCase {
   
 	  private Entity entity          = null;
 	  private Attribute attribute    = null;
+	  private String packageId		  = "package.1.1";
 	  private String id              = "001";
 	  private String name            = "newEntity";
 	  private String description     = "test";
@@ -118,7 +119,7 @@ public class SelectionItemTest extends TestCase {
 		   assertTrue("should not catch exception", 1==2);
 	   }
        
-       entity = new Entity(id, name, description,caseSensitive,orientation,numRecords);
+       entity = new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
        entity.setDBTableName(dbTableName);
 	   entity.add(attribute);
 	   SelectionItem item4 = new SelectionItem(entity, attribute);

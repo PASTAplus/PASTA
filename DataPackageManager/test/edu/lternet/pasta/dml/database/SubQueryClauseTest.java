@@ -18,6 +18,7 @@ public class SubQueryClauseTest extends TestCase {
 	  private Entity entity2          = null;
 	  private Attribute attribute1    = null;
 	  private Attribute attribute2    = null;
+	  private String packageId		  = "package.1.1";
 	  private String id              = "001";
 	  private String name1            = "newEntity1";
 	  private String name2            = "newEntity2";
@@ -71,10 +72,10 @@ public class SubQueryClauseTest extends TestCase {
    */
   protected void setUp() throws Exception {
     super.setUp();
-    entity1 = new Entity(id, name1, description,caseSensitive,orientation,numRecords);
+    entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
     TextDomain domain = new TextDomain();
     attribute1 = new Attribute(attributeId, attributeName1, domain);
-    entity2 = new Entity(id, name2, description,caseSensitive,orientation,numRecords);
+    entity2 = new Entity(packageId, id, name2, description,caseSensitive,orientation,numRecords);
     attribute2 = new Attribute(attributeId, attributeName2, domain);
     entity1.setDBTableName(dbTableName1);
     entity2.setDBTableName(dbTableName2);

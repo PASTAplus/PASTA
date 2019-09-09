@@ -24,6 +24,7 @@ public class JoinTest extends TestCase {
 	  private Entity entity2          = null;
 	  private Attribute attribute1    = null;
 	  private Attribute attribute2    = null;
+	  private String packageId		  = "package.1.1";
 	  private String id              = "001";
 	  private String name1            = "newEntity1";
 	  private String name2            = "newEntity2";
@@ -109,7 +110,7 @@ public class JoinTest extends TestCase {
 		   assertTrue("both entity attribute is null, should catch exception", 1==1);
 	   }
        
-	   entity1 = new Entity(id, name1, description,caseSensitive,orientation,numRecords);
+	   entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
 	   TextDomain domain = new TextDomain();
 	   attribute1 = new Attribute(attributeId, attributeName1, domain);
 	   Join item2 = new Join(entity1, attribute1, entity2, attribute2);
@@ -124,7 +125,7 @@ public class JoinTest extends TestCase {
 		   assertTrue("both entity attribute is null, should catch exception", 1==1);
 	   }
        
-	   entity2 = new Entity(id, name2, description,caseSensitive,orientation,numRecords);
+	   entity2 = new Entity(packageId, id, name2, description,caseSensitive,orientation,numRecords);
 	   Join item3 = new Join(entity1, attribute1, entity2, attribute2);
        
 	   try

@@ -19,6 +19,7 @@ public class EntityTest extends TestCase
    * Instance fields
    */
   private Entity entity         = null;
+  private String packageId	    = "package.1.1";
   private String id             = "001";
   private String name           = "newEntity";
   private String description    = "test";
@@ -68,7 +69,7 @@ public class EntityTest extends TestCase
   protected void setUp() throws Exception
   {
     super.setUp();
-    entity = new Entity(id, name, description,caseSensitive,orientation,numRecords);
+    entity = new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
   }
 
   

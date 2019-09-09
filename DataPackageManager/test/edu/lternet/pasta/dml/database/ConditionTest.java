@@ -23,6 +23,7 @@ public class ConditionTest extends TestCase {
   
 	  private Entity entity          = null;
 	  private Attribute attribute    = null;
+	  private String packageId		  = "package.1.1";
 	  private String id              = "001";
 	  private String name            = "newEntity";
 	  private String description     = "test";
@@ -175,7 +176,7 @@ public class ConditionTest extends TestCase {
 	   
 	   operator = "LIKE";
 	   value = "er";
-       entity = new Entity(id, name, description,caseSensitive,orientation,numRecords);
+       entity = new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
        entity.setDBTableName(dbTableName);
 	   entity.add(attribute);
 	   Condition item7 = new Condition(entity, attribute, operator, value);

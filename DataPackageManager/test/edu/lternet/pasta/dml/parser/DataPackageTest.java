@@ -75,14 +75,15 @@ public class DataPackageTest extends TestCase
   public void testAddEntity()
   {
 	  Entity entity         = null;
-	  String id             = "001";
+      String packageId		  = "package.1.1";
+      String id             = "001";
 	  String name           = "newEntity";
 	  String description    = "test";
 	  Boolean caseSensitive = new Boolean(false);
 	  String  orientation   = "column";
 	  int     numRecords    = 200;
 	  entity = 
-         new Entity(id, name, description,caseSensitive,orientation,numRecords);
+         new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
 	  dataPackage.add(entity);
 	  Entity[] list = dataPackage.getEntityList();
 	  Entity gotEntity = list[0];

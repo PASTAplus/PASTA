@@ -180,7 +180,7 @@ public class DocumentDataPackageParser implements DataPackageParserInterface
         this.record = document2Map(doc, this.attributeXPathMap);
         
         //convert the map to an entity
-        Entity entity = map2Entity(this.record, dataPackage.getPackageId());
+        Entity entity = map2Entity(this.packageId, this.record, dataPackage.getPackageId());
         
         //add the entity to the datapackage
         this.dataPackage.clearEntityList();
@@ -198,7 +198,7 @@ public class DocumentDataPackageParser implements DataPackageParserInterface
     	return dataPackage;
     }
     
-	public static Entity map2Entity(Map record, String entityId) {
+	public static Entity map2Entity(String packageId, Map record, String entityId) {
 		
 		AttributeList attributeList = new AttributeList();
 		
@@ -218,6 +218,7 @@ public class DocumentDataPackageParser implements DataPackageParserInterface
 		
 		Entity entity = 
 			new Entity(
+					packageId,
 					entityId,
 					entityId, // + " name", 
 					entityId, // + " description",

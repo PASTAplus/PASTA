@@ -87,6 +87,7 @@ public class EMLEntity {
    * @param entity  An entity object as defined by the Data Manager Library.
    */
 	public EMLEntity(Entity entity) throws MalformedURLException, UnsupportedEncodingException {
+	    this.packageId = entity.getPackageId();
 		this.entity = entity;
 		this.dataFormat = entity.getDataFormat();
 		this.entityName = entity.getName();

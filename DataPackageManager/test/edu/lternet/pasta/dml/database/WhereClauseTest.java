@@ -19,7 +19,8 @@ public class WhereClauseTest extends TestCase {
 	  private Entity entity2          = null;
 	  private Attribute attribute1    = null;
 	  private Attribute attribute2    = null;
-	  private String id              = "001";
+	  private String packageId		  = "package.1.1";
+      private String id              = "001";
 	  private String name1            = "newEntity1";
 	  private String name2            = "newEntity2";
 	  private String description     = "test";
@@ -103,7 +104,7 @@ public class WhereClauseTest extends TestCase {
    */
   public void testToSQLStringBaseOnCondition()
   {
-	  entity1 = new Entity(id, name1, description,caseSensitive,orientation,numRecords);
+	  entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
 	  TextDomain domain = new TextDomain();
 	  attribute1 = new Attribute(attributeId, attributeName1, domain);
 	  entity1.setDBTableName(dbTableName1);
@@ -132,10 +133,10 @@ public class WhereClauseTest extends TestCase {
   {
 	   ANDRelation relation = new ANDRelation();
 	   
-	   entity1 = new Entity(id, name1, description,caseSensitive,orientation,numRecords);
+	   entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
 	   TextDomain domain = new TextDomain();
 	   attribute1 = new Attribute(attributeId, attributeName1, domain);
-	   entity2 = new Entity(id, name2, description,caseSensitive,orientation,numRecords);
+	   entity2 = new Entity(packageId, id, name2, description,caseSensitive,orientation,numRecords);
 	   attribute2 = new Attribute(attributeId, attributeName2, domain);
 	   entity1.setDBTableName(dbTableName1);
 	   entity2.setDBTableName(dbTableName2);
@@ -168,10 +169,10 @@ public class WhereClauseTest extends TestCase {
   {
 	   ORRelation relation = new ORRelation();
 	   
-	   entity1 = new Entity(id, name1, description,caseSensitive,orientation,numRecords);
+	   entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
 	   TextDomain domain = new TextDomain();
 	   attribute1 = new Attribute(attributeId, attributeName1, domain);
-	   entity2 = new Entity(id, name2, description,caseSensitive,orientation,numRecords);
+	   entity2 = new Entity(packageId, id, name2, description,caseSensitive,orientation,numRecords);
 	   attribute2 = new Attribute(attributeId, attributeName2, domain);
 	   entity1.setDBTableName(dbTableName1);
 	   entity2.setDBTableName(dbTableName2);

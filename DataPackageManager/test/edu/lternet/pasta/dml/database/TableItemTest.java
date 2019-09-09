@@ -14,6 +14,7 @@ public class TableItemTest extends TestCase {
        */
 	  private Entity entity          = null;
 	  //private Attribute attribute    = null;
+	  private String packageId		  = "package.1.1";
 	  private String id              = "001";
 	  private String name            = "newEntity";
 	  private String description     = "test";
@@ -83,7 +84,7 @@ public class TableItemTest extends TestCase {
 		   assertTrue("entity is null, should catch exception", 1==1);
 	   }
        
-	   entity = new Entity(id, name, description,caseSensitive,orientation,numRecords);
+	   entity = new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
 	   TableItem item2 = new TableItem(entity);
        
 	   try

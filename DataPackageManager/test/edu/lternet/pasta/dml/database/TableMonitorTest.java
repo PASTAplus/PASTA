@@ -118,13 +118,13 @@ public class TableMonitorTest extends TestCase {
     dbAdapterName = connectionPool.getDBAdapterName();
     dataManager = DataManager.getInstance(connectionPool, dbAdapterName);
 
-    entity = new Entity(id, entityName, description,
+    entity = new Entity(packageId, id, entityName, description,
                         caseSensitive, orientation, numRecords);
 
-    entityAncient = new Entity(idAncient, entityNameAncient, description,
+    entityAncient = new Entity(packageId, idAncient, entityNameAncient, description,
         caseSensitive, orientation, numRecords);
 
-    entityCurrent = new Entity(idCurrent, entityNameCurrent, description,
+    entityCurrent = new Entity(packageId, idCurrent, entityNameCurrent, description,
         caseSensitive, orientation, numRecords);
     
     if (dbAdapterName.equals(DatabaseAdapter.POSTGRES_ADAPTER)) {

@@ -1538,7 +1538,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           
           System.err.println(String.format("Package ID: %s  Entity: %s", packageId, entityName));
 
-          entityObject = new Entity(id, 
+          entityObject = new Entity(packageId, id,
                                     entityName == null ? null: entityName.trim(),
                                     entityDescription == null ? null: entityDescription.trim(), 
                                     new Boolean(entityCaseSensitive),

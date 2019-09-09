@@ -160,7 +160,9 @@ public class Entity extends DataObjectDescription
     
     /**
      * Constructs this object with some extra parameters.
-     * 
+     *
+     * @param packageId     the packageId of the entity
+     * @param id            the entity nodie id
      * @param name          the name of the Entity
      * @param description   the description of the Entity
      * @param caseSensitive indicates whether this Entity is caseSensitive
@@ -170,11 +172,11 @@ public class Entity extends DataObjectDescription
      * @param emlNamespace  the EML namespace value, e.g. 
      *                      "eml://ecoinformatics.org/eml-2.2.0"
      */
-    public Entity(String id, String name, String description,
+    public Entity(String packageId, String id, String name, String description,
                        Boolean caseSensitive, String orientation,
                        int numRecords, String emlNamespace)
     {
-        this(id, name, description, null);
+        this(packageId, id, name, description, null);
         attributeList = new AttributeList();
         
         if (caseSensitive != null) {
@@ -195,7 +197,9 @@ public class Entity extends DataObjectDescription
 
     /**
      * Constructs this object with some extra parameters.
-     * 
+     *
+     * @param packageId     the packageId of the entity
+     * @param id            the entity nodie id
      * @param name          the name of the Entity
      * @param description   the description of the Entity
      * @param caseSensitive indicates whether this Entity is caseSensitive
@@ -203,11 +207,11 @@ public class Entity extends DataObjectDescription
      *                      major
      * @param numRecords    the number of records in this Entity
      */
-    public Entity(String id, String name, String description,
+    public Entity(String packageId, String id, String name, String description,
                        Boolean caseSensitive, String orientation,
                        int numRecords)
     {
-        this(id, name, description, null);
+        this(packageId, id, name, description, null);
         attributeList = new AttributeList();
         
         if (caseSensitive != null) {
@@ -225,11 +229,12 @@ public class Entity extends DataObjectDescription
     /**
      * Construct an Entity, setting the list of attributes.
      */
-    public Entity(String id, String name, String description,
+    public Entity(String packageId, String id, String name, String description,
             AttributeList attributeList)
     {
         super(id, name, description);
         fileName = "";
+        this.packageId = packageId;
         this.attributeList = attributeList;       
         this.caseSensitive = new Boolean(false);
         this.orientation = "";
@@ -417,7 +422,7 @@ public class Entity extends DataObjectDescription
     public void addQualityCheck(QualityCheck qualityCheck) {
       if (entityReport != null) {
         entityReport.addQualityCheck(qualityCheck);
-        System.err.printf("  Entity: %s  Quality Check: %23s  Status: %5s\n", this, qualityCheck.getIdentifier(), qualityCheck.getStatus());
+        System.err.printf("  PackageID: %s  Entity: %s  Quality Check: %23s  Status: %5s\n", this.packageId, this, qualityCheck.getIdentifier(), qualityCheck.getStatus());
       }
     }
     

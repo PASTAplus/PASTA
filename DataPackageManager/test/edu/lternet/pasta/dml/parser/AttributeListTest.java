@@ -114,13 +114,14 @@ public class AttributeListTest extends TestCase
   public void testParentEntityGetterAndSetter()
   {
 	  Entity entity         = null;
-	  String id             = "001";
+      String packageId		  = "package.1.1";
+      String id             = "001";
 	  String name           = "newEntity";
 	  String description    = "test";
 	  Boolean caseSensitive = new Boolean(false);
 	  String  orientation   = "column";
 	  int     numRecords    = 200;
-	  entity = new Entity(id, name, description,caseSensitive,orientation,numRecords);
+	  entity = new Entity(packageId, id, name, description,caseSensitive,orientation,numRecords);
 	  list.setParent(entity);
 	  Entity gotEntity = list.getParent();
 	  assertEquals(entity, gotEntity);
