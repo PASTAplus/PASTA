@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 import edu.lternet.pasta.dml.database.DelimitedReader;
 import edu.lternet.pasta.dml.download.DownloadHandler;
 import edu.lternet.pasta.dml.download.EcogridEndPointInterface;
@@ -81,6 +83,8 @@ public class Entity extends DataObjectDescription
     public static String OTHERENTITY = "OTHERENTITY";
     
     public static HashMap<String, String> formatStringRegexes;
+
+    private static Logger logger = Logger.getLogger(Entity.class);
     
     static {
     	formatStringRegexes = new HashMap<String, String>();
@@ -111,6 +115,7 @@ public class Entity extends DataObjectDescription
     private boolean      multiple        = false; // if true, multiple inputs 
                                                   // can be mapped to one table
     private String fileName;       // filename where Entity data is stored
+    private String entityName;     // entity name
     private String url;            // distribution URL for this entity
     private String urlFunction;    // value of the URL "function" attribute
     private String urlContentType; // value of URLConnection.getContentType();
@@ -190,6 +195,10 @@ public class Entity extends DataObjectDescription
         if (orientation != null) {
             this.orientation = orientation;
         }
+
+        if (name != null) {
+            this.entityName = name;
+        }
         
         this.numRecords = numRecords;
     }
@@ -221,7 +230,11 @@ public class Entity extends DataObjectDescription
         if (orientation != null) {
             this.orientation = orientation;
         }
-        
+
+        if (name != null) {
+            this.entityName = name;
+        }
+
         this.numRecords = numRecords;
     }
     
@@ -239,7 +252,11 @@ public class Entity extends DataObjectDescription
         this.caseSensitive = new Boolean(false);
         this.orientation = "";
         this.entityReport = new EntityReport(this);
-        
+
+        if (name != null) {
+            this.entityName = name;
+        }
+
         checkEntityName(name);
         checkEntityDescription(description);
     }
@@ -1847,7 +1864,7 @@ public class Entity extends DataObjectDescription
         String foundString = "<![CDATA\n" + twoFiftySix + "\n]>"; */
         String foundString = null;
         if (isBinaryData()) {
-          foundString = "*** BINARY DATA ***";
+          foundString = "Cannot display NON-PLAIN TEXT DATA";
         }
         else {
           foundString = "<![CDATA[\n" + firstKilobyte.trim() + "]]>";
@@ -1963,12 +1980,17 @@ public class Entity extends DataObjectDescription
     private boolean isBinaryUrlContentType() {
       boolean isBinary = true;
       
-      if (urlContentType != null) {
+      if (this.urlContentType != null) {
         /*
          * Check for known text content types
          */
-        if (urlContentType.startsWith("text/") ||
-            urlContentType.equals("application/xml")
+
+        String msg = String.format("Data package: %s, entity: %s, content type: %s",
+                this.packageId, this.entityName, this.urlContentType);
+        logger.info(msg);
+
+        if (this.urlContentType.startsWith("text/") ||
+            this.urlContentType.equals("application/xml")
            ) {
           isBinary = false;
         }
