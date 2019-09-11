@@ -3814,8 +3814,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The identifier value of the data package
 	 * @param revision
 	 *          The revision value of the data package
-	 * @param map
-	 *          The resource map of the data package
 	 * @param authToken
 	 *          The authentication token of the user requesting the archive
 	 * @param transaction
@@ -3830,6 +3828,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		String archiveName = null;
 		DataPackageArchive dataPackageArchive = null;
+
+		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
+		String msg = String.format("Create data package archive (transaction: %s, package: %s, user: %s)",
+						transaction, packageId, userId);
+		logger.warn(msg);
 
 		try {
 			dataPackageArchive = new DataPackageArchive();
@@ -3856,12 +3859,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Returns the File object of the data package archive identified by the
 	 * transaction identifier.
 	 * 
-	 * @param transaction
-	 *          The transaction identifier of the data package archive.
+	 * @param packageId
+	 *          The package identifier of the data package archive.
 	 * @return The archive File object
-	 * @throws FileNotFoundException
+	 * @throws ResourceNotFoundException
 	 */
-	public File getDataPackageArchiveFile(String transaction)
+	public File getDataPackageArchiveFile(String packageId)
 	    throws ResourceNotFoundException {
 
 		File file = null;
@@ -3876,7 +3879,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		try {
-		file = archive.getDataPackageArchiveFile(transaction);
+		file = archive.getDataPackageArchiveFile(packageId);
 		} catch (FileNotFoundException e) {
 			throw new ResourceNotFoundException(e.getMessage());
 		}
@@ -3889,11 +3892,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Deletes the data package archive identified by the transaction identifier.
 	 * 
-	 * @param transaction
-	 *          The transaction identifier of the data package archive.
+	 * @param packageId
+	 *          The package identifier of the data package archive.
 	 * @throws FileNotFoundException
 	 */
-	public void deleteDataPackageArchive(String transaction)
+	public void deleteDataPackageArchive(String packageId)
 	    throws FileNotFoundException {
 
 		DataPackageArchive archive = null;
@@ -3905,7 +3908,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			e.printStackTrace();
 		}
 
-		archive.deleteDataPackageArchive(transaction);
+		archive.deleteDataPackageArchive(packageId);
 	}
 	
 	

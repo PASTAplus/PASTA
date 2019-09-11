@@ -53,11 +53,12 @@ public class DataPackageArchiveTest {
 
 	private static Logger logger = Logger.getLogger(DataPackageArchiveTest.class);
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	private static String tmpDir = null;
+	private static String entityDir = null;
 	private static String transaction = null;
 	private static final String scope = "knb-lter-nin";
 	private static final Integer identifier = 1;
 	private static final Integer revision = 1;
+	private static final String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static String testArchive = null;
 	private static String xslDir = null;
@@ -93,9 +94,9 @@ public class DataPackageArchiveTest {
 			options = ConfigurationListener.getOptions();
 		}
 
-		tmpDir = options.getOption("datapackagemanager.tmpDir");
+		entityDir = options.getOption("datapackagemanager.entityDir");
 
-		if (tmpDir == null || tmpDir.isEmpty()) {
+		if (entityDir == null || entityDir.isEmpty()) {
 			String gripe = "Error: property 'tmpDir' not set!";
 			throw new Exception(gripe);
 		}
@@ -110,7 +111,8 @@ public class DataPackageArchiveTest {
 		// Set transaction identifier based on wall-clock time
 		Long time = new Date().getTime();
 		transaction = time.toString();
-		testArchive = transaction + ".zip";
+
+		testArchive = packageId + ".zip";
 
 	}
 
@@ -162,12 +164,12 @@ public class DataPackageArchiveTest {
 	public void tearDown() throws Exception {
 
 		dpA = null;
-
-		File file = new File(tmpDir + "/" + testArchive);
+		String archive = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		File file = new File(archive);
 
 		// Clean up test archive
 		if (file.exists()) {
-			FileUtils.forceDelete(file);
+			 FileUtils.forceDelete(file);
 		}
 
 	}
@@ -197,7 +199,8 @@ public class DataPackageArchiveTest {
 		    testArchive.equals(archive));
 
 		// Test existence of test archive
-		file = new File(tmpDir + "/" + testArchive);
+		String archivePath = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		file = new File(archivePath);
 		assertTrue("Test archive " + testArchive + " does not exist!",
 		    file.exists());
 
@@ -214,6 +217,7 @@ public class DataPackageArchiveTest {
 		File file = null;
 
 		// Test for successful creation of test archive
+		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
 			    authToken, transaction, xslDir);
@@ -225,7 +229,7 @@ public class DataPackageArchiveTest {
 
 		// Test for getting file object of test archive
 		try {
-			file = dpA.getDataPackageArchiveFile(transaction);
+			file = dpA.getDataPackageArchiveFile(packageId);
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -251,6 +255,7 @@ public class DataPackageArchiveTest {
 		File file = null;
 
 		// Test for successful creation of test archive
+		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
 			    authToken, transaction, xslDir);
@@ -262,7 +267,7 @@ public class DataPackageArchiveTest {
 
 		// Test deleting test archive
 		try {
-	    dpA.deleteDataPackageArchive(transaction);
+	    dpA.deleteDataPackageArchive(packageId);
     } catch (FileNotFoundException e) {
 	    logger.error(e.getMessage());
 	    e.printStackTrace();
@@ -270,7 +275,8 @@ public class DataPackageArchiveTest {
     }
 		
 		// Test for successful deletion of test archive
-		file = new File(tmpDir + "/" + testArchive);
+		String archivePath = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		file = new File(archivePath);
 		assertFalse("Test archive still exists after attempted delete!", file.exists());
 		
 	}

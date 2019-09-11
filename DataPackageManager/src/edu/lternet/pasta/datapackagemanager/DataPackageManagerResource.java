@@ -6091,11 +6091,13 @@ public class DataPackageManagerResource extends PastaWebService {
 					+ serviceMethodName);
 		}
 
+		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
+
 		try {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			File file = dataPackageManager.getDataPackageArchiveFile(transaction);
-			String filename = String.format("%s.zip", transaction);
+			File file = dataPackageManager.getDataPackageArchiveFile(packageId);
+			String filename = String.format("%s.zip", packageId);
 
 			if (file != null && file.exists()) {
 				Long size = FileUtils.sizeOf(file);
