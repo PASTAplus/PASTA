@@ -82,7 +82,7 @@ public class DataPackageArchive {
 
 	private final Logger logger = Logger.getLogger(DataPackageArchive.class);
 
-	private String entityDir = null;
+	private String archiveDir = null;
 	private String tmpDir = null;
 
 	/*
@@ -100,9 +100,9 @@ public class DataPackageArchive {
 			options = ConfigurationListener.getOptions();
 		}
 
-		entityDir = options.getOption("datapackagemanager.entityDir");
+		archiveDir = options.getOption("datapackagemanager.archiveDir");
 
-		if (entityDir == null || entityDir.isEmpty()) {
+		if (archiveDir == null || archiveDir.isEmpty()) {
 			String gripe = "Entity directory property not set!";
 			throw new Exception(gripe);
 		}
@@ -157,7 +157,7 @@ public class DataPackageArchive {
 		String zipName = packageId + ".zip";
 		manifestStringBuffer.append("Manifest file for " + zipName + " created on " + now.toString() + "\n");
 
-		String zipPath = String.format("%s/%s/%s", entityDir, packageId, zipName);
+		String zipPath = String.format("%s/%s", archiveDir, zipName);
 		File zipFile = new File(zipPath);
 
 		if (!zipFile.exists()) {
@@ -348,7 +348,7 @@ public class DataPackageArchive {
 
 				// Create ZIP archive manifest
 				String manifestObjectName = "manifest.txt";
-				String manifestPath = String.format("%s/%s/%s", entityDir, packageId, manifestObjectName);
+				String manifestPath = String.format("%s/%s", archiveDir, manifestObjectName);
 				File manifestFile = new File(manifestPath);
 				FileUtils.writeStringToFile(manifestFile, manifestStringBuffer.toString());
 				FileInputStream manifestFileInputStream = new FileInputStream(manifestFile);
@@ -405,7 +405,7 @@ public class DataPackageArchive {
 	
 	private File transformMetadata(File emlFile, String xslPath, String txtObjectName) {
 		File txtFile = null;
-		String txtPath = String.format("%s/%s", this.entityDir, txtObjectName);
+		String txtPath = String.format("%s/%s", this.archiveDir, txtObjectName);
 		if (emlFile.exists()) {
 			try {
 				logger.info(String.format("Generating text rendering of EML metadata for: %s", emlFile.getName()));
@@ -477,7 +477,7 @@ public class DataPackageArchive {
 		public File getDataPackageArchiveFile(String packageId)
 		    throws FileNotFoundException {
 
-			String archive = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+			String archive = String.format("%s/%s.zip", archiveDir, packageId);
 			File file = new File(archive);
 
 			if (!file.exists()) {
@@ -499,7 +499,7 @@ public class DataPackageArchive {
 		public void deleteDataPackageArchive(String packageId)
 		    throws FileNotFoundException {
 
-			String archive = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+			String archive = String.format("%s/%s.zip", archiveDir, packageId);
 			File file = new File(archive);
 
 			if (!file.exists()) {

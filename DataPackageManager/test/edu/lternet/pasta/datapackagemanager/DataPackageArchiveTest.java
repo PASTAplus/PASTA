@@ -53,7 +53,7 @@ public class DataPackageArchiveTest {
 
 	private static Logger logger = Logger.getLogger(DataPackageArchiveTest.class);
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
-	private static String entityDir = null;
+	private static String archiveDir = null;
 	private static String transaction = null;
 	private static final String scope = "knb-lter-nin";
 	private static final Integer identifier = 1;
@@ -94,9 +94,9 @@ public class DataPackageArchiveTest {
 			options = ConfigurationListener.getOptions();
 		}
 
-		entityDir = options.getOption("datapackagemanager.entityDir");
+		archiveDir = options.getOption("datapackagemanager.archiveDir");
 
-		if (entityDir == null || entityDir.isEmpty()) {
+		if (archiveDir == null || archiveDir.isEmpty()) {
 			String gripe = "Error: property 'tmpDir' not set!";
 			throw new Exception(gripe);
 		}
@@ -164,12 +164,12 @@ public class DataPackageArchiveTest {
 	public void tearDown() throws Exception {
 
 		dpA = null;
-		String archive = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		String archive = String.format("%s/%s.zip", archiveDir, packageId);
 		File file = new File(archive);
 
 		// Clean up test archive
 		if (file.exists()) {
-			 FileUtils.forceDelete(file);
+//			 FileUtils.forceDelete(file);
 		}
 
 	}
@@ -199,7 +199,7 @@ public class DataPackageArchiveTest {
 		    testArchive.equals(archive));
 
 		// Test existence of test archive
-		String archivePath = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		String archivePath = String.format("%s/%s.zip", archiveDir, packageId);
 		file = new File(archivePath);
 		assertTrue("Test archive " + testArchive + " does not exist!",
 		    file.exists());
@@ -275,7 +275,7 @@ public class DataPackageArchiveTest {
     }
 		
 		// Test for successful deletion of test archive
-		String archivePath = String.format("%s/%s/%s.zip", entityDir, packageId, packageId);
+		String archivePath = String.format("%s/%s.zip", archiveDir, packageId);
 		file = new File(archivePath);
 		assertFalse("Test archive still exists after attempted delete!", file.exists());
 		
