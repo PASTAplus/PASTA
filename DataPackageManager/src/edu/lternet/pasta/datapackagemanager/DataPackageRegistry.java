@@ -476,7 +476,7 @@ public class DataPackageRegistry {
         if (resourceType == ResourceType.data) {
           pstmt.setString(7, resourceLocation);
           pstmt.setString(8, entityId);
-          pstmt.setString(9, entityName);
+          pstmt.setString(9, entityName.substring(0, Math.min(entityName.length(), 256)));
           pstmt.setString(10, fileName);
           pstmt.setString(11, principalOwner);
           pstmt.setTimestamp(12, ts);
@@ -1258,7 +1258,7 @@ public class DataPackageRegistry {
    * Gets the data_format value for a given data entity resource identifier
    * from the DATA_CACHE_REGISTRY table
    * 
-   * @param resourceId   the resource identifier
+   * @param entityId   the resource identifier
    * @return  the value of the database table's 'data_format' field matching
    *          the specified resourceId ('resource_id') value
    */
@@ -1746,7 +1746,7 @@ public class DataPackageRegistry {
 	   *            the data package scope value
 	   * @param identifier
 	   *            the data package identifier value
-	   * @param revison
+	   * @param revision
 	   *            the data package revision value
 	   * @return  a newline separated list, where each line in the list is an
 	   *          entity id followed by a comma, followed by an entity
@@ -2325,7 +2325,7 @@ public class DataPackageRegistry {
      * @param sourceId           The PASTA packageId of the source data package. A null value indicates
      *                           that the data source is external to PASTA.
      * @param sourceTitle        The title of the data source.
-     * @param isPastaDataSource  true if the data source exists in PASTA, false if it is external to PASTA
+     * @param sourceURL          The source URL.
      * @throws ClassNotFoundException
      * @throws SQLException
      * @throws ProvenanceException
@@ -2741,7 +2741,7 @@ public class DataPackageRegistry {
 	   * data package, such that the specified data package is a source
 	   * data package for the returned list of derived data packages.
 	   * 
-	   * @param  sourceId - the packageId of the source data package
+	   * @param  derivedId - the packageId of the derived data package
 	   * @return A list of packageId strings corresponding to the list of
 	   *         derived data packages associated with the specified source
 	   *         data packages. If no other data package depends on the
@@ -2798,7 +2798,7 @@ public class DataPackageRegistry {
 	   * 
 	   * @param scope        the data package scope value
 	   * @param identifier   the data package identifier value
-	   * @param revison      the data package revision value
+	   * @param revision      the data package revision value
 	   * @return A list of entity id strings corresponding to the list of
 	   *         data entities for the specified data package.
 	   * @throws ClassNotFoundException
@@ -3777,7 +3777,7 @@ public class DataPackageRegistry {
    * @param resourceId
    *          The resource identifier of the resource to be updated
    *          
-   * @param data_format
+   * @param dataFormat
    *          The value to be stored in the data_format field, e.g. "text/csv"
    *          
    * @throws ClassNotFoundException, IllegalArgumentException, SQLException
