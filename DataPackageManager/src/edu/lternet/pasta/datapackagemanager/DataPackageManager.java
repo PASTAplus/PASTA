@@ -637,6 +637,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
                     scope, identifier, revision);
 
+			logger.warn(LogMessageFormatter.createDataPackageLogMessage(transaction, packageId, user));
+
 			boolean isUpdate = false;
 			boolean useChecksum = false;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
@@ -1384,6 +1386,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					throw new ResourceDeletedException(message);
 				}
 
+				String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
+				logger.warn(LogMessageFormatter.deleteDataPackageLogMessage(packageId, user));
+
 				/*
 				 * Delete the metadata from the Metadata Catalog
 				 */
@@ -1480,10 +1485,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
                     scope, identifier, revision);
 
-			String msg =
-					String.format("Evaluate data package (transaction: %s, package: %s, user: %s, skip download: %s)",
-					transaction, packageId, user, useChecksum);
-			logger.warn(msg);
+            logger.warn(LogMessageFormatter.evaluateDataPackageLogMessage(transaction, packageId, user, useChecksum));
 
 			/*
 			 * Evaluate the data package and create the quality report
@@ -2612,6 +2614,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				throw new UnauthorizedException(message);
 			}
 
+			String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
+			logger.warn(LogMessageFormatter.readDataPackageLogMessage(packageId, user, oreFormat));
+
 			/*
 			 * Get the resource map
 			 */
@@ -3717,6 +3722,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             checkWorkingOn(dataPackageRegistry, levelZeroDataPackage.getDocid(),
                            scope, identifier, revision);
 
+			logger.warn(LogMessageFormatter.updateDataPackageLogMessage(transaction, packageId, user));
+
 			boolean isUpdate = true;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
@@ -3829,10 +3836,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		String archiveName = null;
 		DataPackageArchive dataPackageArchive = null;
 
-		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
-		String msg = String.format("Create data package archive (transaction: %s, package: %s, user: %s)",
-						transaction, packageId, userId);
-		logger.warn(msg);
+		String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
+		logger.warn(LogMessageFormatter.createDataPackageArchiveLogMessage(transaction, packageId, user));
 
 		try {
 			dataPackageArchive = new DataPackageArchive();
@@ -4171,6 +4176,68 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
        journalCitationsXML = stringBuilder.toString();
        return journalCitationsXML;
    }
+}
 
+class LogMessageFormatter
+{
+	private static String basicLogMessage(String methodName, String packageId, String user)
+	{
+		return String.format("%s (package: %s, user: %s", methodName, packageId, user);
+	}
 
+	private static String basicLogMessage(String methodName, String transaction, String packageId, String user)
+	{
+		return String.format("%s (transaction: %s, package: %s, user: %s", methodName, transaction, packageId, user);
+	}
+
+	private static String logMessageWithFlag(String methodName, String packageId, String user, String flagName, boolean flag)
+	{
+		return String.format("%s, %s: %s)", basicLogMessage(methodName, packageId, user), flagName, Boolean.toString(flag));
+	}
+
+	private static String logMessageWithFlag(String methodName, String transaction, String packageId, String user, String flagName, boolean flag)
+	{
+		return String.format("%s, %s: %s)", basicLogMessage(methodName, transaction, packageId, user), flagName, Boolean.toString(flag));
+	}
+
+	static String formatPackageId(String scope, Integer identifier, Integer revision)
+	{
+		if (revision != null)
+		{
+			return String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
+		}
+		else {
+			return String.format("%s.%s.*", scope, identifier.toString());
+		}
+	}
+
+	static String createDataPackageLogMessage(String transaction, String packageId, String user)
+	{
+		return String.format("%s)", basicLogMessage("createDataPackage", transaction, packageId, user));
+	}
+
+	static String updateDataPackageLogMessage(String transaction, String packageId, String user)
+	{
+		return String.format("%s)", basicLogMessage("updateDataPackage", transaction, packageId, user));
+	}
+
+	static String deleteDataPackageLogMessage(String packageId, String user)
+	{
+		return String.format("%s)", basicLogMessage("deleteDataPackage", packageId, user));
+	}
+
+	static String readDataPackageLogMessage(String packageId, String user, boolean oreFormat)
+	{
+		return logMessageWithFlag("readDataPackage", packageId, user, "oreFormat", oreFormat);
+	}
+
+	static String evaluateDataPackageLogMessage(String transaction, String packageId, String user, boolean useChecksum)
+	{
+		return logMessageWithFlag("evaluateDataPackage", transaction, packageId, user, "skipUpload", useChecksum);
+	}
+
+	static String createDataPackageArchiveLogMessage(String transaction, String packageId, String user)
+	{
+		return String.format("%s)", basicLogMessage("createDataPackageArchive", transaction, packageId, user));
+	}
 }
