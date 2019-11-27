@@ -811,7 +811,7 @@ public class Entity extends DataObjectDescription
      * Sets the metadata record delimiter value that was specified for
      * this entity. May be null or an empty string.
      * 
-     * @param  delim  the record delimiter string value to be set
+     * @param  metadataRecordDelimiter  the record delimiter string value to be set
      */
     public void setMetadataRecordDelimiter(String metadataRecordDelimiter) {
       this.metadataRecordDelimiter = metadataRecordDelimiter;
@@ -1228,7 +1228,7 @@ public class Entity extends DataObjectDescription
     /**
      * Sets the urlContentType value for this entity.
      * 
-     * @param url  the urlContentType string value to be set
+     * @param urlContentType  the urlContentType string value to be set
      */
     public void setUrlContentType(String urlContentType) {
       this.urlContentType = urlContentType;
@@ -1238,7 +1238,7 @@ public class Entity extends DataObjectDescription
     /**
      * Sets the urlFunction value for this entity.
      * 
-     * @param url    the urlFunction string value to be set
+     * @param urlFunction    the urlFunction string value to be set
      */
     public void setURLFunction(String urlFunction) {
       this.urlFunction = urlFunction;
@@ -1397,7 +1397,7 @@ public class Entity extends DataObjectDescription
     /**
      * Sets the fileSize value for this entity.
      * 
-     * @param fileSizse   The fileSize value to set
+     * @param size   The file size value to set
      */
    public void setFileSize(long size) {
     	this.fileSize = new Long(size);
@@ -1829,7 +1829,7 @@ public class Entity extends DataObjectDescription
      * Sets the identifier for this entity. Currently we use distribution url
      * as entity identifier.
      * 
-     * @param identifier of this entity, a string holding the distribution url
+     * @param url of this entity, a string holding the distribution url
      */
     public void setEntityIdentifier(String url)
     {
@@ -1884,8 +1884,9 @@ public class Entity extends DataObjectDescription
         new QualityCheck(urlDataIdentifier, urlDataTemplate);
 
       if (QualityCheck.shouldRunQualityCheck(this, urlDataQualityCheck)) {
-        boolean isHTML = isHTML(firstKilobyte);        
-        if (isHTML) {
+        boolean isHTML = isHTML(firstKilobyte);
+        String dataFormat = this.getDataFormat();
+        if (isHTML && !dataFormat.equals("text/html")) {
           String found = "The download URL for this entity returns HTML";
           urlDataQualityCheck.setFound(found);
           String explanation = "Either an HTML declaration string or an 'html' element was detected in the data";
@@ -1910,7 +1911,7 @@ public class Entity extends DataObjectDescription
      */
     private boolean isHTML(String sampleData) {
       boolean isHTML = false;
-      
+
       if (sampleData != null) {
         String htmlDeclaration = "<!doctype html";
         String htmlElement1 = "<html ";
@@ -1934,7 +1935,7 @@ public class Entity extends DataObjectDescription
           isHTML = true;
         }
       }
-      
+
       return isHTML;
     }
     
@@ -2041,7 +2042,7 @@ public class Entity extends DataObjectDescription
     /**
      * Sets the value of the externallyDefinedFormat field.
      * 
-     * @param textFixed The textFixed boolean value to set.
+     * @param externallyDefinedFormat The externallyDefinedFormat boolean value to set.
      */
     public void setExternallyDefinedFormat(boolean externallyDefinedFormat)
     {
