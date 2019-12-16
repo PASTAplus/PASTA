@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.datapackagemanager.solr.search;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -33,9 +34,9 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -115,7 +116,7 @@ public class SimpleSolrSearch {
 	 */
 
 	private Integer rows = ROWS_DEFAULT;
-	private SolrServer solrServer;
+	private SolrClient solrClient;
 	private SolrQuery solrQuery;
 	
 
@@ -124,7 +125,7 @@ public class SimpleSolrSearch {
 	 */
 	
 	public SimpleSolrSearch(String serverURL) {
-		this.solrServer = new HttpSolrServer(serverURL);
+		this.solrClient = new HttpSolrClient.Builder(serverURL).build();
 		this.solrQuery = new SolrQuery();
 	}
 	
@@ -204,8 +205,8 @@ public class SimpleSolrSearch {
 	 * @throws SolrServerException
 	 */
 	public String search() 
-			throws SolrServerException {
-		QueryResponse queryResponse = solrServer.query(solrQuery);
+			throws IOException, SolrServerException {
+		QueryResponse queryResponse = solrClient.query(solrQuery);
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
 		String xmlString = solrDocumentListToXML(solrDocumentList);
 		Map<String,Object> debugMap = queryResponse.getDebugMap();
@@ -322,24 +323,24 @@ public class SimpleSolrSearch {
 						}
 						sb.append(String.format("%s%s</%s>\n", INDENT, INDENT, wrapperElement));
 					}
-					else {					
+					else {
 						String rawValueStr = null;
-
-						if (isDateField(fieldName)) {
-							Date dateValue = (Date) solrDocument.getFieldValue(fieldName);
-							dateValue = adjustDate(dateValue);
-							String formatPattern = bestDateFormat(fieldName);
-							SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
-							if (dateValue != null) {
-								rawValueStr = sdf.format(dateValue);
+						Object o = solrDocument.getFieldValue(fieldName);
+						if (o != null) {
+							if (isDateField(fieldName)) {
+								Date dateValue = (Date) o;
+								dateValue = adjustDate(dateValue);
+								String formatPattern = bestDateFormat(fieldName);
+								SimpleDateFormat sdf = new SimpleDateFormat(formatPattern);
+								if (dateValue != null) {
+									rawValueStr = sdf.format(dateValue);
+								}
+							} else if (isFloatField(fieldName)) {
+								Float floatValue = (Float) o;
+								rawValueStr = floatValue.toString();
+							} else {
+								rawValueStr = o.toString();
 							}
-						}
-						else if (isFloatField(fieldName)) {
-							Float floatValue = (Float) solrDocument.getFieldValue(fieldName);
-							rawValueStr = floatValue.toString();
-						}
-						else {
-							rawValueStr = (String) solrDocument.getFieldValue(fieldName);
 						}
 						
 						if (rawValueStr == null) { 
@@ -385,7 +386,7 @@ public class SimpleSolrSearch {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String solrUrl = "http://localhost:8983/solr/collection1";
 		SimpleSolrSearch simpleSolrSearch =  new SimpleSolrSearch(solrUrl);
 		String queryText = args[0];
