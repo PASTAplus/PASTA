@@ -37,7 +37,7 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     	String scope = "knb-lter-nwk";
     	Integer identifier = new Integer(1424);
     	Integer revision = new Integer(35);
-    	String solrUrl = "http://localhost:8983/solr";
+    	String solrUrl = "http://localhost:8983/solr/collection1";
     	try {
     		String emlXML = FileUtils.readFileToString(emlFile);
     		EmlPackageId epi = new EmlPackageId(scope, identifier, revision);

@@ -519,7 +519,7 @@ public class DataPackage {
 		}
 
 		public String solrSerialize() {
-			return String.format("%s %s %s %s", west, south, east, north);
+			return String.format("ENVELOPE(%s, %s, %s, %s)", west, east, north, south);
 		}
 	}
 	
