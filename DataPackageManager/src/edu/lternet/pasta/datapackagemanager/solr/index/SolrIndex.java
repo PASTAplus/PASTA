@@ -1,23 +1,5 @@
 package edu.lternet.pasta.datapackagemanager.solr.index;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrInputDocument;
-
 import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.eml.DataPackage;
@@ -25,7 +7,18 @@ import edu.lternet.pasta.common.eml.DataPackage.BoundingCoordinates;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
-import edu.lternet.pasta.datapackagemanager.DataPackageManager;
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrInputDocument;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 
 public class SolrIndex {
@@ -42,7 +35,7 @@ public class SolrIndex {
 	 */
   
 	private final String DATE_GRANULARITY = "DAY";
-	private SolrServer solrServer = null;
+	private SolrClient solrClient = null;
 	
 	
 	/*
@@ -50,7 +43,7 @@ public class SolrIndex {
 	 */
 	
 	public SolrIndex(String serverURL) {
-		this.solrServer = new HttpSolrServer(serverURL);
+		this.solrClient = new HttpSolrClient.Builder(serverURL).build();
 	}
 	
 	
@@ -65,7 +58,7 @@ public class SolrIndex {
 	 * @throws SolrServerException
 	 */
 	public void commit() throws IOException, SolrServerException {
-		solrServer.commit();
+		solrClient.commit();
 	}
 	
 
@@ -82,7 +75,7 @@ public class SolrIndex {
 		List<String> ids = new ArrayList<String>();		
 		ids.add(id);
 
-		UpdateResponse updateResponse = solrServer.deleteById(ids);
+		UpdateResponse updateResponse = solrClient.deleteById(ids);
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
 		logger.info(String.format("Delete of document id %s; delete status %d", id, status));
 	}
@@ -400,7 +393,7 @@ public class SolrIndex {
 				}
 			}
 
-			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
+			UpdateResponse updateResponse = solrClient.add(solrInputDocument);
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
 			logger.info(String.format(
 					"Add of id %s; update status %d", id, status));
@@ -504,7 +497,7 @@ public class SolrIndex {
 			solrInputDocument.setField("id", id);
 			solrInputDocument.setField("doi", doiMap);
 
-			UpdateResponse updateResponse = solrServer.add(solrInputDocument);
+			UpdateResponse updateResponse = solrClient.add(solrInputDocument);
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
 			logger.info(String.format(
 					"Update of doi for id %s; update status %d", id, status));

@@ -11,4 +11,6 @@
 #
 #    $ sh bin/solrBatchIndex.sh knb-lter-abc.13,knb-lter-abc.14,knb-lter-abc.15
 #
+export NIS=$HOME/git/PASTA
+export DATAPACKAGEMANAGER=$NIS/DataPackageManager
 java -cp $DATAPACKAGEMANAGER/WebRoot/WEB-INF/classes:$DATAPACKAGEMANAGER/WebRoot/WEB-INF/lib/*:$NIS/lib/servlet/servlet-api.jar edu.lternet.pasta.datapackagemanager.solr.index.BatchIndex $1

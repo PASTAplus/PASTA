@@ -86,7 +86,7 @@ datapackagemanager.errorDir=/home/pasta/local/error
 datapackagemanager.archiveDir=/home/pasta/local/tmp
 datapackagemanager.auditmanager.host=audit.lternet.edu
 datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=LTER,dc=ecoinformatics,dc=org
-datapackagemanager.metadatacatalog.solrUrl=http://solr.lternet.edu:8983/solr
+datapackagemanager.metadatacatalog.solrUrl=http://solr.lternet.edu:8983/solr/collection1
 datapackagemanager.pastaUriHead=https://pasta.lternet.edu/package/
 datapackagemanager.test.doi=doi:10.6073/pasta/3bcc89b2d1a410b7a2c678e3c55055e1
 datapackagemanager.test.emlFileName=NoneSuchBugCount.xml

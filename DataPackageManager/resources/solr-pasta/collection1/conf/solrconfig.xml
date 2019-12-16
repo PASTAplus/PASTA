@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>4.10.1</luceneMatchVersion>
+  <luceneMatchVersion>8.3.0</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -334,7 +334,7 @@
         reduce the risk of propagating index corruption from older segments 
         into new ones, at the expense of slower merging.
     -->
-     <checkIntegrityAtMerge>false</checkIntegrityAtMerge>
+    <!-- <checkIntegrityAtMerge>false</checkIntegrityAtMerge> -->
   </indexConfig>
 
 
@@ -1175,8 +1175,10 @@
        Admin Handlers - This will register all the standard admin
        RequestHandlers.  
     -->
+  <!-- jide
   <requestHandler name="/admin/" 
                   class="solr.admin.AdminHandlers" />
+  -->
   <!-- This single handler is equivalent to the following... -->
   <!--
      <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />

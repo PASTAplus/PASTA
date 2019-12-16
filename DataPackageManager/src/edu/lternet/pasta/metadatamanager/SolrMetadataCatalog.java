@@ -116,7 +116,7 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     }
 
     
-    public String query(UriInfo uriInfo) {
+    public String query(UriInfo uriInfo) throws IOException {
     	String result = null;
     	
     	SimpleSolrSearch simpleSolrSearch = new SimpleSolrSearch(solrUrl);

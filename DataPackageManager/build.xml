@@ -28,10 +28,10 @@
 				<include name="**/commons-codec-*.jar"/>
 				<include name="**/commons-net-*.jar"/>
 			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-httpcomponents-core-4.3.2">
+			<fileset dir="${shared.lib.dir}/apache-httpcomponents-core-4.4.12">
 				<include name="**/*.jar"/>
 			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.3.3">
+			<fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.5.10">
 				<include name="**/*.jar"/>
 			</fileset>
 			<fileset dir="${shared.lib.dir}/apache-logging">
@@ -69,11 +69,14 @@
 				<include name="**/*.jar"/>
 			</fileset>
 			<fileset dir="${shared.lib.dir}/solrj">
-				<include name="solr-solrj-4.10.1.jar"/>
-				<include name="noggit-0.5.jar"/>
+				<include name="solr-solrj-8.3.0.jar"/>
+				<include name="noggit-0.8.jar"/>
 				<include name="slf4j-api-1.7.6.jar"/>
 			</fileset>
-		</copy>
+	                <fileset dir="${shared.lib.dir}/zookeeper-3.4.5">
+                                <include name="**/*.jar"/>
+                        </fileset>
+    		</copy>
 	</target>
 
 	<target name="deploy-solr"
