@@ -1562,8 +1562,10 @@ public class GenericDataPackageParser implements DataPackageParserInterface
           
           entityObject.setCollapseDelimiters(isCollapseDelimiters);         
           entityObject.setRecordDelimiter(recordDelimiter);
-          entityObject.setURL(onlineUrl);
-          entityObject.setURLFunction(onlineUrlFunction);
+          if (hasDistributionOnline) {
+              entityObject.setURL(onlineUrl);
+              entityObject.setURLFunction(onlineUrlFunction);
+          }
           entityObject.setDataFormat(format);
           entityObject.setCompressionMethod(compressionMethod);
           entityObject.setIsDataTableEntity(isDataTableEntity);
