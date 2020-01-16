@@ -49,6 +49,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import edu.lternet.pasta.dml.parser.generic.EMLValidator;
 import edu.lternet.pasta.dml.quality.EntityReport;
 import edu.lternet.pasta.dml.quality.QualityReport;
 import edu.lternet.pasta.dml.quality.QualityCheck;
@@ -238,7 +239,8 @@ public class DataPackage
    * identifier value and the value is the system attribute value, which may
    * be null or empty.
    * 
-   * @param qualityCheck    the new quality check to add
+   * @param alternateIdentifier    the new alternate identifier to add
+   * @param systemAttribute        the system attribute to add
    */
   public void putAlternateIdentifier(String alternateIdentifier, String systemAttribute) {
       alternateIdentifiers.put(alternateIdentifier, systemAttribute);
@@ -781,14 +783,21 @@ public class DataPackage
       String xmlString = XMLUtilities.getDOMTreeAsString(documentElement);
    
       try {
-        EMLParser emlParser = new EMLParser(xmlString);
-        found = "EML IDs and references parser succeeded";
-        parserValidQualityCheck.setStatus(Status.valid);
-        parserValidQualityCheck.setSuggestion("");
-        this.parserValid = true;
+//        EMLParser emlParser = new EMLParser(xmlString);
+        EMLValidator emlValidator = new EMLValidator(xmlString);
+        boolean isValidEML = emlValidator.validate();
+        if (isValidEML) {
+          found = "EML IDs and references parser succeeded";
+          parserValidQualityCheck.setStatus(Status.valid);
+          parserValidQualityCheck.setSuggestion("");
+          this.parserValid = true;
+        } else {
+          found = "Failed to parse IDs and references";
+          parserValidQualityCheck.setFailedStatus();
+        }
       }
       catch (Exception e) {
-        found = "Failed to parse IDs and references: " + e.getMessage();
+        found = "EML Validation exception occurred: " + e.getMessage();
         parserValidQualityCheck.setFailedStatus();
       }
       
@@ -1049,7 +1058,7 @@ public class DataPackage
    * Sets the value of the 'pubDate' to the specified String 
    * value.
    * 
-   * @param systemValue   the 'pubDate' value to set
+   * @param pubDate   the 'pubDate' value to set
    */
   public void setPubDate(String pubDate) {
     this.pubDate = pubDate;
