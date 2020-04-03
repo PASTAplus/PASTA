@@ -12410,7 +12410,8 @@ public class DataPackageManagerResource extends PastaWebService {
     public Response listDataPackageCitations(@Context HttpHeaders headers,
             @PathParam("scope") String scope,
             @PathParam("identifier") Integer identifier,
-            @PathParam("revision") String revision) {
+            @PathParam("revision") String revision,
+			@QueryParam("all") String allParam) {
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "listDataPackageCitations";
@@ -12445,8 +12446,7 @@ public class DataPackageManagerResource extends PastaWebService {
                         revision = newest.toString();
                     }
                 }
-                else
-                    if (revision.equals("oldest")) {
+                else if (revision.equals("oldest")) {
                         Integer oldest = dataPackageManager.getOldestRevision(
                                 scope, identifier);
                         if (oldest != null) {
@@ -12457,7 +12457,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
             Integer revisionInt = new Integer(revision);
             String journalCitationsXML = dataPackageManager.listDataPackageCitations(scope,
-                    identifier, revisionInt, authToken);
+                    identifier, revisionInt, authToken, allParam);
 
             if (journalCitationsXML != null) {
                 responseBuilder = Response.ok(journalCitationsXML.trim());

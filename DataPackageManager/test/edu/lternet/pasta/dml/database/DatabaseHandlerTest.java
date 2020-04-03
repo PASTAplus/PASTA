@@ -33,8 +33,8 @@ public class DatabaseHandlerTest extends TestCase {
   private Connection dbConnection  = null;            // the database connection
   private DatabaseConnectionPoolInterfaceTest connectionPool = null;
   private String dbAdapterName = null;
-  private final String TEST_DOCUMENT = "edi/3/2";
-  private final String TEST_SERVER = "https://pasta-d.lternet.edu/package/metadata/eml/";
+  private final String TEST_DOCUMENT = "test/1/1";
+  private final String TEST_SERVER = "http://localhost:8088/package/metadata/eml/";
   
   
     
@@ -301,7 +301,7 @@ public class DatabaseHandlerTest extends TestCase {
 	                 isPresent);
 	      boolean successLoadingData = databaseHandler.loadDataToDB(dataPackage, endPointInfo);
 	      assertTrue("Couldn't load data, but it should be successful", successLoadingData);
-	      String sql = "select \"count\" from public.sbcmbon_integrated_benthic_cov where \"replicate_id\"='2';";
+	      String sql = "select count(*) from public.e1_plant_biomass_6_16_csv where \"UID\"='2001111';";
 		  Connection connection = connectionPool.getConnection();
 		  Statement statement = connection.createStatement();
 		  ResultSet result = statement.executeQuery(sql);
@@ -315,7 +315,7 @@ public class DatabaseHandlerTest extends TestCase {
 		  result.close();
 		  statement.close();
 		  connectionPool.returnConnection(connection);
-            assertEquals(4, count);
+            assertEquals(1, count);
 	      boolean successDrop = databaseHandler.dropTable(entity);
 	      assertTrue("Couldn't drop table, but it shoud be sucessful", successDrop);
 	    }

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import edu.lternet.pasta.common.EmlPackageIdFormat;
 import edu.lternet.pasta.common.PastaResource;
 import org.apache.log4j.Logger;
 
@@ -4465,13 +4466,24 @@ public class DataPackageRegistry {
           return isOwner;
       }   
         
-      public ArrayList<JournalCitation> listDataPackageCitations(String packageId)
+      public ArrayList<JournalCitation> listDataPackageCitations(String scope, Integer identifier, Integer revision,
+                                                                 String allParam)
               throws ClassNotFoundException, SQLException, IllegalArgumentException {
           ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
 
           Connection connection = null;
-          String selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY journal_citation_id",
-                  JOURNAL_CITATION, packageId);
+          String selectString = "";
+          if (allParam != null) {
+              String packageId = scope + "." + String.valueOf(identifier) + ".%";
+              selectString = String.format("SELECT * FROM %s WHERE package_id LIKE '%s' ORDER BY journal_citation_id",
+                      JOURNAL_CITATION, packageId);
+          } else {
+              EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
+              EmlPackageIdFormat epif = new EmlPackageIdFormat();
+              String packageId = epif.format(epi);
+              selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY journal_citation_id",
+                      JOURNAL_CITATION, packageId);
+          }
           Statement stmt = null;
 
           try {
@@ -4486,6 +4498,7 @@ public class DataPackageRegistry {
                   String articleTitle = rs.getString("article_title");
                   String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
+                  String packageId = rs.getString("package_id");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
                   JournalCitation journalCitation = new JournalCitation();

@@ -4123,20 +4123,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     }
 
 
-   public String listDataPackageCitations(String scope, Integer identifier, Integer revision, AuthToken authToken) 
+   public String listDataPackageCitations(String scope, Integer identifier, Integer revision, AuthToken authToken,
+										  String allParam)
            throws Exception {
        boolean includeDeclaration = false;
        String journalCitationsXML = null;
        StringBuilder stringBuilder = new StringBuilder("");
-       EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
-       EmlPackageIdFormat epif = new EmlPackageIdFormat();
-       String packageId = epif.format(epi);
 
        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
                dbURL, dbUser, dbPassword);
        
        ArrayList<edu.lternet.pasta.datapackagemanager.JournalCitation> journalCitations = 
-               dataPackageRegistry.listDataPackageCitations(packageId);
+               dataPackageRegistry.listDataPackageCitations(scope, identifier, revision, allParam);
        
        stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
        stringBuilder.append("<journalCitations>\n");

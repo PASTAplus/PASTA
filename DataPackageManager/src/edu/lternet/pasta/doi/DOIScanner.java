@@ -256,17 +256,50 @@ public class DOIScanner {
 		String scope = null;
 		
 		if (packageId != null && packageId.contains(".")) {
-			scope = packageId.substring(0, packageId.indexOf('.'));
+			String[] parts = packageId.split("\\.");
+//			scope = packageId.substring(0, packageId.indexOf('.'));
+			scope = parts[0];
 		}
 		else {
 			throw new DOIException("The resource has a null or invalid packageId value.");
 		}
-		
 		return scope;
 	}
-	
-	
-	
+
+
+
+	private Integer identifierFromPackageId(String packageId)
+			throws DOIException {
+		Integer identifier = null;
+
+		if (packageId != null && packageId.contains(".")) {
+			String[] parts = packageId.split("\\.");
+			identifier = Integer.valueOf(parts[1]);
+		}
+		else {
+			throw new DOIException("The resource has a null or invalid packageId value.");
+		}
+		return identifier;
+	}
+
+
+
+	private Integer revisionFromPackageId(String packageId)
+			throws DOIException {
+		Integer revision = null;
+
+		if (packageId != null && packageId.contains(".")) {
+			String[] parts = packageId.split("\\.");
+			revision = Integer.valueOf(parts[2]);
+		}
+		else {
+			throw new DOIException("The resource has a null or invalid packageId value.");
+		}
+		return revision;
+	}
+
+
+
 	private String md5IdFromDoi(String doi) {
 	    String md5Id = null;
 	    
@@ -362,7 +395,13 @@ public class DOIScanner {
 				 * Find all the journal citations for this data package and tell the
 				 * DataCite metadata object to include them as relatedIdentifiers.
 				 */
-				ArrayList<JournalCitation> journalCitations = dataPackageRegistry.listDataPackageCitations(packageId);
+
+				String allParam = null;
+				Integer identifier = identifierFromPackageId(packageId);
+				Integer revision = revisionFromPackageId(packageId);
+
+				ArrayList<JournalCitation> journalCitations = dataPackageRegistry.listDataPackageCitations(scope,
+						identifier, revision, allParam);
 				dataCiteMetadata.addJournalCitations(journalCitations);
 
 				try {
