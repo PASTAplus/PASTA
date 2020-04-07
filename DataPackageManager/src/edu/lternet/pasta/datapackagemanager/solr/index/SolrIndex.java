@@ -59,7 +59,6 @@ public class SolrIndex {
 	 */
 	public void commit() throws IOException, SolrServerException {
 		solrClient.commit();
-		solrClient.close();
 	}
 	
 
@@ -77,7 +76,6 @@ public class SolrIndex {
 		ids.add(id);
 
 		UpdateResponse updateResponse = solrClient.deleteById(ids);
-		solrClient.close();
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
 		logger.info(String.format("Delete of document id %s; delete status %d", id, status));
 	}
@@ -396,7 +394,6 @@ public class SolrIndex {
 			}
 
 			UpdateResponse updateResponse = solrClient.add(solrInputDocument);
-			solrClient.close();
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
 			logger.info(String.format(
 					"Add of id %s; update status %d", id, status));
@@ -501,7 +498,6 @@ public class SolrIndex {
 			solrInputDocument.setField("doi", doiMap);
 
 			UpdateResponse updateResponse = solrClient.add(solrInputDocument);
-			solrClient.close();
 			int status = updateResponse.getStatus(); // Non-zero indicates failure
 			logger.info(String.format(
 					"Update of doi for id %s; update status %d", id, status));
