@@ -207,6 +207,7 @@ public class SimpleSolrSearch {
 	public String search() 
 			throws IOException, SolrServerException {
 		QueryResponse queryResponse = solrClient.query(solrQuery);
+		solrClient.close();  // Must now explicitly close the MF solr connection
 		SolrDocumentList solrDocumentList = queryResponse.getResults();
 		String xmlString = solrDocumentListToXML(solrDocumentList);
 		Map<String,Object> debugMap = queryResponse.getDebugMap();

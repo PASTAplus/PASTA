@@ -59,6 +59,7 @@ public class SolrIndex {
 	 */
 	public void commit() throws IOException, SolrServerException {
 		solrClient.commit();
+		solrClient.close();
 	}
 	
 
