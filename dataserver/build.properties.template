@@ -1,4 +1,4 @@
 # Ant properties for building the dataserver 
 # and deploying to the second Tomcat instance
-tomcat.home=/home/pasta/local/apache-tomcat-2
-tomcat.lib=/home/pasta/local/apache-tomcat-2/lib
+tomcat.home=/var/lib/tomcat8
+tomcat.lib=/usr/share/tomcat8/lib
