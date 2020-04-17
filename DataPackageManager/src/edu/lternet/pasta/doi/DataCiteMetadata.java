@@ -338,7 +338,13 @@ public class DataCiteMetadata extends CitationMetadata {
 
             if (dpr != null) {
                 String packageId = "edi.0.3";
-                ArrayList<JournalCitation> citations = dpr.listDataPackageCitations(packageId);
+				String allParam = null;
+				String scope = "edi";
+				Integer identifier = 0;
+				Integer revision = 3;
+
+				ArrayList<JournalCitation> citations = dpr.listDataPackageCitations(scope, identifier, revision,
+						allParam);
                 dcm.addJournalCitations(citations);
             }
 
