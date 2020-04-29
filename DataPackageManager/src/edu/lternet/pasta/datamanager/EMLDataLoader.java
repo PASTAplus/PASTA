@@ -108,7 +108,7 @@ public class EMLDataLoader implements DataStorageInterface {
    * to the entityId.
    * 
    * @param  url        the data URL
-   * @param  packageId  the packageId string
+   * @param  emlPackageId  the packageId string
    * @param  entitytId  the entityId string
    */
   public void putUrlMapEntries(String url, EmlPackageId emlPackageId, String entityId) {

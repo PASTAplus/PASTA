@@ -23,6 +23,8 @@ import java.util.*;
 
 public class SolrIndex {
 
+
+
 	  /*
 	   * Class fields
 	   */
@@ -61,7 +63,7 @@ public class SolrIndex {
 		solrClient.commit();
 		// solrClient.close();
 	}
-	
+
 
 	/**
 	 * Deletes an EML document from the Solr repository.
@@ -80,7 +82,7 @@ public class SolrIndex {
 		int status = updateResponse.getStatus(); // Non-zero indicates failure
 		logger.info(String.format("Delete of document id %s; delete status %d", id, status));
 	}
-	
+
 	
 	private String determineBeginDate(Set<String> beginDates) {
 		String lowestDate = ISO8601Utility.formatTimestamp("9999-12-31", DATE_GRANULARITY);
