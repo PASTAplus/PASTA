@@ -16,11 +16,11 @@ public class DownloadHandlerTest extends TestCase
      * Class fields
      */
   
-	private static final String METADATA_URL   = "https://pasta-s.lternet.edu/package/metadata/eml/knb-lter-arc/1424/5";
-	private static final long METADATA_EXPECTED_SIZE = 27550; // Expected size of metadata file
-	private static final String INCORRECT_METADATA_URL = "https://pasta-s.lternet.edu/package/metadata/eml/knb-lter-arc/1424/1";
-	private static final String DATA_URL = "https://pasta-s.lternet.edu/package/data/eml/knb-lter-arc/1424/5/dec159de2bffcb968c7f3084a838ca18";
-	private static final long DATA_EXPECTED_SIZE = 40309; // Expected size of data file
+	private static final String METADATA_URL   = "https://pasta-s.lternet.edu/package/metadata/eml/edi/7/7";
+	private static final long METADATA_EXPECTED_SIZE = 46996; // Expected size of metadata file
+	private static final String INCORRECT_METADATA_URL = "https://pasta-s.lternet.edu/package/metadata/eml/edi/7/0";
+	private static final String DATA_URL = "https://pasta-s.lternet.edu/package/data/eml/edi/7/7/172a4b6e794eb14e8e5ccb97fef435a1";
+	private static final long DATA_EXPECTED_SIZE = 398; // Expected size of data file
 
     
     /*

@@ -12305,7 +12305,12 @@ public class DataPackageManagerResource extends PastaWebService {
      * 
      * <strong>List Data Package Citations</strong> operation, specifying the scope,
      * identifier, and revision values to match in the URI.
-     * 
+	 *
+	 * <p>
+	 * Return all citations for a given data package series if the "?all" query parameter
+	 * is appended to the URL.
+     * </p>
+	 *
      * <h4>Requests:</h4>
      * <table border="1" cellspacing="0" cellpadding="3">
      * <tr>
@@ -12320,7 +12325,14 @@ public class DataPackageManagerResource extends PastaWebService {
      * <code>curl -i -X GET https://pasta.lternet.edu/package/citations/eml/edi/1/1</code>
      * </td>
      * </tr>
-     * </table>
+	 <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td align=center>
+	 * <code>curl -i -X GET https://pasta.lternet.edu/package/citations/eml/edi/1/1?all</code>
+	 * </td>
+	 * </tr>
+	 * </table>
      * 
      * <h4>Responses:</h4>
      * <table border="1" cellspacing="0" cellpadding="3">
@@ -12410,7 +12422,8 @@ public class DataPackageManagerResource extends PastaWebService {
     public Response listDataPackageCitations(@Context HttpHeaders headers,
             @PathParam("scope") String scope,
             @PathParam("identifier") Integer identifier,
-            @PathParam("revision") String revision) {
+            @PathParam("revision") String revision,
+			@QueryParam("all") String allParam) {
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "listDataPackageCitations";
@@ -12445,8 +12458,7 @@ public class DataPackageManagerResource extends PastaWebService {
                         revision = newest.toString();
                     }
                 }
-                else
-                    if (revision.equals("oldest")) {
+                else if (revision.equals("oldest")) {
                         Integer oldest = dataPackageManager.getOldestRevision(
                                 scope, identifier);
                         if (oldest != null) {
@@ -12457,7 +12469,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
             Integer revisionInt = new Integer(revision);
             String journalCitationsXML = dataPackageManager.listDataPackageCitations(scope,
-                    identifier, revisionInt, authToken);
+                    identifier, revisionInt, authToken, allParam);
 
             if (journalCitationsXML != null) {
                 responseBuilder = Response.ok(journalCitationsXML.trim());
