@@ -28,6 +28,7 @@ import java.util.Date;
 
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -112,7 +113,8 @@ public class DataPackageArchiveTest {
 		Long time = new Date().getTime();
 		transaction = time.toString();
 
-		testArchive = packageId + ".zip";
+		String userHash = DigestUtils.md5Hex(testUser);
+		testArchive = packageId + "-" + userHash + ".zip";
 
 	}
 
@@ -199,7 +201,7 @@ public class DataPackageArchiveTest {
 		    testArchive.equals(archive));
 
 		// Test existence of test archive
-		String archivePath = String.format("%s/%s.zip", archiveDir, packageId);
+		String archivePath = String.format("%s/%s", archiveDir, testArchive);
 		file = new File(archivePath);
 		assertTrue("Test archive " + testArchive + " does not exist!",
 		    file.exists());
@@ -229,7 +231,7 @@ public class DataPackageArchiveTest {
 
 		// Test for getting file object of test archive
 		try {
-			file = dpA.getDataPackageArchiveFile(packageId);
+			file = dpA.getDataPackageArchiveFile(packageId, testUser);
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -267,7 +269,7 @@ public class DataPackageArchiveTest {
 
 		// Test deleting test archive
 		try {
-	    dpA.deleteDataPackageArchive(packageId);
+	    dpA.deleteDataPackageArchive(packageId, testUser);
     } catch (FileNotFoundException e) {
 	    logger.error(e.getMessage());
 	    e.printStackTrace();

@@ -6096,7 +6096,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			File file = dataPackageManager.getDataPackageArchiveFile(packageId);
+			File file = dataPackageManager.getDataPackageArchiveFile(packageId, userId);
 			String filename = String.format("%s.zip", packageId);
 
 			if (file != null && file.exists()) {
