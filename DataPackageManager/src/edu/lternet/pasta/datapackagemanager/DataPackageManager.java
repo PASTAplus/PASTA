@@ -3869,7 +3869,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return The archive File object
 	 * @throws ResourceNotFoundException
 	 */
-	public File getDataPackageArchiveFile(String packageId)
+	public File getDataPackageArchiveFile(String packageId, String userId)
 	    throws ResourceNotFoundException {
 
 		File file = null;
@@ -3884,7 +3884,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		try {
-		file = archive.getDataPackageArchiveFile(packageId);
+		file = archive.getDataPackageArchiveFile(packageId, userId);
 		} catch (FileNotFoundException e) {
 			throw new ResourceNotFoundException(e.getMessage());
 		}
@@ -3901,7 +3901,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The package identifier of the data package archive.
 	 * @throws FileNotFoundException
 	 */
-	public void deleteDataPackageArchive(String packageId)
+	public void deleteDataPackageArchive(String packageId, String userId)
 	    throws FileNotFoundException {
 
 		DataPackageArchive archive = null;
@@ -3913,7 +3913,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			e.printStackTrace();
 		}
 
-		archive.deleteDataPackageArchive(packageId);
+		archive.deleteDataPackageArchive(packageId, userId);
 	}
 	
 	
