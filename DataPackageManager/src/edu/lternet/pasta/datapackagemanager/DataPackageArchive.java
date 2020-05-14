@@ -153,8 +153,9 @@ public class DataPackageArchive {
 		StringBuffer manifestStringBuffer = new StringBuffer();
 		Date now = new Date();
 
+		String userHash = DigestUtils.md5Hex(userId);
 		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
-		String zipName = packageId + ".zip";
+		String zipName = packageId + "-" + userHash +".zip";
 		manifestStringBuffer.append("Manifest file for " + zipName + " created on " + now.toString() + "\n");
 
 		String zipPath = String.format("%s/%s", archiveDir, zipName);
@@ -474,10 +475,13 @@ public class DataPackageArchive {
 		 * @return The archive file object
 		 * @throws FileNotFoundException
 		 */
-		public File getDataPackageArchiveFile(String packageId)
+		public File getDataPackageArchiveFile(String packageId, String userId)
 		    throws FileNotFoundException {
 
-			String archive = String.format("%s/%s.zip", archiveDir, packageId);
+			String userHash = DigestUtils.md5Hex(userId);
+			String zipName = packageId + "-" + userHash +".zip";
+
+			String archive = String.format("%s/%s", archiveDir, zipName);
 			File file = new File(archive);
 
 			if (!file.exists()) {
@@ -496,10 +500,13 @@ public class DataPackageArchive {
 		 *          The package identifier of the data package archive.
 		 * @throws FileNotFoundException
 		 */
-		public void deleteDataPackageArchive(String packageId)
+		public void deleteDataPackageArchive(String packageId, String userId)
 		    throws FileNotFoundException {
 
-			String archive = String.format("%s/%s.zip", archiveDir, packageId);
+			String userHash = DigestUtils.md5Hex(userId);
+			String zipName = packageId + "-" + userHash +".zip";
+
+			String archive = String.format("%s/%s", archiveDir, zipName);
 			File file = new File(archive);
 
 			if (!file.exists()) {
