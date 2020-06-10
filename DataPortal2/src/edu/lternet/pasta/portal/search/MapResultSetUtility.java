@@ -301,21 +301,28 @@ public class MapResultSetUtility {
   	
   	/*
   	 * Example coordinates argument string:
-  	 *     "-124.3983126 43.625394 -121.3531372 45.5751826"
-  	 *      W bound      S bound   E bound      N bound
+     *     "ENVELOPE(-79.2936, -79.1002, 33.357, 33.1925)"
+     *                W-bound  E-bound   N-bound S-bound
   	 */
   	private String composeLocationField(String coordinates, Set<String> coordinatesSet, boolean useOffset) {
   		String field = null;
   		double lat = 0;
   		double lon = 0;
   		
-  		if (coordinates != null && coordinates.contains(" ")) {
+  		if (coordinates != null && coordinates.contains("ENVELOPE")) {
+
+            // Remove ancillary content from coordinate string
+            coordinates = coordinates
+                    .replace("ENVELOPE(", "")
+                    .replace(")", "")
+                    .replace(",", "");
+
   			String[] tokens = coordinates.split(" ");
   			if (tokens.length == 4) {
-  				String wStr = tokens[0];
-  				String sStr = tokens[1];
-  				String eStr = tokens[2];
-  				String nStr = tokens[3];
+                String wStr = tokens[0];
+                String eStr = tokens[1];
+                String nStr = tokens[2];
+                String sStr = tokens[3];
 				try {			
 					if (wStr.equals(eStr)) {
 						lon = Double.parseDouble(wStr);
