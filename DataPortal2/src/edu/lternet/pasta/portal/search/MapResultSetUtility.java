@@ -309,13 +309,15 @@ public class MapResultSetUtility {
   		double lat = 0;
   		double lon = 0;
   		
-  		if (coordinates != null && coordinates.contains("ENVELOPE")) {
+        if (coordinates != null) {
 
-            // Remove ancillary content from coordinate string
-            coordinates = coordinates
-                    .replace("ENVELOPE(", "")
-                    .replace(")", "")
-                    .replace(",", "");
+            if (coordinates.contains("ENVELOPE")) {
+                // Remove ancillary content from coordinate string
+                coordinates = coordinates
+                        .replace("ENVELOPE(", "")
+                        .replace(")", "")
+                        .replace(",", "");
+            }
 
   			String[] tokens = coordinates.split(" ");
   			if (tokens.length == 4) {
