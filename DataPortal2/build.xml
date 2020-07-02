@@ -63,7 +63,7 @@
        <include name="**/utilities.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/owasp">
-        <include name="**/esapi-2.0.1.jar"/>
+        <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
         <include name="**/postgresql-42.2.5.jre7.jar"/>
