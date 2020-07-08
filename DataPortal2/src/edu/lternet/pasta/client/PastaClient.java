@@ -34,6 +34,9 @@ import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.log4j.Logger;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
+
 import edu.lternet.pasta.common.ResourceDeletedException;
 import edu.lternet.pasta.common.ResourceExistsException;
 import edu.lternet.pasta.common.ResourceNotFoundException;
@@ -250,8 +253,12 @@ public class PastaClient {
   protected void handleStatusCode(int statusCode, String entityString)
       throws Exception {
     final Exception e;
+
+    // Sanitize all exception messages for XSS payloads
+    PolicyFactory policy = Sanitizers.STYLES;
+    String cleanMsg = policy.sanitize(entityString);
     
-    String msg = String.format("PASTA returned status code %d: %s", statusCode, entityString);
+    String msg = String.format("PASTA returned status code %d - %s", statusCode, cleanMsg);
     
     switch (statusCode) {
       case HttpStatus.SC_BAD_REQUEST:
