@@ -91,10 +91,9 @@
         String today = CalendarUtility.todaysDayOfWeek();
         if (today != null && today.equalsIgnoreCase(downtime)) {
             StringBuilder sb = new StringBuilder();
-            sb.append(String.format("The Data Portal and PASTA+ services will be unavailable on %s evening from 7-9 pm Mountain Time for scheduled weekly maintenance.",
-                                    downtime));
-            downtimeHTML = String.format("<em>Please Note: </em>%s",
-                                         sb.toString());
+            sb.append(String.format("Reminder: The Data Portal and PASTA+ services will be unavailable on %s " +
+                            "evening from 7-9 pm Mountain Time for scheduled weekly maintenance.", downtime));
+            downtimeHTML = sb.toString();
         }
     }   
 %>
@@ -177,7 +176,11 @@
 				<div class="span8 box_shadow box_layout">
 					<div class="row-fluid">
 						<div class="span12">
-                            <p class="nis-warn"><%= downtimeHTML %></p>                               
+                            <% if (downtimeHTML != "") { %>
+                                <div class="alert alert-info">
+                                    <strong><%= downtimeHTML %></strong>
+                                </div>
+                            <% } %>
 							<div class="recent_title">
 								<h2>Welcome to the LTER Network Data Portal</h2>
 							</div>
@@ -202,16 +205,6 @@
 							and unpublished works whenever possible. Digital object 
 							identifiers (DOI) are provided for each dataset to facilitate 
 							citation. </p>
-							<!--  
-							<p>Voluntary registration on this site will allow us 
-							to notify you of updates to data and metadata of interest 
-							and of corrections made to data. In addition, your validated 
-							login will gain you access to even more data where contributors 
-							have asked for additional information on use.
-							<span name="New user registration for non-LTER members coming soon!" 
-							class="tooltip">Register now</span>!
-							</p>
-							-->
 							<p>LTER Network scientists make every effort to release 
 							data in a timely fashion and with attention to accurate, 
 							well-designed and well-documented data. To understand 
