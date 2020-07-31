@@ -64,6 +64,7 @@
 			</fileset>
 			<fileset dir="${shared.lib.dir}/owasp">
 				<include name="**/esapi-2.0.1.jar"/>
+				<include name="**/encoder-1.2.2.jar"/>
 			</fileset>
 			<fileset dir="${shared.lib.dir}/postgresql">
 				<include name="**/*.jar"/>

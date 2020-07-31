@@ -15,6 +15,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import org.owasp.encoder.Encode;
 
 public class JournalCitation {
     
@@ -215,16 +216,16 @@ public class JournalCitation {
         sb.append(String.format("    <dateCreated>%s</dateCreated>\n", getDateCreatedStr())); 
         
         if (this.articleDoi != null)
-            { sb.append(String.format("    <articleDoi>%s</articleDoi>\n", this.articleDoi)); }
+            { sb.append(String.format("    <articleDoi>%s</articleDoi>\n", Encode.forXml(this.articleDoi))); }
         
         if (this.articleTitle != null)
-            { sb.append(String.format("    <articleTitle>%s</articleTitle>\n", this.articleTitle)); } 
+            { sb.append(String.format("    <articleTitle>%s</articleTitle>\n", Encode.forXml(this.articleTitle))); }
         
         if (this.articleUrl != null)
-            { sb.append(String.format("    <articleUrl>%s</articleUrl>\n", this.articleUrl)); } 
+            { sb.append(String.format("    <articleUrl>%s</articleUrl>\n", Encode.forXml(this.articleUrl))); }
     
         if (this.journalTitle != null)
-            { sb.append(String.format("    <journalTitle>%s</journalTitle>\n", this.journalTitle)); } 
+            { sb.append(String.format("    <journalTitle>%s</journalTitle>\n", Encode.forXml(this.journalTitle))); }
         
         sb.append("</journalCitation>\n");
 
