@@ -107,15 +107,15 @@
         pastaHost.startsWith("localhost")
        ) {
        tier = "development";
-       sunset = "The development LTER Data Portal interface to the development EDI data repository (this website) will be officially sunsetted 1 September 2020. Please transition to the development EDI Data Portal (https://portal-d.edirepository.org) for uninterrupted access to the development EDI data repository. Send questions or comments to support@enivronmentaldatainitiative.org.";
+       sunset = "The LTER Data Portal in the development environment (this website) will be officially sunsetted 1 September 2020. Please transition to the EDI Data Portal (https://portal-d.edirepository.org) in the same environment for uninterrupted access to the EDI data repository. The EDI Data Portal provides improved services and new features compared to the LTER Data Portal. Send questions or comments to support@enivronmentaldatainitiative.org.";
     }
     else if (pastaHost.startsWith("pasta-s")) {
        tier = "staging";
-       sunset = "The staging LTER Data Portal interface to the staging EDI data repository (this website) will be officially sunsetted 1 September 2020. Please transition to the staging EDI Data Portal (https://portal-s.edirepository.org) for uninterrupted access to the staging EDI data repository. Send questions or comments to support@enivronmentaldatainitiative.org.";
+       sunset = "The LTER Data Portal in the staging environment (this website) will be officially sunsetted 1 September 2020. Please transition to the EDI Data Portal (https://portal-s.edirepository.org) in the same environment for uninterrupted access to the EDI data repository. The EDI Data Portal provides improved services and new features compared to the LTER Data Portal. Send questions or comments to support@enivronmentaldatainitiative.org.";
 
     }
     else {
-        sunset = "The LTER Data Portal interface to the EDI data repository (this website) will be officially sunsetted 1 September 2020. Please transition to the development EDI Data Portal (https://portal.edirepository.org) for uninterrupted access to the EDI data repository. Send questions or comments to support@enivronmentaldatainitiative.org.";
+        sunset = "The LTER Data Portal (this website) will be officially sunsetted 1 September 2020. Please transition to the EDI Data Portal (https://portal.edirepository.org) for uninterrupted access to the EDI data repository. The EDI Data Portal provides improved services and new features compared to the LTER Data Portal. Send questions or comments to support@enivronmentaldatainitiative.org.";
   }
 
 
