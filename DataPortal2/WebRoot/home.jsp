@@ -17,6 +17,7 @@
   -->
 
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="edu.lternet.pasta.client.DataPackageManagerClient" %>
 <%@ page import="edu.lternet.pasta.common.CalendarUtility" %>
 <%@ page import="edu.lternet.pasta.portal.ConfigurationListener" %>
 <%@ page import="edu.lternet.pasta.portal.DataPortalServlet" %>
