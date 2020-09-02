@@ -76,23 +76,23 @@
       <suggestion>Value of the packageId attribute must conform with LTER best practices</suggestion>
       <reference></reference>
     </qualityCheck>
-    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
-      <identifier>pubDatePresent</identifier>
-      <name>'pubDate' element is present</name>
-      <description>Check for presence of the pubDate element</description>
-      <expected>The date that the dataset was submitted for publication in PASTA must be included.
-            (The EML schema does not require this element, but when present, it does constrain its
-            format to YYYY-MM-DD or just YYYY. Citation format uses only the YYYY portion even if a
-            full date is entered.)  
-      </expected>
-      <found></found>
-      <status>notChecked</status>
-      <explanation>'pubDate is part of citation'. 'pubDate' qualifies use of "ongoing" in other metadata elements.</explanation>
-      <suggestion>The year of public release of data online should be listed as the 'pubDate'
-            element. The 'pubDate' should be updated when data and/or metadata are updated or re-released. 
-            The format can be either a 4-digit year (YYYY), or an ISO date (YYYY-MM-DD).</suggestion>
-      <reference>EML Best Practices v.2, p. 17</reference>
-    </qualityCheck>
+<!--    <qualityCheck qualityType="metadata" system="lter" statusType="warn" >-->
+<!--      <identifier>pubDatePresent</identifier>-->
+<!--      <name>'pubDate' element is present</name>-->
+<!--      <description>Check for presence of the pubDate element</description>-->
+<!--      <expected>The date that the dataset was submitted for publication in PASTA must be included.-->
+<!--            (The EML schema does not require this element, but when present, it does constrain its-->
+<!--            format to YYYY-MM-DD or just YYYY. Citation format uses only the YYYY portion even if a-->
+<!--            full date is entered.)-->
+<!--      </expected>-->
+<!--      <found></found>-->
+<!--      <status>notChecked</status>-->
+<!--      <explanation>'pubDate is part of citation'. 'pubDate' qualifies use of "ongoing" in other metadata elements.</explanation>-->
+<!--      <suggestion>The year of public release of data online should be listed as the 'pubDate'-->
+<!--            element. The 'pubDate' should be updated when data and/or metadata are updated or re-released.-->
+<!--            The format can be either a 4-digit year (YYYY), or an ISO date (YYYY-MM-DD).</suggestion>-->
+<!--      <reference>EML Best Practices v.2, p. 17</reference>-->
+<!--    </qualityCheck>-->
     <qualityCheck qualityType="metadata" system="lter" statusType="warn" >
       <identifier>keywordPresent</identifier>
       <name>keyword element is present</name>
