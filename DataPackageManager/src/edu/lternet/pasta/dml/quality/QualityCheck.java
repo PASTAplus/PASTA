@@ -441,7 +441,7 @@ public class QualityCheck {
    * attribute value, then the check is assumed to apply to all versions of
    * EML by default.
    * 
-   * @param dataPackage    The dataPackage object that represents the EML document.
+   * @param emlNamespace    The eml namespace of the EML document.
    * @return  true if this check applies to the EML namespace value declared in
    *          the data package, else false.
    */
