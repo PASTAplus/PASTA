@@ -25,6 +25,7 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -59,34 +60,48 @@ public final class LevelOneEMLFactory {
    */
   private static final Logger logger = Logger.getLogger(LevelOneEMLFactory.class);
 
+  private static final String ABSTRACT_PATH = "//dataset/abstract";
+  private static final String ACCESS_ALLOW_PATH = "//eml/access/allow";
+  private static final String ACCESS_ALLOW_PRINCIPAL_PATH = "//eml/access/allow/principal";
   private static final String ACCESS_PATH = "//access";
+  private static final String ACKNOWLEDGEMENTS_PATH = "//dataset/acknowledgements";
+  private static final String ADDITIONAL_INFO_PATH = "//dataset/additionalInfo";
+  private static final String ANNOTATION_PATH = "//dataset/annotation";
+  private static final String ASSOCIATED_PARTY_PATH = "//dataset/associatedParty";
   private static final String CONTACT_PATH = "//dataset/contact";
+  private static final String COVERAGE_PATH = "//dataset/coverage";
+  private static final String CREATOR_PATH = "//dataset/creator";
+  private static final String DATASET_PATH = "//eml/dataset";
+  private static final String DISTRIBUTION_PATH = "//dataset/distribution";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
-  private static final String DATASET_PATH = "//eml/dataset";
+  private static final String GETTING_STARTED_PATH = "//dataset/gettingStarted";
+  private static final String INTRODUCTION_PATH = "//dataset/introduction";
+  private static final String KEYWORD_SET_PATH = "//dataset/keywordSet";
+  private static final String LANGUAGE_PATH = "//dataset/language";
   private static final String LEVEL_ONE_AUTH_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org/authentication";
-  public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
-  public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
+  private static final String LICENSED_PATH = "//dataset/licensed";
+  private static final String MAINTENANCE_PATH = "//dataset/maintenance";
+  private static final String METADATA_PROVIDER_PATH = "//dataset/metadataProvider";
   private static final String OBJECT_NAME = "physical/objectName";
   private static final String ONLINE_URL = "physical/distribution/online/url";
   private static final String OTHER_ENTITY = "otherEntity";
+  private static final String PUB_DATE_PATH = "//dataset/pubDate";
+  private static final String PUBLISHER_PATH = "//dataset/publisher";
+  private static final String PURPOSE_PATH = "//dataset/purpose";
+  private static final String SERIES_PATH = "//dataset/series";
+  private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
   private static final String SPATIAL_VECTOR_ENTITY = "spatialVector";
   private static final String STORED_PROCEDURE_ENTITY = "storedProcedure";
   private static final String SYSTEM_ATTRIBUTE_PATH = "//@system";
   private static final String TABLE_ENTITY = "dataTable";
-  private static final String VIEW_ENTITY = "view";
-  
-  private static final String DISTRIBUTION_PATH = "//dataset/distribution";
-  private static final String LICENSED_PATH = "//dataset/licensed";
-  private static final String COVERAGE_PATH = "//dataset/coverage";
-  private static final String PURPOSE_PATH = "//dataset/purpose";
-  private static final String MAINTENANCE_PATH = "//dataset/maintenance";
-  private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String TITLE_PATH = "//dataset/title";
-  private static final String ACCESS_ALLOW_PATH = "//eml/access/allow";
-  private static final String ACCESS_ALLOW_PRINCIPAL_PATH = "//eml/access/allow/principal";
-  
+  private static final String VIEW_ENTITY = "view";
+
+  public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
+  public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
+
   private static final String INTELLECTUAL_RIGHTS_CC_BY = 
     "This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
 
@@ -149,6 +164,7 @@ public final class LevelOneEMLFactory {
     
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
+    modifyPubDate(levelZeroEMLDocument);
     checkIntellectualRights(levelZeroEMLDocument);
     checkEdiPrincipal(levelZeroEMLDocument);
 
@@ -160,8 +176,12 @@ public final class LevelOneEMLFactory {
 	 * Enhance a Level-1 EML document with additional information such as the
 	 * DOI identifier.
 	 * 
-	 * @param levelOneEMLDocument
+	 * @param leveOneEMLDocument
 	 *            the original Level-1 EML Document
+	 * @param alternateID
+	 * 			  alternate identifier (e.g., DOI)
+	 * @param attributeValue
+	 * 			  value of alternate identifier attribute
 	 * @return the enhanced Level-1 EML Document, a Document object
 	 * @throws TransformerException
 	 */
@@ -460,84 +480,145 @@ public final class LevelOneEMLFactory {
 	}
 
 
-	  /*
-	   * Add a Level-1 access/allow element with EDI principal to document.
-	   */
-		private void addEdiPrincipal(Document doc)
-				throws TransformerException {
-			Element allowElement = doc.createElement("allow");
-			Element principalElement = doc.createElement("principal");
-			principalElement.appendChild(doc.createTextNode(EDI));
-			allowElement.appendChild(principalElement);
-			Element permissionElement = doc.createElement("permission");
-			permissionElement.appendChild(doc.createTextNode("all"));
-			allowElement.appendChild(permissionElement);
-			
-			/* 
-			 * Insert the access/allow element before an existing access/allow element.
-			 */
-			if (hasElement(doc, ACCESS_ALLOW_PATH)) {
-				Node accessNode = getAccessNode(doc);
-				if (accessNode != null) {
-					String insertBefore = ACCESS_ALLOW_PATH;
-					NodeList insertNodeList = getElementNodeList(doc, insertBefore);
-					Node insertNode = insertNodeList.item(0);		
-					accessNode.insertBefore(allowElement, insertNode);
-				}
-			}
-			else {
-				Node emlNode = getEmlNode(doc);
-				Element accessElement = doc.createElement("access");
-			    //<access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" scope="document" system="https://pasta.edirepository.org">
-				accessElement.setAttribute("authSystem", "https://pasta.edirepository.org/authentication");
-				accessElement.setAttribute("order", "allowFirst");
-				accessElement.setAttribute("scope", "document");
-				accessElement.setAttribute("system", "https://pasta.edirepository.org");
-				accessElement.appendChild(allowElement);
-				String insertBefore = DATASET_PATH;
+  /*
+   * Add a Level-1 access/allow element with EDI principal to document.
+   */
+	private void addEdiPrincipal(Document doc)
+			throws TransformerException {
+		Element allowElement = doc.createElement("allow");
+		Element principalElement = doc.createElement("principal");
+		principalElement.appendChild(doc.createTextNode(EDI));
+		allowElement.appendChild(principalElement);
+		Element permissionElement = doc.createElement("permission");
+		permissionElement.appendChild(doc.createTextNode("all"));
+		allowElement.appendChild(permissionElement);
+
+		/*
+		 * Insert the access/allow element before an existing access/allow element.
+		 */
+		if (hasElement(doc, ACCESS_ALLOW_PATH)) {
+			Node accessNode = getAccessNode(doc);
+			if (accessNode != null) {
+				String insertBefore = ACCESS_ALLOW_PATH;
 				NodeList insertNodeList = getElementNodeList(doc, insertBefore);
-				Node insertNode = insertNodeList.item(0);		
-				emlNode.insertBefore(accessElement, insertNode);
+				Node insertNode = insertNodeList.item(0);
+				accessNode.insertBefore(allowElement, insertNode);
 			}
 		}
-
-
-	    /**
-	     * Add an alternateIdentifier element to the Level-1 metadata document.
-	     * 
-	     * @param doc                   The document object
-	     * @param alternateID           The alternate identifier string value
-	     * @param attributeValue        The value of the system attribute
-	     * 
-	     * @throws TransformerException
-	     */
-		public void addAlternateIdentifier(Document doc, String alternateID, String attributeValue)
-				throws TransformerException {
-			final String elementName = "alternateIdentifier";
-			final String attributeName = "system";
-			Element element = doc.createElement(elementName);
-			element.appendChild(doc.createTextNode(alternateID));
-			if (attributeValue != null) {
-				element.setAttribute(attributeName, attributeValue);
-			}
-			Node datasetNode = getDatasetNode(doc);
-			
-			/* 
-			 * Determine where to insert the alternateIdentifier element. This
-			 * depends on the presence of nearby optional elements.
-			 */
-			String insertBefore = null;
-			if (hasElement(doc, SHORTNAME_PATH)) {
-				insertBefore = SHORTNAME_PATH;  // insert before the shortName
-			}
-			else {
-				insertBefore = TITLE_PATH; // no shortName, so insert before the title
-			}
-			
+		else {
+			Node emlNode = getEmlNode(doc);
+			Element accessElement = doc.createElement("access");
+		    //<access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" scope="document" system="https://pasta.edirepository.org">
+			accessElement.setAttribute("authSystem", "https://pasta.edirepository.org/authentication");
+			accessElement.setAttribute("order", "allowFirst");
+			accessElement.setAttribute("scope", "document");
+			accessElement.setAttribute("system", "https://pasta.edirepository.org");
+			accessElement.appendChild(allowElement);
+			String insertBefore = DATASET_PATH;
 			NodeList insertNodeList = getElementNodeList(doc, insertBefore);
-			Node insertNode = insertNodeList.item(0);		
-			datasetNode.insertBefore(element, insertNode);
+			Node insertNode = insertNodeList.item(0);
+			emlNode.insertBefore(accessElement, insertNode);
 		}
+	}
+
+	private void addPubDate(Document doc, String pubDate) throws TransformerException {
+		Element pubDateElement = doc.createElement("pubDate");
+		pubDateElement.appendChild(doc.createTextNode(pubDate));
+		Node datasetNode = getDatasetNode(doc);
+
+		String insertBefore = null;
+
+		if (hasElement(doc, LANGUAGE_PATH)) {
+			insertBefore = LANGUAGE_PATH;
+		}
+		else if (hasElement(doc, SERIES_PATH)) {
+			insertBefore = SERIES_PATH;
+		}
+		else if (hasElement(doc, ABSTRACT_PATH)) {
+			insertBefore = ABSTRACT_PATH;
+		}
+		else if (hasElement(doc, KEYWORD_SET_PATH)) {
+			insertBefore = KEYWORD_SET_PATH;
+		}
+		else if (hasElement(doc, ADDITIONAL_INFO_PATH)) {
+			insertBefore = ADDITIONAL_INFO_PATH;
+		}
+		else if (hasElement(doc, INTELLECTUAL_RIGHTS_PATH)) {
+			insertBefore = INTELLECTUAL_RIGHTS_PATH;
+		}
+		else if (hasElement(doc, LICENSED_PATH)) {
+			insertBefore = LICENSED_PATH;
+		}
+		else if (hasElement(doc, DISTRIBUTION_PATH)) {
+			insertBefore = DISTRIBUTION_PATH;
+		}
+		else if (hasElement(doc, COVERAGE_PATH)) {
+			insertBefore = COVERAGE_PATH;
+		}
+		else if (hasElement(doc, ANNOTATION_PATH)) {
+			insertBefore = ANNOTATION_PATH;
+		}
+		else if (hasElement(doc, PURPOSE_PATH)) {
+			insertBefore = PURPOSE_PATH;
+		}
+		else if (hasElement(doc, INTRODUCTION_PATH)) {
+			insertBefore = INTRODUCTION_PATH;
+		}
+		else if (hasElement(doc, GETTING_STARTED_PATH)) {
+			insertBefore = GETTING_STARTED_PATH;
+		}
+		else if (hasElement(doc, ACKNOWLEDGEMENTS_PATH)) {
+			insertBefore = ACKNOWLEDGEMENTS_PATH;
+		}
+		else if (hasElement(doc, MAINTENANCE_PATH)) {
+			insertBefore = MAINTENANCE_PATH;
+		}
+		else {
+			insertBefore = CONTACT_PATH;
+		}
+
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);
+		datasetNode.insertBefore(pubDateElement, insertNode);
+
+	}
+
+    /**
+     * Add an alternateIdentifier element to the Level-1 metadata document.
+     *
+     * @param doc                   The document object
+     * @param alternateID           The alternate identifier string value
+     * @param attributeValue        The value of the system attribute
+     *
+     * @throws TransformerException
+     */
+	public void addAlternateIdentifier(Document doc, String alternateID, String attributeValue)
+			throws TransformerException {
+		final String elementName = "alternateIdentifier";
+		final String attributeName = "system";
+		Element element = doc.createElement(elementName);
+		element.appendChild(doc.createTextNode(alternateID));
+		if (attributeValue != null) {
+			element.setAttribute(attributeName, attributeValue);
+		}
+		Node datasetNode = getDatasetNode(doc);
+
+		/*
+		 * Determine where to insert the alternateIdentifier element. This
+		 * depends on the presence of nearby optional elements.
+		 */
+		String insertBefore = null;
+		if (hasElement(doc, SHORTNAME_PATH)) {
+			insertBefore = SHORTNAME_PATH;  // insert before the shortName
+		}
+		else {
+			insertBefore = TITLE_PATH; // no shortName, so insert before the title
+		}
+
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);
+		datasetNode.insertBefore(element, insertNode);
+	}
 
 
   /**
@@ -645,7 +726,7 @@ public final class LevelOneEMLFactory {
    * document does not contain the attribute {@code //@system}, or if it does
    * not have a value, an empty string is returned.
    * 
-   * @param emlDocument
+   * @param levelZeroEMLDocument
    *          an EML document Document object
    * 
    * @return the system attribute value
@@ -759,7 +840,24 @@ public final class LevelOneEMLFactory {
       }
     }
   }
-    
+
+  private void modifyPubDate(Document emlDocument)
+    throws TransformerException {
+
+    CachedXPathAPI xpathapi = new CachedXPathAPI();
+    Node pubDateNode = xpathapi.selectSingleNode(emlDocument, PUB_DATE_PATH);
+
+    LocalDate now = LocalDate.now();
+    String pubDate = now.toString();
+
+    if (pubDateNode != null) {
+    	pubDateNode.setTextContent(pubDate);
+	}
+    else {
+    	addPubDate(emlDocument, pubDate);
+	}
+
+  }
 
   /*
    * Set the value of the @system attribute
