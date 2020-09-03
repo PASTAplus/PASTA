@@ -464,8 +464,20 @@ public final class LevelOneEMLFactory {
 		else if (hasElement(doc, COVERAGE_PATH)) {
 			insertBefore = COVERAGE_PATH;
 		}
+		else if (hasElement(doc, ANNOTATION_PATH)) {
+			insertBefore = ANNOTATION_PATH;
+		}
 		else if (hasElement(doc, PURPOSE_PATH)) {
 			insertBefore = PURPOSE_PATH;
+		}
+		else if (hasElement(doc, INTRODUCTION_PATH)) {
+			insertBefore = INTRODUCTION_PATH;
+		}
+		else if (hasElement(doc, GETTING_STARTED_PATH)) {
+			insertBefore = GETTING_STARTED_PATH;
+		}
+		else if (hasElement(doc, ACKNOWLEDGEMENTS_PATH)) {
+			insertBefore = ACKNOWLEDGEMENTS_PATH;
 		}
 		else if (hasElement(doc, MAINTENANCE_PATH)) {
 			insertBefore = MAINTENANCE_PATH;
