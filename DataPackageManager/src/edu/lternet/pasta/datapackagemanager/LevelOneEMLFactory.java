@@ -72,6 +72,7 @@ public final class LevelOneEMLFactory {
   private static final String COVERAGE_PATH = "//dataset/coverage";
   private static final String CREATOR_PATH = "//dataset/creator";
   private static final String DATASET_PATH = "//eml/dataset";
+  private static final String DATA_TABLE_PATH = "//dataset/dataTable";
   private static final String DISTRIBUTION_PATH = "//dataset/distribution";
   private static final String ENTITY_NAME = "entityName";
   private static final String ENTITY_PATH_PARENT = "//dataset/";
@@ -83,21 +84,29 @@ public final class LevelOneEMLFactory {
   private static final String LICENSED_PATH = "//dataset/licensed";
   private static final String MAINTENANCE_PATH = "//dataset/maintenance";
   private static final String METADATA_PROVIDER_PATH = "//dataset/metadataProvider";
+  private static final String METHODS_PATH = "//dataset/methods";
   private static final String OBJECT_NAME = "physical/objectName";
   private static final String ONLINE_URL = "physical/distribution/online/url";
   private static final String OTHER_ENTITY = "otherEntity";
+  private static final String OTHER_ENTITY_PATH = "//dataset/otherEntity";
+  private static final String PROJECT_PATH = "//dataset/project";
   private static final String PUB_DATE_PATH = "//dataset/pubDate";
   private static final String PUBLISHER_PATH = "//dataset/publisher";
+  private static final String PUB_PLACE_PATH = "//dataset/pubPalce";
   private static final String PURPOSE_PATH = "//dataset/purpose";
   private static final String SERIES_PATH = "//dataset/series";
   private static final String SHORTNAME_PATH = "//dataset/shortName";
   private static final String SPATIAL_RASTER_ENTITY = "spatialRaster";
+  private static final String SPATIAL_RASTER_PATH = "//dataset/spatialRaster";
   private static final String SPATIAL_VECTOR_ENTITY = "spatialVector";
+  private static final String SPATIAL_VECTOR_PATH = "//dataset/spatialVector";
   private static final String STORED_PROCEDURE_ENTITY = "storedProcedure";
+  private static final String STORED_PROCEDURE_PATH = "//dataset/storedProcedure";
   private static final String SYSTEM_ATTRIBUTE_PATH = "//@system";
   private static final String TABLE_ENTITY = "dataTable";
   private static final String TITLE_PATH = "//dataset/title";
   private static final String VIEW_ENTITY = "view";
+  private static final String VIEW_PATH = "//dataset/view";
 
   public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
@@ -165,6 +174,7 @@ public final class LevelOneEMLFactory {
     modifyDataURLs(levelZeroEMLDocument, entityHashMap);
     modifyAccessElementAttributes(levelZeroEMLDocument);
     modifyPubDate(levelZeroEMLDocument);
+    modifyPublisher(levelZeroEMLDocument);
     checkIntellectualRights(levelZeroEMLDocument);
     checkEdiPrincipal(levelZeroEMLDocument);
 
@@ -534,10 +544,6 @@ public final class LevelOneEMLFactory {
 	}
 
 	private void addPubDate(Document doc, String pubDate) throws TransformerException {
-		Element pubDateElement = doc.createElement("pubDate");
-		pubDateElement.appendChild(doc.createTextNode(pubDate));
-		Node datasetNode = getDatasetNode(doc);
-
 		String insertBefore = null;
 
 		if (hasElement(doc, LANGUAGE_PATH)) {
@@ -589,9 +595,70 @@ public final class LevelOneEMLFactory {
 			insertBefore = CONTACT_PATH;
 		}
 
+		Element pubDateElement = doc.createElement("pubDate");
+		pubDateElement.appendChild(doc.createTextNode(pubDate));
+		Node datasetNode = getDatasetNode(doc);
 		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
 		Node insertNode = insertNodeList.item(0);
 		datasetNode.insertBefore(pubDateElement, insertNode);
+
+	}
+
+	private void addPublisher(Document doc)
+		throws TransformerException {
+
+		String insertBefore = null;
+
+		if (hasElement(doc, PUB_PLACE_PATH)) {
+			insertBefore = PUB_PLACE_PATH;
+		}
+		else if (hasElement(doc, METHODS_PATH)) {
+			insertBefore = METHODS_PATH;
+		}
+		else if (hasElement(doc, PROJECT_PATH)) {
+			insertBefore = PROJECT_PATH;
+		}
+		else if (hasElement(doc, DATA_TABLE_PATH)) {
+			insertBefore = DATA_TABLE_PATH;
+		}
+		else if (hasElement(doc, SPATIAL_RASTER_PATH)) {
+			insertBefore = SPATIAL_RASTER_PATH;
+		}
+		else if (hasElement(doc, SPATIAL_VECTOR_PATH)) {
+			insertBefore = SPATIAL_VECTOR_PATH;
+		}
+		else if (hasElement(doc, STORED_PROCEDURE_PATH)) {
+			insertBefore = STORED_PROCEDURE_PATH;
+		}
+		else if (hasElement(doc, VIEW_PATH)) {
+			insertBefore = VIEW_PATH;
+		}
+		else if (hasElement(doc, OTHER_ENTITY_PATH)) {
+			insertBefore = OTHER_ENTITY_PATH;
+		}
+
+		String orgName = "Environmental Data Initiative";
+		String orgEmail = "info@environmentaldatainitiative.org";
+		String orgOnlineUrl = "https://environmentaldatainitiative.org";
+
+		Element publisherElement = doc.createElement("publisher");
+
+		Element orgNameElement = doc.createElement("organizationName");
+		orgNameElement.appendChild(doc.createTextNode(orgName));
+		publisherElement.appendChild(orgNameElement);
+
+		Element orgEmailElement = doc.createElement("electronicMailAddress");
+		orgEmailElement.appendChild(doc.createTextNode(orgEmail));
+		publisherElement.appendChild(orgEmailElement);
+
+		Element orgOnlineUrlElement = doc.createElement("onlineUrl");
+		orgOnlineUrlElement.appendChild(doc.createTextNode(orgOnlineUrl));
+		publisherElement.appendChild(orgOnlineUrlElement);
+
+		Node datasetNode = getDatasetNode(doc);
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);
+		datasetNode.insertBefore(publisherElement, insertNode);
 
 	}
 
@@ -868,6 +935,19 @@ public final class LevelOneEMLFactory {
     else {
     	addPubDate(emlDocument, pubDate);
 	}
+
+  }
+
+  private void modifyPublisher(Document doc) throws TransformerException {
+
+    CachedXPathAPI xpathapi = new CachedXPathAPI();
+    Node publisherNode = xpathapi.selectSingleNode(doc, PUBLISHER_PATH);
+    Node datasetNode = getDatasetNode(doc);
+
+    if (publisherNode != null) {
+    	datasetNode.removeChild(publisherNode);
+	}
+	addPublisher(doc);
 
   }
 
