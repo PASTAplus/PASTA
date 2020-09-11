@@ -92,7 +92,7 @@ public final class LevelOneEMLFactory {
   private static final String PROJECT_PATH = "//dataset/project";
   private static final String PUB_DATE_PATH = "//dataset/pubDate";
   private static final String PUBLISHER_PATH = "//dataset/publisher";
-  private static final String PUB_PLACE_PATH = "//dataset/pubPalce";
+  private static final String PUB_PLACE_PATH = "//dataset/pubPlace";
   private static final String PURPOSE_PATH = "//dataset/purpose";
   private static final String SERIES_PATH = "//dataset/series";
   private static final String SHORTNAME_PATH = "//dataset/shortName";
@@ -175,6 +175,7 @@ public final class LevelOneEMLFactory {
     modifyAccessElementAttributes(levelZeroEMLDocument);
     modifyPubDate(levelZeroEMLDocument);
     modifyPublisher(levelZeroEMLDocument);
+    modifyPubPlace(levelZeroEMLDocument);
     checkIntellectualRights(levelZeroEMLDocument);
     checkEdiPrincipal(levelZeroEMLDocument);
 
@@ -604,6 +605,45 @@ public final class LevelOneEMLFactory {
 
 	}
 
+	private void addPubPlace(Document doc, String pubPlace)
+		throws TransformerException {
+
+		String insertBefore = null;
+
+		if (hasElement(doc, METHODS_PATH)) {
+			insertBefore = METHODS_PATH;
+		}
+		else if (hasElement(doc, PROJECT_PATH)) {
+			insertBefore = PROJECT_PATH;
+		}
+		else if (hasElement(doc, DATA_TABLE_PATH)) {
+			insertBefore = DATA_TABLE_PATH;
+		}
+		else if (hasElement(doc, SPATIAL_RASTER_PATH)) {
+			insertBefore = SPATIAL_RASTER_PATH;
+		}
+		else if (hasElement(doc, SPATIAL_VECTOR_PATH)) {
+			insertBefore = SPATIAL_VECTOR_PATH;
+		}
+		else if (hasElement(doc, STORED_PROCEDURE_PATH)) {
+			insertBefore = STORED_PROCEDURE_PATH;
+		}
+		else if (hasElement(doc, VIEW_PATH)) {
+			insertBefore = VIEW_PATH;
+		}
+		else if (hasElement(doc, OTHER_ENTITY_PATH)) {
+			insertBefore = OTHER_ENTITY_PATH;
+		}
+
+		Element pubPlaceElement = doc.createElement("pubPlace");
+		pubPlaceElement.appendChild(doc.createTextNode(pubPlace));
+		Node datasetNode = getDatasetNode(doc);
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);
+		datasetNode.insertBefore(pubPlaceElement, insertNode);
+
+	}
+
 	private void addPublisher(Document doc)
 		throws TransformerException {
 
@@ -934,6 +974,23 @@ public final class LevelOneEMLFactory {
 	}
     else {
     	addPubDate(emlDocument, pubDate);
+	}
+
+  }
+
+  private void modifyPubPlace(Document emlDocument)
+    throws TransformerException {
+
+    CachedXPathAPI xpathapi = new CachedXPathAPI();
+    Node pubPlaceNode = xpathapi.selectSingleNode(emlDocument, PUB_PLACE_PATH);
+
+    String pubPlace = "Environmental Data Initiative";
+
+    if (pubPlaceNode != null) {
+    	pubPlaceNode.setTextContent(pubPlace);
+	}
+    else {
+    	addPubPlace(emlDocument, pubPlace);
 	}
 
   }
