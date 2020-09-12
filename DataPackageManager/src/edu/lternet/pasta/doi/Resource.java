@@ -20,6 +20,8 @@
 
 package edu.lternet.pasta.doi;
 
+import org.owasp.encoder.Encode;
+
 /**
  * @author servilla
  * @author Duane Costa
@@ -148,16 +150,16 @@ public class Resource {
         appendStringIfNonEmpty(xmlBuffer, "dateCreated", this.dateCreated);
         appendStringIfNonEmpty(xmlBuffer, "dateDeactivated", this.dateDeactivated);
         appendStringIfNonEmpty(xmlBuffer, "doi", this.doi);
-        appendStringIfNonEmpty(xmlBuffer, "entityId", this.entityId);
-        appendStringIfNonEmpty(xmlBuffer, "entityName", this.entityName);
-        appendStringIfNonEmpty(xmlBuffer, "fileName", this.fileName);
+        appendStringIfNonEmpty(xmlBuffer, "entityId", Encode.forXml(this.entityId));
+        appendStringIfNonEmpty(xmlBuffer, "entityName", Encode.forXml(this.entityName));
+        appendStringIfNonEmpty(xmlBuffer, "fileName", Encode.forXml(this.fileName));
         appendStringIfNonEmpty(xmlBuffer, "formatType", this.formatType);
         appendIntegerIfNonEmpty(xmlBuffer, "identifier", this.identifier);
         appendStringIfNonEmpty(xmlBuffer, "md5Checksum", this.md5Checksum);
         appendStringIfNonEmpty(xmlBuffer, "mimeType", this.mimeType);
         appendStringIfNonEmpty(xmlBuffer, "packageId", this.packageId);
         appendStringIfNonEmpty(xmlBuffer, "principalOwner", this.principalOwner);
-        appendStringIfNonEmpty(xmlBuffer, "resourceId", this.resourceId);
+        appendStringIfNonEmpty(xmlBuffer, "resourceId", Encode.forXml(this.resourceId));
         appendStringIfNonEmpty(xmlBuffer, "resourceLocation", this.resourceLocation);
         appendLongIfNonEmpty(xmlBuffer, "resourceSize", this.resourceSize);
         appendStringIfNonEmpty(xmlBuffer, "resourceType", this.resourceType);
