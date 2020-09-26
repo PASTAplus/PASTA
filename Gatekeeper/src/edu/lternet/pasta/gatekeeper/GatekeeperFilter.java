@@ -323,9 +323,10 @@ public final class GatekeeperFilter implements Filter
         if (!user.equals(ConfigurationListener.getPublicUser())) {
 
             String host;
-            if (user.contains(LTER_ORG)) {
-                host = LTER_HOST;
-            } else if (user.contains(EDI_ORG)) {
+//            if (user.contains(LTER_ORG)) {
+//                host = LTER_HOST;
+//            } else if (user.contains(EDI_ORG)) {
+            if (user.contains(EDI_ORG)) {
                 host = EDI_HOST;
             } else {
                 String msg = String.format("Unknown LDAPS server for user %s", user);
