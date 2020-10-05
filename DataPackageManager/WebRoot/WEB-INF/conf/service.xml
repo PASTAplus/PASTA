@@ -479,7 +479,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org</principal>
+                <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
         </access>
@@ -651,7 +651,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org</principal>
+                <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
         </access>
@@ -783,7 +783,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org</principal>
+                <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
         </access>
@@ -915,7 +915,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org</principal>
+                <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
         </access>
