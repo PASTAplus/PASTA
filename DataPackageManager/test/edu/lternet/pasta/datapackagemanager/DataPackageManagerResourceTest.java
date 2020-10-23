@@ -76,7 +76,7 @@ public class DataPackageManagerResourceTest {
   private static final String dirPath = "WebRoot/WEB-INF/conf";
   private static boolean isWindowsPlatform = false;
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
-  private static final String testUserAcl = "uid=gmn-pasta,o=LTER,dc=ecoinformatics,dc=org";
+  private static final String testUserAcl = "uid=gmn-pasta,o=EDI,dc=edirepository,dc=org";
   private static Options options = null;
   private static String testDoi = null;
   private static File testEmlFile = null;
