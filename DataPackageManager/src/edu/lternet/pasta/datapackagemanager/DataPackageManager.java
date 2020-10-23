@@ -671,12 +671,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                 TransformerException, SAXException, ParserConfigurationException {
     String levelOneEMLString = null;
     Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
-    Node documentElement = levelZeroEMLDocument.getDocumentElement();
-    LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
-    Document levelOneEMLDocument = levelOneEMLFactory.make(
+	 Node documentElement = levelZeroEMLDocument.getDocumentElement();
+	 LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
+	 Document levelOneEMLDocument = levelOneEMLFactory.make(
         levelZeroEMLDocument, entityURIHashMap);
-    documentElement = levelOneEMLDocument.getDocumentElement();
-    levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+	 documentElement = levelOneEMLDocument.getDocumentElement();
+	 boolean preserveWhitespace = true;
+	 levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
     
     // Convert to dereferenced EML
     // levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
@@ -708,7 +709,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		Document enhancedEMLDocument = 
 				levelOneEMLFactory.enhance(levelOneEMLDocument, alternateID, attributeValue);
 		documentElement = enhancedEMLDocument.getDocumentElement();
-		enhancedEMLString = XMLUtilities.getDOMTreeAsString(documentElement);
+		boolean preserveWhitespace = true;
+		enhancedEMLString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
 
 		return enhancedEMLString;
 	}
@@ -868,7 +870,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		    try {
 		        Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(emlFile);
 		        Node documentElement = levelZeroEMLDocument.getDocumentElement();
-		        levelZeroXML = XMLUtilities.getDOMTreeAsString(documentElement);
+		        boolean preserveWhitespace = true;
+		        levelZeroXML = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
 
 		        boolean isLevelZero = true;
 		        storeMetadata(emlPackageId, levelZeroXML, isLevelZero);
@@ -1846,8 +1849,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the identifier value of the derived data package
 	 * @param revision
 	 *          the revision value of the derived data package
-	 * @param user
-	 *          the user name
+	 * @param authToken
+	 *          the user authentication token
 	 * @return a newline-separated list of data package resource identifiers
 	 */
 	public String listDataSources(String scope, Integer identifier, Integer revision, AuthToken authToken) 
@@ -1973,8 +1976,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the scope value
 	 * @param identifier
 	 *          the identifier value
-	 * @param user
-	 *          the user name
 	 * @return a newline-separated list of revision values
 	 */
 	public String listDataPackageRevisions(String scope, Integer identifier)
@@ -2007,8 +2008,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * List the scope values for all data packages that are readable by the
 	 * specified user.
 	 * 
-	 * @param user
-	 *          the user name
 	 * @return a newline-separated list of scope values
 	 */
 	public String listDataPackageScopes() throws ClassNotFoundException,
@@ -2158,8 +2157,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Parse an EML document using the Data Manager Library method
 	 * DataManager.parseMetadata().
 	 * 
-	 * @param emlDocument
-	 *          the EML document to be parsed
+	 * @param emlFile
+	 *          the EML file to be parsed
 	 * @param isEvaluate
 	 *          true if this is an evaluate operation
 	 * @return DataPackage the DataPackage object produced by parsing the EML
