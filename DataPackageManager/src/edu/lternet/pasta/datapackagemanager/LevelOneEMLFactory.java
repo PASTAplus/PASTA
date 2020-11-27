@@ -218,8 +218,9 @@ public final class LevelOneEMLFactory {
   	void checkIntellectualRights(Document emlDocument)
         throws TransformerException {
   		boolean hasIntellectualRights = hasIntellectualRights(emlDocument);
+  		boolean hasLicensed = hasLicensed(emlDocument);
   		
-  		if (hasIntellectualRights) {
+  		if ((hasIntellectualRights) || (hasLicensed)) {
   			logger.info("An intellectualRights element was found in the Level-0 EML.");
   		}
   		else {
@@ -392,6 +393,20 @@ public final class LevelOneEMLFactory {
 		}
 
 		return hasEDI;
+	}
+
+
+	/**
+	 * Boolean to determine whether this data package contains an
+	 * licensed element.
+	 *
+	 * @param   emlDocument  the EML Document
+	 * @return  true if this data package has a licensed element,
+	 *          else false
+	 */
+	private boolean hasLicensed(Document emlDocument)
+	          throws TransformerException {
+		return hasElement(emlDocument, LICENSED_PATH);
 	}
 
 
