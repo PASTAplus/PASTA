@@ -211,7 +211,7 @@ public final class LevelOneEMLFactory {
 	
     /**
      * Check to see whether the Level-0 EML already has an intellectualRights
-     * element and if not, add one.
+     * or a licensed element and if not, add a default intellectualRights element.
      * 
      * @param emlDocument  the Level-0 EML document to be checked
      */
@@ -220,9 +220,12 @@ public final class LevelOneEMLFactory {
   		boolean hasIntellectualRights = hasIntellectualRights(emlDocument);
   		boolean hasLicensed = hasLicensed(emlDocument);
   		
-  		if ((hasIntellectualRights) || (hasLicensed)) {
+  		if (hasIntellectualRights) {
   			logger.info("An intellectualRights element was found in the Level-0 EML.");
   		}
+  		else if (hasLicensed) {
+  			logger.info("A licensed element was found in the Level-0 EML.");
+		}
   		else {
   			addDefaultIntellectualRights(emlDocument);
   		}
