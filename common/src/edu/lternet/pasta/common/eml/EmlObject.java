@@ -216,7 +216,7 @@ public class EmlObject {
 	
 	
 	/**
-	 * Returns the abstract text string from the EML document.
+	 * Returns the intellectualRights text string from the EML document.
 	 * 
 	 * @return abstract text
 	 */
