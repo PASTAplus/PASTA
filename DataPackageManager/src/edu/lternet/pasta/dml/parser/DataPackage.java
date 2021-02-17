@@ -49,12 +49,14 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.dml.parser.generic.EMLValidator;
 import edu.lternet.pasta.dml.quality.EntityReport;
 import edu.lternet.pasta.dml.quality.QualityReport;
 import edu.lternet.pasta.dml.quality.QualityCheck;
 import edu.lternet.pasta.dml.quality.QualityCheck.Status;
-import org.ecoinformatics.eml.EMLParser;
+import org.apache.log4j.Logger;
+import org.owasp.encoder.Encode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -111,7 +113,9 @@ public class DataPackage
   
   // for each map entry, key is the identifier value and value is the optional system attribute value
   private Map<String, String> alternateIdentifiers = null; 
-    
+
+  private static final Logger logger = Logger.getLogger(DataPackage.class);
+
   
   /*
    * Constructors
@@ -827,32 +831,39 @@ public class DataPackage
 
     if (QualityCheck.shouldRunQualityCheck(this, qualityCheck)) {
       // Initialize the schemaValidQualityCheck
-      boolean validateSchema = true;
       String found = "";
       final String parserName = "DEFAULT";
 
       Node documentElement = doc.getDocumentElement();
-      String xmlString = XMLUtilities.getDOMTreeAsString(documentElement);
-      String deferencedXmlString = DataPackage.dereferenceEML(xmlString);
-      
-      StringReader stringReader = new StringReader(deferencedXmlString);
-      SAXValidate saxValidate = new SAXValidate(validateSchema);
+      boolean preserveWhitespace = true;
+      String xmlString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
+      String dereferencedXmlString = DataPackage.dereferenceEML(xmlString);
+      StringReader stringReader = new StringReader(dereferencedXmlString);
+      SAXValidate saxValidate = new SAXValidate(true);
     
       try {
         saxValidate.runTest(stringReader, parserName, namespaceInDoc);
-        found = "Dereferenced document validated for namespace: '" + 
-                namespaceInDoc + "'";
+        found = "Dereferenced document validated for namespace: '" + namespaceInDoc + "'";
         qualityCheck.setStatus(Status.valid);
         qualityCheck.setSuggestion("");
         this.schemaValid = true;
       }
       catch (Exception e) {
-        found = "Failed to validate dereferenced document for namespace: '" + 
-                namespaceInDoc + 
-                "'; " + e.getMessage();
-        qualityCheck.setFailedStatus();
+        // TODO: Fix this kludge to mitigate Unicode conversion in transformation
+        if (e.getMessage().startsWith("Character reference")) { // Report, then ignore this specific exception
+          String msg = "During schema validation of dereferenced XML - " + e.getMessage();
+          logger.error(msg);
+          found = "Dereferenced document validated for namespace: '" + namespaceInDoc + "'";
+          qualityCheck.setStatus(Status.valid);
+          qualityCheck.setSuggestion("");
+          this.schemaValid = true;
+        } else {
+          found = "Failed to validate dereferenced document for namespace: '" + namespaceInDoc +
+                  "'; " + Encode.forXml(e.getMessage());
+          logger.error(found);
+          qualityCheck.setFailedStatus();
+        }
       }
-      
       qualityCheck.setFound(found);
       this.addDatasetQualityCheck(qualityCheck);
     }
