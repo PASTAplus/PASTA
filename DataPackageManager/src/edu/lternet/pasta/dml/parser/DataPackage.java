@@ -849,20 +849,10 @@ public class DataPackage
         this.schemaValid = true;
       }
       catch (Exception e) {
-        // TODO: Fix this kludge to mitigate Unicode conversion in transformation
-        if (e.getMessage().startsWith("Character reference")) { // Report, then ignore this specific exception
-          String msg = "During schema validation of dereferenced XML - " + e.getMessage();
-          logger.error(msg);
-          found = "Dereferenced document validated for namespace: '" + namespaceInDoc + "'";
-          qualityCheck.setStatus(Status.valid);
-          qualityCheck.setSuggestion("");
-          this.schemaValid = true;
-        } else {
-          found = "Failed to validate dereferenced document for namespace: '" + namespaceInDoc +
-                  "'; " + Encode.forXml(e.getMessage());
-          logger.error(found);
-          qualityCheck.setFailedStatus();
-        }
+        found = "Failed to validate dereferenced document for namespace: '" + namespaceInDoc +
+                "'; " + Encode.forXml(e.getMessage());
+        logger.error(found);
+        qualityCheck.setFailedStatus();
       }
       qualityCheck.setFound(found);
       this.addDatasetQualityCheck(qualityCheck);
