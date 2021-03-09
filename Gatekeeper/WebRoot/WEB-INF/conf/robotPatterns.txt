@@ -102,7 +102,8 @@ geturl
 G-i-g-a-b-o-t
 GLMSLinkAnalysis
 Goldfire(\s|\+)Server
-google
+###google
+Googlebot
 Grammarly
 grub
 gulliver
@@ -261,7 +262,7 @@ webmon
 webreaper
 WebStripper
 WebZIP
-Wget
+###Wget
 wordpress
 worm
 www.gnip.com
