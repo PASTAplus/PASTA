@@ -1103,7 +1103,7 @@ public class DataPackage
         this.funding = fundingText;
 
         /*
-         * Do a quality check on pubDate presence
+         * Do a quality check on funding presence
          */
         String identifier = "fundingPresence";
         QualityCheck qualityCheckTemplate = QualityReport.getQualityCheckTemplate(identifier);
