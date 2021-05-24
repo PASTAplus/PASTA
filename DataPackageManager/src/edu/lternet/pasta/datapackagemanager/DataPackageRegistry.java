@@ -45,6 +45,7 @@ import edu.lternet.pasta.common.PastaResource;
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.NotFoundException;
+import org.owasp.encoder.Encode;
 
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
@@ -2772,7 +2773,7 @@ public class DataPackageRegistry {
 	      while (rs.next()) {
 	        String sourceId = rs.getString("source_id");
 	        String sourceTitle = rs.getString("source_title");
-	        String sourceURL = rs.getString("source_url");
+	        String sourceURL = Encode.forXml(rs.getString("source_url"));
 	        DataSource dataSource = dataPackage.new DataSource(sourceId, sourceTitle, sourceURL);
 	        dataSources.add(dataSource);
 	      }
