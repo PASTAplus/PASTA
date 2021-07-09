@@ -11967,7 +11967,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
     @POST
     @Path("/citation/eml")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_XML + "; charset=utf-8")
     public Response createJournalCitation(@Context HttpHeaders headers, String requestBody) {
         AuthToken authToken = null;
         String msg = null;
