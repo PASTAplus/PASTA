@@ -133,7 +133,6 @@ jeeves
 jobo
 kyluka
 larbin
-libcurl
 libhttp
 libwww
 lilina
