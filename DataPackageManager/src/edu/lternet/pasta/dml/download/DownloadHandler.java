@@ -549,7 +549,7 @@ public class DownloadHandler implements Runnable
     	QualityCheck onlineURLsQualityCheck = null;
     	boolean onlineURLsException = false;  // used to determine status of onlineURLs quality check
         
-      if (resourceName != null) { resourceName = resourceName.trim(); }
+        if (resourceName != null) { resourceName = resourceName.trim(); }
       
         if (resourceName != null && 
             (resourceName.startsWith("http://") ||
@@ -558,27 +558,34 @@ public class DownloadHandler implements Runnable
              resourceName.startsWith("ftp://") 
             )
            ) {
-             // get the data from a URL
-            int responseCode = 0;
-            String responseMessage = null;
-            
+             int responseCode = 0;
+             String responseMessage = null;
              try {
                  URL url = new URL(resourceName);
-                 boolean isFTP = false;
+                 String contentType = null;
 
-                 if (entity != null) {
-                   String contentType = null;
-                   
-                   // Find the right MIME type and set it as content type
-                   if (resourceName.startsWith("http")) {
+                 if (resourceName.startsWith("http")) {
                 	 HttpURLConnection httpURLConnection = (HttpURLConnection)  url.openConnection();
-                     httpURLConnection.setRequestMethod("HEAD");
-                     httpURLConnection.connect();
+                     httpURLConnection.setRequestMethod("GET");
                      contentType = httpURLConnection.getContentType();
                      responseCode = httpURLConnection.getResponseCode();
                      responseMessage = httpURLConnection.getResponseMessage();
+                     InputStream filestream = httpURLConnection.getInputStream();
+                   try {
+                     successFlag = this.writeRemoteInputStreamIntoDataStorage(filestream);
                    }
-                   else if (resourceName.startsWith("file")) {
+                   catch (IOException e) {
+                     exception = e;
+                     String errorMessage = e.getMessage();
+                     if (errorMessage.startsWith(ONLINE_URLS_EXCEPTION_MESSAGE)) {
+                       onlineURLsException = true;
+                     }
+                   }
+                   finally {
+                	 filestream.close();
+                   }
+                 }
+                 else if (resourceName.startsWith("file")) {
                      String filePath = resourceName.replace("file://", "");
                      File file = new File(filePath);
                      try
@@ -591,21 +598,9 @@ public class DownloadHandler implements Runnable
                        log.error(ioException);
                        contentType = "content/unknown";
                      }
-                   }
-                   else { // FTP
-                	 isFTP = true;
-                     contentType = "application/octet-stream";
-                   }
-                 
-                   entity.setUrlContentType(contentType);
-                 }
-                 
-                 if (!isFTP) { // HTTP(S) or FILE
-                   InputStream filestream = url.openStream();
-
+                     InputStream filestream = url.openStream();
                    try {
-                     successFlag = 
-                        this.writeRemoteInputStreamIntoDataStorage(filestream);
+                     successFlag = this.writeRemoteInputStreamIntoDataStorage(filestream);
                    }
                    catch (IOException e) {
                      exception = e;
@@ -617,7 +612,8 @@ public class DownloadHandler implements Runnable
                    finally {
                 	 filestream.close();
                    }
-                 } else { // FTP
+                   } else { // FTP
+                   contentType = "application/octet-stream";
                    String[] urlParts = resourceName.split("/");
                    String address = urlParts[2];
                    String dir = "/";
@@ -633,8 +629,7 @@ public class DownloadHandler implements Runnable
                    ftpClient.enterLocalPassiveMode();  // necessary to avoid firewall blocking
                    InputStream filestream = ftpClient.retrieveFileStream(fileName);
                    try {
-                     successFlag =
-                         this.writeRemoteInputStreamIntoDataStorage(filestream);
+                     successFlag = this.writeRemoteInputStreamIntoDataStorage(filestream);
                    }
                    catch (IOException e) {
                      exception = e;
@@ -653,20 +648,19 @@ public class DownloadHandler implements Runnable
                        onlineURLsException = true;
                      }
                    }
-
-                   // logout and disconnect if FTP session
-                   if (resourceName.startsWith("ftp") && ftpClient != null) {
-                     try {
-                       ftpClient.enterLocalActiveMode();
-                       ftpClient.logout();
-                       ftpClient.disconnect();
-                     } catch (IOException e) {
-                       exception = new DataSourceNotFoundException(
-                         String.format("Error disconnecting from FTP with resource '%s': %s",
-                                       resourceName, e.getMessage()));
-                       onlineURLsException = true;
-                     }
+                   try {
+                     ftpClient.enterLocalActiveMode();
+                     ftpClient.logout();
+                     ftpClient.disconnect();
+                   } catch (IOException e) {
+                     exception = new DataSourceNotFoundException(
+                       String.format("Error disconnecting from FTP with resource '%s': %s",
+                                     resourceName, e.getMessage()));
+                     onlineURLsException = true;
                    }
+                 }
+                 if (entity != null) {
+                   entity.setUrlContentType(contentType);
                  }
              }
              catch (MalformedURLException e) {
@@ -714,7 +708,6 @@ public class DownloadHandler implements Runnable
                
                entity.addQualityCheck(onlineURLsQualityCheck);
              }
-
              return successFlag;
          }
          else if (resourceName != null && 
@@ -748,8 +741,7 @@ public class DownloadHandler implements Runnable
              return getContentFromEcoGridSource(SRBENDPOINT, srbIdentifier);
          }
          else {
-        	 successFlag = false;
-             return successFlag;
+            return successFlag;
          }
     }
     
