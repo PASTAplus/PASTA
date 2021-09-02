@@ -109,6 +109,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
     protected String packageIdPath = null;
     protected String pubDatePath = null;
     protected String fundingPath = null;
+    protected String awardPath = null;
     protected String dataTableEntityPath = null;
     protected String spatialRasterEntityPath = null;
     protected String spatialVectorEntityPath  = null;
@@ -183,6 +184,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 		entityPhysicalSizePath = "physical/size";
 		alternateIdentifierPath = "//dataset/alternateIdentifier";
 		fundingPath = "//dataset/project/funding";
+        awardPath = "//dataset/project/award/funderName";
 	}
 
 	
@@ -326,10 +328,19 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             }
             
             // Store the funding
+            /*
+                Since EML 2.2.0, funding can mpw be found in either the <funding> element or the
+                <award>/<funderName> element. Both should be checked for congruency compliance.
+             */
             Node fundingNode = xpathapi.selectSingleNode(doc, fundingPath);
             String fundingText = null;
             if (fundingNode != null) {
                 fundingText = fundingNode.getTextContent();
+            } else {
+                fundingNode = xpathapi.selectSingleNode(doc, awardPath);
+                if (fundingNode!= null) {
+                    fundingText = fundingNode.getTextContent();
+                }
             }
             emlDataPackage.setFunding(fundingText);
            
