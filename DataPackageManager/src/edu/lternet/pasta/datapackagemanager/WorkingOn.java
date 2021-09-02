@@ -295,7 +295,7 @@ public class WorkingOn {
 		}
 		
 		String updateSQL = "UPDATE datapackagemanager.WORKING_ON " + 
-		"SET end_date=? WHERE scope=? AND identifier=? AND revision=? AND interrupted=?";
+		"SET end_date=? WHERE scope=? AND identifier=? AND revision=? AND interrupted=? AND end_date IS NULL";
 
 		Integer rowCount = null;
 
