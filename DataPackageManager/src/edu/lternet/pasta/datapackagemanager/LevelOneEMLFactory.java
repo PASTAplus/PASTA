@@ -187,7 +187,7 @@ public final class LevelOneEMLFactory {
 	 * Enhance a Level-1 EML document with additional information such as the
 	 * DOI identifier.
 	 * 
-	 * @param leveOneEMLDocument
+	 * @param levelOneEMLDocument
 	 *            the original Level-1 EML Document
 	 * @param alternateID
 	 * 			  alternate identifier (e.g., DOI)
@@ -196,16 +196,16 @@ public final class LevelOneEMLFactory {
 	 * @return the enhanced Level-1 EML Document, a Document object
 	 * @throws TransformerException
 	 */
-	public Document enhance(Document leveOneEMLDocument, String alternateID, String attributeValue)
+	public Document enhance(Document levelOneEMLDocument, String alternateID, String attributeValue)
 			throws TransformerException {
-		if (leveOneEMLDocument == null) {
+		if (levelOneEMLDocument == null) {
 			throw new IllegalArgumentException(
 					"null Document object passed to LevelOneEMLFactory.enhance() method");
 		}
 
-		addAlternateIdentifier(leveOneEMLDocument, alternateID, attributeValue);
+		addAlternateIdentifier(levelOneEMLDocument, alternateID, attributeValue);
 
-		return leveOneEMLDocument;
+		return levelOneEMLDocument;
 	}
   
 	
