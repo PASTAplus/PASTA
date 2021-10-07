@@ -698,6 +698,9 @@ public final class LevelOneEMLFactory {
 		String orgName = "Environmental Data Initiative";
 		String orgEmail = "info@environmentaldatainitiative.org";
 		String orgOnlineUrl = "https://environmentaldatainitiative.org";
+		String orgUserId = "0330j0z60";
+		String orgUserIdAttributeName = "directory";
+		String orgUserIdAttributeValue = "https://ror.org";
 
 		Element publisherElement = doc.createElement("publisher");
 
@@ -712,6 +715,11 @@ public final class LevelOneEMLFactory {
 		Element orgOnlineUrlElement = doc.createElement("onlineUrl");
 		orgOnlineUrlElement.appendChild(doc.createTextNode(orgOnlineUrl));
 		publisherElement.appendChild(orgOnlineUrlElement);
+
+		Element orgUserIdElement = doc.createElement("userId");
+		orgUserIdElement.appendChild(doc.createTextNode(orgUserId));
+		orgUserIdElement.setAttribute(orgUserIdAttributeName, orgUserIdAttributeValue);
+		publisherElement.appendChild(orgUserIdElement);
 
 		Node datasetNode = getDatasetNode(doc);
 		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
