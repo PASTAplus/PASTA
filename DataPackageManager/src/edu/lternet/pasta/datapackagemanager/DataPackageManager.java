@@ -4010,44 +4010,42 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
      * Journal citation methods
      */
 
-    public JournalCitation createJournalCitation(String userId, String xml) 
-            throws ClassNotFoundException, SQLException, ResourceNotFoundException, UserErrorException {
+    public JournalCitation createJournalCitation(String userId, String xml)
+			throws Exception {
         LocalDateTime now = LocalDateTime.now();
         JournalCitation journalCitation = new JournalCitation(xml);
-        
-        if (journalCitation != null) {
-            journalCitation.setPrincipalOwner(userId);
-            journalCitation.setDateCreated(now);       
-            DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-            String packageId = journalCitation.getPackageId();
-            EmlPackageIdFormat epif = new EmlPackageIdFormat();
-            EmlPackageId epi = epif.parse(packageId);
 
-            if (epi != null) {
-                String scope = epi.getScope();
-                Integer identifier = epi.getIdentifier();
-                Integer revision = epi.getRevision();
-                boolean hasDataPackage = dpr.hasDataPackage(scope, identifier, revision.toString());
-                if (hasDataPackage) {
-                    dpr.addJournalCitation(journalCitation);
-                    updateDataCiteMetadata(dpr, packageId);
-                }
-                else {
-                    throw new ResourceNotFoundException(
-                            String.format(
-                                "No data package for packageId '%s' was found in the data repository",
-                                packageId));
-                }
-            }
-            else {
-                throw new UserErrorException(
-                    String.format(
-                        "Error parsing packageId value '%s'. Please specify a valid scope.identifier.revision.",
-                        packageId));
-            }
-        }
-        
-        return journalCitation;
+		journalCitation.setPrincipalOwner(userId);
+		journalCitation.setDateCreated(now);
+		DataPackageRegistry dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		String packageId = journalCitation.getPackageId();
+		EmlPackageIdFormat epif = new EmlPackageIdFormat();
+		EmlPackageId epi = epif.parse(packageId);
+
+		if (epi != null) {
+			String scope = epi.getScope();
+			Integer identifier = epi.getIdentifier();
+			Integer revision = epi.getRevision();
+			boolean hasDataPackage = dpr.hasDataPackage(scope, identifier, revision.toString());
+			if (hasDataPackage) {
+				dpr.addJournalCitation(journalCitation);
+				updateDataCiteMetadata(dpr, packageId);
+			}
+			else {
+				throw new ResourceNotFoundException(
+						String.format(
+							"No data package for packageId '%s' was found in the data repository",
+							packageId));
+			}
+		}
+		else {
+			throw new UserErrorException(
+				String.format(
+					"Error parsing packageId value '%s'. Please specify a valid scope.identifier.revision.",
+					packageId));
+		}
+
+		return journalCitation;
     }
     
     
