@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 
+import edu.lternet.pasta.common.UserErrorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
@@ -16,6 +17,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import org.owasp.encoder.Encode;
+
+import edu.lternet.pasta.doi.DigitalObjectIdentifier;
 
 public class JournalCitation {
     
@@ -91,7 +94,7 @@ public class JournalCitation {
      * @param xml   an XML string that conforms to the journal citation format, typically sent in
      *              a web service request body
      */
-    public JournalCitation(String xml) {
+    public JournalCitation(String xml) throws Exception {
         parseDocument(xml);
     }
     
@@ -109,7 +112,7 @@ public class JournalCitation {
      * @param   xml          The XML string representation of the EML document
      * @return  dataPackage  a DataPackage object holding parsed values
      */
-    private void parseDocument(String xml) {
+    private void parseDocument(String xml) throws Exception {
       if (xml != null) {
         try {
           InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8");
@@ -117,6 +120,7 @@ public class JournalCitation {
         }
         catch (Exception e) {
           logger.error("Error parsing journal citation metadata: " + e.getMessage());
+          throw e;
         }
       }
     }
@@ -157,7 +161,15 @@ public class JournalCitation {
             Node articleDoiNode = xpathapi.selectSingleNode(document, "//articleDoi");
             if (articleDoiNode != null) {
               String articleDoi = articleDoiNode.getTextContent();
-              setArticleDoi(articleDoi);
+              if (articleDoi.isEmpty()) {
+                  setArticleDoi(articleDoi);
+              }
+              else if (DigitalObjectIdentifier.isRawDoi(articleDoi)) {
+                  setArticleDoi(articleDoi);
+              }
+              else {
+                  throw new UserErrorException(String.format("DOI %s should be in \"prefix/suffix\" format (e.g., 10.6073/d4f26a6c)", articleDoi.trim()));
+              }
             }
 
             Node articleTitleNode = xpathapi.selectSingleNode(document, "//articleTitle");
