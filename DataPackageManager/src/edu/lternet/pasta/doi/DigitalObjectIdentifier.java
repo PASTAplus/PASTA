@@ -191,4 +191,23 @@ public class DigitalObjectIdentifier {
         System.out.println(doi.getDoi());
     }
 
+	/**
+	 * Test if the "doi" string is in a raw DOI format such that it begins
+	 * with a DOI shoulder (e.g., 10.6073/pasta/a9c450094539256346bb53d791bbb588).
+	 *
+	 * @param doi
+	 * @return Boolean
+	 */
+
+	public static Boolean isRawDoi(String doi) {
+		String shoulder = doi.split("/")[0];
+		try {
+			Float.parseFloat(shoulder);
+		}
+		catch (NullPointerException | NumberFormatException ex) {
+			return false;
+		}
+		return true;
+	}
+
 }
