@@ -4028,6 +4028,24 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Integer revision = epi.getRevision();
 			boolean hasDataPackage = dpr.hasDataPackage(scope, identifier, revision.toString());
 			if (hasDataPackage) {
+
+				ArrayList<JournalCitation> citations = dpr.listDataPackageCitations(scope,
+						identifier, revision, null);
+				String articleDoi = journalCitation.getArticleDoi();
+				String articleUrl = journalCitation.getArticleUrl();
+				for (JournalCitation citation : citations) {
+					if (!articleDoi.isEmpty() && articleDoi.equals(citation.articleDoi)) {
+						String gripe = String.format("The journal DOI (%s) is already registered for package %s",
+								articleDoi, packageId);
+						throw new UserErrorException(gripe);
+					}
+					if (!articleUrl.isEmpty() && articleUrl.equals(citation.articleUrl)) {
+						String gripe = String.format("The journal URL (%s) is already registered for package %s",
+								articleUrl, packageId);
+						throw new UserErrorException(gripe);
+					}
+				}
+
 				dpr.addJournalCitation(journalCitation);
 				updateDataCiteMetadata(dpr, packageId);
 			}
