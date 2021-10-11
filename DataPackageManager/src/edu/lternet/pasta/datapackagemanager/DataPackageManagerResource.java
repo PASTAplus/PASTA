@@ -1363,10 +1363,6 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * </table>
 	 * 
-	 * @param emlDocument
-	 *            The URL to an EML document, as specified in the payload of the
-	 *            request.
-	 * 
 	 * @return a Response, which if successful, contains a quality report XML
 	 *         document
 	 */
@@ -1384,43 +1380,49 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		String transaction = generateTransactionID("evaluate", null, null, null);
 
-		authToken = getAuthToken(headers);
-		String userId = authToken.getUserId();
 
-        QueryString queryString = new QueryString(uriInfo);
-        Map<String, List<String>> queryParams = queryString.getParams(); 
-        boolean useChecksum = false;
-		if (queryParams != null) {
-			for (String key : queryParams.keySet()) {
-				if (key.equalsIgnoreCase("useChecksum")) {
-					useChecksum = true;
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			QueryString queryString = new QueryString(uriInfo);
+			Map<String, List<String>> queryParams = queryString.getParams();
+			boolean useChecksum = false;
+			if (queryParams != null) {
+				for (String key : queryParams.keySet()) {
+					if (key.equalsIgnoreCase("useChecksum")) {
+						useChecksum = true;
+					}
 				}
 			}
-		}
 
-		// Is user authorized to run the 'evaluateDataPackage' service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-				serviceMethodName, permission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException("User " + userId
-					+ " is not authorized to execute service method "
-					+ serviceMethodName);
-		}
+			// Is user authorized to run the 'evaluateDataPackage' service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
 
 		String msg = String.format("Evaluate (transaction: %s)", transaction);
 		logger.info(msg);
 
-		// Perform evaluateDataPackage in new thread
-		Evaluator evaluator = new Evaluator(emlFile, userId, authToken,
-				transaction, useChecksum);
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		executorService.execute(evaluator);
-		executorService.shutdown();
+			// Perform evaluateDataPackage in new thread
+			Evaluator evaluator = new Evaluator(emlFile, userId, authToken,
+					transaction, useChecksum);
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			executorService.execute(evaluator);
+			executorService.shutdown();
 
-		responseBuilder = Response.status(Response.Status.ACCEPTED);
-		responseBuilder.entity(transaction);
-		response = responseBuilder.build();
-		response = stampHeader(response);
+			responseBuilder = Response.status(Response.Status.ACCEPTED);
+			responseBuilder.entity(transaction);
+			response = responseBuilder.build();
+			response = stampHeader(response);
+		}
+		catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
 
 		return response;
 
