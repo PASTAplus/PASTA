@@ -1363,6 +1363,10 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * </tr>
 	 * </table>
 	 * 
+	 * @param emlFile
+	 *            An EML document file, as specified in the payload of the
+	 *            request.
+	 *
 	 * @return a Response, which if successful, contains a quality report XML
 	 *         document
 	 */
@@ -1378,7 +1382,6 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-		String transaction = generateTransactionID("evaluate", null, null, null);
 
 
 		try {
@@ -1405,8 +1408,9 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-		String msg = String.format("Evaluate (transaction: %s)", transaction);
-		logger.info(msg);
+			String transaction = generateTransactionID("evaluate", null, null, null);
+			String msg = String.format("Evaluate (transaction: %s)", transaction);
+			logger.info(msg);
 
 			// Perform evaluateDataPackage in new thread
 			Evaluator evaluator = new Evaluator(emlFile, userId, authToken,
