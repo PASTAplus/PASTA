@@ -4220,10 +4220,11 @@ public class DataPackageRegistry {
             String articleUrl = journalCitation.getArticleUrl();
             LocalDateTime dateCreated = journalCitation.getDateCreated();
             String journalTitle = journalCitation.getJournalTitle();
+            String relationType = journalCitation.getRelationType();
 
-            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?,?)",
+            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
                     JOURNAL_CITATION, "package_id", "principal_owner", "article_doi", "article_title", "article_url", "date_created",
-                    "journal_title");
+                    "journal_title", "relation_type");
             logger.debug("insertSQL: " + insertSQL);
 
             try {
@@ -4261,6 +4262,10 @@ public class DataPackageRegistry {
                 } 
                 else { 
                     pstmt.setString(7, journalTitle); 
+                }
+
+                if (relationType != null) {
+                    pstmt.setString(8, relationType);
                 }
                 
                 pstmt.executeUpdate();
@@ -4351,6 +4356,7 @@ public class DataPackageRegistry {
                 String articleTitle = rs.getString("article_title");
                 String articleUrl = rs.getString("article_url");
                 String journalTitle = rs.getString("journal_title");
+                String relationType = rs.getString("relation_type");
                 String principalOwner = rs.getString("principal_owner");
                 Timestamp ts = rs.getTimestamp("date_created");
                 LocalDateTime dateCreated = ts.toLocalDateTime();
@@ -4362,6 +4368,7 @@ public class DataPackageRegistry {
                 journalCitation.setArticleTitle(articleTitle);
                 journalCitation.setArticleUrl(articleUrl);
                 journalCitation.setJournalTitle(journalTitle);
+                journalCitation.setRelationType(relationType);
                 journalCitation.setDateCreated(dateCreated);
                 journalCitations.add(journalCitation);
             }
@@ -4499,6 +4506,7 @@ public class DataPackageRegistry {
                   String articleTitle = rs.getString("article_title");
                   String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
+                  String relationType = rs.getString("relation_type");
                   String packageId = rs.getString("package_id");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
@@ -4510,6 +4518,7 @@ public class DataPackageRegistry {
                   journalCitation.setArticleTitle(articleTitle);
                   journalCitation.setArticleUrl(articleUrl);
                   journalCitation.setJournalTitle(journalTitle);
+                  journalCitation.setRelationType(relationType);
                   journalCitation.setDateCreated(dateCreated);
                   journalCitations.add(journalCitation);
               }
@@ -4549,6 +4558,7 @@ public class DataPackageRegistry {
                   String articleTitle = rs.getString("article_title");
                   String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
+                  String relationType = rs.getString("relation_type");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
                   JournalCitation journalCitation = new JournalCitation();
@@ -4559,6 +4569,7 @@ public class DataPackageRegistry {
                   journalCitation.setArticleTitle(articleTitle);
                   journalCitation.setArticleUrl(articleUrl);
                   journalCitation.setJournalTitle(journalTitle);
+                  journalCitation.setRelationType(relationType);
                   journalCitation.setDateCreated(dateCreated);
                   journalCitations.add(journalCitation);
               }

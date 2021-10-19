@@ -168,6 +168,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	    
 	    String doi = journalCitation.getArticleDoi();
         String url = journalCitation.getArticleUrl();
+		String relationType = journalCitation.getRelationType();
 	    
 	    if (doi != null && !doi.isEmpty()) {
 	        relatedIdentifierStr = doi;
@@ -179,7 +180,7 @@ public class DataCiteMetadata extends CitationMetadata {
 	    }
 	    
 	    if (relatedIdentifierType != null) {
-	        relatedIdentifier = new RelatedIdentifier(relatedIdentifierStr, relatedIdentifierType);
+	        relatedIdentifier = new RelatedIdentifier(relatedIdentifierStr, relatedIdentifierType, relationType);
 	    }
 	    
 	    return relatedIdentifier;
@@ -331,8 +332,8 @@ public class DataCiteMetadata extends CitationMetadata {
             DOIScanner doiScanner = new DOIScanner();
             DataPackageRegistry dpr = doiScanner.getDataPackageRegistry();
             DataCiteMetadata dcm = new DataCiteMetadata();
-            RelatedIdentifier ri1 = new RelatedIdentifier("http://x.y.z", RelatedIdentifierType.URL);
-            RelatedIdentifier ri2 = new RelatedIdentifier("doi:blahblahblah", RelatedIdentifierType.DOI);
+            RelatedIdentifier ri1 = new RelatedIdentifier("http://x.y.z", RelatedIdentifierType.URL, "IsCitedBy");
+            RelatedIdentifier ri2 = new RelatedIdentifier("doi:blahblahblah", RelatedIdentifierType.DOI, "IsReferencedBy");
             dcm.addRelatedIdentifier(ri1);
             dcm.addRelatedIdentifier(ri2);
 

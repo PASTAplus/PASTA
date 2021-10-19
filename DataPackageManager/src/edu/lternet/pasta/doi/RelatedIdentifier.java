@@ -62,12 +62,14 @@ public class RelatedIdentifier {
 	 * is the "isCitedBy" relation type. In other words, the data package is cited
 	 * by the journal article (via the journal article DOI or URL). 
 	 * 
+	 * @param relatedIdentifier
 	 * @param relatedIdentifierType
+	 * @param relationType
 	 */
-	public RelatedIdentifier(String relatedIdentifier, RelatedIdentifierType relatedIdentifierType) {
+	public RelatedIdentifier(String relatedIdentifier, RelatedIdentifierType relatedIdentifierType, String relationType) {
 	    this.relatedIdentifier = relatedIdentifier;
 		this.relatedIdentifierType = relatedIdentifierType;
-		this.relationType = IS_CITED_BY;
+		this.relationType = relationType;
 	}
 
 	

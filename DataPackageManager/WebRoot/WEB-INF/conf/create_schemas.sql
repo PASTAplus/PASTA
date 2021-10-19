@@ -64,6 +64,7 @@ CREATE TABLE datapackagemanager.prov_matrix (
 );
 
 
+CREATE TYPE datapackagemanager.relation_type AS ENUM ('IsCitedBy', 'IsDescribedBy', 'IsReferencedBy');
 CREATE SEQUENCE datapackagemanager.journal_citation_id_seq;
 CREATE TABLE datapackagemanager.journal_citation (
   JOURNAL_CITATION_ID NUMERIC  DEFAULT NEXTVAL('datapackagemanager.journal_citation_id_seq') PRIMARY KEY,
@@ -74,6 +75,7 @@ CREATE TABLE datapackagemanager.journal_citation (
   DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
   JOURNAL_TITLE   TEXT,                               -- name of the journal
   PACKAGE_ID      VARCHAR(100) NOT NULL               -- packageId of source data package in PASTA
+  RELATION_TYPE datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
 );
 
 

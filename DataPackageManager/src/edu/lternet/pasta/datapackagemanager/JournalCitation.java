@@ -41,6 +41,7 @@ public class JournalCitation {
     LocalDateTime dateCreated;
     String packageId;
     String journalTitle;
+    String relationType;
     
 
     
@@ -190,6 +191,15 @@ public class JournalCitation {
               setJournalTitle(journalTitle);
             }
 
+            Node relationTypeNode = xpathapi.selectSingleNode(document, "//relationType");
+            if (relationTypeNode != null) {
+              String relationType = relationTypeNode.getTextContent();
+              setRelationType(relationType);
+            }
+            else {
+                throw new UserErrorException("Relation type cannot be empty");
+            }
+
         }
       }
       catch (SAXException e) {
@@ -239,6 +249,9 @@ public class JournalCitation {
         if (this.journalTitle != null)
             { sb.append(String.format("    <journalTitle>%s</journalTitle>\n", Encode.forXml(this.journalTitle))); }
         
+        if (this.relationType != null)
+            { sb.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
+
         sb.append("</journalCitation>\n");
 
         String xml = sb.toString();
@@ -349,6 +362,14 @@ public class JournalCitation {
 
     public void setJournalTitle(String journalTitle) {
         this.journalTitle = journalTitle;
+    }
+
+    public String getRelationType() {
+        return relationType;
+    }
+
+    public void setRelationType(String relationType) {
+        this.relationType = relationType;
     }
 
 }
