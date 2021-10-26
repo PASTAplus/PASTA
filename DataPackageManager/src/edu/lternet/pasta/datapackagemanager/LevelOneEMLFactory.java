@@ -1026,7 +1026,7 @@ public final class LevelOneEMLFactory {
                   String objectName = objectNameNodeList.item(0).getTextContent();
                   logger.debug("objectName: " + objectName);
                 }
-      
+
                 // Get the distribution information
                 NodeList urlNodeList = xpathapi.selectNodeList(entityNode, ONLINE_URL);
       
@@ -1034,6 +1034,7 @@ public final class LevelOneEMLFactory {
                   String url = urlNodeList.item(0).getTextContent();
                   logger.debug("Changing data URL from:\n  " + url + "\nto:\n  " + entryValue);
                   urlNodeList.item(0).setTextContent(entryValue);
+				  ((Element)urlNodeList.item(0)).setAttribute("function", "download");
                 }
               }
             }
