@@ -534,7 +534,7 @@ public final class LevelOneEMLFactory {
 		Element distributionElement = doc.createElement("distribution");
 		distributionElement.setAttribute("id", doi);
 		distributionElement.setAttribute("system", LEVEL_ONE_SYSTEM_ATTRIBUTE);
-		distributionElement.setAttribute("scope", "EDI");
+		distributionElement.setAttribute("scope", "system");
 		Element onlineElement = doc.createElement("online");
 		Element urlElement = doc.createElement("url");
 		urlElement.setAttribute("function", "information");
