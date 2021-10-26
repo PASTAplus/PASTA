@@ -110,6 +110,7 @@ public final class LevelOneEMLFactory {
 
   public static final String INTELLECTUAL_RIGHTS_PATH = "//dataset/intellectualRights";
   public static final String LEVEL_ONE_SYSTEM_ATTRIBUTE = "https://pasta.edirepository.org";
+  private static final String DOI_SYSTEM_VALUE = "https://doi.org";
 
   private static final String INTELLECTUAL_RIGHTS_CC_BY = 
     "This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.";
@@ -204,6 +205,9 @@ public final class LevelOneEMLFactory {
 		}
 
 		addAlternateIdentifier(levelOneEMLDocument, alternateID, attributeValue);
+		if (attributeValue.equals(DOI_SYSTEM_VALUE)) {
+			addDatasetDistribution(levelOneEMLDocument, alternateID.replaceFirst("doi:", ""));
+		}
 
 		return levelOneEMLDocument;
 	}
@@ -522,6 +526,59 @@ public final class LevelOneEMLFactory {
 
 
   /*
+   * Add Dataset-level distribution with link to DOI landing page
+   */
+  private void addDatasetDistribution(Document doc, String doi) throws TransformerException {
+		String url = String.format("%s/%s", DOI_SYSTEM_VALUE, doi);
+
+		Element distributionElement = doc.createElement("distribution");
+		distributionElement.setAttribute("id", doi);
+		distributionElement.setAttribute("system", LEVEL_ONE_SYSTEM_ATTRIBUTE);
+		distributionElement.setAttribute("scope", "EDI");
+		Element onlineElement = doc.createElement("online");
+		Element urlElement = doc.createElement("url");
+		urlElement.setAttribute("function", "information");
+
+		urlElement.appendChild(doc.createTextNode(url));
+		onlineElement.appendChild(urlElement);
+		distributionElement.appendChild(onlineElement);
+
+		String insertBefore;
+
+		if (hasElement(doc, COVERAGE_PATH)) {
+			insertBefore = COVERAGE_PATH;
+		}
+		else if (hasElement(doc, ANNOTATION_PATH)) {
+			insertBefore = ANNOTATION_PATH;
+		}
+		else if (hasElement(doc, PURPOSE_PATH)) {
+			insertBefore = PURPOSE_PATH;
+		}
+		else if (hasElement(doc, INTRODUCTION_PATH)) {
+			insertBefore = INTRODUCTION_PATH;
+		}
+		else if (hasElement(doc, GETTING_STARTED_PATH)) {
+			insertBefore = GETTING_STARTED_PATH;
+		}
+		else if (hasElement(doc, ACKNOWLEDGEMENTS_PATH)) {
+			insertBefore = ACKNOWLEDGEMENTS_PATH;
+		}
+		else if (hasElement(doc, MAINTENANCE_PATH)) {
+			insertBefore = MAINTENANCE_PATH;
+		}
+		else {
+			insertBefore = CONTACT_PATH;
+		}
+
+		Node datasetNode = getDatasetNode(doc);
+		NodeList insertNodeList = getElementNodeList(doc, insertBefore);
+		Node insertNode = insertNodeList.item(0);
+		datasetNode.insertBefore(distributionElement, insertNode);
+
+  }
+
+
+   /*
    * Add a Level-1 access/allow element with EDI principal to document.
    */
 	private void addEdiPrincipal(Document doc)
