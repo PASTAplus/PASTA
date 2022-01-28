@@ -231,7 +231,7 @@
     <qualityCheck qualityType="congruency" system="lter" statusType="info" >
       <identifier>headerRowAttributeNames</identifier>
       <name>Header row is displayed alongside attribute names</name>
-      <description>Compare tne content of the data header row to the content of EML attribute names.</description>
+      <description>Compare the content of the data header row to the content of EML attribute names.</description>
       <expected>No expectation, information only</expected>
       <found></found>
       <status>notChecked</status>
