@@ -95,10 +95,6 @@ public class AuditManager {
   /**
    * Constructs a new DataPackageRegistry object.
    * 
-   * @param   dbDriver      the database driver
-   * @param   dbURL         the database URL
-   * @paramm  dbUser        the database user name
-   * @param   dbPassword    the database user password
    * @return  an EMLDataCache object
    */
   public AuditManager(Properties p) 
@@ -208,8 +204,7 @@ public class AuditManager {
   /**
    * Adds a new audit entry to the audit resource registry.
    * 
-   * @param oid   
-   * @param service 
+   * @param service
    * @param category 
    * @param serviceMethod     
    * @param entryText  
@@ -795,8 +790,8 @@ public class AuditManager {
       Connection connection = null;
      
       String selectString = 
-        "SELECT oid, entrytime, service, category, servicemethod," +
-        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
+        "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
+        " resourceid, statuscode, userid, useragent, groups, authsystem " +
         "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
         
       boolean orderBy = true;
@@ -820,8 +815,9 @@ public class AuditManager {
           String resourceId = rs.getString(7);
           int statusCode = rs.getInt(8);
           String userId = rs.getString(9);
-          String groups = rs.getString(10);
-          String authSystem = rs.getString(11);
+          String userAgent = rs.getString(10);
+          String groups = rs.getString(11);
+          String authSystem = rs.getString(12);
           AuditRecord auditRecord = new AuditRecord();
           auditRecord.setOid(oid);
           java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
@@ -833,6 +829,7 @@ public class AuditManager {
           auditRecord.setResourceId(resourceId);
           auditRecord.setResponseStatus(new Integer(statusCode));
           auditRecord.setUser(userId);
+          auditRecord.setUserAgent(userAgent);
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
           stringBuffer.append(auditRecord.toXML());
