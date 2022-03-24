@@ -29,14 +29,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -540,55 +533,53 @@ public class AuditManagerResource extends PastaWebService
      * @param uriInfo  a UriInfo object containing the GET's query parameters
      * @return an appropriate HTTP response.
      */
-    @GET
-    @Path("report")
-    public Response getAuditReport(@Context HttpHeaders headers,
-                                    @Context UriInfo uriInfo) {
-		ResponseBuilder responseBuilder = null;
-		Response response = null;
-
-		try {
-            Properties properties = ConfigurationListener.getProperties();
-            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
-            AuditManager auditManager = new AuditManager(properties);
-            QueryString queryString = new QueryString(uriInfo);
-            queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
-            Map<String, List<String>> queryParams = queryString.getParams();
-            File xmlFile = auditManager.getAuditRecordsFile(queryParams);
-			if (xmlFile != null && xmlFile.exists()) {
-				Long size = FileUtils.sizeOf(xmlFile);
-				responseBuilder = Response.ok(xmlFile, MediaType.APPLICATION_XML);
-				responseBuilder.header("Content-Length", size.toString());
-				response = responseBuilder.build();
-				String logMessage = String.format("getAuditRecords service method finished processing: returning %d bytes", size);
-				logger.warn(logMessage);
-			}
-			else {
-				ResourceNotFoundException e = new ResourceNotFoundException(
-				    String.format("Unable to process audit query with query parameters: %s", queryParams));
-				throw (e);
-			}
-            return response;
-        }
-        catch (ClassNotFoundException e) {
-          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
-        }
-		catch (ResourceNotFoundException e) {
-		  return WebExceptionFactory.makeNotFound(e).getResponse();
-		}
-        catch (SQLException e) {
-          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
-        }
-        catch (UnauthorizedException e) {
-            return WebExceptionFactory.makeUnauthorized(e).getResponse();
-        }
-        catch (WebApplicationException e) {
-            return e.getResponse();
-        }
-        catch (IllegalStateException e) {
-            return WebExceptionFactory.makeBadRequest(e).getResponse();
-        }
+  @GET
+  @Path("report")
+  public Response getAuditReport(@Context HttpHeaders headers, @Context UriInfo uriInfo)
+  {
+    ResponseBuilder responseBuilder = null;
+    Response response = null;
+    try {
+      Properties properties = ConfigurationListener.getProperties();
+      assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+      AuditManager auditManager = new AuditManager(properties);
+      QueryString queryString = new QueryString(uriInfo);
+      queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
+      Map<String, List<String>> queryParams = queryString.getParams();
+      MyPair<String, Integer> pair = auditManager.getAuditRecordsXml(queryParams);
+      String xmlString = pair.t;
+      Integer lastOid = pair.u;
+      if (!Objects.equals(xmlString, "")) {
+        Integer size = xmlString.length();
+        responseBuilder = Response.ok(xmlString, MediaType.APPLICATION_XML);
+        responseBuilder.header("Content-Length", size.toString());
+        responseBuilder.header("PASTA-Last-OID", lastOid.toString());
+        response = responseBuilder.build();
+        String logMessage = String.format(
+            "getAuditRecords service method finished processing: returning %d bytes",
+            size);
+        logger.warn(logMessage);
+      }
+      else {
+        ResourceNotFoundException e = new ResourceNotFoundException(
+            String.format("Unable to process audit query with query parameters: %s",
+                queryParams));
+        throw (e);
+      }
+      return response;
+    } catch (ClassNotFoundException | SQLException e) {
+      return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage())
+          .getResponse();
+    } catch (ResourceNotFoundException e) {
+      return WebExceptionFactory.makeNotFound(e).getResponse();
+    } catch (UnauthorizedException e) {
+      return WebExceptionFactory.makeUnauthorized(e).getResponse();
+    } catch (WebApplicationException e) {
+      return e.getResponse();
+    } catch (IllegalStateException e) {
+      return WebExceptionFactory.makeBadRequest(e).getResponse();
     }
+  }
 
   @GET
   @Path("csvreport")
