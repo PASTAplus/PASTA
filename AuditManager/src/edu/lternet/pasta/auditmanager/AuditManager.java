@@ -43,6 +43,8 @@ import java.util.Properties;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.audit.AuditRecord;
@@ -304,6 +306,9 @@ public class AuditManager {
 
       if (fieldName.equals("resourceid")) {
         stringBuffer.append(String.format("%s like '%%%s%%'", fieldName, value));
+      }
+      else if (fieldName.equals("oid")) {
+        stringBuffer.append(String.format("%s>%s", fieldName, value));
       }
       else {
         stringBuffer.append(String.format("%s='%s'", fieldName, value));
@@ -998,10 +1003,6 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
           stringBuffer.append(auditRecord.toXML());
-          if (stringBuffer.toString().length() >= STRING_BUFFER_SIZE) {
-        	  saveXmlToFile(auditFile, stringBuffer);
-        	  stringBuffer = new StringBuffer("");
-          }
         }
       }
       catch(ClassNotFoundException e) {
@@ -1014,7 +1015,6 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
       }
       finally {
         stringBuffer.append(AUDIT_CLOSING_TAG);
-  	    saveXmlToFile(auditFile, stringBuffer);
         if (stmt != null) stmt.close();
         returnConnection(connection);
       }

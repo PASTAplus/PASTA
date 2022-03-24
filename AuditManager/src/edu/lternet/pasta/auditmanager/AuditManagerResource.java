@@ -122,7 +122,9 @@ public class AuditManagerResource extends PastaWebService
     public static final String STATUS_CODE = "status";
     // Query parameter for resourceId
     public static final String RESOURCE_ID = "resourceId";
-    
+    // Query parameter for oid
+    public static final String START_ROW_ID = "oid";
+
     //Query parameter for record limit
     public static final String LIMIT = "limit";
     
@@ -145,6 +147,7 @@ public class AuditManagerResource extends PastaWebService
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
         set.add(RESOURCE_ID);
+        set.add(START_ROW_ID);
         set.add(LIMIT);
         VALID_QUERY_KEYS = Collections.unmodifiableSet(set);
     }
@@ -537,8 +540,6 @@ public class AuditManagerResource extends PastaWebService
   @Path("report")
   public Response getAuditReport(@Context HttpHeaders headers, @Context UriInfo uriInfo)
   {
-    ResponseBuilder responseBuilder = null;
-    Response response = null;
     try {
       Properties properties = ConfigurationListener.getProperties();
       assertAuthorizedToRead(headers, MethodNameUtility.methodName());
@@ -549,24 +550,26 @@ public class AuditManagerResource extends PastaWebService
       MyPair<String, Integer> pair = auditManager.getAuditRecordsXml(queryParams);
       String xmlString = pair.t;
       Integer lastOid = pair.u;
-      if (!Objects.equals(xmlString, "")) {
-        Integer size = xmlString.length();
-        responseBuilder = Response.ok(xmlString, MediaType.APPLICATION_XML);
-        responseBuilder.header("Content-Length", size.toString());
-        responseBuilder.header("PASTA-Last-OID", lastOid.toString());
-        response = responseBuilder.build();
-        String logMessage = String.format(
-            "getAuditRecords service method finished processing: returning %d bytes",
-            size);
-        logger.warn(logMessage);
-      }
-      else {
+
+      if (Objects.equals(xmlString, "")) {
         ResourceNotFoundException e = new ResourceNotFoundException(
             String.format("Unable to process audit query with query parameters: %s",
                 queryParams));
         throw (e);
       }
+
+      Integer size = xmlString.length();
+      ResponseBuilder responseBuilder = Response.ok(xmlString, MediaType.APPLICATION_XML);
+      responseBuilder.header("PASTA-Last-OID", lastOid.toString());
+      responseBuilder.header("Content-Length", size.toString());
+      Response response = responseBuilder.build();
+      String logMessage = String.format(
+          "getAuditRecords service method finished processing: returning %d bytes",
+          size);
+      logger.warn(logMessage);
+
       return response;
+
     } catch (ClassNotFoundException | SQLException e) {
       return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage())
           .getResponse();
