@@ -24,8 +24,10 @@
 
 package edu.lternet.pasta.auditmanager;
 
-import java.io.File;
+import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,11 +44,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -400,44 +398,42 @@ public class AuditManagerResource extends PastaWebService
     @GET
     @Path("report/{oid}")
     public Response getAuditRecord(@Context HttpHeaders headers,
-                                   @PathParam(value = "oid") int oid) {
-        try {
-            Properties properties = ConfigurationListener.getProperties();
-            assertAuthorizedToRead(headers, MethodNameUtility.methodName());
-            AuditManager auditManager = new AuditManager(properties);
-            Integer oidInteger = new Integer(oid);
-            String oidString = oidInteger.toString();
-            List<String> oidList = new ArrayList<String>();
-            oidList.add(oidString);            
-            Map<String, List<String>> queryParams = new HashMap<String, List<String>>();
-            queryParams.put("oid", oidList);
-            String xmlString = auditManager.getAuditRecords(queryParams);
-            if (xmlString.length() == (AuditManager.AUDIT_OPENING_TAG.length() + 
-            		                   AuditManager.AUDIT_CLOSING_TAG.length())) { 
-              throw new ResourceNotFoundException(String.format("Oid %d does not exist.", oid));
-            }
-            return Response.ok(xmlString).build();
+                                   @PathParam(value = "oid") int oid)
+    {
+      try {
+        Properties properties = ConfigurationListener.getProperties();
+        assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+        AuditManager auditManager = new AuditManager(properties);
+        Integer oidInteger = new Integer(oid);
+        String oidString = oidInteger.toString();
+        List<String> oidList = new ArrayList<String>();
+        oidList.add(oidString);
+        Map<String, List<String>> queryParams = new HashMap<String, List<String>>();
+        queryParams.put("oid", oidList);
+        MyPair<String, Integer> pair = auditManager.getAuditRecords(queryParams);
+        String xmlString = pair.t;
+        Integer lastOid = pair.u;
+        if (xmlString.length() == (AuditManager.AUDIT_OPENING_TAG.length() +
+            AuditManager.AUDIT_CLOSING_TAG.length())) {
+          throw new ResourceNotFoundException(
+              String.format("Oid %d does not exist.", oid));
         }
-        catch (ClassNotFoundException e) {
-          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
-        }
-        catch (SQLException e) {
-          return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage()).getResponse();
-        }
-        catch (UnauthorizedException e) {
-            return WebExceptionFactory.makeUnauthorized(e).getResponse();
-        }
-        catch (ResourceNotFoundException e) {
-            return WebExceptionFactory.makeNotFound(e).getResponse();
-        }
-        catch (WebApplicationException e) {
-            return e.getResponse();
-        }
-        catch (IllegalStateException e) {
-            return WebExceptionFactory.makeBadRequest(e).getResponse();
-        }
+        ResponseBuilder response = Response.ok(xmlString);
+        response.header("PASTA-Last-OID", lastOid.toString());
+        return response.build();
+      } catch (ClassNotFoundException | SQLException e) {
+        return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage())
+            .getResponse();
+      } catch (UnauthorizedException e) {
+        return WebExceptionFactory.makeUnauthorized(e).getResponse();
+      } catch (ResourceNotFoundException e) {
+        return WebExceptionFactory.makeNotFound(e).getResponse();
+      } catch (WebApplicationException e) {
+        return e.getResponse();
+      } catch (IllegalStateException e) {
+        return WebExceptionFactory.makeBadRequest(e).getResponse();
+      }
     }
-
 
     /**
      * <strong>Get Audit Report</strong> operation, gets a list of zero or more 
@@ -593,8 +589,56 @@ public class AuditManagerResource extends PastaWebService
             return WebExceptionFactory.makeBadRequest(e).getResponse();
         }
     }
-    
-    
+
+  @GET
+  @Path("csvreport")
+  @Produces(MediaType.TEXT_PLAIN)
+  public Response getAuditReportCsv(@Context HttpHeaders headers,
+                                    @Context UriInfo uriInfo)
+  {
+    Response response = null;
+
+    try {
+      Properties properties = ConfigurationListener.getProperties();
+      assertAuthorizedToRead(headers, MethodNameUtility.methodName());
+      AuditManager auditManager = new AuditManager(properties);
+      QueryString queryString = new QueryString(uriInfo);
+      queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
+      Map<String, List<String>> queryParams = queryString.getParams();
+
+      File csvFile = auditManager.createAuditRecordsCsv(queryParams);
+
+      StreamingOutput fileStream = output -> {
+        try {
+          Files.copy(csvFile.toPath(), output);
+        } catch (NoSuchFileException e) {
+          logger.error("Error: " + e.getMessage());
+        } finally {
+          Files.delete(csvFile.toPath());
+        }
+      };
+
+      response = Response.ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+          .header("content-disposition", "attachment; filename=download.csv").build();
+
+    } catch (ClassNotFoundException | SQLException e) {
+      return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage())
+          .getResponse();
+    } catch (ResourceNotFoundException e) {
+      return WebExceptionFactory.makeNotFound(e).getResponse();
+    } catch (UnauthorizedException e) {
+      return WebExceptionFactory.makeUnauthorized(e).getResponse();
+    } catch (WebApplicationException e) {
+      return e.getResponse();
+    } catch (IllegalStateException e) {
+      return WebExceptionFactory.makeBadRequest(e).getResponse();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return response;
+  }
+
     /**
      * <strong>Get Audit Count</strong> operation, returns a count of the number 
      * audit log records from the audit table (named "eventlog") matching the provided 
