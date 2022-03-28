@@ -4234,21 +4234,21 @@ public class DataPackageRegistry {
                 pstmt.setString(2, principalOwner);
                 
                 if (articleDoi == null) { 
-                    pstmt.setNull(3, java.sql.Types.VARCHAR); 
+                    pstmt.setString(3, "");
                 } 
                 else { 
                     pstmt.setString(3, articleDoi); 
                 }
                 
                 if (articleTitle == null) { 
-                    pstmt.setNull(4, java.sql.Types.BLOB); 
+                    pstmt.setString(4, "");
                 } 
                 else { 
                     pstmt.setString(4, articleTitle); 
                 }
                 
                 if (articleUrl == null) { 
-                    pstmt.setNull(5, java.sql.Types.BLOB); 
+                    pstmt.setString(5, "");
                 } 
                 else { 
                     pstmt.setString(5, articleUrl); 
@@ -4258,7 +4258,7 @@ public class DataPackageRegistry {
                 pstmt.setTimestamp(6, ts);
                 
                 if (journalTitle == null) { 
-                    pstmt.setNull(7, java.sql.Types.BLOB); 
+                    pstmt.setString(7, "");
                 } 
                 else { 
                     pstmt.setString(7, journalTitle); 
