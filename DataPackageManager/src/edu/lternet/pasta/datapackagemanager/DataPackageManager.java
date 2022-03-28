@@ -4034,14 +4034,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				String articleDoi = journalCitation.getArticleDoi();
 				String articleUrl = journalCitation.getArticleUrl();
 				for (JournalCitation citation : citations) {
-					if (!articleDoi.isEmpty() && articleDoi.equals(citation.articleDoi)) {
+					if (articleDoi != null && !articleDoi.isEmpty() && articleDoi.equals(citation.articleDoi)) {
 						String gripe = String.format("The journal DOI (%s) is already registered for package %s",
 								articleDoi, packageId);
+						logger.error(gripe);
 						throw new UserErrorException(gripe);
 					}
-					if (!articleUrl.isEmpty() && articleUrl.equals(citation.articleUrl)) {
+					if (articleUrl != null && !articleUrl.isEmpty() && articleUrl.equals(citation.articleUrl)) {
 						String gripe = String.format("The journal URL (%s) is already registered for package %s",
 								articleUrl, packageId);
+						logger.error(gripe);
 						throw new UserErrorException(gripe);
 					}
 				}
