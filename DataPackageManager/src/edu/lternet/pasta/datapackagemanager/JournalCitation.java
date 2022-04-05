@@ -147,6 +147,7 @@ public class JournalCitation {
         
         if (document != null) {
 
+            /* The journalCitationId is set during database insert, so any value here is essentially ignored */
             Node journalCitationIdNode = xpathapi.selectSingleNode(document, "//journalCitationId");
             if (journalCitationIdNode != null) {
               String journalCitationIdStr = journalCitationIdNode.getTextContent();
@@ -158,7 +159,9 @@ public class JournalCitation {
               String packageId = packageIdNode.getTextContent();
               setPackageId(packageId);
             }
-            
+
+            boolean doiOrUrl = false;
+
             Node articleDoiNode = xpathapi.selectSingleNode(document, "//articleDoi");
             if (articleDoiNode != null) {
               String articleDoi = articleDoiNode.getTextContent();
@@ -167,22 +170,36 @@ public class JournalCitation {
               }
               else if (DigitalObjectIdentifier.isRawDoi(articleDoi)) {
                   setArticleDoi(articleDoi);
+                  doiOrUrl = true;
               }
               else {
-                  throw new UserErrorException(String.format("DOI %s should be in \"prefix/suffix\" format (e.g., 10.6073/d4f26a6c)", articleDoi.trim()));
+                  String gripe = String.format("DOI %s should be in \"prefix/suffix\" format (e.g., 10.6073/d4f26a6c)", articleDoi.trim());
+                  logger.error(gripe);
+                  throw new UserErrorException(gripe);
               }
+            }
+
+            Node articleUrlNode = xpathapi.selectSingleNode(document, "//articleUrl");
+            if (articleUrlNode != null) {
+              String articleUrl = articleUrlNode.getTextContent();
+              if (articleUrl.isEmpty()) {
+                  setArticleUrl(articleUrl);
+              } else {
+                  setArticleUrl(articleUrl);
+                  doiOrUrl = true;
+              }
+            }
+
+            if (!doiOrUrl) {
+                String gripe = "Either an article DOI or URL must be set to a valid value";
+                logger.error(gripe);
+                throw new UserErrorException(gripe);
             }
 
             Node articleTitleNode = xpathapi.selectSingleNode(document, "//articleTitle");
             if (articleTitleNode != null) {
               String articleTitle = articleTitleNode.getTextContent();
               setArticleTitle(articleTitle);
-            }
-
-            Node articleUrlNode = xpathapi.selectSingleNode(document, "//articleUrl");
-            if (articleUrlNode != null) {
-              String articleUrl = articleUrlNode.getTextContent();
-              setArticleUrl(articleUrl);
             }
 
             Node journalTitleNode = xpathapi.selectSingleNode(document, "//journalTitle");
@@ -194,12 +211,18 @@ public class JournalCitation {
             Node relationTypeNode = xpathapi.selectSingleNode(document, "//relationType");
             if (relationTypeNode != null) {
               String relationType = relationTypeNode.getTextContent();
+              if (relationType.isEmpty()) {
+                  String gripe = "A valid relation type is required (IsCitedBy, IsDescribedBy, or IsReferencedBy";
+                  logger.error(gripe);
+                  throw new UserErrorException(gripe);
+              }
               setRelationType(relationType);
             }
             else {
-                throw new UserErrorException("Relation type cannot be empty");
+                String gripe = "Relation type cannot be empty";
+                logger.error(gripe);
+                throw new UserErrorException(gripe);
             }
-
         }
       }
       catch (SAXException e) {

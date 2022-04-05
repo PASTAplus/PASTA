@@ -1018,6 +1018,13 @@ public final class LevelOneEMLFactory {
               String entryValue = entry.getValue();
               if (entryKey.trim().equals(entityName.trim())) {
                 logger.debug("Matched entityName: " + entityName);
+
+				String[] entryValueParts = entryValue.split("/");
+				String entityHash = entryValueParts[entryValueParts.length - 1];
+				((Element)entityNode).setAttribute("id", entityHash);
+				((Element)entityNode).setAttribute("scope", "document");
+				((Element)entityNode).setAttribute("system", LEVEL_ONE_SYSTEM_ATTRIBUTE);
+
       
                 // Get the objectName
                 NodeList objectNameNodeList = xpathapi.selectNodeList(entityNode, OBJECT_NAME);
