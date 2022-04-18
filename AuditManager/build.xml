@@ -17,6 +17,7 @@
         <include name="**/commons-io-2.*.jar"/>
         <include name="**/commons-fileupload-*.jar"/>
         <include name="**/commons-codec-*.jar"/>
+        <include name="**/commons-csv-*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/apache-logging">
         <include name="**/*.jar"/>
