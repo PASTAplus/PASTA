@@ -114,6 +114,8 @@ public class AuditManagerResource extends PastaWebService
     public static final String USER = "user";
     // Query parameter for userAgent
     public static final String USER_AGENT = "userAgent";
+    // Query parameter to exclude instead of include matching userAgent
+    public static final String USER_AGENT_NEGATE = "userAgentNegate";
     // Query parameter for groups
     public static final String GROUP = "group";
     // Query parameter for authSystem
@@ -122,12 +124,13 @@ public class AuditManagerResource extends PastaWebService
     public static final String STATUS_CODE = "status";
     // Query parameter for resourceId
     public static final String RESOURCE_ID = "resourceId";
-    // Query parameter for oid
-    public static final String START_ROW_ID = "oid";
-
-    //Query parameter for record limit
+    // Query parameter for record limit
     public static final String LIMIT = "limit";
-    
+    // Get next page (records after OID)
+    public static final String START_ROW_ID = "oid";
+    // Get previous page (records leading up to OID)
+    public static final String REVERSE_ROW_ID = "roid";
+
     private static Logger logger = Logger.getLogger(AuditManagerResource.class);
     // Set of valid query parameters
     public static final Set<String> VALID_QUERY_KEYS;
@@ -143,12 +146,14 @@ public class AuditManagerResource extends PastaWebService
         set.add(SERVICEMETHOD);
         set.add(USER);
         set.add(USER_AGENT);
+        set.add(USER_AGENT_NEGATE);
         set.add(GROUP);
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
         set.add(RESOURCE_ID);
-        set.add(START_ROW_ID);
         set.add(LIMIT);
+        set.add(START_ROW_ID);
+        set.add(REVERSE_ROW_ID);
         VALID_QUERY_KEYS = Collections.unmodifiableSet(set);
     }
     
@@ -406,15 +411,17 @@ public class AuditManagerResource extends PastaWebService
         oidList.add(oidString);
         Map<String, List<String>> queryParams = new HashMap<String, List<String>>();
         queryParams.put("oid", oidList);
-        MyPair<String, Integer> pair = auditManager.getAuditRecords(queryParams);
+        MyPair<String, MyPair<Integer, Integer>> pair = auditManager.getAuditRecords(queryParams);
         String xmlString = pair.t;
-        Integer lastOid = pair.u;
+        Integer firstOid = pair.u.t;
+        Integer lastOid = pair.u.u;
         if (xmlString.length() == (AuditManager.AUDIT_OPENING_TAG.length() +
             AuditManager.AUDIT_CLOSING_TAG.length())) {
           throw new ResourceNotFoundException(
               String.format("Oid %d does not exist.", oid));
         }
         ResponseBuilder response = Response.ok(xmlString);
+        response.header("PASTA-First-OID", firstOid.toString());
         response.header("PASTA-Last-OID", lastOid.toString());
         return response.build();
       } catch (ClassNotFoundException | SQLException e) {
@@ -547,9 +554,10 @@ public class AuditManagerResource extends PastaWebService
       QueryString queryString = new QueryString(uriInfo);
       queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
       Map<String, List<String>> queryParams = queryString.getParams();
-      MyPair<String, Integer> pair = auditManager.getAuditRecordsXml(queryParams);
+      MyPair<String, MyPair<Integer, Integer>> pair = auditManager.getAuditRecordsXml(queryParams);
       String xmlString = pair.t;
-      Integer lastOid = pair.u;
+      Integer firstOid = pair.u.t;
+      Integer lastOid = pair.u.u;
 
       if (Objects.equals(xmlString, "")) {
         ResourceNotFoundException e = new ResourceNotFoundException(
@@ -560,6 +568,7 @@ public class AuditManagerResource extends PastaWebService
 
       Integer size = xmlString.length();
       ResponseBuilder responseBuilder = Response.ok(xmlString, MediaType.APPLICATION_XML);
+      responseBuilder.header("PASTA-First-OID", firstOid.toString());
       responseBuilder.header("PASTA-Last-OID", lastOid.toString());
       responseBuilder.header("Content-Length", size.toString());
       Response response = responseBuilder.build();

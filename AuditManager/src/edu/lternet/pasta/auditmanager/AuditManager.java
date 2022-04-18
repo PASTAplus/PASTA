@@ -294,6 +294,83 @@ public class AuditManager {
   }
 
 
+  private String composeWhereClause(Map<String, List<String>> queryParams, boolean orderBy) {
+    String whereClause = null;
+    String limit = null;
+
+    StringBuffer stringBuffer = new StringBuffer(" WHERE category IS NOT NULL");
+
+    boolean orderDesc = false;
+
+    for (String key : queryParams.keySet()) {
+      if (!key.equalsIgnoreCase("limit")) {
+        stringBuffer.append(" AND ");
+
+        List<String> values = queryParams.get(key);
+
+        if (key.equalsIgnoreCase("roid")) {
+          orderDesc = true;
+        }
+
+        if (key.equalsIgnoreCase("fromtime")) {
+          String value = values.get(0);
+          String timestamp = dateToTimestamp(value, false);
+          stringBuffer.append(String.format(" entrytime >= '%s'", timestamp));
+        }
+        else if (key.equalsIgnoreCase("totime")) {
+          String value = values.get(0);
+          String timestamp = dateToTimestamp(value, true);
+          stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
+        }
+        else if (key.equalsIgnoreCase("group")) {
+          String orClause = composeORClause("groups", values);
+          stringBuffer.append(orClause);
+        }
+        else if (key.equalsIgnoreCase("userAgent")) {
+          stringBuffer.append(String.format(" useragent ILIKE '%%%s%%'", values.get(0)));
+        }
+        else if (key.equalsIgnoreCase("userAgentNegate")) {
+          stringBuffer.append(String.format(" useragent NOT ILIKE '%%%s%%'", values.get(0)));
+        }
+        else {
+          String orClause = composeORClause(key, values);
+          stringBuffer.append(orClause);
+        }
+      }
+    }
+
+    /*
+     * If orderBy is true, the audit records will be ordered by oid (identifier) value in
+     * ascending order.
+     */
+    if (orderBy) { stringBuffer.append(" ORDER BY oid " + (orderDesc ? "DESC" : "ASC")); }
+
+    /*
+     * Append a record limit value if specified
+     */
+    for (String key : queryParams.keySet()) {
+      List<String> values = queryParams.get(key);
+      if (key.equalsIgnoreCase("limit")) {
+        String limitStr = values.get(0);
+        try {
+          Integer limitInt = new Integer(limitStr);
+          if (limitInt > 0) {
+            limit = limitInt.toString();
+          }
+        }
+        catch (NumberFormatException e) {
+        }
+        if (limit != null) {
+          stringBuffer.append(String.format(" LIMIT %s", limit));
+        }
+      }
+    }
+
+    whereClause = stringBuffer.toString();
+
+    return whereClause;
+  }
+
   private String composeORClause(String key, List<String> values) {
     StringBuffer stringBuffer = new StringBuffer("( ");
     boolean firstValue = true;
@@ -310,6 +387,9 @@ public class AuditManager {
       else if (fieldName.equals("oid")) {
         stringBuffer.append(String.format("%s>%s", fieldName, value));
       }
+      else if (fieldName.equals("roid")) {
+        stringBuffer.append(String.format("oid<%s", value));
+      }
       else {
         stringBuffer.append(String.format("%s='%s'", fieldName, value));
       }
@@ -322,75 +402,6 @@ public class AuditManager {
 
     return orClause;
   }
-
-	private String composeWhereClause(Map<String, List<String>> queryParams, boolean orderBy) {
-		String whereClause = null;
-		String limit = null;
-
-		StringBuffer stringBuffer = new StringBuffer(
-				" WHERE category IS NOT NULL");
-
-		for (String key : queryParams.keySet()) {
-			if (!key.equalsIgnoreCase("limit")) {
-				stringBuffer.append(" AND ");
-				List<String> values = queryParams.get(key);
-
-				if (key.equalsIgnoreCase("fromtime")) {
-					String value = values.get(0);
-					String timestamp = dateToTimestamp(value, false);
-					stringBuffer.append(String.format(" entrytime >= '%s'",
-							timestamp));
-				}
-				else
-					if (key.equalsIgnoreCase("totime")) {
-						String value = values.get(0);
-						String timestamp = dateToTimestamp(value, true);
-						stringBuffer.append(String.format(" entrytime <= '%s'",
-								timestamp));
-					}
-					else
-						if (key.equalsIgnoreCase("group")) {
-							String orClause = composeORClause("groups", values);
-							stringBuffer.append(orClause);
-						}
-						else {
-							String orClause = composeORClause(key, values);
-							stringBuffer.append(orClause);
-						}
-			}
-		}
-
-		/*
-		 * If orderBy is true, the audit records will be ordered by oid (identifier) value in
-		 * ascending order.
-		 */
-		if (orderBy) { stringBuffer.append(" ORDER BY oid ASC"); }
-
-		/*
-		 * Append a record limit value if specified
-		 */
-		for (String key : queryParams.keySet()) {
-			List<String> values = queryParams.get(key);
-			if (key.equalsIgnoreCase("limit")) {
-				String limitStr = values.get(0);
-				try {
-					Integer limitInt = new Integer(limitStr);
-					if (limitInt > 0) {
-						limit = limitInt.toString();
-					}
-				}
-				catch (NumberFormatException e) {
-				}
-				if (limit != null) {
-					stringBuffer.append(String.format(" LIMIT %s", limit));
-				}
-			}
-		}
-
-		whereClause = stringBuffer.toString();
-
-		return whereClause;
-	}
 
 
 	private String composeWhereClauseRecentUploads(Map<String, List<String>> queryParams) {
@@ -483,41 +494,49 @@ public class AuditManager {
   }
 
 
+  /**
+   * Gets a list of audit log records from the audit table (named "eventlog")
+   * matching the provided criteria.
+   *
+   * @param queryParams a map of query parameters and the values they should be matched to
+   * @return an XML string of audit records
+   * @throws ClassNotFoundException
+   * @throws SQLException
+   * @throws IllegalArgumentException
+   */
+  public MyPair<String, MyPair<Integer, Integer>> getAuditRecords(Map<String, List<String>> queryParams)
+      throws ClassNotFoundException, SQLException, IllegalArgumentException
+  {
+    String xmlString = null;
+    int firstOid = 0;
+    int lastOid = 0;
+    if (queryParams != null) {
+      Connection connection = null;
+      String selectString =
+          "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
+              " resourceid, statuscode, userid, userAgent, groups, authsystem " +
+              "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
 
-/**
- * Gets a list of audit log records from the audit table (named "eventlog")
- * matching the provided criteria.
- *
- * @param queryParams a map of query parameters and the values they should be matched to
- * @return an XML string of audit records
- * @throws ClassNotFoundException
- * @throws SQLException
- * @throws IllegalArgumentException
- */
-public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryParams)
-    throws ClassNotFoundException, SQLException, IllegalArgumentException {
-  String xmlString = null;
-  int lastOid = 0;
-  if (queryParams != null) {
-    Connection connection = null;
-    String selectString =
-        "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
-            " resourceid, statuscode, userid, userAgent, groups, authsystem " +
-            "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
-    boolean orderBy = true;
-    selectString += composeWhereClause(queryParams, orderBy);
-    logger.info("WHERE clause: " + selectString);
-    Statement stmt = null;
-    StringBuilder stringBuffer = new StringBuilder(AUDIT_OPENING_TAG);
-    try {
-      connection = getConnection();
-      stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
-      while (rs.next()) {
-         int oid = rs.getInt(1);
-         java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
+      selectString += composeWhereClause(queryParams, true);
+      logger.info("WHERE clause: " + selectString);
 
+      Statement stmt = null;
+      StringBuilder stringBuffer = new StringBuilder(AUDIT_OPENING_TAG);
+      try {
+        connection = getConnection();
+        stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(selectString);
+        while (rs.next()) {
+          int oid = rs.getInt(1);
+          
+          if (firstOid == 0 || firstOid > oid) {
+            firstOid = oid;
+          }
+          if (lastOid == 0 || lastOid < oid) {
+            lastOid = oid;
+          }
 
+          java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
           String service = rs.getString(3);
           String category = rs.getString(4);
           String serviceMethod = rs.getString(5);
@@ -542,28 +561,26 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
           auditRecord.setUserAgent(userAgent);
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
-          stringBuffer.append(auditRecord.toXML());
 
-          lastOid = oid;
+          stringBuffer.append(auditRecord.toXML());
         }
-      }
-      catch(ClassNotFoundException e) {
+      } catch (ClassNotFoundException e) {
         logger.error("ClassNotFoundException: " + e.getMessage());
-        throw(e);
-      }
-      catch(SQLException e) {
+        throw (e);
+      } catch (SQLException e) {
         logger.error("SQLException: " + e.getMessage());
-        throw(e);
-      }
-      finally {
+        throw (e);
+      } finally {
         stringBuffer.append(AUDIT_CLOSING_TAG);
         xmlString = stringBuffer.toString();
-        if (stmt != null) stmt.close();
+        if (stmt != null) {
+          stmt.close();
+        }
         returnConnection(connection);
       }
     }
 
-    return new MyPair<>(xmlString, lastOid);
+    return new MyPair<>(xmlString, new MyPair<>(firstOid, lastOid));
   }
 
 
@@ -571,7 +588,7 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
    * Create a CSV file containing audit records and return the path to the file.
    *
    * @param queryParams a map of query parameters and the values they should be matched to
-   * @return an XML string of audit records
+   * @return CSV file path
    * //   * @throws ClassNotFoundException
    * //   * @throws SQLException
    * //   * @throws IllegalArgumentException
@@ -804,10 +821,8 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
 		if (queryParams != null) {
 			Connection connection = null;
 
-			String selectString = "SELECT count(*) FROM "
-					+ AUDIT_MANAGER_TABLE_QUALIFIED;
-			boolean orderBy = false;
-		    selectString += composeWhereClause(queryParams, orderBy);
+			String selectString = "SELECT count(*) FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
+      selectString += composeWhereClause(queryParams, false);
 		    logger.info("WHERE clause: " + selectString);
 
 			Statement stmt = null;
@@ -942,16 +957,18 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
    * @throws SQLException
    * @throws IllegalArgumentException
    */
-  public MyPair<String, Integer> getAuditRecordsXml(
+  public MyPair<String, MyPair<Integer, Integer>> getAuditRecordsXml(
       Map<String, List<String>> queryParams)
-      throws ClassNotFoundException, SQLException, IllegalArgumentException {
-    final int STRING_BUFFER_SIZE = 100000;
-    Date now = new Date();
-    Long mili = now.getTime();
+      throws ClassNotFoundException, SQLException, IllegalArgumentException
+  {
 
+//    final int STRING_BUFFER_SIZE = 100000;
+    Date now = new Date();
+//    Long mili = now.getTime();
 
     StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
 
+    int firstOid = 0;
     int lastOid = 0;
 
     if (queryParams != null) {
@@ -962,8 +979,7 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
               " resourceid, statuscode, userid, useragent, groups, authsystem " +
               "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
 
-      boolean orderBy = true;
-      selectString += composeWhereClause(queryParams, orderBy);
+      selectString += composeWhereClause(queryParams, true);
       logger.info("WHERE clause: " + selectString);
 
       Statement stmt = null;
@@ -975,7 +991,13 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
 
         while (rs.next()) {
           int oid = rs.getInt(1);
-          lastOid = oid;
+
+          if (firstOid == 0 || firstOid > oid) {
+            firstOid = oid;
+          }
+          if (lastOid == 0 || lastOid < oid) {
+            lastOid = oid;
+          }
 
           java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
           String service = rs.getString(3);
@@ -1002,6 +1024,7 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
           auditRecord.setUserAgent(userAgent);
           auditRecord.setGroups(groups);
           auditRecord.setAuthSystem(authSystem);
+
           stringBuffer.append(auditRecord.toXML());
         }
       }
@@ -1020,7 +1043,7 @@ public MyPair<String, Integer> getAuditRecords(Map<String, List<String>> queryPa
       }
     }
 
-    return new MyPair<>(stringBuffer.toString(), lastOid);
+    return new MyPair<>(stringBuffer.toString(), new MyPair<>(firstOid, lastOid));
   }
 
 

@@ -269,8 +269,7 @@ public class AuditManagerResourceTest {
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
 		// Test READ for OK status
-		Response response = auditManagerResource.getAuditReport(httpHeaders,
-				uriInfo);
+		Response response = auditManagerResource.getAuditReport(httpHeaders, uriInfo);
 		int statusCode = response.getStatus();
 		assertEquals(200, statusCode);
 
