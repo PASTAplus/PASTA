@@ -376,15 +376,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
 					emlDataPackage.getCreators().add(party );
             	}
             }
-            
-            // Store the pubDate
-            String pubDate = null;
-            Node pubDateNode = xpathapi.selectSingleNode(doc, pubDatePath);
-            if (pubDateNode != null) {
-              pubDate = pubDateNode.getTextContent().trim();
-            }
-            emlDataPackage.setPubDate(pubDate);
-            
+
             // Parse the dataset abstract text
             NodeList datasetAbstractNodeList = xpathapi.selectNodeList(doc, datasetAbstractPath);
             parseDatasetAbstract(datasetAbstractNodeList);
