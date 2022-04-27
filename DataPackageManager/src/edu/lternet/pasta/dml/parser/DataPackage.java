@@ -728,8 +728,7 @@ public class DataPackage
    * @param doc            the XML DOM document object
    * @param namespaceInDoc the namespace value specified in the document
    */
-  public void checkSchemaValid(Document doc, String namespaceInDoc) 
-          throws Exception {
+  public void checkSchemaValid(Document doc, String namespaceInDoc)  {
     String schemaValidIdentifier = "schemaValid";
     QualityCheck schemaValidTemplate = 
       QualityReport.getQualityCheckTemplate(schemaValidIdentifier);
@@ -745,9 +744,9 @@ public class DataPackage
       Node documentElement = doc.getDocumentElement();
       String xmlString = XMLUtilities.getDOMTreeAsString(documentElement);
       StringReader stringReader = new StringReader(xmlString);
-      SAXValidate saxValidate = new SAXValidate(validateSchema);
-    
+
       try {
+        SAXValidate saxValidate = new SAXValidate(validateSchema);
         saxValidate.runTest(stringReader, parserName, namespaceInDoc);
         found = "Document validated for namespace: '" + namespaceInDoc + "'";
         schemaValidQualityCheck.setStatus(Status.valid);
