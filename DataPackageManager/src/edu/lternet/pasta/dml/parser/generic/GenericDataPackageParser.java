@@ -245,52 +245,42 @@ public class GenericDataPackageParser implements DataPackageParserInterface
         String emlNamespace = null;
         
         try {
-          // process packageid
-        	Node packageIdNode = xpathapi.selectSingleNode(doc, packageIdPath);
-            
-        	if (packageIdNode != null)
-        	{
-        	   //System.out.println("in packageIdNode is not null");
-        	   packageId          = packageIdNode.getNodeValue();
-        	}
-        	
-          emlDataPackage        = new DataPackage(packageId);
-          
-          emlNamespace = parseEmlNamespace(doc);
-          if (emlDataPackage != null) {
+            Node packageIdNode = xpathapi.selectSingleNode(doc, packageIdPath);
+
+            packageId = packageIdNode.getNodeValue();
+            emlDataPackage = new DataPackage(packageId);
+
+            emlNamespace = parseEmlNamespace(doc);
             emlDataPackage.setEmlNamespace(emlNamespace);
-          }
-          
-          emlDataPackage.checkSchemaValid(doc, emlNamespace);
-          emlDataPackage.checkParserValid(doc);
-          emlDataPackage.checkSchemaValidDereferenced(doc, emlNamespace);
-          
-          String systemValue = parseSystemAttribute(doc);
-          if (systemValue != null) {
+
+            emlDataPackage.checkSchemaValid(doc, emlNamespace);
+            emlDataPackage.checkParserValid(doc);
+            emlDataPackage.checkSchemaValidDereferenced(doc, emlNamespace);
+
+            String systemValue = parseSystemAttribute(doc);
+            if (systemValue != null) {
             emlDataPackage.setSystem(systemValue);
-          }
-          
-          int nKeywordElements = countElements(xpathapi, doc, "keyword");
-          emlDataPackage.setNumberOfKeywordElements(nKeywordElements);
-          int nMethodsElements = countElements(xpathapi, doc, "methods");
-          emlDataPackage.setNumberOfMethodsElements(nMethodsElements);
-          int nCoverageElements = countElements(xpathapi, doc, "coverage");
-          emlDataPackage.setNumberOfCoverageElements(nCoverageElements);
-          int nGeographicCoverageElements = countElements(xpathapi, doc, "geographicCoverage");
-          emlDataPackage.setNumberOfGeographicCoverageElements(nGeographicCoverageElements);
-          int nTaxonomicCoverageElements = countElements(xpathapi, doc, "taxonomicCoverage");
-          emlDataPackage.setNumberOfTaxonomicCoverageElements(nTaxonomicCoverageElements);
-          int nTemporalCoverageElements = countElements(xpathapi, doc, "temporalCoverage");
-          emlDataPackage.setNumberOfTemporalCoverageElements(nTemporalCoverageElements);
+            }
+
+            int nKeywordElements = countElements(xpathapi, doc, "keyword");
+            emlDataPackage.setNumberOfKeywordElements(nKeywordElements);
+            int nMethodsElements = countElements(xpathapi, doc, "methods");
+            emlDataPackage.setNumberOfMethodsElements(nMethodsElements);
+            int nCoverageElements = countElements(xpathapi, doc, "coverage");
+            emlDataPackage.setNumberOfCoverageElements(nCoverageElements);
+            int nGeographicCoverageElements = countElements(xpathapi, doc, "geographicCoverage");
+            emlDataPackage.setNumberOfGeographicCoverageElements(nGeographicCoverageElements);
+            int nTaxonomicCoverageElements = countElements(xpathapi, doc, "taxonomicCoverage");
+            emlDataPackage.setNumberOfTaxonomicCoverageElements(nTaxonomicCoverageElements);
+            int nTemporalCoverageElements = countElements(xpathapi, doc, "temporalCoverage");
+            emlDataPackage.setNumberOfTemporalCoverageElements(nTemporalCoverageElements);
             
             // now dataTable, spatialRaster and spatialVector are handled
-            dataTableEntities              = xpathapi.selectNodeList(doc, dataTableEntityPath);
-            spatialRasterEntities = 
-                              xpathapi.selectNodeList(doc, spatialRasterEntityPath);
-            spatialVectorEntities = 
-                              xpathapi.selectNodeList(doc, spatialVectorEntityPath);
-            otherEntities         = xpathapi.selectNodeList(doc, otherEntityPath);
-            viewEntities          = xpathapi.selectNodeList(doc, viewEntityPath);
+            dataTableEntities = xpathapi.selectNodeList(doc, dataTableEntityPath);
+            spatialRasterEntities = xpathapi.selectNodeList(doc, spatialRasterEntityPath);
+            spatialVectorEntities = xpathapi.selectNodeList(doc, spatialVectorEntityPath);
+            otherEntities = xpathapi.selectNodeList(doc, otherEntityPath);
+            viewEntities = xpathapi.selectNodeList(doc, viewEntityPath);
             
             
             // Store <access> XML block because some applications may need it
@@ -307,7 +297,7 @@ public class GenericDataPackageParser implements DataPackageParserInterface
             		String systemAttributeValue = null;
             		Node alternateIdentifierNode = alternateIdentifierNodeList.item(i);
             		NamedNodeMap attributeNames = alternateIdentifierNode.getAttributes();
-            		if ((attributeNames != null) && (attributeNames.getLength() > 0)) {
+            		if (attributeNames.getLength() > 0) {
             		    Node systemAttributeNode = attributeNames.getNamedItem("system");
             		    if (systemAttributeNode != null) {
             		        systemAttributeValue = systemAttributeNode.getNodeValue();
