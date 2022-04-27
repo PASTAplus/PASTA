@@ -26,6 +26,7 @@ package edu.lternet.pasta.datapackagemanager;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -996,6 +997,8 @@ public final class LevelOneEMLFactory {
 
     EMLReferences emlReferences = new EMLReferences(emlDocument);
     NodeList referencesNodeList = emlReferences.getReferences();
+	EMLAnnotationReferences emlAnnotationReferences = new EMLAnnotationReferences(emlDocument);
+	ArrayList<Node> annotationReferencesArrayList = emlAnnotationReferences.getReferences();
 	String entityId;
     
     for (int j = 0; j < ENTITY_TYPES.length; j++) {
@@ -1039,6 +1042,18 @@ public final class LevelOneEMLFactory {
 						String referenceNodeText = referencesNode.getTextContent();
 						if (entityId.equals(referenceNodeText)) {
 							referencesNode.setTextContent(entityHash);
+						}
+					}
+				}
+
+				// Update any corresponding "annotation" element with a "references" attribute to the new
+				// entity hash "id" attribute
+				if (!entityId.isEmpty()) {
+					for (int k = 0; k < annotationReferencesArrayList.size(); k++) {
+						Node annotationNode = annotationReferencesArrayList.get(k);
+						String annotationNodeAttributeText = ((Element)annotationNode).getAttribute("references");
+						if (entityId.equals(annotationNodeAttributeText)) {
+							((Element)annotationNode).setAttribute("references", entityHash);
 						}
 					}
 				}
