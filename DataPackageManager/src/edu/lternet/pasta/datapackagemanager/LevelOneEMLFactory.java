@@ -993,6 +993,10 @@ public final class LevelOneEMLFactory {
   private void modifyDataURLs(Document emlDocument, HashMap<String, String> entityHashMap) 
           throws TransformerException {
     CachedXPathAPI xpathapi = new CachedXPathAPI();
+
+    EMLReferences emlReferences = new EMLReferences(emlDocument);
+    NodeList referencesNodeList = emlReferences.getReferences();
+	String entityId;
     
     for (int j = 0; j < ENTITY_TYPES.length; j++) {
       String ENTITY_TYPE = ENTITY_TYPES[j];
@@ -1021,11 +1025,24 @@ public final class LevelOneEMLFactory {
 
 				String[] entryValueParts = entryValue.split("/");
 				String entityHash = entryValueParts[entryValueParts.length - 1];
+
+				entityId = ((Element)entityNode).getAttribute("id");
+
 				((Element)entityNode).setAttribute("id", entityHash);
 				((Element)entityNode).setAttribute("scope", "document");
 				((Element)entityNode).setAttribute("system", LEVEL_ONE_SYSTEM_ATTRIBUTE);
 
-      
+				// Update any corresponding "references" element to the new entity hash "id" attribute
+				if (!entityId.isEmpty()) {
+					for (int k = 0; k < referencesNodeList.getLength(); k++) {
+						Node referencesNode = referencesNodeList.item(k);
+						String referenceNodeText = referencesNode.getTextContent();
+						if (entityId.equals(referenceNodeText)) {
+							referencesNode.setTextContent(entityHash);
+						}
+					}
+				}
+
                 // Get the objectName
                 NodeList objectNameNodeList = xpathapi.selectNodeList(entityNode, OBJECT_NAME);
       
