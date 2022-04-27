@@ -1,21 +1,10 @@
 package edu.lternet.pasta.datapackagemanager;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
-import edu.lternet.pasta.dml.quality.QualityReport;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.xpath.CachedXPathAPI;
 import org.apache.xpath.XPathAPI;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.log4j.Logger;

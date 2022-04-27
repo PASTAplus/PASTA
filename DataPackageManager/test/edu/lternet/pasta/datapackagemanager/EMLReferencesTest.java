@@ -3,9 +3,6 @@ package edu.lternet.pasta.datapackagemanager;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,7 +14,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import edu.lternet.pasta.common.FileUtility;
 import edu.ucsb.nceas.utilities.Options;
 
 import edu.lternet.pasta.common.XmlUtility;
