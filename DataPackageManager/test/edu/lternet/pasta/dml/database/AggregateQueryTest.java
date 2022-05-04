@@ -139,7 +139,8 @@ public class AggregateQueryTest extends TestCase {
 	{
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 GROUP BY table1.attribute1;"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 GROUP BY table1.attribute1;"));
 	}
 	catch (UnWellFormedQueryException e)
 	{
@@ -169,7 +170,8 @@ public class AggregateQueryTest extends TestCase {
 	  {
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2  where table1.attribute1 = 'hello' GROUP BY table1.attribute1;"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 where table1.attribute1 = 'hello' GROUP BY table1.attribute1;"));
 	  }
 	  catch (UnWellFormedQueryException e)
 	  {

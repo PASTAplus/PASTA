@@ -1382,14 +1382,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-
-
 		try {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
-			QueryString queryString = new QueryString(uriInfo);
-			Map<String, List<String>> queryParams = queryString.getParams();
+			QueryString queryStr = new QueryString(uriInfo);
+			Map<String, List<String>> queryParams = queryStr.getParams();
 			boolean useChecksum = false;
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
@@ -9656,8 +9654,8 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-            QueryString queryString = new QueryString(uriInfo);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             String type = "insert";
             String xml = "";
             int limit = DataPackageUploadManager.ARRAY_LIMIT;
@@ -9899,8 +9897,8 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-            QueryString queryString = new QueryString(uriInfo);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             String fromDate = null;
             String toDate = null;
             String scope = null;
@@ -10369,8 +10367,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
-	        QueryString queryString = new QueryString(uriInfo);
-	        Map<String, List<String>> queryParams = queryString.getParams(); 
+	        QueryString queryStr = new QueryString(uriInfo);
+	        Map<String, List<String>> queryParams = queryStr.getParams();
 	        boolean useChecksum = false;
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
@@ -11150,9 +11148,9 @@ public class DataPackageManagerResource extends PastaWebService {
 				throw new UnauthorizedException(errorMsg);
 			}
 
-			QueryString queryString = new QueryString(uriInfo);
-			queryString.checkForIllegalKeys(VALID_EVENT_QUERY_KEYS);
-			Map<String, List<String>> queryParams = queryString.getParams();
+			QueryString queryStr = new QueryString(uriInfo);
+			queryStr.checkForIllegalKeys(VALID_EVENT_QUERY_KEYS);
+			Map<String, List<String>> queryParams = queryStr.getParams();
 			SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
 			List<EmlSubscription> emlSubscriptions = subscriptionRegistry
 					.getSubscriptions(userId, queryParams);

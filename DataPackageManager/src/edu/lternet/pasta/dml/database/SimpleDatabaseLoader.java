@@ -38,6 +38,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import edu.lternet.pasta.datapackagemanager.WorkingOn;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import edu.lternet.pasta.dml.DataManager;
@@ -45,6 +46,7 @@ import edu.lternet.pasta.dml.download.DataSourceNotFoundException;
 import edu.lternet.pasta.dml.download.DataStorageInterface;
 import edu.lternet.pasta.dml.parser.AttributeList;
 import edu.lternet.pasta.dml.parser.Entity;
+import org.apache.log4j.Logger;
 
 /**
  * This is a very bare-bones class for loading Entity data into a table
@@ -126,7 +128,7 @@ public class SimpleDatabaseLoader implements DataStorageInterface, Runnable {
 		AttributeList attributeList = entity.getAttributeList();
 		String tableName = entity.getDBTableName();
 		
-		String insertSQL = "";
+		String queryStr = "";
 		Vector<String> rowVector = new Vector<String>();
 		Connection connection = null;
 		
@@ -141,14 +143,14 @@ public class SimpleDatabaseLoader implements DataStorageInterface, Runnable {
 			}
 			connection.setAutoCommit(false);
 			while (!rowVector.isEmpty()) {
-				insertSQL = 
-					databaseAdapter.generateInsertSQL(
+				queryStr = databaseAdapter.generateInsertSQL(
 							attributeList,
 							tableName, 
 							rowVector);
-				if (insertSQL != null) {
+				log.debug("queryStr: " + queryStr);
+				if (queryStr != null) {
 					PreparedStatement statement = 
-						connection.prepareStatement(insertSQL);
+						connection.prepareStatement(queryStr);
 					statement.execute();
 				}
 				rowVector = this.dataReader.getOneRowDataVector();
@@ -161,7 +163,7 @@ public class SimpleDatabaseLoader implements DataStorageInterface, Runnable {
 			log.error("problem while loading data into table.  Error message: "
 					+ e.getMessage());
 			e.printStackTrace();
-			log.error("SQL string to insert row:\n" + insertSQL);
+			log.error("SQL string to insert row:\n" + queryStr);
 
 			success = false;
 			exception = e;

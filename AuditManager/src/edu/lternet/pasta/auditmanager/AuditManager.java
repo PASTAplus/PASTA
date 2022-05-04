@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.bind.DatatypeConverter;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import edu.lternet.pasta.common.SqlEscape;
 import org.apache.log4j.Logger;
 
 import edu.lternet.pasta.common.audit.AuditRecord;
@@ -234,18 +234,18 @@ public class AuditManager {
     Connection connection = null;
     java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
 
-    StringBuffer insertSQL = new StringBuffer("INSERT INTO " +
-                                              AUDIT_MANAGER_TABLE_QUALIFIED +
-                                              "(");
-    insertSQL.append("entrytime, service, category, servicemethod, " +
-                     "entrytext, resourceid, statuscode, userid, userAgent, groups, authsystem) " +
-                     "VALUES(?,?,?,?,?,?,?,?,?,?,?)");
-    String insertString = insertSQL.toString();
-    logger.debug("insertString: " + insertString);
+    String queryStr = String.format(
+        "INSERT INTO %s " +
+            "(entrytime, service, category, servicemethod, entrytext, resourceid, " +
+            "statuscode, userid, userAgent, groups, authsystem) " +
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+        AUDIT_MANAGER_TABLE_QUALIFIED);
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
         connection = getConnection();
-        PreparedStatement pstmt = connection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
         pstmt.setTimestamp(1, ts);
         pstmt.setString(2, service);
         pstmt.setString(3, category);
@@ -261,18 +261,15 @@ public class AuditManager {
         ResultSet rs = pstmt.getGeneratedKeys();
         while (rs.next()) {
           auditId = rs.getInt(1);
-        }
-
-        if (pstmt != null) {
           pstmt.close();
         }
-      }
+    }
     catch (SQLException e) {
         logger.error("Error inserting record for resource " + resourceId
             + " into the resource registry (" + AUDIT_MANAGER_TABLE_QUALIFIED + ")");
         logger.error("SQLException: " + e.getMessage());
         throw (e);
-      }
+    }
     finally {
         returnConnection(connection);
     }
@@ -512,20 +509,24 @@ public class AuditManager {
     int lastOid = 0;
     if (queryParams != null) {
       Connection connection = null;
-      String selectString =
-          "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
-              " resourceid, statuscode, userid, userAgent, groups, authsystem " +
-              "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
 
-      selectString += composeWhereClause(queryParams, true);
-      logger.info("WHERE clause: " + selectString);
+      String queryStr = String.format(
+          "SELECT oid, entrytime, service, category, servicemethod, entrytext, " +
+              "resourceid, statuscode, userid, userAgent, groups, authsystem " +
+              "FROM %s",
+          AUDIT_MANAGER_TABLE_QUALIFIED);
 
+      queryStr += composeWhereClause(queryParams, true);
+
+      logger.debug("queryStr: " + queryStr);
+      
       Statement stmt = null;
       StringBuilder stringBuffer = new StringBuilder(AUDIT_OPENING_TAG);
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
+       
         while (rs.next()) {
           int oid = rs.getInt(1);
           
@@ -556,7 +557,7 @@ public class AuditManager {
           auditRecord.setServiceMethod(serviceMethod);
           auditRecord.setEntryText(entryText);
           auditRecord.setResourceId(resourceId);
-          auditRecord.setResponseStatus(new Integer(statusCode));
+          auditRecord.setResponseStatus(statusCode);
           auditRecord.setUser(userId);
           auditRecord.setUserAgent(userAgent);
           auditRecord.setGroups(groups);
@@ -671,21 +672,21 @@ public class AuditManager {
 
       final String WHERE_CLAUSE = composeWhereClauseRecentUploads(queryParams);
 
-      String selectString =
-        "SELECT oid, entrytime, service, category, servicemethod," +
-        " entrytext, resourceid, statuscode, userid, groups, authsystem " +
-        "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED +
-        WHERE_CLAUSE;
-
-      logger.debug(selectString);
+      String queryStr = String.format(
+          "SELECT oid, entrytime, service, category, servicemethod, entrytext, " +
+              "resourceid, statuscode, userid, groups, authsystem " +
+              "FROM %s%s",
+          AUDIT_MANAGER_TABLE_QUALIFIED, WHERE_CLAUSE);
+      
+      logger.debug("queryStr: " + queryStr);
 
       Statement stmt = null;
 
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
-
+        ResultSet rs = stmt.executeQuery(queryStr);
+       
         while (rs.next()) {
           int oid = rs.getInt(1);
           java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
@@ -818,25 +819,26 @@ public class AuditManager {
 			throws ClassNotFoundException, SQLException, IllegalArgumentException {
 		Integer matchCount = null;
 
-		if (queryParams != null) {
-			Connection connection = null;
+      if (queryParams != null) {
+        Connection connection = null;
 
-			String selectString = "SELECT count(*) FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
-      selectString += composeWhereClause(queryParams, false);
-		    logger.info("WHERE clause: " + selectString);
+        String queryStr = String.format(
+            "SELECT count(*) FROM %s", AUDIT_MANAGER_TABLE_QUALIFIED
+        );
+        queryStr += composeWhereClause(queryParams, false);
+        logger.info("queryStr: " + queryStr);
 
-			Statement stmt = null;
+        Statement stmt = null;
 
-			try {
-				connection = getConnection();
-				stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+        try {
+          connection = getConnection();
+          stmt = connection.createStatement();
+          ResultSet rs = stmt.executeQuery(queryStr);
 
-				while (rs.next()) {
-					matchCount = rs.getInt(1);
-				}
-			}
-			catch (ClassNotFoundException e) {
+          while (rs.next()) {
+            matchCount = rs.getInt(1);
+          }
+        } catch (ClassNotFoundException e) {
 				logger.error("ClassNotFoundException: " + e.getMessage());
 				throw (e);
 			}
@@ -974,20 +976,21 @@ public class AuditManager {
     if (queryParams != null) {
       Connection connection = null;
 
-      String selectString =
-          "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
-              " resourceid, statuscode, userid, useragent, groups, authsystem " +
-              "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
-
-      selectString += composeWhereClause(queryParams, true);
-      logger.info("WHERE clause: " + selectString);
-
+      String queryStr = String.format(
+          "SELECT oid, entrytime, service, category, servicemethod, entrytext, " +
+              "resourceid, statuscode, userid, useragent, groups, authsystem " +
+              "FROM %s",
+          AUDIT_MANAGER_TABLE_QUALIFIED);
+        
+      queryStr += composeWhereClause(queryParams, true);
+      logger.debug("queryStr: " + queryStr);
+      
       Statement stmt = null;
 
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
 
         while (rs.next()) {
           int oid = rs.getInt(1);
@@ -1052,23 +1055,24 @@ public class AuditManager {
    *
    */
   public void fixArchiveRecords()
-           throws ClassNotFoundException, SQLException, IllegalArgumentException {
-      Connection connection = null;
-      String selectString =
-    		  String.format(
-                     "SELECT oid, servicemethod, resourceid from %s " +
-    		         "WHERE servicemethod='readDataPackage' OR " +
-                     "      servicemethod='createDataPackageArchive' OR " +
-    		         "      servicemethod='readDataPackageArchive' " +
-                     "ORDER BY oid",
+           throws ClassNotFoundException, SQLException, IllegalArgumentException {   
+      Connection connection = null;  
+      String queryStr = String.format(
+              "SELECT oid, servicemethod, resourceid from %s " +
+                  "WHERE servicemethod='readDataPackage' " +
+                  "OR servicemethod='createDataPackageArchive' " +
+                  "OR servicemethod='readDataPackageArchive' " +
+                  "ORDER BY oid",
                      AUDIT_MANAGER_TABLE_QUALIFIED);
 
+      logger.debug("queryStr: " + queryStr);
+      
       Statement stmt = null;
 
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
         String dataPackageResourceId = "";
         int dataPackageOid = 0;
 
@@ -1086,15 +1090,15 @@ public class AuditManager {
         	    String archiveResourceId = dataPackageResourceId.replace("/package/", "/package/archive/");
         	    System.out.println(String.format("Data package oid: %d; Archive record oid: %d", dataPackageOid, oid));
         	    System.out.println(String.format("Replacing %s with %s", resourceId, archiveResourceId));
-                String updateString =
-            		  String.format("UPDATE %s SET resourceid='%s' WHERE oid=%d",
-                                    AUDIT_MANAGER_TABLE_QUALIFIED, archiveResourceId, oid);
-                System.out.println(updateString);
-
+                queryStr = String.format(
+                    "UPDATE %s SET resourceid='%s' WHERE oid=%d",
+                    AUDIT_MANAGER_TABLE_QUALIFIED, SqlEscape.str(archiveResourceId), oid);
+                logger.debug("queryStr: " + queryStr);
+                
                 Connection updateConnection = getConnection();
                 Statement updateStmt = updateConnection.createStatement();
-                int nRecords = updateStmt.executeUpdate(updateString);
-                if (nRecords != 1) throw new SQLException(String.format("%d records updated; expected 1.", nRecords));
+                int nRecords = updateStmt.executeUpdate( queryStr);
+                if (nRecords != 1) throw new SQLException(String.format("%d records updated; expected 1.", nRecords));               
                 if (updateStmt != null) updateStmt.close();
                 returnConnection(updateConnection);
 
@@ -1189,23 +1193,25 @@ public class AuditManager {
           throws ClassNotFoundException, SQLException {
     boolean hasAuditRecord = false;
     Connection connection = null;
-    String selectString =
-      "SELECT count(*) FROM " + AUDIT_MANAGER_TABLE_QUALIFIED +
-      "  WHERE oid='" + auditEntryId + "'";
+
+    String queryStr = String.format("SELECT count(*) FROM %s WHERE oid='%s'",
+        AUDIT_MANAGER_TABLE_QUALIFIED, SqlEscape.str(auditEntryId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
-      stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
-
+      stmt = connection.createStatement();             
+      ResultSet rs = stmt.executeQuery(queryStr);
+    
       while (rs.next()) {
         int count = rs.getInt("count");
         hasAuditRecord = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());

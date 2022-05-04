@@ -760,9 +760,9 @@ public class AuditManagerResource extends PastaWebService
             Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuditManager auditManager = new AuditManager(properties);
-            QueryString queryString = new QueryString(uriInfo);
-            queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+           queryStr.checkForIllegalKeys(VALID_QUERY_KEYS);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             Integer matchCount = auditManager.getAuditRecordsCount(queryParams);
 			if (matchCount != null) {
 				String matchCountStr = matchCount.toString();
@@ -881,9 +881,9 @@ public class AuditManagerResource extends PastaWebService
             Properties properties = ConfigurationListener.getProperties();
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuditManager auditManager = new AuditManager(properties);
-            QueryString queryString = new QueryString(uriInfo);
-            queryString.checkForIllegalKeys(VALID_RECENT_UPLOADS_KEYS);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+           queryStr.checkForIllegalKeys(VALID_RECENT_UPLOADS_KEYS);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             String xmlString = auditManager.getRecentUploads(queryParams);
             return Response.ok(xmlString).build();
         }

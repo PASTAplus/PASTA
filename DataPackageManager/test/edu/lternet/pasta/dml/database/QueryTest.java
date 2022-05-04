@@ -137,7 +137,8 @@ public class QueryTest extends TestCase {
 	{
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,table2.attribute2 FROM table1,table2;"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2;"));
 	}
 	catch (UnWellFormedQueryException e)
 	{
@@ -164,7 +165,8 @@ public class QueryTest extends TestCase {
 	  {
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,table2.attribute2 FROM table1,table2  where table1.attribute1 = 'hello';"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello';"));
 	  }
 	  catch (UnWellFormedQueryException e)
 	  {
@@ -194,7 +196,8 @@ public class QueryTest extends TestCase {
 	   {
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,table2.attribute2 FROM table1,table2  where  table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' ;"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' ;"));
 	   }
 	   catch (UnWellFormedQueryException e)
 	   {
@@ -225,7 +228,8 @@ public class QueryTest extends TestCase {
 	   {
 		 String sql = query.toSQLString();
 		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals("SELECT table1.attribute1,table2.attribute2 FROM table1,table2  where  table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' ;"));
+		 assertTrue("Should have a sql ", sql.equals(
+				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' ;"));
 	   }
 	   catch (UnWellFormedQueryException e)
 	   {

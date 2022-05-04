@@ -36,12 +36,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
-import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.common.PastaResource;
+import edu.lternet.pasta.common.*;
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.NotFoundException;
@@ -51,8 +48,6 @@ import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.Resource;
-import edu.lternet.pasta.common.DataPackageUpload;
-import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
@@ -215,23 +210,24 @@ public class DataPackageRegistry {
      * for the specified resourceId and principal.
      */
     if (mayOverwrite && hasResource(resourceId)) {
-      String deleteSQL = "DELETE FROM "  + ACCESS_MATRIX +
-                         "  WHERE resource_id=? AND principal=?";
-      String deleteString = deleteSQL.toString();
-      logger.debug("deleteString: " + deleteString);
+      String queryStr = String.format(
+          "DELETE FROM %s WHERE resource_id=? AND principal=?",
+              ACCESS_MATRIX);
+
+      logger.debug("queryStr: " + queryStr);
 
       try {
         connection = getConnection();
-        PreparedStatement pstmt = connection.prepareStatement(deleteString);
+        PreparedStatement pstmt = connection.prepareStatement( queryStr);
         pstmt.setString(1, resourceId);
         pstmt.setString(2, principal);
         pstmt.executeUpdate();
-        if (pstmt != null) { pstmt.close(); }
+        pstmt.close();
       }
       catch (SQLException e) {
         logger.error(
           "Error deleting record for resource " + resourceId +
-          " and princiapl " + principal +
+          " and principal " + principal +
           " from the access matrix table (" + ACCESS_MATRIX + ")");
         logger.error("SQLException: " + e.getMessage());
         throw(e);
@@ -241,25 +237,22 @@ public class DataPackageRegistry {
       }
     }
  
-    StringBuffer insertSQL = 
-      new StringBuffer("INSERT INTO " + ACCESS_MATRIX + "(");
-    insertSQL.append("resource_id, principal, access_type, access_order, permission) " + 
-                     "VALUES(?,?,?,?,?)");      
-    String insertString = insertSQL.toString();
-    logger.debug("insertString: " + insertString);
+    String queryStr = String.format(
+        "INSERT INTO %s (resource_id, principal, access_type, access_order, permission) " +
+            "VALUES(?,?,?,?,?)", ACCESS_MATRIX);
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
       connection = getConnection();
-      PreparedStatement pstmt = connection.prepareStatement(insertString);
+      PreparedStatement pstmt = connection.prepareStatement(queryStr);
       pstmt.setString(1, resourceId);
       pstmt.setString(2, principal);
       pstmt.setObject(3, accessType, java.sql.Types.OTHER);
       pstmt.setObject(4, accessOrder, java.sql.Types.OTHER);
       pstmt.setObject(5, permission, java.sql.Types.OTHER);
       pstmt.executeUpdate();
-      if (pstmt != null) {
-        pstmt.close();
-      }
+      pstmt.close();
     }
     catch (SQLException e) {
       logger.error("Error inserting access control record for resource " + resourceId +
@@ -293,17 +286,17 @@ public class DataPackageRegistry {
      * for the specified resourceId.
      */
     if (mayOverwrite && hasResource(resourceId)) {
-      String deleteSQL = "DELETE FROM "  + ACCESS_MATRIX +
-                         "  WHERE resource_id=?";
-      String deleteString = deleteSQL.toString();
-      logger.debug("deleteString: " + deleteString);
+      String queryStr =
+          String.format("DELETE FROM %s WHERE resource_id=?", ACCESS_MATRIX);
+
+      logger.debug("queryStr: " + queryStr);
 
       try {
         connection = getConnection();
-        PreparedStatement pstmt = connection.prepareStatement(deleteString);
+        PreparedStatement pstmt = connection.prepareStatement( queryStr);
         pstmt.setString(1, resourceId);
         pstmt.executeUpdate();
-        if (pstmt != null) { pstmt.close(); }
+        pstmt.close();
       }
       catch (SQLException e) {
         logger.error(
@@ -325,26 +318,23 @@ public class DataPackageRegistry {
         String accessOrder = rule.getOrder();
         Rule.Permission permission = rule.getPermission();
 
-        StringBuffer insertSQL = new StringBuffer("INSERT INTO "
-            + ACCESS_MATRIX + "(");
-        insertSQL
-            .append("resource_id, principal, access_type, access_order, permission) "
-                + "VALUES(?,?,?,?,?)");
-        String insertString = insertSQL.toString();
-        logger.debug("insertString: " + insertString);
+        String queryStr = String.format(
+            "INSERT INTO %s (resource_id, principal, access_type, access_order, " +
+                "permission) VALUES(?,?,?,?,?)",
+            ACCESS_MATRIX);
+
+        logger.debug("queryStr: " + queryStr);
 
         try {
           connection = getConnection();
-          PreparedStatement pstmt = connection.prepareStatement(insertString);
+          PreparedStatement pstmt = connection.prepareStatement(queryStr);
           pstmt.setString(1, resourceId);
           pstmt.setString(2, principal);
           pstmt.setObject(3, accessType, java.sql.Types.OTHER);
           pstmt.setObject(4, accessOrder, java.sql.Types.OTHER);
           pstmt.setObject(5, permission, java.sql.Types.OTHER);
           pstmt.executeUpdate();
-          if (pstmt != null) {
-            pstmt.close();
-          }
+          pstmt.close();
         }
         catch (SQLException e) {
           logger.error("Error inserting access control record for resource "
@@ -418,20 +408,20 @@ public class DataPackageRegistry {
 	   * entry.
 	   */
 	  if (mayOverwrite && hasResource(resourceId)) {
-	    StringBuffer updateSQL = new StringBuffer("UPDATE " + RESOURCE_REGISTRY + 
-	                                              " SET date_created=? " +
-	                                              " WHERE resource_id=?");
-	    String updateString = updateSQL.toString();
-	    logger.debug("updateString: " + updateString);
+	    String queryStr = String.format(
+          "UPDATE %s SET date_created=? WHERE resource_id=?",
+          RESOURCE_REGISTRY);
+
+	    logger.debug("queryStr: " + queryStr);
 
 	    try {
 	      connection = getConnection();
-	      PreparedStatement pstmt = connection.prepareStatement(updateString);
+	      PreparedStatement pstmt = connection.prepareStatement( queryStr);
 	      pstmt.setTimestamp(1, ts);
 	      pstmt.setString(2, resourceId);
 	      pstmt.executeUpdate();
-	      if (pstmt != null) { pstmt.close(); }
-	    }
+        pstmt.close();
+      }
 	    catch (SQLException e) {
 	      logger.error(
 	        "Error updating record for resource " + resourceId + 
@@ -444,31 +434,33 @@ public class DataPackageRegistry {
 	    }
 	  }
 	  else {
-      StringBuffer insertSQL = new StringBuffer("INSERT INTO " + 
-                                                RESOURCE_REGISTRY + 
-                                                "(");
+      StringBuffer queryStr = new StringBuffer(
+          String.format("INSERT INTO %s (", RESOURCE_REGISTRY));
       if (resourceType == ResourceType.data) {
-        insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                         "revision, resource_location, entity_id, entity_name, filename, principal_owner, date_created) " + 
-                         "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
+        queryStr.append(
+            "resource_id, resource_type, package_id, scope, identifier, revision, " +
+                "resource_location, entity_id, entity_name, filename, principal_owner, " +
+                "date_created) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
       }
       else if (resourceType == ResourceType.metadata ||
     		   resourceType == ResourceType.report) {
-          insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                  "revision, resource_location, principal_owner, date_created, format_type) " + 
+          queryStr.append(
+              "resource_id, resource_type, package_id, scope, identifier, revision, " +
+                  "resource_location, principal_owner, date_created, format_type) " +
                   "VALUES(?,?,?,?,?,?,?,?,?,?)");
         }
       else {
-        insertSQL.append("resource_id, resource_type, package_id, scope, identifier, " + 
-                         "revision, principal_owner, date_created, format_type) " + 
-                         "VALUES(?,?,?,?,?,?,?,?,?)");
+        queryStr.append(
+            "resource_id, resource_type, package_id, scope, identifier, revision, " +
+                "principal_owner, date_created, format_type) " +
+                "VALUES(?,?,?,?,?,?,?,?,?)");
       }
-      String insertString = insertSQL.toString();
-      logger.debug("insertString: " + insertString);
+
+      logger.debug("queryStr: " + queryStr);
 
       try {
         connection = getConnection();
-        PreparedStatement pstmt = connection.prepareStatement(insertString);
+        PreparedStatement pstmt = connection.prepareStatement(queryStr.toString());
         pstmt.setString(1, resourceId);
         pstmt.setObject(2, resourceType, java.sql.Types.OTHER);
         pstmt.setString(3, packageId);
@@ -496,9 +488,7 @@ public class DataPackageRegistry {
           pstmt.setString(9, formatType);
         }
         pstmt.executeUpdate();
-        if (pstmt != null) {
-          pstmt.close();
-        }
+        pstmt.close();
       }
       catch (SQLException e) {
         logger.error("Error inserting record for resource " + resourceId
@@ -533,15 +523,20 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET doi='" + doi + "' WHERE resource_id='" + resourceId + "';";
+		String queryStr = String.format(
+        "UPDATE datapackagemanager.resource_registry " +
+            "SET doi='%s' " +
+            "WHERE resource_id='%s'",
+        SqlEscape.str(doi), SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		Statement stat = null;
 		Integer rowCount = null;
 
 		try {
 			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
+			rowCount = stat.executeUpdate(queryStr);
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -572,17 +567,17 @@ public class DataPackageRegistry {
     
     Calendar calendar = Calendar.getInstance();
     Timestamp timestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
-    String updateSQL = "UPDATE " + RESOURCE_REGISTRY + 
-                       " SET date_deactivated=? " +
-                       " WHERE scope=? AND identifier=?";
-  
+    String queryStr = String.format(
+        "UPDATE %s SET date_deactivated=? WHERE scope=? AND identifier=?",
+        RESOURCE_REGISTRY);
+
+    logger.debug("queryStr: " + queryStr);
+
     Connection conn = getConnection();
   
     if (conn != null) {
-      logger.debug("updateSQL: " + updateSQL);
-      
       try {
-        PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+        PreparedStatement pstmt = conn.prepareStatement(queryStr);
         pstmt.setTimestamp(1, timestamp);
         pstmt.setString(2, scope);             // Set WHERE scope value
         pstmt.setInt(3, identifier);           // Set WHERE identifier value
@@ -623,15 +618,15 @@ public class DataPackageRegistry {
 			throws ClassNotFoundException, SQLException {
 		boolean deleted = false;
 
-		StringBuilder sqlBuilder = new StringBuilder();
-		sqlBuilder.append("DELETE FROM " + PROV_MATRIX + " WHERE derived_id=?");
-		String updateSQL = sqlBuilder.toString();
+    String queryStr = String.format("DELETE FROM %s WHERE derived_id=?", PROV_MATRIX);
+
+    logger.debug("queryStr: " + queryStr);
 
 		Connection conn = getConnection();
 
 		if (conn != null) {
 			try {
-				PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+				PreparedStatement pstmt = conn.prepareStatement(queryStr);
 				pstmt.setString(1, packageId); // Set packageId value
 				int nRecords = pstmt.executeUpdate();
 				pstmt.close();
@@ -681,15 +676,23 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "UPDATE datapackagemanager.resource_registry"
-		    + " SET doi=NULL WHERE doi='" + doi + "';";
+    String queryStr = null;
+    try {
+      queryStr = String.format(
+          "UPDATE datapackagemanager.resource_registry SET doi=NULL WHERE doi='%s'",
+          SqlEscape.str(doi));
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    logger.debug("queryStr: " + queryStr);
 
 		Statement stat = null;
 		Integer rowCount = null;
 
 		try {
 			stat = conn.createStatement();
-			rowCount = stat.executeUpdate(queryString);
+			rowCount = stat.executeUpdate(queryStr);
 		} 
 		catch (SQLException e) {
 			logger.error(e.getMessage());
@@ -770,16 +773,20 @@ public class DataPackageRegistry {
     if (resourceId != null && !resourceId.equals("")) {
       Connection connection = null;
       
-      String selectString = 
-        "SELECT principal, access_type, access_order, permission FROM " + ACCESS_MATRIX +
-        "  WHERE resource_id='" + resourceId + "'";
+      String queryStr = String.format(
+          "SELECT principal, access_type, access_order, permission " +
+              "FROM %s " +
+              "WHERE resource_id='%s'",
+          ACCESS_MATRIX, SqlEscape.str(resourceId));
+
+      logger.debug("queryStr: " + queryStr);
       
       Statement stmt = null;
       
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
         
         while (rs.next()) {
           String principal = rs.getString(1);
@@ -827,19 +834,21 @@ public class DataPackageRegistry {
     
     if (scope != null && identifier != null && revision != null) {
       Connection connection = null;
-      String selectString = 
-        "SELECT resource_id FROM " + RESOURCE_REGISTRY +
-        "  WHERE scope='" + scope + 
-        "' AND identifier='" + identifier + 
-        "' AND revision='" + revision + "'" +
-        "  ORDER BY date_created";
-    
+      String queryStr = String.format(
+          "SELECT resource_id " +
+              "FROM %s " +
+              "WHERE scope='%s' AND identifier=%d AND revision=%d " +
+              "ORDER BY date_created",
+          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
     
       try {
         connection = getConnection();
         stmt = connection.createStatement();             
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
       
         while (rs.next()) {
           String resourceId = rs.getString("resource_id");
@@ -901,25 +910,27 @@ public class DataPackageRegistry {
 
       try {
         Connection connection = null;
-        String selectString = "SELECT max(revision) FROM " + RESOURCE_REGISTRY
-            + "  WHERE scope='" + scope + "' AND identifier='" + identifier
-            + "'";
-        logger.debug("selectString: " + selectString);
+        String queryStr = String.format(
+            "SELECT max(revision) " +
+                "FROM %s " +
+                "WHERE scope='%s' AND identifier=%d",
+            RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+
+        logger.debug("queryStr: " + queryStr);
 
         Statement stmt = null;
 
         try {
           connection = getConnection();
           stmt = connection.createStatement();
-          ResultSet rs = stmt.executeQuery(selectString);
+          ResultSet rs = stmt.executeQuery(queryStr);
 
           while (rs.next()) {
             int maxRevision = rs.getInt(1);
             newest = new Integer(maxRevision);
           }
 
-          if (stmt != null)
-            stmt.close();
+          stmt.close();
         }
         catch (ClassNotFoundException e) {
           logger.error("ClassNotFoundException: " + e.getMessage());
@@ -965,25 +976,25 @@ public class DataPackageRegistry {
         Integer identifierInt = new Integer(identifier);
 
         Connection connection = null;
-        String selectString = "SELECT min(revision) FROM " + RESOURCE_REGISTRY
-            + "  WHERE scope='" + scope + "' AND identifier='" + identifierInt
-            + "'";
-        logger.debug("selectString: " + selectString);
+        String queryStr = String.format(
+            "SELECT min(revision) FROM %s WHERE scope='%s' AND identifier=%d",
+            RESOURCE_REGISTRY, SqlEscape.str(scope), identifierInt);
+
+        logger.debug("queryStr: " + queryStr);
 
         Statement stmt = null;
 
         try {
           connection = getConnection();
           stmt = connection.createStatement();
-          ResultSet rs = stmt.executeQuery(selectString);
+          ResultSet rs = stmt.executeQuery(queryStr);
 
           while (rs.next()) {
             int minRevision = rs.getInt(1);
             oldest = new Integer(minRevision);
           }
 
-          if (stmt != null)
-            stmt.close();
+          stmt.close();
         }
         catch (SQLException e) {
           logger.error("SQLException: " + e.getMessage());
@@ -1017,23 +1028,24 @@ public class DataPackageRegistry {
   	String doi = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT doi FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT doi FROM %s WHERE resource_id='%s'", RESOURCE_REGISTRY,
+            SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         doi = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1072,24 +1084,24 @@ public class DataPackageRegistry {
 		}
 
 		Connection connection = null;
-		String selectString = 
-				"SELECT package_id FROM " + RESOURCE_REGISTRY + 
-				"  WHERE doi='" + doiValue + "'";
-		logger.debug("selectString: " + selectString);
+		String queryStr = String.format(
+        "SELECT package_id FROM %s WHERE doi='%s'", RESOURCE_REGISTRY,
+            SqlEscape.str(doiValue));
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				packageId = rs.getString(1);
 			}
 
-			if (stmt != null)
-				stmt.close();
+      stmt.close();
 		} catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
 			e.printStackTrace();
@@ -1120,23 +1132,25 @@ public class DataPackageRegistry {
 		String formatType = null;
 
 		Connection connection = null;
-		String selectString = "SELECT format_type FROM " + RESOURCE_REGISTRY
-				+ "  WHERE resource_id='" + resourceId + "'";
+		String queryStr = String.format(
+        "SELECT format_type FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				formatType = rs.getString(1);
 				if (formatType != null) { formatType = formatType.trim(); }
 			}
 
-			if (stmt != null)
-				stmt.close();
+      stmt.close();
 		}
 		catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1171,23 +1185,25 @@ public class DataPackageRegistry {
         String formatType = null;
 
         Connection connection = null;
-        String selectString = "SELECT format_type FROM " + RESOURCE_REGISTRY
-                + "  WHERE resource_id='" + resourceId + "'";
+        String queryStr = String.format(
+            "SELECT format_type FROM %s WHERE resource_id='%s'",
+                RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+        logger.debug("queryStr: " + queryStr);
 
         Statement stmt = null;
 
         try {
             connection = getConnection();
             stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(selectString);
+            ResultSet rs = stmt.executeQuery(queryStr);
 
             while (rs.next()) {
                 formatType = rs.getString(1);
                 if (formatType != null) { formatType = formatType.trim(); }
             }
 
-            if (stmt != null)
-                stmt.close();
+          stmt.close();
         }
         catch (ClassNotFoundException e) {
             logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1219,23 +1235,24 @@ public class DataPackageRegistry {
     String entityName = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT entity_name FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT entity_name FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         entityName = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1270,23 +1287,24 @@ public class DataPackageRegistry {
     String dataFormat = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT DISTINCT data_format FROM " + DATA_CACHE_REGISTRY +
-            "  WHERE entity_id='" + entityId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT DISTINCT data_format FROM %s WHERE entity_id='%s'",
+            DATA_CACHE_REGISTRY, SqlEscape.str(entityId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         dataFormat = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1321,23 +1339,24 @@ public class DataPackageRegistry {
     String dataFormat = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT data_format FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT data_format FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         dataFormat = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1370,23 +1389,24 @@ public class DataPackageRegistry {
     String principalOwner = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT principal_owner FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT principal_owner FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         principalOwner = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1457,14 +1477,17 @@ public class DataPackageRegistry {
     /* First compose an 'allow' entry for the resource owner/submitter */
     Connection connection = null;
     Statement stmt = null;
-    String selectString = 
-            "SELECT principal_owner FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
+
+    String queryStr = String.format(
+        "SELECT principal_owner FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
     	  principalOwner = rs.getString(1);
@@ -1472,7 +1495,7 @@ public class DataPackageRegistry {
     	  accessXmlBuffer.append(element);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1490,14 +1513,19 @@ public class DataPackageRegistry {
     
     /* Then compose 'allow' and/or 'deny' entries from the access_matrix table */
     isOwner = false;
-    selectString = 
-            "SELECT principal, access_type, access_order, permission FROM " + ACCESS_MATRIX +
-            "  WHERE resource_id='" + resourceId + "'";
+
+    queryStr = String.format(
+        "SELECT principal, access_type, access_order, permission " +
+            "FROM %s " +
+            "WHERE resource_id='%s'",
+        ACCESS_MATRIX, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
     	  principal = rs.getString(1);
@@ -1509,7 +1537,7 @@ public class DataPackageRegistry {
     	  accessXmlBuffer.append(element);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1555,9 +1583,12 @@ public class DataPackageRegistry {
             e.printStackTrace();
         }
 
-        String queryString = 
-                String.format("SELECT * FROM datapackagemanager.resource_registry WHERE resource_id='%s'",
-                              resourceId);
+        String queryStr = String.format(
+            "SELECT * FROM datapackagemanager.resource_registry " +
+                "WHERE resource_id='%s'",
+            SqlEscape.str(resourceId));
+
+        logger.debug("queryStr: " + queryStr);
 
         Statement stmt = null;
 
@@ -1567,7 +1598,7 @@ public class DataPackageRegistry {
             resource.setResourceId(resourceId);
             resource.setResourceType(resourceType.toString());
             stmt = conn.createStatement();
-            ResultSet result = stmt.executeQuery(queryString);
+            ResultSet result = stmt.executeQuery(queryStr);
 
             while (result.next()) {
                 resource.setDateCreated(result.getString("date_created"));
@@ -1642,23 +1673,24 @@ public class DataPackageRegistry {
     String checksum = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT sha1_checksum FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT sha1_checksum FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         checksum = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1698,19 +1730,21 @@ public class DataPackageRegistry {
 		StringBuilder sb = new StringBuilder("");
 
 		Connection connection = null;
-		String selectString = String.format(
-			"SELECT entity_id,resource_size FROM %s " +
-		    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
-                "ORDER BY date_created ASC",
-		    RESOURCE_REGISTRY, scope, identifier, revision);
-		logger.debug("selectString: " + selectString);
+		String queryStr = String.format(
+        "SELECT entity_id, resource_size " +
+            "FROM %s " +
+            "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
+            "ORDER BY date_created ASC",
+		    RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+
+    logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				String entityId = rs.getString(1);
@@ -1718,8 +1752,7 @@ public class DataPackageRegistry {
 				sb.append(String.format("%s,%d\n", entityId, entitySize));
 			}
 
-			if (stmt != null)
-				stmt.close();
+      stmt.close();
 		}
 		catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1760,19 +1793,21 @@ public class DataPackageRegistry {
 			StringBuilder sb = new StringBuilder("");
 
 			Connection connection = null;
-			String selectString = String.format(
-				"SELECT entity_id,entity_name FROM %s " +
-			    "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d" +
-                        "ORDER BY date_created ASC",
-			    RESOURCE_REGISTRY, scope, identifier, revision);
-			logger.debug("selectString: " + selectString);
+			String queryStr = String.format(
+          "SELECT entity_id, entity_name " +
+              "FROM %s " +
+              "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
+              "ORDER BY date_created ASC",
+			    RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+
+      logger.debug("queryStr: " + queryStr);
 
 			Statement stmt = null;
 
 			try {
 				connection = getConnection();
 				stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+				ResultSet rs = stmt.executeQuery(queryStr);
 
 				while (rs.next()) {
 					String entityId = rs.getString(1);
@@ -1780,8 +1815,7 @@ public class DataPackageRegistry {
 					sb.append(String.format("%s,%s\n", entityId, entityName));
 				}
 
-				if (stmt != null)
-					stmt.close();
+        stmt.close();
 			}
 			catch (ClassNotFoundException e) {
 				logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1815,24 +1849,24 @@ public class DataPackageRegistry {
 				String dateCreated = null;
 
 				Connection connection = null;
-				String selectString = 
-						  "SELECT date_created FROM " + RESOURCE_REGISTRY + 
-						  "  WHERE resource_id='" + resourceId + "'";
-				logger.debug("selectString: " + selectString);
+				String queryStr = String.format(
+            "SELECT date_created FROM %s WHERE resource_id='%s'",
+                RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+        logger.debug("queryStr: " + queryStr);
 
 				Statement stmt = null;
 
 				try {
 					connection = getConnection();
 					stmt = connection.createStatement();
-					ResultSet rs = stmt.executeQuery(selectString);
+					ResultSet rs = stmt.executeQuery(queryStr);
 
 					while (rs.next()) {
 						dateCreated = rs.getString(1);
 					}
 
-					if (stmt != null)
-						stmt.close();
+          stmt.close();
 				}
 				catch (ClassNotFoundException e) {
 					logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1868,24 +1902,25 @@ public class DataPackageRegistry {
 		Long resourceSize = null;
 
 		Connection connection = null;
-		String selectString = 
-				  "SELECT resource_size FROM " + RESOURCE_REGISTRY + 
-				  "  WHERE resource_id='" + resourceId + "'";
-		logger.debug("selectString: " + selectString);
+
+    String queryStr = String.format(
+        "SELECT resource_size FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				resourceSize = rs.getLong(1);
 			}
 
-			if (stmt != null)
-				stmt.close();
+      stmt.close();
 		}
 		catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
@@ -1948,35 +1983,35 @@ public class DataPackageRegistry {
 			sb.append("SELECT scope, identifier, revision, principal_owner, doi, date_deactivated FROM ");
 			sb.append(RESOURCE_REGISTRY);
 			sb.append(" WHERE resource_type='dataPackage' ");
-			sb.append("   AND date_deactivated IS NOT NULL ");
+			sb.append(" AND date_deactivated IS NOT NULL ");
 			if (hasFromTime) {
-				sb.append("   AND date_deactivated >= '" + fromTime + "'\n");
+				sb.append(String.format(" AND date_deactivated >= '%s'\n", SqlEscape.str(fromTime)));
 			}
 			if (hasToTime) {
-				sb.append("   AND date_deactivated <= '" + toTime + "'\n");
+				sb.append(String.format(" AND date_deactivated <= '%s'\n", SqlEscape.str(toTime)));
 			}
 			if (hasScope) {
-				sb.append("   AND scope= '" + scope + "'\n");
+				sb.append(String.format(" AND scope= '%s'\n", SqlEscape.str(scope)));
 			}
-			sb.append("ORDER BY date_deactivated DESC;");
+			sb.append("ORDER BY date_deactivated DESC ");
 		}
 		else {
 			sb.append("SELECT scope, identifier, revision, principal_owner, doi, date_created FROM ");
 			sb.append(RESOURCE_REGISTRY);
 			sb.append(" WHERE resource_type='dataPackage' ");
 			if (excludeDeleted) {
-				sb.append("   AND date_deactivated IS NULL ");
+				sb.append(" AND date_deactivated IS NULL ");
 			}
 			if (hasFromTime) {
-				sb.append("   AND date_created >= '" + fromTime + "'\n");
+				sb.append(String.format(" AND date_created >= '%s'\n", SqlEscape.str(fromTime)));
 			}
 			if (hasToTime) {
-				sb.append("   AND date_created <= '" + toTime + "'\n");
+				sb.append(String.format(" AND date_created <= '%s'\n", SqlEscape.str(toTime)));
 			}
 			if (hasScope) {
-				sb.append("   AND scope= '" + scope + "'\n");
+				sb.append(String.format(" AND scope= '%s'\n", SqlEscape.str(scope)));
 			}
-			sb.append("ORDER BY date_created DESC;");
+			sb.append("ORDER BY date_created DESC ");
 		}
 		
 		
@@ -1986,8 +2021,8 @@ public class DataPackageRegistry {
 			conn = getConnection();
 
 			if (conn != null) {
-				Statement stmnt = conn.createStatement();
-				ResultSet rs = stmnt.executeQuery(sqlQuery);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
 					scope = rs.getString(1);
@@ -2095,15 +2130,17 @@ public class DataPackageRegistry {
 			throw new IllegalStateException("'method' argument is null");
 		}
 		
-	    String selectString = String.format(
-	       "SELECT scope, identifier, revision, entity_id FROM %s WHERE scope=? AND identifier=? AND %s=? ORDER BY revision ASC LIMIT 1",
-	       RESOURCE_REGISTRY, methodField);
+	    String queryStr = String.format(
+	       "SELECT scope, identifier, revision, entity_id FROM %s " +
+             "WHERE scope=? AND identifier=? AND %s=? " +
+             "ORDER BY revision ASC LIMIT 1",
+	       RESOURCE_REGISTRY, SqlEscape.name(methodField));
 	    
-	    logger.debug("selectString: " + selectString);
+	    logger.debug("queryStr: " + queryStr);
 		
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(selectString);
+			PreparedStatement pstmt = connection.prepareStatement(queryStr);
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.setString(3, hashValue);
@@ -2116,8 +2153,8 @@ public class DataPackageRegistry {
 		    	EmlPackageId matchingEmlPackageId = new EmlPackageId(matchingScope, matchingIdentifier, matchingRevision);
 		    	matchingEmlFileSystemEntity = new EMLFileSystemEntity(matchingEmlPackageId, matchingEntityId);
 		    }
-			if (pstmt != null) { pstmt.close(); }
-		}
+      pstmt.close();
+    }
 		catch (SQLException e) {
 			logger.error("SQLException: " + e.getMessage());
 			throw(e);
@@ -2142,23 +2179,24 @@ public class DataPackageRegistry {
     String resourceLocation = null;
     
     Connection connection = null;
-    String selectString = 
-            "SELECT resource_location FROM " + RESOURCE_REGISTRY +
-            "  WHERE resource_id='" + resourceId + "'";
-    logger.debug("selectString: " + selectString);
+    String queryStr = String.format(
+        "SELECT resource_location FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         resourceLocation = rs.getString(1);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -2189,25 +2227,27 @@ public class DataPackageRegistry {
           throws ClassNotFoundException, SQLException {
     boolean hasDataPackage = false;
     Connection connection = null;
-    String selectString = 
-      "SELECT count(*) FROM " + RESOURCE_REGISTRY +
-      "  WHERE scope='" + scope + "' AND " +
-      "        identifier='" + identifier + "' AND " +
-      "        resource_type != 'report'";
-  
+
+    String queryStr = String.format(
+        "SELECT count(*) FROM %s " +
+            "WHERE scope='%s' AND identifier=%d AND resource_type != 'report'",
+        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
   
     try {
       connection = getConnection();
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
     
       while (rs.next()) {
         int count = rs.getInt("count");
         hasDataPackage = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -2238,25 +2278,26 @@ public class DataPackageRegistry {
           throws ClassNotFoundException, SQLException {
     boolean hasDataPackage = false;
     Connection connection = null;
-    String selectString = 
-      "SELECT count(*) FROM " + RESOURCE_REGISTRY +
-      "  WHERE scope='" + scope + "' AND " +
-      "        identifier='" + identifier + "' AND " +
-      "        revision='" + revision + "'";
+
+    String queryStr = String.format(
+        "SELECT count(*) FROM %s WHERE scope='%s' AND identifier=%d AND revision='%s'",
+        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, SqlEscape.str(revision));
+
+    logger.debug("queryStr: " + queryStr);
   
     Statement stmt = null;
   
     try {
       connection = getConnection();
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
     
       while (rs.next()) {
         int count = rs.getInt("count");
         hasDataPackage = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -2285,23 +2326,26 @@ public class DataPackageRegistry {
           throws ClassNotFoundException, SQLException {
     boolean hasReource = false;
     Connection connection = null;
-    String selectString = 
-      "SELECT count(*) FROM " + RESOURCE_REGISTRY +
-      "  WHERE resource_id='" + resourceId + "'";
-  
+
+    String queryStr = String.format(
+        "SELECT count(*) FROM %s WHERE resource_id='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
   
     try {
       connection = getConnection();
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
     
       while (rs.next()) {
         int count = rs.getInt("count");
         hasReource = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -2356,24 +2400,24 @@ public class DataPackageRegistry {
 						+ "on a non-existent source data package %s", derivedId, sourceURL));
 		}
 
-		StringBuffer insertSQL = new StringBuffer("INSERT INTO " + PROV_MATRIX + "(");
-	    insertSQL.append("derived_id, derived_title, source_id, source_title, source_url) VALUES(?,?,?,?,?)");      
-		String insertString = insertSQL.toString();
-		logger.debug("insertString: " + insertString);
+		String queryStr = String.format(
+        "INSERT INTO %s (derived_id, derived_title, " +
+        "source_id, source_title, source_url) " +
+        "VALUES(?,?,?,?,?)", PROV_MATRIX);
+
+    logger.debug("queryStr: " + queryStr);
 
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(insertString);
+			PreparedStatement pstmt = connection.prepareStatement(queryStr);
 			pstmt.setString(1, derivedId);
 			pstmt.setString(2, derivedTitle);
 			pstmt.setString(3, sourceId);
 			pstmt.setString(4, sourceTitle);
 			pstmt.setString(5, sourceURL);
 			pstmt.executeUpdate();
-			if (pstmt != null) {
-				pstmt.close();
-			}
-		}
+      pstmt.close();
+    }
 		catch (SQLException e) {
 			logger.error(
 					String.format("Error inserting provenance record for derived data package '%s' " +
@@ -2452,26 +2496,29 @@ public class DataPackageRegistry {
           throws ClassNotFoundException, SQLException {
     boolean isDeactivated = false;
     Connection connection = null;
-    String selectString = 
-      "SELECT count(*) FROM " + RESOURCE_REGISTRY +
-      "  WHERE scope='" + scope + "' AND " +
-      "        identifier='" + identifier + "' AND " +
-      "        resource_type='" + ResourceType.dataPackage + "' AND " +
-      "        date_deactivated IS NOT NULL";
-  
+
+    String queryStr = String.format(
+        "SELECT count(*) " +
+            "FROM %s " +
+            "WHERE scope='%s' AND identifier=%d AND resource_type='%s' AND date_deactivated IS NOT NULL",
+        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, SqlEscape.str(
+            String.valueOf(ResourceType.dataPackage)));
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
   
     try {
       connection = getConnection();
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
     
       while (rs.next()) {
         int count = rs.getInt("count");
         isDeactivated = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
@@ -2511,16 +2558,20 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, principal, access_type, "
-		    + "access_order, permission FROM datapackagemanager.access_matrix WHERE"
-		    + " resource_id='" + resourceId + "';";
+		String queryStr = String.format(
+        "SELECT resource_id, principal, access_type, access_order, permission " +
+            "FROM datapackagemanager.access_matrix " +
+            "WHERE resource_id='%s' ",
+        SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		Statement stat = null;
 
 		try {
 
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 
@@ -2572,16 +2623,22 @@ public class DataPackageRegistry {
 	    ArrayList<String> docidList = new ArrayList<String>();
 
 	    Connection connection = null;
-	    String selectString = "SELECT DISTINCT scope, identifier FROM " + RESOURCE_REGISTRY +
-	        "  WHERE resource_type='dataPackage'" +
-	        "  AND date_deactivated IS NULL" +
-	        "  ORDER BY scope, identifier";
+
+      String queryStr = String.format(
+          "SELECT DISTINCT scope, identifier " +
+              "FROM %s " +
+              "WHERE resource_type='dataPackage' AND date_deactivated IS NULL " +
+              "ORDER BY scope, identifier",
+          RESOURCE_REGISTRY);
+
+      logger.debug("queryStr: " + queryStr);
+
 	    Statement stmt = null;
 
 	    try {
 	      connection = getConnection();
 	      stmt = connection.createStatement();
-	      ResultSet rs = stmt.executeQuery(selectString);
+	      ResultSet rs = stmt.executeQuery(queryStr);
 
 	      while (rs.next()) {
 	        String scope = rs.getString("scope");
@@ -2643,18 +2700,22 @@ public class DataPackageRegistry {
 	    ArrayList<String> packageIdList = new ArrayList<String>();
 
 	    Connection connection = null;
-	    String selectString = 
-	    	"SELECT DISTINCT scope, identifier, revision" +
-	        "  FROM " + RESOURCE_REGISTRY +
-	        "  WHERE resource_type='dataPackage'";	    
-	    if (!includeInactive) selectString += " AND date_deactivated IS NULL"; 
-	    selectString += "  ORDER BY scope, identifier, revision";
+
+      String queryStr = String.format(
+          "SELECT DISTINCT scope, identifier, revision FROM %s " +
+              "WHERE resource_type='dataPackage'",
+          RESOURCE_REGISTRY);
+	    if (!includeInactive) queryStr += " AND date_deactivated IS NULL";
+	    queryStr += " ORDER BY scope, identifier, revision";
+
+      logger.debug("queryStr: " + queryStr);
+
 	    Statement stmt = null;
 
 	    try {
 	      connection = getConnection();
 	      stmt = connection.createStatement();
-	      ResultSet rs = stmt.executeQuery(selectString);
+	      ResultSet rs = stmt.executeQuery(queryStr);
 
 	      while (rs.next()) {
 	        String scope = rs.getString("scope");
@@ -2701,16 +2762,22 @@ public class DataPackageRegistry {
 	    ArrayList<DataDescendant> dataDescendants = new ArrayList<DataDescendant>();
 
 	    Connection connection = null;
-	    String selectString = 
-	    		String.format("SELECT DISTINCT derived_id, derived_title FROM %s" +
-	                          "  WHERE source_id='%s' ORDER BY derived_id", 
-	                          PROV_MATRIX, sourceId);
+
+      String queryStr = String.format(
+          "SELECT DISTINCT derived_id, derived_title " +
+              "FROM %s " +
+              "WHERE source_id='%s' " +
+              "ORDER BY derived_id",
+	        PROV_MATRIX, SqlEscape.str(sourceId));
+
+      logger.debug("queryStr: " + queryStr);
+
 	    Statement stmt = null;
 
         try {
 	      connection = getConnection();
 	      stmt = connection.createStatement();
-	      ResultSet rs = stmt.executeQuery(selectString);
+	      ResultSet rs = stmt.executeQuery(queryStr);
 	      edu.lternet.pasta.common.eml.DataPackage dataPackage = new DataPackage(); 
 
 	      while (rs.next()) {
@@ -2758,16 +2825,23 @@ public class DataPackageRegistry {
 	    ArrayList<DataSource> dataSources = new ArrayList<DataSource>();
 
 	    Connection connection = null;
-	    String selectString = 
-	    		String.format("SELECT DISTINCT source_id, source_title, source_url FROM %s" +
-	                          "  WHERE derived_id='%s' ORDER BY source_title", 
-	                          PROV_MATRIX, derivedId);
+
+      String queryStr =
+	    		String.format(
+              "SELECT DISTINCT source_id, source_title, source_url " +
+                  "FROM %s " +
+                  "WHERE derived_id='%s' " +
+                  "ORDER BY source_title",
+	                          PROV_MATRIX, SqlEscape.str(derivedId));
+
+      logger.debug("queryStr: " + queryStr);
+
 	    Statement stmt = null;
 
         try {
 	      connection = getConnection();
 	      stmt = connection.createStatement();
-	      ResultSet rs = stmt.executeQuery(selectString);
+	      ResultSet rs = stmt.executeQuery(queryStr);
 	      edu.lternet.pasta.common.eml.DataPackage dataPackage = new DataPackage(); 
 
 	      while (rs.next()) {
@@ -2813,20 +2887,21 @@ public class DataPackageRegistry {
       
       if (scope != null && identifier != null && revision != null) {
         Connection connection = null;
-        String selectString = 
-          "SELECT entity_id FROM " + RESOURCE_REGISTRY +
-          "  WHERE scope='" + scope + 
-          "' AND identifier='" + identifier + 
-          "' AND revision='" + revision +
-          "' AND entity_id IS NOT NULL" +
-          "  ORDER BY date_created";
+
+        String queryStr = String.format(
+            "SELECT entity_id FROM %s " +
+                "WHERE scope='%s' AND identifier=%d AND revision=%d AND entity_id IS NOT NULL " +
+                "ORDER BY date_created",
+            RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
       
+        logger.debug("queryStr: " + queryStr);
+
         Statement stmt = null;
       
         try {
           connection = getConnection();
           stmt = connection.createStatement();             
-          ResultSet rs = stmt.executeQuery(selectString);
+          ResultSet rs = stmt.executeQuery(queryStr);
         
           while (rs.next()) {
             String entityId = rs.getString("entity_id");
@@ -2871,22 +2946,26 @@ public class DataPackageRegistry {
       
       if (scope != null) {
         Connection connection = null;
-        String selectString = 
-          "SELECT DISTINCT identifier FROM " + RESOURCE_REGISTRY +
-          "  WHERE resource_type='dataPackage'" +
-          "  AND scope='" + scope + "'";
-        
+
+        String queryStr = String.format(
+            "SELECT DISTINCT identifier " +
+                "FROM %s " +
+                "WHERE resource_type='dataPackage' AND scope='%s'",
+            RESOURCE_REGISTRY, SqlEscape.str(scope));
+
+        logger.debug("queryStr: " + queryStr);
+
         if (!includeDeleted) {
-            selectString = selectString + "  AND date_deactivated IS NULL";
+          queryStr += " AND date_deactivated IS NULL";
         }
-          
-        selectString = selectString + "  ORDER BY identifier";
+
+        queryStr += " ORDER BY identifier";
         Statement stmt = null;
       
         try {
           connection = getConnection();
           stmt = connection.createStatement();             
-          ResultSet rs = stmt.executeQuery(selectString);
+          ResultSet rs = stmt.executeQuery(queryStr);
         
           while (rs.next()) {
             String identifier = rs.getString("identifier");
@@ -2927,18 +3006,22 @@ public class DataPackageRegistry {
     
     if (scope != null && identifier != null) {
       Connection connection = null;
-      String selectString = 
-        "SELECT revision FROM " + RESOURCE_REGISTRY +
-        "  WHERE resource_type='dataPackage'" +
-        "  AND scope='" + scope + 
-        "' AND identifier='" + identifier + "'" +
-        "  ORDER BY revision";
+
+      String queryStr = String.format(
+          "SELECT revision " +
+              "FROM %s " +
+              "WHERE resource_type='dataPackage' AND scope='%s' AND identifier=%d " +
+              "ORDER BY revision",
+          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
     
       try {
         connection = getConnection();
         stmt = connection.createStatement();             
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
       
         while (rs.next()) {
           String revision = rs.getString("revision");
@@ -2987,18 +3070,22 @@ public class DataPackageRegistry {
     	revision != null
        ) {
       Connection connection = null;
-      String selectString = 
-        "SELECT revision FROM " + RESOURCE_REGISTRY +
-        "  WHERE resource_type='dataPackage'" +
-        "  AND scope='" + scope + 
-        "' AND identifier='" + identifier + "'" +
-        "  ORDER BY revision";
+
+      String queryStr = String.format(
+          "SELECT revision " +
+              "FROM %s " +
+              "WHERE resource_type='dataPackage' AND scope='%s' AND identifier=%d " +
+              "ORDER BY revision",
+          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
     
       try {
         connection = getConnection();
         stmt = connection.createStatement();             
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
       
         while (rs.next()) {
           int rev = rs.getInt("revision");
@@ -3056,16 +3143,22 @@ public class DataPackageRegistry {
     ArrayList<String> scopeList = new ArrayList<String>();
 
     Connection connection = null;
-    String selectString = "SELECT DISTINCT scope FROM " + RESOURCE_REGISTRY +
-        "  WHERE resource_type='dataPackage'" +
-        "    AND date_deactivated IS NULL" +
-        "  ORDER BY scope";
+
+    String queryStr = String.format(
+        "SELECT DISTINCT scope " +
+            "FROM %s " +
+            "WHERE resource_type='dataPackage' AND date_deactivated IS NULL " +
+            "ORDER BY scope",
+        RESOURCE_REGISTRY);
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         String scope = rs.getString("scope");
@@ -3105,16 +3198,22 @@ public class DataPackageRegistry {
     ArrayList<String> docidList = new ArrayList<String>();
 
     Connection connection = null;
-    String selectString = "SELECT DISTINCT scope, identifier FROM " + RESOURCE_REGISTRY +
-        "  WHERE resource_type='dataPackage'" +
-        "  AND date_deactivated IS NOT NULL" +
-        "  ORDER BY scope, identifier";
+
+    String queryStr = String.format(
+        "SELECT DISTINCT scope, identifier " +
+            "FROM %s " +
+            "WHERE resource_type='dataPackage' AND date_deactivated IS NOT NULL " +
+            "ORDER BY scope, identifier",
+        RESOURCE_REGISTRY);
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
 
     try {
       connection = getConnection();
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
 
       while (rs.next()) {
         String scope = rs.getString("scope");
@@ -3159,14 +3258,19 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, resource_location, scope, identifier, revision, entity_id, sha1_checksum"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND date_deactivated IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, resource_location, scope, identifier, " +
+            "revision, entity_id, sha1_checksum " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type != 'dataPackage' AND date_deactivated IS NULL");
 
-		Statement statement = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement statement = null;
+
+    try {
 			statement = conn.createStatement();
-			ResultSet result = statement.executeQuery(queryString);
+			ResultSet result = statement.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3222,14 +3326,18 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND md5_checksum IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type != 'dataPackage' AND md5_checksum IS NULL ");
 
-		Statement stat = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
+
+    try {
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3281,14 +3389,18 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND sha1_checksum IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type != 'dataPackage' AND sha1_checksum IS NULL");
 
-		Statement stat = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
+
+    try {
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3340,14 +3452,18 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type = 'data' AND data_format IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type = 'data' AND data_format IS NULL");
 
-		Statement stat = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
+
+    try {
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3399,14 +3515,18 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND format_type IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type != 'dataPackage' AND format_type IS NULL");
 
-		Statement stat = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
+
+    try {
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3458,16 +3578,19 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, date_created"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type='dataPackage' AND doi IS NULL AND date_deactivated IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, date_created " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type='dataPackage' AND doi IS NULL AND date_deactivated IS NULL");
 
-		Statement stat = null;
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
 
 		try {
 
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 			String resourceId = null;
 
 			while (result.next()) {
@@ -3526,14 +3649,18 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " resource_type != 'dataPackage' AND resource_size IS NULL;";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE resource_type != 'dataPackage' AND resource_size IS NULL ");
 
-		Statement stat = null;
-		try {
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
+
+    try {
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				Resource resource = new Resource();
@@ -3585,14 +3712,18 @@ public class DataPackageRegistry {
             e.printStackTrace();
         }
 
-        String queryString = "SELECT resource_id, resource_type, scope, identifier, revision, entity_id"
-            + " FROM datapackagemanager.resource_registry WHERE"
-            + " resource_type != 'dataPackage' AND filename IS NULL;";
+        String queryStr = String.format(
+            "SELECT resource_id, resource_type, scope, identifier, revision, entity_id " +
+                "FROM datapackagemanager.resource_registry " +
+                "WHERE resource_type != 'dataPackage' AND filename IS NULL");
+
+        logger.debug("queryStr: " + queryStr);
 
         Statement stat = null;
+
         try {
             stat = conn.createStatement();
-            ResultSet result = stat.executeQuery(queryString);
+            ResultSet result = stat.executeQuery(queryStr);
 
             while (result.next()) {
                 Resource resource = new Resource();
@@ -3648,18 +3779,21 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = 
-			"SELECT resource_id, resource_type, scope, identifier, revision, " +
-		    " date_created, doi, resource_location, entity_id, sha1_checksum, resource_size " + 
-		    "FROM datapackagemanager.resource_registry " +
-		    "WHERE package_id='" + packageId + "'";
+		String queryStr = String.format(
+        "SELECT resource_id, resource_type, scope, identifier, revision, date_created, " +
+            "doi, resource_location, entity_id, sha1_checksum, resource_size " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE package_id='%s'",
+        SqlEscape.str(packageId));
 
-		Statement stat = null;
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
 
 		try {
 
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 			String resourceId = null;
 
 			while (result.next()) {
@@ -3721,16 +3855,19 @@ public class DataPackageRegistry {
 			e.printStackTrace();
 		}
 
-		String queryString = "SELECT doi"
-		    + " FROM datapackagemanager.resource_registry WHERE"
-		    + " doi IS NOT NULL and date_deactivated IS NOT NULL;";
+		String queryStr = String.format(
+        "SELECT doi " +
+            "FROM datapackagemanager.resource_registry " +
+            "WHERE doi IS NOT NULL and date_deactivated IS NOT NULL");
 
-		Statement stat = null;
+		logger.debug("queryStr: " + queryStr);
+
+    Statement stat = null;
 
 		try {
 
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			while (result.next()) {
 				String doi = result.getString("doi");
@@ -3801,13 +3938,17 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 
-		String queryString = String.format(
-			"UPDATE datapackagemanager.resource_registry SET data_format='%s' WHERE resource_id='%s'",
-			dataFormat, resourceId);
+		String queryStr = String.format(
+			"UPDATE datapackagemanager.resource_registry " +
+          "SET data_format='%s' " +
+          "WHERE resource_id='%s'",
+			SqlEscape.str(dataFormat), SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		try {
 			Statement statement = conn.createStatement();
-			int rowCount = statement.executeUpdate(queryString);
+			int rowCount = statement.executeUpdate(queryStr);
 			if (rowCount != 1) {
 				String msg = String.format(
 						"When updating data_format, expected 1 row updated, instead %d rows were updated.",
@@ -3853,13 +3994,17 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 
-		String queryString = String.format(
-			"UPDATE datapackagemanager.resource_registry SET format_type='%s' WHERE resource_id='%s'",
-			formatType, resourceId);
+		String queryStr = String.format(
+			"UPDATE datapackagemanager.resource_registry " +
+          "SET format_type='%s' " +
+          "WHERE resource_id='%s'",
+			SqlEscape.str(formatType), SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		try {
 			Statement statement = conn.createStatement();
-			int rowCount = statement.executeUpdate(queryString);
+			int rowCount = statement.executeUpdate(queryStr);
 			if (rowCount != 1) {
 				String msg = String.format(
 						"When updating format_type, expected 1 row updated, instead %d rows were updated.",
@@ -3905,12 +4050,17 @@ public class DataPackageRegistry {
 	      throw(e);
 	    }
 
-	    String queryString = String.format("UPDATE datapackagemanager.resource_registry "
-	        + "SET md5_checksum='%s' WHERE resource_id='%s'", md5Checksum, resourceId);
+	    String queryStr = String.format("" +
+          "UPDATE datapackagemanager.resource_registry " +
+              "SET md5_checksum='%s' " +
+              "WHERE resource_id='%s'",
+          SqlEscape.str(md5Checksum), SqlEscape.str(resourceId));
+
+      logger.debug("queryStr: " + queryStr);
 
 	    try {
 	      Statement statement = conn.createStatement();
-	      int rowCount = statement.executeUpdate(queryString);
+	      int rowCount = statement.executeUpdate(queryStr);
 	      if (rowCount != 1) {
 	        String msg = String.format("When updating MD5 checksum, expected 1 row updated, instead %d rows were updated.", 
 	        		                   rowCount);
@@ -3955,12 +4105,16 @@ public class DataPackageRegistry {
       throw(e);
     }
 
-    String queryString = String.format("UPDATE datapackagemanager.resource_registry "
-        + "SET sha1_checksum='%s' WHERE resource_id='%s'", sha1Checksum, resourceId);
+    String queryStr = String.format(
+        "UPDATE datapackagemanager.resource_registry " +
+            "SET sha1_checksum='%s' WHERE resource_id='%s'",
+        SqlEscape.str(sha1Checksum), SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
       Statement statement = conn.createStatement();
-      int rowCount = statement.executeUpdate(queryString);
+      int rowCount = statement.executeUpdate(queryStr);
       if (rowCount != 1) {
         String msg = String.format("When updating SHA-1 checksum, expected 1 row updated, instead %d row(s) were updated.", rowCount);
         throw new ChecksumException(msg);
@@ -4000,14 +4154,17 @@ public class DataPackageRegistry {
           throw (e);
       }
 
-      String queryString = String.format(
-              "UPDATE datapackagemanager.resource_registry " + 
-              "SET filename='%s' WHERE resource_id='%s'", 
-              filename, resourceId);
+      String queryStr = String.format(
+          "UPDATE datapackagemanager.resource_registry " +
+              "SET filename='%s' " +
+              "WHERE resource_id='%s'",
+              SqlEscape.str(filename), SqlEscape.str(resourceId));
+
+      logger.debug("queryStr: " + queryStr);
 
       try {
           Statement statement = conn.createStatement();
-          int rowCount = statement.executeUpdate(queryString);
+          int rowCount = statement.executeUpdate(queryStr);
           if (rowCount != 1) {
               String msg = String.format(
                   "When updating resource 'filename' field, expected 1 row updated, instead %d row(s) were updated.",
@@ -4049,14 +4206,17 @@ public class DataPackageRegistry {
 			throw (e);
 		}
 
-		String queryString = String.format(
-				"UPDATE datapackagemanager.resource_registry " + 
-		        "SET resource_size=%d WHERE resource_id='%s'", 
-		        size, resourceId);
+		String queryStr = String.format(
+        "UPDATE datapackagemanager.resource_registry " +
+            "SET resource_size=%d " +
+            "WHERE resource_id='%s'",
+		        size, SqlEscape.str(resourceId));
+
+    logger.debug("queryStr: " + queryStr);
 
 		try {
 			Statement statement = conn.createStatement();
-			int rowCount = statement.executeUpdate(queryString);
+			int rowCount = statement.executeUpdate(queryStr);
 			if (rowCount != 1) {
 				String msg = String.format(
 					"When updating resource_size, expected 1 row updated, instead %d row(s) were updated.",
@@ -4107,17 +4267,20 @@ public class DataPackageRegistry {
 			Connection connection = null;
 			Statement stmt = null;
 
-			String selectString = String.format(
-					"SELECT package_id, scope, identifier, revision FROM %s WHERE resource_type='dataPackage' AND principal_owner='%s'",
-					RESOURCE_REGISTRY, distinguishedName);
-			selectString += "  AND date_deactivated IS NULL"; // exclude deleted
-																// data packages
-			selectString += "  ORDER BY scope ASC, identifier ASC, revision ASC";
+			String queryStr = String.format(
+					"SELECT package_id, scope, identifier, revision " +
+              "FROM %s " +
+              "WHERE resource_type='dataPackage' AND principal_owner='%s'",
+					RESOURCE_REGISTRY, SqlEscape.str(distinguishedName));
+			queryStr += " AND date_deactivated IS NULL"; // exclude deleted data packages
+			queryStr += " ORDER BY scope ASC, identifier ASC, revision ASC";
+
+      logger.debug("queryStr: " + queryStr);
 
 			try {
 				connection = getConnection();
 				stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+				ResultSet rs = stmt.executeQuery(queryStr);
 
 				while (rs.next()) {
 					String packageId = rs.getString("package_id");
@@ -4222,14 +4385,16 @@ public class DataPackageRegistry {
             String journalTitle = journalCitation.getJournalTitle();
             String relationType = journalCitation.getRelationType();
 
-            String insertSQL = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
-                    JOURNAL_CITATION, "package_id", "principal_owner", "article_doi", "article_title", "article_url", "date_created",
-                    "journal_title", "relation_type");
-            logger.debug("insertSQL: " + insertSQL);
+            String queryStr = String.format(
+                "INSERT INTO %s (package_id, principal_owner, article_doi, " +
+                  "article_title, article_url, date_created, journal_title) " +
+                  "VALUES(?,?,?,?,?,?,?)", JOURNAL_CITATION);
+
+            logger.debug("queryStr: " + queryStr);
 
             try {
                 connection = getConnection();
-                PreparedStatement pstmt = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
                 pstmt.setString(1, packageId);
                 pstmt.setString(2, principalOwner);
                 
@@ -4274,10 +4439,8 @@ public class DataPackageRegistry {
                 while (rs.next()) {
                     journalCitationId = rs.getInt(1);
                 }
-                
-                if (pstmt != null) {
-                    pstmt.close();
-                }
+
+              pstmt.close();
             } catch (SQLException e) {
                 logger.error("Error inserting JOURNAL_CITATION record for JournalCitation object:\n"
                         + journalCitation.toXML(true));
@@ -4301,14 +4464,18 @@ public class DataPackageRegistry {
             if (hasJournalCitation(id)) {
                 if (isJournalCitationOwner(id, userId)) {
                     connection = getConnection();
-                    String updateSQL = String.format(
-                            "DELETE FROM %s WHERE journal_citation_id=%d and principal_owner='%s'", JOURNAL_CITATION,
-                            id, userId);
+                    String queryStr = String.format(
+                            "DELETE FROM %s " +
+                                "WHERE journal_citation_id=%d and principal_owner='%s'",
+                        JOURNAL_CITATION, id, SqlEscape.str(userId));
+
+                    logger.debug("queryStr: " + queryStr);
+
                     stmt = connection.createStatement();
-                    rowCount = stmt.executeUpdate(updateSQL);
+                    rowCount = stmt.executeUpdate(queryStr);
 
                     if (rowCount < 1) {
-                        String gripe = "Delete failed: " + updateSQL;
+                        String gripe = "Delete failed: " + queryStr;
                         throw new SQLException(gripe);
                     }
                     else {
@@ -4341,14 +4508,18 @@ public class DataPackageRegistry {
         ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
 
         Connection connection = null;
-        String selectString = String.format("SELECT * FROM %s WHERE journal_citation_id='%d'",
+        String queryStr = String.format(
+            "SELECT * FROM %s WHERE journal_citation_id=%d",
                 JOURNAL_CITATION, journalCitationId);
+
+        logger.debug("queryStr: " + queryStr);
+
         Statement stmt = null;
 
         try {
             connection = getConnection();
             stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(selectString);
+            ResultSet rs = stmt.executeQuery(queryStr);
 
             while (rs.next()) {
                 String packageId = rs.getString("package_id");
@@ -4396,21 +4567,25 @@ public class DataPackageRegistry {
       public boolean hasJournalCitation(Integer identifier) throws ClassNotFoundException, SQLException {
           boolean hasJournalCitation = false;
           Connection connection = null;
-          String selectString = String.format("SELECT count(*) FROM %s WHERE journal_citation_id=%d", 
-                                              JOURNAL_CITATION, identifier);
+          String queryStr = String.format(
+              "SELECT count(*) FROM %s WHERE journal_citation_id=%d",
+              JOURNAL_CITATION, identifier);
+
+          logger.debug("queryStr: " + queryStr);
+
           Statement stmt = null;
 
           try {
               connection = getConnection();
               stmt = connection.createStatement();
-              ResultSet rs = stmt.executeQuery(selectString);
+              ResultSet rs = stmt.executeQuery(queryStr);
 
               while (rs.next()) {
                   int count = rs.getInt("count");
                   hasJournalCitation = (count > 0);
               }
 
-              if (stmt != null) { stmt.close(); }
+            stmt.close();
           } 
           catch (ClassNotFoundException e) {
               logger.error("ClassNotFoundException: " + e.getMessage());
@@ -4441,14 +4616,20 @@ public class DataPackageRegistry {
           Connection connection = null;
 
           if (identifier != null && userId != null && !userId.isEmpty()) {
-              String selectString = String.format("SELECT principal_owner FROM %s WHERE journal_citation_id=%d",
+              String queryStr = String.format("" +
+                      "SELECT principal_owner " +
+                      "FROM %s " +
+                      "WHERE journal_citation_id=%d",
                       JOURNAL_CITATION, identifier);
+
+              logger.debug("queryStr: " + queryStr);
+
               Statement stmt = null;
 
               try {
                   connection = getConnection();
                   stmt = connection.createStatement();
-                  ResultSet rs = stmt.executeQuery(selectString);
+                  ResultSet rs = stmt.executeQuery(queryStr);
 
                   while (rs.next()) {
                       String principalOwner = rs.getString("principal_owner");
@@ -4457,9 +4638,7 @@ public class DataPackageRegistry {
                       }
                   }
 
-                  if (stmt != null) {
-                      stmt.close();
-                  }
+                stmt.close();
               } catch (ClassNotFoundException e) {
                   logger.error("ClassNotFoundException: " + e.getMessage());
                   throw (e);
@@ -4480,24 +4659,35 @@ public class DataPackageRegistry {
           ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
 
           Connection connection = null;
-          String selectString = "";
+          String queryStr;
           if (allParam != null) {
               String packageId = scope + "." + String.valueOf(identifier) + ".%";
-              selectString = String.format("SELECT * FROM %s WHERE package_id LIKE '%s' ORDER BY journal_citation_id",
-                      JOURNAL_CITATION, packageId);
+              queryStr = String.format(
+                  "SELECT * " +
+                      "FROM %s " +
+                      "WHERE package_id LIKE '%s' " +
+                      "ORDER BY journal_citation_id",
+                      JOURNAL_CITATION, SqlEscape.str(packageId));
           } else {
               EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
               EmlPackageIdFormat epif = new EmlPackageIdFormat();
               String packageId = epif.format(epi);
-              selectString = String.format("SELECT * FROM %s WHERE package_id='%s' ORDER BY journal_citation_id",
-                      JOURNAL_CITATION, packageId);
+              queryStr = String.format(
+                  "SELECT * " +
+                      "FROM %s " +
+                      "WHERE package_id='%s' " +
+                      "ORDER BY journal_citation_id",
+                      JOURNAL_CITATION, SqlEscape.str(packageId));
           }
+
+          logger.debug("queryStr: " + queryStr);
+
           Statement stmt = null;
 
           try {
               connection = getConnection();
               stmt = connection.createStatement();
-              ResultSet rs = stmt.executeQuery(selectString);
+              ResultSet rs = stmt.executeQuery(queryStr);
 
               while (rs.next()) {
                   int journalCitationId = rs.getInt("journal_citation_id");
@@ -4542,14 +4732,21 @@ public class DataPackageRegistry {
           ArrayList<JournalCitation> journalCitations = new ArrayList<JournalCitation>();
 
           Connection connection = null;
-          String selectString = String.format("SELECT * FROM %s WHERE principal_owner='%s' ORDER BY journal_citation_id",
-                  JOURNAL_CITATION, principalOwner);
+          String queryStr = String.format(
+              "SELECT * " +
+                  "FROM %s " +
+                  "WHERE principal_owner='%s' " +
+                  "ORDER BY journal_citation_id",
+                  JOURNAL_CITATION, SqlEscape.str(principalOwner));
+
+          logger.debug("queryStr: " + queryStr);
+
           Statement stmt = null;
 
           try {
               connection = getConnection();
               stmt = connection.createStatement();
-              ResultSet rs = stmt.executeQuery(selectString);
+              ResultSet rs = stmt.executeQuery(queryStr);
 
               while (rs.next()) {
                   int journalCitationId = rs.getInt("journal_citation_id");

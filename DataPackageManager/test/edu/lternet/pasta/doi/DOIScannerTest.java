@@ -33,7 +33,9 @@ import java.sql.Statement;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import edu.lternet.pasta.datapackagemanager.*;
 import org.apache.http.HttpEntity;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -41,11 +43,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
-import edu.lternet.pasta.datapackagemanager.DataPackageManager;
-import edu.lternet.pasta.datapackagemanager.DataPackageManagerResource;
-import edu.lternet.pasta.datapackagemanager.DataPackageManagerResourceTest;
-import edu.lternet.pasta.datapackagemanager.DummyCookieHttpHeaders;
 import edu.lternet.pasta.utility.PastaUtility;
 import edu.ucsb.nceas.utilities.Options;
 
@@ -106,6 +103,8 @@ public class DOIScannerTest {
 	/*
 	 * Class methods
 	 */
+
+	private static Logger log = Logger.getLogger(DOIScannerTest.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -387,16 +386,20 @@ public class DOIScannerTest {
 		}
 		assertNotNull("Database connection null", conn);
 
-		String queryString = "SELECT doi"
-		    + " FROM datapackagemanager.resource_registry WHERE" + " package_id='"
-		    + packageId + "' AND resource_type='dataPackage';";
+		String queryStr = String.format(
+				"SELECT doi " +
+						"FROM datapackagemanager.resource_registry " +
+						"WHERE package_id='%s' AND resource_type='dataPackage'",
+				packageId);
+		
+		log.debug("queryStr: " + queryStr);
 
 		Statement stat = null;
 
 		try {
 
 			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryString);
+			ResultSet result = stat.executeQuery(queryStr);
 
 			result.next();
 			doi = result.getString("doi");

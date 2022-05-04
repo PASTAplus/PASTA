@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import edu.lternet.pasta.common.SqlEscape;
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.NotFoundException;
@@ -207,24 +208,21 @@ public class ReservationManager {
 		java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
 		String packageId = String.format("%s.%d", scope, identifier);
 
-		StringBuilder insertSQL = new StringBuilder("INSERT INTO " + RESERVATION + "(");
-		insertSQL.append("scope, identifier, principal, date_reserved) " + "VALUES(?,?,?,?)");
+		String queryStr = String.format(
+				"INSERT INTO %s (scope, identifier, principal, date_reserved) " +
+						"VALUES(?,?,?,?)", RESERVATION);
 
-		String insertString = insertSQL.toString();
-		logger.debug("insertString: " + insertString);
+		logger.debug("queryStr: " + queryStr);
 
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(insertString);
+			PreparedStatement pstmt = connection.prepareStatement(queryStr);
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.setString(3, principal);
 			pstmt.setTimestamp(4, ts);
-
 			pstmt.executeUpdate();
-			if (pstmt != null) {
-				pstmt.close();
-			}
+			pstmt.close();
 			logger.info(String.format("Data package identifier %s has been reserved.", packageId));
 		} 
 		catch (SQLException e) {
@@ -255,7 +253,7 @@ public class ReservationManager {
 		String packageId = String.format("%s.%d", scope, identifier);
 		
 		if (!hasReservation(scope, identifier)) {
-			String msg = String.format("No reservation found for '%s'", 
+			String msg = String.format("No reservation found for '%s'",
 					                   packageId);
 			throw new ResourceNotFoundException(msg);
 		}
@@ -276,21 +274,19 @@ public class ReservationManager {
 			}
 		}
 
-		StringBuilder deleteSQL = new StringBuilder("DELETE FROM " + RESERVATION + 
-				" WHERE scope=? AND identifier=?");
+		String queryStr = String.format(
+				"DELETE FROM %s WHERE scope=? AND identifier=?", RESERVATION);
 
-		String deleteString = deleteSQL.toString();
+		logger.debug("queryStr: " + queryStr);
 
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(deleteString);
+			PreparedStatement pstmt = connection.prepareStatement( queryStr);
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.executeUpdate();
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			logger.info(String.format("Data package identifier %s has been deleted from the %s table", 
+			pstmt.close();
+			logger.info(String.format("Data package identifier %s has been deleted from the %s table",
 					                  packageId, RESERVATION));
 		} 
 		catch (SQLException e) {
@@ -329,13 +325,17 @@ public class ReservationManager {
 			e.printStackTrace();
 		}
 
-		String updateSQL = "UPDATE datapackagemanager.RESERVATION " + 
-		"SET date_uploaded=? WHERE scope=? AND identifier=?";
+		String queryStr =
+				"UPDATE datapackagemanager.RESERVATION " +
+						"SET date_uploaded=? " +
+						"WHERE scope=? AND identifier=?";
+
+		logger.debug("queryStr: " + queryStr);
 
 		Integer rowCount = null;
 
 		try {
-			PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+			PreparedStatement pstmt = conn.prepareStatement(queryStr);
 	        pstmt.setTimestamp(1, ts);          // The upload date-time
 	        pstmt.setString(2, scope);          // Set WHERE scope value
 	        pstmt.setInt(3, identifier);        // Set WHERE identifier value
@@ -408,21 +408,21 @@ public class ReservationManager {
 	public String listActiveReservations() throws Exception {
 		Connection conn = null;
 		String activeReservationsXML = null;
-		StringBuilder queryBuilder = new StringBuilder();
 		StringBuilder xmlBuilder = new StringBuilder("<reservations>\n");
 
-		queryBuilder.append("SELECT scope, identifier, date_reserved, principal FROM ");
-		queryBuilder.append(RESERVATION);
-		queryBuilder.append(" WHERE date_uploaded IS NULL");
-		queryBuilder.append(" ORDER BY date_reserved ASC;");
-		String sqlQuery = queryBuilder.toString();
+		String sqlQuery = String.format(
+				"SELECT scope, identifier, date_reserved, principal " +
+						"FROM %s " +
+						"WHERE date_uploaded IS NULL " +
+						"ORDER BY date_reserved ASC ",
+				RESERVATION);
 
 		try {
 			conn = getConnection();
 
 			if (conn != null) {
-				Statement stmnt = conn.createStatement();
-				ResultSet rs = stmnt.executeQuery(sqlQuery);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
 					xmlBuilder.append("  <reservation>\n");
@@ -457,22 +457,20 @@ public class ReservationManager {
 	 */
 	public String listReservationIdentifiers(String scope) throws Exception {
 		Connection conn = null;
-		StringBuilder queryBuilder = new StringBuilder();
 		StringBuilder identifiers = new StringBuilder("");
 
-		queryBuilder.append("SELECT identifier FROM ");
-		queryBuilder.append(RESERVATION);
-		queryBuilder.append(" WHERE date_uploaded IS NULL AND");
-		queryBuilder.append(String.format(" scope='%s'", scope));
-		queryBuilder.append(" ORDER BY identifier ASC;");
-		String sqlQuery = queryBuilder.toString();
+		String sqlQuery = String.format(
+				"SELECT identifier " +
+						"FROM %s " +
+						"WHERE date_uploaded IS NULL AND scope='%s' " +
+						"ORDER BY identifier ASC",
+				RESERVATION, SqlEscape.str(scope));
 
 		try {
 			conn = getConnection();
-
 			if (conn != null) {
-				Statement stmnt = conn.createStatement();
-				ResultSet rs = stmnt.executeQuery(sqlQuery);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
 					Integer identifier = rs.getInt(1);
@@ -504,26 +502,27 @@ public class ReservationManager {
 			throws ClassNotFoundException, SQLException {
 		boolean isActiveIdentifier = false;
 		Connection connection = null;
-		String selectString = 
-				"SELECT count(*) FROM " + RESERVATION + 
-				"  WHERE scope='" + scope + 
-				"' AND identifier='" + identifier + 
-				"' AND date_uploaded IS NULL;";
+		String queryStr = String.format(
+				"SELECT count(*) " +
+						"FROM %s " +
+						"WHERE scope='%s' AND identifier=%d AND date_uploaded IS NULL",
+				RESERVATION, SqlEscape.str(scope), identifier);
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				int count = rs.getInt("count");
 				isActiveIdentifier = (count > 0);
 			}
 
-			if (stmt != null)
-				stmt.close();
+			stmt.close();
 		} catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
 			throw (e);
@@ -551,24 +550,25 @@ public class ReservationManager {
 			throws ClassNotFoundException, SQLException {
 		boolean hasReservation = false;
 		Connection connection = null;
-		String selectString = String.format(
+		String queryStr = String.format(
 				"SELECT count(*) FROM %s WHERE scope='%s' AND identifier=%d", 
-				RESERVATION, scope, identifier);
+				RESERVATION, SqlEscape.str(scope), identifier);
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				int count = rs.getInt("count");
 				hasReservation = (count > 0);
 			}
 
-			if (stmt != null)
-				stmt.close();
+			stmt.close();
 		} catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
 			throw (e);
@@ -597,25 +597,26 @@ public class ReservationManager {
 			throws ClassNotFoundException, SQLException {
 		String userId = null;
 		Connection connection = null;
-		String selectString = 
-				"SELECT principal FROM " + RESERVATION + 
-				"  WHERE scope='" + scope + 
-				"' AND identifier='" + identifier + 
-				"' AND date_uploaded IS NULL;";
+		String queryStr = String.format(
+				"SELECT principal " +
+						"FROM %s " +
+						"WHERE scope='%s' AND identifier=%d AND date_uploaded IS NULL",
+				RESERVATION, SqlEscape.str(scope), identifier);
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				userId = rs.getString(1);
 			}
 
-			if (stmt != null)
-				stmt.close();
+			stmt.close();
 		} catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
 			throw (e);

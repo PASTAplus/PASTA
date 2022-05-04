@@ -41,8 +41,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
+import edu.lternet.pasta.common.SqlEscape;
+import edu.lternet.pasta.datapackagemanager.WorkingOn;
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.parser.Entity;
+import org.apache.log4j.Logger;
 
 /**
  * TableMonitor monitors all data tables in the database. It stores information
@@ -61,6 +64,8 @@ import edu.lternet.pasta.dml.parser.Entity;
  * 
  */
 public class TableMonitor {
+  
+  private static Logger logger = Logger.getLogger(TableMonitor.class);
   
   /*
    * Class fields
@@ -126,7 +131,7 @@ public class TableMonitor {
     String entityIdentifier = entity.getEntityIdentifier();
     String entityName = entity.getName();
     String packageId = entity.getPackageId();
-    String insertString;
+    String queryStr;
     Date now = new Date();
     String priority = "1";
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -149,24 +154,24 @@ public class TableMonitor {
      * table registry.
      */
     else {
-      insertString = 
-        "INSERT INTO " + 
-        DATA_TABLE_REGISTRY + 
-        " values(" + 
-          "'" + tableName + "', " + 
-          "'" + packageId + "', " + 
-          "'" + entityIdentifier + "', " + 
-          "'" + entityName + "', " + 
-          "'" + simpleDateFormat.format(now) + "', " + 
-          "'" + simpleDateFormat.format(now) + "', " + 
-          priority + 
-        ")";
+      queryStr =
+          String.format("INSERT INTO %s values('%s', '%s', '%s', '%s', '%s', '%s', %s)",
+              DATA_TABLE_REGISTRY,
+              SqlEscape.name(tableName),
+              SqlEscape.str(packageId),
+              SqlEscape.str(entityIdentifier),
+              SqlEscape.str(entityName),
+              SqlEscape.str(simpleDateFormat.format(now)),
+              SqlEscape.str(simpleDateFormat.format(now)),
+              SqlEscape.str(priority));
 
+      logger.debug("queryStr: " + queryStr);
+      
       Connection connection = DataManager.getConnection();
 
       try {
         stmt = connection.createStatement();
-        stmt.executeUpdate(insertString);
+        stmt.executeUpdate(queryStr);
       } 
       catch (SQLException e) {
         System.err.println("Error inserting record for " + tableName
@@ -207,10 +212,14 @@ public class TableMonitor {
           throws SQLException {
     Connection connection = DataManager.getConnection();
     String tableName = null;
-    String selectString = "SELECT TABLE_NAME, ENTITY_IDENTIFIER, ENTITY_NAME" +
-                          " FROM " + DATA_TABLE_REGISTRY +
-                          " WHERE ENTITY_IDENTIFIER='" + entityIdentifier + 
-                          "' AND ENTITY_NAME='" + entityName + "'";
+    String queryStr = String.format(
+        "SELECT TABLE_NAME, ENTITY_IDENTIFIER, ENTITY_NAME " +
+            "FROM %s " +
+            "WHERE ENTITY_IDENTIFIER='%s' AND ENTITY_NAME='%s'",
+        DATA_TABLE_REGISTRY, SqlEscape.str(entityIdentifier), SqlEscape.str(entityName));
+    
+    logger.debug("queryStr: " + queryStr);
+    
     Statement stmt = null;
 
     /*
@@ -219,7 +228,7 @@ public class TableMonitor {
      */
     try {
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         tableName = rs.getString("table_name");
@@ -270,14 +279,14 @@ public class TableMonitor {
     int rowCount = -1;
     
     if (isTableInDB(tableName)) {
-      String selectString = dbAdapter.getCountingRowNumberSQL(tableName);
+      String queryStr = dbAdapter.getCountingRowNumberSQL(tableName);
       Statement stmt = null;
       
       Connection connection = DataManager.getConnection();
 
       try {
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
         
         while (rs.next()) {
           rowCount = rs.getInt("count");
@@ -307,17 +316,16 @@ public class TableMonitor {
    */
   private void createDataTableRegistry() throws SQLException {
     Connection connection = DataManager.getConnection();
-    String createString = 
-      "create table " + DATA_TABLE_REGISTRY + " " +
-      "(" +
-      "  TABLE_NAME varchar(64), " +         // database table name
-      "  PACKAGE_ID varchar(64), " +         // package id
-      "  ENTITY_IDENTIFIER varchar(256), " + // entity identifier
-      "  ENTITY_NAME varchar(256), " +        // entity name
-      "  CREATION_DATE date, " +             // creation date
-      "  LAST_USAGE_DATE date, " +           // last usage date
-      "  PRIORITY int" +                     // expiration policy
-      ")";
+    // database table name
+    // package id
+    // entity identifier
+    // entity name
+    // creation date
+    // last usage date
+    // expiration policy
+    String createString = String.format(
+        "create table %s (TABLE_NAME varchar(64), PACKAGE_ID varchar(64), ENTITY_IDENTIFIER varchar(256), ENTITY_NAME varchar(256), CREATION_DATE date, LAST_USAGE_DATE date, PRIORITY int)",
+        DATA_TABLE_REGISTRY);
 
     Statement stmt = null;
 
@@ -345,16 +353,19 @@ public class TableMonitor {
   public boolean dropTableEntry(String tableName) throws SQLException {
     Connection connection = DataManager.getConnection();
     boolean success = false;
-    String deleteString;
+    String queryStr;
     int rowCount = -1;
     Statement stmt = null;
 
-    deleteString = "DELETE FROM " + DATA_TABLE_REGISTRY + 
-                   " WHERE TABLE_NAME='" + tableName + "'";
+    queryStr =
+        String.format("DELETE FROM %s WHERE TABLE_NAME='%s'", DATA_TABLE_REGISTRY,
+            SqlEscape.str(tableName));
+    
+    logger.debug("queryStr: " + queryStr);
     
     try {
       stmt = connection.createStatement();
-      rowCount = stmt.executeUpdate(deleteString);
+      rowCount = stmt.executeUpdate( queryStr);
       success = (rowCount == 1);
     }
     catch(SQLException e) {
@@ -393,14 +404,17 @@ public class TableMonitor {
   public Date getCreationDate(String tableName) throws SQLException {
     Connection connection = DataManager.getConnection();
     Date creationDate = null;
-    String selectString = 
-      "SELECT creation_date FROM " + DATA_TABLE_REGISTRY +
-      " WHERE table_name='" + tableName + "'";
+    String queryStr =
+        String.format("SELECT creation_date FROM %s WHERE table_name='%s'",
+            DATA_TABLE_REGISTRY, SqlEscape.str(tableName));
+    
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     try {
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         creationDate = rs.getDate("creation_date");    
@@ -517,14 +531,17 @@ public class TableMonitor {
     String tableName = null;
     
     Connection connection = DataManager.getConnection();
-    String selectString = "SELECT table_name FROM " + DATA_TABLE_REGISTRY +
-                          " WHERE package_id ='" + packageID + "'" +
-                          "   AND entity_name ='" + entityName + "'";
+    String queryStr = String.format(
+        "SELECT table_name FROM %s WHERE package_id ='%s' AND entity_name ='%s'",
+        DATA_TABLE_REGISTRY, SqlEscape.str(packageID), SqlEscape.str(entityName));
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
       
     try {
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       if (rs.next()) {
         tableName = rs.getString("table_name");
@@ -560,13 +577,17 @@ public class TableMonitor {
     if (packageID != null) {
       tableNames = new ArrayList<String>();
       Connection connection = DataManager.getConnection();
-      String selectString = "SELECT table_name FROM " + DATA_TABLE_REGISTRY +
-                            " WHERE package_id ='" + packageID + "'";
+      String queryStr =
+          String.format("SELECT table_name FROM %s WHERE package_id ='%s'",
+              DATA_TABLE_REGISTRY, SqlEscape.str(packageID));
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
       
       try {
         stmt = connection.createStatement();             
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
       
         while (rs.next()) {
           String tableName = rs.getString("table_name");
@@ -608,14 +629,17 @@ public class TableMonitor {
   public Date getLastUsageDate(String tableName) throws SQLException {
     Connection connection = DataManager.getConnection();
     Date lastUsageDate = null;
-    String selectString = 
-      "SELECT last_usage_date FROM " + DATA_TABLE_REGISTRY +
-      " WHERE table_name='" + tableName + "'";
+    String queryStr =
+        String.format("SELECT last_usage_date FROM %s WHERE table_name='%s'",
+            DATA_TABLE_REGISTRY, SqlEscape.str(tableName));
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     try {
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         lastUsageDate = rs.getDate("last_usage_date");    
@@ -645,13 +669,16 @@ public class TableMonitor {
     Connection connection = DataManager.getConnection();
     Date oldestDate = new Date();
     String oldestTable = null;
-    String selectString = 
-               "SELECT table_name, last_usage_date FROM " + DATA_TABLE_REGISTRY;
+    String queryStr = String.format("SELECT table_name, last_usage_date FROM %s",
+        DATA_TABLE_REGISTRY);
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     try {
       stmt = connection.createStatement();
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         String tableName = rs.getString("table_name");
@@ -683,13 +710,14 @@ public class TableMonitor {
    */
   public String[] getTableList() throws SQLException {
     Connection connection = DataManager.getConnection();
-    String selectString = "SELECT table_name FROM " + DATA_TABLE_REGISTRY;
+    String queryStr = String.format("SELECT table_name FROM %s", DATA_TABLE_REGISTRY);
+    logger.debug("queryStr: " + queryStr);
     Statement stmt = null;
     Vector vector = new Vector();
     
     try {
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         String tableName = rs.getString("table_name");
@@ -725,15 +753,18 @@ public class TableMonitor {
           throws SQLException {
     Connection connection = DataManager.getConnection();
     String tableName = null;
-    String selectString = 
-      "SELECT table_name" +
-      " FROM " + DATA_TABLE_REGISTRY +
-      " WHERE entity_identifier='" + identifier + "'";
+
+    String queryStr = String.format(
+        "SELECT table_name FROM %s WHERE entity_identifier='%s'",
+            DATA_TABLE_REGISTRY, SqlEscape.str(identifier));
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     try {
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         tableName = rs.getString("table_name");    
@@ -892,15 +923,16 @@ public class TableMonitor {
     Statement stmt = null;
 		boolean success = false;
 
-    String updateString = 
-      "UPDATE " + DATA_TABLE_REGISTRY +
-      " SET last_usage_date='" + dateString + "'" +
-      " WHERE table_name='" + tableName + "'";
-    
+    String queryStr = String.format(
+        "UPDATE %s SET last_usage_date='%s' WHERE table_name='%s'",
+        DATA_TABLE_REGISTRY, SqlEscape.str(dateString), SqlEscape.str(tableName));
+
+    logger.debug("queryStr: " + queryStr);
+
     // Set the last usage date
     try {
       stmt = connection.createStatement();
-      rowCount = stmt.executeUpdate(updateString);
+      rowCount = stmt.executeUpdate(queryStr);
       success = (rowCount == 1);
     } 
     catch (SQLException e) {
@@ -937,15 +969,16 @@ public class TableMonitor {
     Statement stmt = null;
     boolean success = false;
 
-    String updateString = 
-      "UPDATE " + DATA_TABLE_REGISTRY +
-      " SET priority=" + priority +
-      " WHERE table_name='" + tableName + "'";
-    
+    String queryStr =
+        String.format("UPDATE %s SET priority=%d WHERE table_name='%s'",
+            DATA_TABLE_REGISTRY, priority, SqlEscape.str(tableName));
+
+    logger.debug("queryStr: " + queryStr);
+
     // Set the last usage date
     try {
       stmt = connection.createStatement();
-      rowCount = stmt.executeUpdate(updateString);
+      rowCount = stmt.executeUpdate( queryStr);
       success = (rowCount == 1);
     } 
     catch (SQLException e) {

@@ -153,7 +153,7 @@ public class WhereClauseTest extends TestCase {
 	   {
 		 String sql = where.toSQLString();
 		 System.out.println("sql is"+sql+"!");
-		 assertTrue("Should have a sql ", sql.equals(" where  table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' "));
+		 assertTrue("Should have a sql ", sql.equals(" where table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' "));
 	   }
 	   catch (UnWellFormedQueryException e)
 	   {
@@ -189,7 +189,7 @@ public class WhereClauseTest extends TestCase {
 	   {
 		 String sql = where.toSQLString();
 		 System.out.println("sql is"+sql+"!");
-		 assertTrue("Should have a sql ", sql.equals(" where  table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' "));
+		 assertTrue("Should have a sql ", sql.equals(" where table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' "));
 	   }
 	   catch (UnWellFormedQueryException e)
 	   {

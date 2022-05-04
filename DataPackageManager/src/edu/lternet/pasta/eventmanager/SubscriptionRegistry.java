@@ -36,12 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.lternet.pasta.common.*;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.ResourceDeletedException;
-import edu.lternet.pasta.common.ResourceExistsException;
-import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.ucsb.nceas.utilities.Options;
@@ -138,14 +135,15 @@ public class SubscriptionRegistry {
 				identifier, revision, url);
 
 		if (existingSubscriptionId < 0) {
-			StringBuffer insertSQL = new StringBuffer("INSERT INTO " + EML_SUBSCRIPTION + "(");
-			insertSQL.append("active,date_created,creator,scope,identifier,revision,url) "
-							+ "VALUES(?,?,?,?,?,?,?)");
-			String insertString = insertSQL.toString();
+			String queryStr = String.format(
+					"INSERT INTO %s (active,date_created,creator,scope,identifier,revision,url) " +
+					"VALUES(?,?,?,?,?,?,?)", EML_SUBSCRIPTION);
 
+			logger.debug("queryStr: " + queryStr);
+			
 			try {
 				connection = getConnection();
-		        PreparedStatement pstmt = connection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
+		        PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
 				pstmt.setBoolean(1, true);
 				pstmt.setTimestamp(2, ts);
 				pstmt.setString(3, creator);
@@ -176,10 +174,8 @@ public class SubscriptionRegistry {
 		        ResultSet rs = pstmt.getGeneratedKeys();
 		        while (rs.next()) {
 		          subscriptionId = rs.getInt(1);
-		        }        
-				if (pstmt != null) {
-					pstmt.close();
-				}
+		        }
+				pstmt.close();
 			}
 			catch (SQLException e) {
 				logger.error(String.format("Error inserting record into the subscription registry (%s): %s",
@@ -206,14 +202,17 @@ public class SubscriptionRegistry {
 			throws ClassNotFoundException, SQLException, Exception {
 		Connection conn = getConnection();
 
-		String updateSQL = String.format("DELETE FROM %s where creator = '%s'",
-				                         EML_SUBSCRIPTION, "junit");
+		String queryStr = String.format("DELETE FROM %s where creator = 'junit'",
+				                         EML_SUBSCRIPTION);
+
+		logger.debug("queryStr: " + queryStr);
+
 		conn = getConnection();
 
 		if (conn != null) {
 			try {
 				Statement stmt = conn.createStatement();
-				int nRecords = stmt.executeUpdate(updateSQL);
+				int nRecords = stmt.executeUpdate(queryStr);
 				stmt.close();
 				logger.info(String.format("Deleted %d JUnit subscriptions", nRecords));
 			}
@@ -270,11 +269,12 @@ public class SubscriptionRegistry {
 			       creator = rs.getString(1);
 			    }
 
-			    if (pstmt != null) pstmt.close();
+				pstmt.close();
 			    
 			    if (creator == null || !creator.equals(uid)) {
-			    	String msg = String.format("User '%s' is not authorized to delete subscription with ID = %d", 
-			    			                   uid, subscriptionId);
+			    	String msg = String.format(
+								"User '%s' is not authorized to delete subscription with ID = %d",
+			    			uid, subscriptionId);
 			    	throw new UnauthorizedException(msg);
 			    }
 			}
@@ -293,13 +293,17 @@ public class SubscriptionRegistry {
 		}
 		
 		
-		String updateSQL = String.format("UPDATE %s SET active=false WHERE subscription_id=?", 
+		String queryStr = String.format(
+				"UPDATE %s SET active=false WHERE subscription_id=?",
 				                         EML_SUBSCRIPTION);
+
+		logger.debug("queryStr: " + queryStr);
+
 		conn = getConnection();
 
 		if (conn != null) {
 			try {
-				PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+				PreparedStatement pstmt = conn.prepareStatement(queryStr);
 				pstmt.setInt(1, subscriptionId);
 				int nRecords = pstmt.executeUpdate();
 				pstmt.close();
@@ -379,27 +383,38 @@ public class SubscriptionRegistry {
  private int hasSubscription(String creator, String scope, Integer identifier, Integer revision, String url)
          throws ClassNotFoundException, SQLException {
    int subscriptionId = -1;
-   String scopeClause = (scope == null) ? "scope IS NULL" : String.format("scope='%s'", scope);
+   String scopeClause = (scope == null) ? "scope IS NULL" : String.format("scope='%s'", SqlEscape.str(scope));
    String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("identifier=%d", identifier);
    String revisionClause = (revision == null) ? "revision IS NULL" : String.format("revision=%d", revision);
    Connection connection = null;
-   String selectString = 
-     String.format("SELECT subscription_id FROM %s WHERE creator='%s' AND %s AND %s AND %s AND url='%s' AND active=true", 
-    		       EML_SUBSCRIPTION, creator, scopeClause, identifierClause, revisionClause, url
-    		      );
- 
+
+	 String queryStr =
+     String.format(
+				 "SELECT subscription_id " +
+						 "FROM %s " +
+						 "WHERE creator='%s' AND %s AND %s AND %s AND url='%s' AND active=true",
+				 EML_SUBSCRIPTION,
+				 SqlEscape.str(creator),
+				 scopeClause,
+				 identifierClause,
+				 revisionClause,
+				 SqlEscape.str(url)
+		 );
+
+	 logger.debug("queryStr: " + queryStr);
+
    Statement stmt = null;
  
    try {
      connection = getConnection();
      stmt = connection.createStatement();             
-     ResultSet rs = stmt.executeQuery(selectString);
+     ResultSet rs = stmt.executeQuery(queryStr);
    
      while (rs.next()) {
        subscriptionId = rs.getInt(1);
      }
 
-     if (stmt != null) stmt.close();
+		 stmt.close();
    }
    catch(ClassNotFoundException e) {
      logger.error("ClassNotFoundException: " + e.getMessage());
@@ -427,23 +442,26 @@ public class SubscriptionRegistry {
          throws ClassNotFoundException, SQLException {
    boolean hasSubscription = false;
    Connection connection = null;
-   String selectString = 
-     String.format("SELECT * FROM %s WHERE subscription_id = %d AND active=true", 
-    		       EML_SUBSCRIPTION, subscriptionId
-    		      );
- 
+   String queryStr =
+     String.format(
+				 "SELECT * FROM %s WHERE subscription_id=%d AND active=true",
+    		 EML_SUBSCRIPTION, subscriptionId
+		 );
+
+	 logger.debug("queryStr: " + queryStr);
+
    Statement stmt = null;
  
    try {
      connection = getConnection();
      stmt = connection.createStatement();             
-     ResultSet rs = stmt.executeQuery(selectString);
+     ResultSet rs = stmt.executeQuery(queryStr);
    
      while (rs.next()) {
        hasSubscription = true;
      }
 
-     if (stmt != null) stmt.close();
+		 stmt.close();
    }
    catch(ClassNotFoundException e) {
      logger.error("ClassNotFoundException: " + e.getMessage());
@@ -529,7 +547,8 @@ public class SubscriptionRegistry {
 		String creator = null;
 
 		if (wasDeleted(subscriptionId)) {
-			String msg = String.format("Subscription with ID = %d had previously been deleted.", subscriptionId);
+			String msg = String.format(
+					"Subscription with ID = %d had previously been deleted.", subscriptionId);
 			throw new ResourceDeletedException(msg);
 		}
 
@@ -543,14 +562,19 @@ public class SubscriptionRegistry {
 
 		if (conn != null) {
 
-			String selectString = String.format("SELECT date_created, creator, scope, identifier, revision, url FROM %s WHERE subscription_id = %s and active='true'",
-							                    EML_SUBSCRIPTION, subscriptionId);
-			logger.debug(selectString);
+			String queryStr = String.format(
+					"SELECT date_created, creator, scope, identifier, revision, url " +
+							"FROM %s " +
+							"WHERE subscription_id=%d and active='true'",
+					EML_SUBSCRIPTION, subscriptionId);
+
+			logger.debug("queryStr: " + queryStr);
+
 			Statement stmt = null;
 
 			try {
 				stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+				ResultSet rs = stmt.executeQuery(queryStr);
 
 				while (rs.next()) {
 					//java.sql.Timestamp sqlTimestamp = rs.getTimestamp(1);
@@ -613,16 +637,21 @@ public class SubscriptionRegistry {
 			Connection connection = null;
 
 			String whereClause = composeWhereClause(userId, queryParams);
-			String selectString = String
-					.format("SELECT subscription_id, date_created, creator, scope, identifier, revision, url FROM %s %s",
+
+			String queryStr = String
+					.format(
+							"SELECT subscription_id, date_created, creator, scope, identifier, revision, url " +
+									"FROM %s %s",
 							EML_SUBSCRIPTION, whereClause);
-			logger.debug(selectString);
+
+			logger.debug("queryStr: " + queryStr);
+
 			Statement stmt = null;
 
 			try {
 				connection = getConnection();
 				stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+				ResultSet rs = stmt.executeQuery(queryStr);
 
 				while (rs.next()) {
 					int subscriptionId = rs.getInt(1);
@@ -687,16 +716,20 @@ public class SubscriptionRegistry {
 			Connection connection = null;
 
 			String whereClause = composeWhereClause(emlPackageId);
-			String selectString = String
-					.format("SELECT subscription_id, date_created, creator, scope, identifier, revision, url FROM %s %s",
+			String queryStr = String
+					.format(
+							"SELECT subscription_id, date_created, creator, scope, identifier, revision, url " +
+									"FROM %s %s",
 							EML_SUBSCRIPTION, whereClause);
-			logger.debug(selectString);
+
+			logger.debug("queryStr: " + queryStr);
+
 			Statement stmt = null;
 
 			try {
 				connection = getConnection();
 				stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(selectString);
+				ResultSet rs = stmt.executeQuery(queryStr);
 
 				while (rs.next()) {
 					int subscriptionId = rs.getInt(1);
@@ -743,7 +776,12 @@ public class SubscriptionRegistry {
 	private String composeWhereClause(String userId, Map<String, List<String>> queryParams) {
 		String whereClause = null;
 
-		StringBuffer stringBuffer = new StringBuffer(String.format(" WHERE active='true' AND creator='%s'", userId));
+		StringBuffer stringBuffer = null;
+		try {
+			stringBuffer = new StringBuffer(String.format(" WHERE active='true' AND creator='%s'", SqlEscape.str(userId)));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		for (String key : queryParams.keySet()) {
 			stringBuffer.append(" AND ");
@@ -763,7 +801,12 @@ public class SubscriptionRegistry {
 		StringBuffer stringBuffer = new StringBuffer(" WHERE active='true'");
 		
 		String scope = emlPackageId.getScope();
-		String scopeClause = (scope == null) ? "scope IS NULL" : String.format("(scope='%s' OR scope IS NULL)", scope);
+		String scopeClause = null;
+		try {
+			scopeClause = (scope == null) ? "scope IS NULL" : String.format("(scope='%s' OR scope IS NULL)", SqlEscape.str(scope));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		Integer identifier = emlPackageId.getIdentifier();
 		String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("(identifier=%d OR identifier IS NULL)", identifier);
 		Integer revision = emlPackageId.getRevision();
@@ -788,13 +831,20 @@ public class SubscriptionRegistry {
 			}
 			
 			// Fortunately, there's a direct one-to-one mapping between query keys and database field names
-			String fieldName = key;    
+			String fieldName = key;
 
-			if (fieldName.equalsIgnoreCase("identifier") || fieldName.equalsIgnoreCase("revision")) {
-				stringBuffer.append(String.format("%s=%s", fieldName, value));
-			}
-			else {
-				stringBuffer.append(String.format("%s='%s'", fieldName, value));
+			try {
+				if (fieldName.equalsIgnoreCase("identifier") ||
+						fieldName.equalsIgnoreCase("revision")) {
+					stringBuffer.append(String.format("%s=%d", SqlEscape.name(fieldName),
+							SqlEscape.integer(value)));
+				}
+				else {
+					stringBuffer.append(String.format("%s='%s'", SqlEscape.name(fieldName),
+							SqlEscape.str(value)));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 
 			firstValue = false;
@@ -841,23 +891,25 @@ public class SubscriptionRegistry {
          throws ClassNotFoundException, SQLException {
    boolean wasDeleted = false;
    Connection connection = null;
-   String selectString = 
-     String.format("SELECT * FROM %s WHERE subscription_id = %d AND active=false", 
-    		       EML_SUBSCRIPTION, subscriptionId
-    		      );
- 
+   String queryStr = String.format(
+				 "SELECT * FROM %s WHERE subscription_id = %d AND active=false",
+    		 EML_SUBSCRIPTION, subscriptionId
+		 );
+
+	 logger.debug("queryStr: " + queryStr);
+
    Statement stmt = null;
  
    try {
      connection = getConnection();
      stmt = connection.createStatement();             
-     ResultSet rs = stmt.executeQuery(selectString);
+     ResultSet rs = stmt.executeQuery(queryStr);
    
      while (rs.next()) {
        wasDeleted = true;
      }
 
-     if (stmt != null) stmt.close();
+		 stmt.close();
    }
    catch(ClassNotFoundException e) {
      logger.error("ClassNotFoundException: " + e.getMessage());

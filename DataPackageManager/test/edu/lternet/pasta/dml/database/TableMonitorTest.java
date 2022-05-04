@@ -7,17 +7,18 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import edu.lternet.pasta.common.SqlEscape;
+import edu.lternet.pasta.datapackagemanager.WorkingOn;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.parser.Entity;
+import org.apache.log4j.Logger;
 
 public class TableMonitorTest extends TestCase {
 
- 
-  
   /*
    * Instance fields
    */
@@ -49,7 +50,9 @@ public class TableMonitorTest extends TestCase {
   private DatabaseAdapter databaseAdapter = null;
   private DataManager dataManager = null;
     
-    
+
+  private static Logger log = Logger.getLogger(TableMonitorTest.class);
+
   /*
    * Constructors
    */
@@ -172,16 +175,15 @@ public class TableMonitorTest extends TestCase {
     ResultSet rs;
     String tableName;
 
-    String selectString = 
-      "SELECT * FROM " +
-      registry +
-      " WHERE TABLE_NAME='" + TEST_TABLE + "'";
+    String queryStr = String.format(
+        "SELECT * FROM %s WHERE TABLE_NAME='%s'", SqlEscape.str(registry), TEST_TABLE);
+
+    log.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
-    String cleanString = 
-      "DELETE FROM " +
-      registry +
-      " WHERE TABLE_NAME='" + TEST_TABLE + "'";
+    String cleanString =
+        String.format("DELETE FROM %s WHERE TABLE_NAME='%s'", SqlEscape.str(registry), TEST_TABLE);
 
     // First, clean-up any existing entry for the test table
     try {
@@ -206,7 +208,7 @@ public class TableMonitorTest extends TestCase {
     // one record of it should exist.
     try {
       stmt = dbConnection.createStatement();             
-      rs = stmt.executeQuery(selectString);
+      rs = stmt.executeQuery(queryStr);
       
       int rowCount = 0;
       while (rs.next()) {
@@ -289,9 +291,12 @@ public class TableMonitorTest extends TestCase {
    */
   public void testCountRows() throws SQLException {
     String testTable = "TEST_COUNT_ROWS";
-    String createString = "create table " + testTable + " (  ROW_NUMBER int )";
-    String dropString = "drop table " + testTable;
-    String insertString = "insert into " + testTable + " values ( 0 )";
+    String createString =
+        String.format("create table %s (ROW_NUMBER int)", SqlEscape.name(testTable));
+    String dropString = String.format("drop table %s", SqlEscape.name(testTable));
+    String queryStr = String.format("insert into %s values (0)", SqlEscape.name(testTable));
+    log.debug("queryStr: " + queryStr);
+
     int nRows = 3;
     int rowCount;
     Statement stmt = null;
@@ -314,7 +319,7 @@ public class TableMonitorTest extends TestCase {
     for (int i = 0; i < nRows; i++) {
       try {
         stmt = dbConnection.createStatement();
-        stmt.executeUpdate(insertString);
+        stmt.executeUpdate(queryStr);
       } 
       catch (SQLException e) {
         System.err.println("SQLException: " + e.getMessage());
@@ -361,23 +366,22 @@ public class TableMonitorTest extends TestCase {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Statement stmt = null;
 
-    String insertString = 
-      "INSERT INTO " + 
-      registry +
-      " values(" +
-          "'" + TEST_TABLE + "', " +
-          "'" + packageId + "', " +
-          "'" + id + "', " +
-          "'" + entityName + "', " +
-          "'" + simpleDateFormat.format(now) + "', " +
-          "'" + simpleDateFormat.format(now) + "', " +
-          "1" +
-      ")";
+    String queryStr =
+        String.format("INSERT INTO %s values('%s', '%s', '%s', '%s', '%s', '%s', 1)",
+            SqlEscape.name(registry),
+            SqlEscape.str(TEST_TABLE),
+            SqlEscape.str(packageId),
+            SqlEscape.str(id),
+            SqlEscape.str(entityName),
+            SqlEscape.str(simpleDateFormat.format(now)),
+            SqlEscape.str(simpleDateFormat.format(now)));
+
+    log.debug("queryStr: " + queryStr);
 
     // First, insert an entry for the test table
     try {
       stmt = dbConnection.createStatement();             
-      stmt.executeUpdate(insertString);
+      stmt.executeUpdate(queryStr);
     } 
     catch(SQLException e) {
       System.err.println("SQLException: " + e.getMessage());
@@ -584,13 +588,10 @@ public class TableMonitorTest extends TestCase {
    * @throws SQLException
    */
   public void testIsTableInDB() throws SQLException {
-    String createString = "create table " + TEST_TABLE + " " +
-                          "(COFFEE_NAME varchar(32), " +
-                          "SUPPLIER_ID int, " +
-                          "PRICE float, " +
-                          "SALES int, " +
-                          "TOTAL int)";
-    String dropString = "DROP TABLE " + TEST_TABLE;
+    String createString = String.format(
+        "create table %s (COFFEE_NAME varchar(32), SUPPLIER_ID int, PRICE float, SALES int, TOTAL int)",
+        TEST_TABLE);
+    String dropString = String.format("DROP TABLE %s", TEST_TABLE);
     boolean isPresent;
     Statement stmt = null;
 
@@ -674,9 +675,12 @@ public class TableMonitorTest extends TestCase {
     String dataTableRegistryName = tableMonitor.getDataTableRegistryName();
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date testDate = new Date(epochMilliseconds);
-    String selectString = 
-      "SELECT last_usage_date FROM " + dataTableRegistryName +
-      " WHERE table_name ='" + TEST_TABLE + "'";
+    String queryStr = String.format(
+        "SELECT last_usage_date FROM %s WHERE table_name ='%s'",
+        SqlEscape.name(dataTableRegistryName), TEST_TABLE);
+
+    log.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     tableMonitor.addTableEntry(entity);
@@ -689,14 +693,14 @@ public class TableMonitorTest extends TestCase {
     try {
       Date foundDate = null;
       stmt = dbConnection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         foundDate = rs.getDate("last_usage_date");
       }
       
       String twoDates = "testDate = " + simpleDateFormat.format(testDate) 
-                        + ",  "
+                        + ", "
                         + "foundDate = " + simpleDateFormat.format(foundDate)
                         + ". ";
       assertEquals("Last usage date found does not match test value: " + 
@@ -728,9 +732,12 @@ public class TableMonitorTest extends TestCase {
     boolean success;
     int testPriority = 1;
     String dataTableRegistryName = tableMonitor.getDataTableRegistryName();
-    String selectString = 
-      "SELECT priority FROM " + dataTableRegistryName +
-      " WHERE table_name ='" + TEST_TABLE + "'";
+    String queryStr = String.format(
+        "SELECT priority FROM %s WHERE table_name ='%s'",
+        SqlEscape.name(dataTableRegistryName), TEST_TABLE);
+
+    log.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
     
     tableMonitor.addTableEntry(entity);
@@ -744,7 +751,7 @@ public class TableMonitorTest extends TestCase {
     try {
       int foundPriority = -99;
       stmt = dbConnection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
       
       while (rs.next()) {
         foundPriority = rs.getInt("priority");
