@@ -127,7 +127,7 @@ public class AuditManagerResource extends PastaWebService
     // Query parameter for record limit
     public static final String LIMIT = "limit";
     // Get next page (records after OID)
-    public static final String START_ROW_ID = "oid";
+    public static final String START_ROW_ID = "startOid";
     // Get previous page (records leading up to OID)
     public static final String REVERSE_ROW_ID = "roid";
 

@@ -384,8 +384,8 @@ public class AuditManager {
       if (fieldName.equals("resourceid")) {
         stringBuffer.append(String.format("%s like '%%%s%%'", fieldName, value));
       }
-      else if (fieldName.equals("oid")) {
-        stringBuffer.append(String.format("%s>%s", fieldName, value));
+      else if (fieldName.equals("startoid")) {
+        stringBuffer.append(String.format("oid>%s", value));
       }
       else if (fieldName.equals("roid")) {
         stringBuffer.append(String.format("oid<%s", value));
