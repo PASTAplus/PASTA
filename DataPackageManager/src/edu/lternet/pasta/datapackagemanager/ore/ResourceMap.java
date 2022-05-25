@@ -63,9 +63,9 @@ public class ResourceMap {
 	private static final String CITO_IS_DOCUMENTED_BY = "cito:isDocumentedBy";
 	private static final String CITO_IS_SUPPORTED_BY = "cito:isSupportedBy";
 	private static final String CITO_SUPPORTS = "cito:supports";
-	private static final String CREATOR_MBOX = "info@environmentaldatainitiative.org";
+	private static final String CREATOR_MBOX = "info@edirepository.org";
 	private static final String CREATOR_NAME = "Environmental Data Initiative";
-	private static final String CREATOR_URL = "http://environmentaldatainitiative.org";
+	private static final String CREATOR_URL = "http://edirepository.org";
 	private static final String DC_FORMAT = "dc:format";
 	private static final String DCTERMS_CREATED = "dcterms:created";
 	private static final String DCTERMS_CREATOR = "dcterms:creator";

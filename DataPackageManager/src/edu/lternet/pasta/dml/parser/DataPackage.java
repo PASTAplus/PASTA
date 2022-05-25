@@ -79,7 +79,7 @@ public class DataPackage
 	  private static final String REVISION_WITH_LEADING_ZERO_PATTERN =   "^[A-Za-z_0-9\\-]+\\.\\d+\\.0\\d+$";
 	  //private static final String LTER_PACKAGE_ID_PATTERN =              "^knb-lter-[a-z][a-z][a-z]\\.\\d+\\.\\d+$";
 	  private static final String METACAT_PACKAGE_ID_PATTERN =           "^[A-Za-z_0-9\\-]+\\.\\d+\\.\\d+$";
-	  private static final String TECH_SUPPORT_EMAIL = "support@environmentaldatainitiative.org";
+	  private static final String TECH_SUPPORT_EMAIL = "support@edirepository.org";
 	  
 	  
 	  /* A comma-separated list of allowable scope values. This value should be set

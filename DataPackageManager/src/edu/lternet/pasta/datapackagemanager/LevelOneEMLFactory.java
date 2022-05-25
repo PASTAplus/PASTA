@@ -454,9 +454,9 @@ public final class LevelOneEMLFactory {
     //phone2.setAttribute("phonetype", "fax");
     //phone2.appendChild(doc.createTextNode("505 277-2541"));
     Element electronicMailAddress = doc.createElement("electronicMailAddress");
-    electronicMailAddress.appendChild(doc.createTextNode("info@environmentaldatainitiative.org"));    
+    electronicMailAddress.appendChild(doc.createTextNode("info@edirepository.org"));
     Element onlineUrl = doc.createElement("onlineUrl");
-    onlineUrl.appendChild(doc.createTextNode("http://environmentaldatainitiative.org"));    
+    onlineUrl.appendChild(doc.createTextNode("http://edirepository.org"));
     lnoContact.appendChild(positionName);
     lnoContact.appendChild(organizationName);
     lnoContact.appendChild(address);
@@ -754,8 +754,8 @@ public final class LevelOneEMLFactory {
 		}
 
 		String orgName = "Environmental Data Initiative";
-		String orgEmail = "info@environmentaldatainitiative.org";
-		String orgOnlineUrl = "https://environmentaldatainitiative.org";
+		String orgEmail = "info@edirepository.org";
+		String orgOnlineUrl = "https://edirepository.org";
 		String orgUserId = "0330j0z60";
 		String orgUserIdAttributeName = "directory";
 		String orgUserIdAttributeValue = "https://ror.org";
