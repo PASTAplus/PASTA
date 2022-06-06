@@ -223,18 +223,12 @@ public class AuditManagerResourceTest {
 		assertEquals(200, statusCode);
 
 		// Check the message body
-		File entityFile = (File) response.getEntity();
-		try {
-			String entityString = FileUtils.readFileToString(entityFile);
-			String auditReport = entityString.trim();
-			assertTrue(auditReport.length() > 1);
-			assertTrue(auditReport.startsWith("<auditReport>"));
-			assertTrue(auditReport.contains(String.format("<resourceId>%s", testResourceId)));
-			assertTrue(auditReport.endsWith("</auditReport>"));
-		}
-		catch (IOException e) {
-			fail("Error reading audit XML file");
-		}
+		String entityString = response.getEntity().toString();
+		String auditReport = entityString.trim();
+		assertTrue(auditReport.length() > 1);
+		assertTrue(auditReport.startsWith("<auditReport>"));
+		assertTrue(auditReport.contains(String.format("<resourceId>%s", testResourceId)));
+		assertTrue(auditReport.endsWith("</auditReport>"));
 	}
 
 
@@ -274,19 +268,12 @@ public class AuditManagerResourceTest {
 		assertEquals(200, statusCode);
 
 		// Check the message body
-		File entityFile = (File) response.getEntity();
-		try {
-			String entityString = FileUtils.readFileToString(entityFile);
-			String auditReport = entityString.trim();
-			assertTrue(auditReport.length() > 1);
-			assertTrue(auditReport.startsWith("<auditReport>"));
-			assertTrue(auditReport.contains(String.format("<user>%s</user>",
-					testUser)));
-			assertTrue(auditReport.endsWith("</auditReport>"));
-		}
-		catch (IOException e) {
-			fail("Error reading audit XML file");
-		}
+		String entityString = response.getEntity().toString();
+		String auditReport = entityString.trim();
+		assertTrue(auditReport.length() > 1);
+		assertTrue(auditReport.startsWith("<auditReport>"));
+		assertTrue(auditReport.contains(String.format("<user>%s</user>", testUser)));
+		assertTrue(auditReport.endsWith("</auditReport>"));
 	}
 
 
