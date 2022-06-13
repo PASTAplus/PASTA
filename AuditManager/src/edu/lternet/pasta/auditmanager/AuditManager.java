@@ -24,30 +24,18 @@
 
 package edu.lternet.pasta.auditmanager;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.xml.bind.DatatypeConverter;
-
+import edu.lternet.pasta.common.audit.AuditRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 
-import edu.lternet.pasta.common.audit.AuditRecord;
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
+import java.sql.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -382,7 +370,7 @@ public class AuditManager {
       String fieldName = getFieldName(key);
 
       if (fieldName.equals("resourceid")) {
-        stringBuffer.append(String.format("%s like '%%%s%%'", fieldName, value));
+        stringBuffer.append(String.format("%s like '%s%%'", fieldName, value));
       }
       else if (fieldName.equals("startoid")) {
         stringBuffer.append(String.format("oid>%s", value));
@@ -585,20 +573,14 @@ public class AuditManager {
 
 
   /**
-   * Create a CSV file containing audit records and return the path to the file.
+   * Get audit records as a CSV stream
    *
+   * @param output Output stream that receives the CSV
    * @param queryParams a map of query parameters and the values they should be matched to
-   * @return CSV file path
-   * //   * @throws ClassNotFoundException
-   * //   * @throws SQLException
-   * //   * @throws IllegalArgumentException
    */
-  public File createAuditRecordsCsv(Map<String, List<String>> queryParams)
-      throws IOException
-  //      throws ClassNotFoundException, SQLException, IllegalArgumentException
+  public void getAuditRecordsCsv(OutputStream output, Map<String, List<String>> queryParams)
   {
-    File tmpCsv = File.createTempFile("audit_records", ".csv");
-    try (CSVPrinter printer = new CSVPrinter(new FileWriter(tmpCsv), CSVFormat.EXCEL)) {
+    try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(output), CSVFormat.EXCEL)) {
       if (queryParams != null) {
         Connection connection = null;
         String selectString =
@@ -606,14 +588,30 @@ public class AuditManager {
                 " resourceid, statuscode, userid, userAgent, groups, authsystem " +
                 "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
         selectString += composeWhereClause(queryParams, true);
+
+        logger.info(String.format("getAuditRecordsCsv() selectString: %s", selectString));
+        System.out.printf("getAuditRecordsCsv() selectString: %s", selectString);
+
         Statement stmt = null;
         try {
           connection = getConnection();
+          // To enable server side cursor, we need to turn autocommit off, and set the
+          // fetch size.
+          // https://jdbc.postgresql.org/documentation/head/query.html#query-with-cursor
+          connection.setAutoCommit(false);
           stmt = connection.createStatement();
+          final long startTime = System.currentTimeMillis();
+          // Set fetch size to enable server side cursor.
+          stmt.setFetchSize(10);
           ResultSet rs = stmt.executeQuery(selectString);
+          final long endTime = System.currentTimeMillis();
+          logger.info("Query execution time: " + (endTime - startTime));
+          System.out.printf("Query execution time: %f sec%n", (endTime - startTime) / 1000.0);
+
           printer.printRecord("Oid", "EntryTime", "Service", "Category",
               "ServiceMethod", "EntryText", "ResourceId", "ResponseStatus", "User",
               "UserAgent", "Groups", "AuthSystem");
+
           while (rs.next()) {
             int oid = rs.getInt(1);
             java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
@@ -645,10 +643,12 @@ public class AuditManager {
           returnConnection(connection);
         }
       }
+      // Flush and close are no-ops on OutputStream
+      // output.flush();
+      // output.close();
     } catch (IOException | ClassNotFoundException | SQLException ex) {
       ex.printStackTrace();
     }
-    return tmpCsv;
   }
 
 

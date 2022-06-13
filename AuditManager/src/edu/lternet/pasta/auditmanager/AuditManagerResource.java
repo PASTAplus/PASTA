@@ -24,35 +24,20 @@
 
 package edu.lternet.pasta.auditmanager;
 
-import java.io.*;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.sql.SQLException;
-import java.util.*;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import com.sun.jersey.api.client.ClientResponse.Status;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-
-import edu.lternet.pasta.common.MethodNameUtility;
-import edu.lternet.pasta.common.PastaWebService;
-import edu.lternet.pasta.common.QueryString;
-import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.common.WebExceptionFactory;
+import edu.lternet.pasta.common.*;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.File;
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.*;
 
 
 /**
@@ -599,7 +584,7 @@ public class AuditManagerResource extends PastaWebService
   public Response getAuditReportCsv(@Context HttpHeaders headers,
                                     @Context UriInfo uriInfo)
   {
-    Response response = null;
+    Response response;
 
     try {
       Properties properties = ConfigurationListener.getProperties();
@@ -609,20 +594,12 @@ public class AuditManagerResource extends PastaWebService
       queryString.checkForIllegalKeys(VALID_QUERY_KEYS);
       Map<String, List<String>> queryParams = queryString.getParams();
 
-      File csvFile = auditManager.createAuditRecordsCsv(queryParams);
-
-      StreamingOutput fileStream = output -> {
-        try {
-          Files.copy(csvFile.toPath(), output);
-        } catch (NoSuchFileException e) {
-          logger.error("Error: " + e.getMessage());
-        } finally {
-          Files.delete(csvFile.toPath());
-        }
+      StreamingOutput csvStream = output -> {
+        auditManager.getAuditRecordsCsv(output, queryParams);
       };
 
-      response = Response.ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
-          .header("content-disposition", "attachment; filename=download.csv").build();
+      response = Response.ok(csvStream, MediaType.APPLICATION_OCTET_STREAM)
+          .header("content-disposition", "attachment; filename=auditreport.csv").build();
 
     } catch (ClassNotFoundException | SQLException e) {
       return WebExceptionFactory.make(Status.INTERNAL_SERVER_ERROR, e, e.getMessage())
@@ -635,8 +612,6 @@ public class AuditManagerResource extends PastaWebService
       return e.getResponse();
     } catch (IllegalStateException e) {
       return WebExceptionFactory.makeBadRequest(e).getResponse();
-    } catch (IOException e) {
-      e.printStackTrace();
     }
 
     return response;
