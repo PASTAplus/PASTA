@@ -589,8 +589,7 @@ public class AuditManager {
                 "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
         selectString += composeWhereClause(queryParams, false);
 
-        logger.info(String.format("getAuditRecordsCsv() selectString: %s", selectString));
-        System.out.printf("getAuditRecordsCsv() selectString: %s", selectString);
+        logger.debug(String.format("getAuditRecordsCsv() selectString: %s", selectString));
 
         Statement stmt = null;
         try {
@@ -605,8 +604,7 @@ public class AuditManager {
           stmt.setFetchSize(10);
           ResultSet rs = stmt.executeQuery(selectString);
           final long endTime = System.currentTimeMillis();
-          logger.info("Query execution time: " + (endTime - startTime));
-          System.out.printf("Query execution time: %f sec%n", (endTime - startTime) / 1000.0);
+          logger.debug(String.format("Query execution time: %f sec", (endTime - startTime) / 1000.0));
 
           printer.printRecord("Oid", "EntryTime", "Service", "Category",
               "ServiceMethod", "EntryText", "ResourceId", "ResponseStatus", "User",
