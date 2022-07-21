@@ -1542,7 +1542,7 @@ Examples
   
     curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
        -H "Content-Type: application/xml" --data-binary @journalCitation.xml \
-       -X POST https://pasta.lternet.edu/package/eml
+       -X POST https://pasta.lternet.edu/package/citation/eml
 
   Where file journalCitation.xml contains the following XML: ::
 
