@@ -1609,6 +1609,7 @@ Examples
         <articleTitle>Tree Survey in Southern Arizona</articleTitle>
         <articleUrl>http://treejournal.com/articles/12345</articleUrl>
         <journalTitle>The Tree Journal</journalTitle>
+        <relationType>IsCitedBy</relationType>
     </journalCitation>
 
 
