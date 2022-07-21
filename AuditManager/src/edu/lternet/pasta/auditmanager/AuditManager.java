@@ -587,7 +587,7 @@ public class AuditManager {
             "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
                 " resourceid, statuscode, userid, userAgent, groups, authsystem " +
                 "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
-        selectString += composeWhereClause(queryParams, true);
+        selectString += composeWhereClause(queryParams, false);
 
         logger.debug(String.format("getAuditRecordsCsv() selectString: %s", selectString));
 
