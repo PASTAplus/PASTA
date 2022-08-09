@@ -221,4 +221,15 @@ public final class WebExceptionFactory {
         return new WebApplicationException(r);
     }
 
+    /**
+     * Returns a '503 Service Unavailable', the server is not ready to handle the request.
+     *
+     * @param message the entity.
+     *
+     * @return a '503 Service Unavailable' web application exception.
+     */
+    public static WebApplicationException makeServiceUnavailable(Throwable cause) {
+        return make(Response.Status.SERVICE_UNAVAILABLE, cause, cause.getMessage());
+    }
+
 }
