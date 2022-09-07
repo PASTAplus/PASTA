@@ -327,6 +327,10 @@ public class AuditManager {
       }
     }
 
+    if (!queryParams.containsKey("robots")) {
+      stringBuffer.append(" AND userid not like 'robots:%'");
+    }
+
     /*
      * If orderBy is true, the audit records will be ordered by oid (identifier) value in
      * ascending order.
