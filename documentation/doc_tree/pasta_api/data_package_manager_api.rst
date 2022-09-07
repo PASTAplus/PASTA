@@ -1542,7 +1542,7 @@ Examples
   
     curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" \
        -H "Content-Type: application/xml" --data-binary @journalCitation.xml \
-       -X POST https://pasta.lternet.edu/package/eml
+       -X POST https://pasta.lternet.edu/package/citation/eml
 
   Where file journalCitation.xml contains the following XML: ::
 
@@ -1553,6 +1553,7 @@ Examples
         <articleTitle>Tree Survey in Southern Arizona</articleTitle>
         <articleUrl>http://treejournal.com/articles/12345</articleUrl>
         <journalTitle>The Tree Journal</journalTitle>
+        <relationType>IsCitedBy</relationType>
     </journalCitation>
 
 
@@ -1609,6 +1610,7 @@ Examples
         <articleTitle>Tree Survey in Southern Arizona</articleTitle>
         <articleUrl>http://treejournal.com/articles/12345</articleUrl>
         <journalTitle>The Tree Journal</journalTitle>
+        <relationType>IsCitedBy</relationType>
     </journalCitation>
 
 
@@ -1644,6 +1646,7 @@ Examples
             <articleTitle>Tree Survey in Southern Arizona</articleTitle>
             <articleUrl>http://treejournal.com/articles/12345</articleUrl>
             <journalTitle>The Tree Journal</journalTitle>
+            <relationType>IsCitedBy</relationType>
         </journalCitation>
         <journalCitation>
             <journalCitationId>18</journalCitationId>
@@ -1654,6 +1657,7 @@ Examples
             <articleTitle>Mesquites of the Southwest</articleTitle>
             <articleUrl>http://swtrees.com/articles/68999</articleUrl>
             <journalTitle>Trees of the Southwest</journalTitle>
+            <relationType>IsCitedBy</relationType>
         </journalCitation>
     </journalCitations>
 
@@ -1689,6 +1693,7 @@ Examples
             <articleTitle>Tree Survey in Southern Arizona</articleTitle>
             <articleUrl>http://treejournal.com/articles/12345</articleUrl>
             <journalTitle>The Tree Journal</journalTitle>
+            <relationType>IsCitedBy</relationType>
         </journalCitation>
         <journalCitation>
             <journalCitationId>18</journalCitationId>
@@ -1699,6 +1704,7 @@ Examples
             <articleTitle>Mesquites of the Southwest</articleTitle>
             <articleUrl>http://swtrees.com/articles/68999</articleUrl>
             <journalTitle>Trees of the Southwest</journalTitle>
+            <relationType>IsCitedBy</relationType>
         </journalCitation>
     </journalCitations>
 
