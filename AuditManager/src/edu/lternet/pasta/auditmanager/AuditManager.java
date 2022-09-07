@@ -30,13 +30,25 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.*;
-import java.sql.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 
 /**
 * @author dcosta
@@ -181,7 +193,7 @@ public class AuditManager {
       }
     }
 
-    Date returnDate = DatatypeConverter.parseDateTime(s).getTime();
+    java.util.Date returnDate = DatatypeConverter.parseDateTime(s).getTime();
     logger.debug("returnDate: " + returnDate.toString());
     return returnDate;
   }
@@ -290,6 +302,16 @@ public class AuditManager {
 
     boolean orderDesc = false;
 
+    // In the loop below, we iterate over keys, so each key can only add a filter. The
+    // semantics for excluding robots is that the absence of the key causes the filter
+    // to be added, so we negate the key here.
+    if (queryParams.containsKey("robots")) {
+      queryParams.remove("robots");
+    }
+    else {
+      queryParams.put("excludeRobots", Collections.emptyList());
+    }
+
     for (String key : queryParams.keySet()) {
       if (!key.equalsIgnoreCase("limit")) {
         stringBuffer.append(" AND ");
@@ -320,15 +342,14 @@ public class AuditManager {
         else if (key.equalsIgnoreCase("userAgentNegate")) {
           stringBuffer.append(String.format(" useragent NOT ILIKE '%%%s%%'", values.get(0)));
         }
+        else if (key.equalsIgnoreCase("excludeRobots")) {
+          stringBuffer.append(" userid NOT LIKE 'robots:%'");
+        }
         else {
           String orClause = composeORClause(key, values);
           stringBuffer.append(orClause);
         }
       }
-    }
-
-    if (!queryParams.containsKey("robots")) {
-      stringBuffer.append(" AND userid not like 'robots:%'");
     }
 
     /*
@@ -965,7 +986,7 @@ public class AuditManager {
   {
 
 //    final int STRING_BUFFER_SIZE = 100000;
-    Date now = new Date();
+    java.util.Date now = new java.util.Date();
 //    Long mili = now.getTime();
 
     StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
