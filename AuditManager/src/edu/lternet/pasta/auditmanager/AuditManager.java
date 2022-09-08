@@ -343,7 +343,7 @@ public class AuditManager {
           stringBuffer.append(String.format(" useragent NOT ILIKE '%%%s%%'", values.get(0)));
         }
         else if (key.equalsIgnoreCase("excludeRobots")) {
-          stringBuffer.append(" userid NOT LIKE 'robots:%'");
+          stringBuffer.append(" userid NOT LIKE 'robot%'");
         }
         else {
           String orClause = composeORClause(key, values);
