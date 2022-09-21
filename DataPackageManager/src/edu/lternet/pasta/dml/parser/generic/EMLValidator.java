@@ -118,7 +118,10 @@ public class EMLValidator {
         // If an `additionalMetadata` element references another using a child
         // `describes` element, another element with that value in its `id`
         // attribute MUST exist in the document
-        String xPathValues = "//annotation[@references]/@references|//references|//describes|//customUnit";
+        // If a `customUnit` element exists, its name content MUST match a
+        // corresponding `id` attribute in an STMML unit definition within
+        // `additionalMetadata`
+        String xPathValues = "//annotation[@references]/@references|//references|//describes|//unit/customUnit";
         ArrayList<String> refs = getXPathValues(xPathValues);
         for (String s : refs) {
             if (!ids.contains(s)) {
