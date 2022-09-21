@@ -121,7 +121,7 @@ public class EMLValidator {
         // If a `customUnit` element exists, its name content MUST match a
         // corresponding `id` attribute in an STMML unit definition within
         // `additionalMetadata`
-        String xPathValues = "//annotation[@references]/@references|//references|//describes|//unit/customUnit";
+        String xPathValues = "//annotation[@references]/@references|//references|//describes";
         ArrayList<String> refs = getXPathValues(xPathValues);
         for (String s : refs) {
             if (!ids.contains(s)) {
@@ -156,6 +156,18 @@ public class EMLValidator {
             //Node n = both_id_ref.item(i);
             //debugNode(n, "");
             //}
+        }
+
+        // If a customUnit is referenced in a document, it must have a
+        // corresponding STMML unit definition in the document with a matching
+        // @id
+        ArrayList<String> unitIdentifiers = getXPathValues("//*[local-name() = 'unitList']/*[local-name() = 'unit']/@id");
+        ArrayList<String> unitReferences = getXPathValues("//unit/customUnit");
+        for (String s : unitReferences) {
+            if (!unitIdentifiers.contains(s)) {
+                errors.add("Invalid: Custom unit definition missing: " + s);
+                isValid = false;
+            }
         }
 
         // TODO: When `references` is used, the `system` attribute MUST have the
