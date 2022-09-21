@@ -118,7 +118,8 @@ public class EMLValidator {
         // If an `additionalMetadata` element references another using a child
         // `describes` element, another element with that value in its `id`
         // attribute MUST exist in the document
-        ArrayList<String> refs = getXPathValues("//annotation[@references]/@references|//references|//describes");
+        String xPathValues = "//annotation[@references]/@references|//references|//describes|//customUnit";
+        ArrayList<String> refs = getXPathValues(xPathValues);
         for (String s : refs) {
             if (!ids.contains(s)) {
                 errors.add("Invalid: Reference missing from IDs: " + s);
