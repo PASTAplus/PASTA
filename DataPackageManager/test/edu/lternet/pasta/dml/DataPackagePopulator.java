@@ -98,7 +98,7 @@ public class DataPackagePopulator extends TestCase {
 
 	private Map uploadFiles(File dir) throws Exception {
 		
-	    log.debug("uploading files in dir=" + dir.getAbsolutePath());
+		log.debug("uploading files in dir=" + dir.getAbsolutePath());
 
 		//the return map includes the (docid,file) key/value pairs
 		Map fileMap = new TreeMap();

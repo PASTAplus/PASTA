@@ -53,6 +53,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.ServiceUnavailableException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -284,6 +285,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	private String versionHeader = null;
 	private String versionNumber = null;
 
+	private boolean readOnly = false;
+
 
 	/*
 	 * Constructors
@@ -300,6 +303,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		Options options = ConfigurationListener.getOptions();
 		if (options != null) {
 			this.dataServerContext = options.getOption("datapackagemanager.dataserver.context");
+			String readOnly = options.getOption("datapackagemanager.readOnly");
+			if (readOnly != null && readOnly.equals("true")) {
+				this.readOnly = true;
+			}
 			String sizeThresholdOption = options.getOption("datapackagemanager.dataserver.sizeThreshold");
 			if (sizeThresholdOption == null || sizeThresholdOption.equals("")) {
 				this.sizeThreshold = SIZE_THRESHOLD_DEFAULT;
@@ -925,6 +932,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		AuthToken authToken = null;
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 			
@@ -952,6 +963,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 		catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 
 		return response;
@@ -1041,29 +1055,38 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		String transaction = generateTransactionID("archive", scope, identifier, revision);
 
-		authToken = getAuthToken(headers);
-		String userId = authToken.getUserId();
+		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
 
-		// Is user authorized to run the 'createDataPackage' service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-				serviceMethodName, permission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException("User " + userId
-					+ " is not authorized to execute service method "
-					+ serviceMethodName);
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+
+			// Is user authorized to run the 'createDataPackage' service method?
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+					serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException("User " + userId
+						+ " is not authorized to execute service method "
+						+ serviceMethodName);
+			}
+
+			// Perform createDataPackage in new thread
+			Archivor archivor = new Archivor(scope, identifier, revision, userId,
+					authToken, transaction);
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			executorService.execute(archivor);
+			executorService.shutdown();
+
+			responseBuilder = Response.status(Response.Status.ACCEPTED);
+			responseBuilder.entity(transaction);
+			response = responseBuilder.build();
+			response = stampHeader(response);
 		}
-
-		// Perform createDataPackage in new thread
-		Archivor archivor = new Archivor(scope, identifier, revision, userId,
-				authToken, transaction);
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		executorService.execute(archivor);
-		executorService.shutdown();
-
-		responseBuilder = Response.status(Response.Status.ACCEPTED);
-		responseBuilder.entity(transaction);
-		response = responseBuilder.build();
-		response = stampHeader(response);
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+		}
 
 		return response;
 
@@ -1122,6 +1145,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "createReservation";
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -1162,15 +1189,15 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (UserErrorException e) {
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			msg = e.getMessage();
-		}
-		catch (Exception e) {
+		} catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+		} catch (Exception e) {
 			WebApplicationException webApplicationException = WebExceptionFactory
 					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
 							e.getMessage());
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
-		}
-		finally {
+		} finally {
 			audit(serviceMethodName, authToken, response, null, msg);
 		}
 
@@ -1230,6 +1257,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "deleteReservation";
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -1266,6 +1297,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 		catch (UserErrorException e) {
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
@@ -1383,6 +1417,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		AuthToken authToken = null;
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -1424,6 +1462,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 		catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 
 		return response;
@@ -10364,6 +10405,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -10401,6 +10446,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 		catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 
 		return response;
@@ -10507,6 +10555,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -10553,6 +10605,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 		catch (Exception e) {
 			entryText = e.getMessage();
@@ -10660,6 +10715,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "createSubscription";
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -10703,6 +10762,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (ResourceExistsException e) {
 			response = WebExceptionFactory.makeConflict(e).getResponse();
 			msg = e.getMessage();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 		catch (Exception e) {
 			WebApplicationException webApplicationException = WebExceptionFactory
@@ -10791,6 +10853,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "deleteSubscription";
 
 		try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
@@ -10832,6 +10898,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (WebApplicationException e) {
 			response = e.getResponse();
 			msg = e.getMessage();
+		}
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
 		catch (Exception e) {
 			WebApplicationException webApplicationException = WebExceptionFactory
@@ -10876,8 +10945,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <tr>
 	 * <td></td>
 	 * <td></td>
-	 * <td>curl -i -b auth-token=$AUTH_TOKEN_UCARROLL -X POST
-	 * https://event.lternet.edu/eventmanager/event/eml/120</td>
+	 * <td>curl -i -u "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org:PASSWORD" -X POST
+	 * https://pasta.lternet.edu/package/event/eml/120</td>
 	 * </tr>
 	 * </table>
 	 * 
@@ -11980,6 +12049,10 @@ public class DataPackageManagerResource extends PastaWebService {
         final String serviceMethodName = "createJournalCitation";
 
         try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
             authToken = getAuthToken(headers);
             String userId = authToken.getUserId();
 
@@ -12031,6 +12104,9 @@ public class DataPackageManagerResource extends PastaWebService {
             msg = e.getMessage();
             response = WebResponseFactory.makeBadRequest(e);
         }
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+		}
         catch (Exception e) {
             WebApplicationException webApplicationException = WebExceptionFactory
                     .make(Response.Status.INTERNAL_SERVER_ERROR, e,
@@ -12107,6 +12183,10 @@ public class DataPackageManagerResource extends PastaWebService {
         final String serviceMethodName = "deleteJournalCitation";
 
         try {
+			if (this.readOnly) {
+				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			}
+
             authToken = getAuthToken(headers);
             String userId = authToken.getUserId();
 
@@ -12149,6 +12229,9 @@ public class DataPackageManagerResource extends PastaWebService {
             response = e.getResponse();
             msg = e.getMessage();
         }
+		catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+		}
         catch (Exception e) {
             WebApplicationException webApplicationException = WebExceptionFactory
                     .make(Response.Status.INTERNAL_SERVER_ERROR, e,

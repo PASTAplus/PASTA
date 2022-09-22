@@ -24,9 +24,17 @@
 
 package edu.lternet.pasta.auditmanager;
 
+import edu.lternet.pasta.common.audit.AuditRecord;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.log4j.Logger;
+
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -36,20 +44,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import edu.lternet.pasta.common.SqlEscape;
-import org.apache.log4j.Logger;
-
-import edu.lternet.pasta.common.audit.AuditRecord;
-
-
 /**
 * @author dcosta
 * @version 1.0
@@ -193,7 +194,7 @@ public class AuditManager {
       }
     }
 
-    Date returnDate = DatatypeConverter.parseDateTime(s).getTime();
+    java.util.Date returnDate = DatatypeConverter.parseDateTime(s).getTime();
     logger.debug("returnDate: " + returnDate.toString());
     return returnDate;
   }
@@ -299,6 +300,16 @@ public class AuditManager {
 
     boolean orderDesc = false;
 
+    // In the loop below, we iterate over keys, so each key can only add a filter. The
+    // semantics for excluding robots is that the absence of the key causes the filter
+    // to be added, so we negate the key here.
+    if (queryParams.containsKey("robots")) {
+      queryParams.remove("robots");
+    }
+    else {
+      queryParams.put("excludeRobots", Collections.emptyList());
+    }
+
     for (String key : queryParams.keySet()) {
       if (!key.equalsIgnoreCase("limit")) {
         stringBuffer.append(" AND ");
@@ -328,6 +339,9 @@ public class AuditManager {
         }
         else if (key.equalsIgnoreCase("userAgentNegate")) {
           stringBuffer.append(String.format(" useragent NOT ILIKE '%%%s%%'", values.get(0)));
+        }
+        else if (key.equalsIgnoreCase("excludeRobots")) {
+          stringBuffer.append(" userid NOT LIKE 'robot%'");
         }
         else {
           String orClause = composeORClause(key, values);
@@ -381,8 +395,8 @@ public class AuditManager {
       if (fieldName.equals("resourceid")) {
         stringBuffer.append(String.format("%s like '%%%s%%'", fieldName, value));
       }
-      else if (fieldName.equals("oid")) {
-        stringBuffer.append(String.format("%s>%s", fieldName, value));
+      else if (fieldName.equals("startoid")) {
+        stringBuffer.append(String.format("oid>%s", value));
       }
       else if (fieldName.equals("roid")) {
         stringBuffer.append(String.format("oid<%s", value));
@@ -586,35 +600,43 @@ public class AuditManager {
 
 
   /**
-   * Create a CSV file containing audit records and return the path to the file.
+   * Get audit records as a CSV stream
    *
+   * @param output Output stream that receives the CSV
    * @param queryParams a map of query parameters and the values they should be matched to
-   * @return CSV file path
-   * //   * @throws ClassNotFoundException
-   * //   * @throws SQLException
-   * //   * @throws IllegalArgumentException
    */
-  public File createAuditRecordsCsv(Map<String, List<String>> queryParams)
-      throws IOException
-  //      throws ClassNotFoundException, SQLException, IllegalArgumentException
+  public void getAuditRecordsCsv(OutputStream output, Map<String, List<String>> queryParams)
   {
-    File tmpCsv = File.createTempFile("audit_records", ".csv");
-    try (CSVPrinter printer = new CSVPrinter(new FileWriter(tmpCsv), CSVFormat.EXCEL)) {
+    try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(output), CSVFormat.EXCEL)) {
       if (queryParams != null) {
         Connection connection = null;
         String selectString =
             "SELECT oid, entrytime, service, category, servicemethod, entrytext," +
                 " resourceid, statuscode, userid, userAgent, groups, authsystem " +
                 "FROM " + AUDIT_MANAGER_TABLE_QUALIFIED;
-        selectString += composeWhereClause(queryParams, true);
+        selectString += composeWhereClause(queryParams, false);
+
+        logger.debug(String.format("getAuditRecordsCsv() selectString: %s", selectString));
+
         Statement stmt = null;
         try {
           connection = getConnection();
+          // To enable server side cursor, we need to turn autocommit off, and set the
+          // fetch size.
+          // https://jdbc.postgresql.org/documentation/head/query.html#query-with-cursor
+          connection.setAutoCommit(false);
           stmt = connection.createStatement();
+          final long startTime = System.currentTimeMillis();
+          // Set fetch size to enable server side cursor.
+          stmt.setFetchSize(10);
           ResultSet rs = stmt.executeQuery(selectString);
+          final long endTime = System.currentTimeMillis();
+          logger.debug(String.format("Query execution time: %f sec", (endTime - startTime) / 1000.0));
+
           printer.printRecord("Oid", "EntryTime", "Service", "Category",
               "ServiceMethod", "EntryText", "ResourceId", "ResponseStatus", "User",
               "UserAgent", "Groups", "AuthSystem");
+
           while (rs.next()) {
             int oid = rs.getInt(1);
             java.sql.Timestamp sqlTimestamp = rs.getTimestamp(2);
@@ -646,10 +668,12 @@ public class AuditManager {
           returnConnection(connection);
         }
       }
+      // Flush and close are no-ops on OutputStream
+      // output.flush();
+      // output.close();
     } catch (IOException | ClassNotFoundException | SQLException ex) {
       ex.printStackTrace();
     }
-    return tmpCsv;
   }
 
 
@@ -965,7 +989,7 @@ public class AuditManager {
   {
 
 //    final int STRING_BUFFER_SIZE = 100000;
-    Date now = new Date();
+    java.util.Date now = new java.util.Date();
 //    Long mili = now.getTime();
 
     StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);

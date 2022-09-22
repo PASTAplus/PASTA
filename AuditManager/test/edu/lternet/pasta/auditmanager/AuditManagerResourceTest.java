@@ -24,27 +24,22 @@
 
 package edu.lternet.pasta.auditmanager;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.apache.commons.io.FileUtils;
+import org.junit.*;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.*;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 /**
@@ -223,18 +218,12 @@ public class AuditManagerResourceTest {
 		assertEquals(200, statusCode);
 
 		// Check the message body
-		File entityFile = (File) response.getEntity();
-		try {
-			String entityString = FileUtils.readFileToString(entityFile);
-			String auditReport = entityString.trim();
-			assertTrue(auditReport.length() > 1);
-			assertTrue(auditReport.startsWith("<auditReport>"));
-			assertTrue(auditReport.contains(String.format("<resourceId>%s", testResourceId)));
-			assertTrue(auditReport.endsWith("</auditReport>"));
-		}
-		catch (IOException e) {
-			fail("Error reading audit XML file");
-		}
+		String entityString = response.getEntity().toString();
+		String auditReport = entityString.trim();
+		assertTrue(auditReport.length() > 1);
+		assertTrue(auditReport.startsWith("<auditReport>"));
+		assertTrue(auditReport.contains(String.format("<resourceId>%s", testResourceId)));
+		assertTrue(auditReport.endsWith("</auditReport>"));
 	}
 
 
@@ -264,7 +253,9 @@ public class AuditManagerResourceTest {
 	 */
 	@Test
 	public void testGetAuditRecordsUser() {
-		Map<String, String> query = Collections.singletonMap("user", testUser);
+		Map<String, String> query = new HashMap<>();
+		query.put("user", testUser);
+		query.put("limit", "10");
 		UriInfo uriInfo = new DummyUriInfo(query);
 		HttpHeaders httpHeaders = new DummyCookieHttpHeaders(testUser);
 
@@ -274,23 +265,20 @@ public class AuditManagerResourceTest {
 		assertEquals(200, statusCode);
 
 		// Check the message body
-		File entityFile = (File) response.getEntity();
-		try {
-			String entityString = FileUtils.readFileToString(entityFile);
-			String auditReport = entityString.trim();
-			assertTrue(auditReport.length() > 1);
-			assertTrue(auditReport.startsWith("<auditReport>"));
-			assertTrue(auditReport.contains(String.format("<user>%s</user>",
-					testUser)));
-			assertTrue(auditReport.endsWith("</auditReport>"));
-		}
-		catch (IOException e) {
-			fail("Error reading audit XML file");
-		}
+		String entityString = response.getEntity().toString();
+		String auditReport = entityString.trim();
+		assertTrue(auditReport.length() > 1);
+		assertTrue(auditReport.startsWith("<auditReport>"));
+		assertTrue(auditReport.contains(String.format("<user>%s</user>", testUser)));
+		assertTrue(auditReport.endsWith("</auditReport>"));
 	}
 
+	private Object getEntity(Response response)
+	{
+		return response.getEntity();
+	}
 
-    /**
+	/**
      * Test the status and message body of the getDocIdResourceReads() service method.
      */
     @Test

@@ -3,14 +3,14 @@ About
 =====
 
 The PASTA+ data repository software is actively developed and managed by the
-`Environmental Data Initiative <https://www.environmentaldatainitiative.org>`_
+`Environmental Data Initiative <https://edirepository.org>`_
 (EDI), a National Science Foundation (NSF) funded project through the Division
 of Environmental Biology (DEB) under grants #1565103 and #1629233. EDI
 institutional support comes from the University of New Mexico and the
 University of Wisconsin, with Principal Investigators Dr. Mark Servilla and
 Dr. Corinna Gries, respectively. The EDI grant period of performance is from
 July 2016 through June 2019. Please refer to the project's website (`here
-<https://www.environmentaldatainitiative.org>`_) for more information about
+<https://edirepository.org/about-edi>`_) for more information about
 the Environmental Data Initiative.
 
 
@@ -40,6 +40,6 @@ Data Repository. EDI also manages two Data Portals, the `EDI Data Portal
 <https://portal.lternet.edu/nis>`_, which interact directly with PASTA+
 software through its REST web-service API and serve as a reference
 implementations for how to use the API in a web applications. Questions or
-feedback may be sent to support@environmentaldatainitiative.org. The PASTA+ software may be accessed through our GitHub repository at `PASTAplus/PASTA <https://github.com/PASTAplus/PASTA>`_.
+feedback may be sent to support@edirepository.org. The PASTA+ software may be accessed through our GitHub repository at `PASTAplus/PASTA <https://github.com/PASTAplus/PASTA>`_.
 
 .. [#pasta_funding] Funding for PASTA was derived from both the NSF DEB and the American Recovery and Reinvestment Act of 2009.
