@@ -262,8 +262,8 @@ public class AuditManager {
         ResultSet rs = pstmt.getGeneratedKeys();
         while (rs.next()) {
           auditId = rs.getInt(1);
-          pstmt.close();
         }
+        pstmt.close();
     }
     catch (SQLException e) {
         logger.error("Error inserting record for resource " + resourceId
