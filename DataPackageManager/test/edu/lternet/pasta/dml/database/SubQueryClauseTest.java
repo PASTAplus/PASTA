@@ -61,7 +61,7 @@ public class SubQueryClauseTest extends TestCase {
     suite.addTest(new SubQueryClauseTest("testToSQLStringBaseOnEverythingIsNull"));
     suite.addTest(new SubQueryClauseTest("testToSQLStringWithIllegalInClause"));
     suite.addTest(new SubQueryClauseTest("testToSQLStringBaseOnSelection"));
-    //suite.addTest(new SubQueryClauseTest("testToSQLStringHasWhereCaluseBaseOnANDRelation"));
+    //suite.addTest(new SubQueryClauseTest("testToSQLStringHasWhereClauseBaseOnANDRelation"));
     //suite.addTest(new SubQueryClauseTest("testToSQLStringHasWhereClauseBaseOnORRelation"));
     return suite;
   }
@@ -199,7 +199,7 @@ public class SubQueryClauseTest extends TestCase {
    * test toSQLString based on where clause constructor with ANDRelation
    *
    */
-  public void testToSQLStringHasWhereCaluseBaseOnANDRelation()
+  public void testToSQLStringHasWhereClauseBaseOnANDRelation()
   {
 	   ANDRelation relation = new ANDRelation();
 	   Condition cond1 = new Condition(entity1, attribute1, operator, value);

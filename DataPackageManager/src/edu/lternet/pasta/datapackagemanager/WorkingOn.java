@@ -492,8 +492,10 @@ public class WorkingOn {
 		String sqlQuery = String.format(
 				"SELECT identifier " +
 						"FROM %s " +
-						"WHERE start_date IS NOT NULL AND scope='%s' AND end_date IS NULL AND interrupted=false",
-				WORKING_ON, SqlEscape.str(scope));
+						"WHERE start_date IS NOT NULL AND scope=%s AND end_date IS NULL AND interrupted=false",
+				SqlEscape.name(WORKING_ON),
+				SqlEscape.str(scope)
+		);
 
 		try {
 			conn = getConnection();
@@ -536,8 +538,12 @@ public class WorkingOn {
 		String queryStr = String.format(
 				"SELECT count(*) " +
 						"FROM %s " +
-						"WHERE scope='%s' AND identifier=%d AND revision=%d AND end_date IS NULL AND interrupted='false'",
-				WORKING_ON, scope, identifier, revision);
+						"WHERE scope=%s AND identifier=%s AND revision=%s AND end_date IS NULL AND interrupted='false'",
+				SqlEscape.name(WORKING_ON),
+				SqlEscape.str(scope),
+				SqlEscape.integer(identifier),
+				SqlEscape.integer(revision)
+		);
 
 		logger.debug("queryStr: " + queryStr);
 

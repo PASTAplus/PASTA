@@ -33,6 +33,7 @@ import java.sql.Statement;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import edu.lternet.pasta.common.SqlEscape;
 import edu.lternet.pasta.datapackagemanager.*;
 import org.apache.http.HttpEntity;
 import org.apache.log4j.Logger;
@@ -374,7 +375,8 @@ public class DOIScannerTest {
 	}
 
 	
-	private String getDoiValue(String packageId) {
+	private String getDoiValue(String packageId) throws SQLException
+	{
 
 		String doi = null;
 
@@ -389,8 +391,9 @@ public class DOIScannerTest {
 		String queryStr = String.format(
 				"SELECT doi " +
 						"FROM datapackagemanager.resource_registry " +
-						"WHERE package_id='%s' AND resource_type='dataPackage'",
-				packageId);
+						"WHERE package_id=%s AND resource_type='dataPackage'",
+				SqlEscape.integer(packageId)
+		);
 		
 		log.debug("queryStr: " + queryStr);
 

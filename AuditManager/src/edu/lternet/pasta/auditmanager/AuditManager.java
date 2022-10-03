@@ -292,7 +292,9 @@ public class AuditManager {
   }
 
 
-  private String composeWhereClause(Map<String, List<String>> queryParams, boolean orderBy) {
+  private String composeWhereClause(Map<String, List<String>> queryParams, boolean orderBy)
+      throws SQLException
+  {
     String whereClause = null;
     String limit = null;
 
@@ -323,12 +325,12 @@ public class AuditManager {
         if (key.equalsIgnoreCase("fromtime")) {
           String value = values.get(0);
           String timestamp = dateToTimestamp(value, false);
-          stringBuffer.append(String.format(" entrytime >= '%s'", timestamp));
+          stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.integer(timestamp)));
         }
         else if (key.equalsIgnoreCase("totime")) {
           String value = values.get(0);
           String timestamp = dateToTimestamp(value, true);
-          stringBuffer.append(String.format(" entrytime <= '%s'", timestamp));
+          stringBuffer.append(String.format(" entrytime <= %s", SqlEscape.integer(timestamp)));
         }
         else if (key.equalsIgnoreCase("group")) {
           String orClause = composeORClause("groups", values);
@@ -382,7 +384,8 @@ public class AuditManager {
     return whereClause;
   }
 
-  private String composeORClause(String key, List<String> values) {
+  private String composeORClause(String key, List<String> values) throws SQLException
+  {
     StringBuffer stringBuffer = new StringBuffer("( ");
     boolean firstValue = true;
 
@@ -402,7 +405,7 @@ public class AuditManager {
         stringBuffer.append(String.format("oid<%s", value));
       }
       else {
-        stringBuffer.append(String.format("%s='%s'", fieldName, value));
+        stringBuffer.append(String.format("%s=%s", SqlEscape.name(fieldName), SqlEscape.str(value)));
       }
 
       firstValue = false;
@@ -415,7 +418,9 @@ public class AuditManager {
   }
 
 
-	private String composeWhereClauseRecentUploads(Map<String, List<String>> queryParams) {
+	private String composeWhereClauseRecentUploads(Map<String, List<String>> queryParams)
+      throws SQLException
+  {
 		String whereClause = null;
 		String limit = null;
 	    final String ORDER_CLAUSE = " ORDER BY entrytime DESC";
@@ -429,13 +434,11 @@ public class AuditManager {
 				if (key.equalsIgnoreCase("fromtime")) {
 					String value = values.get(0);
 					String timestamp = dateToTimestamp(value, false);
-					stringBuffer.append(String.format(" entrytime >= '%s'",
-							timestamp));
+					stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.integer(timestamp)));
 				}
 				else if (key.equalsIgnoreCase("serviceMethod")) {
 					String value = values.get(0);
-					stringBuffer.append(String.format(" servicemethod='%s'",
-							value));
+					stringBuffer.append(String.format(" servicemethod=%s", SqlEscape.str(value)));
 				}
 			}
 		}
@@ -1115,8 +1118,11 @@ public class AuditManager {
         	    System.out.println(String.format("Data package oid: %d; Archive record oid: %d", dataPackageOid, oid));
         	    System.out.println(String.format("Replacing %s with %s", resourceId, archiveResourceId));
                 queryStr = String.format(
-                    "UPDATE %s SET resourceid='%s' WHERE oid=%d",
-                    AUDIT_MANAGER_TABLE_QUALIFIED, SqlEscape.str(archiveResourceId), oid);
+                    "UPDATE %s SET resourceid=%s WHERE oid=%s",
+                    SqlEscape.name(AUDIT_MANAGER_TABLE_QUALIFIED),
+                    SqlEscape.str(archiveResourceId),
+                    SqlEscape.integer(oid)
+                );
                 logger.debug("queryStr: " + queryStr);
                 
                 Connection updateConnection = getConnection();
@@ -1218,8 +1224,10 @@ public class AuditManager {
     boolean hasAuditRecord = false;
     Connection connection = null;
 
-    String queryStr = String.format("SELECT count(*) FROM %s WHERE oid='%s'",
-        AUDIT_MANAGER_TABLE_QUALIFIED, SqlEscape.str(auditEntryId));
+    String queryStr = String.format("SELECT count(*) FROM %s WHERE oid=%s",
+        SqlEscape.name(AUDIT_MANAGER_TABLE_QUALIFIED),
+        SqlEscape.str(auditEntryId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 

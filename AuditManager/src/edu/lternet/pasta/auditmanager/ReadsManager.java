@@ -324,13 +324,14 @@ readDataEntity' OR " +
               String SQL_STRING_RESOURCE = String.format(
                   "SELECT servicemethod, userid " +
                       "FROM auditmanager.eventlog " +
-                      "WHERE resourceid='%s' " +
+                      "WHERE resourceid=%s " +
                       "AND (servicemethod='readDataEntity' " +
                       "OR servicemethod='readDataPackage' " +
                       "OR servicemethod='readDataPackageArchive' " +
                       "OR servicemethod='readDataPackageReport' " +
                       "OR servicemethod='readMetadata') AND statuscode=200 ",
-              edu.lternet.pasta.common.SqlEscape.str(resourceId));
+                  edu.lternet.pasta.common.SqlEscape.str(resourceId)
+              );
 
               try {
                   stmt = connection.createStatement();
@@ -530,9 +531,12 @@ readDataEntity' OR " +
      
       String queryStr = String.format(
           "SELECT * FROM %s " +
-                "WHERE scope='%s' AND identifier=%d " +
+                "WHERE scope=%s AND identifier=%s " +
                 "ORDER BY scope, identifier, revision ASC",
-                      READS_MANAGER_TABLE_QUALIFIED, SqlEscape.str(scope), identifier);
+          SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -593,9 +597,13 @@ readDataEntity' OR " +
      
       String queryStr =
         String.format("SELECT * FROM %s " +
-                "WHERE scope='%s' AND identifier=%d AND revision=%d " +
+                "WHERE scope=%s AND identifier=%s AND revision=%s " +
                 "ORDER BY scope, identifier, revision ASC",
-                      READS_MANAGER_TABLE_QUALIFIED, SqlEscape.str(scope), identifier, revision);
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(scope),
+            SqlEscape.integer(identifier),
+            SqlEscape.integer(revision)
+        );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -653,9 +661,11 @@ readDataEntity' OR " +
      
       String queryStr =
         String.format("SELECT * FROM %s " +
-                "WHERE resource_id='%s' " +
+                "WHERE resource_id=%s " +
                 "ORDER BY scope, identifier, revision ASC",
-                      READS_MANAGER_TABLE_QUALIFIED, SqlEscape.str(resourceId));
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(resourceId)
+        );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -752,8 +762,10 @@ readDataEntity' OR " +
     boolean hasResource = false;
     Connection connection = null;
     String queryStr =
-        String.format("SELECT count(*) FROM %s WHERE resource_id='%s'",
-            READS_MANAGER_TABLE_QUALIFIED, SqlEscape.str(resourceId));
+        String.format("SELECT count(*) FROM %s WHERE resource_id=%s",
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(resourceId)
+        );
 
     logger.debug("queryStr: " + queryStr);
 

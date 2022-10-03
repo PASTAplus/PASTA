@@ -383,17 +383,17 @@ public class SubscriptionRegistry {
  private int hasSubscription(String creator, String scope, Integer identifier, Integer revision, String url)
          throws ClassNotFoundException, SQLException {
    int subscriptionId = -1;
-   String scopeClause = (scope == null) ? "scope IS NULL" : String.format("scope='%s'", SqlEscape.str(scope));
-   String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("identifier=%d", identifier);
-   String revisionClause = (revision == null) ? "revision IS NULL" : String.format("revision=%d", revision);
+   String scopeClause = (scope == null) ? "scope IS NULL" : String.format("scope=%s", SqlEscape.str(scope));
+   String identifierClause = (identifier == null) ? "identifier IS NULL" : String.format("identifier=%s", SqlEscape.integer(identifier));
+   String revisionClause = (revision == null) ? "revision IS NULL" : String.format("revision=%s", SqlEscape.integer(revision));
    Connection connection = null;
 
 	 String queryStr =
      String.format(
 				 "SELECT subscription_id " +
 						 "FROM %s " +
-						 "WHERE creator='%s' AND %s AND %s AND %s AND url='%s' AND active=true",
-				 EML_SUBSCRIPTION,
+						 "WHERE creator=%s AND %s AND %s AND %s AND url=%s AND active=true",
+				 SqlEscape.name(EML_SUBSCRIPTION),
 				 SqlEscape.str(creator),
 				 scopeClause,
 				 identifierClause,
@@ -778,7 +778,7 @@ public class SubscriptionRegistry {
 
 		StringBuffer stringBuffer = null;
 		try {
-			stringBuffer = new StringBuffer(String.format(" WHERE active='true' AND creator='%s'", SqlEscape.str(userId)));
+			stringBuffer = new StringBuffer(String.format(" WHERE active='true' AND creator=%s", SqlEscape.str(userId)));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -803,7 +803,7 @@ public class SubscriptionRegistry {
 		String scope = emlPackageId.getScope();
 		String scopeClause = null;
 		try {
-			scopeClause = (scope == null) ? "scope IS NULL" : String.format("(scope='%s' OR scope IS NULL)", SqlEscape.str(scope));
+			scopeClause = (scope == null) ? "scope IS NULL" : String.format("(scope=%s OR scope IS NULL)", SqlEscape.str(scope));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -840,8 +840,12 @@ public class SubscriptionRegistry {
 							SqlEscape.integer(value)));
 				}
 				else {
-					stringBuffer.append(String.format("%s='%s'", SqlEscape.name(fieldName),
-							SqlEscape.str(value)));
+					stringBuffer.append(String.format(
+							"%s=%s",
+							SqlEscape.name(fieldName),
+							SqlEscape.str(value)
+						)
+					);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

@@ -176,14 +176,20 @@ public class TableMonitorTest extends TestCase {
     String tableName;
 
     String queryStr = String.format(
-        "SELECT * FROM %s WHERE TABLE_NAME='%s'", SqlEscape.str(registry), TEST_TABLE);
+        "SELECT * FROM %s WHERE TABLE_NAME=%s",
+        SqlEscape.name(registry),
+        SqlEscape.str(TEST_TABLE)
+    );
 
     log.debug("queryStr: " + queryStr);
 
     Statement stmt = null;
     
     String cleanString =
-        String.format("DELETE FROM %s WHERE TABLE_NAME='%s'", SqlEscape.str(registry), TEST_TABLE);
+        String.format("DELETE FROM %s WHERE TABLE_NAME=%s",
+            SqlEscape.name(registry),
+            SqlEscape.str(TEST_TABLE)
+        );
 
     // First, clean-up any existing entry for the test table
     try {
@@ -367,14 +373,15 @@ public class TableMonitorTest extends TestCase {
     Statement stmt = null;
 
     String queryStr =
-        String.format("INSERT INTO %s values('%s', '%s', '%s', '%s', '%s', '%s', 1)",
+        String.format("INSERT INTO %s values(%s, %s, %s, %s, %s, %s, 1)",
             SqlEscape.name(registry),
             SqlEscape.str(TEST_TABLE),
             SqlEscape.str(packageId),
             SqlEscape.str(id),
             SqlEscape.str(entityName),
             SqlEscape.str(simpleDateFormat.format(now)),
-            SqlEscape.str(simpleDateFormat.format(now)));
+            SqlEscape.str(simpleDateFormat.format(now))
+        );
 
     log.debug("queryStr: " + queryStr);
 
@@ -676,8 +683,10 @@ public class TableMonitorTest extends TestCase {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date testDate = new Date(epochMilliseconds);
     String queryStr = String.format(
-        "SELECT last_usage_date FROM %s WHERE table_name ='%s'",
-        SqlEscape.name(dataTableRegistryName), TEST_TABLE);
+        "SELECT last_usage_date FROM %s WHERE table_name=%s",
+        SqlEscape.name(dataTableRegistryName),
+        SqlEscape.str(TEST_TABLE)
+    );
 
     log.debug("queryStr: " + queryStr);
 
@@ -733,8 +742,10 @@ public class TableMonitorTest extends TestCase {
     int testPriority = 1;
     String dataTableRegistryName = tableMonitor.getDataTableRegistryName();
     String queryStr = String.format(
-        "SELECT priority FROM %s WHERE table_name ='%s'",
-        SqlEscape.name(dataTableRegistryName), TEST_TABLE);
+        "SELECT priority FROM %s WHERE table_name=%s",
+        SqlEscape.name(dataTableRegistryName),
+        SqlEscape.str(TEST_TABLE)
+    );
 
     log.debug("queryStr: " + queryStr);
 

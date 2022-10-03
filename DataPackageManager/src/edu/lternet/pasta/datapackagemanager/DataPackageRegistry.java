@@ -525,9 +525,11 @@ public class DataPackageRegistry {
 
 		String queryStr = String.format(
         "UPDATE datapackagemanager.resource_registry " +
-            "SET doi='%s' " +
-            "WHERE resource_id='%s'",
-        SqlEscape.str(doi), SqlEscape.str(resourceId));
+            "SET doi=%s " +
+            "WHERE resource_id=%s",
+        SqlEscape.str(doi),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -679,8 +681,9 @@ public class DataPackageRegistry {
     String queryStr = null;
     try {
       queryStr = String.format(
-          "UPDATE datapackagemanager.resource_registry SET doi=NULL WHERE doi='%s'",
-          SqlEscape.str(doi));
+          "UPDATE datapackagemanager.resource_registry SET doi=NULL WHERE doi=%s",
+          SqlEscape.str(doi)
+      );
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -776,8 +779,10 @@ public class DataPackageRegistry {
       String queryStr = String.format(
           "SELECT principal, access_type, access_order, permission " +
               "FROM %s " +
-              "WHERE resource_id='%s'",
-          ACCESS_MATRIX, SqlEscape.str(resourceId));
+              "WHERE resource_id=%s",
+          SqlEscape.name(ACCESS_MATRIX),
+          SqlEscape.str(resourceId)
+      );
 
       logger.debug("queryStr: " + queryStr);
       
@@ -837,9 +842,13 @@ public class DataPackageRegistry {
       String queryStr = String.format(
           "SELECT resource_id " +
               "FROM %s " +
-              "WHERE scope='%s' AND identifier=%d AND revision=%d " +
+              "WHERE scope=%s AND identifier=%s AND revision=%s " +
               "ORDER BY date_created",
-          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+          SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier),
+          SqlEscape.integer(revision)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -913,8 +922,11 @@ public class DataPackageRegistry {
         String queryStr = String.format(
             "SELECT max(revision) " +
                 "FROM %s " +
-                "WHERE scope='%s' AND identifier=%d",
-            RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+                "WHERE scope=%s AND identifier=%s",
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(scope),
+            SqlEscape.integer(identifier)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -977,8 +989,11 @@ public class DataPackageRegistry {
 
         Connection connection = null;
         String queryStr = String.format(
-            "SELECT min(revision) FROM %s WHERE scope='%s' AND identifier=%d",
-            RESOURCE_REGISTRY, SqlEscape.str(scope), identifierInt);
+            "SELECT min(revision) FROM %s WHERE scope=%s AND identifier=%s",
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(scope),
+            SqlEscape.integer(identifierInt)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -1029,8 +1044,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT doi FROM %s WHERE resource_id='%s'", RESOURCE_REGISTRY,
-            SqlEscape.str(resourceId));
+        "SELECT doi FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1085,8 +1102,10 @@ public class DataPackageRegistry {
 
 		Connection connection = null;
 		String queryStr = String.format(
-        "SELECT package_id FROM %s WHERE doi='%s'", RESOURCE_REGISTRY,
-            SqlEscape.str(doiValue));
+        "SELECT package_id FROM %s WHERE doi=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(doiValue)
+    );
 
 		logger.debug("queryStr: " + queryStr);
 
@@ -1133,8 +1152,10 @@ public class DataPackageRegistry {
 
 		Connection connection = null;
 		String queryStr = String.format(
-        "SELECT format_type FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT format_type FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1186,8 +1207,10 @@ public class DataPackageRegistry {
 
         Connection connection = null;
         String queryStr = String.format(
-            "SELECT format_type FROM %s WHERE resource_id='%s'",
-                RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+            "SELECT format_type FROM %s WHERE resource_id=%s",
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(resourceId)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -1236,8 +1259,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT entity_name FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT entity_name FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1288,8 +1313,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT DISTINCT data_format FROM %s WHERE entity_id='%s'",
-            DATA_CACHE_REGISTRY, SqlEscape.str(entityId));
+        "SELECT DISTINCT data_format FROM %s WHERE entity_id=%s",
+        SqlEscape.name(DATA_CACHE_REGISTRY),
+        SqlEscape.str(entityId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1340,8 +1367,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT data_format FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT data_format FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1390,8 +1419,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT principal_owner FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT principal_owner FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1479,8 +1510,10 @@ public class DataPackageRegistry {
     Statement stmt = null;
 
     String queryStr = String.format(
-        "SELECT principal_owner FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT principal_owner FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1517,8 +1550,10 @@ public class DataPackageRegistry {
     queryStr = String.format(
         "SELECT principal, access_type, access_order, permission " +
             "FROM %s " +
-            "WHERE resource_id='%s'",
-        ACCESS_MATRIX, SqlEscape.str(resourceId));
+            "WHERE resource_id=%s",
+        SqlEscape.name(ACCESS_MATRIX),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1585,8 +1620,9 @@ public class DataPackageRegistry {
 
         String queryStr = String.format(
             "SELECT * FROM datapackagemanager.resource_registry " +
-                "WHERE resource_id='%s'",
-            SqlEscape.str(resourceId));
+                "WHERE resource_id=%s",
+            SqlEscape.str(resourceId)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -1674,8 +1710,10 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT sha1_checksum FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT sha1_checksum FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1733,9 +1771,13 @@ public class DataPackageRegistry {
 		String queryStr = String.format(
         "SELECT entity_id, resource_size " +
             "FROM %s " +
-            "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
+            "WHERE resource_type='data' AND scope=%s AND identifier=%s AND revision=%s " +
             "ORDER BY date_created ASC",
-		    RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+		    SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(scope),
+        SqlEscape.integer(identifier),
+        SqlEscape.integer(revision)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -1796,9 +1838,13 @@ public class DataPackageRegistry {
 			String queryStr = String.format(
           "SELECT entity_id, entity_name " +
               "FROM %s " +
-              "WHERE resource_type='data' AND scope='%s' AND identifier=%d AND revision=%d " +
+              "WHERE resource_type='data' AND scope=%s AND identifier=%s AND revision=%s " +
               "ORDER BY date_created ASC",
-			    RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+			    SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier),
+          SqlEscape.integer(revision)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -1850,8 +1896,10 @@ public class DataPackageRegistry {
 
 				Connection connection = null;
 				String queryStr = String.format(
-            "SELECT date_created FROM %s WHERE resource_id='%s'",
-                RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+            "SELECT date_created FROM %s WHERE resource_id=%s",
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(resourceId)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -1904,8 +1952,10 @@ public class DataPackageRegistry {
 		Connection connection = null;
 
     String queryStr = String.format(
-        "SELECT resource_size FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT resource_size FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
 		logger.debug("queryStr: " + queryStr);
 
@@ -1985,13 +2035,13 @@ public class DataPackageRegistry {
 			sb.append(" WHERE resource_type='dataPackage' ");
 			sb.append(" AND date_deactivated IS NOT NULL ");
 			if (hasFromTime) {
-				sb.append(String.format(" AND date_deactivated >= '%s'\n", SqlEscape.str(fromTime)));
+				sb.append(String.format(" AND date_deactivated >= %s\n", SqlEscape.str(fromTime)));
 			}
 			if (hasToTime) {
-				sb.append(String.format(" AND date_deactivated <= '%s'\n", SqlEscape.str(toTime)));
+				sb.append(String.format(" AND date_deactivated <= %s\n", SqlEscape.str(toTime)));
 			}
 			if (hasScope) {
-				sb.append(String.format(" AND scope= '%s'\n", SqlEscape.str(scope)));
+				sb.append(String.format(" AND scope= %s\n", SqlEscape.str(scope)));
 			}
 			sb.append("ORDER BY date_deactivated DESC ");
 		}
@@ -2003,13 +2053,13 @@ public class DataPackageRegistry {
 				sb.append(" AND date_deactivated IS NULL ");
 			}
 			if (hasFromTime) {
-				sb.append(String.format(" AND date_created >= '%s'\n", SqlEscape.str(fromTime)));
+				sb.append(String.format(" AND date_created >= %s\n", SqlEscape.str(fromTime)));
 			}
 			if (hasToTime) {
-				sb.append(String.format(" AND date_created <= '%s'\n", SqlEscape.str(toTime)));
+				sb.append(String.format(" AND date_created <= %s\n", SqlEscape.str(toTime)));
 			}
 			if (hasScope) {
-				sb.append(String.format(" AND scope= '%s'\n", SqlEscape.str(scope)));
+				sb.append(String.format(" AND scope = %s\n", SqlEscape.str(scope)));
 			}
 			sb.append("ORDER BY date_created DESC ");
 		}
@@ -2180,8 +2230,9 @@ public class DataPackageRegistry {
     
     Connection connection = null;
     String queryStr = String.format(
-        "SELECT resource_location FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT resource_location FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId));
 
     logger.debug("queryStr: " + queryStr);
 
@@ -2230,8 +2281,11 @@ public class DataPackageRegistry {
 
     String queryStr = String.format(
         "SELECT count(*) FROM %s " +
-            "WHERE scope='%s' AND identifier=%d AND resource_type != 'report'",
-        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+            "WHERE scope=%s AND identifier=%s AND resource_type != 'report'",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(scope),
+        SqlEscape.integer(identifier)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -2280,8 +2334,11 @@ public class DataPackageRegistry {
     Connection connection = null;
 
     String queryStr = String.format(
-        "SELECT count(*) FROM %s WHERE scope='%s' AND identifier=%d AND revision='%s'",
-        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, SqlEscape.str(revision));
+        "SELECT count(*) FROM %s WHERE scope=%s AND identifier=%s AND revision=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(scope),
+        SqlEscape.integer(identifier),
+        SqlEscape.integer(revision));
 
     logger.debug("queryStr: " + queryStr);
   
@@ -2328,8 +2385,10 @@ public class DataPackageRegistry {
     Connection connection = null;
 
     String queryStr = String.format(
-        "SELECT count(*) FROM %s WHERE resource_id='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(resourceId));
+        "SELECT count(*) FROM %s WHERE resource_id=%s",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -2500,9 +2559,12 @@ public class DataPackageRegistry {
     String queryStr = String.format(
         "SELECT count(*) " +
             "FROM %s " +
-            "WHERE scope='%s' AND identifier=%d AND resource_type='%s' AND date_deactivated IS NOT NULL",
-        RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, SqlEscape.str(
-            String.valueOf(ResourceType.dataPackage)));
+            "WHERE scope=%s AND identifier=%s AND resource_type=%s AND date_deactivated IS NOT NULL",
+        SqlEscape.name(RESOURCE_REGISTRY),
+        SqlEscape.str(scope),
+        SqlEscape.integer(identifier),
+        SqlEscape.str(String.valueOf(ResourceType.dataPackage))
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -2561,7 +2623,7 @@ public class DataPackageRegistry {
 		String queryStr = String.format(
         "SELECT resource_id, principal, access_type, access_order, permission " +
             "FROM datapackagemanager.access_matrix " +
-            "WHERE resource_id='%s' ",
+            "WHERE resource_id=%s ",
         SqlEscape.str(resourceId));
 
     logger.debug("queryStr: " + queryStr);
@@ -2766,9 +2828,11 @@ public class DataPackageRegistry {
       String queryStr = String.format(
           "SELECT DISTINCT derived_id, derived_title " +
               "FROM %s " +
-              "WHERE source_id='%s' " +
+              "WHERE source_id=%s " +
               "ORDER BY derived_id",
-	        PROV_MATRIX, SqlEscape.str(sourceId));
+	        SqlEscape.name(PROV_MATRIX),
+          SqlEscape.str(sourceId)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -2830,9 +2894,11 @@ public class DataPackageRegistry {
 	    		String.format(
               "SELECT DISTINCT source_id, source_title, source_url " +
                   "FROM %s " +
-                  "WHERE derived_id='%s' " +
+                  "WHERE derived_id=%s " +
                   "ORDER BY source_title",
-	                          PROV_MATRIX, SqlEscape.str(derivedId));
+              SqlEscape.name(PROV_MATRIX),
+              SqlEscape.str(derivedId)
+          );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -2890,9 +2956,13 @@ public class DataPackageRegistry {
 
         String queryStr = String.format(
             "SELECT entity_id FROM %s " +
-                "WHERE scope='%s' AND identifier=%d AND revision=%d AND entity_id IS NOT NULL " +
+                "WHERE scope=%s AND identifier=%s AND revision=%s AND entity_id IS NOT NULL " +
                 "ORDER BY date_created",
-            RESOURCE_REGISTRY, SqlEscape.str(scope), identifier, revision);
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(scope),
+            SqlEscape.integer(identifier),
+            SqlEscape.integer(revision)
+        );
       
         logger.debug("queryStr: " + queryStr);
 
@@ -2950,8 +3020,10 @@ public class DataPackageRegistry {
         String queryStr = String.format(
             "SELECT DISTINCT identifier " +
                 "FROM %s " +
-                "WHERE resource_type='dataPackage' AND scope='%s'",
-            RESOURCE_REGISTRY, SqlEscape.str(scope));
+                "WHERE resource_type='dataPackage' AND scope=%s",
+            SqlEscape.name(RESOURCE_REGISTRY),
+            SqlEscape.str(scope)
+        );
 
         logger.debug("queryStr: " + queryStr);
 
@@ -3010,9 +3082,12 @@ public class DataPackageRegistry {
       String queryStr = String.format(
           "SELECT revision " +
               "FROM %s " +
-              "WHERE resource_type='dataPackage' AND scope='%s' AND identifier=%d " +
+              "WHERE resource_type='dataPackage' AND scope=%s AND identifier=%s " +
               "ORDER BY revision",
-          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+          SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -3074,9 +3149,12 @@ public class DataPackageRegistry {
       String queryStr = String.format(
           "SELECT revision " +
               "FROM %s " +
-              "WHERE resource_type='dataPackage' AND scope='%s' AND identifier=%d " +
+              "WHERE resource_type='dataPackage' AND scope=%s AND identifier=%s " +
               "ORDER BY revision",
-          RESOURCE_REGISTRY, SqlEscape.str(scope), identifier);
+          SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -3783,8 +3861,9 @@ public class DataPackageRegistry {
         "SELECT resource_id, resource_type, scope, identifier, revision, date_created, " +
             "doi, resource_location, entity_id, sha1_checksum, resource_size " +
             "FROM datapackagemanager.resource_registry " +
-            "WHERE package_id='%s'",
-        SqlEscape.str(packageId));
+            "WHERE package_id=%s",
+        SqlEscape.str(packageId)
+    );
 
 		logger.debug("queryStr: " + queryStr);
 
@@ -3940,9 +4019,11 @@ public class DataPackageRegistry {
 
 		String queryStr = String.format(
 			"UPDATE datapackagemanager.resource_registry " +
-          "SET data_format='%s' " +
-          "WHERE resource_id='%s'",
-			SqlEscape.str(dataFormat), SqlEscape.str(resourceId));
+          "SET data_format=%s " +
+          "WHERE resource_id=%s",
+			SqlEscape.str(dataFormat),
+      SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -3996,9 +4077,11 @@ public class DataPackageRegistry {
 
 		String queryStr = String.format(
 			"UPDATE datapackagemanager.resource_registry " +
-          "SET format_type='%s' " +
-          "WHERE resource_id='%s'",
-			SqlEscape.str(formatType), SqlEscape.str(resourceId));
+          "SET format_type=%s " +
+          "WHERE resource_id=%s",
+      SqlEscape.str(formatType),
+      SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -4052,9 +4135,11 @@ public class DataPackageRegistry {
 
 	    String queryStr = String.format("" +
           "UPDATE datapackagemanager.resource_registry " +
-              "SET md5_checksum='%s' " +
-              "WHERE resource_id='%s'",
-          SqlEscape.str(md5Checksum), SqlEscape.str(resourceId));
+              "SET md5_checksum=%s " +
+              "WHERE resource_id=%s",
+          SqlEscape.str(md5Checksum),
+          SqlEscape.str(resourceId)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -4107,8 +4192,10 @@ public class DataPackageRegistry {
 
     String queryStr = String.format(
         "UPDATE datapackagemanager.resource_registry " +
-            "SET sha1_checksum='%s' WHERE resource_id='%s'",
-        SqlEscape.str(sha1Checksum), SqlEscape.str(resourceId));
+            "SET sha1_checksum=%s WHERE resource_id=%s",
+        SqlEscape.str(sha1Checksum),
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -4156,9 +4243,11 @@ public class DataPackageRegistry {
 
       String queryStr = String.format(
           "UPDATE datapackagemanager.resource_registry " +
-              "SET filename='%s' " +
-              "WHERE resource_id='%s'",
-              SqlEscape.str(filename), SqlEscape.str(resourceId));
+              "SET filename=%s " +
+              "WHERE resource_id=%s",
+          SqlEscape.str(filename),
+          SqlEscape.str(resourceId)
+      );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -4209,8 +4298,10 @@ public class DataPackageRegistry {
 		String queryStr = String.format(
         "UPDATE datapackagemanager.resource_registry " +
             "SET resource_size=%d " +
-            "WHERE resource_id='%s'",
-		        size, SqlEscape.str(resourceId));
+            "WHERE resource_id=%s",
+        size,
+        SqlEscape.str(resourceId)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -4270,8 +4361,10 @@ public class DataPackageRegistry {
 			String queryStr = String.format(
 					"SELECT package_id, scope, identifier, revision " +
               "FROM %s " +
-              "WHERE resource_type='dataPackage' AND principal_owner='%s'",
-					RESOURCE_REGISTRY, SqlEscape.str(distinguishedName));
+              "WHERE resource_type='dataPackage' AND principal_owner=%s",
+					SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.str(distinguishedName)
+      );
 			queryStr += " AND date_deactivated IS NULL"; // exclude deleted data packages
 			queryStr += " ORDER BY scope ASC, identifier ASC, revision ASC";
 
@@ -4465,9 +4558,12 @@ public class DataPackageRegistry {
                 if (isJournalCitationOwner(id, userId)) {
                     connection = getConnection();
                     String queryStr = String.format(
-                            "DELETE FROM %s " +
-                                "WHERE journal_citation_id=%d and principal_owner='%s'",
-                        JOURNAL_CITATION, id, SqlEscape.str(userId));
+                        "DELETE FROM %s " +
+                        "WHERE journal_citation_id=%s and principal_owner=%s",
+                        SqlEscape.name(JOURNAL_CITATION),
+                        SqlEscape.integer(id),
+                        SqlEscape.str(userId)
+                    );
 
                     logger.debug("queryStr: " + queryStr);
 
@@ -4665,9 +4761,11 @@ public class DataPackageRegistry {
               queryStr = String.format(
                   "SELECT * " +
                       "FROM %s " +
-                      "WHERE package_id LIKE '%s' " +
+                      "WHERE package_id LIKE %s " +
                       "ORDER BY journal_citation_id",
-                      JOURNAL_CITATION, SqlEscape.str(packageId));
+                  SqlEscape.name(JOURNAL_CITATION),
+                  SqlEscape.str(packageId)
+              );
           } else {
               EmlPackageId epi = new EmlPackageId(scope, identifier, revision);
               EmlPackageIdFormat epif = new EmlPackageIdFormat();
@@ -4675,9 +4773,11 @@ public class DataPackageRegistry {
               queryStr = String.format(
                   "SELECT * " +
                       "FROM %s " +
-                      "WHERE package_id='%s' " +
+                      "WHERE package_id=%s " +
                       "ORDER BY journal_citation_id",
-                      JOURNAL_CITATION, SqlEscape.str(packageId));
+                  SqlEscape.name(JOURNAL_CITATION),
+                  SqlEscape.str(packageId)
+              );
           }
 
           logger.debug("queryStr: " + queryStr);
@@ -4735,9 +4835,11 @@ public class DataPackageRegistry {
           String queryStr = String.format(
               "SELECT * " +
                   "FROM %s " +
-                  "WHERE principal_owner='%s' " +
+                  "WHERE principal_owner=%s " +
                   "ORDER BY journal_citation_id",
-                  JOURNAL_CITATION, SqlEscape.str(principalOwner));
+              SqlEscape.name(JOURNAL_CITATION),
+              SqlEscape.str(principalOwner)
+          );
 
           logger.debug("queryStr: " + queryStr);
 

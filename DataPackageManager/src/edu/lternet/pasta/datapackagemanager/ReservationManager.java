@@ -462,9 +462,11 @@ public class ReservationManager {
 		String sqlQuery = String.format(
 				"SELECT identifier " +
 						"FROM %s " +
-						"WHERE date_uploaded IS NULL AND scope='%s' " +
+						"WHERE date_uploaded IS NULL AND scope=%s " +
 						"ORDER BY identifier ASC",
-				RESERVATION, SqlEscape.str(scope));
+				SqlEscape.name(RESERVATION),
+				SqlEscape.str(scope)
+		);
 
 		try {
 			conn = getConnection();
@@ -505,8 +507,11 @@ public class ReservationManager {
 		String queryStr = String.format(
 				"SELECT count(*) " +
 						"FROM %s " +
-						"WHERE scope='%s' AND identifier=%d AND date_uploaded IS NULL",
-				RESERVATION, SqlEscape.str(scope), identifier);
+						"WHERE scope=%s AND identifier=%s AND date_uploaded IS NULL",
+				SqlEscape.name(RESERVATION),
+				SqlEscape.str(scope),
+				SqlEscape.integer(identifier)
+		);
 
 		logger.debug("queryStr: " + queryStr);
 
@@ -551,8 +556,11 @@ public class ReservationManager {
 		boolean hasReservation = false;
 		Connection connection = null;
 		String queryStr = String.format(
-				"SELECT count(*) FROM %s WHERE scope='%s' AND identifier=%d", 
-				RESERVATION, SqlEscape.str(scope), identifier);
+				"SELECT count(*) FROM %s WHERE scope=%s AND identifier=%s",
+				SqlEscape.name(RESERVATION),
+				SqlEscape.str(scope),
+				SqlEscape.integer(identifier)
+		);
 
 		logger.debug("queryStr: " + queryStr);
 
@@ -600,8 +608,11 @@ public class ReservationManager {
 		String queryStr = String.format(
 				"SELECT principal " +
 						"FROM %s " +
-						"WHERE scope='%s' AND identifier=%d AND date_uploaded IS NULL",
-				RESERVATION, SqlEscape.str(scope), identifier);
+						"WHERE scope=%s AND identifier=%s AND date_uploaded IS NULL",
+				SqlEscape.name(RESERVATION),
+				SqlEscape.str(scope),
+				SqlEscape.integer(identifier)
+		);
 
 		logger.debug("queryStr: " + queryStr);
 

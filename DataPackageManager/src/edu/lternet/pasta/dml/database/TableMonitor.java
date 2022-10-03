@@ -155,7 +155,7 @@ public class TableMonitor {
      */
     else {
       queryStr =
-          String.format("INSERT INTO %s values('%s', '%s', '%s', '%s', '%s', '%s', %s)",
+          String.format("INSERT INTO %s values(%s, %s, %s, %s, %s, %s, %s)",
               DATA_TABLE_REGISTRY,
               SqlEscape.name(tableName),
               SqlEscape.str(packageId),
@@ -215,8 +215,11 @@ public class TableMonitor {
     String queryStr = String.format(
         "SELECT TABLE_NAME, ENTITY_IDENTIFIER, ENTITY_NAME " +
             "FROM %s " +
-            "WHERE ENTITY_IDENTIFIER='%s' AND ENTITY_NAME='%s'",
-        DATA_TABLE_REGISTRY, SqlEscape.str(entityIdentifier), SqlEscape.str(entityName));
+            "WHERE ENTITY_IDENTIFIER=%s AND ENTITY_NAME=%s",
+        SqlEscape.name(DATA_TABLE_REGISTRY),
+        SqlEscape.str(entityIdentifier),
+        SqlEscape.str(entityName)
+    );
     
     logger.debug("queryStr: " + queryStr);
     
@@ -358,8 +361,10 @@ public class TableMonitor {
     Statement stmt = null;
 
     queryStr =
-        String.format("DELETE FROM %s WHERE TABLE_NAME='%s'", DATA_TABLE_REGISTRY,
-            SqlEscape.str(tableName));
+        String.format("DELETE FROM %s WHERE TABLE_NAME=%s",
+            SqlEscape.name(DATA_TABLE_REGISTRY),
+            SqlEscape.str(tableName)
+        );
     
     logger.debug("queryStr: " + queryStr);
     
@@ -405,8 +410,10 @@ public class TableMonitor {
     Connection connection = DataManager.getConnection();
     Date creationDate = null;
     String queryStr =
-        String.format("SELECT creation_date FROM %s WHERE table_name='%s'",
-            DATA_TABLE_REGISTRY, SqlEscape.str(tableName));
+        String.format("SELECT creation_date FROM %s WHERE table_name=%s",
+            SqlEscape.name(DATA_TABLE_REGISTRY),
+            SqlEscape.str(tableName)
+        );
     
     logger.debug("queryStr: " + queryStr);
 
@@ -532,8 +539,11 @@ public class TableMonitor {
     
     Connection connection = DataManager.getConnection();
     String queryStr = String.format(
-        "SELECT table_name FROM %s WHERE package_id ='%s' AND entity_name ='%s'",
-        DATA_TABLE_REGISTRY, SqlEscape.str(packageID), SqlEscape.str(entityName));
+        "SELECT table_name FROM %s WHERE package_id=%s AND entity_name=%s",
+        SqlEscape.name(DATA_TABLE_REGISTRY),
+        SqlEscape.str(packageID),
+        SqlEscape.str(entityName)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -578,8 +588,10 @@ public class TableMonitor {
       tableNames = new ArrayList<String>();
       Connection connection = DataManager.getConnection();
       String queryStr =
-          String.format("SELECT table_name FROM %s WHERE package_id ='%s'",
-              DATA_TABLE_REGISTRY, SqlEscape.str(packageID));
+          String.format("SELECT table_name FROM %s WHERE package_id =%s",
+              SqlEscape.name(DATA_TABLE_REGISTRY),
+              SqlEscape.str(packageID)
+          );
 
       logger.debug("queryStr: " + queryStr);
 
@@ -630,8 +642,10 @@ public class TableMonitor {
     Connection connection = DataManager.getConnection();
     Date lastUsageDate = null;
     String queryStr =
-        String.format("SELECT last_usage_date FROM %s WHERE table_name='%s'",
-            DATA_TABLE_REGISTRY, SqlEscape.str(tableName));
+        String.format("SELECT last_usage_date FROM %s WHERE table_name=%s",
+            SqlEscape.name(DATA_TABLE_REGISTRY),
+            SqlEscape.str(tableName)
+        );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -755,8 +769,10 @@ public class TableMonitor {
     String tableName = null;
 
     String queryStr = String.format(
-        "SELECT table_name FROM %s WHERE entity_identifier='%s'",
-            DATA_TABLE_REGISTRY, SqlEscape.str(identifier));
+        "SELECT table_name FROM %s WHERE entity_identifier=%s",
+        SqlEscape.name(DATA_TABLE_REGISTRY),
+        SqlEscape.str(identifier)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -924,8 +940,11 @@ public class TableMonitor {
 		boolean success = false;
 
     String queryStr = String.format(
-        "UPDATE %s SET last_usage_date='%s' WHERE table_name='%s'",
-        DATA_TABLE_REGISTRY, SqlEscape.str(dateString), SqlEscape.str(tableName));
+        "UPDATE %s SET last_usage_date=%s WHERE table_name=%s",
+        SqlEscape.name(DATA_TABLE_REGISTRY),
+        SqlEscape.str(dateString),
+        SqlEscape.str(tableName)
+    );
 
     logger.debug("queryStr: " + queryStr);
 
@@ -970,8 +989,11 @@ public class TableMonitor {
     boolean success = false;
 
     String queryStr =
-        String.format("UPDATE %s SET priority=%d WHERE table_name='%s'",
-            DATA_TABLE_REGISTRY, priority, SqlEscape.str(tableName));
+        String.format("UPDATE %s SET priority=%s WHERE table_name=%s",
+            SqlEscape.name(DATA_TABLE_REGISTRY),
+            SqlEscape.integer(priority),
+            SqlEscape.str(tableName)
+        );
 
     logger.debug("queryStr: " + queryStr);
 
