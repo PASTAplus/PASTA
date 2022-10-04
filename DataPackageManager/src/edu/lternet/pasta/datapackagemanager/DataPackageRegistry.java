@@ -1593,10 +1593,10 @@ public class DataPackageRegistry {
                         resource.setFileName("quality_report.xml");
                     }
                     else if (resourceType.equals(ResourceType.data)) {
-                        resource.setFileName(result.getString("filename"));
-                        resource.setDataFormat(result.getString("data_format"));
+                        resource.setFileName(Encode.forXml(result.getString("filename")));
+                        resource.setDataFormat(Encode.forXml(result.getString("data_format")));
                         resource.setEntityId(result.getString("entity_id"));
-                        resource.setEntityName(result.getString("entity_name"));
+                        resource.setEntityName(Encode.forXml(result.getString("entity_name")));
                         resource.setMimeType(result.getString("mime_type"));
                         resource.setResourceLocation(result.getString("resource_location"));
                         resource.setResourceSize(result.getLong("resource_size"));
