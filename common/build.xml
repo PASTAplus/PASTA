@@ -67,7 +67,7 @@
         <include name="quickcheck-0.6.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
-        <include name="postgresql-42.3.4.jar"/>
+        <include name="postgresql-42.2.5.jre7.jar"/>
       </fileset>
     </copy>
   </target>
