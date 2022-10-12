@@ -91,7 +91,9 @@ public abstract class DatabaseAdapter {
 	protected String TO_DATE_FUNCTION = "to_timestamp";
 	private final String XML_SCHEMA_DATATYPES = 
 	    "http://www.w3.org/2001/XMLSchema-datatypes";
-	protected static final int DEFAULT_TABLE_NAME_MAX_LENGTH = 30;
+
+    // Postgres 10: 63 bytes - https://www.postgresql.org/docs/10/runtime-config-preset.html see max_identifier_length
+	protected static final int DEFAULT_TABLE_NAME_MAX_LENGTH = 63;
 	private QualityCheck dateFormatMatchesQualityCheck = null;
   
   
