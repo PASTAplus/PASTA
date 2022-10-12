@@ -45,6 +45,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.codec.digest.DigestUtils;
 import edu.lternet.pasta.dml.parser.Attribute;
 import edu.lternet.pasta.dml.parser.AttributeList;
 import edu.lternet.pasta.dml.parser.DateTimeDomain;
@@ -127,26 +128,7 @@ public abstract class DatabaseAdapter {
   public static String getLegalDBTableName(String entityName) {
     final int tableNameMaxLength = getTableNameMaxLength();
     String legalName = null;
-    char[] badChars = {' ', '-', '.', '/', ',', '(', ')', '<', '>', '=', ':', ';', '&'};
-    char goodChar = '_';
-    
-    if (entityName != null) {
-      int entityNameLength = entityName.length();
-      int legalNameLength = Math.min(entityNameLength, tableNameMaxLength);
-      legalName = entityName.substring(0, legalNameLength);
-    }
-
-    if (legalName != null) {
-      for (int i = 0; i < badChars.length; i++) {
-        legalName = legalName.replace(badChars[i], goodChar);
-      }
-
-      // If first character is a digit, prepend an underscore
-      char firstCharacter = legalName.charAt(0);
-      if (Character.isDigit(firstCharacter)) {
-        legalName = UNDERSCORE + legalName;
-      }
-    }
+    legalName = UNDERSCORE + DigestUtils.md5Hex(entityName);
     
     return legalName;
   }
