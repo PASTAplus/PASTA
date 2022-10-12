@@ -620,7 +620,7 @@ public abstract class DatabaseAdapter {
   private String getLegalDbFieldName(String attributeName) {
     String legalName = attributeName;
     
-    char[] badChars = {' ', '-', '.', '/', ':', '@', '[', ']'};
+    char[] badChars = {' ', '-', '.', '/', ':', '@', '[', ']',',', '(', ')', '<', '>', '=', ';', '&'};
     char goodChar = '_';
     
     for (int i = 0; i < badChars.length; i++) {
