@@ -114,16 +114,11 @@ public abstract class DatabaseAdapter {
 
 	
   /**
-   * Given an entity name, return a well-formed table name. This is a generic
-   * implementation that should work for most databases. This method should be
-   * overridden by a database adapter subclass if it has special rules for the
-   * well-formedness of a table name. This method simply looks for illegal
-   * table name characters in the entity name and replaces them with underscore 
-   * characters.
+   * Return MD5 hex hash value of entity name to ensure unique and SQL valid
+   * database table name.
    * 
    * @param entityName   the entity name
-   * @return             a well-formed table name corresponding to the entity\
-   *                     name
+   * @return             MD5 hex hash value
    */
   public static String getLegalDBTableName(String entityName) {
     final int tableNameMaxLength = getTableNameMaxLength();
