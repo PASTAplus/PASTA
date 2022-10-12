@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.lternet.pasta.common.SqlEscape;
 import org.apache.log4j.Logger;
 
 /**
@@ -330,7 +331,7 @@ readDataEntity' OR " +
                       "OR servicemethod='readDataPackageArchive' " +
                       "OR servicemethod='readDataPackageReport' " +
                       "OR servicemethod='readMetadata') AND statuscode=200 ",
-                  edu.lternet.pasta.common.SqlEscape.str(resourceId)
+                      SqlEscape.str(resourceId)
               );
 
               try {
