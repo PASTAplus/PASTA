@@ -3862,9 +3862,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Returns the File object of the data package archive identified by the
 	 * transaction identifier.
-	 * 
+	 *
+	 * @param transactionId
+	 * 			The transaction id of the request
 	 * @param packageId
 	 *          The package identifier of the data package archive.
+	 * @param userId
+	 * 			The user id of the request
 	 * @return The archive File object
 	 * @throws ResourceNotFoundException
 	 */
