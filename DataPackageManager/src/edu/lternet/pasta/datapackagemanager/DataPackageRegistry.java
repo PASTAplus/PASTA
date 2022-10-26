@@ -2184,7 +2184,9 @@ public class DataPackageRegistry {
 	       "SELECT scope, identifier, revision, entity_id FROM %s " +
              "WHERE scope=? AND identifier=? AND %s=? " +
              "ORDER BY revision ASC LIMIT 1",
-	       RESOURCE_REGISTRY, SqlEscape.name(methodField));
+	        SqlEscape.name(RESOURCE_REGISTRY),
+          SqlEscape.name(methodField)
+      );
 	    
 	    logger.debug("queryStr: " + queryStr);
 		

@@ -156,8 +156,8 @@ public class TableMonitor {
     else {
       queryStr =
           String.format("INSERT INTO %s values(%s, %s, %s, %s, %s, %s, %s)",
-              DATA_TABLE_REGISTRY,
-              SqlEscape.name(tableName),
+              SqlEscape.name(DATA_TABLE_REGISTRY),
+              SqlEscape.str(tableName),
               SqlEscape.str(packageId),
               SqlEscape.str(entityIdentifier),
               SqlEscape.str(entityName),

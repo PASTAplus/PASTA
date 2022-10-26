@@ -405,7 +405,11 @@ public class AuditManager {
         stringBuffer.append(String.format("oid<%s", value));
       }
       else {
-        stringBuffer.append(String.format("%s=%s", SqlEscape.name(fieldName), SqlEscape.str(value)));
+        stringBuffer.append(
+            String.format("%s=%s",
+            SqlEscape.name(fieldName),
+            SqlEscape.str(value))
+        );
       }
 
       firstValue = false;
