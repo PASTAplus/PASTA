@@ -836,7 +836,8 @@ public class SubscriptionRegistry {
 			try {
 				if (fieldName.equalsIgnoreCase("identifier") ||
 						fieldName.equalsIgnoreCase("revision")) {
-					stringBuffer.append(String.format("%s=%d", SqlEscape.name(fieldName),
+					stringBuffer.append(String.format("%s=%s",
+							SqlEscape.name(fieldName),
 							SqlEscape.integer(value)));
 				}
 				else {

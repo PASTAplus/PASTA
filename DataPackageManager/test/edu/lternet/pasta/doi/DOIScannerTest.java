@@ -392,7 +392,7 @@ public class DOIScannerTest {
 				"SELECT doi " +
 						"FROM datapackagemanager.resource_registry " +
 						"WHERE package_id=%s AND resource_type='dataPackage'",
-				SqlEscape.integer(packageId)
+				SqlEscape.str(packageId)
 		);
 		
 		log.debug("queryStr: " + queryStr);

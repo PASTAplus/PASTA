@@ -263,7 +263,7 @@ public class AuditManager {
         while (rs.next()) {
           auditId = rs.getInt(1);
         }
-        pstmt.close();
+      pstmt.close();
     }
     catch (SQLException e) {
         logger.error("Error inserting record for resource " + resourceId
@@ -325,12 +325,12 @@ public class AuditManager {
         if (key.equalsIgnoreCase("fromtime")) {
           String value = values.get(0);
           String timestamp = dateToTimestamp(value, false);
-          stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.integer(timestamp)));
+          stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.str(timestamp)));
         }
         else if (key.equalsIgnoreCase("totime")) {
           String value = values.get(0);
           String timestamp = dateToTimestamp(value, true);
-          stringBuffer.append(String.format(" entrytime <= %s", SqlEscape.integer(timestamp)));
+          stringBuffer.append(String.format(" entrytime <= %s", SqlEscape.str(timestamp)));
         }
         else if (key.equalsIgnoreCase("group")) {
           String orClause = composeORClause("groups", values);
@@ -434,7 +434,7 @@ public class AuditManager {
 				if (key.equalsIgnoreCase("fromtime")) {
 					String value = values.get(0);
 					String timestamp = dateToTimestamp(value, false);
-					stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.integer(timestamp)));
+					stringBuffer.append(String.format(" entrytime >= %s", SqlEscape.str(timestamp)));
 				}
 				else if (key.equalsIgnoreCase("serviceMethod")) {
 					String value = values.get(0);
