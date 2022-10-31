@@ -156,7 +156,7 @@ public class WhereClause
         
     	if (condition != null)
     	{  		
-    		sql.append(condition.toSQLString());
+      		sql.append(condition.toSQLString());
     	}
     	else if (and != null)
     	{

@@ -22,7 +22,7 @@ public class SqlEscape {
       return "'" + Utils.escapeLiteral(null, s, true).toString() + "'";
     }
     log.error("Received null str");
-    return null;
+    return "'null'";
   }
 
   /*
