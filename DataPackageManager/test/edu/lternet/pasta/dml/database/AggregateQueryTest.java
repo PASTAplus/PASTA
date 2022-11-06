@@ -125,8 +125,8 @@ public class AggregateQueryTest extends TestCase {
    * Query has aggregate selection and group by
    *
    */
-  public void testToSQLStringBaseOnSelection()
-  {
+  public void testToSQLStringBaseOnSelection() throws UnWellFormedQueryException
+	{
 	query.addSelectionItem(select1);
 	query.addSelectionItem(select2);
 	query.addTableItem(table1);
@@ -135,17 +135,8 @@ public class AggregateQueryTest extends TestCase {
 	groupBy.addGroupByItem(select1);
 	query.setGroupBy(groupBy);
     
-	try
-	{
-		 String sql = query.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(
-				 "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 GROUP BY table1.attribute1;"));
-	}
-	catch (UnWellFormedQueryException e)
-	{
-		assertTrue("Should have a sql", 1==2);
-	}
+	String sql = query.toSQLString();
+	assertSqlEquals(sql, "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 GROUP BY table1.attribute1;");
 	
   }
   
@@ -154,7 +145,8 @@ public class AggregateQueryTest extends TestCase {
    *
    */
   public void testToSQLStringHasWhereClauseBaseOnCondition()
-  {
+			throws UnWellFormedQueryException
+	{
 	  Condition con = new Condition(entity1, attribute1, operator, value);
 	  WhereClause where = new WhereClause(con);
 	  query.addSelectionItem(select1);
@@ -165,20 +157,18 @@ public class AggregateQueryTest extends TestCase {
 	  GroupBy groupBy = new GroupBy();
 	  groupBy.addGroupByItem(select1);
 	  query.setGroupBy(groupBy);
-      
-	  try
-	  {
-		 String sql = query.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(
-				 "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 where table1.attribute1 = 'hello' GROUP BY table1.attribute1;"));
-	  }
-	  catch (UnWellFormedQueryException e)
-	  {
-		assertTrue("Should have a sql", 1==2);
-	  }
+
+		String sql = query.toSQLString();
+		assertSqlEquals(sql, "SELECT table1.attribute1,COUNT(table2.attribute2) FROM table1,table2 where table1.attribute1 = 'hello' GROUP BY table1.attribute1;");
   }
   
+  public void assertSqlEquals(String expected, String actual)
+  {
+    assertEquals("SQL query string mismatch",
+				expected.replaceAll("\\s+", " ").trim(),
+				actual.replaceAll("\\s+", " ").trim()
+		);
+  }
  
 }
 

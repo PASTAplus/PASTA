@@ -146,33 +146,23 @@ public class SubQueryClauseTest extends TestCase {
   /**
    * Query only has selection, no where clause
    */
-  public void testToSQLStringBaseOnSelection()
-  {
-	inClause = "IN";
-	query.addSelectionItem(select1);
-	query.addTableItem(table1);
-	subQuery = new SubQueryClause(entity1, attribute1, inClause, query);
-    
-	try
+  public void testToSQLStringBaseOnSelection() throws UnWellFormedQueryException
 	{
-		 String sql = subQuery.toSQLString();
-		 System.out.println("sql is"+sql+"!");
-		 assertTrue("Should have a sql ", sql.equals(
-				 "table1.attribute1 IN (SELECT table1.attribute1 FROM table1 )"));
+		inClause = "IN";
+		query.addSelectionItem(select1);
+		query.addTableItem(table1);
+		subQuery = new SubQueryClause(entity1, attribute1, inClause, query);
+		String sql = subQuery.toSQLString();
+		assertSqlEquals(sql, "table1.attribute1 IN (SELECT table1.attribute1 FROM table1 )");
 	}
-	catch (UnWellFormedQueryException e)
-	{
-		assertTrue("Should have a sql", 1==2);
-	}
-	
-  }
   
   /**
    * test toSQLString based on where clause constructor with condition
    *
    */
   public void testToSQLStringHasWhereClauseBaseOnCondition()
-  {
+			throws UnWellFormedQueryException
+	{
 	  Condition con = new Condition(entity1, attribute1, operator, value);
 	  WhereClause where = new WhereClause(con);
 	  query.addSelectionItem(select1);
@@ -180,18 +170,8 @@ public class SubQueryClauseTest extends TestCase {
 	  query.addTableItem(table1);
 	  query.addTableItem(table2);
 	  query.setWhereClause(where);
-      
-	  try
-	  {
-		 String sql = query.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(
-				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello';"));
-	  }
-	  catch (UnWellFormedQueryException e)
-	  {
-		assertTrue("Should have a sql", 1==2);
-	  }
+		String sql = query.toSQLString();
+		assertSqlEquals(sql, "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello';");
   }
   
   
@@ -200,7 +180,8 @@ public class SubQueryClauseTest extends TestCase {
    *
    */
   public void testToSQLStringHasWhereClauseBaseOnANDRelation()
-  {
+			throws UnWellFormedQueryException
+	{
 	   ANDRelation relation = new ANDRelation();
 	   Condition cond1 = new Condition(entity1, attribute1, operator, value);
 	   Condition cond2 = new Condition(entity2, attribute2, operator, value);
@@ -212,18 +193,8 @@ public class SubQueryClauseTest extends TestCase {
 	   query.addTableItem(table1);
 	   query.addTableItem(table2);
 	   query.setWhereClause(where);
-       
-	   try
-	   {
 		 String sql = query.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(
-				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' ;"));
-	   }
-	   catch (UnWellFormedQueryException e)
-	   {
-		 assertTrue("Should have a sql", 1==2);
-	   }
+		 assertSqlEquals(sql,  "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' ;");
   }
    
   
@@ -232,7 +203,8 @@ public class SubQueryClauseTest extends TestCase {
    *
    */
   public void testToSQLStringHasWhereClauseBaseOnORRelation()
-  {
+			throws UnWellFormedQueryException
+	{
 	   ORRelation relation = new ORRelation();
 	   Condition cond1 = new Condition(entity1, attribute1, operator, value);
 	   Condition cond2 = new Condition(entity2, attribute2, operator, value);
@@ -245,19 +217,18 @@ public class SubQueryClauseTest extends TestCase {
 	   query.addTableItem(table2);
 	   query.setWhereClause(where);
        
-	   try
-	   {
 		 String sql = query.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(
-				 "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' ;"));
-	   }
-	   catch (UnWellFormedQueryException e)
-	   {
-		 assertTrue("Should have a sql", 1==2);
-	   }
+		 assertSqlEquals(sql,  "SELECT table1.attribute1,table2.attribute2 FROM table1,table2 where table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' ;");
   }
- 
+
+	public void assertSqlEquals(String expected, String actual)
+  {
+    assertEquals("SQL query string mismatch",
+				expected.replaceAll("\\s+", " ").trim(),
+				actual.replaceAll("\\s+", " ").trim()
+		);
+  }
+
 }
 
 

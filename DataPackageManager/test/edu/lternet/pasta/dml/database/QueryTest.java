@@ -206,8 +206,9 @@ public class QueryTest extends TestCase {
 
   public void assertSqlEquals(String expected, String actual)
   {
-    assertEquals("SQL query string mismatch", expected.replaceAll("\\s+", " "),
-        actual.replaceAll("\\s+", " "));
+    assertEquals("SQL query string mismatch",
+				expected.replaceAll("\\s+", " ").trim(),
+				actual.replaceAll("\\s+", " ").trim()
+		);
   }
 }
-

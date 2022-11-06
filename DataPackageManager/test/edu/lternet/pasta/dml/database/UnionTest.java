@@ -126,7 +126,7 @@ public class UnionTest extends TestCase {
 	try
 	{
 		 String sql = union.toSQLString();
-		 System.out.println("sql is"+sql);
+		 System.out.println("sql is "+sql);
 		 assertTrue(
 				 "Should have a sql ", 
 				 sql.equals(
