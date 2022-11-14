@@ -337,10 +337,26 @@ public class AuditManagerResource extends PastaWebService
 	 * <strong>Get Audit Record</strong> operation, retrieves a single audit record 
 	 * based on the audit identifier value specified in the path.
      *
+  	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/audit/report/3</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 *
      * <h4>Responses:</h4>
      *
      * <p>
-     * If the request is successful, the response will contain plain text.
+     * If the request is successful, the response will contain xml.
      * </p>
      *
      * <table border="1" cellspacing="0" cellpadding="3">
@@ -354,7 +370,7 @@ public class AuditManagerResource extends PastaWebService
      * <td>200 OK</td>
      * <td>If the request was successful.</td>
      * <td>The specified subscription's attributes.</td>
-     * <td><code>text/plain</code></td>
+     * <td><code>application/xml</code></td>
      * </tr>
      * <tr>
      * <td>400 Bad Request</td>
@@ -621,7 +637,7 @@ public class AuditManagerResource extends PastaWebService
   }
 
     /**
-     * <strong>Get Audit Count</strong> operation, returns a count of the number 
+     * <strong>Get Audit Count</strong> operation, returns the count of
      * audit log records from the audit table (named "eventlog") matching the provided 
      * criteria.
      *
@@ -692,9 +708,25 @@ public class AuditManagerResource extends PastaWebService
      * while a query parameter of "resourceId=knb-lter-and/2719/6" will match any audit log entry
      * whose resourceId value contains the substring "knb-lter-and/2719/6". 
      *
-     * <h4>Responses:</h4>
+  	 * <h4>Requests:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>None</td>
+	 * <td align=center></td>
+	 * <td>
+	 * <code>curl -i -X GET "https://pasta.lternet.edu/audit/count?resourceId=https://pasta.lternet.edu/package/eml/edi/12/1"</code>
+	 * </td>
+	 * </tr>
+	 * </table>
+	 *
+   * <h4>Responses:</h4>
      *
-     * <p>If the request is successful, the response will contain XML text.</p>
+     * <p>If the request is successful, the response will contain text.</p>
      *
      * <table border="1" cellspacing="0" cellpadding="3">
      *   <tr>
@@ -706,8 +738,8 @@ public class AuditManagerResource extends PastaWebService
      *   <tr>
      *     <td>200 OK</td>
      *     <td>If the request was successful.</td>
-     *     <td>The specified subscription's attributes.</td>
-     *     <td><code>application/xml</code></td>
+     *     <td>The count. For example, "10."</td>
+     *     <td><code>text/plain</code></td>
      *   </tr>
      *   <tr>
      *     <td>400 Bad Request</td>
