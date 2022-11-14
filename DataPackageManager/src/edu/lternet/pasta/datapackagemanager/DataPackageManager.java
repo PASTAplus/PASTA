@@ -3862,13 +3862,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Returns the File object of the data package archive identified by the
 	 * transaction identifier.
-	 * 
+	 *
+	 * @param transactionId
+	 * 			The transaction id of the request
 	 * @param packageId
 	 *          The package identifier of the data package archive.
+	 * @param userId
+	 * 			The user id of the request
 	 * @return The archive File object
 	 * @throws ResourceNotFoundException
 	 */
-	public File getDataPackageArchiveFile(String packageId, String userId)
+	public File getDataPackageArchiveFile(String transactionId, String packageId, String userId)
 	    throws ResourceNotFoundException {
 
 		File file = null;
@@ -3885,7 +3889,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		try {
 		file = archive.getDataPackageArchiveFile(packageId, userId);
 		} catch (FileNotFoundException e) {
-			throw new ResourceNotFoundException(e.getMessage());
+			logger.error(e.getMessage());
+			String gripe = String.format("The data package archive %s does not exist", transactionId);
+			throw new ResourceNotFoundException(gripe);
 		}
 
 		return file;

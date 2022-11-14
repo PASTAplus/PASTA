@@ -6017,7 +6017,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <strong>Read Data Package Archive</strong> operation, specifying the
 	 * <em>transaction identifier</em> of the data package archive to be read in
 	 * the URI, returning the data package archive as a binary object in the ZIP
-	 * file format.
+	 * file format. Note that the user id of the request must be the same as the
+	 * original requestor.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -6141,7 +6142,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			File file = dataPackageManager.getDataPackageArchiveFile(packageId, userId);
+			File file = dataPackageManager.getDataPackageArchiveFile(transaction, packageId, userId);
 			String filename = String.format("%s.zip", packageId);
 
 			if (file != null && file.exists()) {
