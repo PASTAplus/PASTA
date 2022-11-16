@@ -940,7 +940,7 @@ Examples
   
 1. Using :command:`curl` to read a data package archive and redirect the output to a file::
 
-curl -s -X GET https://pasta.lternet.edu/package/archive/eml/knb-lter-nin/1/1/archive_knb-lter-nin.1.1_15494687022457218 > knb-lter-nin.1.1.zip
+    curl -s -X GET https://pasta.lternet.edu/package/archive/eml/knb-lter-nin/1/1/archive_knb-lter-nin.1.1_15494687022457218 > knb-lter-nin.1.1.zip
 
 
 *Read Data Package DOI*
