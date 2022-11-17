@@ -79,6 +79,7 @@
     <delete dir="${web.lib.dir}" />
     <echo>Cleaning build and classes directories: ${basedir}/${classes.dir}</echo>
     <delete dir="${build.dir}"/>
+    <delete dir="${api.dir}" />
     <delete includeemptydirs="true">
       <fileset dir="${classes.dir}" includes="**/*"/>
     </delete>
