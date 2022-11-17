@@ -472,7 +472,7 @@ readDataEntity' OR " +
       conn = getConnection();
       PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
       pstmt.setObject(1, resourceId);
-      pstmt.executeQuery();
+      pstmt.executeUpdate();
     } catch (ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());
       throw (e);
