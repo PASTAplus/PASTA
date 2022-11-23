@@ -4479,11 +4479,13 @@ public class DataPackageRegistry {
             LocalDateTime dateCreated = journalCitation.getDateCreated();
             String journalTitle = journalCitation.getJournalTitle();
             String relationType = journalCitation.getRelationType();
-
+            
             String queryStr = String.format(
-                "INSERT INTO %s (package_id, principal_owner, article_doi, " +
-                  "article_title, article_url, date_created, journal_title) " +
-                  "VALUES(?,?,?,?,?,?,?)", JOURNAL_CITATION);
+              "INSERT INTO %s (package_id, principal_owner, article_doi, " +
+                  "article_title, article_url, date_created, journal_title, " +
+                  "relation_type) " +
+                  "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
+              JOURNAL_CITATION);
 
             logger.debug("queryStr: " + queryStr);
 
