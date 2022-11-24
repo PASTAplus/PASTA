@@ -90,6 +90,8 @@ public class AuditManager {
   private String dbUser;             // database user name
   private String dbPassword;         // database user password
 
+  private boolean ignoreRobots;
+
 
   /*
    * Constructors
@@ -107,6 +109,8 @@ public class AuditManager {
     this.dbURL = ConfigurationListener.getProperty(p, "dbURL");
     this.dbUser = ConfigurationListener.getProperty(p, "dbUser");
     this.dbPassword = ConfigurationListener.getProperty(p, "dbPassword");
+
+    this.ignoreRobots = ConfigurationListener.getProperty(p, "ignore.robots").equals("true");
 
     /* Initialize the tmpDir value and create the directory */
     String tmpDirValue = ConfigurationListener.getTmpDir();
@@ -499,13 +503,16 @@ public class AuditManager {
     String groups = auditRecord.getGroups();
     String authSystem = auditRecord.getAuthSystem();
 
-    try {
-      auditId = addAuditEntry (service, category, serviceMethod,
-                     entryText, resourceId, statusCode, userId,
-                     userAgent, groups, authSystem);
-    }
-    finally {
-
+    if ((this.ignoreRobots) && (userId.equalsIgnoreCase("robot"))) {
+      String msg = "Not recording robot-based event";
+      logger.debug(msg);
+    } else {
+      try {
+        auditId = addAuditEntry(service, category, serviceMethod,
+                entryText, resourceId, statusCode, userId,
+                userAgent, groups, authSystem);
+      } finally {
+      }
     }
 
     return auditId;

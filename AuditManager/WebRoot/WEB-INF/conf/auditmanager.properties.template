@@ -12,6 +12,7 @@ dbUser=pasta
 dbPassword=HIDE_PASSWORD
 dbMaxConnections=10
 
+ignore.robots=true
 pasta.service.acr=service.xml
 web.service.version=AuditManager-0.1
 welcome.page=../doc/welcome.html
