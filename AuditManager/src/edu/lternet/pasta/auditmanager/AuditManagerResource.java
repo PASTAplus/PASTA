@@ -597,6 +597,112 @@ public class AuditManagerResource extends PastaWebService
     }
   }
 
+    /**
+     * <strong>Get Audit CSVReport</strong> operation, gets a list of zero or more
+     * audit records matching the query parameters as specified in the request and streams
+     * back a comma separated values result set.
+     *
+     * <h4>Query Parameters:</h4>
+     * <table border="1" cellspacing="0" celpadding="3">
+     *   <tr>
+     *     <td><b>Parameter</b></td>
+     *     <td><b>Value Constraints</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>category</td>
+     *     <td>debug, info, error, warn</td>
+     *   </tr>
+     *   <tr>
+     *     <td>service</td>
+     *     <td>Any of the PASTA services.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>serviceMethod</td>
+     *     <td>Any of the PASTA service Resource class JAX-RS methods.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>user</td>
+     *     <td>Any user.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>group</td>
+     *     <td>Any group.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>authSystem</td>
+     *     <td>A valid auth system identifier.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>status</td>
+     *     <td>A valid HTTP Response Code.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>resourceId</td>
+     *     <td>A PASTA resource identifier, e.g. https://pasta.lternet.edu/package/eml/knb-lter-and/2719/6, or a substring thereof (see below)</td>
+     *   <tr>
+     *     <td>fromTime</td>
+     *     <td>An ISO8601 timestamp</td>
+     *   </tr>
+     *   <tr>
+     *     <td>toTime</td>
+     *     <td>An ISO8601 timestamp</td>
+     *   </tr>
+     *   <tr>
+     *     <td>limit</td>
+     *     <td>A positive whole number</td>
+     *   </tr>
+     * </table>
+     * <br/>
+     * The query parameters <code>fromTime</code> and optionally
+     * <code>toTime</code> should be used to indicate a time span. When
+     * <code>toTime</code> is absent, the report will consist of all matching
+     * records up to the current time. Either of these parameters may only be
+     * used once.
+     * <br/>
+     * The query parameter <code>limit</code> sets an upper limit on the number
+     * of audit records returned. For example, "limit=1000".
+     * <br/>
+     * The query parameter <code>resourceId</code> will match any audit log entry whose resourceId
+     * value contains the specified string value. Thus, a query parameter of "resourceId=knb-lter-and"
+     * will match any audit log entry whose resourceId value contains the substring "knb-lter-and",
+     * while a query parameter of "resourceId=knb-lter-and/2719/6" will match any audit log entry
+     * whose resourceId value contains the substring "knb-lter-and/2719/6".
+     *
+     * <h4>Responses:</h4>
+     *
+     * <p>If the request is successful, the response will contain applications/csv text.</p>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     *   <tr>
+     *     <td><b>Status</b></td>
+     *     <td><b>Reason</b></td>
+     *     <td><b>Entity</b></td>
+     *     <td><b>MIME type</b></td>
+     *   </tr>
+     *   <tr>
+     *     <td>200 OK</td>
+     *     <td>If the request was successful.</td>
+     *     <td>The specified query's result set in CSV format.</td>
+     *     <td><code>text/csv</code></code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>400 Bad Request</td>
+     *     <td>If the specified identification number cannot be parsed as an integer.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td>401 Unauthorized</td>
+     *     <td>If the requesting user is not authorized to read the specified subscription.</td>
+     *     <td>An error message.</td>
+     *     <td><code>text/plain</code></td>
+     *   </tr>
+     * </table>
+     *
+     * @param headers  the HTTP request headers containing the authorization token.
+     * @param uriInfo  a UriInfo object containing the GET's query parameters
+     * @return an appropriate HTTP response.
+     */
   @GET
   @Path("csvreport")
   @Produces(MediaType.TEXT_PLAIN)
