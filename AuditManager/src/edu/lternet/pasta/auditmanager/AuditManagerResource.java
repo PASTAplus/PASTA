@@ -1046,7 +1046,8 @@ public class AuditManagerResource extends PastaWebService
      * <strong>Get DocId Reads</strong> operation, returns an XML-formatted list that
      * summarizes all the successful reads (total reads and non-robot reads) for all the resources of
      * a given PASTA document ID, where a document ID is of the format "scope.identifier"
-     * (excludes revision).
+     * (excludes revision). Note: as of 23 November 2022, robot-based events are no longer recorded.
+     * For this reason, total reads and non-robot reads will increase at the same rate.
      *
      * <h4>Responses:</h4>
      *
@@ -1181,6 +1182,8 @@ public class AuditManagerResource extends PastaWebService
      * <strong>Get PackageId Reads</strong> operation, returns an XML-formatted list that
      * summarizes all the successful reads (total reads and non-robot reads) for all the resources of
      * a given PASTA package ID, where a package ID is of the format "scope.identifier.revision".
+     * Note: as of 23 November 2022, robot-based events are no longer recorded. For this reason,
+     * total reads and non-robot reads will increase at the same rate.
      *
      * <h4>Responses:</h4>
      *
