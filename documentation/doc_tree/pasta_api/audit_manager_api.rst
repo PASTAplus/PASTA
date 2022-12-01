@@ -62,8 +62,10 @@ REST API
 
 Description
 """""""""""
-Returns an XML-formatted list that summarizes all the successful reads (total reads and non-robot reads) for all the resources of
-a given PASTA document ID, where a document ID is of the format "scope.identifier" (excludes revision).
+Returns an XML-formatted list that summarizes all the successful reads (total reads and non-robot reads) for all the
+resources of a given PASTA document ID, where a document ID is of the format "scope.identifier" (excludes revision).
+Note: as of 23 November 2022, robot-based events are no longer recorded. For this reason, total reads and non-robot
+reads will increase at the same rate.
 
 REST API
 """"""""
@@ -159,8 +161,10 @@ Examples
 
 Description
 """""""""""
-Returns an XML-formatted list that summarizes all the successful reads (total reads and non-robot reads) for all the resources of
-a given PASTA package ID, where a package ID is of the format "scope.identifier.revision".
+Returns an XML-formatted list that summarizes all the successful reads (total reads and non-robot reads) for all the
+resources of a given PASTA package ID, where a package ID is of the format "scope.identifier.revision". Note: as of 23
+November 2022, robot-based events are no longer recorded. For this reason, total reads and non-robot reads will
+increase at the same rate.
 
 REST API
 """"""""
