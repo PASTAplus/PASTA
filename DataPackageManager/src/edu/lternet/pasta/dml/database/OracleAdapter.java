@@ -183,8 +183,7 @@ public class OracleAdapter extends DatabaseAdapter {
      */
 	 public String getCountingRowNumberSQL(String tableName)
 	 {
-		  String selectString = "SELECT COUNT(*) FROM " + tableName;
-		  return selectString;
+		 return String.format("SELECT COUNT(*) FROM %s", tableName);
 	 }
 	
 }

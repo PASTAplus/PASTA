@@ -211,7 +211,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
   public void run() {
     DelimitedReader delimitedReader = null;
     QualityCheck dataLoadQualityCheck = null;
-    String insertSQL = "";
+    String queryStr = "";
     Vector<String> rowVector = new Vector<String>();
     int rowCount = 0;
     
@@ -329,18 +329,18 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
     	  }
     	  //connection.setAutoCommit(false);
         while (!rowVector.isEmpty()) {
-          insertSQL = databaseAdapter.generateInsertSQL(attributeList,
+          queryStr = databaseAdapter.generateInsertSQL(attributeList,
                                                         tableName, 
                                                         rowVector);
-          if (insertSQL != null)
+          if (queryStr != null)
           {
               PreparedStatement pstmt = null;
               try {
-                  pstmt = connection.prepareStatement(insertSQL);
+                  pstmt = connection.prepareStatement(queryStr);
                   pstmt.execute();
               }
               catch (SQLException e) {
-                  log.error(String.format("Insert SQL failed: %s", insertSQL));
+                  log.error(String.format("Insert SQL failed: %s", queryStr));
                   throw(e);
               }
               finally {

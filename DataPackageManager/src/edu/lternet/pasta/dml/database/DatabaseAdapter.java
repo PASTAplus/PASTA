@@ -293,7 +293,7 @@ public abstract class DatabaseAdapter {
     }
 
     if (oneRowData == null || oneRowData.isEmpty()) {
-        throw new SQLException("The the data is null and couldn't generte insert sql statement");
+        throw new SQLException("The the data is null and couldn't generate insert sql statement");
     }
 
     StringBuffer sqlAttributePart = new StringBuffer();

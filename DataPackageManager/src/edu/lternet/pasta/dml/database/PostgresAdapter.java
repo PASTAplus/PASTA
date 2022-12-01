@@ -843,8 +843,7 @@ public class PostgresAdapter extends DatabaseAdapter {
    * @return the sql string which can count how many rows
    */
   public String getCountingRowNumberSQL(String tableName) {
-    String selectString = "SELECT COUNT(*) FROM " + tableName;
-    return selectString;
+    return String.format("SELECT COUNT(*) FROM %s", tableName);
   }
 	
 }

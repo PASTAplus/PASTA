@@ -122,8 +122,8 @@ public class SolrMetadataCatalog implements MetadataCatalog {
     	SimpleSolrSearch simpleSolrSearch = new SimpleSolrSearch(solrUrl);
     	
     	try {
-            QueryString queryString = new QueryString(uriInfo);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             
 			if (queryParams != null) {
 

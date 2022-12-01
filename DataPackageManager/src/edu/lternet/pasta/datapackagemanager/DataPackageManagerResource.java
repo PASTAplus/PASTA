@@ -1416,8 +1416,6 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
 
-
-
 		try {
 			if (this.readOnly) {
 				throw new ServiceUnavailableException("PASTA is now in read-only mode");
@@ -1426,8 +1424,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
-			QueryString queryString = new QueryString(uriInfo);
-			Map<String, List<String>> queryParams = queryString.getParams();
+			QueryString queryStr = new QueryString(uriInfo);
+			Map<String, List<String>> queryParams = queryStr.getParams();
 			boolean useChecksum = false;
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
@@ -6019,7 +6017,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 * <strong>Read Data Package Archive</strong> operation, specifying the
 	 * <em>transaction identifier</em> of the data package archive to be read in
 	 * the URI, returning the data package archive as a binary object in the ZIP
-	 * file format.
+	 * file format. Note that the user id of the request must be the same as the
+	 * original requestor.
 	 * 
 	 * <h4>Requests:</h4>
 	 * <table border="1" cellspacing="0" cellpadding="3">
@@ -6143,7 +6142,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			File file = dataPackageManager.getDataPackageArchiveFile(packageId, userId);
+			File file = dataPackageManager.getDataPackageArchiveFile(transaction, packageId, userId);
 			String filename = String.format("%s.zip", packageId);
 
 			if (file != null && file.exists()) {
@@ -9697,8 +9696,8 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-            QueryString queryString = new QueryString(uriInfo);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             String type = "insert";
             String xml = "";
             int limit = DataPackageUploadManager.ARRAY_LIMIT;
@@ -9940,8 +9939,8 @@ public class DataPackageManagerResource extends PastaWebService {
 						+ serviceMethodName);
 			}
 
-            QueryString queryString = new QueryString(uriInfo);
-            Map<String, List<String>> queryParams = queryString.getParams();
+            QueryString queryStr = new QueryString(uriInfo);
+            Map<String, List<String>> queryParams = queryStr.getParams();
             String fromDate = null;
             String toDate = null;
             String scope = null;
@@ -10414,8 +10413,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			authToken = getAuthToken(headers);
 			String userId = authToken.getUserId();
 
-	        QueryString queryString = new QueryString(uriInfo);
-	        Map<String, List<String>> queryParams = queryString.getParams(); 
+	        QueryString queryStr = new QueryString(uriInfo);
+	        Map<String, List<String>> queryParams = queryStr.getParams();
 	        boolean useChecksum = false;
 			if (queryParams != null) {
 				for (String key : queryParams.keySet()) {
@@ -11219,9 +11218,9 @@ public class DataPackageManagerResource extends PastaWebService {
 				throw new UnauthorizedException(errorMsg);
 			}
 
-			QueryString queryString = new QueryString(uriInfo);
-			queryString.checkForIllegalKeys(VALID_EVENT_QUERY_KEYS);
-			Map<String, List<String>> queryParams = queryString.getParams();
+			QueryString queryStr = new QueryString(uriInfo);
+			queryStr.checkForIllegalKeys(VALID_EVENT_QUERY_KEYS);
+			Map<String, List<String>> queryParams = queryStr.getParams();
 			SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
 			List<EmlSubscription> emlSubscriptions = subscriptionRegistry
 					.getSubscriptions(userId, queryParams);

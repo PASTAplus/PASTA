@@ -123,7 +123,7 @@ public class ChecksumValidator {
 							errorCount++;
 						}
 						else if (!storedChecksum.equals(calculatedChecksum)) {
-							System.err.println(String.format("Checksums do not match for resource %s\n  Stored checksum:     %s\n  Calculated checksum: %s", 
+							System.err.println(String.format("Checksums do not match for resource %s\n Stored checksum: %s\n Calculated checksum: %s",
 																resourceId, storedChecksum, calculatedChecksum));
 							errorCount++;
 						}

@@ -200,8 +200,7 @@ public class Condition implements ConditionInterface
 			}
 			else if ( value != null)
 			{
-				throw new UnWellFormedQueryException("" + 
-                                                     value + 
+				throw new UnWellFormedQueryException(value +
                      UnWellFormedQueryException.CONDITION_VALUE_IS_NOT_NUMBER +
                                                      operator);
 			}

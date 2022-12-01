@@ -37,8 +37,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.lternet.pasta.common.SqlEscape;
 import org.apache.log4j.Logger;
-
 
 /**
 * @author dcosta
@@ -186,8 +186,9 @@ readDataEntity' OR " +
   private void deleteAllRows() 
           throws ClassNotFoundException, SQLException {
       Connection connection = null;
-      final String UPDATE_STRING = String.format("DELETE FROM %s",
-                                                 READS_MANAGER_TABLE_QUALIFIED);
+      final String UPDATE_STRING = String.format(
+          "DELETE FROM %s",
+          READS_MANAGER_TABLE_QUALIFIED);
       
       Statement stmt = null;
       
@@ -277,15 +278,15 @@ readDataEntity' OR " +
            
       final String SQL_STRING =
           "SELECT DISTINCT resourceId " +
-          "FROM auditmanager.eventlog " +
-          "WHERE (servicemethod='readDataEntity' OR " +
-          "       servicemethod='readDataPackage' OR " +
-          "       servicemethod='readDataPackageArchive' OR " +
-          "       servicemethod='readDataPackageReport' OR " +
-          "       servicemethod='readMetadata') " +
-          "      AND statuscode=200 " +
-          "      AND resourceId like 'http%' " +
-          "ORDER BY resourceId ASC";   
+              "FROM auditmanager.eventlog " +
+              "WHERE (servicemethod='readDataEntity' " +
+              "OR servicemethod='readDataPackage' " +
+              "OR servicemethod='readDataPackageArchive' " +
+              "OR servicemethod='readDataPackageReport' " +
+              "OR servicemethod='readMetadata') " +
+              "AND statuscode=200 " +
+              "AND resourceId like 'http%%' " +
+              "ORDER BY resourceId ASC";
       Statement stmt = null;
       
       try {
@@ -298,7 +299,7 @@ readDataEntity' OR " +
             resourceIds.add(resourceId);
           }
           
-          System.err.println(String.format("Processing %d resourceIds", resourceIds.size()));
+          System.err.printf("Processing %d resourceIds%n", resourceIds.size());
         }
         catch(ClassNotFoundException e) {
           System.err.println("ClassNotFoundException: " + e.getMessage());
@@ -319,19 +320,19 @@ readDataEntity' OR " +
           
           for (String resourceId : resourceIds) {
               i++;
-              System.err.println(String.format("(%d) Processing resourceId: %s", i, resourceId));
+              System.err.printf("(%d) Processing resourceId: %s%n", i, resourceId);
           
               String SQL_STRING_RESOURCE = String.format(
-              "SELECT servicemethod, userid " +
-              "FROM auditmanager.eventlog " +
-              "WHERE resourceid='%s' AND " +
-              " (servicemethod='readDataEntity' OR " +
-              "  servicemethod='readDataPackage' OR " +
-              "  servicemethod='readDataPackageArchive' OR " +
-              "  servicemethod='readDataPackageReport' OR " +
-              "  servicemethod='readMetadata') AND " +
-              " statuscode=200 ",
-              resourceId);
+                  "SELECT servicemethod, userid " +
+                      "FROM auditmanager.eventlog " +
+                      "WHERE resourceid=%s " +
+                      "AND (servicemethod='readDataEntity' " +
+                      "OR servicemethod='readDataPackage' " +
+                      "OR servicemethod='readDataPackageArchive' " +
+                      "OR servicemethod='readDataPackageReport' " +
+                      "OR servicemethod='readMetadata') AND statuscode=200 ",
+                      SqlEscape.str(resourceId)
+              );
 
               try {
                   stmt = connection.createStatement();
@@ -401,31 +402,28 @@ readDataEntity' OR " +
     int totalReads = 1;
     int nonRobotReads = isNonRobotRead ? 1 : 0;
     Connection connection = null;
-    
-    StringBuffer insertSQL = new StringBuffer("INSERT INTO " + 
-                                              READS_MANAGER_TABLE_QUALIFIED + 
-                                              "(");
-    insertSQL.append("resource_id, resource_type, scope, identifier, " + 
-                     "revision, total_reads, non_robot_reads) " + 
-                     "VALUES(?,?,?,?,?,?,?)");
-    String insertString = insertSQL.toString();
-    logger.debug("insertString: " + insertString);
+
+    String queryStr =
+        String.format("INSERT INTO %s (resource_id, resource_type, scope, identifier, " +
+            "revision, total_reads, non_robot_reads) " +
+            "VALUES(?,?,?,?,?,?,?)", READS_MANAGER_TABLE_QUALIFIED);
+
+    logger.debug("queryStr: " + queryStr);
 
     try {
-        connection = getConnection();
-        PreparedStatement pstmt = connection.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
-        pstmt.setString(1, resourceId);
-        pstmt.setObject(2, resourceType, java.sql.Types.OTHER);        
-        pstmt.setString(3, scope);
-        pstmt.setInt(4, identifier);
-        pstmt.setInt(5, revision);
-        pstmt.setInt(6, totalReads);
-        pstmt.setInt(7, nonRobotReads);
-        pstmt.executeUpdate();
-        if (pstmt != null) {
-          pstmt.close();
-        }
-      }
+      connection = getConnection();
+      PreparedStatement pstmt =
+          connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
+      pstmt.setString(1, resourceId);
+      pstmt.setObject(2, resourceType, java.sql.Types.OTHER);
+      pstmt.setString(3, scope);
+      pstmt.setInt(4, identifier);
+      pstmt.setInt(5, revision);
+      pstmt.setInt(6, totalReads);
+      pstmt.setInt(7, nonRobotReads);
+      pstmt.executeUpdate();
+      pstmt.close();
+    }
     catch (SQLException e) {
         logger.error("Error inserting record for resource " + resourceId
             + " into the Audit Manager (" + READS_MANAGER_TABLE_QUALIFIED + ")");
@@ -443,46 +441,48 @@ readDataEntity' OR " +
    * Increments the total_reads (and possibly the non_robot_reads) value(s) for the specified resource_id.
    * 
    * @param resourceId              The resource whose value is to be incremented.
-   * @param isNonRobotRead          If true, the non_robot_reads field is also incrmemented.
+   * @param isNonRobotRead          If true, the non_robot_reads field is also incremented.
    * @throws ClassNotFoundException
    * @throws SQLException
    */
-  public void incrementResourceRecord (String resourceId, boolean isNonRobotRead)
-               throws ClassNotFoundException, SQLException {
-         Connection connection = null;
-         String updateSQL = null;
-         Statement stmt = null;
-         
-         if (isNonRobotRead) {
-             updateSQL = String.format(
-            "UPDATE %s SET total_reads = total_reads + 1, non_robot_reads = non_robot_reads + 1 WHERE resource_id='%s'", 
-            READS_MANAGER_TABLE_QUALIFIED, resourceId);
-         }
-         else {
-             updateSQL = String.format("UPDATE %s SET total_reads = total_reads + 1 WHERE resource_id='%s'", 
-                                       READS_MANAGER_TABLE_QUALIFIED, resourceId);
-         }
-         
-        try {
-            connection = getConnection();
-            stmt = connection.createStatement();
-            int rowCount = stmt.executeUpdate(updateSQL);
-        } 
-        catch (ClassNotFoundException e) {
-            logger.error("ClassNotFoundException: " + e.getMessage());
-            throw (e);
-        } 
-        catch (SQLException e) {
-            logger.error("SQLException: " + e.getMessage());
-            throw (e);
-        } 
-        finally {
-            if (stmt != null)
-                stmt.close();
-            returnConnection(connection);
-        }
+  public void incrementResourceRecord(String resourceId, boolean isNonRobotRead)
+      throws ClassNotFoundException, SQLException
+  {
+    String sqlQuery;
+    Statement stmt = null;
 
-       }
+    if (isNonRobotRead) {
+      sqlQuery = String.format(
+          "UPDATE %s SET total_reads = total_reads + 1, " +
+              "non_robot_reads = non_robot_reads + 1 " +
+              "WHERE resource_id=?",
+          READS_MANAGER_TABLE_QUALIFIED);
+    }
+    else {
+      sqlQuery = String.format(
+          "UPDATE %s SET total_reads = total_reads + 1 WHERE resource_id=?",
+          READS_MANAGER_TABLE_QUALIFIED);
+    }
+
+    Connection conn = null;
+
+//    org.postgresql.core.Utils.escapeLiteral
+
+    try {
+      conn = getConnection();
+      PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+      pstmt.setObject(1, resourceId);
+      pstmt.executeUpdate();
+    } catch (ClassNotFoundException e) {
+      logger.error("ClassNotFoundException: " + e.getMessage());
+      throw (e);
+    } catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      throw (e);
+    } finally {
+      returnConnection(conn);
+    }
+  }
        
        
   /*
@@ -517,7 +517,7 @@ readDataEntity' OR " +
    * matching the provided criteria, and return them in XML format.
    * 
    * @param scope  the scope value to match
-   * @param identifer the identifier value to match
+   * @param identifier the identifier value to match
    * @return  an XML-formatted list of matching records
    * @throws ClassNotFoundException
    * @throws SQLException
@@ -525,20 +525,28 @@ readDataEntity' OR " +
    */
   public String getDocIdReads(String scope, Integer identifier)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-      StringBuffer stringBuffer = new StringBuffer(XML_DECLARATION);
+      StringBuilder stringBuffer = new StringBuilder(XML_DECLARATION);
       stringBuffer.append(READS_OPENING_TAG);
       String xmlString = null;
       Connection connection = null;
      
-      String selectString = 
-        String.format("SELECT * FROM %s WHERE scope='%s' AND identifier=%d ORDER BY scope, identifier, revision ASC", 
-                      READS_MANAGER_TABLE_QUALIFIED, scope, identifier);
+      String queryStr = String.format(
+          "SELECT * FROM %s " +
+                "WHERE scope=%s AND identifier=%s " +
+                "ORDER BY scope, identifier, revision ASC",
+          SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+          SqlEscape.str(scope),
+          SqlEscape.integer(identifier)
+      );
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
      
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
        
         while (rs.next()) {
           String resourceId = rs.getString("resource_id");
@@ -588,15 +596,24 @@ readDataEntity' OR " +
       String xmlString = null;
       Connection connection = null;
      
-      String selectString = 
-        String.format("SELECT * FROM %s WHERE scope='%s' AND identifier=%d AND revision=%d ORDER BY scope, identifier, revision ASC", 
-                      READS_MANAGER_TABLE_QUALIFIED, scope, identifier, revision);
+      String queryStr =
+        String.format("SELECT * FROM %s " +
+                "WHERE scope=%s AND identifier=%s AND revision=%s " +
+                "ORDER BY scope, identifier, revision ASC",
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(scope),
+            SqlEscape.integer(identifier),
+            SqlEscape.integer(revision)
+        );
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
      
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
        
         while (rs.next()) {
           String resourceId = rs.getString("resource_id");
@@ -643,15 +660,22 @@ readDataEntity' OR " +
       String xmlString = null;
       Connection connection = null;
      
-      String selectString = 
-        String.format("SELECT * FROM %s WHERE resource_id='%s' ORDER BY scope, identifier, revision ASC", 
-                      READS_MANAGER_TABLE_QUALIFIED, resourceId);
+      String queryStr =
+        String.format("SELECT * FROM %s " +
+                "WHERE resource_id=%s " +
+                "ORDER BY scope, identifier, revision ASC",
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(resourceId)
+        );
+
+      logger.debug("queryStr: " + queryStr);
+
       Statement stmt = null;
      
       try {
         connection = getConnection();
         stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(selectString);
+        ResultSet rs = stmt.executeQuery(queryStr);
        
         while (rs.next()) {
             String resourceType = rs.getString("resource_type");
@@ -738,23 +762,27 @@ readDataEntity' OR " +
           throws ClassNotFoundException, SQLException {
     boolean hasResource = false;
     Connection connection = null;
-    String selectString = 
-      "SELECT count(*) FROM " + READS_MANAGER_TABLE_QUALIFIED +
-      "  WHERE resource_id='" + resourceId + "'";
-  
+    String queryStr =
+        String.format("SELECT count(*) FROM %s WHERE resource_id=%s",
+            SqlEscape.name(READS_MANAGER_TABLE_QUALIFIED),
+            SqlEscape.str(resourceId)
+        );
+
+    logger.debug("queryStr: " + queryStr);
+
     Statement stmt = null;
   
     try {
       connection = getConnection();
       stmt = connection.createStatement();             
-      ResultSet rs = stmt.executeQuery(selectString);
+      ResultSet rs = stmt.executeQuery(queryStr);
     
       while (rs.next()) {
         int count = rs.getInt("count");
         hasResource = (count > 0);
       }
 
-      if (stmt != null) stmt.close();
+      stmt.close();
     }
     catch(ClassNotFoundException e) {
       logger.error("ClassNotFoundException: " + e.getMessage());

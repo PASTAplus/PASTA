@@ -102,8 +102,8 @@ public class WhereClauseTest extends TestCase {
    * test toSQLString based on where clause constructor with condition
    *
    */
-  public void testToSQLStringBaseOnCondition()
-  {
+  public void testToSQLStringBaseOnCondition() throws UnWellFormedQueryException
+	{
 	  entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
 	  TextDomain domain = new TextDomain();
 	  attribute1 = new Attribute(attributeId, attributeName1, domain);
@@ -111,17 +111,8 @@ public class WhereClauseTest extends TestCase {
 	  attribute1.setDBFieldName(dbAttributeName1);
 	  Condition con = new Condition(entity1, attribute1, operator, value);
 	  WhereClause where = new WhereClause(con);
-      
-	  try
-	  {
-		 String sql = where.toSQLString();
-		 System.out.println("sql is"+sql);
-		 assertTrue("Should have a sql ", sql.equals(" where table1.attribute1 = 'hello'"));
-	  }
-	  catch (UnWellFormedQueryException e)
-	  {
-		assertTrue("Should have a sql", 1==2);
-	  }
+		String sql = where.toSQLString();
+		assertSqlEquals(sql, "where table1.attribute1 = 'hello'");
   }
   
   
@@ -129,8 +120,8 @@ public class WhereClauseTest extends TestCase {
    * test toSQLString based on where clause constructor with ANDRelation
    *
    */
-  public void testToSQLStringBaseOnANDRelation()
-  {
+  public void testToSQLStringBaseOnANDRelation() throws UnWellFormedQueryException
+	{
 	   ANDRelation relation = new ANDRelation();
 	   
 	   entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
@@ -146,27 +137,17 @@ public class WhereClauseTest extends TestCase {
 	   Condition cond2 = new Condition(entity2, attribute2, operator, value);
 	   relation.addCondtionInterface(cond1);
 	   relation.addCondtionInterface(cond2);
-	   
 	   WhereClause where = new WhereClause(relation);
-       
-	   try
-	   {
 		 String sql = where.toSQLString();
-		 System.out.println("sql is"+sql+"!");
-		 assertTrue("Should have a sql ", sql.equals(" where  table1.attribute1 = 'hello' AND table2.attribute2 = 'hello' "));
-	   }
-	   catch (UnWellFormedQueryException e)
-	   {
-		 assertTrue("Should have a sql", 1==2);
-	   }
+		 assertSqlEquals(sql, "where table1.attribute1 = 'hello' AND table2.attribute2 = 'hello'");
   }
    
   /**
    * test toSQLString based on where clause constructor with ORRelation
    *
    */
-  public void testToSQLStringBaseOnORRelation()
-  {
+  public void testToSQLStringBaseOnORRelation() throws UnWellFormedQueryException
+	{
 	   ORRelation relation = new ORRelation();
 	   
 	   entity1 = new Entity(packageId, id, name1, description,caseSensitive,orientation,numRecords);
@@ -182,20 +163,17 @@ public class WhereClauseTest extends TestCase {
 	   Condition cond2 = new Condition(entity2, attribute2, operator, value);
 	   relation.addCondtionInterface(cond1);
 	   relation.addCondtionInterface(cond2);
-	   
 	   WhereClause where = new WhereClause(relation);
-       
-	   try
-	   {
 		 String sql = where.toSQLString();
-		 System.out.println("sql is"+sql+"!");
-		 assertTrue("Should have a sql ", sql.equals(" where  table1.attribute1 = 'hello' OR table2.attribute2 = 'hello' "));
-	   }
-	   catch (UnWellFormedQueryException e)
-	   {
-		 assertTrue("Should have a sql", 1==2);
-	   }
+		 assertSqlEquals(sql, "where table1.attribute1 = 'hello' OR table2.attribute2 = 'hello'");
   }
-   
+
+  public void assertSqlEquals(String expected, String actual)
+  {
+    assertEquals("SQL query string mismatch",
+				expected.replaceAll("\\s+", " ").trim(),
+				actual.replaceAll("\\s+", " ").trim()
+		);
+  }
 }
 

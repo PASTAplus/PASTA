@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import edu.lternet.pasta.common.SqlEscape;
 import org.apache.log4j.Logger;
 
 import edu.ucsb.nceas.utilities.Options;
@@ -189,26 +190,24 @@ public class WorkingOn {
 		java.sql.Timestamp ts = new java.sql.Timestamp(System.currentTimeMillis());
 		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 
-		StringBuilder insertSQL = new StringBuilder("INSERT INTO " + WORKING_ON + "(");
-		insertSQL.append("scope, identifier, revision, service_method, start_date) " + "VALUES(?,?,?,?,?)");
+		String queryStr = String.format(
+				"INSERT INTO %s (scope, identifier, revision, service_method, start_date) " +
+						"VALUES(?,?,?,?,?)",
+				WORKING_ON);
 
-		String insertString = insertSQL.toString();
-		logger.debug("insertString: " + insertString);
+		logger.debug("queryStr: " + queryStr);
 
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(insertString);
+			PreparedStatement pstmt = connection.prepareStatement(queryStr);
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.setInt(3, revision);
 			pstmt.setString(4, serviceMethod);
 			pstmt.setTimestamp(5, ts);
-
 			pstmt.executeUpdate();
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			logger.info(String.format("Work for '%s' on data package '%s' has been started.", 
+			pstmt.close();
+			logger.info(String.format("Work for '%s' on data package '%s' has been started.",
 					                  serviceMethod, packageId));
 		} 
 		catch (SQLException e) {
@@ -238,22 +237,21 @@ public class WorkingOn {
 		Connection connection = null;
 		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 
-		StringBuilder deleteSQL = new StringBuilder("DELETE FROM " + WORKING_ON + 
-				" WHERE scope=? AND identifier=? and revision=?");
+		String queryStr = String.format(
+				"DELETE FROM %s WHERE scope=? AND identifier=? and revision=?",
+						WORKING_ON);
 
-		String deleteString = deleteSQL.toString();
+		logger.debug("queryStr: " + queryStr);
 
 		try {
 			connection = getConnection();
-			PreparedStatement pstmt = connection.prepareStatement(deleteString);
+			PreparedStatement pstmt = connection.prepareStatement( queryStr);
 			pstmt.setString(1, scope);
 			pstmt.setInt(2, identifier);
 			pstmt.setInt(3, revision);
 			pstmt.executeUpdate();
-			if (pstmt != null) {
-				pstmt.close();
-			}
-			logger.info(String.format("%s has been deleted from the %s table", 
+			pstmt.close();
+			logger.info(String.format("%s has been deleted from the %s table",
 					                  packageId, WORKING_ON));
 		} 
 		catch (SQLException e) {
@@ -294,14 +292,18 @@ public class WorkingOn {
 			e.printStackTrace();
 		}
 		
-		String updateSQL = "UPDATE datapackagemanager.WORKING_ON " + 
-		"SET end_date=? WHERE scope=? AND identifier=? AND revision=? AND interrupted=? AND end_date IS NULL";
+		String queryStr =
+				"UPDATE datapackagemanager.WORKING_ON " +
+						"SET end_date=? " +
+						"WHERE scope=? AND identifier=? AND revision=? AND interrupted=?";
+
+		logger.debug("queryStr: " + queryStr);
 
 		Integer rowCount = null;
 
 		try {
 			if (conn != null) {
-				PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+				PreparedStatement pstmt = conn.prepareStatement(queryStr);
 				pstmt.setTimestamp(1, ts); // The field to be updated
 				pstmt.setString(2, scope); // Set WHERE scope value
 				pstmt.setInt(3, identifier); // Set WHERE identifier value
@@ -353,13 +355,17 @@ public class WorkingOn {
 			e.printStackTrace();
 		}
 
-		String updateSQL = "UPDATE datapackagemanager.WORKING_ON " + 
-		"SET interrupted=? WHERE end_date IS NULL AND interrupted=?";
+		String queryStr =
+				"UPDATE datapackagemanager.WORKING_ON " +
+						"SET interrupted=? " +
+						"WHERE end_date IS NULL AND interrupted=?";
+
+		logger.debug("queryStr: " + queryStr);
 
 		Integer rowCount = null;
 
 		try {
-			PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+			PreparedStatement pstmt = conn.prepareStatement(queryStr);
 	        pstmt.setBoolean(1, true);          // The field to be updated
 	        pstmt.setBoolean(2, false);         // Set WHERE interrupted value
 	        rowCount = pstmt.executeUpdate();
@@ -437,22 +443,19 @@ public class WorkingOn {
 	public ArrayList<String> listActiveDataPackages() throws Exception {
 		Connection conn = null;
 		ArrayList<String> activeDataPackages = new ArrayList<String>();
-		StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT scope, identifier, revision, service_method, start_date FROM ");
-		sb.append(WORKING_ON);
-		sb.append(" WHERE start_date IS NOT NULL AND ");
-		sb.append("   end_date IS NULL AND ");
-		sb.append("   interrupted=false ");
-		sb.append("ORDER BY start_date ASC;");
-		String sqlQuery = sb.toString();
+		String sqlQuery = String.format(
+				"SELECT scope, identifier, revision, service_method, start_date " +
+						"FROM %s WHERE start_date IS NOT NULL AND end_date IS NULL AND interrupted=false " +
+						"ORDER BY start_date ASC",
+				WORKING_ON);
 
 		try {
 			conn = getConnection();
 
 			if (conn != null) {
-				Statement stmnt = conn.createStatement();
-				ResultSet rs = stmnt.executeQuery(sqlQuery);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
 					String scope = rs.getString(1);
@@ -485,22 +488,21 @@ public class WorkingOn {
 			throws Exception {
 		Connection conn = null;
 		ArrayList<Integer> identifiers = new ArrayList<Integer>();
-		StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT identifier FROM ");
-		sb.append(WORKING_ON);
-		sb.append(" WHERE start_date IS NOT NULL  AND ");
-		sb.append(String.format("   scope='%s' AND ", scope));
-		sb.append("   end_date IS NULL AND ");
-		sb.append("   interrupted=false ");
-		String sqlQuery = sb.toString();
+		String sqlQuery = String.format(
+				"SELECT identifier " +
+						"FROM %s " +
+						"WHERE start_date IS NOT NULL AND scope=%s AND end_date IS NULL AND interrupted=false",
+				SqlEscape.name(WORKING_ON),
+				SqlEscape.str(scope)
+		);
 
 		try {
 			conn = getConnection();
 
 			if (conn != null) {
-				Statement stmnt = conn.createStatement();
-				ResultSet rs = stmnt.executeQuery(sqlQuery);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sqlQuery);
 
 				while (rs.next()) {
 					Integer identifier = rs.getInt(1);
@@ -533,27 +535,31 @@ public class WorkingOn {
 			throws ClassNotFoundException, SQLException {
 		boolean hasDataPackage = false;
 		Connection connection = null;
-		String selectString = 
-				"SELECT count(*) FROM " + WORKING_ON + 
-				"  WHERE scope='" + scope + 
-				"' AND identifier='" + identifier + 
-				"' AND revision='" + revision + 
-				"' AND end_date IS NULL AND interrupted='false';";
+		String queryStr = String.format(
+				"SELECT count(*) " +
+						"FROM %s " +
+						"WHERE scope=%s AND identifier=%s AND revision=%s AND end_date IS NULL AND interrupted='false'",
+				SqlEscape.name(WORKING_ON),
+				SqlEscape.str(scope),
+				SqlEscape.integer(identifier),
+				SqlEscape.integer(revision)
+		);
+
+		logger.debug("queryStr: " + queryStr);
 
 		Statement stmt = null;
 
 		try {
 			connection = getConnection();
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery(selectString);
+			ResultSet rs = stmt.executeQuery(queryStr);
 
 			while (rs.next()) {
 				int count = rs.getInt("count");
 				hasDataPackage = (count > 0);
 			}
 
-			if (stmt != null)
-				stmt.close();
+			stmt.close();
 		} catch (ClassNotFoundException e) {
 			logger.error("ClassNotFoundException: " + e.getMessage());
 			throw (e);
