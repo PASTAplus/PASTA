@@ -255,8 +255,7 @@ public class HSQLAdapter extends DatabaseAdapter {
 	 */
 	 public String getCountingRowNumberSQL(String tableName)
 	 {
-		  String selectString = "SELECT COUNT(*) \"count\" FROM " + tableName;
-		  return selectString;
+		 return String.format("SELECT COUNT(*) \"count\" FROM %s", tableName);
 	 }
 	
 }

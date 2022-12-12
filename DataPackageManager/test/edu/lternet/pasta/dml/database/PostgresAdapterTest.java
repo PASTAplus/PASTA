@@ -75,7 +75,7 @@ public class PostgresAdapterTest extends TestCase
 	  
       
 	  /**
-	   * Tests generating insertSQL method
+	   * Tests generating queryStr method
 	   */
 	  public void testGenerateInsertSQL() throws SQLException, DataNotMatchingMetadataException
 	  {
