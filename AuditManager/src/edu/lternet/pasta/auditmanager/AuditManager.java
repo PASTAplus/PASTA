@@ -306,16 +306,6 @@ public class AuditManager {
 
     boolean orderDesc = false;
 
-    // In the loop below, we iterate over keys, so each key can only add a filter. The
-    // semantics for excluding robots is that the absence of the key causes the filter
-    // to be added, so we negate the key here.
-    if (queryParams.containsKey("robots")) {
-      queryParams.remove("robots");
-    }
-    else {
-      queryParams.put("excludeRobots", Collections.emptyList());
-    }
-
     for (String key : queryParams.keySet()) {
       if (!key.equalsIgnoreCase("limit")) {
         stringBuffer.append(" AND ");
@@ -346,8 +336,11 @@ public class AuditManager {
         else if (key.equalsIgnoreCase("userAgentNegate")) {
           stringBuffer.append(String.format(" useragent NOT ILIKE '%%%s%%'", values.get(0)));
         }
-        else if (key.equalsIgnoreCase("excludeRobots")) {
-          stringBuffer.append(" userid NOT LIKE 'robot%'");
+        else if (key.equalsIgnoreCase("userDn")) {
+          stringBuffer.append(String.format(" userid ILIKE '%%%s%%'", values.get(0)));
+        }
+        else if (key.equalsIgnoreCase("userDnNegate")) {
+          stringBuffer.append(String.format(" userid NOT ILIKE '%%%s%%'", values.get(0)));
         }
         else {
           String orClause = composeORClause(key, values);
