@@ -137,7 +137,7 @@ public class AuditManagerResource extends PastaWebService
         set.add(USER_AGENT);
         set.add(USER_AGENT_NEGATE);
         set.add(USER_DN);
-        set.add(USER_DN_NEGATE);
+`        set.add(USER_DN_NEGATE);
         set.add(GROUP);
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
