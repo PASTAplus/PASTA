@@ -1,93 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="deploy" name="DataPackageManager">
-	<property file="build.properties"/>
-	<property file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"/>
-	<property name="classes.dir" value="WebRoot/WEB-INF/classes"/>
-	<property name="test.classes.dir" location="build/test/classes"/>
-	<property name="webapp.name" value="package"/>
+  <property file="build.properties"/>
+  <property file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"/>
+  <property name="classes.dir" value="WebRoot/WEB-INF/classes"/>
+  <property name="test.classes.dir" location="build/test/classes"/>
+  <property name="webapp.name" value="package"/>
 
-	<!-- Import standard build file -->
-	<import file="../ant-util/simple.xml"/>
+  <!-- Import standard build file -->
+  <import file="../ant-util/simple.xml"/>
 
-	<!-- Copy shared libraries into the local lib directory -->
-	<target name="prepare" depends="prepare-common">
-	    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties" 
-	          todir="${classes.dir}" 
-	    />   
-	    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties" 
-	          todir="${test.classes.dir}" 
-	    />   
-		<copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
+  <!-- Copy shared libraries into the local lib directory -->
+  <target name="prepare" depends="prepare-common">
+    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"
+          todir="${classes.dir}"
+    />
+    <copy file="./WebRoot/WEB-INF/conf/datapackagemanager.properties"
+          todir="${test.classes.dir}"
+    />
+    <copy todir="${web.lib.dir}" preservelastmodified="true" verbose="true"
           filtering="no">
-			<fileset dir="${shared.lib.dir}/apache-commons">
-				<include name="**/commons-configuration*.jar"/>
-				<include name="**/commons-logging*.jar"/>
-				<include name="**/commons-lang*.jar"/>
-				<include name="**/commons-io-2.*.jar"/>
-				<include name="**/commons-fileupload-*.jar"/>
-				<include name="**/commons-codec-*.jar"/>
-				<include name="**/commons-net-*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-httpcomponents-core-4.4.12">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.5.10">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-logging">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-xalan">
-				<include name="**/xalan.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/apache-xerces">
-				<include name="resolver.jar"/>
-				<include name="serializer.jar"/>
-				<include name="xercesImpl.jar"/>
-				<include name="xml-apis.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/datamanager">
-				<include name="**/*.jar"/>
-				<exclude name="**/datamanager.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/jersey">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/junit">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/metacat">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/ning">
-				<include name="async-http-client-1.4.0.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/owasp">
-				<include name="**/esapi-2.0.1.jar"/>
-				<include name="**/encoder-1.2.2.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/postgresql">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${shared.lib.dir}/solrj">
-				<include name="solr-solrj-8.3.0.jar"/>
-				<include name="noggit-0.8.jar"/>
-				<include name="slf4j-api-1.7.6.jar"/>
-			</fileset>
-	                <fileset dir="${shared.lib.dir}/zookeeper-3.4.5">
-                                <include name="**/*.jar"/>
-                        </fileset>
-    		</copy>
-	</target>
+      <fileset dir="${shared.lib.dir}/apache-commons">
+        <include name="**/commons-configuration*.jar"/>
+        <include name="**/commons-logging*.jar"/>
+        <include name="**/commons-lang*.jar"/>
+        <include name="**/commons-io-2.*.jar"/>
+        <include name="**/commons-fileupload-*.jar"/>
+        <include name="**/commons-codec-*.jar"/>
+        <include name="**/commons-net-*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-httpcomponents-core-4.4.12">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-httpcomponents-client-4.5.10">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-logging">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xalan">
+        <include name="**/xalan.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/apache-xerces">
+        <include name="resolver.jar"/>
+        <include name="serializer.jar"/>
+        <include name="xercesImpl.jar"/>
+        <include name="xml-apis.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/datamanager">
+        <include name="**/*.jar"/>
+        <exclude name="**/datamanager.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/jersey">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/junit">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/metacat">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/ning">
+        <include name="async-http-client-1.4.0.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/owasp">
+        <include name="**/esapi-2.0.1.jar"/>
+        <include name="**/encoder-1.2.2.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/postgresql">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/solrj">
+        <include name="solr-solrj-8.3.0.jar"/>
+        <include name="noggit-0.8.jar"/>
+        <include name="slf4j-api-1.7.6.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/zookeeper-3.4.5">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${shared.lib.dir}/saxon10">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+  </target>
 
-	<target name="deploy-solr"
-	          description="Run this target on the Solr server. Deploys the PASTA solr configuration to Solr">
-		<copy todir="${solr.home}"
-	          preservelastmodified="true" verbose="true" filtering="no">
-		    <fileset dir="resources/solr-pasta">
-		      <include name="**/*.*"/>
-		    </fileset>
-		</copy>
-	</target>
+  <target name="deploy-solr"
+          description="Run this target on the Solr server. Deploys the PASTA solr configuration to Solr">
+    <copy todir="${solr.home}"
+          preservelastmodified="true" verbose="true" filtering="no">
+      <fileset dir="resources/solr-pasta">
+        <include name="**/*.*"/>
+      </fileset>
+    </copy>
+  </target>
 
 </project>

@@ -18,7 +18,7 @@
 
   
   <!-- create a variable that contains all the elements that have an 'id' 
-       attribute. Do this so that the the search for such elements only has
+       attribute. Do this so that the search for such elements only has
        to be carried out once.
     -->     
   <xsl:variable name="ids" select="//*[@id!='']"/>
