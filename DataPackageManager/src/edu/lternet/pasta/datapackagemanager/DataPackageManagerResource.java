@@ -78,6 +78,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -117,7 +118,6 @@ import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.token.AuthTokenFactory;
-import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
 import edu.lternet.pasta.eventmanager.SubscriptionRegistry;
@@ -1415,6 +1415,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "evaluateDataPackage";
 		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = null;
+
+
 
 		try {
 			if (this.readOnly) {
@@ -9558,6 +9560,95 @@ public class DataPackageManagerResource extends PastaWebService {
 		return response;
 	}
 
+	@GET
+	@Path("/search/download")
+	@Produces("application/csv")
+	public Response searchDownload(@Context HttpHeaders headers,
+																 @Context UriInfo uriInfo) {
+
+		AuthToken authToken = null;
+		String resourceId = null;
+		String entryText = "";
+		String resultsetXML = null;
+		ResponseBuilder responseBuilder = null;
+		Response response = null;
+		final String serviceMethodName = "searchDownload";
+		Rule.Permission permission = Rule.Permission.read;
+		String robot = null;
+		String userAgent = getUserAgent(headers);
+
+		try {
+			authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+			robot = getRobot(headers);
+
+			// // Is user authorized to run the service method?
+			// boolean serviceMethodAuthorized = isServiceMethodAuthorized(
+			// 		serviceMethodName, permission, authToken);
+			// if (!serviceMethodAuthorized) {
+			// 	throw new UnauthorizedException("User " + userId
+			// 			+ " is not authorized to execute service method "
+			// 			+ serviceMethodName);
+			// }
+
+			try {
+				URI uri = uriInfo.getRequestUri();
+				if (uri != null) {
+					entryText = uri.getQuery();
+				}
+			}
+			catch (UnsupportedOperationException e) {
+				/*
+				 * DummyUriInfo doesn't support the getRequestUri() method but it's only
+				 * used during testing so we don't really care
+				 */
+				;
+			}
+
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			resultsetXML = dataPackageManager.searchDataPackages(uriInfo,
+					userId, authToken);
+
+			String csv = XsltUtil.transformSearchResultXmlToCsv(resultsetXML);
+
+			if (csv != null) {
+				responseBuilder = Response.ok(csv);
+				response = responseBuilder.build();
+			}
+			else {
+				ResourceNotFoundException e = new ResourceNotFoundException(
+						"No search results returned");
+				entryText += "; " + e.getMessage();
+				WebApplicationException webApplicationException = WebExceptionFactory
+						.makeNotFound(e);
+				response = webApplicationException.getResponse();
+			}
+		}
+		catch (IllegalArgumentException e) {
+			entryText += "; " + e.getMessage();
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		}
+		catch (UnauthorizedException e) {
+			entryText += "; " + e.getMessage();
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		}
+		catch (UserErrorException e) {
+			entryText += "; " + e.getMessage();
+			response = WebResponseFactory.makeBadRequest(e);
+		}
+		catch (Exception e) {
+			entryText += "; " + e.getMessage();
+			WebApplicationException webApplicationException = WebExceptionFactory
+					.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+							e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+
+		audit(serviceMethodName, authToken, response, resourceId, entryText,
+				robot, userAgent);
+		response = stampHeader(response);
+		return response;
+	}
 
 	/**
 	 * <strong>List Recent Uploads</strong> operation, optionally specifying the upload type ("insert" or "update") and a maximum limit as query parameters in the URL.
