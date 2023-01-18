@@ -45,6 +45,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.codec.digest.DigestUtils;
 import edu.lternet.pasta.dml.parser.Attribute;
 import edu.lternet.pasta.dml.parser.AttributeList;
 import edu.lternet.pasta.dml.parser.DateTimeDomain;
@@ -91,7 +92,9 @@ public abstract class DatabaseAdapter {
 	protected String TO_DATE_FUNCTION = "to_timestamp";
 	private final String XML_SCHEMA_DATATYPES = 
 	    "http://www.w3.org/2001/XMLSchema-datatypes";
-	protected static final int DEFAULT_TABLE_NAME_MAX_LENGTH = 30;
+
+    // Postgres 10: 63 bytes - https://www.postgresql.org/docs/10/runtime-config-preset.html see max_identifier_length
+	protected static final int DEFAULT_TABLE_NAME_MAX_LENGTH = 63;
 	private QualityCheck dateFormatMatchesQualityCheck = null;
   
   
@@ -111,40 +114,16 @@ public abstract class DatabaseAdapter {
 
 	
   /**
-   * Given an entity name, return a well-formed table name. This is a generic
-   * implementation that should work for most databases. This method should be
-   * overridden by a database adapter subclass if it has special rules for the
-   * well-formedness of a table name. This method simply looks for illegal
-   * table name characters in the entity name and replaces them with underscore 
-   * characters.
+   * Return MD5 hex hash value of entity name to ensure unique and SQL valid
+   * database table name.
    * 
    * @param entityName   the entity name
-   * @return             a well-formed table name corresponding to the entity\
-   *                     name
+   * @return             MD5 hex hash value
    */
   public static String getLegalDBTableName(String entityName) {
     final int tableNameMaxLength = getTableNameMaxLength();
     String legalName = null;
-    char[] badChars = {' ', '-', '.', '/', ',', '(', ')', '<', '>', '=', ':', ';', '&'};
-    char goodChar = '_';
-    
-    if (entityName != null) {
-      int entityNameLength = entityName.length();
-      int legalNameLength = Math.min(entityNameLength, tableNameMaxLength);
-      legalName = entityName.substring(0, legalNameLength);
-    }
-
-    if (legalName != null) {
-      for (int i = 0; i < badChars.length; i++) {
-        legalName = legalName.replace(badChars[i], goodChar);
-      }
-
-      // If first character is a digit, prepend an underscore
-      char firstCharacter = legalName.charAt(0);
-      if (Character.isDigit(firstCharacter)) {
-        legalName = UNDERSCORE + legalName;
-      }
-    }
+    legalName = UNDERSCORE + DigestUtils.md5Hex(entityName);
     
     return legalName;
   }
@@ -618,7 +597,7 @@ public abstract class DatabaseAdapter {
   private String getLegalDbFieldName(String attributeName) {
     String legalName = attributeName;
     
-    char[] badChars = {' ', '-', '.', '/', ':', '@', '[', ']'};
+    char[] badChars = {' ', '-', '.', '/', ':', '@', '[', ']',',', '(', ')', '<', '>', '=', ';', '&'};
     char goodChar = '_';
     
     for (int i = 0; i < badChars.length; i++) {
