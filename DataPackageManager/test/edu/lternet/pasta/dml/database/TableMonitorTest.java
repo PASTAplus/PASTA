@@ -13,6 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import edu.lternet.pasta.dml.database.DatabaseAdapter;
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.parser.Entity;
 import org.apache.log4j.Logger;
@@ -178,7 +179,7 @@ public class TableMonitorTest extends TestCase {
     String queryStr = String.format(
         "SELECT * FROM %s WHERE TABLE_NAME=%s",
         SqlEscape.name(registry),
-        SqlEscape.str(TEST_TABLE)
+        SqlEscape.str(DatabaseAdapter.getLegalDBTableName(TEST_TABLE))
     );
 
     log.debug("queryStr: " + queryStr);
@@ -188,7 +189,7 @@ public class TableMonitorTest extends TestCase {
     String cleanString =
         String.format("DELETE FROM %s WHERE TABLE_NAME=%s",
             SqlEscape.name(registry),
-            SqlEscape.str(TEST_TABLE)
+            SqlEscape.str(DatabaseAdapter.getLegalDBTableName(TEST_TABLE))
         );
 
     // First, clean-up any existing entry for the test table
@@ -221,13 +222,13 @@ public class TableMonitorTest extends TestCase {
         rowCount++;
         String TABLE_NAME = rs.getString("TABLE_NAME");
         
-        if (TABLE_NAME.equalsIgnoreCase(TEST_TABLE)) {
+        if (TABLE_NAME.equalsIgnoreCase(DatabaseAdapter.getLegalDBTableName(TEST_TABLE))) {
           isPresent = true;
         }
       }
       
       assertTrue("Table entry not present", isPresent);
-      assertEquals("Multiple table entries found for "+TEST_TABLE, rowCount, 1);
+      assertEquals("Multiple table entries found for "+DatabaseAdapter.getLegalDBTableName(TEST_TABLE), rowCount, 1);
     }
     catch(SQLException e) {
       System.err.println("SQLException: " + e.getMessage());
@@ -264,24 +265,22 @@ public class TableMonitorTest extends TestCase {
     String entityName = this.entityName;
     String assignedTableName = null;
     String irregularEntityName = "entity With Spaces-And-Dashes";
-    String irregularTableName = "entity_With_Spaces_And_Dashes";
+    String irregularTableName = "entity With Spaces-And-Dashes";
 
     /* Get the assigned table name from the TableMonitor for a simple
      * entity name (no spaces or dashes). In this case, the assigned name
      * should be equal to the entityName.
      */
-    assignedTableName = tableMonitor.assignTableName(entityIdentifier, 
-                                                     entityName);
-    assertEquals("Error assigning table name: ", entityName, assignedTableName);
+    assignedTableName = tableMonitor.assignTableName(entityIdentifier, entityName);
+    assertEquals("Error assigning table name: ", DatabaseAdapter.getLegalDBTableName(entityName), assignedTableName);
     
     /* Get the assigned table name from the TableMonitor for an entity name
      * that contains spaces and dashes. In this case, the assigned name
      * should be equal to irregularName.
      */
-    assignedTableName = tableMonitor.assignTableName(entityIdentifier, 
-                                                     irregularEntityName);
-    assertEquals("Error assigning table name: ",
-                 irregularTableName, assignedTableName);
+    assignedTableName = tableMonitor.assignTableName(entityIdentifier, irregularEntityName);
+    String expectedTableName = DatabaseAdapter.getLegalDBTableName(irregularTableName);
+    assertEquals("Error assigning table name: ", expectedTableName, assignedTableName);
     
   }
   
@@ -296,7 +295,7 @@ public class TableMonitorTest extends TestCase {
    * @throws SQLException
    */
   public void testCountRows() throws SQLException {
-    String testTable = "TEST_COUNT_ROWS";
+    String testTable = DatabaseAdapter.getLegalDBTableName("TEST_COUNT_ROWS");
     String createString =
         String.format("create table %s (ROW_NUMBER int)", SqlEscape.name(testTable));
     String dropString = String.format("drop table %s", SqlEscape.name(testTable));
@@ -375,7 +374,7 @@ public class TableMonitorTest extends TestCase {
     String queryStr =
         String.format("INSERT INTO %s values(%s, %s, %s, %s, %s, %s, 1)",
             SqlEscape.name(registry),
-            SqlEscape.str(TEST_TABLE),
+            SqlEscape.str(DatabaseAdapter.getLegalDBTableName(TEST_TABLE)),
             SqlEscape.str(packageId),
             SqlEscape.str(id),
             SqlEscape.str(entityName),
@@ -399,7 +398,7 @@ public class TableMonitorTest extends TestCase {
     }
 
     // Next, tell TableMonitor to drop the table entry for the test table
-    success = tableMonitor.dropTableEntry(TEST_TABLE);
+    success = tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
     
     // Assert that one row was successfully deleted
     assertTrue("Failed to drop table entry", success);
@@ -421,7 +420,7 @@ public class TableMonitorTest extends TestCase {
     tableMonitor.addTableEntry(entity);
     
     // Retrieve the creation date from the data table registry
-    creationDate = tableMonitor.getCreationDate(TEST_TABLE);
+    creationDate = tableMonitor.getCreationDate(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
     String creationDateString = simpleDateFormat.format(creationDate);
 
     // Assert that creation date should be equal to today's date
@@ -430,7 +429,7 @@ public class TableMonitorTest extends TestCase {
                creationDateString.equals(nowDateString));
     
     // Clean-up the test table entry
-    tableMonitor.dropTableEntry(TEST_TABLE);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
   }
     
  
@@ -449,7 +448,7 @@ public class TableMonitorTest extends TestCase {
     tableMonitor.addTableEntry(entity);
     
     // Retrieve the creation date from the data table registry
-    lastUsageDate = tableMonitor.getCreationDate(TEST_TABLE);
+    lastUsageDate = tableMonitor.getCreationDate(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
     String lastUsageDateString = simpleDateFormat.format(lastUsageDate);
 
     // Assert that last usage date should be equal to today's date
@@ -458,7 +457,7 @@ public class TableMonitorTest extends TestCase {
                lastUsageDateString.equals(nowDateString));
     
     // Clean-up the test table entry
-    tableMonitor.dropTableEntry(TEST_TABLE);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
   }
   
 
@@ -477,17 +476,17 @@ public class TableMonitorTest extends TestCase {
     Date now = new Date();
     
     tableMonitor.addTableEntry(entityAncient);
-    tableMonitor.setLastUsageDate(entityNameAncient, ancientDate);
+    tableMonitor.setLastUsageDate(DatabaseAdapter.getLegalDBTableName(entityNameAncient), ancientDate);
 
     tableMonitor.addTableEntry(entityCurrent);
-    tableMonitor.setLastUsageDate(entityNameCurrent, now);   
+    tableMonitor.setLastUsageDate(DatabaseAdapter.getLegalDBTableName(entityNameCurrent), now);
 
     String oldestTable = tableMonitor.getOldestTable();  
-    tableMonitor.dropTableEntry(entityNameAncient);
-    tableMonitor.dropTableEntry(entityNameCurrent);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(entityNameAncient));
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(entityNameCurrent));
     
-    assertEquals("Did not find the oldest table", 
-                 oldestTable, entityNameAncient);
+    assertEquals("Did not find the oldest table", oldestTable,
+            DatabaseAdapter.getLegalDBTableName(entityNameAncient));
   }
   
 
@@ -506,20 +505,20 @@ public class TableMonitorTest extends TestCase {
     String[] tableList = tableMonitor.getTableList();
     
     for (int i = 0; i < tableList.length; i++) {
-      found = found || (tableList[i].equalsIgnoreCase(TEST_TABLE));
+      found = found || (tableList[i].equalsIgnoreCase(DatabaseAdapter.getLegalDBTableName(TEST_TABLE)));
     }
     
-    assertTrue("Did not find " + TEST_TABLE + " in table list", found);
+    assertTrue("Did not find " + DatabaseAdapter.getLegalDBTableName(TEST_TABLE) + " in table list", found);
 
     found = false;
-    tableMonitor.dropTableEntry(TEST_TABLE);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
     tableList = tableMonitor.getTableList();
     
     for (int i = 0; i < tableList.length; i++) {
-      found = found || (tableList[i].equalsIgnoreCase(TEST_TABLE));
+      found = found || (tableList[i].equalsIgnoreCase(DatabaseAdapter.getLegalDBTableName(TEST_TABLE)));
     }
     
-    assertFalse("Found " + TEST_TABLE + 
+    assertFalse("Found " + DatabaseAdapter.getLegalDBTableName(TEST_TABLE) +
                 " in table list, but it should have been dropped" , 
                 found);
   }
@@ -597,8 +596,8 @@ public class TableMonitorTest extends TestCase {
   public void testIsTableInDB() throws SQLException {
     String createString = String.format(
         "create table %s (COFFEE_NAME varchar(32), SUPPLIER_ID int, PRICE float, SALES int, TOTAL int)",
-        TEST_TABLE);
-    String dropString = String.format("DROP TABLE %s", TEST_TABLE);
+        DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
+    String dropString = String.format("DROP TABLE %s", DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
     boolean isPresent;
     Statement stmt = null;
 
@@ -616,9 +615,9 @@ public class TableMonitorTest extends TestCase {
     try {
       stmt = dbConnection.createStatement();             
       stmt.executeUpdate(createString);
-      isPresent = tableMonitor.isTableInDB(TEST_TABLE);
+      isPresent = tableMonitor.isTableInDB(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
       assertTrue("Could not find table " + 
-                 TEST_TABLE + " but it should be in db", 
+                 DatabaseAdapter.getLegalDBTableName(TEST_TABLE) + " but it should be in db",
                  isPresent);
     } 
     catch(SQLException e) {
@@ -632,8 +631,8 @@ public class TableMonitorTest extends TestCase {
     try {
       stmt = dbConnection.createStatement();             
       stmt.executeUpdate(dropString);
-      isPresent = tableMonitor.isTableInDB(TEST_TABLE);
-      assertFalse("Found table " + TEST_TABLE + " but it should not be in db", 
+      isPresent = tableMonitor.isTableInDB(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
+      assertFalse("Found table " + DatabaseAdapter.getLegalDBTableName(TEST_TABLE) + " but it should not be in db",
                   isPresent);
     }
     catch(SQLException e) {
@@ -685,7 +684,7 @@ public class TableMonitorTest extends TestCase {
     String queryStr = String.format(
         "SELECT last_usage_date FROM %s WHERE table_name=%s",
         SqlEscape.name(dataTableRegistryName),
-        SqlEscape.str(TEST_TABLE)
+        SqlEscape.str(DatabaseAdapter.getLegalDBTableName(TEST_TABLE))
     );
 
     log.debug("queryStr: " + queryStr);
@@ -693,7 +692,7 @@ public class TableMonitorTest extends TestCase {
     Statement stmt = null;
     
     tableMonitor.addTableEntry(entity);
-    success = tableMonitor.setLastUsageDate(TEST_TABLE, testDate);
+    success = tableMonitor.setLastUsageDate(DatabaseAdapter.getLegalDBTableName(TEST_TABLE), testDate);
     
     assertTrue("tableMonitor.setLastUsageDate() did not succeed. ", success);
     
@@ -725,7 +724,7 @@ public class TableMonitorTest extends TestCase {
     }
 
     // Clean-up table entry for test table
-    tableMonitor.dropTableEntry(TEST_TABLE);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
   }
   
   
@@ -744,7 +743,7 @@ public class TableMonitorTest extends TestCase {
     String queryStr = String.format(
         "SELECT priority FROM %s WHERE table_name=%s",
         SqlEscape.name(dataTableRegistryName),
-        SqlEscape.str(TEST_TABLE)
+        SqlEscape.str(DatabaseAdapter.getLegalDBTableName(TEST_TABLE))
     );
 
     log.debug("queryStr: " + queryStr);
@@ -752,7 +751,7 @@ public class TableMonitorTest extends TestCase {
     Statement stmt = null;
     
     tableMonitor.addTableEntry(entity);
-    success = tableMonitor.setTableExpirationPolicy(TEST_TABLE, testPriority);
+    success = tableMonitor.setTableExpirationPolicy(DatabaseAdapter.getLegalDBTableName(TEST_TABLE), testPriority);
     
     assertTrue("tableMonitor.setTableExpirationPolicy() did not succeed. ", 
                success);
@@ -779,7 +778,7 @@ public class TableMonitorTest extends TestCase {
     }
 
     // Clean-up table entry for test table
-    tableMonitor.dropTableEntry(TEST_TABLE);
+    tableMonitor.dropTableEntry(DatabaseAdapter.getLegalDBTableName(TEST_TABLE));
   }
   
 }

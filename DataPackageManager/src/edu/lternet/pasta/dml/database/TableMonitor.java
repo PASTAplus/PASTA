@@ -253,8 +253,7 @@ public class TableMonitor {
      * find a name that is not already in use.
      */
     if (tableName == null) {
-      String tableNameCandidate = 
-                                DatabaseAdapter.getLegalDBTableName(entityName);
+      String tableNameCandidate = DatabaseAdapter.getLegalDBTableName(entityName);
       
       while (tableName == null) {
         if (isDBTableNameInUse(tableNameCandidate)) {

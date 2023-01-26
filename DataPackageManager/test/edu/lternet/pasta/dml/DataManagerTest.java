@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.lternet.pasta.dml.database.Condition;
+import edu.lternet.pasta.dml.database.DatabaseAdapter;
 import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterfaceTest;
 import edu.lternet.pasta.dml.database.Query;
 import edu.lternet.pasta.dml.database.SelectionItem;
@@ -206,33 +207,25 @@ public class DataManagerTest extends TestCase {
         if (success) {
           String packageID = TEST_PACKAGE_ID;
           String entityName = ENTITY_NAME;
+          String assertTableName = DatabaseAdapter.getLegalDBTableName(entityName);
           String tableName = DataManager.getDBTableName(packageID, entityName);
           assertNotNull("null value for tableName (case 1)", tableName);
-          assertEquals("tableName does not equal expected value", 
-                       tableName, 
-                       TABLE_NAME);
+          assertEquals("tableName does not equal expected value", assertTableName, tableName);
           
-          String[] fieldNames = 
-                             DataManager.getDBFieldNames(packageID, entityName);         
+          String[] fieldNames = DataManager.getDBFieldNames(packageID, entityName);
           assertNotNull("null value for fieldNames array", fieldNames);   
-          assertEquals("Incorrect number of columns found", 
-                       fieldNames.length, NUMBER_OF_COLUMNS);
-          assertEquals("First field name does not equal expected value",
-                       fieldNames[0].toLowerCase(), COLUMN_1);
-          assertEquals("Second field name does not equal expected value",
-                       fieldNames[1].toLowerCase(), COLUMN_2);
+          assertEquals("Incorrect number of columns found", NUMBER_OF_COLUMNS, fieldNames.length);
+          assertEquals("First field name does not equal expected value", COLUMN_1, fieldNames[0].toLowerCase());
+          assertEquals("Second field name does not equal expected value", COLUMN_2, fieldNames[1].toLowerCase());
           
           // Test alternative signature of DataManager.getDBTableName(entity).
           // First, when entity.getDBTableName() is non-null, the method should
           // find the table name stored in the entity object itself.
           //
-          assertNotNull("null value for entity.getDBTableName()",
-                        entity.getDBTableName());
+          assertNotNull("null value for entity.getDBTableName()", entity.getDBTableName());
           tableName = DataManager.getDBTableName(entity);
           assertNotNull("null value for tableName (case 2)", tableName);
-          assertEquals("tableName does not equal expected value", 
-                       tableName, 
-                       TABLE_NAME);
+          assertEquals("tableName does not equal expected value", assertTableName, tableName);
           
           // Test alternative signature of DataManager.getDBTableName(entity).
           // Second, when entity.getDBTableName() is set to null. In this case,
@@ -242,9 +235,7 @@ public class DataManagerTest extends TestCase {
           entity.setDBTableName(null);
           tableName = DataManager.getDBTableName(entity);
           assertNotNull("null value for tableName (case 3)", tableName);
-          assertEquals("tableName does not equal expected value", 
-                       tableName, 
-                       TABLE_NAME);
+          assertEquals("tableName does not equal expected value", assertTableName, tableName);
           // Need to reset the tableName prior to dropping the table
           entity.setDBTableName(tableName);
           
@@ -407,6 +398,7 @@ public class DataManagerTest extends TestCase {
      * known values.
      */
     if (success && dataPackage != null) {
+      String assertTable = DatabaseAdapter.getLegalDBTableName(TABLE_NAME);
       dataPackages = new DataPackage[1];
       dataPackages[0] = dataPackage;
       Query query = new Query();
@@ -422,11 +414,9 @@ public class DataManagerTest extends TestCase {
       query.setWhereClause(whereClause);
       String sqlString = query.toSQLString();
       System.out.println("Query SQL = " + query.toSQLString());
-      assertEquals("Unexpected value for query.toSQLString()",
-                   sqlString,
-                   "SELECT NoneSuchBugCount.\"fld\" " +
-                   "FROM NoneSuchBugCount  " +
-                   "where NoneSuchBugCount.\"sppm2\" > 2.0;");
+      String assertQuery = String.format("SELECT %s.\"fld\" FROM %s  where %s.\"sppm2\" > 2.0;",
+              assertTable, assertTable, assertTable);
+      assertEquals("Unexpected value for query.toSQLString()", assertQuery, sqlString);
 
       try {
         resultSet = dataManager.selectData(query, dataPackages);
