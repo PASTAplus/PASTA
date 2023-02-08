@@ -4,11 +4,12 @@ Welcome! Bienvenido!  أهلا بك! 欢迎!
 
 This is the official documentation tree of the *PASTA* data repository
 software. The PASTA software and related contents is owned and maintained by
-the `Environmental Data Iniative <https://edirepository.org>`_ (EDI). PASTA is
+the `Environmental Data Initiative <https://edirepository.org>`_ (EDI). PASTA is
 a service oriented software system written in Java and uses Java Servlet
 containers for REST web-services. Services can be deployed on separate servers
 for performance or deployed onto a single server for simplicity, testing, and
-development. Deployments have been tested on Linux, OS X, and Windows. EDI utilizes PASTA in its operation of the *EDI data repository*.
+development. Deployments have been tested on Linux, OS X, and Windows. EDI
+utilizes PASTA in its operation of the *EDI data repository*.
 
 Documentation is divided into the following categories:
 
