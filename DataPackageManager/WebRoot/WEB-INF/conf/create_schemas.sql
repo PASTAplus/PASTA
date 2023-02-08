@@ -74,7 +74,7 @@ CREATE TABLE datapackagemanager.journal_citation (
   PRINCIPAL_OWNER VARCHAR(250) NOT NULL,              -- distinguished name of the creator of this entry
   DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
   JOURNAL_TITLE   TEXT,                               -- name of the journal
-  PACKAGE_ID      VARCHAR(100) NOT NULL               -- packageId of source data package in PASTA
+  PACKAGE_ID      VARCHAR(100) NOT NULL,               -- packageId of source data package in PASTA
   RELATION_TYPE datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
 );
 
