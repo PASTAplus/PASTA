@@ -13,7 +13,8 @@ utilizes PASTA in its operation of the *EDI data repository*.
 
 Documentation is divided into the following categories:
 
-#. **About:** A short history of PASTA+ and how it is being used in a production environment.
+#. **About:** A short history of PASTA+ and how it is being used in a
+   production environment.
 
 #. **Standard Operating Procedures:** Procedures for the general operation of the PASTA+ data repository.
 
