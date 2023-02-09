@@ -38,9 +38,11 @@ from publicly funded programs and projects within the United States of America
 and beyond. As of July 2018, there are 42,800 unique data packages in the EDI
 Data Repository. EDI also manages two Data Portals, the `EDI Data Portal
 <https://portal.edirepository.org/nis>`_ and the `LTER Data Portal
-<https://portal.lternet.edu/nis>`_, which interact directly with PASTA
-software through its REST web-service API and serve as a reference
-implementations for how to use the API in a web applications. Questions or
-feedback may be sent to support@edirepository.org. The PASTA software may be accessed through our GitHub repository at `PASTAplus/PASTA <https://github.com/PASTAplus/PASTA>`_.
+<https://portal.lternet.edu/nis>`_, which interact directly with PASTA software
+through its REST web-service API and serve as a reference implementations for
+how to use the API in a web applications. Questions or feedback may be sent to
+support@edirepository.org. The PASTA software may be accessed through our GitHub
+repository at `PASTAplus/PASTA <https://github.com/PASTAplus/PASTA>`_.
 
-.. [#pasta_funding] Funding for PASTA was derived from both the NSF DEB and the American Recovery and Reinvestment Act of 2009.
+.. [#pasta_funding] Funding for PASTA was derived from both the NSF DEB and the
+                    American Recovery and Reinvestment Act of 2009.
