@@ -32,5 +32,6 @@ Locally developed PASTA+ services (excluding Apache Solr) are written in Java an
 
 .. toctree::
     :hidden:
+
     use_cases
     architecture
