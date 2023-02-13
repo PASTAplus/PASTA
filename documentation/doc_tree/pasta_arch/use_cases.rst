@@ -19,8 +19,8 @@ Use-case attributes
 * Users may belong to one or more groups simultaneously.
 * Users may map different UIDs to a single "real" identity.
 
-Use Cases
-~~~~~~~~~
+Use-case scenarios
+~~~~~~~~~~~~~~~~~~
 
 #. Create a new user
 #. Create a new group (not implemented)
@@ -60,6 +60,36 @@ Use-case attributes
 * A "publicly accessible" data package is one that is accessible to
   all users of the system.
 
+Use-case scenarios
+~~~~~~~~~~~~~~~~~~
+
+#. Create a new user
 
 Audit Log Management
 --------------------
+
+High-level description of the audit log management use cases:
+
+Use-case attributes
+~~~~~~~~~~~~~~~~~~~
+
+* An audit log entry contains the following attributes and attribute types:
+
+    #. oid integer (primary key),
+    #. entryTime timestamp,
+    #. service string,
+    #. category string,
+    #. serviceMethod string,
+    #. entryText string,
+    #. resourceId string,
+    #. statusCode integer,
+    #. userid string,
+    #. userAgent string,
+    #. groups string,
+    #. authSystem string
+
+Use-case scenarios
+~~~~~~~~~~~~~~~~~~
+
+#. Create a new user
+
