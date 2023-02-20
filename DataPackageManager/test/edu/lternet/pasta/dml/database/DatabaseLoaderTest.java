@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ResourceBundle;
 
+import edu.lternet.pasta.dml.database.DatabaseAdapter;
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.download.DataStorageInterface;
 import edu.lternet.pasta.dml.download.DownloadHandler;
@@ -248,7 +249,8 @@ public class DatabaseLoaderTest extends TestCase {
     assertTrue(dataStorage.doesDataExist(identifier) == true);
     assertTrue(handler.isSuccess() == true);
     assertTrue(handler.isBusy() == false);
-    String sql = "select sppm2 from NoneSuchBugCount where fld='Blue Field';";
+    String legalTableName = DatabaseAdapter.getLegalDBTableName("NoneSuchBugCount");
+    String sql = String.format("SELECT sppm2 FROM %s WHERE fld='Blue Field';", legalTableName);
     connectionPool.returnConnection(dbConnection);
     connection = connectionPool.getConnection();
     Statement statement = connection.createStatement();

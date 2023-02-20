@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import edu.lternet.pasta.dml.database.DatabaseAdapter;
 import edu.lternet.pasta.dml.DataManager;
 import edu.lternet.pasta.dml.download.EcogridEndPointInterfaceTest;
 import edu.lternet.pasta.dml.parser.DataPackage;
@@ -297,11 +298,11 @@ public class DatabaseHandlerTest extends TestCase {
 	      assertTrue("DatabaseHandler did not succeed in generating table",success);
 	      String tableName = entity.getDBTableName(); 
 	      boolean isPresent = databaseHandler.isTableInDB(tableName);
-	      assertTrue("Could not find table " + tableName +" but it should be in db", 
-	                 isPresent);
+	      assertTrue("Could not find table " + tableName +" but it should be in db", isPresent);
 	      boolean successLoadingData = databaseHandler.loadDataToDB(dataPackage, endPointInfo);
 	      assertTrue("Couldn't load data, but it should be successful", successLoadingData);
-	      String sql = "select count(*) from public.e1_plant_biomass_6_16_csv where \"UID\"='2001111';";
+          String legalTableName = DatabaseAdapter.getLegalDBTableName(entity.toString());
+	      String sql = String.format("SELECT COUNT(*) from %s where \"UID\"='2001111';", legalTableName);
 		  Connection connection = connectionPool.getConnection();
 		  Statement statement = connection.createStatement();
 		  ResultSet result = statement.executeQuery(sql);

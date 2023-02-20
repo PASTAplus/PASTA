@@ -101,8 +101,10 @@ public class AuditManagerResource extends PastaWebService
     public static final String USER_AGENT = "userAgent";
     // Query parameter to exclude instead of include matching userAgent
     public static final String USER_AGENT_NEGATE = "userAgentNegate";
-    // Query parameter to include instead of exclude robots
-    public static final String INCLUDE_ROBOTS = "robots";
+    // Query parameter for user
+    public static final String USER_DN = "userDn";
+    // Query parameter to exclude instead of include matching user
+    public static final String USER_DN_NEGATE = "userDnNegate";
     // Query parameter for groups
     public static final String GROUP = "group";
     // Query parameter for authSystem
@@ -134,7 +136,8 @@ public class AuditManagerResource extends PastaWebService
         set.add(USER);
         set.add(USER_AGENT);
         set.add(USER_AGENT_NEGATE);
-        set.add(INCLUDE_ROBOTS);
+        set.add(USER_DN);
+        set.add(USER_DN_NEGATE);
         set.add(GROUP);
         set.add(AUTHSYSTEM);
         set.add(STATUS_CODE);
