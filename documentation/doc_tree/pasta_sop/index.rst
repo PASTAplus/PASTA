@@ -13,5 +13,5 @@ The EDI data repository follows a *metadata-driven* workflow that consumes
 .. toctree::
    :hidden:
 
-   DataPackageDefinition
-   ArchiveLifeCycle
+   data_package_definition
+   archive_life_cycle
