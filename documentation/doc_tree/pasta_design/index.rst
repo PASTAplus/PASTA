@@ -1,6 +1,6 @@
-***********************
-Design and Architecture
-***********************
+*****************
+Repository Design
+*****************
 
 PASTA+ is based on a `Service Oriented Architecture (SOA)
 <https://en.wikipedia.org/wiki/Service-oriented_architecture>`_ design
@@ -28,10 +28,13 @@ Manager search API.
 
 .. image:: images/PASTAplus_SOA.png
 
-Locally developed PASTA+ services (excluding Apache Solr) are written in Java and expose their REST web-service interface through either Tomcat or Jetty servlet web-interfaces.
+Locally developed PASTA+ services (excluding Apache Solr) are written in Java
+and expose their REST web-service interface through either Tomcat or Jetty
+servlet web-interfaces.
 
 .. toctree::
     :hidden:
 
     use_cases
-    architecture
+    services
+    security

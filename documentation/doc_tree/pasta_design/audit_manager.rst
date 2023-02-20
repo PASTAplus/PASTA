@@ -1,0 +1,6 @@
+============
+Audit Manger
+============
+
+.. toctree::
+    :hidden:

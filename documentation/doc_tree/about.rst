@@ -43,3 +43,6 @@ Environmental Data Initiative.
 
 .. [#pasta_funding] Funding for PASTA was derived from both the NSF DEB and the
                     American Recovery and Reinvestment Act of 2009.
+
+.. toctree::
+    :hidden:

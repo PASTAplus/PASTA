@@ -221,3 +221,7 @@ REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/audit/recent-uploads <https://pasta.lternet.edu/audit/docs/api#GET%20:%20recent-uploads>`_
+
+
+.. toctree::
+    :hidden:

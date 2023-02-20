@@ -16,11 +16,10 @@ Documentation is divided into the following categories:
 #. **About:** A short history of PASTA+ and how it is being used in a
    production environment.
 
+#. **Repository Design:** Design documentation of the PASTA+ data repository.
+
 #. **Standard Operating Procedures:** Procedures for the general operation of
    the PASTA+ data repository.
-
-#. **Design and Architecture:** Design documentation of the PASTA+ architecture
-   and software development principles.
 
 #. **REST API:** Documentation for the PASTA API and general information and
    suggestions for software developers who would like to build an application
@@ -34,8 +33,8 @@ Documentation is divided into the following categories:
    :hidden:
    
    /doc_tree/about
+   /doc_tree/pasta_design/index
    /doc_tree/pasta_sop/index
-   /doc_tree/pasta_arch/index
    /doc_tree/pasta_api/index
-   /doc_tree/help/index
+   /doc_tree/faq/index
    

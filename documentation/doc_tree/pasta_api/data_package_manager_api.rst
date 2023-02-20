@@ -1746,3 +1746,6 @@ token has permission to read the specified data package resource.
 REST API
 """"""""
 `GET : https://pasta.lternet.edu/package/authz?resourceId={resource identifier} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/authz>`_
+
+.. toctree::
+    :hidden:

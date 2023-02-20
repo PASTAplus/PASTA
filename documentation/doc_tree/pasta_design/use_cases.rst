@@ -93,3 +93,5 @@ Use-case scenarios
 
 #. Create a new user
 
+.. toctree::
+    :hidden:

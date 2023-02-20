@@ -9,7 +9,12 @@ Access Control Rules
 
 The access control rule is a declarative statement that describes the principals and associated permissions for a specific protected resource. The rule itself is declared as being either an **allow** or a **deny** rule, meaning that the following rule definition explicitly permits or blocks a level of access to the resource, respectively.
 
-Principals are simple string values that map to the unique identifier of an :doc:`authenticated user </doc_tree/pasta_arch/gatekeeper>`. For example, a common user identifier used in PASTA+ is in the form of an LDAP distinguished name: ``uid=ucarroll,o=EDI,dc=edirepository,dc=org``. The principal may also be a group identifier, like ``authenticated``, or a role, such as the system user ``pasta`` or the anonymous user ``public``.
+Principals are simple string values that map to the unique identifier of an
+:doc:`authenticated user </doc_tree/pasta_design/gatekeeper>`. For example, a
+common user identifier used in PASTA+ is in the form of an LDAP distinguished
+name: ``uid=ucarroll,o=EDI,dc=edirepository,dc=org``. The principal may also be
+a group identifier, like ``authenticated``, or a role, such as the system user
+``pasta`` or the anonymous user ``public``.
 
 Permissions are defined as an hierarchical enumeration of **read**, **write**, or **all** (the permission **changePermisssion** is equivalent to **all**) privileges; for an **allow** rule, **read** permission has the least privilege, while **all** permission has the most privilege (this hierarchy is reversed for **deny** rules). Permission definitions differ between physical objects and API methods as described in the following table:
 
@@ -141,3 +146,5 @@ Performing the authorization of a service request in PASTA+ is a simple two-step
 
    Authorization processing UML sequence diagram.
 
+.. toctree::
+    :hidden:

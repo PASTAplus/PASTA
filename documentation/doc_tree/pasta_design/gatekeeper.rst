@@ -72,3 +72,6 @@ the Gatekeeper removes the digital signature from the authentication token
 (i.e., creates an internal authentication token), adds it to the HTTP request
 *Cookie* as before, and then forwards the HTTP request to the PASTA+ end-point
 service for processing.
+
+.. toctree::
+    :hidden:
