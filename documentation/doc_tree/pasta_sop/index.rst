@@ -16,6 +16,10 @@ Descriptions of the following SOPs are provided:
 #. **Data Package Life Cycle:** A detailed description of a data
    package's life cycle.
 
+#. **Replication and Backup Strategies:** Discussion about how EDI utilizes
+   replication and backup strategies to ensure all data packages are secure and
+   recoverable.
+
 
 
 .. toctree::
@@ -23,3 +27,4 @@ Descriptions of the following SOPs are provided:
 
    data_package_definition
    archive_life_cycle
+   backup

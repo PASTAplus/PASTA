@@ -42,7 +42,7 @@ event and registers it with the *Audit Manager* service (**Step 13**).
     :align: center
     :scale: 100%
 
-    UML sequence diagram of the life cycle of a data package in the EDI data
+    UML sequence diagram of a data package life cycle in the EDI data
     repository.
 
 Key Steps
@@ -64,13 +64,58 @@ header field (see the discussion on authentication in the PASTA+
 :doc:`Gatekeeper </doc_tree/pasta_design/gatekeeper>` service).
 
 **Step 4:** The *Gatekeeper* service acts as both an authentication service
-for inbound requests (*Step 3*) and as a reverse proxy to forward validated
+for inbound requests (**Step 3**) and as a reverse proxy to forward validated
 requests onto the appropriate service.
 
-**Steps 5 & 6:**
+**Step 5:** The *Data Package Manager* receives the EML document from
+the *Gatekeeper* reverse proxy and validates it for compliance to the EML XML
+schema. It then performs a series of non-schema related verification tests,
+namely to ensure the proper use of `<references>`, `<annotation>`, and
+`<customUnit>` elements.
 
-Replication and Backup Strategies
----------------------------------
+**Steps 6, 7, & 8:** Once validation and verification steps are complete, the
+*Data Package Manager* extracts the URL for the *data object* from the EML
+document and performs an HTTP GET request to download the data object from the
+remote cache to a local cache.
+
+**Step 9:** With the *data object* in a local cache, the *Data Package
+Manager* verifies that the data object description in the EML accurately
+describes the data object stored in the local cache. This step includes both
+size and ``md5sum`` checksum verification and, if the data is a text-based table
+(e.g., a *comma-separated-values* file), the *Data Package Manager* perform
+type checking for each data value in every row of the table.
+
+**Step 10:** After all tests pass, the *data object* is moved to a permanent
+location in the repository data store, along with the
+:doc:`other components </doc_tree/pasta_sop/data_package_definition>` of an
+archived data package. The data store is defined as a *block-storage* disk
+device and storage is optimized using *OS* system operations.
+
+**Step 11:** The *Data Package Manager* next extracts all content from the
+EML document that is relevant to the generation of a search index record and
+inserts that content into the repository's
+:doc:`Solr </doc_tree/pasta_design/solr>` search service (the *Solr*
+search service is an instance of the *Apache Solr* search engine). The *Solr*
+search index stores content for only the most recent revision of a data
+package -- older revisions are overwritten within the index.
+
+**Step 12:** The *Data Package Manager* then registers the data package *Digital
+Object Identifier* (DOI) with *DataCite*, a DOI registrar that specifically
+supports DOI registration of data objects. The DOI value is generated on a
+unique namespace value associated with the data package. EDI is a direct
+member of DataCite and is assigned the DOI shoulder value of `10.6073`.
+
+**Step 13:** The final step of the life cycle occurs when the *Data Package
+Manager* inserts a repository audit event record into the *event database table*
+of the :doc:`Audit Manager </doc_tree/pasta_design/audit_manager>` service.
+This audit event includes 1) the user identifier and group associations, 2) the
+date and time of the event, 3) the service requested, 4) the outcome status of
+the event, 5) the resource identifier resulting from the event, and 6) any
+accessory information associated with the event.
+
+Note that any failure to pass validation or verification that occurs in steps
+5-9 prevents the data package from proceeding into archive status in the
+repository.
 
 .. toctree::
     :hidden:
