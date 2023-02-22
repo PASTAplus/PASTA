@@ -1087,6 +1087,8 @@ REST API
 
 `GET : https://pasta.lternet.edu/package/metadata/eml/{scope}/{identifier}/{revision} <https://pasta.lternet.edu/package/docs/api#GET%20:%20/metadata/eml/{scope}/{identifier}/{revision}>`_
 
+.. _dublin-core:
+
 *Read Metadata Dublin Core*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

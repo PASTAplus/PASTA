@@ -25,8 +25,8 @@ Documentation is divided into the following categories:
    suggestions for software developers who would like to build an application
    that interacts with the PASTA API.
 
-#. **General FAQ:** A list of the most commonly asked questions and their
-   answers about the EDI Data Repository and PASTA.
+#. **Frequently Asked Questions:** A list of the most commonly asked questions
+   and their answers about the EDI Data Repository and PASTA.
 
 
 .. toctree::

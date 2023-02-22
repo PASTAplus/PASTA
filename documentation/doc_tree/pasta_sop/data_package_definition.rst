@@ -36,9 +36,22 @@ described above. The original EML science metadata is augmented with
 additional information that is specific to the EDI data repository. On disk,
 the original metadata is labeled as *Level-0-EML.xml* and the augmented metadata
 is labeled as *Level-1-EML.xml*. Original data files are renamed using
-the ``md5sum`` hash value of the EML ``<objectName>`` element value. The purpose
+the ``md5sum`` hash value of the EML `<objectName>` element value. The purpose
 of this renaming is to remove any potential OS-level issues with file names that
-may contain special characters.
+may contain special characters. The quality report is also an XML file
+and named *quality_report.xml*. Finally, metadata information is extracted from
+the Level-1 EML and used to generate a Dublin Core metadata document that is
+named *Level-1-DC.xml*. This Dublin Core document is available through the
+:ref:`Read Metadata Dublin Core <dublin-core>` PASTA+ REST API. For example, a
+typical data package resource listing with two data objects on disk might look
+like: ::
+
+    482fef41e108b34ad816e96423711470
+    cba4645e845957d015008e7bccf4f902
+    Level-0-EML.xml
+    Level-1-DC.xml
+    Level-1-EML.xml
+    quality_report.xml
 
 .. toctree::
     :hidden:
