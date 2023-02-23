@@ -22,14 +22,14 @@ Tracking Architecture, in July 2016, with the end of the LTER Network Office
 project and the beginning of the Environmental Data Initiative. Informally, we
 still refer to the software as "PASTA."
 
-The PASTA data repository software is managed by the `Environmental Data
+The PASTA+ data repository software is managed by the `Environmental Data
 Initiative <https://edirepository.org>`_ (EDI), a National Science Foundation
 (NSF) funded project through the Division of Biological Infrastructure (DBI)
 under grants #2223103 and #2223104 at the University of Wisconsin and the
 University of New Mexico, respectively. The principal investigators of EDI are
-Dr. Corinna Gries and Dr. Mark Servilla. EDI has been operating since July 2016
-and is a publisher and archivist of science data for the environmental and
-ecological science communities. EDI provides key services and technical
+Dr. Corinna Gries (UW) and Dr. Mark Servilla (UNM). EDI has been operating since
+July 2016 and is a publisher and archivist of science data for the environmental
+and ecological science communities. EDI provides key services and technical
 expertise to the scientific community that ensure environmental and ecological
 data are well curated and accessible for discovery and re-use well into the
 future. We assist researchers from field stations, individual laboratories, and

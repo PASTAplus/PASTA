@@ -35,12 +35,14 @@ writes them to a permanent data store (**Step 10**). Next, the *Data Package
 Manager* extracts specific search information from the EML and indexes it in the
 *Solr* search service (**Step 11**), followed by the creation and registration
 of a Digital Object Identifier (DOI) for the data package to the *DateCite* DOI
-registry (**Step 12**). Finally, the *Data Package Manager* generates an audit
-event and registers it with the *Audit Manager* service (**Step 13**).
+registry (**Step 12**). Next, the data package resource information is recorded
+in the *resource registry* database table (**Step 13**). Finally, the Data
+Package Manager* generates an audit event and registers it with the *Audit
+Manager* service (**Step 14**).
 
 .. figure:: images/archive_life_cycle.png
     :align: center
-    :scale: 100%
+    :scale: 80%
 
     UML sequence diagram of a data package life cycle in the EDI data
     repository.
@@ -103,15 +105,64 @@ package -- older revisions are overwritten within the index.
 Object Identifier* (DOI) with *DataCite*, a DOI registrar that specifically
 supports DOI registration of data objects. The DOI value is generated on a
 unique namespace value associated with the data package. EDI is a direct
-member of DataCite and is assigned the DOI shoulder value of `10.6073`.
+member of DataCite and is assigned the DOI shoulder value of `10.6073`. If
+the registration request to DataCite fails, the *Data Package Manager* will
+reattempt to perform the registration on hourly basis until a successful
+registration occurs.
 
-**Step 13:** The final step of the life cycle occurs when the *Data Package
-Manager* inserts a repository audit event record into the *event database table*
+**Step 13:** At this point in the life cycle, the *Data Package Manager* sets
+data package resource information (information about each component of the data
+package) into the *resource registry* database table. The schema definition
+for the table is below:
+
+.. code-block:: sql
+
+    CREATE TYPE datapackagemanager.resource_type AS ENUM ('data', 'dataPackage', 'metadata', 'report');
+    CREATE TABLE datapackagemanager.resource_registry (
+      resource_id VARCHAR(350) NOT NULL,                        -- resource id, the primary key
+      doi VARCHAR(256),                                         -- digital object identifier (DOI)
+      resource_type datapackagemanager.resource_type NOT NULL,  -- resource type
+      resource_location VARCHAR(500),                           -- root location for this resource (referenced by entity resources only)
+      package_id VARCHAR(100) NOT NULL,                         -- the EML 'packageId' attribute value
+      scope VARCHAR(100) NOT NULL,                              -- the scope
+      identifier INT8 NOT NULL,                                 -- the identifier
+      revision INT8 NOT NULL,                                   -- the revision
+      entity_id VARCHAR(256),                                   -- the entity id (as appears in the URL)
+      entity_name VARCHAR(256),                                 -- the entity name (as appears in the EML)
+      principal_owner VARCHAR(250) NOT NULL,                    -- the principal who owns this resource
+      date_created TIMESTAMP NOT NULL,                          -- creation date/time
+      date_deactivated TIMESTAMP,                               -- deactivation date/time; NULL indicates still active
+      filename TEXT,                                            -- the filename of this resource
+      md5_checksum CHAR(32),                                    -- MD5 checksum of this resource, a 32-character hexadecimal string
+      sha1_checksum CHAR(40),                                   -- SHA-1 checksum of this resource, a 40-character hexadecimal string
+      format_type VARCHAR(100),                                 -- the metadata format type, e.g. 'eml://ecoinformatics.org/eml-2.1.1'
+      mime_type VARCHAR(100),                                   -- the mime type, e.g. 'text/csv'
+      resource_size BIGINT,                                     -- the size of the resource in bytes
+      data_format TEXT,                                         -- the data format as determined by parsing the EML
+    );
+
+
+**Step 14:** The final step of the life cycle occurs when the *Data Package
+Manager* inserts a repository audit event record into the *event* database table
 of the :doc:`Audit Manager </doc_tree/pasta_design/audit_manager>` service.
-This audit event includes 1) the user identifier and group associations, 2) the
-date and time of the event, 3) the service requested, 4) the outcome status of
-the event, 5) the resource identifier resulting from the event, and 6) any
-accessory information associated with the event.
+The schema definition for the table is below:
+
+.. code-block:: sql
+
+    CREATE TABLE auditmanager.eventlog (
+       oid numeric primary key,           -- oid primary key
+       entryTime timestamp not null,      -- entry creation date/time
+       service varchar(32) not null,      -- the PASTA+ main service
+       category varchar(8) not null,      -- the event status code
+       serviceMethod varchar(128),        -- the specific PASTA+ service method
+       entryText text,                    -- event human readable information
+       resourceId varchar(128),           -- resource id
+       statusCode numeric,                -- http status code of the event
+       userid varchar(128),               -- user identifier of event requester
+       userAgent text,                    -- http user agent code
+       groups varchar(512),               -- user groups of event requester
+       authSystem varchar(128)            -- authentication system
+    );
 
 Note that any failure to pass validation or verification that occurs in steps
 5-9 prevents the data package from proceeding into archive status in the
