@@ -35,5 +35,7 @@ common/test/edu/lternet/pasta/common/security/auth/UserCreds.properties
 */src/META-INF/persistence.xml
 */documents/javadoc
 /shell/env.sh
+/documentation/build/*
 /documentation/_build/*
 /documentation/deprecated
+/documentation/.idea
