@@ -61,11 +61,14 @@ for off site redundancy.
 
 Consistency between the primary and secondary block storage systems occurs
 through internal controller software, while other replicated storage undergoes
-automatic fixity checks on a continuous basis. Consistency of data packages on
-Glacier occur rarely and are a manual process. The risk management strategy used
-to inform this process is primarily “Lots of Copies Keeps Stuff Safe” (LOCKSS),
-in addition to ensuring copies are geographically distributed. Longer term
-storage is being coordinated with the Dryad Digital Repository.
+automatic fixity checks on a continuous basis. Consistency checks of data
+packages on Glacier are performed using a manual process that retrieves and
+verifies random data packages on a periodic basis.
+
+The risk management strategy used to inform this process is primarily “Lots of
+Copies Keeps Stuff Safe” (LOCKSS), in addition to ensuring copies are
+geographically distributed. Longer term storage of data package content is being
+coordinated with the Dryad Digital Repository.
 
 .. toctree::
     :hidden:

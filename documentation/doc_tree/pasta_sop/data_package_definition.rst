@@ -8,9 +8,11 @@ repository is a **Data Package**. A data package contains science metadata, one
 or more science data objects, and a quality report describing how well metadata
 and data are aligned.
 
-.. image:: images/data_package.png
+.. figure:: images/data_package.png
     :align: center
     :scale: 60%
+
+    Components of a PASTA+ data package.
 
 **Science Metadata**: The science metadata is described using the `Ecological
 Metadata Standard <https://eml.ecoinformatics.org/>`_ (EML). The EML must meet
@@ -56,31 +58,66 @@ like: ::
 Data Package Identifiers
 ------------------------
 
-In the context of the PASTA+ data repository software, a package identifier is a
-unique identifier assigned to a data package that is stored in the repository. A
-data package in PASTA is a collection of data files and associated metadata that
-are related to a specific research project or study
+In the context of PASTA+, a package identifier is a unique identifier assigned
+to a data package that is stored in the repository. This identifier is internal
+to PASTA+ and consists of three parts: the *scope*, *accession*, and *revision*.
+The scope is an alpha-numeric string that defines a namespace under which
+certain data packages exist (e.g., "edi" or "knb-lter-mcr"). The accession is a
+positive integer and uniquely identifies one or more data packages under the
+scope namespace. Also a positive integer, the revision denotes the version of
+the data package associated with a specific accession of the scope. New
+revisions must be a value greater than the previous highest revision, but not
+necessarily consecutive. The package identifier is often represented as the
+scope, accession, and revision concatenated together with periods separating the
+individual parts (below).
 
-.. image:: images/package_id.png
+.. figure:: images/package_id.png
     :align: center
     :scale: 70%
+
+Examples of complete PASTA+ data package identifiers are *edi.1.10* or
+*knb-lter-mcr.14.2*.
+
+PASTA+ data package identifiers are also used within system *purls* that
+uniquely identify data packages and their components (or *resources* when
+considering REST) through the PASTA+ REST API. For example, a full set of
+resource *purls* for the *edi.1.1* data package are: ::
+
+    https://pasta.lternet.edu/package/data/eml/edi/1/1/cba4645e845957d015008e7bccf4f902
+    https://pasta.lternet.edu/package/data/eml/edi/1/1/482fef41e108b34ad816e96423711470
+    https://pasta.lternet.edu/package/metadata/eml/edi/1/1
+    https://pasta.lternet.edu/package/report/eml/edi/1/1
+    https://pasta.lternet.edu/package/eml/edi/1/1
+
+The public facing identifier is defined by the data package Digital Object
+Identifier (DOI). PASTA+ data packages use the EDI DOI shoulder value of
+*10.6073*. For example: ::
+
+    doi:10.6073/pasta/a30d5b90676008cfb7987f31b4343a35
+
+The DOI resolves to the PASTA+ data package landing page on the EDI Data
+Portal. DOIs do not exist for the individual components of the data package.
+
 
 Data Package Versioning
 -----------------------
 
 Data Packages in PASTA+ are immutable once archived. So how do you update a data
 package with new metadata or extend a data table with new time-series data? To
-perform an update of an existing data package, you would publish a revision to
-that data package, thereby creating a data package series. A data package series
+perform an update of an existing data package, you would publish a revision of
+the data package, thereby creating a data package series. A data package series
 is one or more data package revisions that update either the metadata, the
-data, or both the metadata and data of a previous data package. PASTA+ uses
-numeric revisions to denote the revision chain, with each more recent
-revision having a higher value number. These numbers, however, are not
-required to be consecutive.
+data, or both the metadata and data of a previous data package in the same
+series. PASTA+ uses positive integers to denote the revision chain, with each
+more recent revision having a higher value number. These numbers, however, are
+not required to be consecutive (below).
 
-.. image:: images/revision_chain.png
+.. figure:: images/revision_chain.png
     :align: center
     :scale: 100%
+
+    Example revision chain of a PASTA+ data package series. Revision values
+    highlighted in orange.
 
 
 
