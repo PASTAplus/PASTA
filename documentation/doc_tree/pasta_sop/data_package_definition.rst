@@ -53,5 +53,36 @@ like: ::
     Level-1-EML.xml
     quality_report.xml
 
+Data Package Identifiers
+------------------------
+
+In the context of the PASTA+ data repository software, a package identifier is a
+unique identifier assigned to a data package that is stored in the repository. A
+data package in PASTA is a collection of data files and associated metadata that
+are related to a specific research project or study
+
+.. image:: images/package_id.png
+    :align: center
+    :scale: 70%
+
+Data Package Versioning
+-----------------------
+
+Data Packages in PASTA+ are immutable once archived. So how do you update a data
+package with new metadata or extend a data table with new time-series data? To
+perform an update of an existing data package, you would publish a revision to
+that data package, thereby creating a data package series. A data package series
+is one or more data package revisions that update either the metadata, the
+data, or both the metadata and data of a previous data package. PASTA+ uses
+numeric revisions to denote the revision chain, with each more recent
+revision having a higher value number. These numbers, however, are not
+required to be consecutive.
+
+.. image:: images/revision_chain.png
+    :align: center
+    :scale: 100%
+
+
+
 .. toctree::
     :hidden:
