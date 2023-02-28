@@ -354,33 +354,30 @@ public class SolrIndex {
 				String north = boundingCoordinates.getNorth();
 
 				/*
-				 * Only index when north coord >= south coord.
-				 * However, west can be greater than east across the International
-				 * Date Line.
+				 * Only index coordinates if all four values are valid doubles.
 				 */
 				if (isValidDouble(west) &&
-				isValidDouble(south) &&
-				isValidDouble(east) &&
-				isValidDouble(north)
-						) {
-					if (isGreaterThanOrEqualToCoord(north, south)) {
-						/*
-						 * A rectangle is indexed with four points to represent the
-						 * corners. These points should be represented in MinX,
-						 * MinY, MaxX, MaxY order.
-						 * 
-						 * For example:
-						 * 
-						 * <field name="location_rpt">-74.093 41.042 -69.347 44.558</field>
-						 */
-						String value = boundingCoordinates.solrSerialize();
-						solrInputDocument.addField("coordinates", value);
+					isValidDouble(south) &&
+					isValidDouble(east) &&
+					isValidDouble(north)
+				) {
+					/*
+					 * Only index coordinates if south is less than north, and neither north or south
+					 * are poles and with the same coordinate value.
+					 */
+					if (isLessThanCoord(north, south)) {
+						String gripe = String.format("Unable to index geospatial coordinates for %s because north " +
+								"coordinate (%s) is less than south coordinate (%s)", packageId, north, south);
+						logger.warn(gripe);
+					}
+					else if (isSamePole(north, south)) {
+						String gripe = String.format("Unable to index geospatial coordinates for %s because north " +
+								"and south are poles and have the same coordinates (%s, %s)", packageId, north, south);
+						logger.warn(gripe);
 					}
 					else {
-						logger.warn(String.format(
-									"Unable to index geospatial coordinates for %s because north " +
-									"coord (%s) is less than south coord (%s)",
-									packageId, north, south));
+						String value = boundingCoordinates.solrSerialize();
+						solrInputDocument.addField("coordinates", value);
 					}
 				}
 			}
@@ -447,14 +444,24 @@ public class SolrIndex {
     
     
     /*
-     * Is the first coordinate greater than or equal to the second?
+     * Is the first coordinate less than the second?
      */
-    private boolean isGreaterThanOrEqualToCoord(String str1, String str2) {
+    private boolean isLessThanCoord(String str1, String str2) {
     	Double coord1 = new Double(str1);
     	Double coord2 = new Double(str2);
-    	return (coord1 >= coord2);
+    	return (coord1 < coord2);
     }
-    
+
+
+	/*
+	 * Is lat and lon both equal to +/-90.0
+	 */
+
+	private boolean isSamePole(String str1, String str2) {
+		Double coord1 = new Double(str1);
+		Double coord2 = new Double(str2);
+		return (coord1 == 90.0 && coord2 == 90.0) || (coord1 == -90.0 && coord2 == -90.0);
+	}
     
     /*
      * Can a valid Double be created from this string?
