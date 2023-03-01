@@ -38,12 +38,26 @@ REST API
 
 Description
 """""""""""
-Gets an audit report, an XML list of zero or more audit records matching the query parameters as specified in the request.
+Gets an audit report, an XML list of zero or more audit records matching the query parameters as specified in the
+request.
 
 REST API
 """"""""
 
 `GET : https://pasta.lternet.edu/audit/report <https://pasta.lternet.edu/audit/docs/api#GET%20:%20report>`_
+
+*Get Audit CSV Report*
+^^^^^^^^^^^^^^^^^^^^^^
+
+Description
+"""""""""""
+Gets a list of zero or more audit records matching the query parameters as specified in the request and streams back a
+comma separated values result set.
+
+REST API
+""""""""
+
+`GET : https://pasta.lternet.edu/audit/csv <https://pasta.lternet.edu/audit/docs/api#GET%20:%20csv>`_
 
 *Get Audit Count*
 ^^^^^^^^^^^^^^^^^
@@ -73,8 +87,8 @@ REST API
 `GET : https://pasta.lternet.edu/audit/reads/{scope}/{identifier} <https://pasta.lternet.edu/audit/docs/api#GET%20:%20reads/{scope}/{identifier}>`_
 
 Examples
-""""""""
-  
+--------
+
 1. Using :command:`curl` to list resource reads for document identifier "knb-lter-nwk.3120". Note that results from multiple revisions of "knb-lter-nwk.3120" are included in the output.::
 
      curl -X GET https://pasta.lternet.edu/audit/reads/edi/0
