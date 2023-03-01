@@ -80,10 +80,8 @@ public final class GatekeeperFilter implements Filter
     private static final int BAD_REQUEST_CODE = 400;
     private static final int UNAUTHORIZED_CODE = 401;
 
-    private static final String LTER_HOST = "ldap.lternet.edu";
     private static final String EDI_HOST = "ldap.edirepository.org";
 
-    private static final String LTER_ORG = "o=LTER";
     private static final String EDI_ORG = "o=EDI";
     
     /*
@@ -327,7 +325,7 @@ public final class GatekeeperFilter implements Filter
 //                host = LTER_HOST;
 //            } else if (user.contains(EDI_ORG)) {
             if (user.contains(EDI_ORG)) {
-                host = EDI_HOST;
+                host = ConfigurationListener.getLdapHost();
             } else {
                 String msg = String.format("Unknown LDAPS server for user %s", user);
                 throw new UnauthorizedException(msg);

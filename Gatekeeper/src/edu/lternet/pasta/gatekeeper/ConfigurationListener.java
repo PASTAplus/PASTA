@@ -54,6 +54,7 @@ public class ConfigurationListener implements ServletContextListener
     public static final String VETTED_GROUP = "token.vettedgroup";
     public static final String AUTH_GROUP = "token.authgroup";
     public static final String PUBLIC_USER = "token.publicuser";
+    public static final String LDAP_HOST = "ldap.host";
     public static final String LDAP_KEY_STORE = "ldap.keystore";
     public static final String WEB_SERVICE_VERSION = "web.service.version";
     public static final String LTER_KEYSTORE = "lter.keystore";
@@ -74,6 +75,7 @@ public class ConfigurationListener implements ServletContextListener
     private static String vettedGroup = null;
     private static String authGroup = null;
     private static String publicUser = null;
+    private static String ldapHost = null;
     private static File ldapKeyStore = null;
     private static SecretKey privateKey = null;
     private static String webServiceVersion = null;
@@ -163,8 +165,17 @@ public class ConfigurationListener implements ServletContextListener
     }
 
     /**
-     * Getter for the ldapKeyStore class field.
+     * Getter for the ldapHost class field.
      * 
+     * @return the ldapHost class field.
+     */
+    public static String getLdapHost() {
+        return ldapHost;
+    }
+
+    /**
+     * Getter for the ldapKeyStore class field.
+     *
      * @return the ldapKeyStore class field.
      */
     public static File getLdapKeyStore() {
@@ -312,6 +323,7 @@ public class ConfigurationListener implements ServletContextListener
         setVettedGroup(prop);
         setAuthGroup(prop);
         setPublicUser(prop);
+        setLdapHost(prop);
         setLdapKeyStore(prop);
         setLterKeyStore(prop);
         setLterCertificate(prop);
@@ -387,7 +399,14 @@ public class ConfigurationListener implements ServletContextListener
                                                    PROPERTIES));
     }
 
-    private void setLdapKeyStore(Properties p) {
+      private void setLdapHost(Properties p) {
+
+        ldapHost = p.getProperty(LDAP_HOST);
+        if (ldapHost == null)
+            throw new IllegalArgumentException(ldapHost + " not specified");
+    }
+
+  private void setLdapKeyStore(Properties p) {
 
         String fileName = p.getProperty(LDAP_KEY_STORE);
         if (fileName == null || fileName.isEmpty()) {
