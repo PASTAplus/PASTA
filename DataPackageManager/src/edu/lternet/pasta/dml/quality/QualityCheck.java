@@ -34,6 +34,8 @@ package edu.lternet.pasta.dml.quality;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.owasp.encoder.Encode;
+
 import edu.lternet.pasta.dml.parser.DataPackage;
 import edu.lternet.pasta.dml.parser.Entity;
 
@@ -490,7 +492,7 @@ public class QualityCheck {
    * them harmless.
    */
   private String checkForEmbeddedCDATA(String text) {
-	  String checkedText = text;
+	  String checkedText = Encode.forXml(text);
 	  final String cdataStart = "<![CDATA[";
 	  final String cdataEnd = "]]>";
 	  final String cdataEndEscaped = "] ] >";
