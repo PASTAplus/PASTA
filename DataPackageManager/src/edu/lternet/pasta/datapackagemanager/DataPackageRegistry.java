@@ -36,6 +36,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import edu.lternet.pasta.common.*;
@@ -4465,90 +4466,129 @@ public class DataPackageRegistry {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public void addJournalCitation(JournalCitation journalCitation) 
-            throws ClassNotFoundException, SQLException {
-        Connection connection = null;
-        int journalCitationId = 0;
+    public void addJournalCitation(JournalCitation journalCitation)
+        throws ClassNotFoundException, SQLException
+    {
+      Connection connection = null;
+      int journalCitationId = 0;
 
-        if (journalCitation != null) {
-            String packageId = journalCitation.getPackageId();
-            String principalOwner = journalCitation.getPrincipalOwner();
-            String articleDoi = journalCitation.getArticleDoi();
-            String articleTitle = journalCitation.getArticleTitle();
-            String articleUrl = journalCitation.getArticleUrl();
-            LocalDateTime dateCreated = journalCitation.getDateCreated();
-            String journalTitle = journalCitation.getJournalTitle();
-            String relationType = journalCitation.getRelationType();
-            
-            String queryStr = String.format(
-              "INSERT INTO %s (package_id, principal_owner, article_doi, " +
-                  "article_title, article_url, date_created, journal_title, " +
-                  "relation_type) " +
-                  "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
-              JOURNAL_CITATION);
+      if (journalCitation != null) {
+        String packageId = journalCitation.getPackageId();
+        String principalOwner = journalCitation.getPrincipalOwner();
+        String articleDoi = journalCitation.getArticleDoi();
+        String articleTitle = journalCitation.getArticleTitle();
+        String articleUrl = journalCitation.getArticleUrl();
+        LocalDateTime dateCreated = journalCitation.getDateCreated();
+        String journalTitle = journalCitation.getJournalTitle();
+        String relationType = journalCitation.getRelationType();
 
-            logger.debug("queryStr: " + queryStr);
+        String queryStr = String.format(
+            "INSERT INTO %s (package_id, principal_owner, article_doi, " +
+                "article_title, article_url, date_created, journal_title, " +
+                "relation_type) " +
+                "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
+            JOURNAL_CITATION);
 
-            try {
-                connection = getConnection();
-                PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
-                pstmt.setString(1, packageId);
-                pstmt.setString(2, principalOwner);
-                
-                if (articleDoi == null) { 
-                    pstmt.setString(3, "");
-                } 
-                else { 
-                    pstmt.setString(3, articleDoi); 
-                }
-                
-                if (articleTitle == null) { 
-                    pstmt.setString(4, "");
-                } 
-                else { 
-                    pstmt.setString(4, articleTitle); 
-                }
-                
-                if (articleUrl == null) { 
-                    pstmt.setString(5, "");
-                } 
-                else { 
-                    pstmt.setString(5, articleUrl); 
-                }
-                
-                java.sql.Timestamp ts = Timestamp.valueOf(dateCreated);
-                pstmt.setTimestamp(6, ts);
-                
-                if (journalTitle == null) { 
-                    pstmt.setString(7, "");
-                } 
-                else { 
-                    pstmt.setString(7, journalTitle); 
-                }
+        logger.debug("queryStr: " + queryStr);
 
-                if (relationType != null) {
-                    pstmt.setString(8, relationType);
-                }
-                
-                pstmt.executeUpdate();
-                
-                ResultSet rs = pstmt.getGeneratedKeys();
-                while (rs.next()) {
-                    journalCitationId = rs.getInt(1);
-                }
+        try {
+          connection = getConnection();
+          PreparedStatement pstmt =
+              connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
+          pstmt.setString(1, packageId);
+          pstmt.setString(2, principalOwner);
+          pstmt.setString(3, Objects.toString(articleDoi, ""));
+          pstmt.setString(4, Objects.toString(articleTitle, ""));
+          pstmt.setString(5, Objects.toString(articleUrl, ""));
+          pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
+          pstmt.setString(7, Objects.toString(journalTitle, ""));
+          pstmt.setString(8, Objects.toString(relationType, "IsCitedBy"));
+          pstmt.executeUpdate();
 
-              pstmt.close();
-            } catch (SQLException e) {
-                logger.error("Error inserting JOURNAL_CITATION record for JournalCitation object:\n"
-                        + journalCitation.toXML(true));
-                throw (e);
-            } finally {
-                journalCitation.setJournalCitationId(journalCitationId); // set the id value of the journal citation
-                returnConnection(connection);
-            }
+          ResultSet rs = pstmt.getGeneratedKeys();
+          while (rs.next()) {
+            journalCitationId = rs.getInt(1);
+          }
+
+          pstmt.close();
+        } catch (SQLException e) {
+          logger.error(
+              "Error inserting JOURNAL_CITATION record for JournalCitation object:\n" +
+                  journalCitation.toXML(true));
+          throw (e);
+        } finally {
+          journalCitation.setJournalCitationId(
+              journalCitationId); // set the id value of the journal citation
+          returnConnection(connection);
         }
+      }
     }
-  
+
+  public void updateJournalCitation(JournalCitation journalCitation)
+      throws ClassNotFoundException, SQLException
+  {
+    Connection connection = null;
+
+    if (journalCitation != null) {
+      int journalCitationId = journalCitation.getJournalCitationId();
+      String packageId = journalCitation.getPackageId();
+      String principalOwner = journalCitation.getPrincipalOwner();
+      String articleDoi = journalCitation.getArticleDoi();
+      String articleTitle = journalCitation.getArticleTitle();
+      String articleUrl = journalCitation.getArticleUrl();
+      LocalDateTime dateCreated = journalCitation.getDateCreated();
+      String journalTitle = journalCitation.getJournalTitle();
+      String relationType = journalCitation.getRelationType();
+
+      // fmt:off
+      // language=PostgreSQL
+      String queryStr = String.format(
+          "UPDATE %s set package_id=?," +
+              "principal_owner=?," +
+              "article_doi=?," +
+              "article_title=?," +
+              "article_url=?," +
+              // "date_created=?," +
+              "journal_title=?," +
+              "relation_type=?::datapackagemanager.relation_type " +
+              "WHERE journal_citation_id=?",
+          SqlEscape.name(JOURNAL_CITATION));
+      // fmt:on
+
+      logger.error("queryStr: " + queryStr);
+
+      try {
+        connection = getConnection();
+        PreparedStatement pstmt =
+            connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
+        pstmt.setString(1, packageId);
+        pstmt.setString(2, principalOwner);
+        pstmt.setString(3, Objects.toString(articleDoi, ""));
+        pstmt.setString(4, Objects.toString(articleTitle, ""));
+        pstmt.setString(5, Objects.toString(articleUrl, ""));
+        // pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
+        pstmt.setString(6, Objects.toString(journalTitle, ""));
+        pstmt.setString(7, Objects.toString(relationType, "IsCitedBy"));
+        pstmt.setInt(8, journalCitationId);
+        pstmt.executeUpdate();
+        ResultSet rs = pstmt.getGeneratedKeys();
+        while (rs.next()) {
+          journalCitationId = rs.getInt(1);
+        }
+        pstmt.close();
+      } catch (SQLException e) {
+        logger.error(
+            "Error updating JOURNAL_CITATION record for JournalCitation object:\n" +
+                journalCitation.toXML(true));
+        throw (e);
+      } finally {
+        journalCitation.setJournalCitationId(
+            journalCitationId); // set the id value of the journal citation
+        returnConnection(connection);
+      }
+    }
+  }
+
     
     public Integer deleteJournalCitation(Integer id, String userId)
             throws ClassNotFoundException, SQLException, NotFoundException {
@@ -4890,5 +4930,98 @@ public class DataPackageRegistry {
           return journalCitations;
       }
             
+  /**
+	 * Determine if journal article DOI exists for another journal citation for the given
+   * Package ID.
+   *
+   * A single Package ID can have multiple journal citations, but each journal citation
+   * must have a unique DOI and/or URL.
+   *
+   * @param citationId   Journal citation ID to exclude from the search
+   *                     (use -1 to include all citations)
+   * @param packageId    Package ID for which to search
+   * @param articleDoi   Article DOI for which to search
+	 */
+  public boolean journalArticleDoiExists(Integer citationId, String packageId,
+                                         String articleDoi) throws Exception
+  {
+    // fmt:off
+    // language=PostgreSQL
+    String queryStr = String.format(
+        "SELECT count(*) as count FROM %s " +
+            "WHERE journal_citation_id != ?" +
+            "AND article_doi = ? AND package_id = ?",
+        SqlEscape.name(JOURNAL_CITATION));
+    // fmt:on
+
+    logger.debug("queryStr: " + queryStr);
+
+    boolean exists;
+
+    try {
+      Connection connection = getConnection();
+      PreparedStatement pstmt = connection.prepareStatement(queryStr);
+      pstmt.setInt(1, citationId);
+      pstmt.setString(2, articleDoi);
+      pstmt.setString(3, packageId);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int count = rs.getInt("count");
+      exists = count > 0;
+      pstmt.close();
+    } catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      throw (e);
+    }
+
+    return exists;
+  }
+
+  /**
+	 * Determine if journal article DOI exists for another journal citation for the given
+   * Package ID.
+   *
+   * A single Package ID can have multiple journal citations, but each journal citation
+   * must have a unique DOI and/or URL.
+   *
+   * @param citationId   Journal citation ID to exclude from the search
+   *                     (use -1 to include all citations)
+   * @param packageId    Package ID for which to search
+   * @param articleUrl   Article URL for which to search
+	 */
+  public boolean journalArticleUrlExists(Integer citationId, String packageId,
+                                         String articleUrl) throws Exception
+  {
+    // fmt:off
+    // language=PostgreSQL
+    String queryStr = String.format(
+        "SELECT count(*) as count FROM %s " +
+            "WHERE journal_citation_id != ?" +
+            "AND article_url = ? AND package_id = ?",
+        SqlEscape.name(JOURNAL_CITATION));
+    // fmt:on
+
+    logger.debug("queryStr: " + queryStr);
+
+    boolean exists;
+
+    try {
+      Connection connection = getConnection();
+      PreparedStatement pstmt = connection.prepareStatement(queryStr);
+      pstmt.setInt(1, citationId);
+      pstmt.setString(2, articleUrl);
+      pstmt.setString(3, packageId);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int count = rs.getInt("count");
+      exists = count > 0;
+      pstmt.close();
+    } catch (SQLException e) {
+      logger.error("SQLException: " + e.getMessage());
+      throw (e);
+    }
+
+    return exists;
+  }
 
 }
