@@ -12213,6 +12213,165 @@ public class DataPackageManagerResource extends PastaWebService {
         return response;
     }
 
+    /**
+     * <strong>Update Journal Citation</strong> operation, updates an existing
+     * journal citation entry in PASTA.
+     *
+     * <h4>Request entity:</h4>
+     *
+     * <p>
+     * The request entity should be an XML document (MIME type
+     * <code>application/xml</code>) that contains the journal citation metadata.
+     * For example:
+     * </p>
+     *
+     * <pre>
+            &lt;journalCitation&gt;
+                &lt;packageId&gt;edi.0.3&lt;/packageId&gt;
+                &lt;articleDoi&gt;10.5072/FK2/06dccc7b0cb2a2d5f6fef62cb4b36dae&lt;/articleDoi&gt;
+                &lt;articleTitle&gt;Tree Survey in Southern Arizona&lt;/articleTitle&gt;
+                &lt;articleUrl&gt;http://swtrees.com/articles/12345&lt;/articleUrl&gt;
+                &lt;journalTitle&gt;Journal of Southwestern Trees&lt;/journalTitle&gt;
+            &lt;/journalCitation&gt;
+     * </pre>
+     *
+     * <h4>Responses:</h4>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <td><b>Status</b></td>
+     * <td><b>Reason</b></td>
+     * <td><b>Entity</b></td>
+     * <td><b>MIME type</b></td>
+     * </tr>
+     * <tr>
+     * <td>201 Update</td>
+     * <td>If the request was successful.</td>
+     * <td>None</td>
+     * <td>N/A</td>
+     * </tr>
+     * <tr>
+     * <td>400 Bad Request</td>
+     * <td>If the request entity contains an error, such as improperly formatted
+     * XML, EML packageId, or URL.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>401 Unauthorized</td>
+     * <td>If the requesting user is not authorized to create journal citations.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <tr>
+     * <td>404 Not Found</td>
+     * <td>A data package with the specified package identifier was not found in the repository.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>409 Conflict</td>
+     * <td>If a journal citation already exists with the same creator and attributes.</td>
+     * <td>
+     * An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * </table>
+     *
+     * @param headers
+     *            the HTTP request headers containing the authorization token.
+     * @param citationXml
+     *            the POST request's body, containing XML.
+     *
+     * @return an appropriate HTTP response.
+     */
+		@PUT
+		@Path("/citation/eml/{journalCitationId}")
+		@Consumes(MediaType.APPLICATION_XML + "; charset=utf-8")
+		public Response updateJournalCitation(@Context HttpHeaders headers,
+																					String citationXml,
+																					@PathParam("journalCitationId")
+																					Integer journalCitationId)
+		{
+			AuthToken authToken = null;
+			String msg = null;
+			Rule.Permission permission = Rule.Permission.write;
+			Response response = null;
+			final String serviceMethodName = "updateJournalCitation";
+
+			try {
+				if (this.readOnly) {
+					throw new ServiceUnavailableException("PASTA is now in read-only mode");
+				}
+
+				authToken = getAuthToken(headers);
+				String userId = authToken.getUserId();
+
+				// Is user authorized to run the 'updateJournalCitation' service method?
+				boolean serviceMethodAuthorized =
+						isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+
+				if (!serviceMethodAuthorized) {
+					throw new UnauthorizedException(
+							"User " + userId + " is not authorized to execute service method " +
+									serviceMethodName);
+				}
+
+				JournalCitation journalCitation = new JournalCitation(citationXml);
+
+				if (journalCitationId != 0 && journalCitationId != journalCitation.getJournalCitationId()) {
+					throw new UserErrorException(String.format(
+							"Journal citation ID in URL (%d) does not match journal citation ID in XML (%d)",
+							journalCitationId, journalCitation.getJournalCitationId()));
+				}
+
+				DataPackageManager dpm = new DataPackageManager();
+				journalCitation = dpm.updateJournalCitation(userId, citationXml);
+
+				if (journalCitation != null) {
+					journalCitationId = journalCitation.getJournalCitationId();
+					URI uri = URI.create(String.format("%d", journalCitationId));
+					msg =
+							String.format("Updated journal citation with journalCitationId value: %d",
+									journalCitationId);
+					response = Response.created(uri).build();
+				}
+				else {
+					throw new Exception(String.format(
+							"An error occurred while attempting to update journal citation entry for request: %s",
+							citationXml));
+				}
+			} catch (XmlParsingException e) {
+				response = WebExceptionFactory.makeBadRequest(e).getResponse();
+				msg = e.getMessage();
+			} catch (UnauthorizedException e) {
+				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+				msg = e.getMessage();
+			} catch (ResourceNotFoundException e) {
+				msg = e.getMessage();
+				response = WebExceptionFactory.makeNotFound(e).getResponse();
+			} catch (ResourceDeletedException e) {
+				msg = e.getMessage();
+				response = WebExceptionFactory.makeConflict(e).getResponse();
+			} catch (UserErrorException e) {
+				msg = e.getMessage();
+				response = WebResponseFactory.makeBadRequest(e);
+			} catch (ServiceUnavailableException e) {
+				response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+			} catch (Exception e) {
+				WebApplicationException webApplicationException =
+						WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+								e.getMessage());
+				response = webApplicationException.getResponse();
+				msg = e.getMessage();
+			} finally {
+				audit(serviceMethodName, authToken, response, null, msg);
+			}
+
+			return response;
+		}
+
 
     /**
      * <strong>Delete Journal Citation</strong> operation, deletes the journal citation entry
@@ -12264,79 +12423,71 @@ public class DataPackageManagerResource extends PastaWebService {
      * 
      * @return an appropriate HTTP response.
      */
-    @DELETE
-    @Path("/citation/eml/{journalCitationId}")
-    public Response deleteJournalCitation(@Context HttpHeaders headers,
-            @PathParam("journalCitationId") String journalCitationId) {
-        AuthToken authToken = null;
-        String msg = null;
-        Rule.Permission permission = Rule.Permission.write;
-        Response response = null;
-        final String serviceMethodName = "deleteJournalCitation";
+		@DELETE
+		@Path("/citation/eml/{journalCitationId}")
+		public Response deleteJournalCitation(@Context HttpHeaders headers,
+																					@PathParam("journalCitationId")
+																					String journalCitationId)
+		{
+			AuthToken authToken = null;
+			String msg = null;
+			Rule.Permission permission = Rule.Permission.write;
+			Response response = null;
+			final String serviceMethodName = "deleteJournalCitation";
 
-        try {
-			if (this.readOnly) {
-				throw new ServiceUnavailableException("PASTA is now in read-only mode");
+			try {
+				if (this.readOnly) {
+					throw new ServiceUnavailableException("PASTA is now in read-only mode");
+				}
+
+				authToken = getAuthToken(headers);
+				String userId = authToken.getUserId();
+
+				// Is user authorized to run the 'deleteJournalCitation' service
+				// method?
+				boolean serviceMethodAuthorized =
+						isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+
+				if (!serviceMethodAuthorized) {
+					throw new UnauthorizedException(
+							"User " + userId + " is not authorized to execute service method " +
+									serviceMethodName);
+				}
+
+				Integer id = parseJournalCitationId(journalCitationId);
+				DataPackageManager dpm = new DataPackageManager();
+				Integer deletedId = dpm.deleteJournalCitation(id, userId);
+				msg = String.format("Deleted journal citation with id = '%d'.", deletedId);
+				response = Response.ok().build();
+			} catch (IllegalArgumentException e) {
+				response = WebExceptionFactory.makeBadRequest(e).getResponse();
+				msg = e.getMessage();
+			} catch (UnauthorizedException e) {
+				response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+				msg = e.getMessage();
+			} catch (ResourceNotFoundException e) {
+				response = WebExceptionFactory.makeNotFound(e).getResponse();
+				msg = e.getMessage();
+			} catch (ResourceDeletedException e) {
+				response = WebExceptionFactory.makeGone(e).getResponse();
+				msg = e.getMessage();
+			} catch (WebApplicationException e) {
+				response = e.getResponse();
+				msg = e.getMessage();
+			} catch (ServiceUnavailableException e) {
+				response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+			} catch (Exception e) {
+				WebApplicationException webApplicationException =
+						WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+								e.getMessage());
+				response = webApplicationException.getResponse();
+				msg = e.getMessage();
+			} finally {
+				audit(serviceMethodName, authToken, response, null, msg);
 			}
 
-            authToken = getAuthToken(headers);
-            String userId = authToken.getUserId();
-
-            // Is user authorized to run the 'deleteJournalCitation' service
-            // method?
-            boolean serviceMethodAuthorized = isServiceMethodAuthorized(
-                    serviceMethodName, permission, authToken);
-
-            if (!serviceMethodAuthorized) {
-                throw new UnauthorizedException("User " + userId
-                        + " is not authorized to execute service method "
-                        + serviceMethodName);
-            }
-
-            Integer id = parseJournalCitationId(journalCitationId);
-            DataPackageManager dpm = new DataPackageManager();
-
-            Integer deletedId = dpm.deleteJournalCitation(id, userId);
-            msg = String.format("Deleted journal citation with id = '%d'.",
-                                deletedId);
-            response = Response.ok().build();
-        }
-        catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
-            msg = e.getMessage();
-        }
-        catch (UnauthorizedException e) {
-            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-            msg = e.getMessage();
-        }
-        catch (ResourceNotFoundException e) {
-            response = WebExceptionFactory.makeNotFound(e).getResponse();
-            msg = e.getMessage();
-        }
-        catch (ResourceDeletedException e) {
-            response = WebExceptionFactory.makeGone(e).getResponse();
-            msg = e.getMessage();
-        }
-        catch (WebApplicationException e) {
-            response = e.getResponse();
-            msg = e.getMessage();
-        }
-		catch (ServiceUnavailableException e) {
-			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+			return response;
 		}
-        catch (Exception e) {
-            WebApplicationException webApplicationException = WebExceptionFactory
-                    .make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
-            response = webApplicationException.getResponse();
-            msg = e.getMessage();
-        }
-        finally {
-            audit(serviceMethodName, authToken, response, null, msg);
-        }
-
-        return response;
-    }
 
 
     /**
