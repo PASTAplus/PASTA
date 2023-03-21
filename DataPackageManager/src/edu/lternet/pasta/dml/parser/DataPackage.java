@@ -1249,7 +1249,7 @@ public void setCreators(List<Party> creators) {
 	  boolean isPastaDoi = false;
 	  
 	  final String[] doiShoulders = { 
-			  "10.5072/FK2", 
+			  "10.0311/FK2",
 			  "10.6073/pasta"
 	  };
 	  
