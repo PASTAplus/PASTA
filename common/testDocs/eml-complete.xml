@@ -1,0 +1,3666 @@
+<eml:eml packageId="string" system="string string" scope="system" xml:lang="string"
+         xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0">
+  <!--Optional:-->
+  <access id="string" system="string" scope="document" order="allowFirst"
+          authSystem="string">
+    <!--You have a CHOICE of the next 2 items at this level-->
+    <!--You have a CHOICE of the next 2 items at this level-->
+    <allow>
+      <!--1 or more repetitions:-->
+      <principal>string</principal>
+      <!--1 or more repetitions:-->
+      <permission>read</permission>
+    </allow>
+    <deny>
+      <!--1 or more repetitions:-->
+      <principal>string</principal>
+      <!--1 or more repetitions:-->
+      <permission>write</permission>
+    </deny>
+    <references system="string string">string</references>
+  </access>
+  <!--You have a CHOICE of the next 4 items at this level-->
+  <dataset id="string string" system="string string" scope="document">
+    <title>Crossing Treeline: Bacterioplankton community composition in alpine and subalpine lakes of the Rocky Mountain southern ecoregion and associated physical and chemical characteristics</title>
+    <creator>
+      <individualName>
+        <givenName>Kim</givenName>
+        <surName>Vincent</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>kim.vincent@colorado.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/9999-9999-9999-9999</userId>
+    </creator>
+    <associatedParty>
+      <individualName>
+        <givenName>Hannah</givenName>
+        <surName>Holland-Moritz</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>Hannah.Hollandmoritz@colorado.edu</electronicMailAddress>
+      <role>Data Analysis, Conceptual Content</role>
+    </associatedParty>
+    <associatedParty>
+      <individualName>
+        <givenName>Adam</givenName>
+        <givenName>J.</givenName>
+        <surName>Solon</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>Adam.Solon@colorado.edu</electronicMailAddress>
+      <role>Field Crew, Lab Analysis, Conceptual Content</role>
+    </associatedParty>
+    <!--You have a CHOICE of the next 2 items at this level-->
+    <!--Zero or more repetitions:-->
+    <alternateIdentifier system="string">string</alternateIdentifier>
+    <!--Optional:-->
+    <shortName>string</shortName>
+    <!--1 or more repetitions:-->
+    <title xml:lang="string">
+      circum
+      <!--Zero or more repetitions:-->
+      <value xml:lang="string">string</value>
+      regemque
+    </title>
+    <!--1 or more repetitions:-->
+    <creator id="string" system="string string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <salutation xml:lang="string">
+          foedere
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          ferant
+        </salutation>
+        <!--Zero or more repetitions:-->
+        <givenName xml:lang="string">
+          profundum
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          sceptra
+        </givenName>
+        <surName xml:lang="string">
+          et
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          turbine
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        iovis
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        flammato
+      </organizationName>
+      <positionName xml:lang="string">
+        speluncis
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        profundum
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <address id="string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--Zero or more repetitions:-->
+        <deliveryPoint xml:lang="string">
+          flammas
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          ac
+        </deliveryPoint>
+        <!--Optional:-->
+        <city xml:lang="string">
+          hoc
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          rapidum
+        </city>
+        <!--Optional:-->
+        <administrativeArea xml:lang="string">
+          ac
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          caelumque
+        </administrativeArea>
+        <!--Optional:-->
+        <postalCode xml:lang="string">
+          speluncis
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          circum
+        </postalCode>
+        <!--Optional:-->
+        <country xml:lang="string">
+          aris
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          coniunx
+        </country>
+        <references system="string string">string</references>
+      </address>
+      <!--Zero or more repetitions:-->
+      <phone phonetype="voice">string</phone>
+      <!--Zero or more repetitions:-->
+      <electronicMailAddress xml:lang="string">
+        arce
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        claustra
+      </electronicMailAddress>
+      <!--Zero or more repetitions:-->
+      <onlineUrl>http://www.any.com/certo/quisquam</onlineUrl>
+      <!--Zero or more repetitions:-->
+      <userId directory="https://orcid.org">0000-0000-9999-9999</userId>
+      <references system="string">string</references>
+    </creator>
+    <!--Zero or more repetitions:-->
+    <metadataProvider id="string string" system="string string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <salutation xml:lang="string">
+          ac
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          sed
+        </salutation>
+        <!--Zero or more repetitions:-->
+        <givenName xml:lang="string">
+          pectore
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          talia
+        </givenName>
+        <surName xml:lang="string">
+          pectore
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          austris
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        annos
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        sciret
+      </organizationName>
+      <positionName xml:lang="string">
+        certo
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        dare
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <address id="string string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--Zero or more repetitions:-->
+        <deliveryPoint xml:lang="string">
+          volutans
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          dedit
+        </deliveryPoint>
+        <!--Optional:-->
+        <city xml:lang="string">
+          faciat
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          magno
+        </city>
+        <!--Optional:-->
+        <administrativeArea xml:lang="string">
+          et
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          ac
+        </administrativeArea>
+        <!--Optional:-->
+        <postalCode xml:lang="string">
+          et
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          regemque
+        </postalCode>
+        <!--Optional:-->
+        <country xml:lang="string">
+          annos
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          infixit
+        </country>
+        <references system="string">string</references>
+      </address>
+      <!--Zero or more repetitions:-->
+      <phone phonetype="voice">string</phone>
+      <!--Zero or more repetitions:-->
+      <electronicMailAddress xml:lang="string">
+        tenens
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        regina
+      </electronicMailAddress>
+      <!--Zero or more repetitions:-->
+      <onlineUrl>http://www.any.org/habenas/insuper</onlineUrl>
+      <!--Zero or more repetitions:-->
+      <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+      <references system="string">string</references>
+    </metadataProvider>
+    <!--Zero or more repetitions:-->
+    <associatedParty id="string string" system="string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <salutation xml:lang="string">
+          in
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          soror
+        </salutation>
+        <!--Zero or more repetitions:-->
+        <givenName xml:lang="string">
+          abdidit
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          iunonis
+        </givenName>
+        <surName xml:lang="string">
+          coniunx
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          adorat
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        ipsa
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        illum
+      </organizationName>
+      <positionName xml:lang="string">
+        frenat
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        aris
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <address id="string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--Zero or more repetitions:-->
+        <deliveryPoint xml:lang="string">
+          mollitque
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          premere
+        </deliveryPoint>
+        <!--Optional:-->
+        <city xml:lang="string">
+          montis
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          insuper
+        </city>
+        <!--Optional:-->
+        <administrativeArea xml:lang="string">
+          molemque
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          ferant
+        </administrativeArea>
+        <!--Optional:-->
+        <postalCode xml:lang="string">
+          gero
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          nimborum
+        </postalCode>
+        <!--Optional:-->
+        <country xml:lang="string">
+          circum
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          vasto
+        </country>
+        <references system="string">string</references>
+      </address>
+      <!--Zero or more repetitions:-->
+      <phone phonetype="voice">string</phone>
+      <!--Zero or more repetitions:-->
+      <electronicMailAddress xml:lang="string">
+        flammato
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        aris
+      </electronicMailAddress>
+      <!--Zero or more repetitions:-->
+      <onlineUrl>http://www.company.org/tenens/incedo</onlineUrl>
+      <!--Zero or more repetitions:-->
+      <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+      <references system="string string">string</references>
+      <role>publisher</role>
+    </associatedParty>
+    <!--Optional:-->
+    <pubDate>2013-11-24-07:00</pubDate>
+    <!--Optional:-->
+    <language xml:lang="string">
+      dedit
+      <!--Zero or more repetitions:-->
+      <value xml:lang="string">string</value>
+      qui
+    </language>
+    <!--Optional:-->
+    <series>string</series>
+    <!--Optional:-->
+    <abstract xml:lang="string">
+      profundum
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <!--Zero or more repetitions:-->
+      <section xml:lang="string">
+        <!--Optional:-->
+        <title xml:lang="string">string</title>
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <para xml:lang="string">
+          atris
+          <!--You have a CHOICE of the next 8 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <itemizedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </itemizedlist>
+          <orderedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </orderedlist>
+          <emphasis xml:lang="string">
+            imposuit
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            atris
+          </emphasis>
+          <subscript xml:lang="string">
+            magno
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            animos
+          </subscript>
+          <superscript xml:lang="string">
+            iras
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            sonoras
+          </superscript>
+          <literalLayout>
+            verrantque
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            patriam
+          </literalLayout>
+          <!--Optional:-->
+          <ulink url="anySimpleType">
+            metuens
+            <citetitle xml:lang="string">string</citetitle>
+            montis
+          </ulink>
+          dare
+        </para>
+        <section/>
+      </section>
+      <!--Zero or more repetitions:-->
+      <para xml:lang="string">
+        laxas
+        <!--You have a CHOICE of the next 8 items at this level-->
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        <itemizedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </itemizedlist>
+        <orderedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </orderedlist>
+        <emphasis xml:lang="string">
+          tempestatesque
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          e
+        </emphasis>
+        <subscript xml:lang="string">
+          sceptra
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          volutans
+        </subscript>
+        <superscript xml:lang="string">
+          vasto
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          murmure
+        </superscript>
+        <literalLayout>
+          coniunx
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          vinclis
+        </literalLayout>
+        <!--Optional:-->
+        <ulink url="anySimpleType">
+          rapidum
+          <citetitle xml:lang="string">string</citetitle>
+          rapidi
+        </ulink>
+        turbine
+      </para>
+      <!--Zero or more repetitions:-->
+      <markdown>string</markdown>
+      antro
+    </abstract>
+    <!--Zero or more repetitions:-->
+    <keywordSet>
+      <!--1 or more repetitions:-->
+      <keyword xml:lang="string" keywordType="temporal">
+        sciret
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        aequora
+      </keyword>
+      <!--Optional:-->
+      <keywordThesaurus>string</keywordThesaurus>
+    </keywordSet>
+    <!--Zero or more repetitions:-->
+    <additionalInfo xml:lang="string">
+      luctantis
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <!--Zero or more repetitions:-->
+      <section xml:lang="string">
+        <!--Optional:-->
+        <title xml:lang="string">string</title>
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <para xml:lang="string">
+          aequora
+          <!--You have a CHOICE of the next 8 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <itemizedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </itemizedlist>
+          <orderedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </orderedlist>
+          <emphasis xml:lang="string">
+            ipsa
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            et
+          </emphasis>
+          <subscript xml:lang="string">
+            aris
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            incedo
+          </subscript>
+          <superscript xml:lang="string">
+            imperio
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            hic
+          </superscript>
+          <literalLayout>
+            arce
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            ego
+          </literalLayout>
+          <!--Optional:-->
+          <ulink url="anySimpleType">
+            ni
+            <citetitle xml:lang="string">string</citetitle>
+            tempestatesque
+          </ulink>
+          circum
+        </para>
+        <section/>
+      </section>
+      <!--Zero or more repetitions:-->
+      <para xml:lang="string">
+        ego
+        <!--You have a CHOICE of the next 8 items at this level-->
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        <itemizedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </itemizedlist>
+        <orderedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </orderedlist>
+        <emphasis xml:lang="string">
+          corde
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          aris
+        </emphasis>
+        <subscript xml:lang="string">
+          insuper
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          molemque
+        </subscript>
+        <superscript xml:lang="string">
+          temperat
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          rapidum
+        </superscript>
+        <literalLayout>
+          magno
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          nimborum
+        </literalLayout>
+        <!--Optional:-->
+        <ulink url="anySimpleType">
+          gero
+          <citetitle xml:lang="string">string</citetitle>
+          altos
+        </ulink>
+        iunonis
+      </para>
+      <!--Zero or more repetitions:-->
+      <markdown>string</markdown>
+      aeoliam
+    </additionalInfo>
+    <!--Optional:-->
+    <intellectualRights xml:lang="string">
+      premere
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <!--Zero or more repetitions:-->
+      <section xml:lang="string">
+        <!--Optional:-->
+        <title xml:lang="string">string</title>
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <para xml:lang="string">
+          hic
+          <!--You have a CHOICE of the next 8 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <itemizedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </itemizedlist>
+          <orderedlist>
+            <!--1 or more repetitions:-->
+            <listitem>
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <para/>
+              <itemizedlist/>
+              <orderedlist/>
+            </listitem>
+          </orderedlist>
+          <emphasis xml:lang="string">
+            iovisque
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            et
+          </emphasis>
+          <subscript xml:lang="string">
+            nubibus
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            carcere
+          </subscript>
+          <superscript xml:lang="string">
+            imposuit
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            <subscript/>
+            <superscript/>
+            murmure
+          </superscript>
+          <literalLayout>
+            rates
+            <!--Zero or more repetitions:-->
+            <value xml:lang="string">string</value>
+            maria
+          </literalLayout>
+          <!--Optional:-->
+          <ulink url="anySimpleType">
+            supplex
+            <citetitle xml:lang="string">string</citetitle>
+            imponet
+          </ulink>
+          ipsa
+        </para>
+        <section/>
+      </section>
+      <!--Zero or more repetitions:-->
+      <para xml:lang="string">
+        numen
+        <!--You have a CHOICE of the next 8 items at this level-->
+        <!--Zero or more repetitions:-->
+        <value xml:lang="string">string</value>
+        <itemizedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </itemizedlist>
+        <orderedlist>
+          <!--1 or more repetitions:-->
+          <listitem>
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <para/>
+            <itemizedlist/>
+            <orderedlist/>
+          </listitem>
+        </orderedlist>
+        <emphasis xml:lang="string">
+          volutans
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          per
+        </emphasis>
+        <subscript xml:lang="string">
+          maria
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          et
+        </subscript>
+        <superscript xml:lang="string">
+          foedere
+          <!--You have a CHOICE of the next 3 items at this level-->
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          <subscript/>
+          <superscript/>
+          tempestatesque
+        </superscript>
+        <literalLayout>
+          sciret
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          ego
+        </literalLayout>
+        <!--Optional:-->
+        <ulink url="anySimpleType">
+          rapidi
+          <citetitle xml:lang="string">string</citetitle>
+          iaculata
+        </ulink>
+        montis
+      </para>
+      <!--Zero or more repetitions:-->
+      <markdown>string</markdown>
+      omnipotens
+    </intellectualRights>
+    <!--Zero or more repetitions:-->
+    <licensed>
+      <licenseName>string</licenseName>
+      <!--Optional:-->
+      <url>http://www.test.org/premit/talia</url>
+      <!--Optional:-->
+      <identifier>string</identifier>
+    </licensed>
+    <!--Zero or more repetitions:-->
+    <distribution id="string" system="string" scope="document">
+      <!--You have a CHOICE of the next 4 items at this level-->
+      <online>
+        <!--Optional:-->
+        <onlineDescription xml:lang="string">
+          vasto
+          <!--Zero or more repetitions:-->
+          <value xml:lang="string">string</value>
+          et
+        </onlineDescription>
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <url function="download">http://www.corp.gov/premit/vasto</url>
+        <connection id="string string" system="string" scope="document">
+          <!--You have a CHOICE of the next 2 items at this level-->
+          <connectionDefinition id="string" system="string" scope="document">
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <schemeName system="string string">string</schemeName>
+            <description xml:lang="string">
+              bella
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <!--Zero or more repetitions:-->
+              <section xml:lang="string">
+                <!--Optional:-->
+                <title xml:lang="string">string</title>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <para xml:lang="string">
+                  tempestatesque
+                  <!--You have a CHOICE of the next 8 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <itemizedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </itemizedlist>
+                  <orderedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </orderedlist>
+                  <emphasis xml:lang="string">
+                    ac
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    rapidi
+                  </emphasis>
+                  <subscript xml:lang="string">
+                    imposuit
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    e
+                  </subscript>
+                  <superscript xml:lang="string">
+                    ignem
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    tenens
+                  </superscript>
+                  <literalLayout>
+                    et
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    vinclis
+                  </literalLayout>
+                  <!--Optional:-->
+                  <ulink url="anySimpleType">
+                    murmure
+                    <citetitle xml:lang="string">string</citetitle>
+                    aeolus
+                  </ulink>
+                  premere
+                </para>
+                <section/>
+              </section>
+              <!--Zero or more repetitions:-->
+              <para xml:lang="string">
+                sonoras
+                <!--You have a CHOICE of the next 8 items at this level-->
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                <itemizedlist>
+                  <!--1 or more repetitions:-->
+                  <listitem>
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <para/>
+                    <itemizedlist/>
+                    <orderedlist/>
+                  </listitem>
+                </itemizedlist>
+                <orderedlist>
+                  <!--1 or more repetitions:-->
+                  <listitem>
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <para/>
+                    <itemizedlist/>
+                    <orderedlist/>
+                  </listitem>
+                </orderedlist>
+                <emphasis xml:lang="string">
+                  rapidi
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  soror
+                </emphasis>
+                <subscript xml:lang="string">
+                  rapidum
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <subscript/>
+                  <superscript/>
+                  imperio
+                </subscript>
+                <superscript xml:lang="string">
+                  premere
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <subscript/>
+                  <superscript/>
+                  transfixo
+                </superscript>
+                <literalLayout>
+                  insuper
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  ego
+                </literalLayout>
+                <!--Optional:-->
+                <ulink url="anySimpleType">
+                  maria
+                  <citetitle xml:lang="string">string</citetitle>
+                  cum
+                </ulink>
+                rates
+              </para>
+              <!--Zero or more repetitions:-->
+              <markdown>string</markdown>
+              arce
+            </description>
+            <!--1 or more repetitions:-->
+            <parameterDefinition>
+              <name>string</name>
+              <definition>string</definition>
+              <!--Optional:-->
+              <defaultValue>string</defaultValue>
+            </parameterDefinition>
+            <references system="string string">string</references>
+          </connectionDefinition>
+          <!--Zero or more repetitions:-->
+          <parameter>
+            <name>string</name>
+            <value>string</value>
+          </parameter>
+          <references system="string string">string</references>
+        </connection>
+        <connectionDefinition id="string string" system="string" scope="document">
+          <!--You have a CHOICE of the next 2 items at this level-->
+          <schemeName system="string string">string</schemeName>
+          <description xml:lang="string">
+            ni
+            <!--You have a CHOICE of the next 3 items at this level-->
+            <!--Zero or more repetitions:-->
+            <section xml:lang="string">
+              <!--Optional:-->
+              <title xml:lang="string">string</title>
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <para xml:lang="string">
+                rapidum
+                <!--You have a CHOICE of the next 8 items at this level-->
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                <itemizedlist>
+                  <!--1 or more repetitions:-->
+                  <listitem>
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <para/>
+                    <itemizedlist/>
+                    <orderedlist/>
+                  </listitem>
+                </itemizedlist>
+                <orderedlist>
+                  <!--1 or more repetitions:-->
+                  <listitem>
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <para/>
+                    <itemizedlist/>
+                    <orderedlist/>
+                  </listitem>
+                </orderedlist>
+                <emphasis xml:lang="string">
+                  secum
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  auras
+                </emphasis>
+                <subscript xml:lang="string">
+                  animos
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <subscript/>
+                  <superscript/>
+                  iovisque
+                </subscript>
+                <superscript xml:lang="string">
+                  magno
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <subscript/>
+                  <superscript/>
+                  flammato
+                </superscript>
+                <literalLayout>
+                  secum
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  hic
+                </literalLayout>
+                <!--Optional:-->
+                <ulink url="anySimpleType">
+                  et
+                  <citetitle xml:lang="string">string</citetitle>
+                  aeoliam
+                </ulink>
+                terras
+              </para>
+              <section/>
+            </section>
+            <!--Zero or more repetitions:-->
+            <para xml:lang="string">
+              altos
+              <!--You have a CHOICE of the next 8 items at this level-->
+              <!--Zero or more repetitions:-->
+              <value xml:lang="string">string</value>
+              <itemizedlist>
+                <!--1 or more repetitions:-->
+                <listitem>
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <para/>
+                  <itemizedlist/>
+                  <orderedlist/>
+                </listitem>
+              </itemizedlist>
+              <orderedlist>
+                <!--1 or more repetitions:-->
+                <listitem>
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <para/>
+                  <itemizedlist/>
+                  <orderedlist/>
+                </listitem>
+              </orderedlist>
+              <emphasis xml:lang="string">
+                rex
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                profundum
+              </emphasis>
+              <subscript xml:lang="string">
+                magno
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                <subscript/>
+                <superscript/>
+                premit
+              </subscript>
+              <superscript xml:lang="string">
+                certo
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                <subscript/>
+                <superscript/>
+                luctantis
+              </superscript>
+              <literalLayout>
+                dare
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                luctantis
+              </literalLayout>
+              <!--Optional:-->
+              <ulink url="anySimpleType">
+                terras
+                <citetitle xml:lang="string">string</citetitle>
+                nubibus
+              </ulink>
+              altos
+            </para>
+            <!--Zero or more repetitions:-->
+            <markdown>string</markdown>
+            et
+          </description>
+          <!--1 or more repetitions:-->
+          <parameterDefinition>
+            <name>string</name>
+            <definition>string</definition>
+            <!--Optional:-->
+            <defaultValue>string</defaultValue>
+          </parameterDefinition>
+          <references system="string">string</references>
+        </connectionDefinition>
+      </online>
+      <offline>
+        <mediumName>string</mediumName>
+        <!--Optional:-->
+        <mediumDensity>string</mediumDensity>
+        <!--Optional:-->
+        <mediumDensityUnits>string</mediumDensityUnits>
+        <!--Optional:-->
+        <mediumVolume>string</mediumVolume>
+        <!--Zero or more repetitions:-->
+        <mediumFormat>string</mediumFormat>
+        <!--Optional:-->
+        <mediumNote>string</mediumNote>
+      </offline>
+      <inline>
+        annos
+        <!--You may enter ANY elements at this point-->
+        <AnyElement/>
+        tot
+      </inline>
+      <references system="string">string</references>
+    </distribution>
+    <!--Optional:-->
+    <coverage id="string string" system="string string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <geographicCoverage id="string string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <geographicDescription>string</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>180.0</westBoundingCoordinate>
+          <eastBoundingCoordinate>180.0</eastBoundingCoordinate>
+          <northBoundingCoordinate>90.0</northBoundingCoordinate>
+          <southBoundingCoordinate>90.0</southBoundingCoordinate>
+          <!--Optional:-->
+          <boundingAltitudes>
+            <altitudeMinimum>1000.00</altitudeMinimum>
+            <altitudeMaximum>1000.00</altitudeMaximum>
+            <altitudeUnits>Yard_Indian</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+        <!--Zero or more repetitions:-->
+        <datasetGPolygon>
+          <datasetGPolygonOuterGRing>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <!--3 or more repetitions:-->
+            <gRingPoint>
+              <gRingLatitude>90.0</gRingLatitude>
+              <gRingLongitude>180.0</gRingLongitude>
+            </gRingPoint>
+            <gRingPoint>
+              <gRingLatitude>90.0</gRingLatitude>
+              <gRingLongitude>180.0</gRingLongitude>
+            </gRingPoint>
+            <gRingPoint>
+              <gRingLatitude>90.0</gRingLatitude>
+              <gRingLongitude>180.0</gRingLongitude>
+            </gRingPoint>
+            <gRing>string</gRing>
+          </datasetGPolygonOuterGRing>
+          <!--Zero or more repetitions:-->
+          <datasetGPolygonExclusionGRing>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <!--1 or more repetitions:-->
+            <gRingPoint>
+              <gRingLatitude>90.0</gRingLatitude>
+              <gRingLongitude>180.0</gRingLongitude>
+            </gRingPoint>
+            <gRing>string</gRing>
+          </datasetGPolygonExclusionGRing>
+        </datasetGPolygon>
+        <references system="string string">string</references>
+      </geographicCoverage>
+      <temporalCoverage id="string string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <!--1 or more repetitions:-->
+        <singleDateTime>
+          <!--You have a CHOICE of the next 2 items at this level-->
+          <calendarDate>2005-10-23</calendarDate>
+          <!--Optional:-->
+          <time>23:45:36-06:00</time>
+          <alternativeTimeScale>
+            <timeScaleName>string</timeScaleName>
+            <timeScaleAgeEstimate>string</timeScaleAgeEstimate>
+            <!--Optional:-->
+            <timeScaleAgeUncertainty>string</timeScaleAgeUncertainty>
+            <!--Optional:-->
+            <timeScaleAgeExplanation>string</timeScaleAgeExplanation>
+            <!--Zero or more repetitions:-->
+            <timeScaleCitation id="string string" system="string" scope="document">
+              <!--You have a CHOICE of the next 3 items at this level-->
+              <!--Zero or more repetitions:-->
+              <alternateIdentifier system="string string">string</alternateIdentifier>
+              <!--Optional:-->
+              <shortName>string</shortName>
+              <!--1 or more repetitions:-->
+              <title xml:lang="string">
+                dea
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                transfixo
+              </title>
+              <!--1 or more repetitions:-->
+              <creator id="string string" system="string string" scope="document">
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <individualName>
+                  <!--Zero or more repetitions:-->
+                  <salutation xml:lang="string">
+                    imposuit
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    una
+                  </salutation>
+                  <!--Zero or more repetitions:-->
+                  <givenName xml:lang="string">
+                    iunonis
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    corde
+                  </givenName>
+                  <surName xml:lang="string">
+                    sceptra
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    et
+                  </surName>
+                </individualName>
+                <organizationName xml:lang="string">
+                  sciret
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  quae
+                </organizationName>
+                <positionName xml:lang="string">
+                  ac
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  caelumque
+                </positionName>
+                <!--Zero or more repetitions:-->
+                <address id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <deliveryPoint xml:lang="string">
+                    sceptra
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    volutans
+                  </deliveryPoint>
+                  <!--Optional:-->
+                  <city xml:lang="string">
+                    terras
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    venit
+                  </city>
+                  <!--Optional:-->
+                  <administrativeArea xml:lang="string">
+                    aut
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    et
+                  </administrativeArea>
+                  <!--Optional:-->
+                  <postalCode xml:lang="string">
+                    regemque
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    ferant
+                  </postalCode>
+                  <!--Optional:-->
+                  <country xml:lang="string">
+                    iras
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    arce
+                  </country>
+                  <references system="string">string</references>
+                </address>
+                <!--Zero or more repetitions:-->
+                <phone phonetype="voice">string</phone>
+                <!--Zero or more repetitions:-->
+                <electronicMailAddress xml:lang="string">
+                  ignem
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  ipsa
+                </electronicMailAddress>
+                <!--Zero or more repetitions:-->
+                <onlineUrl>http://www.company.org/sedet/vasto</onlineUrl>
+                <!--Zero or more repetitions:-->
+                <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+                <references system="string">string</references>
+              </creator>
+              <!--Zero or more repetitions:-->
+              <metadataProvider id="string string" system="string string"
+                                scope="document">
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <individualName>
+                  <!--Zero or more repetitions:-->
+                  <salutation xml:lang="string">
+                    secum
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    bella
+                  </salutation>
+                  <!--Zero or more repetitions:-->
+                  <givenName xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    ast
+                  </givenName>
+                  <surName xml:lang="string">
+                    iaculata
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    nubibus
+                  </surName>
+                </individualName>
+                <organizationName xml:lang="string">
+                  divum
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  aut
+                </organizationName>
+                <positionName xml:lang="string">
+                  insuper
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  ni
+                </positionName>
+                <!--Zero or more repetitions:-->
+                <address id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <deliveryPoint xml:lang="string">
+                    hic
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    imposuit
+                  </deliveryPoint>
+                  <!--Optional:-->
+                  <city xml:lang="string">
+                    murmure
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    claustra
+                  </city>
+                  <!--Optional:-->
+                  <administrativeArea xml:lang="string">
+                    illi
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    pater
+                  </administrativeArea>
+                  <!--Optional:-->
+                  <postalCode xml:lang="string">
+                    tot
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    quippe
+                  </postalCode>
+                  <!--Optional:-->
+                  <country xml:lang="string">
+                    profundum
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    regina
+                  </country>
+                  <references system="string">string</references>
+                </address>
+                <!--Zero or more repetitions:-->
+                <phone phonetype="voice">string</phone>
+                <!--Zero or more repetitions:-->
+                <electronicMailAddress xml:lang="string">
+                  exspirantem
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  murmure
+                </electronicMailAddress>
+                <!--Zero or more repetitions:-->
+                <onlineUrl>http://www.my.com/mollitque/ventos</onlineUrl>
+                <!--Zero or more repetitions:-->
+                <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+                <references system="string string">string</references>
+              </metadataProvider>
+              <!--Zero or more repetitions:-->
+              <associatedParty id="string" system="string" scope="document">
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <individualName>
+                  <!--Zero or more repetitions:-->
+                  <salutation xml:lang="string">
+                    caelumque
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    quippe
+                  </salutation>
+                  <!--Zero or more repetitions:-->
+                  <givenName xml:lang="string">
+                    sedet
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    sonoras
+                  </givenName>
+                  <surName xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    illi
+                  </surName>
+                </individualName>
+                <organizationName xml:lang="string">
+                  ventos
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  ventos
+                </organizationName>
+                <positionName xml:lang="string">
+                  iunonis
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  molemque
+                </positionName>
+                <!--Zero or more repetitions:-->
+                <address id="string string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <deliveryPoint xml:lang="string">
+                    scopuloque
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    tenens
+                  </deliveryPoint>
+                  <!--Optional:-->
+                  <city xml:lang="string">
+                    ventos
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    circum
+                  </city>
+                  <!--Optional:-->
+                  <administrativeArea xml:lang="string">
+                    secum
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    circum
+                  </administrativeArea>
+                  <!--Optional:-->
+                  <postalCode xml:lang="string">
+                    magno
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    acuto
+                  </postalCode>
+                  <!--Optional:-->
+                  <country xml:lang="string">
+                    iaculata
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    honorem
+                  </country>
+                  <references system="string">string</references>
+                </address>
+                <!--Zero or more repetitions:-->
+                <phone phonetype="voice">string</phone>
+                <!--Zero or more repetitions:-->
+                <electronicMailAddress xml:lang="string">
+                  ac
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  adorat
+                </electronicMailAddress>
+                <!--Zero or more repetitions:-->
+                <onlineUrl>http://www.sample.com/flammas/profundum</onlineUrl>
+                <!--Zero or more repetitions:-->
+                <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+                <references system="string">string</references>
+                <role>string</role>
+              </associatedParty>
+              <!--Optional:-->
+              <pubDate>2009</pubDate>
+              <!--Optional:-->
+              <language xml:lang="string">
+                vinclis
+                <!--Zero or more repetitions:-->
+                <value xml:lang="string">string</value>
+                supplex
+              </language>
+              <!--Optional:-->
+              <series>string</series>
+              <!--Optional:-->
+              <abstract xml:lang="string">
+                in
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <section xml:lang="string">
+                  <!--Optional:-->
+                  <title xml:lang="string">string</title>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <para xml:lang="string">
+                    aeolus
+                    <!--You have a CHOICE of the next 8 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <itemizedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </itemizedlist>
+                    <orderedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </orderedlist>
+                    <emphasis xml:lang="string">
+                      talia
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      indignantes
+                    </emphasis>
+                    <subscript xml:lang="string">
+                      auras
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      ventis
+                    </subscript>
+                    <superscript xml:lang="string">
+                      ventis
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      carcere
+                    </superscript>
+                    <literalLayout>
+                      rapidum
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      flammato
+                    </literalLayout>
+                    <!--Optional:-->
+                    <ulink url="anySimpleType">
+                      claustra
+                      <citetitle xml:lang="string">string</citetitle>
+                      habenas
+                    </ulink>
+                    ignem
+                  </para>
+                  <section/>
+                </section>
+                <!--Zero or more repetitions:-->
+                <para xml:lang="string">
+                  caelumque
+                  <!--You have a CHOICE of the next 8 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <itemizedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </itemizedlist>
+                  <orderedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </orderedlist>
+                  <emphasis xml:lang="string">
+                    in
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    tenens
+                  </emphasis>
+                  <subscript xml:lang="string">
+                    evertitque
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    rates
+                  </subscript>
+                  <superscript xml:lang="string">
+                    et
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    laxas
+                  </superscript>
+                  <literalLayout>
+                    qui
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    gente
+                  </literalLayout>
+                  <!--Optional:-->
+                  <ulink url="anySimpleType">
+                    incedo
+                    <citetitle xml:lang="string">string</citetitle>
+                    speluncis
+                  </ulink>
+                  abdidit
+                </para>
+                <!--Zero or more repetitions:-->
+                <markdown>string</markdown>
+                patriam
+              </abstract>
+              <!--Zero or more repetitions:-->
+              <keywordSet>
+                <!--1 or more repetitions:-->
+                <keyword xml:lang="string" keywordType="stratum">
+                  molemque
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  exspirantem
+                </keyword>
+                <!--Optional:-->
+                <keywordThesaurus>string</keywordThesaurus>
+              </keywordSet>
+              <!--Zero or more repetitions:-->
+              <additionalInfo xml:lang="string">
+                animos
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <section xml:lang="string">
+                  <!--Optional:-->
+                  <title xml:lang="string">string</title>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <para xml:lang="string">
+                    dare
+                    <!--You have a CHOICE of the next 8 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <itemizedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </itemizedlist>
+                    <orderedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </orderedlist>
+                    <emphasis xml:lang="string">
+                      animos
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      aut
+                    </emphasis>
+                    <subscript xml:lang="string">
+                      montis
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      iunonis
+                    </subscript>
+                    <superscript xml:lang="string">
+                      ventos
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      aris
+                    </superscript>
+                    <literalLayout>
+                      et
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      metuens
+                    </literalLayout>
+                    <!--Optional:-->
+                    <ulink url="anySimpleType">
+                      foedere
+                      <citetitle xml:lang="string">string</citetitle>
+                      venit
+                    </ulink>
+                    verrantque
+                  </para>
+                  <section/>
+                </section>
+                <!--Zero or more repetitions:-->
+                <para xml:lang="string">
+                  numen
+                  <!--You have a CHOICE of the next 8 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <itemizedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </itemizedlist>
+                  <orderedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </orderedlist>
+                  <emphasis xml:lang="string">
+                    hic
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    quisquam
+                  </emphasis>
+                  <subscript xml:lang="string">
+                    per
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    disiecitque
+                  </subscript>
+                  <superscript xml:lang="string">
+                    vinclis
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    iovisque
+                  </superscript>
+                  <literalLayout>
+                    montis
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    ego
+                  </literalLayout>
+                  <!--Optional:-->
+                  <ulink url="anySimpleType">
+                    acuto
+                    <citetitle xml:lang="string">string</citetitle>
+                    flammas
+                  </ulink>
+                  secum
+                </para>
+                <!--Zero or more repetitions:-->
+                <markdown>string</markdown>
+                ventos
+              </additionalInfo>
+              <!--Optional:-->
+              <intellectualRights xml:lang="string">
+                iras
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <section xml:lang="string">
+                  <!--Optional:-->
+                  <title xml:lang="string">string</title>
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <para xml:lang="string">
+                    rapidi
+                    <!--You have a CHOICE of the next 8 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <itemizedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </itemizedlist>
+                    <orderedlist>
+                      <!--1 or more repetitions:-->
+                      <listitem>
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <para/>
+                        <itemizedlist/>
+                        <orderedlist/>
+                      </listitem>
+                    </orderedlist>
+                    <emphasis xml:lang="string">
+                      et
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      et
+                    </emphasis>
+                    <subscript xml:lang="string">
+                      carcere
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      faciat
+                    </subscript>
+                    <superscript xml:lang="string">
+                      iras
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      <subscript/>
+                      <superscript/>
+                      sedet
+                    </superscript>
+                    <literalLayout>
+                      iras
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      soror
+                    </literalLayout>
+                    <!--Optional:-->
+                    <ulink url="anySimpleType">
+                      tempestatesque
+                      <citetitle xml:lang="string">string</citetitle>
+                      certo
+                    </ulink>
+                    austris
+                  </para>
+                  <section/>
+                </section>
+                <!--Zero or more repetitions:-->
+                <para xml:lang="string">
+                  quisquam
+                  <!--You have a CHOICE of the next 8 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  <itemizedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </itemizedlist>
+                  <orderedlist>
+                    <!--1 or more repetitions:-->
+                    <listitem>
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <para/>
+                      <itemizedlist/>
+                      <orderedlist/>
+                    </listitem>
+                  </orderedlist>
+                  <emphasis xml:lang="string">
+                    divum
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    sciret
+                  </emphasis>
+                  <subscript xml:lang="string">
+                    et
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    montis
+                  </subscript>
+                  <superscript xml:lang="string">
+                    et
+                    <!--You have a CHOICE of the next 3 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    <subscript/>
+                    <superscript/>
+                    aeoliam
+                  </superscript>
+                  <literalLayout>
+                    tempestatesque
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    talia
+                  </literalLayout>
+                  <!--Optional:-->
+                  <ulink url="anySimpleType">
+                    soror
+                    <citetitle xml:lang="string">string</citetitle>
+                    caelumque
+                  </ulink>
+                  murmure
+                </para>
+                <!--Zero or more repetitions:-->
+                <markdown>string</markdown>
+                aeoliam
+              </intellectualRights>
+              <!--Zero or more repetitions:-->
+              <licensed>
+                <licenseName>string</licenseName>
+                <!--Optional:-->
+                <url>http://www.my.org/corripuit/rapidi</url>
+                <!--Optional:-->
+                <identifier>string</identifier>
+              </licensed>
+              <!--Zero or more repetitions:-->
+              <distribution id="string string" system="string" scope="document">
+                <!--You have a CHOICE of the next 4 items at this level-->
+                <online>
+                  <!--Optional:-->
+                  <onlineDescription xml:lang="string">
+                    nimborum
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    austris
+                  </onlineDescription>
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <url function="download">http://www.your.org/patriam/circum</url>
+                  <connection id="string" system="string string" scope="document">
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <connectionDefinition id="string string" system="string"
+                                          scope="document">
+                      <!--You have a CHOICE of the next 2 items at this level-->
+                      <schemeName system="string">string</schemeName>
+                      <description xml:lang="string">
+                        rapidum
+                        <!--You have a CHOICE of the next 3 items at this level-->
+                        <!--Zero or more repetitions:-->
+                        <section xml:lang="string">
+                          <!--Optional:-->
+                          <title xml:lang="string">string</title>
+                          <!--You have a CHOICE of the next 2 items at this level-->
+                          <para xml:lang="string">
+                            infixit
+                            <!--You have a CHOICE of the next 8 items at this level-->
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            <itemizedlist>
+                              <!--1 or more repetitions:-->
+                              <listitem>
+                                <!--You have a CHOICE of the next 3 items at this level-->
+                                <para/>
+                                <itemizedlist/>
+                                <orderedlist/>
+                              </listitem>
+                            </itemizedlist>
+                            <orderedlist>
+                              <!--1 or more repetitions:-->
+                              <listitem>
+                                <!--You have a CHOICE of the next 3 items at this level-->
+                                <para/>
+                                <itemizedlist/>
+                                <orderedlist/>
+                              </listitem>
+                            </orderedlist>
+                            <emphasis xml:lang="string">
+                              et
+                              <!--Zero or more repetitions:-->
+                              <value xml:lang="string">string</value>
+                              abdidit
+                            </emphasis>
+                            <subscript xml:lang="string">
+                              laxas
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <!--Zero or more repetitions:-->
+                              <value xml:lang="string">string</value>
+                              <subscript/>
+                              <superscript/>
+                              magno
+                            </subscript>
+                            <superscript xml:lang="string">
+                              auras
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <!--Zero or more repetitions:-->
+                              <value xml:lang="string">string</value>
+                              <subscript/>
+                              <superscript/>
+                              annos
+                            </superscript>
+                            <literalLayout>
+                              regina
+                              <!--Zero or more repetitions:-->
+                              <value xml:lang="string">string</value>
+                              soror
+                            </literalLayout>
+                            <!--Optional:-->
+                            <ulink url="anySimpleType">
+                              pater
+                              <citetitle xml:lang="string">string</citetitle>
+                              annos
+                            </ulink>
+                            corripuit
+                          </para>
+                          <section/>
+                        </section>
+                        <!--Zero or more repetitions:-->
+                        <para xml:lang="string">
+                          qui
+                          <!--You have a CHOICE of the next 8 items at this level-->
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          <itemizedlist>
+                            <!--1 or more repetitions:-->
+                            <listitem>
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <para/>
+                              <itemizedlist/>
+                              <orderedlist/>
+                            </listitem>
+                          </itemizedlist>
+                          <orderedlist>
+                            <!--1 or more repetitions:-->
+                            <listitem>
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <para/>
+                              <itemizedlist/>
+                              <orderedlist/>
+                            </listitem>
+                          </orderedlist>
+                          <emphasis xml:lang="string">
+                            patriam
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            gero
+                          </emphasis>
+                          <subscript xml:lang="string">
+                            infixit
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            <subscript/>
+                            <superscript/>
+                            speluncis
+                          </subscript>
+                          <superscript xml:lang="string">
+                            frenat
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            <subscript/>
+                            <superscript/>
+                            per
+                          </superscript>
+                          <literalLayout>
+                            montis
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            altos
+                          </literalLayout>
+                          <!--Optional:-->
+                          <ulink url="anySimpleType">
+                            iaculata
+                            <citetitle xml:lang="string">string</citetitle>
+                            aeolus
+                          </ulink>
+                          metuens
+                        </para>
+                        <!--Zero or more repetitions:-->
+                        <markdown>string</markdown>
+                        ventis
+                      </description>
+                      <!--1 or more repetitions:-->
+                      <parameterDefinition>
+                        <name>string</name>
+                        <definition>string</definition>
+                        <!--Optional:-->
+                        <defaultValue>string</defaultValue>
+                      </parameterDefinition>
+                      <references system="string">string</references>
+                    </connectionDefinition>
+                    <!--Zero or more repetitions:-->
+                    <parameter>
+                      <name>string</name>
+                      <value>string</value>
+                    </parameter>
+                    <references system="string">string</references>
+                  </connection>
+                  <connectionDefinition id="string" system="string" scope="document">
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <schemeName system="string">string</schemeName>
+                    <description xml:lang="string">
+                      iussus
+                      <!--You have a CHOICE of the next 3 items at this level-->
+                      <!--Zero or more repetitions:-->
+                      <section xml:lang="string">
+                        <!--Optional:-->
+                        <title xml:lang="string">string</title>
+                        <!--You have a CHOICE of the next 2 items at this level-->
+                        <para xml:lang="string">
+                          evertitque
+                          <!--You have a CHOICE of the next 8 items at this level-->
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          <itemizedlist>
+                            <!--1 or more repetitions:-->
+                            <listitem>
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <para/>
+                              <itemizedlist/>
+                              <orderedlist/>
+                            </listitem>
+                          </itemizedlist>
+                          <orderedlist>
+                            <!--1 or more repetitions:-->
+                            <listitem>
+                              <!--You have a CHOICE of the next 3 items at this level-->
+                              <para/>
+                              <itemizedlist/>
+                              <orderedlist/>
+                            </listitem>
+                          </orderedlist>
+                          <emphasis xml:lang="string">
+                            aeolus
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            et
+                          </emphasis>
+                          <subscript xml:lang="string">
+                            ignem
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            <subscript/>
+                            <superscript/>
+                            flammas
+                          </subscript>
+                          <superscript xml:lang="string">
+                            gente
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            <subscript/>
+                            <superscript/>
+                            transfixo
+                          </superscript>
+                          <literalLayout>
+                            imponet
+                            <!--Zero or more repetitions:-->
+                            <value xml:lang="string">string</value>
+                            cum
+                          </literalLayout>
+                          <!--Optional:-->
+                          <ulink url="anySimpleType">
+                            scopuloque
+                            <citetitle xml:lang="string">string</citetitle>
+                            frenat
+                          </ulink>
+                          altos
+                        </para>
+                        <section/>
+                      </section>
+                      <!--Zero or more repetitions:-->
+                      <para xml:lang="string">
+                        premere
+                        <!--You have a CHOICE of the next 8 items at this level-->
+                        <!--Zero or more repetitions:-->
+                        <value xml:lang="string">string</value>
+                        <itemizedlist>
+                          <!--1 or more repetitions:-->
+                          <listitem>
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <para/>
+                            <itemizedlist/>
+                            <orderedlist/>
+                          </listitem>
+                        </itemizedlist>
+                        <orderedlist>
+                          <!--1 or more repetitions:-->
+                          <listitem>
+                            <!--You have a CHOICE of the next 3 items at this level-->
+                            <para/>
+                            <itemizedlist/>
+                            <orderedlist/>
+                          </listitem>
+                        </orderedlist>
+                        <emphasis xml:lang="string">
+                          scopuloque
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          iras
+                        </emphasis>
+                        <subscript xml:lang="string">
+                          ni
+                          <!--You have a CHOICE of the next 3 items at this level-->
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          <subscript/>
+                          <superscript/>
+                          disiecitque
+                        </subscript>
+                        <superscript xml:lang="string">
+                          regemque
+                          <!--You have a CHOICE of the next 3 items at this level-->
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          <subscript/>
+                          <superscript/>
+                          cum
+                        </superscript>
+                        <literalLayout>
+                          speluncis
+                          <!--Zero or more repetitions:-->
+                          <value xml:lang="string">string</value>
+                          vinclis
+                        </literalLayout>
+                        <!--Optional:-->
+                        <ulink url="anySimpleType">
+                          aeolus
+                          <citetitle xml:lang="string">string</citetitle>
+                          dea
+                        </ulink>
+                        imperio
+                      </para>
+                      <!--Zero or more repetitions:-->
+                      <markdown>string</markdown>
+                      transfixo
+                    </description>
+                    <!--1 or more repetitions:-->
+                    <parameterDefinition>
+                      <name>string</name>
+                      <definition>string</definition>
+                      <!--Optional:-->
+                      <defaultValue>string</defaultValue>
+                    </parameterDefinition>
+                    <references system="string string">string</references>
+                  </connectionDefinition>
+                </online>
+                <offline>
+                  <mediumName>string</mediumName>
+                  <!--Optional:-->
+                  <mediumDensity>string</mediumDensity>
+                  <!--Optional:-->
+                  <mediumDensityUnits>string</mediumDensityUnits>
+                  <!--Optional:-->
+                  <mediumVolume>string</mediumVolume>
+                  <!--Zero or more repetitions:-->
+                  <mediumFormat>string</mediumFormat>
+                  <!--Optional:-->
+                  <mediumNote>string</mediumNote>
+                </offline>
+                <inline>
+                  furentibus
+                  <!--You may enter ANY elements at this point-->
+                  <AnyElement/>
+                  flammato
+                </inline>
+                <references system="string">string</references>
+              </distribution>
+              <!--Optional:-->
+              <coverage/>
+              <!--Zero or more repetitions:-->
+              <annotation id="string string" system="string" scope="document">
+                <propertyURI label="string">http://www.any.com/illum/terras
+                </propertyURI>
+                <valueURI label="string">http://www.any.org/volutans/sonoras</valueURI>
+              </annotation>
+              <!--Zero or more repetitions:-->
+              <contact id="string" system="string" scope="document">
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <individualName>
+                  <!--Zero or more repetitions:-->
+                  <salutation xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    ni
+                  </salutation>
+                  <!--Zero or more repetitions:-->
+                  <givenName xml:lang="string">
+                    habenas
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    imposuit
+                  </givenName>
+                  <surName xml:lang="string">
+                    iras
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    laxas
+                  </surName>
+                </individualName>
+                <organizationName xml:lang="string">
+                  fremunt
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  maria
+                </organizationName>
+                <positionName xml:lang="string">
+                  dea
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  furentibus
+                </positionName>
+                <!--Zero or more repetitions:-->
+                <address id="string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--Zero or more repetitions:-->
+                  <deliveryPoint xml:lang="string">
+                    aeolus
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    disiecitque
+                  </deliveryPoint>
+                  <!--Optional:-->
+                  <city xml:lang="string">
+                    tempestatesque
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    molemque
+                  </city>
+                  <!--Optional:-->
+                  <administrativeArea xml:lang="string">
+                    sciret
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    aut
+                  </administrativeArea>
+                  <!--Optional:-->
+                  <postalCode xml:lang="string">
+                    vasto
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    atris
+                  </postalCode>
+                  <!--Optional:-->
+                  <country xml:lang="string">
+                    imposuit
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    flammato
+                  </country>
+                  <references system="string string">string</references>
+                </address>
+                <!--Zero or more repetitions:-->
+                <phone phonetype="voice">string</phone>
+                <!--Zero or more repetitions:-->
+                <electronicMailAddress xml:lang="string">
+                  sceptra
+                  <!--Zero or more repetitions:-->
+                  <value xml:lang="string">string</value>
+                  atris
+                </electronicMailAddress>
+                <!--Zero or more repetitions:-->
+                <onlineUrl>http://www.corp.org/aut/pater</onlineUrl>
+                <!--Zero or more repetitions:-->
+                <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+                <references system="string string">string</references>
+              </contact>
+              <!--You have a CHOICE of the next 13 items at this level-->
+              <article>
+                <journal>string</journal>
+                <!--Optional:-->
+                <volume>string</volume>
+                <!--Optional:-->
+                <issue>string</issue>
+                <!--Optional:-->
+                <pageRange>string</pageRange>
+                <!--Optional:-->
+                <publisher id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <salutation xml:lang="string">
+                      flammas
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      iras
+                    </salutation>
+                    <!--Zero or more repetitions:-->
+                    <givenName xml:lang="string">
+                      vasto
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      coniunx
+                    </givenName>
+                    <surName xml:lang="string">
+                      iussus
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      quae
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    supplex
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    circum
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    adorat
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    et
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <address id="string" system="string" scope="document">
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <deliveryPoint xml:lang="string">
+                      iunonis
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      rapidi
+                    </deliveryPoint>
+                    <!--Optional:-->
+                    <city xml:lang="string">
+                      fremunt
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      disiecitque
+                    </city>
+                    <!--Optional:-->
+                    <administrativeArea xml:lang="string">
+                      foedere
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      dea
+                    </administrativeArea>
+                    <!--Optional:-->
+                    <postalCode xml:lang="string">
+                      molemque
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      ferant
+                    </postalCode>
+                    <!--Optional:-->
+                    <country xml:lang="string">
+                      patriam
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      abdidit
+                    </country>
+                    <references system="string">string</references>
+                  </address>
+                  <!--Zero or more repetitions:-->
+                  <phone phonetype="voice">string</phone>
+                  <!--Zero or more repetitions:-->
+                  <electronicMailAddress xml:lang="string">
+                    incedo
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    exspirantem
+                  </electronicMailAddress>
+                  <!--Zero or more repetitions:-->
+                  <onlineUrl>http://www.test.gov/nubibus/aequora</onlineUrl>
+                  <!--Zero or more repetitions:-->
+                  <userId directory="https://orcid.org">9999-9999-9999-9999</userId>
+                  <references system="string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <publicationPlace>string</publicationPlace>
+                <!--Optional:-->
+                <ISSN>string</ISSN>
+              </article>
+              <book>
+                <publisher id="string string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <salutation xml:lang="string">
+                      supplex
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      ipsa
+                    </salutation>
+                    <!--Zero or more repetitions:-->
+                    <givenName xml:lang="string">
+                      atris
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      feta
+                    </givenName>
+                    <surName xml:lang="string">
+                      abdidit
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      adorat
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    dare
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    terras
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    et
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <address id="string string" system="string string" scope="document">
+                    <!--You have a CHOICE of the next 2 items at this level-->
+                    <!--Zero or more repetitions:-->
+                    <deliveryPoint xml:lang="string">
+                      rex
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      e
+                    </deliveryPoint>
+                    <!--Optional:-->
+                    <city xml:lang="string">
+                      et
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      animos
+                    </city>
+                    <!--Optional:-->
+                    <administrativeArea xml:lang="string">
+                      imperio
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      ferant
+                    </administrativeArea>
+                    <!--Optional:-->
+                    <postalCode xml:lang="string">
+                      secum
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      bella
+                    </postalCode>
+                    <!--Optional:-->
+                    <country xml:lang="string">
+                      regemque
+                      <!--Zero or more repetitions:-->
+                      <value xml:lang="string">string</value>
+                      profundum
+                    </country>
+                    <references system="string">string</references>
+                  </address>
+                  <!--Zero or more repetitions:-->
+                  <phone phonetype="voice">string</phone>
+                  <!--Zero or more repetitions:-->
+                  <electronicMailAddress xml:lang="string">
+                    altos
+                    <!--Zero or more repetitions:-->
+                    <value xml:lang="string">string</value>
+                    vinclis
+                  </electronicMailAddress>
+                  <!--Zero or more repetitions:-->
+                  <onlineUrl>http://www.test.org/ferant/circum</onlineUrl>
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </book>
+              <chapter>
+                <publisher id="string string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      quae
+                      <!--Zero or more repetitions:-->
+                      ventos
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    secum
+                    <!--Zero or more repetitions:-->
+                    ni
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    circum
+                    <!--Zero or more repetitions:-->
+                    talia
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--1 or more repetitions:-->
+                <editor id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      imperio
+                      <!--Zero or more repetitions:-->
+                      ni
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    rapidi
+                    <!--Zero or more repetitions:-->
+                    caelumque
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    illi
+                    <!--Zero or more repetitions:-->
+                    aeolus
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </editor>
+                <bookTitle>string</bookTitle>
+                <!--Optional:-->
+              </chapter>
+              <editedBook>
+                <publisher id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      ac
+                      <!--Zero or more repetitions:-->
+                      rapidum
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    habenas
+                    <!--Zero or more repetitions:-->
+                    quisquam
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    sed
+                    <!--Zero or more repetitions:-->
+                    sceptra
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </editedBook>
+              <manuscript>
+                <!--1 or more repetitions:-->
+                <institution id="string string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      flammato
+                      <!--Zero or more repetitions:-->
+                      iussus
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    infixit
+                    <!--Zero or more repetitions:-->
+                    ipsa
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    supplex
+                    <!--Zero or more repetitions:-->
+                    dedit
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string">string</references>
+                </institution>
+                <!--Optional:-->
+              </manuscript>
+              <report>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </report>
+              <thesis>
+                <degree>string</degree>
+                <institution id="string string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      patriam
+                      <!--Zero or more repetitions:-->
+                      scopuloque
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    auras
+                    <!--Zero or more repetitions:-->
+                    indignantes
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    tenens
+                    <!--Zero or more repetitions:-->
+                    altos
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </institution>
+                <!--Optional:-->
+              </thesis>
+              <conferenceProceedings>
+                <publisher id="string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      ni
+                      <!--Zero or more repetitions:-->
+                      vinclis
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    illum
+                    <!--Zero or more repetitions:-->
+                    divum
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    premere
+                    <!--Zero or more repetitions:-->
+                    furentibus
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--1 or more repetitions:-->
+                <editor id="string" system="string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      claustra
+                      <!--Zero or more repetitions:-->
+                      e
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    secum
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    habenas
+                    <!--Zero or more repetitions:-->
+                    adorat
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </editor>
+                <bookTitle>string</bookTitle>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </conferenceProceedings>
+              <personalCommunication>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Zero or more repetitions:-->
+              </personalCommunication>
+              <map>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Zero or more repetitions:-->
+                <!--Optional:-->
+              </map>
+              <generic>
+                <publisher id="string string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      incedo
+                      <!--Zero or more repetitions:-->
+                      et
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    regina
+                    <!--Zero or more repetitions:-->
+                    ego
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    abdidit
+                    <!--Zero or more repetitions:-->
+                    dea
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </generic>
+              <audioVisual>
+                <publisher id="string string" system="string string" scope="document">
+                  <!--You have a CHOICE of the next 2 items at this level-->
+                  <!--You have a CHOICE of the next 3 items at this level-->
+                  <individualName>
+                    <!--Zero or more repetitions:-->
+                    <!--Zero or more repetitions:-->
+                    <surName xml:lang="string">
+                      flammato
+                      <!--Zero or more repetitions:-->
+                      flammato
+                    </surName>
+                  </individualName>
+                  <organizationName xml:lang="string">
+                    et
+                    <!--Zero or more repetitions:-->
+                    sed
+                  </organizationName>
+                  <positionName xml:lang="string">
+                    pater
+                    <!--Zero or more repetitions:-->
+                    nimborum
+                  </positionName>
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <!--Zero or more repetitions:-->
+                  <references system="string string">string</references>
+                </publisher>
+                <!--Zero or more repetitions:-->
+                <!--Zero or more repetitions:-->
+                <!--Optional:-->
+              </audioVisual>
+              <presentation>
+                <!--Optional:-->
+                <!--Optional:-->
+                <!--Optional:-->
+              </presentation>
+              <bibtex>string</bibtex>
+              <references system="string string">string</references>
+            </timeScaleCitation>
+          </alternativeTimeScale>
+        </singleDateTime>
+        <rangeOfDates>
+          <beginDate>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <calendarDate>2013-12-07-07:00</calendarDate>
+            <!--Optional:-->
+            <alternativeTimeScale>
+              <timeScaleName>string</timeScaleName>
+              <timeScaleAgeEstimate>string</timeScaleAgeEstimate>
+              <!--Optional:-->
+              <!--Optional:-->
+              <!--Zero or more repetitions:-->
+            </alternativeTimeScale>
+          </beginDate>
+          <endDate>
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <calendarDate>2016-06-26</calendarDate>
+            <!--Optional:-->
+            <alternativeTimeScale>
+              <timeScaleName>string</timeScaleName>
+              <timeScaleAgeEstimate>string</timeScaleAgeEstimate>
+              <!--Optional:-->
+              <!--Optional:-->
+              <!--Zero or more repetitions:-->
+            </alternativeTimeScale>
+          </endDate>
+        </rangeOfDates>
+        <references system="string string">string</references>
+      </temporalCoverage>
+      <taxonomicCoverage id="string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--Optional:-->
+        <!--Optional:-->
+        <!--1 or more repetitions:-->
+        <taxonomicClassification id="string">
+          <!--Optional:-->
+          <!--Optional:-->
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+        </taxonomicClassification>
+        <references system="string">string</references>
+      </taxonomicCoverage>
+      <references system="string string">string</references>
+    </coverage>
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--1 or more repetitions:-->
+    <contact id="string string" system="string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <surName xml:lang="string">
+          quippe
+          <!--Zero or more repetitions:-->
+          feta
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        ni
+        <!--Zero or more repetitions:-->
+        bella
+      </organizationName>
+      <positionName xml:lang="string">
+        ventis
+        <!--Zero or more repetitions:-->
+        ac
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <references system="string string">string</references>
+    </contact>
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <references system="string string">string</references>
+  </dataset>
+  <citation id="string string" system="string" scope="document">
+    <!--You have a CHOICE of the next 3 items at this level-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--1 or more repetitions:-->
+    <title xml:lang="string">
+      quippe
+      <!--Zero or more repetitions:-->
+      imponet
+    </title>
+    <!--1 or more repetitions:-->
+    <creator id="string string" system="string string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <surName xml:lang="string">
+          infixit
+          <!--Zero or more repetitions:-->
+          et
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        animos
+        <!--Zero or more repetitions:-->
+        illi
+      </organizationName>
+      <positionName xml:lang="string">
+        aequora
+        <!--Zero or more repetitions:-->
+        et
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <references system="string string">string</references>
+    </creator>
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--You have a CHOICE of the next 13 items at this level-->
+    <article>
+      <journal>string</journal>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </article>
+    <book>
+      <publisher id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            premit
+            <!--Zero or more repetitions:-->
+            supplex
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          talia
+          <!--Zero or more repetitions:-->
+          iovis
+        </organizationName>
+        <positionName xml:lang="string">
+          omnipotens
+          <!--Zero or more repetitions:-->
+          et
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string string">string</references>
+      </publisher>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </book>
+    <chapter>
+      <publisher id="string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            abdidit
+            <!--Zero or more repetitions:-->
+            sonoras
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          quippe
+          <!--Zero or more repetitions:-->
+          patriam
+        </organizationName>
+        <positionName xml:lang="string">
+          caelumque
+          <!--Zero or more repetitions:-->
+          gero
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </publisher>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--1 or more repetitions:-->
+      <editor id="string string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            infixit
+            <!--Zero or more repetitions:-->
+            aequora
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          bella
+          <!--Zero or more repetitions:-->
+          transfixo
+        </organizationName>
+        <positionName xml:lang="string">
+          supplex
+          <!--Zero or more repetitions:-->
+          iovis
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </editor>
+      <bookTitle>string</bookTitle>
+      <!--Optional:-->
+    </chapter>
+    <editedBook>
+      <publisher id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            flammas
+            <!--Zero or more repetitions:-->
+            caelumque
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          foedere
+          <!--Zero or more repetitions:-->
+          ni
+        </organizationName>
+        <positionName xml:lang="string">
+          turbine
+          <!--Zero or more repetitions:-->
+          abdidit
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </publisher>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </editedBook>
+    <manuscript>
+      <!--1 or more repetitions:-->
+      <institution id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            illi
+            <!--Zero or more repetitions:-->
+            infixit
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          terras
+          <!--Zero or more repetitions:-->
+          annos
+        </organizationName>
+        <positionName xml:lang="string">
+          rates
+          <!--Zero or more repetitions:-->
+          praeterea
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </institution>
+      <!--Optional:-->
+    </manuscript>
+    <report>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </report>
+    <thesis>
+      <degree>string</degree>
+      <institution id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            divum
+            <!--Zero or more repetitions:-->
+            aeolus
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          hoc
+          <!--Zero or more repetitions:-->
+          iussus
+        </organizationName>
+        <positionName xml:lang="string">
+          ni
+          <!--Zero or more repetitions:-->
+          certo
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </institution>
+      <!--Optional:-->
+    </thesis>
+    <conferenceProceedings>
+      <publisher id="string string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            terras
+            <!--Zero or more repetitions:-->
+            pectore
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          vasto
+          <!--Zero or more repetitions:-->
+          metuens
+        </organizationName>
+        <positionName xml:lang="string">
+          honorem
+          <!--Zero or more repetitions:-->
+          talia
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string string">string</references>
+      </publisher>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--1 or more repetitions:-->
+      <editor id="string" system="string string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            venit
+            <!--Zero or more repetitions:-->
+            nubibus
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          sonoras
+          <!--Zero or more repetitions:-->
+          certo
+        </organizationName>
+        <positionName xml:lang="string">
+          iunonis
+          <!--Zero or more repetitions:-->
+          vinclis
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </editor>
+      <bookTitle>string</bookTitle>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </conferenceProceedings>
+    <personalCommunication>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Zero or more repetitions:-->
+    </personalCommunication>
+    <map>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Zero or more repetitions:-->
+      <!--Optional:-->
+    </map>
+    <generic>
+      <publisher id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            premit
+            <!--Zero or more repetitions:-->
+            acuto
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          ego
+          <!--Zero or more repetitions:-->
+          et
+        </organizationName>
+        <positionName xml:lang="string">
+          feta
+          <!--Zero or more repetitions:-->
+          montis
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string string">string</references>
+      </publisher>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </generic>
+    <audioVisual>
+      <publisher id="string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <individualName>
+          <!--Zero or more repetitions:-->
+          <!--Zero or more repetitions:-->
+          <surName xml:lang="string">
+            talia
+            <!--Zero or more repetitions:-->
+            loca
+          </surName>
+        </individualName>
+        <organizationName xml:lang="string">
+          aeoliam
+          <!--Zero or more repetitions:-->
+          una
+        </organizationName>
+        <positionName xml:lang="string">
+          rapidi
+          <!--Zero or more repetitions:-->
+          premit
+        </positionName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <references system="string">string</references>
+      </publisher>
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Optional:-->
+    </audioVisual>
+    <presentation>
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+    </presentation>
+    <bibtex>string</bibtex>
+    <references system="string">string</references>
+  </citation>
+  <software id="string string" system="string" scope="document">
+    <!--You have a CHOICE of the next 2 items at this level-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--1 or more repetitions:-->
+    <title xml:lang="string">
+      transfixo
+      <!--Zero or more repetitions:-->
+      annos
+    </title>
+    <!--1 or more repetitions:-->
+    <creator id="string string" system="string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <surName xml:lang="string">
+          nimborum
+          <!--Zero or more repetitions:-->
+          quisquam
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        imponet
+        <!--Zero or more repetitions:-->
+        montis
+      </organizationName>
+      <positionName xml:lang="string">
+        fremunt
+        <!--Zero or more repetitions:-->
+        premit
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <references system="string string">string</references>
+    </creator>
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--1 or more repetitions:-->
+    <implementation>
+      <!--1 or more repetitions:-->
+      <distribution id="string string" system="string" scope="document">
+        <!--You have a CHOICE of the next 2 items at this level-->
+        <!--You have a CHOICE of the next 3 items at this level-->
+        <online>
+          <!--Optional:-->
+          <!--You have a CHOICE of the next 2 items at this level-->
+          <url function="download">http://www.corp.com/omnipotens/annos</url>
+          <connection id="string string" system="string string" scope="document">
+            <!--You have a CHOICE of the next 2 items at this level-->
+            <connectionDefinition id="string string" system="string" scope="document">
+              <!--You have a CHOICE of the next 2 items at this level-->
+              <schemeName system="string string">string</schemeName>
+              <description xml:lang="string">
+                murmure
+                <!--You have a CHOICE of the next 3 items at this level-->
+                <!--Zero or more repetitions:-->
+                <!--Zero or more repetitions:-->
+                <!--Zero or more repetitions:-->
+                tot
+              </description>
+              <!--1 or more repetitions:-->
+              <parameterDefinition>
+                <name>string</name>
+                <definition>string</definition>
+                <!--Optional:-->
+              </parameterDefinition>
+              <references system="string">string</references>
+            </connectionDefinition>
+            <!--Zero or more repetitions:-->
+            <references system="string string">string</references>
+          </connection>
+        </online>
+        <offline>
+          <mediumName>string</mediumName>
+          <!--Optional:-->
+          <!--Optional:-->
+          <!--Optional:-->
+          <!--Zero or more repetitions:-->
+          <!--Optional:-->
+        </offline>
+        <inline>mollitque aeolus</inline>
+        <!--Optional:-->
+        <references system="string string">string</references>
+      </distribution>
+      <!--Optional:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Optional:-->
+      <!--Zero or more repetitions:-->
+      <!--Optional:-->
+      <!--Zero or more repetitions:-->
+    </implementation>
+    <!--Zero or more repetitions:-->
+    <version>string</version>
+    <!--Optional:-->
+    <references system="string string">string</references>
+  </software>
+  <protocol id="string" system="string string" scope="document">
+    <!--You have a CHOICE of the next 2 items at this level-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--1 or more repetitions:-->
+    <title xml:lang="string">
+      hoc
+      <!--Zero or more repetitions:-->
+      hoc
+    </title>
+    <!--1 or more repetitions:-->
+    <creator id="string" system="string string" scope="document">
+      <!--You have a CHOICE of the next 2 items at this level-->
+      <!--You have a CHOICE of the next 3 items at this level-->
+      <individualName>
+        <!--Zero or more repetitions:-->
+        <!--Zero or more repetitions:-->
+        <surName xml:lang="string">
+          ignem
+          <!--Zero or more repetitions:-->
+          ast
+        </surName>
+      </individualName>
+      <organizationName xml:lang="string">
+        furentibus
+        <!--Zero or more repetitions:-->
+        annos
+      </organizationName>
+      <positionName xml:lang="string">
+        cum
+        <!--Zero or more repetitions:-->
+        austris
+      </positionName>
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <!--Zero or more repetitions:-->
+      <references system="string">string</references>
+    </creator>
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <!--Optional:-->
+    <!--Zero or more repetitions:-->
+    <!--Zero or more repetitions:-->
+    <references system="string">string</references>
+  </protocol>
+  <!--Optional:-->
+  <!--Zero or more repetitions:-->
+</eml:eml>
