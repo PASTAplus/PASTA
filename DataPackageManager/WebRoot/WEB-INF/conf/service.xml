@@ -1146,6 +1146,22 @@
         </access>
     </pasta:service-method>
 
+    <pasta:service-method name="updateJournalCitation">
+        <access
+            system="https://pasta.edirepository.org"
+            authSystem="https://pasta.edirepository.org/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>vetted</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
     <pasta:service-method name="deleteJournalCitation">
         <access
             system="https://pasta.edirepository.org"
