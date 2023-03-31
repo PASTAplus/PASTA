@@ -34,6 +34,8 @@ public class ResponsibleParty {
   private String phoneType = "";
   private String electronicMailAddress = "";
   private String onlineUrl = "";
+  private String userId = null;
+  private String userIdDirectory = null;
 
   
   /*
@@ -401,9 +403,13 @@ public class ResponsibleParty {
     this.electronicMailAddress = electronicMailAddress;
   }
 
-
   public void setOnlineUrl(String onlineUrl) {
     this.onlineUrl = onlineUrl;
   }
-  
+
+  public String getUserId() { return userId; }
+  public void setUserId(String userId) { this.userId = userId; }
+
+  public String getUserIdDirectory() { return userIdDirectory; }
+  public void setUserIdDirectory(String userIdDirectory) { this.userIdDirectory = userIdDirectory; }
 }
