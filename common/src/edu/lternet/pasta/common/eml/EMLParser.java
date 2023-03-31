@@ -636,6 +636,9 @@ public class EMLParser {
     }
   }
 
+  // Get the text value of the last child text node of the given element and call the
+  // given setter with it, causing the value to be set in the bound ResponsibleParty
+  // object. If there are no child text nodes, the setter is not called.
   private void _set(Consumer<String> rp_setter, Element el)
   {
     NodeList nodeList = el.getChildNodes();
