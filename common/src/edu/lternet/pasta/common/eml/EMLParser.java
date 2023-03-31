@@ -27,6 +27,7 @@ package edu.lternet.pasta.common.eml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -635,11 +636,7 @@ public class EMLParser {
     }
   }
 
-  interface _responsiblePartyStringMethod {
-    void run(String str);
-  }
-
-  private void _set(_responsiblePartyStringMethod rp, Element el)
+  private void _set(Consumer<String> rp_setter, Element el)
   {
     NodeList nodeList = el.getChildNodes();
     for (int i = 0; i < nodeList.getLength(); i++) {
@@ -647,8 +644,8 @@ public class EMLParser {
       if (node instanceof Text) {
         Text textNode = (Text) node;
         String nodeValue = textNode.getNodeValue();
-        logger.debug(String.format("%s: %s", rp, nodeValue));
-        rp.run(nodeValue);
+        logger.debug(String.format("%s: %s", rp_setter, nodeValue));
+        rp_setter.accept(nodeValue);
       }
     }
   }
