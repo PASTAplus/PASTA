@@ -254,14 +254,8 @@ public class DataCiteMetadata extends CitationMetadata {
 					}
 					if (addNameIdentifier) {
 						sb.append(String.format(
-								"            <nameIdentifier>%s</nameIdentifier>\n",
-								nameIdentifier));
-						sb.append(String.format(
-								"            <nameIdentifierScheme>%s</nameIdentifierScheme>\n",
-								nameIdentifierScheme));
-						sb.append(String.format(
-								"            <schemeUri>%s</schemeUri>\n",
-								schemeUri));
+								"            <nameIdentifier nameIdentifierScheme=\"%s\" schemeURI=\"%s\">%s</nameIdentifier>\n",
+								nameIdentifierScheme, schemeUri, nameIdentifier));
 					}
 				}
 

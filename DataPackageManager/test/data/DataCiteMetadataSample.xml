@@ -6,12 +6,11 @@
     <creators>
         <creator>
             <creatorName>A Surname, A Given Name 1 A Given Name 2</creatorName>
-            <nameIdentifier>0000-0003-2604-299X</nameIdentifier>
-            <nameIdentifierScheme>ORCID</nameIdentifierScheme>
-            <schemeUri>https://orcid.org</schemeUri>
+            <nameIdentifier nameIdentifierScheme="ORCID" schemeURI="https://orcid.org">0000-0003-2604-299X</nameIdentifier>
         </creator>
     </creators>
     <titles>
+        <title>A new method for estimating the global oceanic heat content</title>
     </titles>
     <publisher>Environmental Data Initiative</publisher>
     <publicationYear>2018</publicationYear>

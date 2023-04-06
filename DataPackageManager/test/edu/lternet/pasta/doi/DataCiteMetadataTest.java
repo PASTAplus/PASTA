@@ -3,6 +3,7 @@ package edu.lternet.pasta.doi;
 import edu.lternet.pasta.common.FileUtility;
 import edu.lternet.pasta.common.eml.EMLParser;
 import edu.lternet.pasta.common.eml.ResponsibleParty;
+import edu.lternet.pasta.common.eml.Title;
 import edu.lternet.pasta.datapackagemanager.JournalCitation;
 import junit.framework.TestCase;
 
@@ -14,7 +15,7 @@ public class DataCiteMetadataTest extends TestCase {
   public static final String DATA_CITE_METADATA_SAMPLE_XML =
       "test/data/DataCiteMetadataSample.xml";
 
-  public void testToDataCiteXml() throws ConfigurationException
+  public void testToDataCiteXml() throws Exception
   {
     DataCiteMetadata dcm = new DataCiteMetadata();
 
@@ -27,6 +28,15 @@ public class DataCiteMetadataTest extends TestCase {
     // dcm.setAlternateIdentifier("doi:10.6073/pasta/123456789");
     dcm.setPublicationYear("2018");
     dcm.setLocationUrl("https://pasta.lternet.edu/package/data/eml/knb-lter-lno/1/1");
+
+    Title title = new Title();
+    title.setTitle("A new method for estimating the global oceanic heat content");
+    title.setTitleType("Subtitle");
+
+    ArrayList<Title> titles = new ArrayList<>();
+    titles.add(title);
+
+    dcm.setTitles(titles);
 
     JournalCitation jc = new JournalCitation();
     jc.setArticleDoi("10.1002/2017GL075000");
