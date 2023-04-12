@@ -65,13 +65,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -1092,6 +1086,106 @@ public class DataPackageManagerResource extends PastaWebService {
 
 	}
 
+	/**
+	 * <strong>Download Data Package as a ZIP archive</strong> operation, specifying the
+	 * scope, identifier, and revision of the data package in the URI, and returning a
+	 * stream of zipped bytes in the response message body.
+	 *
+	 * <h4>Request:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 * <tr>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Request</b></th>
+	 * </tr>
+	 * <tr>
+	 * <td align=center>none</td>
+	 * <td align=center>none</td>
+	 * <td><code>curl -i -X GET
+	 * https://pasta.lternet.edu/package/download/eml/knb-lter-lno/1/1</code></td>
+	 * </tr>
+	 * </table>
+	 *
+	 * <h4>Response:</h4>
+	 * <table border="1" cellspacing="0" cellpadding="3">
+	 *
+	 * <tr>
+	 * <th><b>Status</b></th>
+	 * <th><b>Reason</b></th>
+	 * <th><b>Message Body</b></th>
+	 * <th><b>MIME type</b></th>
+	 * <th><b>Sample Message Body</b></th>
+	 * </tr>
+	 *
+	 * <tr>
+	 * <td align=center>200 OK</td>
+	 * <td align=center>The request was successful</td>
+	 * <td align=center><code>ZIP bytes</code></td>
+	 * <td align=center><code>application/zip</code></td>
+	 * <td align=center><code>[ZIP bytes]</code></td>
+	 * </tr>
+	 *
+	 * <tr>
+	 * <td align=center>401 Unauthorized</td>
+	 * <td align=center>The requesting user is not authorized to execute this service method</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 *
+	 * <tr>
+	 * <td align=center>405 Method Not Allowed</td>
+	 * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+	 * <td align=center>An error message</td>
+	 * <td align=center><code>text/plain</code></td>
+	 * <td align=center><code>Error message</code></td>
+	 * </tr>
+	 *
+	 * </table>
+	 *
+	 * @return a Response, which, if successful, contains a stream of zipped bytes.
+	 */
+	@GET
+	@Path("/download/eml/{scope}/{identifier}/{revision}")
+	@Produces("application/zip")
+	public Response downloadDataPackageArchive(@Context HttpHeaders headers,
+																						 @PathParam("scope") String scope,
+																						 @PathParam("identifier")
+																						 Integer identifier,
+																						 @PathParam("revision") Integer revision)
+			throws ServiceUnavailableException
+	{
+		final String serviceMethodName = "createDataPackageArchive";
+		Rule.Permission permission = Rule.Permission.write;
+		AuthToken authToken = getAuthToken(headers);
+		String userId = authToken.getUserId();
+
+		// Is user authorized to run the 'createDataPackage' service method?
+		boolean serviceMethodAuthorized =
+				isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+		if (!serviceMethodAuthorized) {
+			throw new UnauthorizedException(
+					"User " + userId + " is not authorized to execute service method " +
+							serviceMethodName);
+		}
+
+		if (this.readOnly) {
+			throw new ServiceUnavailableException("PASTA is now in read-only mode");
+		}
+
+		Response.ResponseBuilder responseBuilder = Response.status(Response.Status.ACCEPTED);
+
+		StreamingOutput streamingZipOutput = outputStream -> {
+			List<String> pathList = new ArrayList<>();
+			pathList.add("/tmp/zip/f1");
+			pathList.add("/tmp/zip/f2");
+			ZipStreamer z = new ZipStreamer();
+			z.zipStream(outputStream, pathList);
+		};
+
+		responseBuilder.entity(streamingZipOutput);
+		return responseBuilder.build();
+	}
 
 	/**
 	 * <strong>Create Reservation</strong> operation, creates a new
