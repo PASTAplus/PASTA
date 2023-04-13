@@ -60,20 +60,21 @@ Data Package Identifiers
 
 In the context of PASTA+, a package identifier is a unique identifier assigned
 to a data package that is stored in the repository. This identifier is internal
-to PASTA+ and consists of three parts: the *scope*, *accession*, and *revision*.
-The scope is an alpha-numeric string that defines a namespace under which
-certain data packages exist (e.g., "edi" or "knb-lter-mcr"). The accession is a
-positive integer and uniquely identifies one or more data packages under the
-scope namespace. Also a positive integer, the revision denotes the version of
-the data package associated with a specific accession of the scope. New
-revisions must be a value greater than the previous highest revision, but not
-necessarily consecutive. The package identifier is often represented as the
-scope, accession, and revision concatenated together with periods separating the
-individual parts (below).
+to PASTA+ and consists of three parts: the *scope*, *accession*,
+and *revision*. The scope is an alpha-numeric string that defines a namespace
+under which certain data packages exist (e.g., "edi" or "knb-lter-mcr"). The
+accession is a positive integer and uniquely identifies one or more data
+packages under the scope namespace. Also a positive integer, the revision
+denotes the version of the data package associated with a specific accession of
+the scope. New revisions must be a value greater than the previous highest
+revision, but not necessarily consecutive. The package identifier is often
+represented as the scope, accession, and revision concatenated together with
+periods separating the individual parts (below):
 
-.. figure:: images/package_id.png
-    :align: center
-    :scale: 70%
+.. raw:: html
+
+    <p align="center"><b>scope.accession.revision</b></p>
+
 
 Examples of complete PASTA+ data package identifiers are *edi.1.10* or
 *knb-lter-mcr.14.2*.

@@ -1,0 +1,3560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="edi.900.1" system="https://pasta.edirepository.org"
+  xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0"
+  xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1  http://nis.lternet.edu/schemas/EML/eml-2.1.1/eml.xsd">
+  <access authSystem="https://pasta.edirepository.org/authentication"
+    order="allowFirst" scope="document" system="https://pasta.edirepository.org">
+    <allow>
+      <principal>uid=EDI,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>uid=kvincent,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <alternateIdentifier system="https://doi.org">doi:10.6073/pasta/e2749ec25457ca0b87d0f939086d0911</alternateIdentifier>
+    <title>Crossing Treeline: Bacterioplankton community composition in alpine and subalpine lakes of the Rocky Mountain southern ecoregion and associated physical and chemical characteristics</title>
+    <creator>
+      <individualName>
+        <givenName>Kim</givenName>
+        <surName>Vincent</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>kim.vincent@colorado.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0003-4449-7306</userId>
+    </creator>
+    <associatedParty>
+      <individualName>
+        <givenName>Hannah</givenName>
+        <surName>Holland-Moritz</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>Hannah.Hollandmoritz@colorado.edu</electronicMailAddress>
+      <role>Data Analysis, Conceptual Content</role>
+    </associatedParty>
+    <associatedParty>
+      <individualName>
+        <givenName>Adam</givenName>
+        <givenName>J.</givenName>
+        <surName>Solon</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>Adam.Solon@colorado.edu</electronicMailAddress>
+      <role>Field Crew, Lab Analysis, Conceptual Content</role>
+    </associatedParty>
+    <associatedParty>
+      <individualName>
+        <givenName>Eli</givenName>
+        <givenName>M. S.</givenName>
+        <surName>Gendron</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>eli.gendron@colorado.edu</electronicMailAddress>
+      <role>Conceptual Content</role>
+    </associatedParty>
+    <associatedParty>
+      <individualName>
+        <givenName>Steven</givenName>
+        <givenName>K.</givenName>
+        <surName>Schmidt</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>steve.schmidt@colorado.edu</electronicMailAddress>
+      <role>Conceptual Content</role>
+    </associatedParty>
+    <pubDate>2020-02-04</pubDate>
+    <abstract>
+      <para>
+  This dataset includes lake water samples collected in the summer of
+  2016 from 16 different mountain lakes in the Rocky mountains in both
+  Rocky Mountain National Park and the Snowy Range of southern Wyoming.
+  Each lake was sampled twice: once in the early summer when hydrologic
+  connections with the surrounding terrestrial environment were high and
+  again in the late summer when hydrologic connections were low. The
+  main goal of the study was to compare communities of bacterioplankton
+  in alpine and subalpine lakes to determine if communities differed
+  across treeline as soil microbes in the surrounding terrestrial
+  environment were. To do so, we collected water samples from the
+  deepest point of each lake, mixed it with a surface water sample and
+  characterized bacterioplankton communities with 16S sequencing
+  technology. Additionally, we wanted to identify abiotic factors that
+  may correlate with community dissimilarity and characterized a suite
+  of chemical attributes for each lake. Lake characteristics reported
+  included surface temperature, soluble reactive phosphorous (SRP),
+  ammonia (NH3+), pH, total dissolved nitrogen (TDN), total dissolved
+  phosphorus (TDP), and total dissolved organic carbon (DOC), and
+  chlorophyll a (chl-a).
+</para>
+    </abstract>
+    <keywordSet>
+      <keyword>Rocky Mountain National Park</keyword>
+      <keyword>Snowy Range</keyword>
+      <keyword>alpine lake</keyword>
+      <keyword>bacterioplankton</keyword>
+      <keyword>bacterial communities</keyword>
+      <keyword>subalpine lake</keyword>
+    </keywordSet>
+    <keywordSet>
+      <keyword>treeline</keyword>
+      <keyword>water quality</keyword>
+      <keywordThesaurus>https://vocab.lternet.edu/vocab/vocab/index.php</keywordThesaurus>
+    </keywordSet>
+    <intellectualRights>
+      <para>
+  This information is released under the Creative Commons license -
+  Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/).
+  The consumer of these data ("Data User" herein) is required
+  to cite it appropriately in any publication that results from its use.
+  The Data User should realize that these data may be actively used by
+  others for ongoing research and that coordination may be necessary to
+  prevent duplicate publication. The Data User is urged to contact the
+  authors of these data if any questions about methodology or results
+  occur. Where appropriate, the Data User is encouraged to consider
+  collaboration or co-authorship with the authors. The Data User should
+  realize that misinterpretation of data may occur if used out of
+  context of the original study. While substantial efforts are made to
+  ensure the accuracy of data and associated documentation, complete
+  accuracy of data sets cannot be guaranteed. All data are made
+  available "as is." The Data User should be aware, however,
+  that data are updated periodically and it is the responsibility of the
+  Data User to check for new versions of the data. The data authors and
+  the repository where these data were obtained shall not be liable for
+  damages resulting from any use or misinterpretation of the data. Thank
+  you.
+</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Rocky Mountain National Park and Snowy Range, Colorado and Wyoming, USA</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>106.2747</westBoundingCoordinate>
+          <eastBoundingCoordinate>105.5936</eastBoundingCoordinate>
+          <northBoundingCoordinate>41.3793</northBoundingCoordinate>
+          <southBoundingCoordinate>40.1726</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2016-07-11</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2016-08-23</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <maintenance>
+      <description>complete</description>
+    </maintenance>
+    <contact>
+      <individualName>
+        <givenName>Kim</givenName>
+        <surName>Vincent</surName>
+      </individualName>
+      <organizationName>CU Boulder</organizationName>
+      <electronicMailAddress>kim.vincent@colorado.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0003-4449-7306</userId>
+    </contact>
+    <methods>
+      <methodStep>
+        <description>
+          <para>
+  Methods
+</para>
+          <para>
+  Sample collection During the summer of 2016, we sampled 16 lakes in
+  drainages that spanned treeline in the Southern Rocky Mountain
+  ecoregion twice during the growing season: once at the beginning of
+  summer and again near the end. The first visit was made in July, as
+  early as possible after ice-off to safely access the upper most lake
+  in each drainage and the second visit was made approximately five
+  weeks later. Three of the four drainages were located in Rocky
+  Mountain National Park (RMNP), Colorado; and the fourth was located in
+  the Snowy Range of southern Wyoming (Figure 1). The Snowy Range
+  drainage was chosen for comparison with RMNP lakes to determine if the
+  alpine treeline pattern held in different geographic locations. Each
+  drainage contained two lakes above (alpine) and two below (subalpine)
+  treeline. Shrubs and tundra vegetation were present in the terrestrial
+  environment surrounding the alpine lakes in all four drainages. The
+  lakes range in elevation from approximately 2,800 m to 3,600 m.
+  Vegetation at treeline was dominated by Engelmann spruce (Picea
+  engelmannii) and lodgepole pine (Pinus contorta).
+</para>
+          <para>
+  We accessed backcountry lakes by foot, and to avoid potential
+  contamination of pathogens or aquatic invasive species, we sampled
+  upper lakes first, and worked down the drainage to the lower elevation
+  lakes. At the deepest point of each lake (accessed with an inflatable
+  Alpaca raft), we recorded water temperature and the depth. We
+  collected two water samples at the deepest point of the lake: one from
+  the surface of the lake (grab sample) and one from approximately 1 m
+  above the bottom of the lake with an acrylic Van Dorn bottle. Samples
+  were collected in acid washed and triple DI rinsed 500 ml HDPE
+  bottles. We mixed even volumes of the surface and the bottom samples
+  to create one representative sample for each lake. All lakes within a
+  drainage were sampled between the hours of 0800 and 1300 and within 36
+  hours of one another to minimize potential temporal effects.
+</para>
+          <para>
+  Sample processing Within 12 hours of collection, we hand-filtered
+  between 500 ml and 1,000 ml lake water through 0.7 µm pore size glass
+  fiber filters (GF/F, pre-combusted at 475o C for 4 hours) and 500 ml
+  though 0.2 µm pore size sterile filters in the field. The filtrate
+  (0.7 µm pore size filter) was transferred to high-density polyethylene
+  (HDPE) plastic bottles and kept for water chemistry characterization.
+  We transferred the 0.7 µm GF/F filters (chlorophyll-a samples) and 0.2
+  µm filters (microbial samples) to sterile plastic vials.
+</para>
+          <para>
+  Chemical analyses We characterized the chemical properties of the
+  water samples at the University of Colorado (Boulder, CO). Ammonia
+  (NH3+) and soluble reactive phosphorus (SRP) were analyzed immediately
+  upon return to the laboratory. Before freezing, we warmed 50 ml of the
+  sample to room temperature and recorded pH. The remaining filtrate was
+  frozen (-20°C) until analysis within three months for total dissolved
+  nitrogen (TDN), total dissolved phosphorus (TDP), and total dissolved
+  organic carbon (DOC). We analyzed TDP colorimetrically (Grasshoff et
+  al. 2009), TDN with an ion chromatograph, and DOC using a Shimadzu
+  model 7100 carbon analyzer. We extracted chlorophyll a (chl-a) from
+  the 0.7 µm GF/F filters using the 90% hot ethanol method (Nusch 1980),
+  then covered samples in foil and kept refrigerated (4°C) until
+  analysis 24 hours later. We then hand-filtered extracted samples
+  through Whatman GF/F (pore size 1.2 µm) filters before
+  spectrophotometric analysis and corrected final values for
+  phaeopigment.
+</para>
+        </description>
+      </methodStep>
+    </methods>
+    <project>
+      <title>Crossing Treeline Cooperative Agreement</title>
+      <personnel>
+        <individualName>
+          <givenName>Kim</givenName>
+          <surName>Vincent</surName>
+        </individualName>
+        <organizationName>CU Boulder</organizationName>
+        <electronicMailAddress>kim.vincent@colorado.edu</electronicMailAddress>
+        <userId directory="https://orcid.org">https://orcid.org/0000-0003-4449-7306</userId>
+        <role>Principal Investigator</role>
+      </personnel>
+      <funding>Rocky Mountain National Park: P14AC00749</funding>
+    </project>
+    <dataTable>
+      <entityName>Water chemistry and other measured characteristics of Rocky Mountain lakes</entityName>
+      <entityDescription>Water chemistry and other measured characteristics of Rocky Mountain lakes</entityDescription>
+      <physical>
+        <objectName>CrossingTreeline_cleaned.csv</objectName>
+        <size unit="bytes">3395</size>
+        <authentication method="MD5">2bee7c3330321126595968d5d4c2bc47</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/900/1/d3f1c54cd4d1780f79beaf8cb4fda48a</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>SampleID</attributeName>
+          <attributeDefinition>Unique identifier for each sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Unique identifier for each sample</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Lake</attributeName>
+          <attributeDefinition>The name of the lake where the sample was collected</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>The name of the lake where the sample was collected</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>LakeType</attributeName>
+          <attributeDefinition>Either alpine-above treeline or subalpine- below treeline</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>Alpine</code>
+                    <definition>Lakes are located above treeline</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Subalpine</code>
+                    <definition>Lakes are located below treeline</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Visit</attributeName>
+          <attributeDefinition>Either early summer- Visit_1 or late summer- Visit_2</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>Visit_1</code>
+                    <definition>The first visit accessed immediately after ice-off of the upper most lake in the drainage when hydrologic connectivity is high</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Visit_2</code>
+                    <definition>The second visit accessed approximately 5 weeks later when hydrologic connectivity is low</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Watershed</attributeName>
+          <attributeDefinition>Name of the watershed where each lake is located</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>Snowbank</code>
+                    <definition>The Snowbank watershed consists of the following four lakes- Snowbank Lake Lion Lake II Lion Lake I and Thunder Lake</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pear</code>
+                    <definition>The Pear watershed consists of the following four lakes- Cony Lake Upper Hutcheson Lake Pear Reservoir Finch Lake</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Glacier Gorge</code>
+                    <definition>The Glacier Gorge watershed consists of the following four lakes- Frozen Lake Blue Lake Black Lake and Mills Lake</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Snowys</code>
+                    <definition>The Snowy watershed consists of the following four lakes- East Glacier Lake West Glacier Lake Little Brooklyn Lake and Jeep Lake</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Elevation</attributeName>
+          <attributeDefinition>meters above sea level</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>meter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">3021</minimum>
+                  <maximum exclusive="false">3529</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Date</attributeName>
+          <attributeDefinition>Date collection was made</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>SRP</attributeName>
+          <attributeDefinition>soluble reactive phosphorous</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>microgramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.2</minimum>
+                  <maximum exclusive="false">6.7</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>TDP</attributeName>
+          <attributeDefinition>total dissolved phosphorous</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>microgramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.88</minimum>
+                  <maximum exclusive="false">12.42</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>pH</attributeName>
+          <attributeDefinition>pH at room temperature</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">6.13</minimum>
+                  <maximum exclusive="false">9.12</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>ChlA</attributeName>
+          <attributeDefinition>concentration of chlorophyll-a</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.4</minimum>
+                  <maximum exclusive="false">18.7</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>NH3</attributeName>
+          <attributeDefinition>ammonia</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>microgramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.6</minimum>
+                  <maximum exclusive="false">98</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>TDN</attributeName>
+          <attributeDefinition>total dissolved nitrogen</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>microgramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">101.66</minimum>
+                  <maximum exclusive="false">532.78</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>DOC</attributeName>
+          <attributeDefinition>total dissolved organic carbon</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.44</minimum>
+                  <maximum exclusive="false">7.57</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Fish</attributeName>
+          <attributeDefinition>Whether fish are present or absent in the lake Y- fish present N- fish absent</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>n</code>
+                    <definition>The lake does not contain fish</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>y</code>
+                    <definition>The lake contains fish</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>TempS</attributeName>
+          <attributeDefinition>Temperature of lake surface water</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">7.7</minimum>
+                  <maximum exclusive="false">22</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>32</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>Relative abundance of bacterial taxa by sample for alpine and subalpine lakes</entityName>
+      <entityDescription>Relative abundance of bacterial taxa by sample for alpine and subalpine lakes</entityDescription>
+      <physical>
+        <objectName>Seq_Table_Bac_wtaxa.csv</objectName>
+        <size unit="bytes">196361</size>
+        <authentication method="MD5">8b03ad880b4edd5030e71219237571e6</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/900/1/f570164c36410da2523723bc8915360d</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>ASV_ID</attributeName>
+          <attributeDefinition>ID given for each taxa identified to the lowest resolution available.</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>ID given for each taxa identified to the lowest resolution available.</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV002</attributeName>
+          <attributeDefinition>Sample corresponding to Snowbank Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1730</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV003</attributeName>
+          <attributeDefinition>Sample corresponding to Lion Lake 2, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1522</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV004</attributeName>
+          <attributeDefinition>Sample corresponding to Lion Lake 1, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1486</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV005</attributeName>
+          <attributeDefinition>Sample corresponding to Thunder Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">840</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV006</attributeName>
+          <attributeDefinition>Sample corresponding to Cony Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1514</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV007</attributeName>
+          <attributeDefinition>Sample corresponding to Upper Hutcheson, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1773</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV008</attributeName>
+          <attributeDefinition>Sample corresponding to Pear Reservoir, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">746</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV009</attributeName>
+          <attributeDefinition>Sample corresponding to Finch Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1298</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV010</attributeName>
+          <attributeDefinition>Sample corresponding to Frozen Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">722</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV011</attributeName>
+          <attributeDefinition>Sample corresponding to Blue Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">787</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV012</attributeName>
+          <attributeDefinition>Sample corresponding to Black Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1007</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV013</attributeName>
+          <attributeDefinition>Sample corresponding to Mills Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">929</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV014</attributeName>
+          <attributeDefinition>Sample corresponding to East Glacier, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1082</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV016</attributeName>
+          <attributeDefinition>Sample corresponding to West Glacier Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">740</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV017</attributeName>
+          <attributeDefinition>Sample corresponding to Little Brooklyn, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">964</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV018</attributeName>
+          <attributeDefinition>Sample corresponding to Jeep Lake, visit 1</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1135</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV019</attributeName>
+          <attributeDefinition>Sample corresponding to Snowbank Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1615</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV020</attributeName>
+          <attributeDefinition>Sample corresponding to Lion Lake 2, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1217</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV021</attributeName>
+          <attributeDefinition>Sample corresponding to Lion Lake 1, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">899</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV022</attributeName>
+          <attributeDefinition>Sample corresponding to Thunder Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">832</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV023</attributeName>
+          <attributeDefinition>Sample corresponding to Frozen Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">655</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV024</attributeName>
+          <attributeDefinition>Sample corresponding to Black Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">850</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV025</attributeName>
+          <attributeDefinition>Sample corresponding to West Glacier Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1498</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV026</attributeName>
+          <attributeDefinition>Sample corresponding to East Glacier, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">3215</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV027</attributeName>
+          <attributeDefinition>Sample corresponding to Little Brooklyn, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">506</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV028</attributeName>
+          <attributeDefinition>Sample corresponding to Jeep Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1213</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV029</attributeName>
+          <attributeDefinition>Sample corresponding to Cony Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1708</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV030</attributeName>
+          <attributeDefinition>Sample corresponding to Upper Hutcheson, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1334</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV031</attributeName>
+          <attributeDefinition>Sample corresponding to Pear Reservoir, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1322</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV032</attributeName>
+          <attributeDefinition>Sample corresponding to Finch Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1523</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV033</attributeName>
+          <attributeDefinition>Sample corresponding to Blue Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1728</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>KV034</attributeName>
+          <attributeDefinition>Sample corresponding to Mills Lake, visit 2</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">975</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Kingdom</attributeName>
+          <attributeDefinition>Kingdom</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>Archaea</code>
+                    <definition>Kingdom Archaea</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteria</code>
+                    <definition>Kingdom Bacteria</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Phylum</attributeName>
+          <attributeDefinition>Phylum</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>Acidobacteria</code>
+                    <definition>Phylum Acidobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Actinobacteria</code>
+                    <definition>Phylum Actinobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Armatimonadetes</code>
+                    <definition>Phylum Armatimonadetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteroidetes</code>
+                    <definition>Phylum Bacteroidetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chlamydiae</code>
+                    <definition>Phylum Chlamydiae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chloroflexi</code>
+                    <definition>Phylum Chloroflexi</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cyanobacteria</code>
+                    <definition>Phylum Cyanobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deinococcus-Thermus</code>
+                    <definition>Phylum Deinococcus-Thermus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Dependentiae</code>
+                    <definition>Phylum Dependentiae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Elusimicrobia</code>
+                    <definition>Phylum Elusimicrobia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Epsilonbacteraeota</code>
+                    <definition>Phylum Epsilonbacteraeota</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fibrobacteres</code>
+                    <definition>Phylum Fibrobacteres</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Firmicutes</code>
+                    <definition>Phylum Firmicutes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fusobacteria</code>
+                    <definition>Phylum Fusobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmatimonadetes</code>
+                    <definition>Phylum Gemmatimonadetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kiritimatiellaeota</code>
+                    <definition>Phylum Kiritimatiellaeota</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lentisphaerae</code>
+                    <definition>Phylum Lentisphaerae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Margulisbacteria</code>
+                    <definition>Phylum Margulisbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown Phylum</code>
+                    <definition>Unknown Phylum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nanoarchaeaeota</code>
+                    <definition>Phylum Nanoarchaeaeota</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospirae</code>
+                    <definition>Phylum Nitrospirae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Omnitrophicaeota</code>
+                    <definition>Phylum Omnitrophicaeota</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Patescibacteria</code>
+                    <definition>Phylum Patescibacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Planctomycetes</code>
+                    <definition>Phylum Planctomycetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Proteobacteria</code>
+                    <definition>Phylum Proteobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirochaetes</code>
+                    <definition>Phylum Spirochaetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Thaumarchaeota</code>
+                    <definition>Phylum Thaumarchaeota</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Verrucomicrobia</code>
+                    <definition>Phylum Verrucomicrobia</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Class</attributeName>
+          <attributeDefinition>Class</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>ABY1</code>
+                    <definition>Class ABY1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidimicrobiia</code>
+                    <definition>Class Acidimicrobiia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidobacteriia</code>
+                    <definition>Class Acidobacteriia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Actinobacteria</code>
+                    <definition>Class Actinobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Alphaproteobacteria</code>
+                    <definition>Class Alphaproteobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Anaerolineae</code>
+                    <definition>Class Anaerolineae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Armatimonadia</code>
+                    <definition>Class Armatimonadia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Babeliae</code>
+                    <definition>Class Babeliae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacilli</code>
+                    <definition>Class Bacilli</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteroidia</code>
+                    <definition>Class Bacteroidia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Berkelbacteria</code>
+                    <definition>Class Berkelbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Betaproteobacteria</code>
+                    <definition>Class Betaproteobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Blastocatellia_(Subgroup_4)</code>
+                    <definition>Class Blastocatellia_Subgroup_4</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Campylobacteria</code>
+                    <definition>Class Campylobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chlamydiae</code>
+                    <definition>Class Chlamydiae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chloroflexia</code>
+                    <definition>Class Chloroflexia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chthonomonadetes</code>
+                    <definition>Class Chthonomonadetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Clostridia</code>
+                    <definition>Class Clostridia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>CPR2</code>
+                    <definition>Class CPR2</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deinococci</code>
+                    <definition>Class Deinococci</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deltaproteobacteria</code>
+                    <definition>Class Deltaproteobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Elusimicrobia</code>
+                    <definition>Class Elusimicrobia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fibrobacteria</code>
+                    <definition>Class Fibrobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fimbriimonadia</code>
+                    <definition>Class Fimbriimonadia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fusobacteriia</code>
+                    <definition>Class Fusobacteriia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gammaproteobacteria</code>
+                    <definition>Class Gammaproteobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmatimonadetes</code>
+                    <definition>Class Gemmatimonadetes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gracilibacteria</code>
+                    <definition>Class Gracilibacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Holophagae</code>
+                    <definition>Class Holophagae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ignavibacteria</code>
+                    <definition>Class Ignavibacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>KD4-96</code>
+                    <definition>Class KD4-96</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kiritimatiellae</code>
+                    <definition>Class Kiritimatiellae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lineage_IIb</code>
+                    <definition>Class Lineage_IIb</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Melainabacteria</code>
+                    <definition>Class Melainabacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microgenomatia</code>
+                    <definition>Class Microgenomatia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown Class</code>
+                    <definition>Unknown Class</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Negativicutes</code>
+                    <definition>Class Negativicutes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrososphaeria</code>
+                    <definition>Class Nitrososphaeria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospira</code>
+                    <definition>Class Nitrospira</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oligosphaeria</code>
+                    <definition>Class Oligosphaeria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Omnitrophia</code>
+                    <definition>Class Omnitrophia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oxyphotobacteria</code>
+                    <definition>Class Oxyphotobacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parcubacteria</code>
+                    <definition>Class Parcubacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phycisphaerae</code>
+                    <definition>Class Phycisphaerae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Planctomycetacia</code>
+                    <definition>Class Planctomycetacia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Saccharimonadia</code>
+                    <definition>Class Saccharimonadia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SL56_marine_group</code>
+                    <definition>Class SL56_marine_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirochaetia</code>
+                    <definition>Class Spirochaetia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Subgroup_6</code>
+                    <definition>Class Subgroup_6</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Thermoleophilia</code>
+                    <definition>Class Thermoleophilia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>vadinHA49</code>
+                    <definition>Class vadinHA49</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Verrucomicrobiae</code>
+                    <definition>Class Verrucomicrobiae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Woesearchaeia</code>
+                    <definition>Class Woesearchaeia</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Order</attributeName>
+          <attributeDefinition>Order</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>211ds20</code>
+                    <definition>Order 211ds20</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Absconditabacteriales_(SR1)</code>
+                    <definition>Order Absconditabacteriales_SR1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acetobacterales</code>
+                    <definition>Order Acetobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aeromonadales</code>
+                    <definition>Order Aeromonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Anaerolineales</code>
+                    <definition>Order Anaerolineales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Armatimonadales</code>
+                    <definition>Order Armatimonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Azospirillales</code>
+                    <definition>Order Azospirillales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Babeliales</code>
+                    <definition>Order Babeliales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacillales</code>
+                    <definition>Order Bacillales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteroidales</code>
+                    <definition>Order Bacteroidales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bdellovibrionales</code>
+                    <definition>Order Bdellovibrionales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Beggiatoales</code>
+                    <definition>Order Beggiatoales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Betaproteobacteriales</code>
+                    <definition>Order Betaproteobacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Blastocatellales</code>
+                    <definition>Order Blastocatellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Burkholderiales</code>
+                    <definition>Order Burkholderiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Campylobacterales</code>
+                    <definition>Order Campylobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Falkowbacteria</code>
+                    <definition>Order Candidatus_Falkowbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Lloydbacteria</code>
+                    <definition>Order Candidatus_Lloydbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Magasanikbacteria</code>
+                    <definition>Order Candidatus_Magasanikbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Moranbacteria</code>
+                    <definition>Order Candidatus_Moranbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Nomurabacteria</code>
+                    <definition>Order Candidatus_Nomurabacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Pacebacteria</code>
+                    <definition>Order Candidatus_Pacebacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Peregrinibacteria</code>
+                    <definition>Order Candidatus_Peregrinibacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Peribacteria</code>
+                    <definition>Order Candidatus_Peribacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Staskawiczbacteria</code>
+                    <definition>Order Candidatus_Staskawiczbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Woesebacteria</code>
+                    <definition>Order Candidatus_Woesebacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Yonathbacteria</code>
+                    <definition>Order Candidatus_Yonathbacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Zambryskibacteria</code>
+                    <definition>Order Candidatus_Zambryskibacteria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Caulobacterales</code>
+                    <definition>Order Caulobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>CCM11a</code>
+                    <definition>Order CCM11a</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cellvibrionales</code>
+                    <definition>Order Cellvibrionales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chitinophagales</code>
+                    <definition>Order Chitinophagales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chlamydiales</code>
+                    <definition>Order Chlamydiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chloroflexales</code>
+                    <definition>Order Chloroflexales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chthoniobacterales</code>
+                    <definition>Order Chthoniobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chthonomonadales</code>
+                    <definition>Order Chthonomonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Clostridiales</code>
+                    <definition>Order Clostridiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Corynebacteriales</code>
+                    <definition>Order Corynebacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cytophagales</code>
+                    <definition>Order Cytophagales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deinococcales</code>
+                    <definition>Order Deinococcales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Desulfuromonadales</code>
+                    <definition>Order Desulfuromonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Diplorickettsiales</code>
+                    <definition>Order Diplorickettsiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>EC3</code>
+                    <definition>Order EC3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Enterobacteriales</code>
+                    <definition>Order Enterobacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fibrobacterales</code>
+                    <definition>Order Fibrobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fimbriimonadales</code>
+                    <definition>Order Fimbriimonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Flavobacteriales</code>
+                    <definition>Order Flavobacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Frankiales</code>
+                    <definition>Order Frankiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fusobacteriales</code>
+                    <definition>Order Fusobacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gaiellales</code>
+                    <definition>Order Gaiellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gammaproteobacteria_Incertae_Sedis</code>
+                    <definition>Order Gammaproteobacteria_Incertae_Sedis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gastranaerophilales</code>
+                    <definition>Order Gastranaerophilales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmatales</code>
+                    <definition>Order Gemmatales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmatimonadales</code>
+                    <definition>Order Gemmatimonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gloeobacterales</code>
+                    <definition>Order Gloeobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Holophagales</code>
+                    <definition>Order Holophagales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ignavibacteriales</code>
+                    <definition>Order Ignavibacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>IMCC26256</code>
+                    <definition>Order IMCC26256</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Isosphaerales</code>
+                    <definition>Order Isosphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kiritimatiellales</code>
+                    <definition>Order Kiritimatiellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lactobacillales</code>
+                    <definition>Order Lactobacillales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Legionellales</code>
+                    <definition>Order Legionellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Leptolyngbyales</code>
+                    <definition>Order Leptolyngbyales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lineage_IV</code>
+                    <definition>Order Lineage_IV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylacidiphilales</code>
+                    <definition>Order Methylacidiphilales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylococcales</code>
+                    <definition>Order Methylococcales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Micavibrionales</code>
+                    <definition>Order Micavibrionales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Micrococcales</code>
+                    <definition>Order Micrococcales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Micropepsales</code>
+                    <definition>Order Micropepsales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microtrichales</code>
+                    <definition>Order Microtrichales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Myxococcales</code>
+                    <definition>Order Myxococcales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown Order</code>
+                    <definition>Unknown Order</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrosopumilales</code>
+                    <definition>Order Nitrosopumilales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospirales</code>
+                    <definition>Order Nitrospirales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nostocales</code>
+                    <definition>Order Nostocales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Obscuribacterales</code>
+                    <definition>Order Obscuribacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oligoflexales</code>
+                    <definition>Order Oligoflexales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oligosphaerales</code>
+                    <definition>Order Oligosphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Omnitrophales</code>
+                    <definition>Order Omnitrophales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Opitutales</code>
+                    <definition>Order Opitutales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oxyphotobacteria_Incertae_Sedis</code>
+                    <definition>Order Oxyphotobacteria_Incertae_Sedis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paracaedibacterales</code>
+                    <definition>Order Paracaedibacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parvibaculales</code>
+                    <definition>Order Parvibaculales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pedosphaerales</code>
+                    <definition>Order Pedosphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>PeM15</code>
+                    <definition>Order PeM15</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phycisphaerales</code>
+                    <definition>Order Phycisphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pirellulales</code>
+                    <definition>Order Pirellulales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Piscirickettsiales</code>
+                    <definition>Order Piscirickettsiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Planctomycetales</code>
+                    <definition>Order Planctomycetales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudanabaenales</code>
+                    <definition>Order Pseudanabaenales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudomonadales</code>
+                    <definition>Order Pseudomonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>R7C24</code>
+                    <definition>Order R7C24</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>RBG-13-54-9</code>
+                    <definition>Order RBG-13-54-9</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Reyranellales</code>
+                    <definition>Order Reyranellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhizobiales</code>
+                    <definition>Order Rhizobiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodobacterales</code>
+                    <definition>Order Rhodobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodospirillales</code>
+                    <definition>Order Rhodospirillales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rickettsiales</code>
+                    <definition>Order Rickettsiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Saccharimonadales</code>
+                    <definition>Order Saccharimonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Salinisphaerales</code>
+                    <definition>Order Salinisphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SAR11_clade</code>
+                    <definition>Order SAR11_clade</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SAR324_clade(Marine_group_B)</code>
+                    <definition>Order SAR324_clade_Marine_group_B</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SBR1031</code>
+                    <definition>Order SBR1031</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Selenomonadales</code>
+                    <definition>Order Selenomonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SJA-15</code>
+                    <definition>Order SJA-15</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solibacterales</code>
+                    <definition>Order Solibacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solirubrobacterales</code>
+                    <definition>Order Solirubrobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingobacteriales</code>
+                    <definition>Order Sphingobacteriales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingomonadales</code>
+                    <definition>Order Sphingomonadales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirochaetales</code>
+                    <definition>Order Spirochaetales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Steroidobacterales</code>
+                    <definition>Order Steroidobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Subgroup_2</code>
+                    <definition>Order Subgroup_2</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Synechococcales</code>
+                    <definition>Order Synechococcales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Syntrophobacterales</code>
+                    <definition>Order Syntrophobacterales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Tepidisphaerales</code>
+                    <definition>Order Tepidisphaerales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Thiomicrospirales</code>
+                    <definition>Order Thiomicrospirales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Tistrellales</code>
+                    <definition>Order Tistrellales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Vampirovibrionales</code>
+                    <definition>Order Vampirovibrionales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Verrucomicrobiales</code>
+                    <definition>Order Verrucomicrobiales</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Xanthomonadales</code>
+                    <definition>Order Xanthomonadales</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Family</attributeName>
+          <attributeDefinition>Family</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>0319-6G20</code>
+                    <definition>Family 0319-6G20</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>053A03-B-DI-P58</code>
+                    <definition>Family 053A03-B-DI-P58</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>37-13</code>
+                    <definition>Family 37-13</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>AB1</code>
+                    <definition>Family AB1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acetobacteraceae</code>
+                    <definition>Family Acetobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acetobacterales_Incertae_Sedis</code>
+                    <definition>Family Acetobacterales_Incertae_Sedis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidothermaceae</code>
+                    <definition>Family Acidothermaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aeromonadaceae</code>
+                    <definition>Family Aeromonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>AKAU3564_sediment_group</code>
+                    <definition>Family AKAU3564_sediment_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>AKYH767</code>
+                    <definition>Family AKYH767</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Alcaligenaceae</code>
+                    <definition>Family Alcaligenaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Amoebophilaceae</code>
+                    <definition>Family Amoebophilaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Anaerolineaceae</code>
+                    <definition>Family Anaerolineaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Anaplasmataceae</code>
+                    <definition>Family Anaplasmataceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Archangiaceae</code>
+                    <definition>Family Archangiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Arcobacteraceae</code>
+                    <definition>Family Arcobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Armatimonadaceae</code>
+                    <definition>Family Armatimonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Azospirillaceae</code>
+                    <definition>Family Azospirillaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Babeliaceae</code>
+                    <definition>Family Babeliaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteriovoracaceae</code>
+                    <definition>Family Bacteriovoracaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteroidetes_vadinHA17</code>
+                    <definition>Family Bacteroidetes_vadinHA17</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Barnesiellaceae</code>
+                    <definition>Family Barnesiellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bdellovibrionaceae</code>
+                    <definition>Family Bdellovibrionaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Beggiatoaceae</code>
+                    <definition>Family Beggiatoaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Beijerinckiaceae</code>
+                    <definition>Family Beijerinckiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Blastocatellaceae</code>
+                    <definition>Family Blastocatellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Blfdi19</code>
+                    <definition>Family Blfdi19</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Burkholderiaceae</code>
+                    <definition>Family Burkholderiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Caulobacteraceae</code>
+                    <definition>Family Caulobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cellvibrionaceae</code>
+                    <definition>Family Cellvibrionaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chitinibacteraceae</code>
+                    <definition>Family Chitinibacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chitinophagaceae</code>
+                    <definition>Family Chitinophagaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chromobacteriaceae</code>
+                    <definition>Family Chromobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chthoniobacteraceae</code>
+                    <definition>Family Chthoniobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Clade_III</code>
+                    <definition>Family Clade_III</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Clostridiaceae_1</code>
+                    <definition>Family Clostridiaceae_1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Comamonadaceae</code>
+                    <definition>Family Comamonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Crocinitomicaceae</code>
+                    <definition>Family Crocinitomicaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cryomorphaceae</code>
+                    <definition>Family Cryomorphaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cryptosporangiaceae</code>
+                    <definition>Family Cryptosporangiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>cvE6</code>
+                    <definition>Family cvE6</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cyanobacteriaceae</code>
+                    <definition>Family Cyanobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cyanobiaceae</code>
+                    <definition>Family Cyanobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cyclobacteriaceae</code>
+                    <definition>Family Cyclobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cytophagaceae</code>
+                    <definition>Family Cytophagaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deinococcaceae</code>
+                    <definition>Family Deinococcaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Devosiaceae</code>
+                    <definition>Family Devosiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Diplorickettsiaceae</code>
+                    <definition>Family Diplorickettsiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Dysgonomonadaceae</code>
+                    <definition>Family Dysgonomonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Enterobacteriaceae</code>
+                    <definition>Family Enterobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>env.OPS_17</code>
+                    <definition>Family env.OPS_17</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fibrobacteraceae</code>
+                    <definition>Family Fibrobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fimbriimonadaceae</code>
+                    <definition>Family Fimbriimonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Flavobacteriaceae</code>
+                    <definition>Family Flavobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>FTLpost3</code>
+                    <definition>Family FTLpost3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fusobacteriaceae</code>
+                    <definition>Family Fusobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Geminicoccaceae</code>
+                    <definition>Family Geminicoccaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmataceae</code>
+                    <definition>Family Gemmataceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gemmatimonadaceae</code>
+                    <definition>Family Gemmatimonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Geobacteraceae</code>
+                    <definition>Family Geobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gloeobacteraceae</code>
+                    <definition>Family Gloeobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Holophagaceae</code>
+                    <definition>Family Holophagaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hymenobacteraceae</code>
+                    <definition>Family Hymenobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hyphomicrobiaceae</code>
+                    <definition>Family Hyphomicrobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hyphomonadaceae</code>
+                    <definition>Family Hyphomonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ilumatobacteraceae</code>
+                    <definition>Family Ilumatobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Isosphaeraceae</code>
+                    <definition>Family Isosphaeraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>KD3-93</code>
+                    <definition>Family KD3-93</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kiritimatiellaceae</code>
+                    <definition>Family Kiritimatiellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Legionellaceae</code>
+                    <definition>Family Legionellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lentimicrobiaceae</code>
+                    <definition>Family Lentimicrobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Leptolyngbyaceae</code>
+                    <definition>Family Leptolyngbyaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Leptotrichiaceae</code>
+                    <definition>Family Leptotrichiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>LiUU-11-161</code>
+                    <definition>Family LiUU-11-161</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylacidiphilaceae</code>
+                    <definition>Family Methylacidiphilaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylomonaceae</code>
+                    <definition>Family Methylomonaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylophilaceae</code>
+                    <definition>Family Methylophilaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microbacteriaceae</code>
+                    <definition>Family Microbacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microcystaceae</code>
+                    <definition>Family Microcystaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Micropepsaceae</code>
+                    <definition>Family Micropepsaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microscillaceae</code>
+                    <definition>Family Microscillaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Microtrichaceae</code>
+                    <definition>Family Microtrichaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>mle1-27</code>
+                    <definition>Family mle1-27</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Moraxellaceae</code>
+                    <definition>Family Moraxellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Mycobacteriaceae</code>
+                    <definition>Family Mycobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown Family</code>
+                    <definition>Unknown Family</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Neisseriaceae</code>
+                    <definition>Family Neisseriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrosomonadaceae</code>
+                    <definition>Family Nitrosomonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrosopumilaceae</code>
+                    <definition>Family Nitrosopumilaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospiraceae</code>
+                    <definition>Family Nitrospiraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nostocaceae</code>
+                    <definition>Family Nostocaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>NS11-12_marine_group</code>
+                    <definition>Family NS11-12_marine_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>NS9_marine_group</code>
+                    <definition>Family NS9_marine_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oligoflexaceae</code>
+                    <definition>Family Oligoflexaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Omnitrophaceae</code>
+                    <definition>Family Omnitrophaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Opitutaceae</code>
+                    <definition>Family Opitutaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oxalobacteraceae</code>
+                    <definition>Family Oxalobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P3OB-42</code>
+                    <definition>Family P3OB-42</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paludibacteraceae</code>
+                    <definition>Family Paludibacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paracaedibacteraceae</code>
+                    <definition>Family Paracaedibacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parachlamydiaceae</code>
+                    <definition>Family Parachlamydiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parvibaculaceae</code>
+                    <definition>Family Parvibaculaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pedosphaeraceae</code>
+                    <definition>Family Pedosphaeraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phormidiaceae</code>
+                    <definition>Family Phormidiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phycisphaeraceae</code>
+                    <definition>Family Phycisphaeraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pirellulaceae</code>
+                    <definition>Family Pirellulaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Piscirickettsiaceae</code>
+                    <definition>Family Piscirickettsiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Polyangiaceae</code>
+                    <definition>Family Polyangiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Prolixibacteraceae</code>
+                    <definition>Family Prolixibacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudanabaenaceae</code>
+                    <definition>Family Pseudanabaenaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudomonadaceae</code>
+                    <definition>Family Pseudomonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Puniceicoccaceae</code>
+                    <definition>Family Puniceicoccaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Reyranellaceae</code>
+                    <definition>Family Reyranellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhizobiaceae</code>
+                    <definition>Family Rhizobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhizobiales_Incertae_Sedis</code>
+                    <definition>Family Rhizobiales_Incertae_Sedis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodanobacteraceae</code>
+                    <definition>Family Rhodanobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodobacteraceae</code>
+                    <definition>Family Rhodobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodocyclaceae</code>
+                    <definition>Family Rhodocyclaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodospirillaceae</code>
+                    <definition>Family Rhodospirillaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rickettsiaceae</code>
+                    <definition>Family Rickettsiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rickettsiales_Incertae_Sedis</code>
+                    <definition>Family Rickettsiales_Incertae_Sedis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rikenellaceae</code>
+                    <definition>Family Rikenellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Roseiflexaceae</code>
+                    <definition>Family Roseiflexaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rubinisphaeraceae</code>
+                    <definition>Family Rubinisphaeraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rubritaleaceae</code>
+                    <definition>Family Rubritaleaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ruminococcaceae</code>
+                    <definition>Family Ruminococcaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sandaracinaceae</code>
+                    <definition>Family Sandaracinaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Saprospiraceae</code>
+                    <definition>Family Saprospiraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Schlesneriaceae</code>
+                    <definition>Family Schlesneriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Simkaniaceae</code>
+                    <definition>Family Simkaniaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SM2D12</code>
+                    <definition>Family SM2D12</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solibacteraceae_(Subgroup_3)</code>
+                    <definition>Family Solibacteraceae_Subgroup_3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solimonadaceae</code>
+                    <definition>Family Solimonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solirubrobacteraceae</code>
+                    <definition>Family Solirubrobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingobacteriaceae</code>
+                    <definition>Family Sphingobacteriaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingomonadaceae</code>
+                    <definition>Family Sphingomonadaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirochaetaceae</code>
+                    <definition>Family Spirochaetaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirosomaceae</code>
+                    <definition>Family Spirosomaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sporichthyaceae</code>
+                    <definition>Family Sporichthyaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SR-FBR-L83</code>
+                    <definition>Family SR-FBR-L83</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Staphylococcaceae</code>
+                    <definition>Family Staphylococcaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Steroidobacteraceae</code>
+                    <definition>Family Steroidobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Streptococcaceae</code>
+                    <definition>Family Streptococcaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sulfurospirillaceae</code>
+                    <definition>Family Sulfurospirillaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Syntrophaceae</code>
+                    <definition>Family Syntrophaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>T34</code>
+                    <definition>Family T34</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Terrimicrobiaceae</code>
+                    <definition>Family Terrimicrobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Thioglobaceae</code>
+                    <definition>Family Thioglobaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>TRA3-20</code>
+                    <definition>Family TRA3-20</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>UBA12409</code>
+                    <definition>Family UBA12409</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown_Family</code>
+                    <definition>Family Unknown_Family</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Veillonellaceae</code>
+                    <definition>Family Veillonellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Vermiphilaceae</code>
+                    <definition>Family Vermiphilaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Verrucomicrobiaceae</code>
+                    <definition>Family Verrucomicrobiaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>WD2101_soil_group</code>
+                    <definition>Family WD2101_soil_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Weeksellaceae</code>
+                    <definition>Family Weeksellaceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Xanthobacteraceae</code>
+                    <definition>Family Xanthobacteraceae</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Xiphinematobacteraceae</code>
+                    <definition>Family Xiphinematobacteraceae</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>Genus</attributeName>
+          <attributeDefinition>Genus</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>966-1</code>
+                    <definition>Genus 966-1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ac37b</code>
+                    <definition>Genus Ac37b</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidibacter</code>
+                    <definition>Genus Acidibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidothermus</code>
+                    <definition>Genus Acidothermus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acidovorax_temperans</code>
+                    <definition>Genus Acidovorax_temperans</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Acinetobacter</code>
+                    <definition>Genus Acinetobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aeromonas</code>
+                    <definition>Genus Aeromonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Afipia</code>
+                    <definition>Genus Afipia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Algoriphagus</code>
+                    <definition>Genus Algoriphagus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Alkanindiges</code>
+                    <definition>Genus Alkanindiges</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Allorhizobium-Neorhizobium-Pararhizobium-Rhizobium</code>
+                    <definition>Genus Allorhizobium-Neorhizobium-Pararhizobium-Rhizobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>alphaI_cluster</code>
+                    <definition>Genus alphaI_cluster</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Alsobacter</code>
+                    <definition>Genus Alsobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Anaeromyxobacter</code>
+                    <definition>Genus Anaeromyxobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aphanizomenon_NIES81</code>
+                    <definition>Genus Aphanizomenon_NIES81</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aquabacterium</code>
+                    <definition>Genus Aquabacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Arcicella</code>
+                    <definition>Genus Arcicella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Arcobacter</code>
+                    <definition>Genus Arcobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Armatimonas</code>
+                    <definition>Genus Armatimonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Asinibacterium</code>
+                    <definition>Genus Asinibacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Aurantimicrobium</code>
+                    <definition>Genus Aurantimicrobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bacteriovorax</code>
+                    <definition>Genus Bacteriovorax</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bdellovibrio</code>
+                    <definition>Genus Bdellovibrio</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Beijerinckia</code>
+                    <definition>Genus Beijerinckia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bradyrhizobium</code>
+                    <definition>Genus Bradyrhizobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Brevundimonas</code>
+                    <definition>Genus Brevundimonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Bryobacter</code>
+                    <definition>Genus Bryobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>BSV13</code>
+                    <definition>Genus BSV13</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Calothrix_KVSF5</code>
+                    <definition>Genus Calothrix_KVSF5</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Alysiosphaera</code>
+                    <definition>Genus Candidatus_Alysiosphaera</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Amoebophilus</code>
+                    <definition>Genus Candidatus_Amoebophilus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Aquiluna</code>
+                    <definition>Genus Candidatus_Aquiluna</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Arcanobacter</code>
+                    <definition>Genus Candidatus_Arcanobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Berkiella</code>
+                    <definition>Genus Candidatus_Berkiella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Captivus</code>
+                    <definition>Genus Candidatus_Captivus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Endoecteinascidia</code>
+                    <definition>Genus Candidatus_Endoecteinascidia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Finniella</code>
+                    <definition>Genus Candidatus_Finniella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Gigarickettsia</code>
+                    <definition>Genus Candidatus_Gigarickettsia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Hepatincola</code>
+                    <definition>Genus Candidatus_Hepatincola</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Limnoluna</code>
+                    <definition>Genus Candidatus_Limnoluna</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Megaira</code>
+                    <definition>Genus Candidatus_Megaira</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Methylopumilus</code>
+                    <definition>Genus Candidatus_Methylopumilus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Nitrosoarchaeum</code>
+                    <definition>Genus Candidatus_Nitrosoarchaeum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Omnitrophus</code>
+                    <definition>Genus Candidatus_Omnitrophus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Ovatusbacter</code>
+                    <definition>Genus Candidatus_Ovatusbacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Planktoluna</code>
+                    <definition>Genus Candidatus_Planktoluna</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Planktophila</code>
+                    <definition>Genus Candidatus_Planktophila</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Rhabdochlamydia</code>
+                    <definition>Genus Candidatus_Rhabdochlamydia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Solibacter</code>
+                    <definition>Genus Candidatus_Solibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Candidatus_Xiphinematobacter</code>
+                    <definition>Genus Candidatus_Xiphinematobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Caulobacter</code>
+                    <definition>Genus Caulobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cellvibrio</code>
+                    <definition>Genus Cellvibrio</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cephaloticoccus</code>
+                    <definition>Genus Cephaloticoccus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cerasicoccus</code>
+                    <definition>Genus Cerasicoccus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cetobacterium</code>
+                    <definition>Genus Cetobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chryseobacterium</code>
+                    <definition>Genus Chryseobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Chthoniobacter</code>
+                    <definition>Genus Chthoniobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>CL500-29_marine_group</code>
+                    <definition>Genus CL500-29_marine_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>CL500-3</code>
+                    <definition>Genus CL500-3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Clostridium_sensu_stricto_13</code>
+                    <definition>Genus Clostridium_sensu_stricto_13</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Conexibacter</code>
+                    <definition>Genus Conexibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Crenothrix</code>
+                    <definition>Genus Crenothrix</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cryobacterium</code>
+                    <definition>Genus Cryobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cyanobium_PCC-6307</code>
+                    <definition>Genus Cyanobium_PCC-6307</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Cytophaga</code>
+                    <definition>Genus Cytophaga</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deefgea</code>
+                    <definition>Genus Deefgea</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Deinococcus</code>
+                    <definition>Genus Deinococcus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Devosia</code>
+                    <definition>Genus Devosia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Dinghuibacter</code>
+                    <definition>Genus Dinghuibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Duganella</code>
+                    <definition>Genus Duganella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Dysgonomonas</code>
+                    <definition>Genus Dysgonomonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ellin6067</code>
+                    <definition>Genus Ellin6067</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Emticicia</code>
+                    <definition>Genus Emticicia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Enhydrobacter</code>
+                    <definition>Genus Enhydrobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ferruginibacter</code>
+                    <definition>Genus Ferruginibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fibrella</code>
+                    <definition>Genus Fibrella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Flavobacterium</code>
+                    <definition>Genus Flavobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Flectobacillus</code>
+                    <definition>Genus Flectobacillus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fluviicola</code>
+                    <definition>Genus Fluviicola</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Fodinicola</code>
+                    <definition>Genus Fodinicola</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>FukuN18_freshwater_group</code>
+                    <definition>Genus FukuN18_freshwater_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>FukuN57</code>
+                    <definition>Genus FukuN57</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ga0074140</code>
+                    <definition>Genus Ga0074140</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Geminocystis_PCC-6308</code>
+                    <definition>Genus Geminocystis_PCC-6308</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Geobacter</code>
+                    <definition>Genus Geobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Geothrix</code>
+                    <definition>Genus Geothrix</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>GKS98_freshwater_group</code>
+                    <definition>Genus GKS98_freshwater_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Gloeobacter_PCC-7421</code>
+                    <definition>Genus Gloeobacter_PCC-7421</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Haematospirillum</code>
+                    <definition>Genus Haematospirillum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Haliscomenobacter</code>
+                    <definition>Genus Haliscomenobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Herbaspirillum</code>
+                    <definition>Genus Herbaspirillum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Herminiimonas</code>
+                    <definition>Genus Herminiimonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>hgcI_clade</code>
+                    <definition>Genus hgcI_clade</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hirschia</code>
+                    <definition>Genus Hirschia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hymenobacter</code>
+                    <definition>Genus Hymenobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Hyphomicrobium</code>
+                    <definition>Genus Hyphomicrobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>IMCC26134</code>
+                    <definition>Genus IMCC26134</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Iodobacter</code>
+                    <definition>Genus Iodobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Janthinobacterium</code>
+                    <definition>Genus Janthinobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>JGI_0001001-H03</code>
+                    <definition>Genus JGI_0001001-H03</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kamptonema_PCC-6407</code>
+                    <definition>Genus Kamptonema_PCC-6407</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Kinneretia</code>
+                    <definition>Genus Kinneretia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Klebsiella</code>
+                    <definition>Genus Klebsiella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lacihabitans</code>
+                    <definition>Genus Lacihabitans</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lactococcus</code>
+                    <definition>Genus Lactococcus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lacunisphaera</code>
+                    <definition>Genus Lacunisphaera</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Lautropia</code>
+                    <definition>Genus Lautropia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>LD29</code>
+                    <definition>Genus LD29</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Legionella</code>
+                    <definition>Genus Legionella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Leptolyngbya_ANT.L52.2</code>
+                    <definition>Genus Leptolyngbya_ANT.L52.2</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Limnohabitans</code>
+                    <definition>Genus Limnohabitans</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Luteolibacter</code>
+                    <definition>Genus Luteolibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Massilia</code>
+                    <definition>Genus Massilia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylobacter</code>
+                    <definition>Genus Methylobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylobacterium</code>
+                    <definition>Genus Methylobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylorosula</code>
+                    <definition>Genus Methylorosula</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Methylotenera</code>
+                    <definition>Genus Methylotenera</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>MSBL3</code>
+                    <definition>Genus MSBL3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Mucilaginibacter</code>
+                    <definition>Genus Mucilaginibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>MWH-Ta3</code>
+                    <definition>Genus MWH-Ta3</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Mycobacterium</code>
+                    <definition>Genus Mycobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Unknown Genus</code>
+                    <definition>Unknown Genus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nevskia</code>
+                    <definition>Genus Nevskia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospira</code>
+                    <definition>Genus Nitrospira</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nitrospirillum</code>
+                    <definition>Genus Nitrospirillum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Nostoc_PCC-7107</code>
+                    <definition>Genus Nostoc_PCC-7107</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Novosphingobium</code>
+                    <definition>Genus Novosphingobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>NS10_marine_group</code>
+                    <definition>Genus NS10_marine_group</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>OLB12</code>
+                    <definition>Genus OLB12</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Oligoflexus</code>
+                    <definition>Genus Oligoflexus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>OM27_clade</code>
+                    <definition>Genus OM27_clade</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Opitutus</code>
+                    <definition>Genus Opitutus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ottowia</code>
+                    <definition>Genus Ottowia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pajaroellobacter</code>
+                    <definition>Genus Pajaroellobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paludibacter</code>
+                    <definition>Genus Paludibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paludibaculum</code>
+                    <definition>Genus Paludibaculum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parafrigoribacterium</code>
+                    <definition>Genus Parafrigoribacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parasediminibacterium</code>
+                    <definition>Genus Parasediminibacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Parvibaculum</code>
+                    <definition>Genus Parvibaculum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Paucibacter</code>
+                    <definition>Genus Paucibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pedobacter</code>
+                    <definition>Genus Pedobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Peredibacter</code>
+                    <definition>Genus Peredibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phenylobacterium</code>
+                    <definition>Genus Phenylobacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Phormidium_CYN64</code>
+                    <definition>Genus Phormidium_CYN64</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pirellula</code>
+                    <definition>Genus Pirellula</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Piscinibacter</code>
+                    <definition>Genus Piscinibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Polaromonas</code>
+                    <definition>Genus Polaromonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Polymorphobacter</code>
+                    <definition>Genus Polymorphobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Polynucleobacter</code>
+                    <definition>Genus Polynucleobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Porphyrobacter</code>
+                    <definition>Genus Porphyrobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Prosthecobacter</code>
+                    <definition>Genus Prosthecobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudanabaena_PCC-7429</code>
+                    <definition>Genus Pseudanabaena_PCC-7429</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudarcicella</code>
+                    <definition>Genus Pseudarcicella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudoclavibacter</code>
+                    <definition>Genus Pseudoclavibacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudomonas</code>
+                    <definition>Genus Pseudomonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Pseudorhodobacter</code>
+                    <definition>Genus Pseudorhodobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Psychroglaciecola</code>
+                    <definition>Genus Psychroglaciecola</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ralstonia</code>
+                    <definition>Genus Ralstonia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Reyranella</code>
+                    <definition>Genus Reyranella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhizorhapis</code>
+                    <definition>Genus Rhizorhapis</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodobacter</code>
+                    <definition>Genus Rhodobacter</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodoferax</code>
+                    <definition>Genus Rhodoferax</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodoluna</code>
+                    <definition>Genus Rhodoluna</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodovarius</code>
+                    <definition>Genus Rhodovarius</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rhodovastum</code>
+                    <definition>Genus Rhodovastum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rickettsia</code>
+                    <definition>Genus Rickettsia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Roseateles</code>
+                    <definition>Genus Roseateles</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Roseococcus</code>
+                    <definition>Genus Roseococcus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Roseomonas</code>
+                    <definition>Genus Roseomonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Rudanella</code>
+                    <definition>Genus Rudanella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Ruminococcaceae_UCG-014</code>
+                    <definition>Genus Ruminococcaceae_UCG-014</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Runella</code>
+                    <definition>Genus Runella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Salinispira</code>
+                    <definition>Genus Salinispira</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sandaracinus</code>
+                    <definition>Genus Sandaracinus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sandarakinorhabdus</code>
+                    <definition>Genus Sandarakinorhabdus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Schlesneria</code>
+                    <definition>Genus Schlesneria</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sediminibacterium</code>
+                    <definition>Genus Sediminibacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SH-PL14</code>
+                    <definition>Genus SH-PL14</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Silvanigrella</code>
+                    <definition>Genus Silvanigrella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Simplicispira</code>
+                    <definition>Genus Simplicispira</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>SM1A02</code>
+                    <definition>Genus SM1A02</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Smithella</code>
+                    <definition>Genus Smithella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Snowella_0TU37S04</code>
+                    <definition>Genus Snowella_0TU37S04</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Solitalea</code>
+                    <definition>Genus Solitalea</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingomonas</code>
+                    <definition>Genus Sphingomonas</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sphingorhabdus</code>
+                    <definition>Genus Sphingorhabdus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirochaeta_2</code>
+                    <definition>Genus Spirochaeta_2</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Spirosoma</code>
+                    <definition>Genus Spirosoma</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sporichthya</code>
+                    <definition>Genus Sporichthya</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Staphylococcus</code>
+                    <definition>Genus Staphylococcus</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Sulfurospirillum</code>
+                    <definition>Genus Sulfurospirillum</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Terrimicrobium</code>
+                    <definition>Genus Terrimicrobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Treponema_2</code>
+                    <definition>Genus Treponema_2</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Tychonema_CCAP_1459-11B</code>
+                    <definition>Genus Tychonema_CCAP_1459-11B</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>UKL13-1</code>
+                    <definition>Genus UKL13-1</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Undibacterium</code>
+                    <definition>Genus Undibacterium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Variovorax</code>
+                    <definition>Genus Variovorax</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Verrucomicrobium</code>
+                    <definition>Genus Verrucomicrobium</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Vogesella</code>
+                    <definition>Genus Vogesella</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Yersinia</code>
+                    <definition>Genus Yersinia</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Z-35</code>
+                    <definition>Genus Z-35</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Zavarzinella</code>
+                    <definition>Genus Zavarzinella</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>1329</numberOfRecords>
+    </dataTable>
+  </dataset>
+</eml:eml>

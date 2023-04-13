@@ -216,9 +216,49 @@ public class DataCiteMetadata extends CitationMetadata {
 
 		if (creators != null) {
 			for (ResponsibleParty creator : creators) {
-			  String creatorName = creator.getCreatorName();
+				String creatorName = creator.getCreatorName();
 				sb.append("        <creator>\n");
-				sb.append(String.format("            <creatorName>%s</creatorName>\n", creatorName));
+				sb.append(
+						String.format("            <creatorName>%s</creatorName>\n", creatorName));
+
+				// Add name identifier if available
+				String userId = creator.getUserId();
+				String userIdDirectory = creator.getUserIdDirectory();
+				if (userId != null && userIdDirectory != null) {
+					String nameIdentifier = null;
+					String nameIdentifierScheme = null;
+					String schemeUri = null;
+					boolean addNameIdentifier = true;
+					if (userIdDirectory.matches("https?://orcid.org.*")) {
+						nameIdentifier = userId.replaceAll("https?://orcid.org/", "");
+						nameIdentifierScheme = "ORCID";
+						schemeUri = "https://orcid.org";
+					}
+					else if (userIdDirectory.matches("https?://ror.org.*")) {
+						nameIdentifier = userId;
+						nameIdentifierScheme = "ROR";
+						schemeUri = "https://ror.org/";
+					}
+					else if (userIdDirectory.matches("https?://isni.org.*")) {
+						nameIdentifier = userId;
+						nameIdentifierScheme = "ISNI";
+						schemeUri = "https://isni.org/";
+					}
+					else if (userIdDirectory.matches("https?://www.grid.ac.*")) {
+						nameIdentifier = userId;
+						nameIdentifierScheme = "GRID";
+						schemeUri = "https://www.grid.ac/";
+					}
+					else {
+						addNameIdentifier = false;
+					}
+					if (addNameIdentifier) {
+						sb.append(String.format(
+								"            <nameIdentifier nameIdentifierScheme=\"%s\" schemeURI=\"%s\">%s</nameIdentifier>\n",
+								nameIdentifierScheme, schemeUri, nameIdentifier));
+					}
+				}
+
 				sb.append("        </creator>\n");
 			}
 		}
