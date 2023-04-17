@@ -75,6 +75,7 @@
   <target name="clean" description="Deletes compiled classes">
     <delete dir="${classes.dir}"/>
     <delete dir="${jar.dir}"/>
+    <delete dir="${lib.dir}"/>
   </target>
 
   <target name="jar" depends="compile">
