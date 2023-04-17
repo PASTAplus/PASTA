@@ -52,7 +52,7 @@
         <include name="serializer.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/unboundid">
-        <include name="unboundid-ldapsdk-se.jar"/>
+        <include name="unboundid-ldapsdk.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
         <include name="eml-2.1.0.jar"/>
