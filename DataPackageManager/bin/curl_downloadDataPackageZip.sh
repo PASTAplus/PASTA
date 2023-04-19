@@ -7,7 +7,7 @@ set -e # exit on error
 HOST="http://localhost:8088"
 
 [[ $# -ne 4 ]] && {
-  echo "Usage: $0 <uid> <scope> <revision> <revision>"
+  echo "Usage: $0 <uid> <scope> <identifier> <revision>"
   exit 1
 }
 

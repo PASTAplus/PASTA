@@ -6,9 +6,7 @@
     <creators>
         <creator>
             <creatorName>A Surname, A Given Name 1 A Given Name 2</creatorName>
-            <nameIdentifier>0000-0003-2604-299X</nameIdentifier>
-            <nameIdentifierScheme>ORCID</nameIdentifierScheme>
-            <schemeUri>https://orcid.org</schemeUri>
+            <nameIdentifier nameIdentifierScheme="ORCID" schemeUri="https://orcid.org">0000-0003-2604-299X</nameIdentifier>
         </creator>
     </creators>
     <titles>

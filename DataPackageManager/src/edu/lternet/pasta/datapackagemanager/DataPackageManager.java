@@ -2963,7 +2963,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	public File getMetadataFile(String scope, Integer identifier,
 	    String revision, String user, AuthToken authToken)
 	    throws ClassNotFoundException, SQLException, ClientProtocolException,
-	    IOException, Exception {
+	    IOException, UnauthorizedException {
 		String entityId = null;
 		File levelOneEMLFile = null;
 		boolean hasDataPackage = false;
