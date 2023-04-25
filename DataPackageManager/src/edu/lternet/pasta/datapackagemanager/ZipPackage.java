@@ -4,7 +4,6 @@ import edu.lternet.pasta.common.EmlPackageId;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.ucsb.nceas.utilities.Options;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -13,8 +12,11 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -59,35 +61,32 @@ public class ZipPackage {
 
   private void initConfig()
   {
-    configurationListener = new ConfigurationListener();
-    configurationListener.initialize(CONFIG_PATH);
     options = ConfigurationListener.getOptions();
+    if (options == null) {
+      configurationListener = new ConfigurationListener();
+      configurationListener.initialize(CONFIG_PATH);
+      options = ConfigurationListener.getOptions();
+    }
   }
 
-  /**
-   * @return Stream of zip file bytes
-   */
-  public String getZipStream()
+  public void writeZip(OutputStream outputStream) throws Exception
   {
-    return "test";
+    List<ZipMember> zipMemberList = create();
+    ZipStreamer z = new ZipStreamer();
+    z.zipStream(outputStream, zipMemberList);
   }
 
-  /**
-   * @return String of manifest file
-   * @throws Exception
-   */
-  public String createManifest(
+
+  public List<ZipMember> create(
   ) throws Exception
   {
+    List<ZipMember> zipMemberList = new ArrayList<>();
+
     EmlPackageId emlPackageId = new EmlPackageId(this.scope, this.identifier, this.revision);
     StringBuilder manifestBuilder = new StringBuilder();
     Date now = new Date();
-
-    String userHash = DigestUtils.md5Hex(this.userId);
-    String packageId = String.format(
-        "%s.%s.%s", this.scope, this.identifier.toString(), this.revision.toString());
-    String zipName = String.format("%s-%s.zip", packageId, userHash);
-
+    String zipName = String.format(
+        "%s.%s.%s.zip", this.scope, this.identifier.toString(), this.revision.toString());
     manifestBuilder.append(String.format("Manifest file for %s created on %s\n", zipName, now));
 
     String resourceMapStr = this.dataPackageManager.readDataPackage(this.scope, this.identifier,
@@ -100,22 +99,28 @@ public class ZipPackage {
       String line = mapScanner.nextLine();
       // metadata/eml/
       if (line.contains(URI_MIDDLE_METADATA)) {
+        // Add the EML XML file
+        File emlXmlFile = getEmlFile();
+        String emlXmlName = String.format("%s.xml", emlPackageId);
+        long emlXmlSize = emlXmlFile.length();
+        manifestBuilder.append(String.format("%s (%d bytes)\n", emlXmlName, emlXmlSize));
+        zipMemberList.add(new ZipMember(emlXmlName, emlXmlFile.toPath()));
+        // Add plain text representation of the EML XML file
         String emlXmlStr = getEml();
-        manifestBuilder.append(String.format("%s.xml (%d bytes)\n", emlPackageId,
-            emlXmlStr.getBytes(StandardCharsets.UTF_8).length
-        ));
         String emlTxtStr = transformXml(emlXmlStr, XSLT_FILE_NAME);
-        manifestBuilder.append(String.format("%s.txt (%d bytes)\n", emlPackageId,
+        String emlTxtName = String.format("%s.txt", emlPackageId);
+        manifestBuilder.append(String.format("%s (%d bytes)\n", emlTxtName,
             emlTxtStr.getBytes(StandardCharsets.UTF_8).length
         ));
+        zipMemberList.add(new ZipMember(emlTxtName, emlTxtStr.getBytes(StandardCharsets.UTF_8)));
       }
       // report/eml/
       else if (line.contains(URI_MIDDLE_REPORT)) {
-        String reportStr = getReport(emlPackageId);
-        String objectName = String.format("%s.report.xml", emlPackageId);
-        manifestBuilder.append(String.format("%s (%d bytes)\n", objectName,
-            reportStr.getBytes(StandardCharsets.UTF_8).length
-        ));
+        File reportFile = getReportFile(emlPackageId);
+        String reportName = String.format("%s.report.xml", emlPackageId);
+        long reportSize = reportFile.length();
+        manifestBuilder.append(String.format("%s (%d bytes)\n", reportName, reportSize));
+        zipMemberList.add(new ZipMember(reportName, reportFile.toPath()));
       }
       // data/eml/
       else if (line.contains(URI_MIDDLE_DATA)) {
@@ -142,18 +147,23 @@ public class ZipPackage {
           continue;
         }
         String objectName = dataPackageManager.findObjectName(metaXml, entityName);
-        String entityStr = getEntity(entityId);
-        manifestBuilder.append(String.format("%s (%d bytes)\n", objectName,
-            entityStr.getBytes(StandardCharsets.UTF_8).length
-        ));
+        File dataFile = getDataFile(entityId);
+        long dataSize = dataFile.length();
+        manifestBuilder.append(String.format("%s (%d bytes)\n", objectName, dataSize));
+        zipMemberList.add(new ZipMember(objectName, dataFile.toPath()));
       }
     }
-    return manifestBuilder.toString();
+
+    zipMemberList.add(new ZipMember("manifest.txt", manifestBuilder
+        .toString()
+        .getBytes(StandardCharsets.UTF_8)));
+
+    return zipMemberList;
   }
 
   private String transformXml(
       String xml,
-      String xsltName
+      @SuppressWarnings("SameParameterValue") String xsltName
   ) throws TransformerException
   {
     String xslPath = String.format("%s/%s", this.xslDir, xsltName);
@@ -171,33 +181,130 @@ public class ZipPackage {
 
   /**
    * Get EML metadata doc as a string.
-   *
+   * <p>
    * If the user is not authorized to read the EML document, throws UnauthorizedException..
    *
    * @return the EML document as a string
    */
-  private String getEml() throws SQLException, IOException, ClassNotFoundException
+  public String getEml() throws SQLException, IOException, ClassNotFoundException
   {
-    File f = dataPackageManager.getMetadataFile(this.scope, this.identifier,
-        this.revision.toString(), this.userId, this.authToken
-    );
-    return FileUtils.readFileToString(f);
+    return FileUtils.readFileToString(getEmlFile());
   }
 
-  private String getReport(EmlPackageId emlPackageId)
+  public File getEmlFile() throws ClassNotFoundException, SQLException, IOException
+  {
+    return getMetadataFile();
+  }
+
+  public File getMetadataFile() throws ClassNotFoundException, SQLException, IOException
+  {
+    return dataPackageManager.getMetadataFile(this.scope, this.identifier, this.revision.toString(),
+        this.userId, this.authToken
+    );
+  }
+
+  public String getReport(EmlPackageId emlPackageId)
       throws SQLException, IOException, ClassNotFoundException
   {
-    File f = this.dataPackageManager.readDataPackageReport(this.scope, this.identifier,
-        this.revision.toString(), emlPackageId, this.authToken, this.userId
-    );
-    return FileUtils.readFileToString(f);
+    return FileUtils.readFileToString(getReportFile(emlPackageId));
   }
 
-  private String getEntity(String entityId) throws Exception
+  public File getReportFile(EmlPackageId emlPackageId)
+      throws ClassNotFoundException, SQLException, IOException
   {
-    File f = dataPackageManager.getDataEntityFile(this.scope, this.identifier,
+    return this.dataPackageManager.readDataPackageReport(this.scope, this.identifier,
+        this.revision.toString(), emlPackageId, this.authToken, this.userId
+    );
+  }
+
+  public String getEntity(String entityId) throws Exception
+  {
+    return FileUtils.readFileToString(getDataFile(entityId));
+  }
+
+  public File getDataFile(String entityId) throws Exception
+  {
+    return dataPackageManager.getDataEntityFile(this.scope, this.identifier,
         this.revision.toString(), entityId, this.authToken, this.userId
     );
-    return FileUtils.readFileToString(f);
+  }
+}
+
+// Represent a zip entry and its corresponding file path.
+// The name is required, along with either a file path or an input stream.
+class ZipMember {
+  String name;
+  Path path;
+  InputStream stream;
+  Integer streamSize;
+  byte[] bytes;
+
+  public ZipMember(
+      String name,
+      Path file
+  )
+  {
+    this.name = name;
+    this.path = file;
+  }
+
+  public ZipMember(
+      String name,
+      InputStream stream,
+      Integer streamSize
+  )
+  {
+    this.name = name;
+    this.stream = stream;
+    this.streamSize = streamSize;
+  }
+
+  public ZipMember(
+      String name,
+      byte[] bytes
+  )
+  {
+    this.name = name;
+    this.bytes = bytes;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public Path getPath()
+  {
+    return path;
+  }
+
+  public InputStream getStream()
+  {
+    return stream;
+  }
+
+  public byte[] getBytes()
+  {
+    return bytes;
+  }
+
+  public Integer getStreamSize()
+  {
+    return streamSize;
+  }
+
+  public boolean isPath()
+  {
+    return path != null;
+  }
+
+  public boolean isStream()
+  {
+    return stream != null;
+  }
+
+  public boolean isBytes()
+  {
+    return bytes != null;
   }
 }

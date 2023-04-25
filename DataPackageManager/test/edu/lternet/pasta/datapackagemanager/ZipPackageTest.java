@@ -4,6 +4,9 @@ import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.ucsb.nceas.utilities.Options;
 import org.junit.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 // import edu.lternet.pasta.datapackagemanager.ZipPackage;
@@ -55,18 +58,11 @@ public class ZipPackageTest {
   }
 
   @Test
-  public void testGetZipStream() throws Exception
+  public void testCreate() throws Exception
   {
     ZipPackage zipPackage = getZipPackage();
-    zipPackage.getZipStream();
-  }
-
-  @Test
-  public void testCreateManifest() throws Exception
-  {
-    ZipPackage zipPackage = getZipPackage();
-    String manifestStr = zipPackage.createManifest();
-    System.out.println(manifestStr);
+		List<ZipMember> zipMemberList = zipPackage.create();
+    // System.out.println(manifestStr);
   }
 
   private ZipPackage getZipPackage() throws Exception

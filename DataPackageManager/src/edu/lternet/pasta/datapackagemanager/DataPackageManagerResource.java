@@ -1103,64 +1103,58 @@ public class DataPackageManagerResource extends PastaWebService {
 	@GET
 	@Path("/download/eml/{scope}/{identifier}/{revision}")
 	@Produces("application/zip")
-	public Response downloadDataPackageArchive(@Context HttpHeaders headers,
-																						 @PathParam("scope") String scope,
-																						 @PathParam("identifier")
-																						 Integer identifier,
-																						 @PathParam("revision") Integer revision)
-			throws Exception
+	public Response downloadDataPackageArchive(
+			@Context HttpHeaders headers,
+			@PathParam("scope") String scope,
+			@PathParam("identifier") Integer identifier,
+			@PathParam("revision") Integer revision
+	) throws Exception
 	{
-		final String serviceMethodName = "createDataPackageArchive";
-		Rule.Permission permission = Rule.Permission.write;
 		AuthToken authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
 		// Is user authorized to run the 'createDataPackage' service method?
-		boolean serviceMethodAuthorized =
-				isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized("createDataPackageArchive",
+				Rule.Permission.write, authToken
+		);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
+			throw new UnauthorizedException(String.format(
+					"User %s is not authorized to execute service method createDataPackageArchive", userId));
 		}
 
 		if (this.readOnly) {
 			throw new ServiceUnavailableException("PASTA is now in read-only mode");
 		}
 
-		Response.ResponseBuilder responseBuilder = Response.status(Response.Status.ACCEPTED);
+		Response.ResponseBuilder responseBuilder;
 
+		// Create streaming ZIP response
+		DataPackageManager dpm = new DataPackageManager();
+		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken
+		);
+		try {
+			StreamingOutput streamingZipOutput = outputStream -> {
+				try {
+					zipPackage.writeZip(outputStream);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			};
+			responseBuilder = Response.status(Response.Status.OK);
+			responseBuilder.entity(streamingZipOutput);
+		} catch (ResourceNotFoundException e) {
+			responseBuilder = Response.status(Response.Status.NOT_FOUND);
+			responseBuilder.entity(e.getMessage());
+		} catch (UnauthorizedException e) {
+			responseBuilder = Response.status(Response.Status.UNAUTHORIZED);
+			responseBuilder.entity(e.getMessage());
+		} catch (Exception e) {
+			responseBuilder = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+			responseBuilder.entity(e.getMessage());
+		}
 
-		// Manifest
-
-		String userHash = DigestUtils.md5Hex(userId);
-		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
-		String zipName = packageId + "-" + userHash + ".zip";
-
-
-		// String manifest = createManifest();
-
-
-		// this.xslDir;
-
-		StreamingOutput streamingZipOutput = outputStream -> {
-			List<String> pathList = new ArrayList<>();
-			pathList.add("/tmp/zip/f1");
-			pathList.add("/tmp/zip/f2");
-			ZipStreamer z = new ZipStreamer();
-			z.zipStream(outputStream, pathList);
-		};
-
-		responseBuilder.entity(streamingZipOutput);
 		return responseBuilder.build();
 	}
-
-
-
-
-
-
-
 
 		/**
 		 * <strong>Create Reservation</strong> operation, creates a new
