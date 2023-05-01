@@ -52,7 +52,7 @@
         <include name="serializer.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/unboundid">
-        <include name="unboundid-ldapsdk-se.jar"/>
+        <include name="unboundid-ldapsdk.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/jaxb-eml-2.1.0">
         <include name="eml-2.1.0.jar"/>
@@ -67,7 +67,7 @@
         <include name="quickcheck-0.6.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/postgresql">
-        <include name="postgresql-42.2.5.jre7.jar"/>
+          <include name="**/*.jar"/>
       </fileset>
     </copy>
   </target>
@@ -75,6 +75,7 @@
   <target name="clean" description="Deletes compiled classes">
     <delete dir="${classes.dir}"/>
     <delete dir="${jar.dir}"/>
+    <delete dir="${lib.dir}"/>
   </target>
 
   <target name="jar" depends="compile">
