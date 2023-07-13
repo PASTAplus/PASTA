@@ -980,8 +980,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 */
 				String entityAccessXML = emlEntity.getAccessXML();
 				AccessMatrix entityAccessMatrix = new AccessMatrix(entityAccessXML);
-				authorizer.storeAccessMatrix(entityURI, entityAccessMatrix,
-				    mayOverwrite);
+				authorizer.storeAccessMatrix(entityURI, entityAccessMatrix, mayOverwrite);
 			}
 
 			/*
@@ -992,13 +991,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			
 			dataPackageRegistry.addDataPackageResource(metadataURI,
 			    ResourceType.metadata, resourceLocation, packageId, scope,
-			    identifier, revision, null, null, null, user, metadataFormatType, mayOverwrite);
+			    identifier, revision, null, null, null, user, metadataFormatType,
+				mayOverwrite);
 			
 			/*
 			 * Store the access control rules for the metadata resource
 			 */
-			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix,
-			    mayOverwrite);
+			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix, mayOverwrite);
 			
 		}
 
@@ -1020,8 +1019,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			/*
 			 * Store the access control rules for the quality report resource
 			 */
-			authorizer
-			    .storeAccessMatrix(reportURI, datasetAccessMatrix, mayOverwrite);
+			authorizer.storeAccessMatrix(reportURI, datasetAccessMatrix, mayOverwrite);
 		}
 
 		qualityReportXML = levelZeroDataPackage.getDataPackage().getQualityReport()
@@ -1055,8 +1053,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * Store the access control rules for the data package resource
 				 */
-				authorizer.storeAccessMatrix(dataPackageURI, datasetAccessMatrix,
-				    mayOverwrite);
+				authorizer.storeAccessMatrix(dataPackageURI, datasetAccessMatrix, mayOverwrite);
 				
 				/*
 				 * Add a DataPackageUpload object to the DataPackageUploadManager to update
