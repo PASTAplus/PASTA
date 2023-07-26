@@ -75,7 +75,20 @@ CREATE TABLE datapackagemanager.journal_citation (
   DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
   JOURNAL_TITLE   TEXT,                               -- name of the journal
   PACKAGE_ID      VARCHAR(100) NOT NULL,               -- packageId of source data package in PASTA
-  RELATION_TYPE datapackagemanager.relation_type NOT NULL -- type of relation between data package subject and citation object
+  RELATION_TYPE datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
+  PUB_DATE        DATE                                -- journal publication date
+);
+
+
+CREATE TABLE datapackagemanager.journal_citation_author
+(
+    id                  SERIAL PRIMARY KEY,
+    journal_citation_id INTEGER NOT NULL CONSTRAINT FK_JOURNAL_CITATION REFERENCES DATAPACKAGEMANAGER.JOURNAL_CITATION,
+    given               VARCHAR(32),
+    family              VARCHAR(32),
+    suffix              VARCHAR(8),
+    sequence            SMALLINT NOT NULL,
+    orcid               VARCHAR(16)
 );
 
 
