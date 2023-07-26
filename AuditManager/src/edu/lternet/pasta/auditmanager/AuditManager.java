@@ -857,7 +857,7 @@ public class AuditManager {
             "SELECT count(*) FROM %s", AUDIT_MANAGER_TABLE_QUALIFIED
         );
         queryStr += composeWhereClause(queryParams, false);
-        logger.info("queryStr: " + queryStr);
+        logger.debug("queryStr: " + queryStr);
 
         Statement stmt = null;
 
