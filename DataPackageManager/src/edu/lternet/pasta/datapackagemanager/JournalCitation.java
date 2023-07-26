@@ -1,27 +1,31 @@
 package edu.lternet.pasta.datapackagemanager;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerException;
-
 import edu.lternet.pasta.common.UserErrorException;
+import edu.lternet.pasta.doi.DigitalObjectIdentifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
+import org.owasp.encoder.Encode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import org.owasp.encoder.Encode;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 
-import edu.lternet.pasta.doi.DigitalObjectIdentifier;
+
 
 public class JournalCitation {
-    
+    DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     /*
      * Class variables
      */
@@ -41,6 +45,7 @@ public class JournalCitation {
     LocalDateTime dateCreated;
     String packageId;
     String journalTitle;
+    Date pubDate;
     String relationType;
     
 
@@ -63,6 +68,7 @@ public class JournalCitation {
                 sb.append("    <articleTitle>Mesquite Tree Survey in Southern Arizona</articleTitle>\n");
                 //sb.append("    <articleUrl>http://swtreejournal.com/articles/12345</articleUrl>\n");
                 sb.append("    <journalTitle>Journal of Southwest Trees</journalTitle>\n");
+                sb.append("    <pubDate>2020-12-31</pubDate>\n");
                 sb.append("</journalCitation>\n");
                 String requestXML = sb.toString();
                 JournalCitation journalCitation = dpm.createJournalCitation(userId, requestXML);
@@ -223,6 +229,13 @@ public class JournalCitation {
                 logger.error(gripe);
                 throw new UserErrorException(gripe);
             }
+
+            Node pubDateNode = xpathapi.selectSingleNode(document, "//pubDate");
+            if (pubDateNode != null) {
+              String pubDate = pubDateNode.getTextContent();
+              setPubDate(pubDate);
+            }
+
         }
       }
       catch (SAXException e) {
@@ -274,6 +287,9 @@ public class JournalCitation {
         
         if (this.relationType != null)
             { sb.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
+
+        if (this.pubDate != null)
+            { sb.append(String.format("    <pubDate>%s</pubDate>\n", Encode.forXml(getPubDateAsString()))); }
 
         sb.append("</journalCitation>\n");
 
@@ -395,4 +411,27 @@ public class JournalCitation {
         this.relationType = relationType;
     }
 
+    public Date getPubDate() {
+        return this.pubDate;
+    }
+
+    public java.sql.Date getPubDateAsSql() {
+        return this.pubDate != null ? new java.sql.Date(pubDate.getTime()) : null;
+    }
+
+    public String getPubDateAsString() {
+        return this.pubDate != null ? DATE_FORMAT.format(this.pubDate) : null;
+    }
+
+    public void setPubDate(Date pubDate) {
+        this.pubDate = pubDate;
+    }
+
+    public void setPubDate(String pubDate) {
+        try {
+            this.pubDate = pubDate != null && !pubDate.equals("") ? DATE_FORMAT.parse(pubDate) : null;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
