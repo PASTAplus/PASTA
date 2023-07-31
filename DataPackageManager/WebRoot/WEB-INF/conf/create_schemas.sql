@@ -76,7 +76,7 @@ CREATE TABLE datapackagemanager.journal_citation (
   JOURNAL_TITLE   TEXT,                               -- name of the journal
   PACKAGE_ID      VARCHAR(100) NOT NULL,               -- packageId of source data package in PASTA
   RELATION_TYPE datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
-  PUB_DATE        DATE                                -- journal publication date
+  PUB_YEAR        SMALLINT                                -- journal publication year (often called the publication date)
 );
 
 

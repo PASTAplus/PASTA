@@ -30,11 +30,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.TreeSet;
-import java.util.Date;
+
 import edu.lternet.pasta.common.*;
 import org.apache.log4j.Logger;
-
-import java.text.DateFormat;
 
 import com.sun.jersey.api.NotFoundException;
 import org.owasp.encoder.Encode;
@@ -4475,7 +4473,7 @@ public class DataPackageRegistry {
         LocalDateTime dateCreated = journalCitation.getDateCreated();
         String journalTitle = journalCitation.getJournalTitle();
         String relationType = journalCitation.getRelationType();
-        Date pubDate = journalCitation.getPubDate();
+        Integer journalPubYear = journalCitation.getJournalPubYear();
 
         // fmt:off
         // language=PostgreSQL
@@ -4489,7 +4487,7 @@ public class DataPackageRegistry {
                     "date_created, " +
                     "journal_title, " +
                     "relation_type, " +
-                    "pub_date " +
+                    "pub_year " +
                     "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
             JOURNAL_CITATION);
         // fmt:on
@@ -4508,7 +4506,7 @@ public class DataPackageRegistry {
           pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
           pstmt.setString(7, Objects.toString(journalTitle, ""));
           pstmt.setString(8, Objects.toString(relationType, "IsCitedBy"));
-          pstmt.setDate(9, pubDate != null ? new java.sql.Date(pubDate.getTime()) : null);
+          pstmt.setObject(9, journalPubYear, java.sql.Types.INTEGER);
           pstmt.executeUpdate();
 
           ResultSet rs = pstmt.getGeneratedKeys();
@@ -4545,7 +4543,7 @@ public class DataPackageRegistry {
       LocalDateTime dateCreated = journalCitation.getDateCreated();
       String journalTitle = journalCitation.getJournalTitle();
       String relationType = journalCitation.getRelationType();
-      java.sql.Date pubDate = journalCitation.getPubDateAsSql();
+      Integer journalPubYear = journalCitation.getJournalPubYear();
 
       // fmt:off
       // language=PostgreSQL
@@ -4558,7 +4556,7 @@ public class DataPackageRegistry {
               // "date_created=?," +
               "journal_title=?, " +
               "relation_type=?::datapackagemanager.relation_type, " +
-              "pub_date=? " +
+              "pub_year=? " +
               "WHERE journal_citation_id=? ",
           SqlEscape.name(JOURNAL_CITATION));
       // fmt:on
@@ -4577,7 +4575,7 @@ public class DataPackageRegistry {
         // pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
         pstmt.setString(6, Objects.toString(journalTitle, ""));
         pstmt.setString(7, Objects.toString(relationType, "IsCitedBy"));
-        pstmt.setDate(8, pubDate);
+        pstmt.setObject(8, journalPubYear, java.sql.Types.INTEGER);
         pstmt.setInt(9, journalCitationId);
         pstmt.executeUpdate();
         ResultSet rs = pstmt.getGeneratedKeys();
@@ -4677,7 +4675,7 @@ public class DataPackageRegistry {
                 String articleUrl = rs.getString("article_url");
                 String journalTitle = rs.getString("journal_title");
                 String relationType = rs.getString("relation_type");
-                Date pubDate = rs.getDate("pub_date");
+                Integer journalPubYear = rs.getInt("pub_year");
                 String principalOwner = rs.getString("principal_owner");
                 Timestamp ts = rs.getTimestamp("date_created");
                 LocalDateTime dateCreated = ts.toLocalDateTime();
@@ -4691,7 +4689,7 @@ public class DataPackageRegistry {
                 journalCitation.setJournalTitle(journalTitle);
                 journalCitation.setRelationType(relationType);
                 journalCitation.setDateCreated(dateCreated);
-                journalCitation.setPubDate(pubDate);
+                journalCitation.setJournalPubYear(journalPubYear);
                 journalCitations.add(journalCitation);
             }
         } catch (ClassNotFoundException e) {
@@ -4854,7 +4852,7 @@ public class DataPackageRegistry {
                   String relationType = rs.getString("relation_type");
                   String packageId = rs.getString("package_id");
                   Timestamp ts = rs.getTimestamp("date_created");
-                  Date pubDate = rs.getDate("pub_date");
+                  Integer journalPubYear = rs.getInt("pub_year");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
                   JournalCitation journalCitation = new JournalCitation();
                   journalCitation.setJournalCitationId(journalCitationId);
@@ -4866,7 +4864,7 @@ public class DataPackageRegistry {
                   journalCitation.setJournalTitle(journalTitle);
                   journalCitation.setRelationType(relationType);
                   journalCitation.setDateCreated(dateCreated);
-                  journalCitation.setPubDate(pubDate);
+                  journalCitation.setJournalPubYear(journalPubYear);
                   journalCitations.add(journalCitation);
               }
           } catch (ClassNotFoundException e) {
@@ -4915,7 +4913,7 @@ public class DataPackageRegistry {
                   String articleUrl = rs.getString("article_url");
                   String journalTitle = rs.getString("journal_title");
                   String relationType = rs.getString("relation_type");
-                  Date pubDate = rs.getDate("pub_date");
+                  Integer journalPubYear= rs.getInt("pub_year");
                   Timestamp ts = rs.getTimestamp("date_created");
                   LocalDateTime dateCreated = ts.toLocalDateTime();
                   JournalCitation journalCitation = new JournalCitation();
@@ -4928,7 +4926,7 @@ public class DataPackageRegistry {
                   journalCitation.setJournalTitle(journalTitle);
                   journalCitation.setRelationType(relationType);
                   journalCitation.setDateCreated(dateCreated);
-                  journalCitation.setPubDate(pubDate);
+                  journalCitation.setJournalPubYear(journalPubYear);
                   journalCitations.add(journalCitation);
               }
           } catch (ClassNotFoundException e) {

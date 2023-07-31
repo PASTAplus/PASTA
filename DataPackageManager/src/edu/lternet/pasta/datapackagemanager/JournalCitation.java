@@ -15,17 +15,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class JournalCitation {
-    DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     /*
      * Class variables
      */
@@ -45,7 +40,7 @@ public class JournalCitation {
     LocalDateTime dateCreated;
     String packageId;
     String journalTitle;
-    Date pubDate;
+    Integer journalPubYear;
     String relationType;
     
 
@@ -68,7 +63,7 @@ public class JournalCitation {
                 sb.append("    <articleTitle>Mesquite Tree Survey in Southern Arizona</articleTitle>\n");
                 //sb.append("    <articleUrl>http://swtreejournal.com/articles/12345</articleUrl>\n");
                 sb.append("    <journalTitle>Journal of Southwest Trees</journalTitle>\n");
-                sb.append("    <pubDate>2020-12-31</pubDate>\n");
+                sb.append("    <pubDate>2020</pubDate>\n");
                 sb.append("</journalCitation>\n");
                 String requestXML = sb.toString();
                 JournalCitation journalCitation = dpm.createJournalCitation(userId, requestXML);
@@ -233,7 +228,7 @@ public class JournalCitation {
             Node pubDateNode = xpathapi.selectSingleNode(document, "//pubDate");
             if (pubDateNode != null) {
               String pubDate = pubDateNode.getTextContent();
-              setPubDate(pubDate);
+              setJournalPubYear(pubDate);
             }
 
         }
@@ -288,8 +283,8 @@ public class JournalCitation {
         if (this.relationType != null)
             { sb.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
 
-        if (this.pubDate != null)
-            { sb.append(String.format("    <pubDate>%s</pubDate>\n", Encode.forXml(getPubDateAsString()))); }
+        if (this.journalPubYear != null)
+            { sb.append(String.format("    <pubDate>%s</pubDate>\n", Encode.forXml(getJournalPubYear().toString()))); }
 
         sb.append("</journalCitation>\n");
 
@@ -411,27 +406,43 @@ public class JournalCitation {
         this.relationType = relationType;
     }
 
-    public Date getPubDate() {
-        return this.pubDate;
+    public Integer getJournalPubYear() {
+        return this.journalPubYear;
     }
 
-    public java.sql.Date getPubDateAsSql() {
-        return this.pubDate != null ? new java.sql.Date(pubDate.getTime()) : null;
-    }
-
-    public String getPubDateAsString() {
-        return this.pubDate != null ? DATE_FORMAT.format(this.pubDate) : null;
-    }
-
-    public void setPubDate(Date pubDate) {
-        this.pubDate = pubDate;
-    }
-
-    public void setPubDate(String pubDate) {
-        try {
-            this.pubDate = pubDate != null && !pubDate.equals("") ? DATE_FORMAT.parse(pubDate) : null;
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+    public void setJournalPubYear(Integer journalPubYear) {
+        // ResultSet.getInt() returns 0 if the DB value is null.
+        if (journalPubYear == 0) {
+            journalPubYear = null;
         }
+        this.journalPubYear = journalPubYear;
+    }
+
+    /**
+     * Set journalPubYear from pubDate String in YYYY-MM-DD or YYYY format.
+     */
+    public void setJournalPubYear(String pubDate) {
+        if (pubDate == null || pubDate.equals("")) {
+            this.journalPubYear = null;
+            return;
+        }
+
+        Pattern pubYearMonthDayPattern = Pattern.compile("^(\\d{4})-\\d{2}-\\d{2}$");
+        Matcher pubYearMonthDayMatcher = pubYearMonthDayPattern.matcher(pubDate);
+        if (pubYearMonthDayMatcher.matches()) {
+            this.journalPubYear = Integer.valueOf(pubYearMonthDayMatcher.group(1));
+            return;
+        }
+
+        Pattern pubYearPattern = Pattern.compile("^(\\d{4})$");
+        Matcher pubYearMatcher = pubYearPattern.matcher(pubDate);
+        if (pubYearMatcher.matches()) {
+            this.journalPubYear = Integer.valueOf(pubYearMatcher.group(1));
+            return;
+        }
+
+        String errorMsg = String.format("Error extracting year from PubDate: %s", pubDate);
+        logger.error(errorMsg);
+        throw new RuntimeException(errorMsg);
     }
 }
