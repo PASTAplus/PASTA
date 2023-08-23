@@ -4478,7 +4478,7 @@ public class DataPackageRegistry {
         // fmt:off
         // language=PostgreSQL
         String queryStr = String.format(
-            "INSERT INTO %s (" +
+            "INSERT INTO %s ( " +
                     "package_id, " +
                     "principal_owner, " +
                     "article_doi, " +
@@ -4487,8 +4487,8 @@ public class DataPackageRegistry {
                     "date_created, " +
                     "journal_title, " +
                     "relation_type, " +
-                    "pub_year " +
-                    "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type)",
+                    "pub_year ) " +
+                    "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type,?) ",
             JOURNAL_CITATION);
         // fmt:on
 
