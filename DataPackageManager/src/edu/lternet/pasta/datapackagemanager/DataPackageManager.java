@@ -4083,7 +4083,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		journalCitation.setPrincipalOwner(userId);
 		journalCitation.setDateCreated(LocalDateTime.now());
 
-		Integer citationId = journalCitation.getJournalCitationId();
+		Integer journalCitationId = journalCitation.getJournalCitationId();
 		String packageId = journalCitation.getPackageId();
 		String articleDoi = journalCitation.getArticleDoi();
 		String articleUrl = journalCitation.getArticleUrl();
@@ -4104,7 +4104,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		if (articleDoi != null && !articleDoi.isEmpty()) {
-			if (dpr.journalArticleDoiExists(citationId, packageId, articleDoi)) {
+			if (dpr.journalArticleDoiExists(journalCitationId, packageId, articleDoi)) {
 				String msg = String.format(
 						"The journal DOI (%s) is already registered for another package", articleDoi);
 				logger.error(msg);
@@ -4113,7 +4113,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 
 		if (articleUrl != null && !articleUrl.isEmpty()) {
-			if (dpr.journalArticleUrlExists(citationId, packageId, articleUrl)) {
+			if (dpr.journalArticleUrlExists(journalCitationId, packageId, articleUrl)) {
 				String msg = String.format(
 						"The journal URL (%s) is already registered for another package", articleUrl);
 				logger.error(msg);

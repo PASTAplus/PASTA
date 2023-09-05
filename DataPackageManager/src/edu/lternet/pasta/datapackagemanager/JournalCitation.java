@@ -8,6 +8,7 @@ import org.apache.xpath.CachedXPathAPI;
 import org.owasp.encoder.Encode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,11 +17,95 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class JournalCitation {
+    public static class ArticleAuthor {
+        Integer sequence;
+        String given;
+        String family;
+        String suffix;
+        String shortOrcid;
+
+        public ArticleAuthor(Integer sequence, String given, String family, String suffix, String orcid) {
+            orcid = emptyToNull(orcid);
+            String shortOrcid = orcidUrlToShort(orcid);
+            assertOrcidCheckDigit(shortOrcid);
+            this.sequence = sequence;
+            this.given = emptyToNull(given);
+            this.family = emptyToNull(family);
+            this.suffix = emptyToNull(suffix);
+            this.shortOrcid = emptyToNull(shortOrcid);
+        }
+
+        private String emptyToNull(String s) {
+            if (s == null || s.isEmpty()) {
+                return null;
+            }
+            return s;
+        }
+        public Integer getSequence() {
+            return sequence;
+        }
+
+        public String getGiven() {
+            return given;
+        }
+
+        public String getFamily() {
+            return family;
+        }
+
+        public String getSuffix() {
+            return suffix;
+        }
+
+        public String getShortOrcid() {
+            return shortOrcid;
+        }
+
+        public String getOrcidUrl() {
+            return orcidShortToUrl(shortOrcid);
+        }
+
+        public static String orcidUrlToShort(String orcidUrl) {
+            if (orcidUrl != null) {
+                String orcidShortStr = orcidUrl.replaceAll("^https?://orcid.org/|-", "");
+                assert orcidShortStr.length() == 16;
+                return orcidShortStr;
+            }
+            return null;
+        }
+
+        public static String orcidShortToUrl(String orcidStr) {
+            if (orcidStr != null) {
+                assert orcidStr.length() == 16;
+                String formattedOrcid = orcidStr.replaceAll("(.{4})(?!$)", "$1-");
+                return "https://orcid.org/" + formattedOrcid;
+            }
+            return null;
+        }
+
+        public static void assertOrcidCheckDigit(String orcidStr) {
+            assert orcidStr == null || orcidStr.charAt(15) == generateOrcidCheckDigit(orcidStr);
+        }
+
+        public static char generateOrcidCheckDigit(String orcidStr) {
+            assert orcidStr.length() == 16;
+            int total = 0;
+            for (int i = 0; i < 15; i++) {
+                int digit = Character.getNumericValue(orcidStr.charAt(i));
+                total = (total + digit) * 2;
+            }
+            int remainder = total % 11;
+            int result = (12 - remainder) % 11;
+            return (result == 10) ? 'X' : (char) ('0' + result);
+        }
+    }
+
     /*
      * Class variables
      */
@@ -42,7 +127,7 @@ public class JournalCitation {
     String journalTitle;
     Integer journalPubYear;
     String relationType;
-    
+    ArrayList<ArticleAuthor> articleAuthorList = new ArrayList<>();
 
     
     public static void main(String[] args) {
@@ -231,6 +316,11 @@ public class JournalCitation {
               setJournalPubYear(pubDate);
             }
 
+            Node articleAuthorNode = xpathapi.selectSingleNode(document, "//articleAuthorList");
+            if (articleAuthorNode != null) {
+                setArticleAuthorList(articleAuthorNode);
+            }
+
         }
       }
       catch (SAXException e) {
@@ -258,38 +348,51 @@ public class JournalCitation {
      */
     public String toXML(boolean includeDeclaration) {
         String firstLine = includeDeclaration ? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" : "";
-        StringBuilder sb = new StringBuilder(firstLine);
-        sb.append("<journalCitation>\n");
+        StringBuilder xmlBuilder = new StringBuilder(firstLine);
+        xmlBuilder.append("<journalCitation>\n");
         
         if (this.journalCitationId > 0)
-            { sb.append(String.format("    <journalCitationId>%d</journalCitationId>\n", this.journalCitationId)); } 
+            { xmlBuilder.append(String.format("    <journalCitationId>%d</journalCitationId>\n", this.journalCitationId)); }
         
-        sb.append(String.format("    <packageId>%s</packageId>\n", this.packageId)); 
-        sb.append(String.format("    <principalOwner>%s</principalOwner>\n", this.principalOwner)); 
-        sb.append(String.format("    <dateCreated>%s</dateCreated>\n", getDateCreatedStr())); 
+        xmlBuilder.append(String.format("    <packageId>%s</packageId>\n", this.packageId));
+        xmlBuilder.append(String.format("    <principalOwner>%s</principalOwner>\n", this.principalOwner));
+        xmlBuilder.append(String.format("    <dateCreated>%s</dateCreated>\n", getDateCreatedStr()));
         
         if (this.articleDoi != null)
-            { sb.append(String.format("    <articleDoi>%s</articleDoi>\n", Encode.forXml(this.articleDoi))); }
+            { xmlBuilder.append(String.format("    <articleDoi>%s</articleDoi>\n", Encode.forXml(this.articleDoi))); }
         
         if (this.articleTitle != null)
-            { sb.append(String.format("    <articleTitle>%s</articleTitle>\n", Encode.forXml(this.articleTitle))); }
+            { xmlBuilder.append(String.format("    <articleTitle>%s</articleTitle>\n", Encode.forXml(this.articleTitle))); }
         
         if (this.articleUrl != null)
-            { sb.append(String.format("    <articleUrl>%s</articleUrl>\n", Encode.forXml(this.articleUrl))); }
+            { xmlBuilder.append(String.format("    <articleUrl>%s</articleUrl>\n", Encode.forXml(this.articleUrl))); }
     
         if (this.journalTitle != null)
-            { sb.append(String.format("    <journalTitle>%s</journalTitle>\n", Encode.forXml(this.journalTitle))); }
+            { xmlBuilder.append(String.format("    <journalTitle>%s</journalTitle>\n", Encode.forXml(this.journalTitle))); }
         
         if (this.relationType != null)
-            { sb.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
+            { xmlBuilder.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
 
         if (this.journalPubYear != null)
-            { sb.append(String.format("    <pubDate>%s</pubDate>\n", Encode.forXml(getJournalPubYear().toString()))); }
+            { xmlBuilder.append(String.format("    <pubDate>%d</pubDate>\n", getJournalPubYear())); }
 
-        sb.append("</journalCitation>\n");
+        if (this.articleAuthorList != null) {
+            xmlBuilder.append("    <articleAuthorList>\n");
+            for (ArticleAuthor author : this.articleAuthorList) {
+                xmlBuilder.append("        <author>\n");
+                xmlBuilder.append(String.format("            <sequence>%d</sequence>\n", author.getSequence()));
+                xmlBuilder.append(String.format("            <given>%s</given>\n",       Encode.forXml(author.getGiven() == null ? "" : author.getGiven())));
+                xmlBuilder.append(String.format("            <family>%s</family>\n",     Encode.forXml(author.getFamily() == null ? "" : author.getFamily())));
+                xmlBuilder.append(String.format("            <suffix>%s</suffix>\n",     Encode.forXml(author.getSuffix() == null ? "" : author.getSuffix())));
+                xmlBuilder.append(String.format("            <orcid>%s</orcid>\n",       Encode.forXml(author.getOrcidUrl() == null ? "" : author.getOrcidUrl())));
+                xmlBuilder.append("        </author>\n");
+            }
+            xmlBuilder.append("    </articleAuthorList>\n");
+        }
 
-        String xml = sb.toString();
-        return xml;
+        xmlBuilder.append("</journalCitation>\n");
+
+        return xmlBuilder.toString();
     }
     
     
@@ -412,17 +515,14 @@ public class JournalCitation {
 
     public void setJournalPubYear(Integer journalPubYear) {
         // ResultSet.getInt() returns 0 if the DB value is null.
-        if (journalPubYear == 0) {
-            journalPubYear = null;
-        }
-        this.journalPubYear = journalPubYear;
+        this.journalPubYear = journalPubYear == 0 ? null : journalPubYear;
     }
 
     /**
      * Set journalPubYear from pubDate String in YYYY-MM-DD or YYYY format.
      */
     public void setJournalPubYear(String pubDate) {
-        if (pubDate == null || pubDate.equals("")) {
+        if (pubDate == null || pubDate.isEmpty()) {
             this.journalPubYear = null;
             return;
         }
@@ -444,5 +544,47 @@ public class JournalCitation {
         String errorMsg = String.format("Error extracting year from PubDate: %s", pubDate);
         logger.error(errorMsg);
         throw new RuntimeException(errorMsg);
+    }
+
+    private void setArticleAuthorList(Node articleAuthorNode) throws TransformerException {
+        CachedXPathAPI xpathapi = new CachedXPathAPI();
+        NodeList authorNodeList = xpathapi.selectNodeList(articleAuthorNode, "//author");
+
+        articleAuthorList.clear();
+
+        for (int i = 0; i < authorNodeList.getLength(); i++) {
+            Node authorNode = authorNodeList.item(i);
+
+            Node node;
+
+            node = xpathapi.selectSingleNode(authorNode, "sequence");
+            Integer sequence = node != null ? Integer.parseInt(node.getTextContent()) : null;
+
+            node = xpathapi.selectSingleNode(authorNode, "given");
+            String given = node != null ? node.getTextContent() : null;
+
+            node = xpathapi.selectSingleNode(authorNode, "family");
+            String family = node != null ? node.getTextContent() : null;
+
+            node = xpathapi.selectSingleNode(authorNode, "suffix");
+            String suffix = node != null ? node.getTextContent() : null;
+
+            node = xpathapi.selectSingleNode(authorNode, "orcid");
+            String orcid = node != null ? node.getTextContent() : null;
+
+            articleAuthorList.add(new ArticleAuthor(sequence, given, family, suffix, orcid));
+        }
+    }
+
+    public ArrayList<ArticleAuthor> getArticleAuthorList() {
+        return articleAuthorList;
+    }
+
+    public void setArticleAuthorList(ArrayList<ArticleAuthor> articleAuthorList) {
+        this.articleAuthorList = articleAuthorList;
+    }
+
+    public void addArticleAuthor(ArticleAuthor articleAuthor) {
+        this.articleAuthorList.add(articleAuthor);
     }
 }
