@@ -4967,6 +4967,7 @@ public class DataPackageRegistry {
                     journalCitation.setRelationType(relationType);
                     journalCitation.setDateCreated(dateCreated);
                     journalCitation.setJournalPubYear(journalPubYear);
+                    journalCitation.setArticleAuthorList(getArticleAuthorListById(journalCitationId));
                     journalCitations.add(journalCitation);
                 }
             } catch (ClassNotFoundException e) {
@@ -5031,6 +5032,7 @@ public class DataPackageRegistry {
                     journalCitation.setRelationType(relationType);
                     journalCitation.setDateCreated(dateCreated);
                     journalCitation.setJournalPubYear(journalPubYear);
+                    journalCitation.setArticleAuthorList(getArticleAuthorListById(journalCitationId));
                     journalCitations.add(journalCitation);
                 }
             } catch (ClassNotFoundException e) {
