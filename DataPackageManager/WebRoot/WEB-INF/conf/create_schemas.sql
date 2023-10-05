@@ -66,19 +66,22 @@ CREATE TABLE datapackagemanager.prov_matrix (
 
 CREATE TYPE datapackagemanager.relation_type AS ENUM ('IsCitedBy', 'IsDescribedBy', 'IsReferencedBy');
 CREATE SEQUENCE datapackagemanager.journal_citation_id_seq;
-CREATE TABLE datapackagemanager.journal_citation (
-  JOURNAL_CITATION_ID NUMERIC  DEFAULT NEXTVAL('datapackagemanager.journal_citation_id_seq') PRIMARY KEY,
-  ARTICLE_DOI     VARCHAR(256),                       -- digital object identifier (DOI) of the journal article
-  ARTICLE_TITLE   TEXT,                               -- title of the journal article
-  ARTICLE_URL     TEXT NOT NULL,                      -- a URL to the journal article, possibly derived from the article DOI value
-  PRINCIPAL_OWNER VARCHAR(250) NOT NULL,              -- distinguished name of the creator of this entry
-  DATE_CREATED    TIMESTAMP    NOT NULL,              -- date that the identifier was reserved
-  JOURNAL_TITLE   TEXT,                               -- name of the journal
-  PACKAGE_ID      VARCHAR(100) NOT NULL,               -- packageId of source data package in PASTA
-  RELATION_TYPE datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
-  PUB_YEAR        SMALLINT                                -- journal publication year (often called the publication date)
+CREATE TABLE datapackagemanager.journal_citation
+(
+    JOURNAL_CITATION_ID NUMERIC DEFAULT NEXTVAL('datapackagemanager.journal_citation_id_seq') PRIMARY KEY,
+    ARTICLE_DOI         VARCHAR(256),                              -- digital object identifier (DOI) of the journal article
+    ARTICLE_TITLE       TEXT,                                      -- title of the journal article
+    ARTICLE_URL         TEXT                             NOT NULL, -- a URL to the journal article, possibly derived from the article DOI value
+    PRINCIPAL_OWNER     VARCHAR(250)                     NOT NULL, -- distinguished name of the creator of this entry
+    DATE_CREATED        TIMESTAMP                        NOT NULL, -- date that the identifier was reserved
+    JOURNAL_TITLE       TEXT,                                      -- name of the journal
+    PACKAGE_ID          VARCHAR(100)                     NOT NULL, -- packageId of source data package in PASTA
+    RELATION_TYPE       datapackagemanager.relation_type NOT NULL, -- type of relation between data package subject and citation object
+    PUB_YEAR            SMALLINT,                                  -- journal publication year (often called the publication date)
+    JOURNAL_ISSUE       VARCHAR(32),
+    ARTICLE_PAGES       VARCHAR(32),
+    JOURNAL_VOLUME      VARCHAR(32)
 );
-
 
 CREATE TABLE datapackagemanager.journal_citation_author
 (

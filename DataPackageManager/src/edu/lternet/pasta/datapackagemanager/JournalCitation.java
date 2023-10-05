@@ -128,8 +128,10 @@ public class JournalCitation {
     Integer journalPubYear;
     String relationType;
     ArrayList<ArticleAuthor> articleAuthorList = new ArrayList<>();
+    String journalIssue;
+    String journalVolume;
+    String articlePages;
 
-    
     public static void main(String[] args) {
         String packageId = args[0];
         String dirPath = "WebRoot/WEB-INF/conf";
@@ -316,11 +318,28 @@ public class JournalCitation {
               setJournalPubYear(pubDate);
             }
 
-            Node articleAuthorNode = xpathapi.selectSingleNode(document, "//articleAuthorList");
+            Node articleAuthorNode = xpathapi.selectSingleNode(document, "//articleAuthors");
             if (articleAuthorNode != null) {
                 setArticleAuthorList(articleAuthorNode);
             }
 
+            Node journalIssueNode = xpathapi.selectSingleNode(document, "//journalIssue");
+            if (journalIssueNode != null) {
+              String journalIssue = journalIssueNode.getTextContent();
+              setJournalIssue(journalIssue);
+            }
+
+            Node journalVolumeNode = xpathapi.selectSingleNode(document, "//journalVolume");
+            if (journalVolumeNode != null) {
+              String journalVolume = journalVolumeNode.getTextContent();
+              setJournalVolume(journalVolume);
+            }
+
+            Node articlePagesNode = xpathapi.selectSingleNode(document, "//articlePages");
+            if (articlePagesNode != null) {
+              String articlePages = articlePagesNode.getTextContent();
+              setArticlePages(articlePages);
+            }
         }
       }
       catch (SAXException e) {
@@ -376,8 +395,18 @@ public class JournalCitation {
         if (this.journalPubYear != null)
             { xmlBuilder.append(String.format("    <pubDate>%d</pubDate>\n", getJournalPubYear())); }
 
+        if (this.journalIssue != null)
+            { xmlBuilder.append(String.format("    <journalIssue>%s</journalIssue>\n", Encode.forXml(this.journalIssue))); }
+
+        if (this.journalVolume != null)
+            { xmlBuilder.append(String.format("    <journalVolume>%s</journalVolume>\n", Encode.forXml(this.journalVolume))); }
+
+        if (this.articlePages != null) {
+            xmlBuilder.append(String.format("    <articlePages>%s</articlePages>\n", Encode.forXml(this.articlePages)));
+        }
+
         if (this.articleAuthorList != null) {
-            xmlBuilder.append("    <articleAuthorList>\n");
+            xmlBuilder.append("    <articleAuthors>\n");
             for (ArticleAuthor author : this.articleAuthorList) {
                 xmlBuilder.append("        <author>\n");
                 xmlBuilder.append(String.format("            <sequence>%d</sequence>\n", author.getSequence()));
@@ -387,7 +416,7 @@ public class JournalCitation {
                 xmlBuilder.append(String.format("            <orcid>%s</orcid>\n",       Encode.forXml(author.getOrcidUrl() == null ? "" : author.getOrcidUrl())));
                 xmlBuilder.append("        </author>\n");
             }
-            xmlBuilder.append("    </articleAuthorList>\n");
+            xmlBuilder.append("    </articleAuthors>\n");
         }
 
         xmlBuilder.append("</journalCitation>\n");
@@ -548,30 +577,23 @@ public class JournalCitation {
 
     private void setArticleAuthorList(Node articleAuthorNode) throws TransformerException {
         CachedXPathAPI xpathapi = new CachedXPathAPI();
-        NodeList authorNodeList = xpathapi.selectNodeList(articleAuthorNode, "//author");
+        NodeList authorNodeList = xpathapi.selectNodeList(articleAuthorNode, "author");
 
         articleAuthorList.clear();
 
         for (int i = 0; i < authorNodeList.getLength(); i++) {
             Node authorNode = authorNodeList.item(i);
-
             Node node;
-
             node = xpathapi.selectSingleNode(authorNode, "sequence");
             Integer sequence = node != null ? Integer.parseInt(node.getTextContent()) : null;
-
             node = xpathapi.selectSingleNode(authorNode, "given");
             String given = node != null ? node.getTextContent() : null;
-
             node = xpathapi.selectSingleNode(authorNode, "family");
             String family = node != null ? node.getTextContent() : null;
-
             node = xpathapi.selectSingleNode(authorNode, "suffix");
             String suffix = node != null ? node.getTextContent() : null;
-
             node = xpathapi.selectSingleNode(authorNode, "orcid");
             String orcid = node != null ? node.getTextContent() : null;
-
             articleAuthorList.add(new ArticleAuthor(sequence, given, family, suffix, orcid));
         }
     }
@@ -586,5 +608,29 @@ public class JournalCitation {
 
     public void addArticleAuthor(ArticleAuthor articleAuthor) {
         this.articleAuthorList.add(articleAuthor);
+    }
+
+    public String getJournalIssue() {
+        return journalIssue;
+    }
+
+    public void setJournalIssue(String journalIssue) {
+        this.journalIssue = journalIssue;
+    }
+
+    public String getJournalVolume() {
+        return journalVolume;
+    }
+
+    public void setJournalVolume(String journalVolume) {
+        this.journalVolume = journalVolume;
+    }
+
+    public String getArticlePages() {
+        return articlePages;
+    }
+
+    public void setArticlePages(String articlePages) {
+        this.articlePages = articlePages;
     }
 }
