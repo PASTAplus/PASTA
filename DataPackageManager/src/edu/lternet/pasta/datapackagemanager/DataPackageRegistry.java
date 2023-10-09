@@ -4496,7 +4496,7 @@ public class DataPackageRegistry {
                     "journal_volume, " +
                     "article_pages " +
                 " ) " +
-                    "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type,?,?,?,?,?) ",
+                    "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type,?,?,?,?) ",
             JOURNAL_CITATION);
         // fmt:on
 
