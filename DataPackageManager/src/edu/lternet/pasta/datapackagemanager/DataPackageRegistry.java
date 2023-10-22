@@ -53,6 +53,9 @@ import edu.lternet.pasta.common.security.token.BasicAuthToken;
 import edu.lternet.pasta.datamanager.EMLFileSystemEntity;
 import edu.ucsb.nceas.utilities.Options;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author dcosta
@@ -5026,11 +5029,15 @@ public class DataPackageRegistry {
 
             Connection connection = null;
             String queryStr = String.format(
-                    "SELECT * " +
-                            "FROM %s " +
-                            "WHERE principal_owner=%s " +
-                            "ORDER BY journal_citation_id",
+                "SELECT c.journal_citation_id, c.article_doi, c.article_title, c.article_url, c.principal_owner, c.date_created, c.journal_title, c.package_id, c.relation_type, c.pub_year, c.journal_issue, c.journal_volume, c.article_pages,\n" +
+                    "json_agg((a.id, a.sequence, a.given, a.family, a.suffix, a.orcid)) as authors\n" +
+                    "FROM %s c\n" +
+                    "left join %s a on c.journal_citation_id = a.journal_citation_id\n" +
+                    "WHERE principal_owner=%s\n" +
+                    "group by c.journal_citation_id, c.article_doi, c.article_title, c.article_url, c.principal_owner, c.date_created, c.journal_title, c.package_id, c.relation_type, c.pub_year, c.journal_issue, c.journal_volume, c.article_pages\n" +
+                    "order by c.journal_citation_id",
                     SqlEscape.name(JOURNAL_CITATION),
+                    SqlEscape.name(JOURNAL_CITATION_AUTHOR),
                     SqlEscape.str(principalOwner)
             );
 
@@ -5045,27 +5052,19 @@ public class DataPackageRegistry {
 
                 while (rs.next()) {
                     int journalCitationId = rs.getInt("journal_citation_id");
-                    String packageId = rs.getString("package_id");
-                    String articleDoi = rs.getString("article_doi");
-                    String articleTitle = rs.getString("article_title");
-                    String articleUrl = rs.getString("article_url");
-                    String journalTitle = rs.getString("journal_title");
-                    String relationType = rs.getString("relation_type");
-                    Integer journalPubYear = rs.getInt("pub_year");
                     Timestamp ts = rs.getTimestamp("date_created");
-                    LocalDateTime dateCreated = ts.toLocalDateTime();
                     JournalCitation journalCitation = new JournalCitation();
                     journalCitation.setJournalCitationId(journalCitationId);
-                    journalCitation.setPackageId(packageId);
+                    journalCitation.setPackageId(rs.getString("package_id"));
                     journalCitation.setPrincipalOwner(principalOwner);
-                    journalCitation.setArticleDoi(articleDoi);
-                    journalCitation.setArticleTitle(articleTitle);
-                    journalCitation.setArticleUrl(articleUrl);
-                    journalCitation.setJournalTitle(journalTitle);
-                    journalCitation.setRelationType(relationType);
-                    journalCitation.setDateCreated(dateCreated);
-                    journalCitation.setJournalPubYear(journalPubYear);
-                    journalCitation.setArticleAuthorList(getArticleAuthorListById(journalCitationId));
+                    journalCitation.setArticleDoi(rs.getString("article_doi"));
+                    journalCitation.setArticleTitle(rs.getString("article_title"));
+                    journalCitation.setArticleUrl(rs.getString("article_url"));
+                    journalCitation.setJournalTitle(rs.getString("journal_title"));
+                    journalCitation.setRelationType(rs.getString("relation_type"));
+                    journalCitation.setDateCreated(ts.toLocalDateTime());
+                    journalCitation.setJournalPubYear(rs.getInt("pub_year"));
+                    journalCitation.setArticleAuthorList(new JSONArray(rs.getString("authors")));
                     journalCitations.add(journalCitation);
                 }
             } catch (ClassNotFoundException e) {
@@ -5073,6 +5072,9 @@ public class DataPackageRegistry {
                 throw (e);
             } catch (SQLException e) {
                 logger.error("SQLException: " + e.getMessage());
+                throw (e);
+            } catch (JSONException e) {
+                logger.error("JSONException: " + e.getMessage());
                 throw (e);
             } finally {
                 if (stmt != null) {

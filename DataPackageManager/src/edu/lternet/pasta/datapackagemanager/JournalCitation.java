@@ -5,6 +5,7 @@ import edu.lternet.pasta.doi.DigitalObjectIdentifier;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.CachedXPathAPI;
+import org.json.JSONObject;
 import org.owasp.encoder.Encode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -16,13 +17,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 
 public class JournalCitation {
+
     public static class ArticleAuthor {
         Integer sequence;
         String given;
@@ -598,13 +602,31 @@ public class JournalCitation {
         }
     }
 
-    public ArrayList<ArticleAuthor> getArticleAuthorList() {
-        return articleAuthorList;
+    public void setArticleAuthorList(JSONArray authors) throws SQLException {
+        for (int i = 0; i < authors.length(); i++) {
+            JSONObject author = authors.getJSONObject(i);
+            // If there are no authors for a given citation, Postgres returns a single author with all null values
+            // instead of an empty array. So we have to check for the empty case and skip the row.
+            if (author.isNull("f1")) { // id
+                continue;
+            }
+            Integer sequence = author.getInt("f2"); // sequence
+            String given = author.optString("f3"); // given
+            String family = author.optString("f4"); // family
+            String suffix = author.optString("f5"); // suffix
+            String orcid = author.optString("f6"); // orcid
+            articleAuthorList.add(new ArticleAuthor(sequence, given, family, suffix, orcid));
+        }
     }
 
     public void setArticleAuthorList(ArrayList<ArticleAuthor> articleAuthorList) {
         this.articleAuthorList = articleAuthorList;
     }
+
+    public ArrayList<ArticleAuthor> getArticleAuthorList() {
+        return articleAuthorList;
+    }
+
 
     public void addArticleAuthor(ArticleAuthor articleAuthor) {
         this.articleAuthorList.add(articleAuthor);

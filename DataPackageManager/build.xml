@@ -80,6 +80,9 @@
       <fileset dir="${shared.lib.dir}/saxon10">
         <include name="**/*.jar"/>
       </fileset>
+      <fileset dir="${shared.lib.dir}/json">
+        <include name="**/*.jar"/>
+      </fileset>
     </copy>
   </target>
 
