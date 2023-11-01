@@ -121,7 +121,7 @@ public class JournalCitation {
      * Instance variables
      */
     
-    int journalCitationId;
+    Integer journalCitationId;
     String articleTitle;
     String articleDoi;
     String articleUrl;
@@ -373,62 +373,47 @@ public class JournalCitation {
         String firstLine = includeDeclaration ? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" : "";
         StringBuilder xmlBuilder = new StringBuilder(firstLine);
         xmlBuilder.append("<journalCitation>\n");
-        
-        if (this.journalCitationId > 0)
-            { xmlBuilder.append(String.format("    <journalCitationId>%d</journalCitationId>\n", this.journalCitationId)); }
-        
-        xmlBuilder.append(String.format("    <packageId>%s</packageId>\n", this.packageId));
-        xmlBuilder.append(String.format("    <principalOwner>%s</principalOwner>\n", this.principalOwner));
-        xmlBuilder.append(String.format("    <dateCreated>%s</dateCreated>\n", getDateCreatedStr()));
-        
-        if (this.articleDoi != null)
-            { xmlBuilder.append(String.format("    <articleDoi>%s</articleDoi>\n", Encode.forXml(this.articleDoi))); }
-        
-        if (this.articleTitle != null)
-            { xmlBuilder.append(String.format("    <articleTitle>%s</articleTitle>\n", Encode.forXml(this.articleTitle))); }
-        
-        if (this.articleUrl != null)
-            { xmlBuilder.append(String.format("    <articleUrl>%s</articleUrl>\n", Encode.forXml(this.articleUrl))); }
-    
-        if (this.journalTitle != null)
-            { xmlBuilder.append(String.format("    <journalTitle>%s</journalTitle>\n", Encode.forXml(this.journalTitle))); }
-        
-        if (this.relationType != null)
-            { xmlBuilder.append(String.format("    <relationType>%s</relationType>\n", Encode.forXml(this.relationType))); }
-
-        if (this.journalPubYear != null)
-            { xmlBuilder.append(String.format("    <pubDate>%d</pubDate>\n", getJournalPubYear())); }
-
-        if (this.journalIssue != null)
-            { xmlBuilder.append(String.format("    <journalIssue>%s</journalIssue>\n", Encode.forXml(this.journalIssue))); }
-
-        if (this.journalVolume != null)
-            { xmlBuilder.append(String.format("    <journalVolume>%s</journalVolume>\n", Encode.forXml(this.journalVolume))); }
-
-        if (this.articlePages != null) {
-            xmlBuilder.append(String.format("    <articlePages>%s</articlePages>\n", Encode.forXml(this.articlePages)));
-        }
-
+        xmlBuilder.append(String.format("    <journalCitationId>%s</journalCitationId>\n", encodeForXml(this.journalCitationId)));
+        xmlBuilder.append(String.format("    <packageId>%s</packageId>\n", encodeForXml(this.packageId)));
+        xmlBuilder.append(String.format("    <principalOwner>%s</principalOwner>\n", encodeForXml(this.principalOwner)));
+        xmlBuilder.append(String.format("    <dateCreated>%s</dateCreated>\n", encodeForXml(getDateCreatedStr())));
+        xmlBuilder.append(String.format("    <articleDoi>%s</articleDoi>\n", encodeForXml(this.articleDoi)));
+        xmlBuilder.append(String.format("    <articleTitle>%s</articleTitle>\n", encodeForXml(this.articleTitle)));
+        xmlBuilder.append(String.format("    <articleUrl>%s</articleUrl>\n", encodeForXml(this.articleUrl)));
+        xmlBuilder.append(String.format("    <journalTitle>%s</journalTitle>\n", encodeForXml(this.journalTitle)));
+        xmlBuilder.append(String.format("    <relationType>%s</relationType>\n", encodeForXml(this.relationType)));
+        xmlBuilder.append(String.format("    <pubDate>%s</pubDate>\n", encodeForXml(this.journalPubYear)));
+        xmlBuilder.append(String.format("    <journalIssue>%s</journalIssue>\n", encodeForXml(this.journalIssue)));
+        xmlBuilder.append(String.format("    <journalVolume>%s</journalVolume>\n", encodeForXml(this.journalVolume)));
+        xmlBuilder.append(String.format("    <articlePages>%s</articlePages>\n", encodeForXml(this.articlePages)));
+        xmlBuilder.append("    <articleAuthors>\n");
         if (this.articleAuthorList != null) {
-            xmlBuilder.append("    <articleAuthors>\n");
             for (ArticleAuthor author : this.articleAuthorList) {
                 xmlBuilder.append("        <author>\n");
-                xmlBuilder.append(String.format("            <sequence>%d</sequence>\n", author.getSequence()));
-                xmlBuilder.append(String.format("            <given>%s</given>\n",       Encode.forXml(author.getGiven() == null ? "" : author.getGiven())));
-                xmlBuilder.append(String.format("            <family>%s</family>\n",     Encode.forXml(author.getFamily() == null ? "" : author.getFamily())));
-                xmlBuilder.append(String.format("            <suffix>%s</suffix>\n",     Encode.forXml(author.getSuffix() == null ? "" : author.getSuffix())));
-                xmlBuilder.append(String.format("            <orcid>%s</orcid>\n",       Encode.forXml(author.getOrcidUrl() == null ? "" : author.getOrcidUrl())));
+                xmlBuilder.append(String.format("            <sequence>%s</sequence>\n", encodeForXml(author.getSequence())));
+                xmlBuilder.append(String.format("            <given>%s</given>\n", encodeForXml(author.getGiven())));
+                xmlBuilder.append(String.format("            <family>%s</family>\n", encodeForXml(author.getFamily())));
+                xmlBuilder.append(String.format("            <suffix>%s</suffix>\n", encodeForXml(author.getSuffix())));
+                xmlBuilder.append(String.format("            <orcid>%s</orcid>\n", encodeForXml(author.getOrcidUrl())));
                 xmlBuilder.append("        </author>\n");
             }
-            xmlBuilder.append("    </articleAuthors>\n");
         }
-
+        xmlBuilder.append("    </articleAuthors>\n");
         xmlBuilder.append("</journalCitation>\n");
-
         return xmlBuilder.toString();
     }
-    
-    
+
+    String encodeForXml(String s) {
+        if (s == null || s.isEmpty()) {
+            return "";
+        }
+        return Encode.forXml(s);
+    }
+
+    String encodeForXml(Integer i) {
+        return encodeForXml(i == null ? "" : i.toString());
+    }
+
     private String getDateCreatedStr() {
         String dateCreatedStr = "";
         if (this.dateCreated != null) {
