@@ -243,7 +243,9 @@ public class JournalCitation {
             Node journalCitationIdNode = xpathapi.selectSingleNode(document, "//journalCitationId");
             if (journalCitationIdNode != null) {
               String journalCitationIdStr = journalCitationIdNode.getTextContent();
-              setJournalCitationId(Integer.parseInt(journalCitationIdStr));
+              if (journalCitationIdStr != null && !journalCitationIdStr.isEmpty()) {
+                  setJournalCitationId(Integer.parseInt(journalCitationIdStr));
+              }
             }
             
             Node packageIdNode = xpathapi.selectSingleNode(document, "//packageId");
