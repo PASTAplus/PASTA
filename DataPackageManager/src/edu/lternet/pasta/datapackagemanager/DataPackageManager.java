@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -93,6 +94,8 @@ import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.Options;
 import edu.ucsb.nceas.utilities.XMLUtilities;
 
+import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
+
 /**
  * @author dcosta
  * @version 1.0
@@ -106,6 +109,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static final String LEVEL_ONE_FILE_NAME = "Level-1-EML.xml";
 	private static final String LEVEL_ZERO_FILE_NAME = "Level-0-EML.xml";
 	private static final String DOI_SYSTEM_VALUE = "https://doi.org";
+	private static final String NORMALIZE_WHITESPACE_XSL = "normalizeWhitespace.xsl";
 
 	public enum DataPackageManagerAction {
 		CREATE, READ, UPDATE, DELETE, SEARCH
@@ -665,25 +669,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ParserConfigurationException 
 	 * @throws SAXException 
 	 */
- public String toLevelOne(File levelZeroEMLFile,
-                        HashMap<String, String> entityURIHashMap) 
-         throws IOException,
-                TransformerException, SAXException, ParserConfigurationException {
-    String levelOneEMLString = null;
-    Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
-	 Node documentElement = levelZeroEMLDocument.getDocumentElement();
-	 LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
-	 Document levelOneEMLDocument = levelOneEMLFactory.make(
-        levelZeroEMLDocument, entityURIHashMap);
-	 documentElement = levelOneEMLDocument.getDocumentElement();
-	 boolean preserveWhitespace = true;
-	 levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
-    
-    // Convert to dereferenced EML
-    // levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
-
-    return levelOneEMLString;
-  }
+	public String toLevelOne(File levelZeroEMLFile, HashMap<String, String> entityURIHashMap)
+		throws IOException, TransformerException, SAXException, ParserConfigurationException, ParseException {
+		Document levelZeroEMLDocument = XmlUtility.xmlFileToDocument(levelZeroEMLFile);
+		LevelOneEMLFactory levelOneEMLFactory = new LevelOneEMLFactory();
+		Document levelOneEMLDocument = levelOneEMLFactory.make(levelZeroEMLDocument, entityURIHashMap);
+		Node documentElement = levelOneEMLDocument.getDocumentElement();
+		boolean preserveWhitespace = true;
+		String levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
+		levelOneEMLString = XsltUtil.transform(levelOneEMLString, NORMALIZE_WHITESPACE_XSL, null);
+		// Convert to dereferenced EML
+		// levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
+		return levelOneEMLString;
+	}
 
 
 	/**
