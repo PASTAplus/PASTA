@@ -214,6 +214,9 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
     String queryStr = "";
     Vector<String> rowVector = new Vector<String>();
     int rowCount = 0;
+    int emptyRows = 0;
+    String entityName = this.entity.getName();
+    String packageId = this.entity.getPackageId();
     
     if (entity == null) {
       success = false;
@@ -350,6 +353,9 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
             if (rowCount % 1000000 == 0) {
             	log.info(String.format("%s row count: %d", tableName, rowCount));
             }
+          } else {
+            log.warn(String.format("%s (%s): empty row found", packageId, entityName));
+            emptyRows++;
           }
             
           rowVector = dataReader.getOneRowDataVector();
@@ -470,11 +476,15 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
             else {
               // Report number of records check as failed
               numberOfRecordsQualityCheck.setFailedStatus();
-              numberOfRecordsQualityCheck.setExplanation(
-                "The number of records found in the data table (" + rowCount +
-                ") does not match the 'numberOfRecords' value specified in the EML (" +
-                expectedNumberOfRecords + ")"
-              );
+              String explanation = "The number of records found in the data table (" + rowCount +
+                      ") does not match the 'numberOfRecords' value specified in the EML (" +
+                      expectedNumberOfRecords + ")";
+
+              if (emptyRows > 0) {
+                explanation += ". There are " + emptyRows + " empty row(s) (e.g., `,,,,,`) found in the data table.";
+              }
+
+              numberOfRecordsQualityCheck.setExplanation(explanation);
             }
             entity.addQualityCheck(numberOfRecordsQualityCheck);
           }
