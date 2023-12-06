@@ -1132,6 +1132,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		DataPackageManager dpm = new DataPackageManager();
 		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken
 		);
+		String entryText = null;
 		try {
 			StreamingOutput streamingZipOutput = outputStream -> {
 				try {
@@ -1144,16 +1145,24 @@ public class DataPackageManagerResource extends PastaWebService {
 			responseBuilder.entity(streamingZipOutput);
 		} catch (ResourceNotFoundException e) {
 			responseBuilder = Response.status(Response.Status.NOT_FOUND);
-			responseBuilder.entity(e.getMessage());
+			entryText = e.getMessage();
+			responseBuilder.entity(entryText);
 		} catch (UnauthorizedException e) {
 			responseBuilder = Response.status(Response.Status.UNAUTHORIZED);
-			responseBuilder.entity(e.getMessage());
+			entryText = e.getMessage();
+			responseBuilder.entity(entryText);
 		} catch (Exception e) {
 			responseBuilder = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
-			responseBuilder.entity(e.getMessage());
+			entryText = e.getMessage();
+			responseBuilder.entity(entryText);
 		}
 
-		return responseBuilder.build();
+		Response response = responseBuilder.build();
+
+		String resourceId = DataPackageManager.composeResourceId(ResourceType.archive, scope, identifier, revision, null);
+		audit("downloadDataPackageArchive", authToken, response, resourceId, entryText);
+
+		return response;
 	}
 
 		/**
@@ -11194,9 +11203,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 				String archive = "";
 				String gripe = null;
-				String resourceId =
-						DataPackageManager.composeResourceId(ResourceType.archive, scope,
-								identifier, revision, null);
+				String resourceId = DataPackageManager.composeResourceId(ResourceType.archive, scope, identifier, revision, null);
 				Response response = null;
 				ResponseBuilder responseBuilder = null;
 				String serviceMethodName = "createDataPackageArchive";
