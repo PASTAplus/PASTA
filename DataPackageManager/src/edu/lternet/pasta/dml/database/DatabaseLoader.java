@@ -481,7 +481,7 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
                       expectedNumberOfRecords + ")";
 
               if (emptyRows > 0) {
-                explanation += ". There are " + emptyRows + " empty row(s) (e.g., `,,,,,`) found in the data table.";
+                explanation += ". Empty row(s) (e.g., `,,,,,`) found (" + emptyRows + ") in the data table.";
               }
 
               numberOfRecordsQualityCheck.setExplanation(explanation);
