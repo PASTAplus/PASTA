@@ -3914,7 +3914,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 					if (objectName != null) {
 						responseBuilder.header("Content-Disposition",
-								"attachment; filename=" + objectName);
+								"attachment; filename=\"" + objectName + "\"");
 					}
 				}
 				else {
@@ -5996,7 +5996,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				if (size < this.sizeThreshold) {
 					responseBuilder = Response.ok(file, "application/zip");
 					responseBuilder.header("Content-Disposition",
-							"attachment; filename=" + filename);
+							"attachment; filename=\"" + filename + "\"");
 					responseBuilder.header("Content-Length", size.toString());
 				}
 				else {
