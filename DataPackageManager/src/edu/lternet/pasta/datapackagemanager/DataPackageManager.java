@@ -677,7 +677,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		Node documentElement = levelOneEMLDocument.getDocumentElement();
 		boolean preserveWhitespace = true;
 		String levelOneEMLString = XMLUtilities.getDOMTreeAsString(documentElement, preserveWhitespace);
-		levelOneEMLString = XsltUtil.transform(levelOneEMLString, NORMALIZE_WHITESPACE_XSL, null);
+		levelOneEMLString = XsltUtil.transformToPrettyXml(levelOneEMLString, NORMALIZE_WHITESPACE_XSL, null);
 		// Convert to dereferenced EML
 		// levelOneEMLString = DataPackage.dereferenceEML(levelOneEMLString);
 		return levelOneEMLString;

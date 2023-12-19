@@ -35,86 +35,98 @@ import java.util.HashMap;
 
 public class XsltUtil {
 
-  private static final String DIR_PATH = "WebRoot/WEB-INF/conf";
-  private static final String SEARCH_RESULT_XML_TO_CSV_NAME = "searchResultXmlToCsv.xslt";
+    private static final String DIR_PATH = "WebRoot/WEB-INF/conf";
+    private static final String SEARCH_RESULT_XML_TO_CSV_NAME = "searchResultXmlToCsv.xslt";
 
-  private static final Logger logger = Logger.getLogger(XsltUtil.class);
+    private static final Logger logger = Logger.getLogger(XsltUtil.class);
 
-  public static String transformSearchResultXmlToCsv(String searchResultXml)
-      throws IOException, ParseException
-  {
-    HashMap<String, String> parametersMap = null;
-    return transform(searchResultXml, SEARCH_RESULT_XML_TO_CSV_NAME, parametersMap);
-  }
-
-  public static String transform(
-      String xml,
-      String xsltName,
-      HashMap<String, String> parameters
-
-  ) throws ParseException, IOException
-  {
-    String xsltPath = getXsltPath(xsltName);
-    File xsltFile = new File(xsltPath);
-    StringReader stringReader = new StringReader(xml);
-    StringWriter stringWriter = new StringWriter();
-    StreamSource xsltSource = new StreamSource(xsltFile);
-    Source source = new StreamSource(stringReader);
-
-    String s;
-    try {
-      Processor processor = new Processor(false);
-      XsltCompiler xsltCompiler = processor.newXsltCompiler();
-      XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
-      XdmNode xdmNode = processor.newDocumentBuilder().build(source);
-      Serializer out = processor.newSerializer();
-      out.setOutputProperty(Serializer.Property.METHOD, "html");
-      out.setOutputProperty(Serializer.Property.INDENT, "no");
-      out.setOutputProperty(Serializer.Property.ENCODING, "UTF-8");
-      out.setOutputWriter(stringWriter);
-      XsltTransformer xsltTransformer = xsltExecutable.load();
-      xsltTransformer.setInitialContextNode(xdmNode);
-      if (parameters != null) {
-        for (String parameterName : parameters.keySet()) {
-          String parameterValue = parameters.get(parameterName);
-          if (parameterValue != null && !parameterValue.equals("")) {
-            QName qName = new QName(parameterName);
-            XdmAtomicValue xdmAtomicValue =
-                new XdmAtomicValue(parameterValue, ItemType.STRING);
-            xsltTransformer.setParameter(qName, xdmAtomicValue);
-          }
-        }
-      }
-      xsltTransformer.setDestination(out);
-      xsltTransformer.transform();
-      s = stringWriter.toString();
-    } catch (SaxonApiException e) {
-      logger.error(e.getMessage());
-      e.printStackTrace();
-      throw new ParseException("XSLT Parse Error: " + e.getMessage(), 0);
+    public static String transformSearchResultXmlToCsv(String searchResultXml)
+        throws IOException, ParseException {
+        return transform(searchResultXml, SEARCH_RESULT_XML_TO_CSV_NAME, null, "text", "no");
     }
 
-    return s;
-  }
+    public static String transformToCompactHtml(
+        String xml,
+        String xsltName,
+        HashMap<String, String> parameters
+    ) throws ParseException, IOException {
+        return transform(xml, xsltName, parameters, "html", "no");
+    }
 
-  public static String loadXslt(String xsltName) throws IOException
-  {
-    String xsltPath = getXsltPath(xsltName);
-    byte[] encodedBytes = Files.readAllBytes(Paths.get(xsltPath));
-    return new String(encodedBytes, StandardCharsets.UTF_8);
-  }
+    public static String transformToPrettyXml(
+        String xml,
+        String xsltName,
+        HashMap<String, String> parameters
+    ) throws ParseException, IOException {
+        return transform(xml, xsltName, parameters, "xml", "yes");
+    }
 
-  public static String getXsltPath(String xsltName) throws IOException
-  {
-    Options options = ConfigurationListener.getOptions();
-		if (options == null) {
-			ConfigurationListener configurationListener = new ConfigurationListener();
-			configurationListener.initialize(DIR_PATH);
-			options = ConfigurationListener.getOptions();
-		}
-    String xsltDir = options.getOption("datapackagemanager.xslDir");
-    String xsltPath = String.format("%s/%s", xsltDir, xsltName);
-    return xsltPath;
-  }
+    private static String transform(
+        String xml,
+        String xsltName,
+        HashMap<String, String> parameters,
+        String outputMethod,
+        String indent
+    ) throws ParseException, IOException {
+        String xsltPath = getXsltPath(xsltName);
+        File xsltFile = new File(xsltPath);
+        StringReader stringReader = new StringReader(xml);
+        StringWriter stringWriter = new StringWriter();
+        StreamSource xsltSource = new StreamSource(xsltFile);
+        Source source = new StreamSource(stringReader);
+
+        String s;
+        try {
+            Processor processor = new Processor(false);
+            XsltCompiler xsltCompiler = processor.newXsltCompiler();
+            XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
+            XdmNode xdmNode = processor.newDocumentBuilder().build(source);
+            Serializer out = processor.newSerializer();
+            out.setOutputProperty(Serializer.Property.METHOD, outputMethod);
+            out.setOutputProperty(Serializer.Property.INDENT, indent);
+            out.setOutputProperty(Serializer.Property.ENCODING, "UTF-8");
+            out.setOutputWriter(stringWriter);
+            XsltTransformer xsltTransformer = xsltExecutable.load();
+            xsltTransformer.setInitialContextNode(xdmNode);
+            if (parameters != null) {
+                for (String parameterName : parameters.keySet()) {
+                    String parameterValue = parameters.get(parameterName);
+                    if (parameterValue != null && !parameterValue.isEmpty()) {
+                        QName qName = new QName(parameterName);
+                        XdmAtomicValue xdmAtomicValue =
+                            new XdmAtomicValue(parameterValue, ItemType.STRING);
+                        xsltTransformer.setParameter(qName, xdmAtomicValue);
+                    }
+                }
+            }
+            xsltTransformer.setDestination(out);
+            xsltTransformer.transform();
+            s = stringWriter.toString();
+        } catch (SaxonApiException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            throw new ParseException("XSLT Parse Error: " + e.getMessage(), 0);
+        }
+
+        return s;
+    }
+
+    public static String loadXslt(String xsltName) throws IOException {
+        String xsltPath = getXsltPath(xsltName);
+        byte[] encodedBytes = Files.readAllBytes(Paths.get(xsltPath));
+        return new String(encodedBytes, StandardCharsets.UTF_8);
+    }
+
+    public static String getXsltPath(String xsltName) throws IOException {
+        Options options = ConfigurationListener.getOptions();
+        if (options == null) {
+            ConfigurationListener configurationListener = new ConfigurationListener();
+            configurationListener.initialize(DIR_PATH);
+            options = ConfigurationListener.getOptions();
+        }
+        String xsltDir = options.getOption("datapackagemanager.xslDir");
+        String xsltPath = String.format("%s/%s", xsltDir, xsltName);
+        return xsltPath;
+    }
 
 }
