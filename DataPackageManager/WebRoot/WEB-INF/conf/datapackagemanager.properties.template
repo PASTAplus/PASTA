@@ -46,7 +46,7 @@ dbMaxConnections=10
 ##
 ## LTER Scope Registry
 ##
-scopeRegistry=edi,ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-ble,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nes,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,lter-landsat-ledaps,msb-tempbiodev,msb-paleon,ltreb-cap,msb-cap,sea
+scopeRegistry=cos-spu,edi,ecotrends,knb-lter-and,knb-lter-arc,knb-lter-bes,knb-lter-ble,knb-lter-bnz,knb-lter-cap,knb-lter-cce,knb-lter-cdr,knb-lter-cwt,knb-lter-fce,knb-lter-gce,knb-lter-hbr,knb-lter-hfr,knb-lter-jrn,knb-lter-kbs,knb-lter-knz,knb-lter-luq,knb-lter-mcm,knb-lter-mcr,knb-lter-nes,knb-lter-nin,knb-lter-ntl,knb-lter-nwk,knb-lter-nwt,knb-lter-pal,knb-lter-pie,knb-lter-sbc,knb-lter-sev,knb-lter-sgs,knb-lter-vcr,lter-landsat,lter-landsat-ledaps,msb-tempbiodev,msb-paleon,ltreb-cap,msb-cap
 
 #
 # Sample document properties. Used by the sample calling application
