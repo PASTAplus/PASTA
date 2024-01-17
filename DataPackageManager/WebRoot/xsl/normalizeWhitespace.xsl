@@ -7,7 +7,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="*/text()[not(ancestor::markup or ancestor::literalLayout or ancestor::objectName or ancestor::attributeName)]">
+    <xsl:template match="*/text()[not(ancestor::markup or ancestor::literalLayout or ancestor::objectName or ancestor::attributeName or ancestor::para)]">
         <xsl:value-of select="normalize-space(replace(., '&#160;', ' '))"/>
     </xsl:template>
 </xsl:stylesheet>
