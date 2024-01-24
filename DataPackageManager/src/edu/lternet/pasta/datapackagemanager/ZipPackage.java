@@ -73,7 +73,6 @@ public class ZipPackage {
         z.zipStream(outputStream, zipMemberList);
     }
 
-
     public List<ZipMember> create(
     ) throws Exception {
         List<ZipMember> zipMemberList = new ArrayList<>();
@@ -183,6 +182,51 @@ public class ZipPackage {
 
         return zipMemberList;
     }
+
+    public List<String> getDataResourceIdList() throws Exception {
+        List<String> dataResourceIdList = new ArrayList<>();
+
+        String resourceMapStr;
+        try {
+            resourceMapStr = this.dataPackageManager.readDataPackage(
+                this.scope, this.identifier, this.revision.toString(), this.authToken, this.userId, false
+            );
+        } catch (UnauthorizedException e) {
+            return dataResourceIdList;
+        }
+
+        Scanner mapScanner = new Scanner(resourceMapStr);
+
+        while (mapScanner.hasNextLine()) {
+            String line = mapScanner.nextLine();
+            if (line.contains(URI_MIDDLE_DATA)) {
+                String[] lineParts = line.split("/");
+                String entityId = lineParts[lineParts.length - 1];
+                if (isAuthorized(entityId)) {
+                    String entityResourceId = DataPackageManager.composeResourceId(
+                        DataPackageManager.ResourceType.data, this.scope, this.identifier, this.revision, entityId
+                    );
+                    dataResourceIdList.add(entityResourceId);
+                }
+            }
+        }
+
+        return dataResourceIdList;
+    }
+
+    public boolean isAuthorized(String entityId) {
+        try {
+            getDataFile(entityId);
+        } catch (UnauthorizedException e) {
+            return false;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+			e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 
     private String transformXml(
             String xml,
