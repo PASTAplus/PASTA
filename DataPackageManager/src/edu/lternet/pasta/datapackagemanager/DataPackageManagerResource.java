@@ -1170,7 +1170,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Add audit records (which also increases download counters) for each individual data entity in the zip file. Only data
 		// entities for which the user has permissions, and which are present in the zip file, are included.
 		for (String dataResourceId : dataResourceIdList) {
-			audit("readDataEntity", authToken, response, dataResourceId, entryText);
+			audit("readDataEntity", authToken, response, dataResourceId, "Downloaded as part of zip archive");
 		}
 
 		return response;
