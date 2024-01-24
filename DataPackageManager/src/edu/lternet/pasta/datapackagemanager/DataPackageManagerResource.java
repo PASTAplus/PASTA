@@ -1113,13 +1113,15 @@ public class DataPackageManagerResource extends PastaWebService {
 		AuthToken authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
+		final String serviceMethodName = "createDataPackageArchive";
+
 		// Is user authorized to run the 'createDataPackage' service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized("createDataPackageArchive",
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName,
 				Rule.Permission.write, authToken
 		);
 		if (!serviceMethodAuthorized) {
 			throw new UnauthorizedException(String.format(
-					"User %s is not authorized to execute service method createDataPackageArchive", userId));
+					"User %s is not authorized to execute service method %s", serviceMethodName, userId));
 		}
 
 		if (this.readOnly) {
@@ -1130,8 +1132,9 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		// Create streaming ZIP response
 		DataPackageManager dpm = new DataPackageManager();
-		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken
-		);
+		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken);
+		List<String> dataResourceIdList = zipPackage.getDataResourceIdList();
+
 		String entryText = null;
 		try {
 			StreamingOutput streamingZipOutput = outputStream -> {
@@ -1160,7 +1163,15 @@ public class DataPackageManagerResource extends PastaWebService {
 		Response response = responseBuilder.build();
 
 		String resourceId = DataPackageManager.composeResourceId(ResourceType.archive, scope, identifier, revision, null);
-		audit("downloadDataPackageArchive", authToken, response, resourceId, entryText);
+
+		// Add audit record (which also increases download counter) for the download of the zip archive itself.
+		audit("readDataPackageArchive", authToken, response, resourceId, entryText);
+
+		// Add audit records (which also increases download counters) for each individual data entity in the zip file. Only data
+		// entities for which the user has permissions, and which are present in the zip file, are included.
+		for (String dataResourceId : dataResourceIdList) {
+			audit("readDataEntity", authToken, response, dataResourceId, entryText);
+		}
 
 		return response;
 	}
