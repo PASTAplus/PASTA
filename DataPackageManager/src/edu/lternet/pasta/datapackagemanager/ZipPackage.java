@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Scanner;
 
 
@@ -96,7 +97,9 @@ public class ZipPackage {
             return zipMemberList;
         }
 
+        TreeSet<String> objectNameSet = new TreeSet<>();
         Scanner mapScanner = new Scanner(resourceMapStr);
+
 
         while (mapScanner.hasNextLine()) {
             String line = mapScanner.nextLine();
@@ -166,6 +169,28 @@ public class ZipPackage {
                     continue;
                 }
                 String objectName = dataPackageManager.findObjectName(metaXml, entityName);
+
+                if (objectName == null) {
+                    objectName = "<unknown object>";
+                }
+
+                int lastIndex = objectName.lastIndexOf('.');
+                String fileName = lastIndex >= 0 ? objectName.substring(0, lastIndex) : objectName;
+                String extension = lastIndex >= 0 ? objectName.substring(lastIndex + 1) : "";
+                String dot = lastIndex >= 0 ? "." : "";
+
+
+                // Deduplicate object names
+                if (objectNameSet.contains(objectName)) {
+                    Integer count = 1;
+                    while (objectNameSet.contains(String.format("%s(%d)%s%s", fileName, count, dot, extension))) {
+                        count++;
+                    }
+                    objectName = String.format("%s(%d)%s%s", fileName, count, dot, extension);
+                }
+
+                objectNameSet.add(objectName);
+
                 long dataSize = dataFile.length();
                 manifestBuilder.append(
                         String.format("%s (%d bytes)\n", objectName == null ? "<unknown object>" : objectName,
