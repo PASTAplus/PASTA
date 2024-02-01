@@ -24,12 +24,8 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -2159,14 +2155,19 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return DataPackage the DataPackage object produced by parsing the EML
 	 */
 	public DataPackage parseEml(File emlFile, boolean isEvaluate)
-	    throws FileNotFoundException, Exception {
+		throws Exception {
 		DataPackage dataPackage = null;
 
 		if (emlFile != null) {
-			FileInputStream fileInputStream = new FileInputStream(emlFile);
-			if (fileInputStream != null) {
+            InputStream is = XsltUtil.transformToPrettyXml(
+                Files.newInputStream(emlFile.toPath()),
+				NORMALIZE_WHITESPACE_XSL,
+				null
+            );
+
+			if (is != null) {
 				if (dataManager != null) {
-					dataPackage = dataManager.parseMetadata(fileInputStream);
+					dataPackage = dataManager.parseMetadata(is);
 
 					if (dataPackage != null) {
 						if (!isEvaluate && dataPackage.hasDatasetQualityError()) {
