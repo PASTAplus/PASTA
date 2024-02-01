@@ -219,6 +219,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		VALID_EVENT_QUERY_KEYS = Collections.unmodifiableSet(set);
 	}
 
+	private static final String SEARCH_RESULT_XML_TO_CSV_NAME = "searchResultXmlToCsv.xslt";
+
 	/*
 	 * Instance fields
 	 */
@@ -9303,7 +9305,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resultsetXML = dataPackageManager.searchDataPackages(uriInfo, userId, authToken);
 
-			String csv = XsltUtil.transformSearchResultXmlToCsv(resultsetXML);
+			String csv = XsltUtil.transformToText(resultsetXML, SEARCH_RESULT_XML_TO_CSV_NAME, null);
 
 			if (csv != null) {
 				responseBuilder = Response.ok(csv);

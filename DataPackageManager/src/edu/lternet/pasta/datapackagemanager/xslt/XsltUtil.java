@@ -23,10 +23,7 @@ import org.apache.log4j.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,47 +33,53 @@ import java.util.HashMap;
 public class XsltUtil {
 
     private static final String DIR_PATH = "WebRoot/WEB-INF/conf";
-    private static final String SEARCH_RESULT_XML_TO_CSV_NAME = "searchResultXmlToCsv.xslt";
 
     private static final Logger logger = Logger.getLogger(XsltUtil.class);
 
-    public static String transformSearchResultXmlToCsv(String searchResultXml)
-        throws IOException, ParseException {
-        return transform(searchResultXml, SEARCH_RESULT_XML_TO_CSV_NAME, null, "text", "no");
-    }
-
-    public static String transformToCompactHtml(
+    public static String transformToText(
         String xml,
         String xsltName,
         HashMap<String, String> parameters
-    ) throws ParseException, IOException {
-        return transform(xml, xsltName, parameters, "html", "no");
+    ) {
+        return transform(
+            new ByteArrayInputStream(xml.getBytes()), xsltName, parameters, "text", "no"
+        ).toString();
     }
 
     public static String transformToPrettyXml(
         String xml,
         String xsltName,
         HashMap<String, String> parameters
-    ) throws ParseException, IOException {
-        return transform(xml, xsltName, parameters, "xml", "yes");
+    ) {
+        return transform(
+            new ByteArrayInputStream(xml.getBytes()), xsltName, parameters, "xml", "yes"
+        ).toString();
     }
 
-    private static String transform(
-        String xml,
+    public static InputStream transformToPrettyXml(
+        InputStream xml,
+        String xsltName,
+        HashMap<String, String> parameters
+    ) {
+        OutputStream os = transform(xml, xsltName, parameters, "xml", "yes");
+        return new ByteArrayInputStream(os.toString().getBytes());
+    }
+
+    private static OutputStream transform(
+        InputStream xml,
         String xsltName,
         HashMap<String, String> parameters,
         String outputMethod,
         String indent
-    ) throws ParseException, IOException {
-        String xsltPath = getXsltPath(xsltName);
-        File xsltFile = new File(xsltPath);
-        StringReader stringReader = new StringReader(xml);
-        StringWriter stringWriter = new StringWriter();
-        StreamSource xsltSource = new StreamSource(xsltFile);
-        Source source = new StreamSource(stringReader);
+    ) {
+        OutputStream outputStream = new ByteArrayOutputStream();
 
-        String s;
         try {
+            String xsltPath = getXsltPath(xsltName);
+            File xsltFile = new File(xsltPath);
+            StreamSource xsltSource = new StreamSource(xsltFile);
+            Source source = new StreamSource(xml);
+
             Processor processor = new Processor(false);
             XsltCompiler xsltCompiler = processor.newXsltCompiler();
             XsltExecutable xsltExecutable = xsltCompiler.compile(xsltSource);
@@ -85,7 +88,7 @@ public class XsltUtil {
             out.setOutputProperty(Serializer.Property.METHOD, outputMethod);
             out.setOutputProperty(Serializer.Property.INDENT, indent);
             out.setOutputProperty(Serializer.Property.ENCODING, "UTF-8");
-            out.setOutputWriter(stringWriter);
+            out.setOutputStream(outputStream);
             XsltTransformer xsltTransformer = xsltExecutable.load();
             xsltTransformer.setInitialContextNode(xdmNode);
             if (parameters != null) {
@@ -101,14 +104,13 @@ public class XsltUtil {
             }
             xsltTransformer.setDestination(out);
             xsltTransformer.transform();
-            s = stringWriter.toString();
-        } catch (SaxonApiException e) {
+        } catch (IOException | SaxonApiException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            throw new ParseException("XSLT Parse Error: " + e.getMessage(), 0);
+            throw new RuntimeException("XSLT processing error: " + e.getMessage());
         }
 
-        return s;
+        return outputStream;
     }
 
     public static String loadXslt(String xsltName) throws IOException {
