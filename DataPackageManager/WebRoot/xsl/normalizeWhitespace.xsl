@@ -5,7 +5,7 @@
     <xsl:output omit-xml-declaration="no" indent="yes"/>
 
     <!-- Template to copy nodes and apply templates to attributes and child nodes -->
-    <xsl:template match="@*|node()">
+    <xsl:template match="node()">
         <xsl:copy>
             <!-- Apply templates to attributes first to normalize space, then to child nodes -->
             <xsl:apply-templates select="@*"/>
@@ -14,7 +14,7 @@
     </xsl:template>
 
     <!-- Template for normalizing space in text nodes, with specific exclusions -->
-    <xsl:template match="*/text()[not(ancestor::markup or ancestor::literalLayout or ancestor::objectName or ancestor::attributeName or ancestor::para)]">
+    <xsl:template match="text()[not(ancestor::markup or ancestor::literalLayout or ancestor::objectName or ancestor::attributeName or ancestor::para)]">
         <xsl:value-of select="normalize-space(replace(., '&#160;', ' '))"/>
     </xsl:template>
 
