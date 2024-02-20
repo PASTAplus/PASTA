@@ -849,11 +849,11 @@ public class DataPackage
       }
       catch (Exception e) {
         found = "Failed to validate dereferenced document for namespace: '" + namespaceInDoc +
-                "'; " + Encode.forXml(e.getMessage());
+                "'; " + e.getMessage();
         logger.error(found);
         qualityCheck.setFailedStatus();
       }
-      qualityCheck.setFound(found);
+      qualityCheck.setFound(Encode.forXml(found));
       this.addDatasetQualityCheck(qualityCheck);
     }
   }
