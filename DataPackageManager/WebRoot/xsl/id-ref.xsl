@@ -27,9 +27,14 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 >
 
+<!--
+  Change encoding from UTF-8 to UTF-16 to prevent the generation
+  of UTF-8 surrogate pairs for unicode code points greater than
+  16-bit. MSS 2024-04-10
+-->
   <xsl:output method="xml"
               omit-xml-declaration="no"
-              encoding="UTF-8"
+              encoding="UTF-16"
               indent="yes"
   />
 
