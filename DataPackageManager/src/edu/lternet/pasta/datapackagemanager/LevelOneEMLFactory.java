@@ -121,6 +121,7 @@ public final class LevelOneEMLFactory {
   
   private final static String EDI =  "uid=EDI,o=EDI,dc=edirepository,dc=org";
   private final static String EDI2 = "uid=EDI,o=edi,dc=edirepository,dc=org";
+  private final static String SPU = "SPU_EDI_Data_Author";
 
   /*
    * Instance variables
@@ -180,6 +181,7 @@ public final class LevelOneEMLFactory {
     modifyPubPlace(levelZeroEMLDocument);
     checkIntellectualRights(levelZeroEMLDocument);
     checkEdiPrincipal(levelZeroEMLDocument);
+	checkSpuPrincipal(levelZeroEMLDocument);
 
     return levelZeroEMLDocument;
   }
@@ -249,19 +251,46 @@ public final class LevelOneEMLFactory {
 		if (packageId != null) {
 			String scope = packageId.split("\\.")[0];
 			if (scope.equals("edi")) {
-				boolean hasEdiPrincipal = hasEdiPrincipal(emlDocument);
+				boolean hasEdiPrincipal = hasPrincipal(emlDocument, EDI);
+				boolean hasEdi2Principal = hasPrincipal(emlDocument, EDI2);
   		
-				if (hasEdiPrincipal) {
+				if (hasEdiPrincipal || hasEdi2Principal) {
 					logger.info("An access/allow/principal element for EDI was found in the Level-0 EML.");
 				}
 				else {
-					addEdiPrincipal(emlDocument);
+					addGodPrincipal(emlDocument, EDI);
 				}
 			}
 		}
   	}
 
-  	
+
+	/**
+	 * Check to see whether the Level-0 EML with scope of "cos-spu" already has an
+	 * principal element for uid=EDI..., and if not, add one.
+	 *
+	 * @param emlDocument  the Level-0 EML document to be checked
+	 */
+	void checkSpuPrincipal(Document emlDocument)
+			throws TransformerException {
+		String packageId = getPackageIdAttribute(emlDocument);
+		if (packageId != null) {
+			String scope = packageId.split("\\.")[0];
+			if (scope.equals("cos-spu")) {
+				boolean hasSpuPrincipal = hasPrincipal(emlDocument, SPU);
+
+				if (hasSpuPrincipal) {
+					logger.info("An access/allow/principal element for SPU was found in the Level-0 EML.");
+				}
+				else {
+					addGodPrincipal(emlDocument, SPU);
+				}
+			}
+		}
+	}
+
+
+
 	/**
 	 * Count the number of elements at a given path. This method is useful
 	 * for JUnit tests.
@@ -375,16 +404,15 @@ public final class LevelOneEMLFactory {
 
 	/**
 	 * Boolean to determine whether this data package contains an access 
-	 * control element for principal with uid=EDI... If it does, we don't 
-	 * want to add a duplicate element.
+	 * control element for the given principal.
 	 * 
      * @param   emlDocument  the Level-0 EML Document
-	 * @return  true if this data package has a //access/allow/principal element for
-	 *          an EDI uid, else false
+	 * @param   principal     the principal to be checked
+	 * @return  true if this data package has a //access/allow/principal element for principal
 	 */
-	public boolean hasEdiPrincipal(Document emlDocument)
+	public boolean hasPrincipal(Document emlDocument, String principal)
 	          throws TransformerException {
-		boolean hasEDI = false;
+		boolean hasPrincipal = false;
 	    CachedXPathAPI xpathapi = new CachedXPathAPI();
 
 	    // Parse the //eml/access/allow/principal elements
@@ -394,13 +422,13 @@ public final class LevelOneEMLFactory {
 				Element principalElement = (Element) principalNodeList.item(i);
 				String principalText = principalElement.getTextContent();
 
-				if (EDI.equals(principalText) || EDI2.equals(principalText)) {
-					hasEDI = true;
+				if (principal.equals(principalText)) {
+					hasPrincipal = true;
 				}
 			}
 		}
 
-		return hasEDI;
+		return hasPrincipal;
 	}
 
 
@@ -582,11 +610,11 @@ public final class LevelOneEMLFactory {
    /*
    * Add a Level-1 access/allow element with EDI principal to document.
    */
-	private void addEdiPrincipal(Document doc)
+	private void addGodPrincipal(Document doc, String principal)
 			throws TransformerException {
 		Element allowElement = doc.createElement("allow");
 		Element principalElement = doc.createElement("principal");
-		principalElement.appendChild(doc.createTextNode(EDI));
+		principalElement.appendChild(doc.createTextNode(principal));
 		allowElement.appendChild(principalElement);
 		Element permissionElement = doc.createElement("permission");
 		permissionElement.appendChild(doc.createTextNode("all"));
