@@ -834,20 +834,20 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 
 				if (entityIdNamePairs != null) {
-          for (String entityId : entityIdNamePairs.keySet()) {
-            EMLEntity emlEntity = new EMLEntity(levelZeroDataPackage);
-            emlEntity.setEntityId(entityId);
-            String entityName = entityIdNamePairs.get(entityId);
-            emlEntity.setEntityName(entityName);
-            String entityURI = pastaUriHead + URI_MIDDLE_DATA + uriDocidPart + SLASH + entityId;
-            emlEntity.setEntityURI(entityURI);
-            entityURIList.add(entityURI);
-            entityURIHashMap.put(entityName, entityURI);
-            // Add this emlEntity to the list of entities in the data package
-            levelZeroDataPackage.addEMLEntity(emlEntity);
-          }
-          
-          isDataValid = levelZeroDataPackage.isDataValid();
+					for (String entityId : entityIdNamePairs.keySet()) {
+						EMLEntity emlEntity = new EMLEntity(levelZeroDataPackage);
+						emlEntity.setEntityId(entityId);
+						String entityName = entityIdNamePairs.get(entityId);
+						emlEntity.setEntityName(entityName);
+						String entityURI = pastaUriHead + URI_MIDDLE_DATA + uriDocidPart + SLASH + entityId;
+						emlEntity.setEntityURI(entityURI);
+						entityURIList.add(entityURI);
+						entityURIHashMap.put(entityName, entityURI);
+						// Add this emlEntity to the list of entities in the data package
+						levelZeroDataPackage.addEMLEntity(emlEntity);
+					}
+
+					isDataValid = levelZeroDataPackage.isDataValid();
 				}
 			}
 
