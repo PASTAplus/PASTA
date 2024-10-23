@@ -493,6 +493,14 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  
 	  //boolean forceUseChecksum = true;
 	  //if (useChecksum || forceUseChecksum) {
+
+	  EMLFileSystemEntity efse = new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
+
+	  if (!evaluateMode && efse.exists()) {
+		  // Delete entity file residual from a previously attempted download
+		  efse.deleteEntity();
+	  }
+
 	  if (useChecksum) {
 		  wasLinked = useChecksum(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
 	  }
@@ -515,7 +523,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		  }
 	  }
 			  
-	  EMLFileSystemEntity efse = new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
 	  efse.setEvaluateMode(evaluateMode);
 	  String entityFileURL = efse.getEntityFileURL(evaluateMode);
 	  emlEntity.setFileUrl(entityFileURL);
