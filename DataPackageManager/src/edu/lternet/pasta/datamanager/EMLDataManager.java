@@ -495,9 +495,12 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	  //if (useChecksum || forceUseChecksum) {
 
 	  EMLFileSystemEntity efse = new EMLFileSystemEntity(entityDir, emlPackageId, entityId);
+      efse.setEvaluateMode(evaluateMode);
+      String entityFileURL = efse.getEntityFileURL(evaluateMode);
+      emlEntity.setFileUrl(entityFileURL);
 
-	  if (!evaluateMode && efse.exists()) {
-		  // Delete entity file residual from a previously attempted download
+	  // Clean residual entity files from previous upload/evaluation attempts
+      if (efse.exists()) {
 		  efse.deleteEntity();
 	  }
 
@@ -522,10 +525,6 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 	          throw new IllegalStateException(errorMsg);
 		  }
 	  }
-			  
-	  efse.setEvaluateMode(evaluateMode);
-	  String entityFileURL = efse.getEntityFileURL(evaluateMode);
-	  emlEntity.setFileUrl(entityFileURL);
 
 	  /*
 	   * Double-check to ensure that the entity file exists on the system in the expected location.
