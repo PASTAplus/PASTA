@@ -1,0 +1,35 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Read Resource Authorization
+
+actor client
+participant DPMR as "DataPackageManagerResource.\n readResource()"
+participant DPM as "DataPackageManager.\n readResource()"
+participant DPR as "DataPackageRegistry"
+participant Authorizer
+participant AccessMatrix
+
+autonumber
+
+client->DPMR: API read resource\n request
+DPMR->DPM: readResource\n (resourceId, userId, authToken)
+DPM->DPR: new DataPackageRegistry\n (resourceId)
+DPR-->DPM: dataPackageRegistry
+DPM->Authorizer: new Authorizer\n (datPackageRegistry)
+Authorizer-->DPM: authorizer
+DPM->DPM: permission = "read"
+DPM->Authorizer: authorizer.isAuthorized\n (authToken, resourceId, permission)
+Authorizer->DPR: getPrincipalOwner\n (resourceId)
+DPR-->Authorizer: principalOwner
+Authorizer->DPR: getAccessControlRules\n (resourceId)
+DPR-->Authorizer: ruleList
+Authorizer->AccessMatrix: new AccessMatrix\n (ruleList)
+AccessMatrix-->Authorizer: accessMatrix
+Authorizer->AccessMatrix: accessMatrix.isAuthorized\n (authToken, principalOwner,\n permission)
+AccessMatrix-->Authorizer: boolean
+Authorizer-->DPM: boolean
+DPM->DPM: process resource\n read request
+DPM-->DPMR: resource
+DPMR->client: resource
+@enduml
