@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Service Method Authorization
+
+actor client
+participant DPMR as "DataPackageManagerResource.\n serviceMethod()"
+participant ISMA as "DataPackageManagerResource.\n isServiceMethodAuthorized()"
+participant AccessMatrix
+
+autonumber
+
+client->DPMR: request
+DPMR->ISMA: isServiceMethodAuthorized\n (serviceMethodName,\n permission,\n authToken)
+ISMA->ISMA: generateAccessXML
+ISMA->AccessMatrix: new AccessMatrix(accessXML)
+AccessMatrix-->ISMA: accessMatrix
+ISMA->ISMA: principalOwner = "PASTA"
+ISMA->AccessMatrix: accessMatrix.isAuthorized\n (authToken, principalOwner,\n permission)
+AccessMatrix-->ISMA: boolean
+ISMA-->DPMR: boolean
+DPMR->DPMR: process request
+DPMR-->client: response
+@enduml
