@@ -4,14 +4,17 @@
 title Service Method Authorization
 
 actor client
+participant Gatekeeper
 participant DPMR as "DataPackageManagerResource.\n serviceMethod()"
 participant ISMA as "DataPackageManagerResource.\n isServiceMethodAuthorized()"
 participant AccessMatrix
+boundary AuthZ #red
 
 autonumber
 
-client->DPMR: request
-DPMR->ISMA: isServiceMethodAuthorized\n (serviceMethodName,\n permission,\n authToken)
+client->Gatekeeper: <font color=red>API request(JWT)
+Gatekeeper->Gatekeeper: <font color=red>convertToAuthToken(JWT):\n <font color=red>authToken
+Gatekeeper->DPMR: API request(authToken)DPMR->ISMA: isServiceMethodAuthorized\n (serviceMethodName,\n permission,\n authToken)
 ISMA->ISMA: generateAccessXML
 ISMA->AccessMatrix: new AccessMatrix(accessXML)
 AccessMatrix-->ISMA: accessMatrix
@@ -19,6 +22,9 @@ ISMA->ISMA: principalOwner = "PASTA"
 ISMA->AccessMatrix: accessMatrix.isAuthorized\n (authToken, principalOwner,\n permission)
 AccessMatrix-->ISMA: boolean
 ISMA-->DPMR: boolean
+DPMR->DPMR: <font color=red>getAccessXML(serviceMethodName)
+DPMR->AuthZ: <font color=red>AuthZ.isAuthorized\n<font color=red>(JWT, accessXML, permission)
+AuthZ-->DPMR: <font color=red>boolean
 DPMR->DPMR: process request
 DPMR-->client: response
 @enduml

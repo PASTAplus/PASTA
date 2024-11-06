@@ -1,4 +1,8 @@
 @startuml
+'https://plantuml.com/sequence-diagram
+
+title Data Package Life Cycle Authorization
+
 actor client
 participant DataPackageManagerResource
 participant Creator
@@ -13,6 +17,7 @@ participant DataPackage
 participant QualityReport
 participant QualityCheck
 participant SolrMetadataCatalog
+boundary AuthZ #red
 
 autonumber
 
@@ -89,7 +94,8 @@ group createDataPackage()
         DataPackageManager->DataPackageManager: insertSolr(levelOneEML)
         DataPackageManager->DataPackageManager: insertProvenanceRecord
         note right: only if provenance information\nexists in the metadata
-        DataPackageManager->DataPackageManager: insertResourceRegistry
+        DataPackageManager->DataPackageManager: insertIntoResourceRegistryDB
+        DataPackageManager[#red]->AuthZ: <font color=red>AuthZ.addACL(Level-1 EML)
         DataPackageManager->DataPackageManager: registerDOI
         note right: The levelOneEML is regenerated\nwith the DOI as alternate\nidentifier and the Dublin\nCore metadata is regenerated\n(this is not optimal)
         DataPackageManager->DataPackageManager: removeFromWorkingOn(packageId)
@@ -101,3 +107,4 @@ DataPackageManagerResource<--Creator:
 client<--DataPackageManagerResource:
 
 @enduml
+

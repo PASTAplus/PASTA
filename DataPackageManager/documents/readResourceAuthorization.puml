@@ -4,15 +4,19 @@
 title Read Resource Authorization
 
 actor client
+participant Gatekeeper
 participant DPMR as "DataPackageManagerResource.\n readResource()"
 participant DPM as "DataPackageManager.\n readResource()"
 participant DPR as "DataPackageRegistry"
 participant Authorizer
 participant AccessMatrix
+boundary AuthZ #red
 
 autonumber
 
-client->DPMR: API read resource\n request
+client->Gatekeeper: <font color=red>API request(JWT)
+Gatekeeper->Gatekeeper: <font color=red>convertToAuthToken(JWT):\n <font color=red>authToken
+Gatekeeper->DPMR: API request(authToken)
 DPMR->DPM: readResource\n (resourceId, userId, authToken)
 DPM->DPR: new DataPackageRegistry\n (resourceId)
 DPR-->DPM: dataPackageRegistry
@@ -29,6 +33,8 @@ AccessMatrix-->Authorizer: accessMatrix
 Authorizer->AccessMatrix: accessMatrix.isAuthorized\n (authToken, principalOwner,\n permission)
 AccessMatrix-->Authorizer: boolean
 Authorizer-->DPM: boolean
+DPM[#red]->AuthZ: <font color=red>AuthZ.isAuthorized\n<font color=red>(authToken, resourceId, permission)
+AuthZ[#red]-->DPM: <font color=red>boolean
 DPM->DPM: process resource\n read request
 DPM-->DPMR: resource
 DPMR->client: resource
