@@ -96,6 +96,7 @@ group createDataPackage()
         note right: only if provenance information\nexists in the metadata
         DataPackageManager->DataPackageManager: insertIntoResourceRegistryDB
         DataPackageManager[#red]->AuthZ: <font color=red>AuthZ.addACL(Level-1 EML)
+        AuthZ[#red]-->DataPackageManager: <font color=red>OK(200) or Accepted(202)
         DataPackageManager->DataPackageManager: registerDOI
         note right: The levelOneEML is regenerated\nwith the DOI as alternate\nidentifier and the Dublin\nCore metadata is regenerated\n(this is not optimal)
         DataPackageManager->DataPackageManager: removeFromWorkingOn(packageId)

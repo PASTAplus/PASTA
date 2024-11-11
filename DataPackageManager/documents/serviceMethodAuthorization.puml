@@ -23,7 +23,7 @@ ISMA->AccessMatrix: accessMatrix.isAuthorized\n (authToken, principalOwner,\n pe
 AccessMatrix-->ISMA: boolean
 ISMA-->DPMR: boolean
 DPMR->DPMR: <font color=red>getAccessXML(serviceMethodName)
-DPMR->AuthZ: <font color=red>AuthZ.isAuthorized\n<font color=red>(JWT, accessXML, permission)
+DPMR->AuthZ: <font color=red>AuthZ.isAuthorized\n<font color=red>(authToken, accessXML, permission)
 AuthZ-->DPMR: <font color=red>boolean
 DPMR->DPMR: process request
 DPMR-->client: response
