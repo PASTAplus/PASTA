@@ -4465,27 +4465,26 @@ public class DataPackageRegistry {
     public void addJournalCitation(JournalCitation journalCitation)
         throws ClassNotFoundException, SQLException
     {
-      Connection connection = null;
-      int journalCitationId = 0;
+        int journalCitationId = 0;
 
-      if (journalCitation != null) {
-        String packageId = journalCitation.getPackageId();
-        String principalOwner = journalCitation.getPrincipalOwner();
-        String articleDoi = journalCitation.getArticleDoi();
-        String articleTitle = journalCitation.getArticleTitle();
-        String articleUrl = journalCitation.getArticleUrl();
-        LocalDateTime dateCreated = journalCitation.getDateCreated();
-        String journalTitle = journalCitation.getJournalTitle();
-        String relationType = journalCitation.getRelationType();
-        Integer journalPubYear = journalCitation.getJournalPubYear();
-        String journalIssue = journalCitation.getJournalIssue();
-        String journalVolume = journalCitation.getJournalVolume();
-        String articlePages = journalCitation.getArticlePages();
+        if (journalCitation != null) {
+            String packageId = journalCitation.getPackageId();
+            String principalOwner = journalCitation.getPrincipalOwner();
+            String articleDoi = journalCitation.getArticleDoi();
+            String articleTitle = journalCitation.getArticleTitle();
+            String articleUrl = journalCitation.getArticleUrl();
+            LocalDateTime dateCreated = journalCitation.getDateCreated();
+            String journalTitle = journalCitation.getJournalTitle();
+            String relationType = journalCitation.getRelationType();
+            Integer journalPubYear = journalCitation.getJournalPubYear();
+            String journalIssue = journalCitation.getJournalIssue();
+            String journalVolume = journalCitation.getJournalVolume();
+            String articlePages = journalCitation.getArticlePages();
 
-        // fmt:off
-        // language=PostgreSQL
-        String queryStr = String.format(
-            "INSERT INTO %s ( " +
+            // fmt:off
+            // language=PostgreSQL
+            String queryStr = String.format(
+                "INSERT INTO %s ( " +
                     "package_id, " +
                     "principal_owner, " +
                     "article_doi, " +
@@ -4498,53 +4497,59 @@ public class DataPackageRegistry {
                     "journal_issue, " +
                     "journal_volume, " +
                     "article_pages " +
-                " ) " +
+                    " ) " +
                     "VALUES(?,?,?,?,?,?,?,?::datapackagemanager.relation_type,?,?,?,?) ",
-            JOURNAL_CITATION);
-        // fmt:on
+                JOURNAL_CITATION);
+            // fmt:on
 
-        logger.debug("queryStr: " + queryStr);
+            logger.debug("queryStr: " + queryStr);
 
-        try {
-          connection = getConnection();
-          PreparedStatement pstmt =
-              connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS);
-          pstmt.setString(1, packageId);
-          pstmt.setString(2, principalOwner);
-          pstmt.setString(3, Objects.toString(articleDoi, ""));
-          pstmt.setString(4, Objects.toString(articleTitle, ""));
-          pstmt.setString(5, Objects.toString(articleUrl, ""));
-          pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
-          pstmt.setString(7, Objects.toString(journalTitle, ""));
-          pstmt.setString(8, Objects.toString(relationType, "IsCitedBy"));
-          pstmt.setObject(9, journalPubYear, java.sql.Types.INTEGER);
-          pstmt.setString(10, Objects.toString(journalIssue, ""));
-          pstmt.setString(11, Objects.toString(journalVolume, ""));
-          pstmt.setString(12, Objects.toString(articlePages, ""));
+            try (
+                Connection connection = getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS)
+            ) {
+                pstmt.setString(1, packageId);
+                pstmt.setString(2, principalOwner);
+                pstmt.setString(3, Objects.toString(articleDoi, ""));
+                pstmt.setString(4, Objects.toString(articleTitle, ""));
+                pstmt.setString(5, Objects.toString(articleUrl, ""));
+                pstmt.setTimestamp(6, Timestamp.valueOf(dateCreated));
+                pstmt.setString(7, Objects.toString(journalTitle, ""));
+                pstmt.setString(8, Objects.toString(relationType, "IsCitedBy"));
+                pstmt.setObject(9, journalPubYear, java.sql.Types.INTEGER);
+                pstmt.setString(10, Objects.toString(journalIssue, ""));
+                pstmt.setString(11, Objects.toString(journalVolume, ""));
+                pstmt.setString(12, Objects.toString(articlePages, ""));
 
-          pstmt.executeUpdate();
+                pstmt.executeUpdate();
 
-          ResultSet rs = pstmt.getGeneratedKeys();
-          while (rs.next()) {
-            journalCitationId = rs.getInt(1);
-          }
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    while (rs.next()) {
+                        journalCitationId = rs.getInt(1);
+                    }
+                }
+            } catch (SQLException e) {
+                logger.error(
+                    "Error inserting JOURNAL_CITATION record for JournalCitation object:\n" +
+                        journalCitation.toXML(true));
+                throw (e);
+            }
 
-          pstmt.close();
-        } catch (SQLException e) {
-          logger.error(
-              "Error inserting JOURNAL_CITATION record for JournalCitation object:\n" +
-                  journalCitation.toXML(true));
-          throw (e);
-        } finally {
-          journalCitation.setJournalCitationId(
-              journalCitationId); // set the id value of the journal citation
-          returnConnection(connection);
+            journalCitation.setJournalCitationId(journalCitationId);
+
+            try {
+                updateAuthors(journalCitation, journalCitationId);
+            } catch (SQLException | ClassNotFoundException e) {
+                logger.error(
+                    "Error updating JOURNAL_CITATION_AUTHOR record for JournalCitation object:\n" +
+                        journalCitation.toXML(true));
+                throw (e);
+            }
         }
-      }
     }
-
     public void updateJournalCitation(JournalCitation journalCitation)
-        throws ClassNotFoundException, SQLException {
+        throws ClassNotFoundException, SQLException
+    {
 
         if (journalCitation == null) {
             return;
@@ -4556,7 +4561,7 @@ public class DataPackageRegistry {
         String articleDoi = journalCitation.getArticleDoi();
         String articleTitle = journalCitation.getArticleTitle();
         String articleUrl = journalCitation.getArticleUrl();
-        LocalDateTime dateCreated = journalCitation.getDateCreated();
+        // LocalDateTime dateCreated = journalCitation.getDateCreated();
         String journalTitle = journalCitation.getJournalTitle();
         String relationType = journalCitation.getRelationType();
         Integer journalPubYear = journalCitation.getJournalPubYear();
@@ -4587,7 +4592,7 @@ public class DataPackageRegistry {
 
         try (
             Connection connection = getConnection();
-            PreparedStatement pstmt = connection.prepareStatement(queryStr);
+            PreparedStatement pstmt = connection.prepareStatement(queryStr)
         ) {
             pstmt.setString(1, packageId);
             pstmt.setString(2, principalOwner);
@@ -4608,11 +4613,58 @@ public class DataPackageRegistry {
                 "Error updating JOURNAL_CITATION record for JournalCitation object:\n" +
                     journalCitation.toXML(true));
             throw (e);
+        } finally {
+            journalCitation.setJournalCitationId(journalCitationId);
         }
+        try {
+            updateAuthors(journalCitation, journalCitationId);
+        } catch (SQLException | ClassNotFoundException e) {
+            logger.error(
+                "Error updating JOURNAL_CITATION_AUTHOR record for JournalCitation object:\n" +
+                    journalCitation.toXML(true));
+            throw (e);
+        }
+    }
 
-        // Update authors
+    private void updateAuthors(JournalCitation journalCitation, int journalCitationId) throws SQLException, ClassNotFoundException
+    {
+        String queryStr = String.format(
+            "INSERT INTO %s (journal_citation_id, sequence, given, family, suffix, orcid)\n" +
+                "VALUES(?,?,?,?,?,?)\n",
+            SqlEscape.name(JOURNAL_CITATION_AUTHOR)
+        );
 
-        queryStr = String.format(
+        logger.debug("queryStr: " + queryStr);
+
+        try (
+            Connection connection = getConnection();
+            PreparedStatement insertPstmt = connection.prepareStatement(queryStr)
+        ) {
+            connection.setAutoCommit(false);
+
+            deleteAuthors(journalCitationId);
+
+            for (JournalCitation.ArticleAuthor articleAuthor : journalCitation.getArticleAuthorList()) {
+                setParam(insertPstmt, 1, journalCitationId);
+                setParam(insertPstmt, 2, articleAuthor.getSequence());
+                setParam(insertPstmt, 3, articleAuthor.getGiven());
+                setParam(insertPstmt, 4, articleAuthor.getFamily());
+                setParam(insertPstmt, 5, articleAuthor.getSuffix());
+                setParam(insertPstmt, 6, articleAuthor.getShortOrcid());
+                insertPstmt.addBatch();
+            }
+            insertPstmt.executeBatch();
+
+            connection.commit();
+        } catch (SQLException e) {
+            logger.error("Error updating JOURNAL_CITATION_AUTHOR record: " + e.getMessage());
+            throw (e);
+        }
+    }
+
+    private void deleteAuthors(int journalCitationId) throws SQLException, ClassNotFoundException
+    {
+        String queryStr = String.format(
             "DELETE FROM %s WHERE journal_citation_id=?",
             SqlEscape.name(JOURNAL_CITATION_AUTHOR)
         );
@@ -4621,45 +4673,12 @@ public class DataPackageRegistry {
 
         try (
             Connection connection = getConnection();
-            PreparedStatement pstmt = connection.prepareStatement(queryStr);
+            PreparedStatement deletePstmt = connection.prepareStatement(queryStr);
         ) {
-            pstmt.setInt(1, journalCitationId);
-            pstmt.executeUpdate();
+            deletePstmt.setInt(1, journalCitationId);
+            deletePstmt.executeUpdate();
         } catch (SQLException e) {
-            logger.error(
-                "Error updating JOURNAL_CITATION_AUTHOR record for JournalCitation object:\n" +
-                    journalCitation.toXML(true));
-            throw (e);
-        }
-
-        // fmt:off
-        // language=PostgreSQL
-        queryStr = String.format(
-            "INSERT INTO %s (journal_citation_id, sequence, given, family, suffix, orcid)\n" +
-                "VALUES(?,?,?,?,?,?)\n",
-            SqlEscape.name(JOURNAL_CITATION_AUTHOR));
-        // fmt:on
-
-        logger.debug("queryStr: " + queryStr);
-
-        try (
-            Connection connection = getConnection();
-            PreparedStatement pstmt = connection.prepareStatement(queryStr);
-        ) {
-            for (JournalCitation.ArticleAuthor articleAuthor : journalCitation.getArticleAuthorList()) {
-                setParam(pstmt, 1, journalCitationId);
-                setParam(pstmt, 2, articleAuthor.getSequence());
-                setParam(pstmt, 3, articleAuthor.getGiven());
-                setParam(pstmt, 4, articleAuthor.getFamily());
-                setParam(pstmt, 5, articleAuthor.getSuffix());
-                setParam(pstmt, 6, articleAuthor.getShortOrcid());
-                pstmt.addBatch();
-            }
-            pstmt.executeBatch();
-        } catch (SQLException e) {
-            logger.error(
-                "Error updating JOURNAL_CITATION_AUTHOR record for JournalCitation object:\n" +
-                    journalCitation.toXML(true));
+            logger.error("Error deleting JOURNAL_CITATION_AUTHOR records: " + e.getMessage());
             throw (e);
         }
     }
@@ -4690,52 +4709,57 @@ public class DataPackageRegistry {
 
 
     public Integer deleteJournalCitation(Integer id, String userId)
-        throws ClassNotFoundException, SQLException, NotFoundException {
+        throws ClassNotFoundException, SQLException, NotFoundException
+    {
+        if (!hasJournalCitation(id)) {
+            throw new NotFoundException(String.format("No journal citation with id value '%d' was found.", id));
+        }
+
+        if (!isJournalCitationOwner(id, userId)) {
+            throw new UnauthorizedException(String
+                .format("Journal citation with id value '%d' is not owned by user '%s'.", id, userId));
+        }
+
+        String queryStr = String.format(
+            "DELETE FROM %s WHERE journal_citation_id=? AND principal_owner=?",
+            SqlEscape.name(JOURNAL_CITATION)
+        );
+
+        logger.debug("queryStr: " + queryStr);
+
         Integer deletedId = null;
-        Connection connection = null;
-        Statement stmt = null;
-        Integer rowCount = null;
 
-        try {
-            if (hasJournalCitation(id)) {
-                if (isJournalCitationOwner(id, userId)) {
-                    connection = getConnection();
-                    String queryStr = String.format(
-                        "DELETE FROM %s " +
-                            "WHERE journal_citation_id=%s and principal_owner=%s",
-                        SqlEscape.name(JOURNAL_CITATION),
-                        SqlEscape.integer(id),
-                        SqlEscape.str(userId)
-                    );
+        try (
+            Connection connection = getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(queryStr)
+        ) {
+            // getConnection() returns a connection with autoCommit = true.
+            // We start a transaction here to ensure that the delete is atomic. as getConnection() does not use a pool,
+            // this does not persist after the connection is closed.
+            connection.setAutoCommit(false);
 
-                    logger.debug("queryStr: " + queryStr);
+            deleteAuthors(id);
 
-                    stmt = connection.createStatement();
-                    rowCount = stmt.executeUpdate(queryStr);
+            setParam(pstmt, 1, id);
+            setParam(pstmt, 2, userId);
 
-                    if (rowCount < 1) {
-                        String gripe = "Delete failed: " + queryStr;
-                        throw new SQLException(gripe);
-                    } else {
-                        deletedId = id;
-                    }
-                } else {
-                    throw new UnauthorizedException(String
-                        .format("Journal citation with id value '%d' is not owned by user '%s'.", id, userId));
-                }
+            Integer rowCount = pstmt.executeUpdate();
+
+            if (rowCount < 1) {
+                String gripe = "Delete failed: " + queryStr;
+                throw new SQLException(gripe);
             } else {
-                throw new NotFoundException(String.format("No journal citation with id value '%d' was found.", id));
+                deletedId = id;
             }
+
+            connection.commit();
         } catch (SQLException e) {
             logger.error("Error deleting JOURNAL_CITATION record: " + e.getMessage());
             throw (e);
-        } finally {
-            returnConnection(connection);
         }
 
         return deletedId;
     }
-
 
         public ArrayList<JournalCitation> getCitationWithId (Integer journalCitationId)
             throws ClassNotFoundException, SQLException, IllegalArgumentException {
