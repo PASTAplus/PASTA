@@ -55,7 +55,7 @@ import edu.ucsb.nceas.utilities.Options;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+
 
 /**
  * @author dcosta
@@ -4826,6 +4826,7 @@ public class DataPackageRegistry {
             return journalCitations;
         }
 
+
         public ArrayList<JournalCitation.ArticleAuthor> getArticleAuthorListById (Integer journalCitationId) throws SQLException, ClassNotFoundException {
             String queryStr = String.format(
                     "SELECT sequence, given, family, suffix, orcid\n" +
@@ -5044,6 +5045,42 @@ public class DataPackageRegistry {
             }
 
             return journalCitations;
+        }
+
+        public ArrayList<Pair<Integer, String>> listDataPackagesCitedBy (String articleDoi)
+              throws ClassNotFoundException, SQLException, IllegalArgumentException
+        {
+            ArrayList<Pair<Integer, String>> packageIdList = new ArrayList<>();
+
+            // fmt:off
+            // language=PostgreSQL
+            String queryStr = String.format(
+                "SELECT DISTINCT journal_citation_id, package_id " +
+                    "FROM %s " +
+                    "WHERE article_doi = ? " +
+                    "ORDER BY package_id, journal_citation_id",
+                JOURNAL_CITATION);
+            // fmt:on
+
+            logger.debug("queryStr: " + queryStr);
+
+            try (
+                Connection connection = getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(queryStr, Statement.RETURN_GENERATED_KEYS)
+            ) {
+                pstmt.setString(1, articleDoi);
+    			ResultSet rs = pstmt.executeQuery();
+	    	    while (rs.next()) {
+                    Integer journalCitationId = rs.getInt(1);
+		        	String packageId = rs.getString(2);
+                    packageIdList.add(new Pair(journalCitationId, packageId));
+                }
+            } catch (SQLException | ClassNotFoundException e) {
+                logger.error("Exception: " + e.getMessage());
+                throw (e);
+            }
+
+            return packageIdList;
         }
 
 

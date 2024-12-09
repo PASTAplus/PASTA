@@ -24,51 +24,7 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import edu.lternet.pasta.dml.DataManager;
-import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
-import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
-import edu.lternet.pasta.dml.download.DownloadHandler;
-import edu.lternet.pasta.dml.parser.DataPackage;
-import edu.lternet.pasta.dml.quality.QualityReport;
-
-import edu.lternet.pasta.common.DataPackageUpload;
-import edu.lternet.pasta.common.EmlPackageId;
-import edu.lternet.pasta.common.EmlPackageIdFormat;
-import edu.lternet.pasta.common.ResourceDeletedException;
-import edu.lternet.pasta.common.ResourceExistsException;
-import edu.lternet.pasta.common.ResourceNotFoundException;
-import edu.lternet.pasta.common.UserErrorException;
-import edu.lternet.pasta.common.XmlUtility;
+import edu.lternet.pasta.common.*;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
@@ -81,6 +37,13 @@ import edu.lternet.pasta.datamanager.StorageManager;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.datapackagemanager.dc.DublinCore;
 import edu.lternet.pasta.datapackagemanager.ore.ResourceMap;
+import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
+import edu.lternet.pasta.dml.DataManager;
+import edu.lternet.pasta.dml.database.ConnectionNotAvailableException;
+import edu.lternet.pasta.dml.database.DatabaseConnectionPoolInterface;
+import edu.lternet.pasta.dml.download.DownloadHandler;
+import edu.lternet.pasta.dml.parser.DataPackage;
+import edu.lternet.pasta.dml.quality.QualityReport;
 import edu.lternet.pasta.doi.DOIException;
 import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
@@ -89,8 +52,38 @@ import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
 import edu.ucsb.nceas.utilities.IOUtil;
 import edu.ucsb.nceas.utilities.Options;
 import edu.ucsb.nceas.utilities.XMLUtilities;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
-import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * @author dcosta
@@ -4225,6 +4218,60 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 		journalCitationsXML = stringBuilder.toString();
 		return journalCitationsXML;
+	}
+
+
+	public String listDataPackagesCitedBy(String articleDoi, AuthToken authToken) throws Exception
+	{
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+		ArrayList<Pair<Integer, String>> citations = dataPackageRegistry.listDataPackagesCitedBy(articleDoi);
+
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+		Document doc = docBuilder.newDocument();
+
+		Element rootEl = doc.createElement("PackagesCitedBy");
+		rootEl.setAttribute("articleDoi", articleDoi);
+
+		doc.appendChild(rootEl);
+
+		for (Pair<Integer, String> citation : citations) {
+			Element citationEl = doc.createElement("journalCitation");
+			rootEl.appendChild(citationEl);
+
+			Element CitationIdEl = doc.createElement("articleCitationId");
+            CitationIdEl.appendChild(doc.createTextNode(citation.t.toString()));
+			citationEl.appendChild(CitationIdEl);
+
+			Element packageIdEl = doc.createElement("packageId");
+            packageIdEl.appendChild(doc.createTextNode(citation.u));
+			citationEl.appendChild(packageIdEl);
+		}
+
+		return documentToString(doc);
+	}
+
+
+	private String documentToString(Document doc)
+	{
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer t = tf.newTransformer();
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			// Standalone = There is no external DTD.
+			// This will also add a newline after the XML declaration.
+			t.setOutputProperty(OutputKeys.STANDALONE, "yes");
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			t.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			StringWriter writer = new StringWriter();
+			t.transform(new DOMSource(doc), new StreamResult(writer));
+			return writer.getBuffer().toString();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 

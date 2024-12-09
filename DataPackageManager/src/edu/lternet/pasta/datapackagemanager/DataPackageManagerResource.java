@@ -73,6 +73,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 /**
  * <p>
  * The Data Package Manager Web Service provides a suite of operations to
@@ -12395,7 +12396,49 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
-		/**
+	@GET
+	@Path("/citedby/eml")
+	@Produces("application/xml")
+	public Response listDataPackagesCitedBy(
+		@Context HttpHeaders headers,
+		@QueryParam("articleDoi") String articleDoi
+	)
+	{
+		Response response;
+		try {
+			AuthToken authToken = getAuthToken(headers);
+			String userId = authToken.getUserId();
+			// Is user authorized to run the service method?
+			Rule.Permission permission = Rule.Permission.read;
+			final String serviceMethodName = "listDataPackagesCitedBy";
+			boolean serviceMethodAuthorized =
+				isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+			if (!serviceMethodAuthorized) {
+				throw new UnauthorizedException(
+					"User " + userId + " is not authorized to execute service method " + serviceMethodName);
+			}
+			DataPackageManager dataPackageManager = new DataPackageManager();
+			String packageListXml = dataPackageManager.listDataPackagesCitedBy(articleDoi, authToken);
+			ResponseBuilder responseBuilder = Response.ok(packageListXml);
+			response = responseBuilder.build();
+		} catch (IllegalArgumentException e) {
+			response = WebExceptionFactory.makeBadRequest(e).getResponse();
+		} catch (ResourceNotFoundException e) {
+			response = WebExceptionFactory.makeNotFound(e).getResponse();
+		} catch (UnauthorizedException e) {
+			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (UserErrorException e) {
+			response = WebResponseFactory.makeBadRequest(e);
+		} catch (Exception e) {
+			WebApplicationException webApplicationException =
+				WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+			response = webApplicationException.getResponse();
+		}
+		response = stampHeader(response);
+		return response;
+	}
+
+	/**
 		 *
 		 * <strong>List Principal Owner Citations</strong> operation, specifying the principal owner of the citations
 		 * to be listed.
