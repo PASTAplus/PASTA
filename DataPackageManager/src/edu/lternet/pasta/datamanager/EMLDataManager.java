@@ -504,9 +504,9 @@ public class EMLDataManager implements DatabaseConnectionPoolInterface {
 		  efse.deleteEntity();
 	  }
 
-	  if (useChecksum) {
-		  wasLinked = useChecksum(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
-	  }
+//	  if (useChecksum) {
+//		  wasLinked = useChecksum(dataPackageRegistry, emlPackageId, emlEntity, evaluateMode);
+//	  }
 	  
 	  if (!wasLinked) {
 		  if (dataManager != null) {
