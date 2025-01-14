@@ -1627,12 +1627,16 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * @param headers
 		 *            the HTTP request headers containing the authorization token.
 		 *
-		 * @param uriInfo
-		 *            contains the query string parameters.
+		 * @param scope
+		 *            scope of the data package identifier.
 		 *
-		 * @param eml
-		 *            the EML document to which provenance will be appended.
+		 * @param identifier
+		 *            identifier of the data package identifier.
+         *
+         * @param revision
+         *            revision of the data package identifier.
 		 *
+         *
 		 * @return an appropriate HTTP response.
 		 */
 		@GET @Path("/provenance/eml/{scope}/{identifier}/{revision}") @Consumes(
@@ -3142,6 +3146,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * </tr>
 		 * </table>
 		 *
+         * @param headers
+         *           The HTTP headers from the request.
 		 * @param scope
 		 *            The scope of the metadata document.
 		 * @param identifier
@@ -6305,12 +6311,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * </tr>
 		 * </table>
 		 *
-		 * @param scope
+		 * @param headers
 		 *            The scope of the data package
-		 * @param identifier
-		 *            The identifier of the data package
-		 * @param revision
-		 *            The revision of the data package
 		 * @param transaction
 		 *            The transaction of the data package error
 		 * @return a Response object containing a data package error if found, else
@@ -7640,12 +7642,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * </tr>
 		 * </table>
 		 *
-		 * @param scope
-		 *            The scope of the data package
-		 * @param identifier
-		 *            The identifier of the data package
-		 * @param revision
-		 *            The revision of the data package
+		 * @param headers
+		 *            The request headers
 		 * @param transaction
 		 *            The transaction identifier, e.g. "1364424858431"
 		 * @return A Response object containing the evaluate quality report
@@ -9170,10 +9168,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * </tr>
 		 * </table>
 		 *
-		 * @param pathQuery
-		 *            A pathquery XML document, as specified in the payload of the
-		 *            request.
-		 *
+		 * @param headers
+		 *            The request headers
+         * @param uriInfo
+         *           Contains the query parameters
 		 * @return a Response, which if successful, contains a resultset XML
 		 *         document
 		 */
@@ -9439,13 +9437,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * </tr>
 		 * </table>
 		 *
-		 * @param type   optional query parameter to determine which type
-		 *               of recent data package uploads to return;
-		 *               recognized values are "type=insert" or "type=update".
-		 * @param limit  optional query parameter used to limit the number
-		 *               of recent data packages uploads returned in the list,
-		 *               e.g. "limit=3".
-		 *
+		 * @param headers
+		 *               The request headers
+		 * @param uriInfo
+		 *              Contains the query parameters
 		 * @return a Response, which if successful, contains a resultset XML
 		 *         document
 		 */
@@ -11587,10 +11582,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			/**
 			 * Removes any file that is older than the specified time-to-live
-			 * (ttl).
-			 *
-			 * @param ttl
-			 *            The time-to-live value in milliseconds.
 			 */
 			public void doClean()
 			{
