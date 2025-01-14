@@ -3153,9 +3153,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		 */
 		@GET @Path("/eml/{scope}/{identifier}") @Produces("text/plain")
 		public Response listDataPackageRevisions (@Context HttpHeaders
-		headers, @PathParam("scope") String scope, @PathParam("identifier") String
-		identifierStr, @QueryParam("filter") @DefaultValue("") String filter){
-		Integer identifier = null;
+		headers, @PathParam("scope") String scope, @PathParam("identifier") Integer
+		identifier, @QueryParam("filter") @DefaultValue("") String filter){
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
 		final String serviceMethodName = "listDataPackageRevisions";
@@ -3166,12 +3165,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		try {
 
-			// Check for a non-integer identifier
-			try {
-				identifier = new Integer(identifierStr);
-			} catch (NumberFormatException e) {
-				String message =
-						"identifier value '" + identifierStr + "' must be a non-negative integer\n";
+            if (identifier < 0) {
+    		    String message = String.format("Identifier value %d must be non-negative", identifier);
 				throw new UserErrorException(message);
 			}
 
