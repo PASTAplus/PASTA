@@ -1132,7 +1132,7 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the 'createDataPackage' service method?
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, Rule.Permission.write, authToken);
             if (!serviceMethodAuthorized) {
-                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+                String msg = String.format("Only authenticated users are authorized to execute the %s service method.", serviceMethodName);
                 throw new UnauthorizedException(msg);
             }
 
@@ -3843,7 +3843,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
             if (!serviceMethodAuthorized) {
-                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+                String msg = String.format("Only authenticated users are authorized to execute the %s service method.", serviceMethodName);
                 throw new UnauthorizedException(msg);
             }
 
