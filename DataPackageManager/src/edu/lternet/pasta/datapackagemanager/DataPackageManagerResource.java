@@ -1116,20 +1116,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		AuthToken authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
-		final String serviceMethodName = "createDataPackageArchive";
-
-		// Is user authorized to run the 'createDataPackage' service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName,
-				Rule.Permission.write, authToken
-		);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(String.format(
-					"User %s is not authorized to execute service method %s", serviceMethodName, userId));
-		}
-
-		if (this.readOnly) {
-			throw new ServiceUnavailableException("PASTA is now in read-only mode");
-		}
+		final String serviceMethodName = "downloadDataPackageArchive";
 
 		Response.ResponseBuilder responseBuilder;
 
@@ -1140,13 +1127,24 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		String entryText = null;
 		try {
-			StreamingOutput streamingZipOutput = outputStream -> {
+
+
+            // Is user authorized to run the 'createDataPackage' service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, Rule.Permission.write, authToken);
+            if (!serviceMethodAuthorized) {
+                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+                throw new UnauthorizedException(msg);
+            }
+
+            StreamingOutput streamingZipOutput = outputStream -> {
 				try {
 					zipPackage.writeZip(outputStream);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			};
+
+
 			responseBuilder = Response.status(Response.Status.OK);
 			responseBuilder.entity(streamingZipOutput);
 		} catch (ResourceNotFoundException e) {
@@ -3843,13 +3841,11 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			// Is user authorized to run the service method?
-			boolean serviceMethodAuthorized =
-					isServiceMethodAuthorized(serviceMethodName, permission, authToken);
-			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+            if (!serviceMethodAuthorized) {
+                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+                throw new UnauthorizedException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
