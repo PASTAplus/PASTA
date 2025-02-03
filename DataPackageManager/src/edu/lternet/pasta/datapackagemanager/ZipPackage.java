@@ -22,9 +22,9 @@ import java.util.Scanner;
 
 
 public class ZipPackage {
-    private static final String URI_MIDDLE_DATA = "data/eml/";
-    private static final String URI_MIDDLE_METADATA = "metadata/eml/";
-    private static final String URI_MIDDLE_REPORT = "report/eml/";
+    private static final String URI_MIDDLE_DATA = "/data/eml/";
+    private static final String URI_MIDDLE_METADATA = "/metadata/eml/";
+    private static final String URI_MIDDLE_REPORT = "/report/eml/";
     private static final String XSLT_FILE_NAME = "eml_text-21.xsl";
     private static final String CONFIG_PATH = "WebRoot/WEB-INF/conf";
     private static final Logger logger = Logger.getLogger(ZipPackage.class);
@@ -103,6 +103,7 @@ public class ZipPackage {
 
         while (mapScanner.hasNextLine()) {
             String line = mapScanner.nextLine();
+            logger.info(line);
             // metadata/eml/
             if (line.contains(URI_MIDDLE_METADATA)) {
                 // Add the EML XML file
