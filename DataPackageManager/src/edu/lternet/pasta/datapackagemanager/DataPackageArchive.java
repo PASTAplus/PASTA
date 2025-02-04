@@ -70,9 +70,9 @@ public class DataPackageArchive {
 	 * Class variables
 	 */
 
-	private static final String URI_MIDDLE_DATA = "data/eml/";
-	private static final String URI_MIDDLE_METADATA = "metadata/eml/";
-	private static final String URI_MIDDLE_REPORT = "report/eml/";
+	private static final String URI_MIDDLE_DATA = "/data/eml/";
+	private static final String URI_MIDDLE_METADATA = "/metadata/eml/";
+	private static final String URI_MIDDLE_REPORT = "/report/eml/";
 	private static final String dirPath = "WebRoot/WEB-INF/conf";
 	private static final String XSLT_FILE_NAME = "eml_text-21.xsl";
 

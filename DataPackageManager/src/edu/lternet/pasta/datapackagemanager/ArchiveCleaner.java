@@ -68,10 +68,10 @@ public class ArchiveCleaner {
 			options = ConfigurationListener.getOptions();
 		}
 
-		tmpDir = options.getOption("datapackagemanager.tmpDir");
+		tmpDir = options.getOption("datapackagemanager.archiveDir");
 
 		if (tmpDir == null || tmpDir.isEmpty()) {
-			String gripe = "Temporary directory property not set!";
+			String gripe = "Archive directory property not set!";
 			throw new Exception(gripe);
 		}
 
@@ -120,6 +120,7 @@ public class ArchiveCleaner {
 		Collection<File> files = FileUtils.listFiles(tmpDir, ext, false);
 
 		for (File file : files) {
+            logger.info("ArchiveCleaner: " + file.getAbsolutePath());
 			if (file != null && file.exists()) {
 				lastModified = file.lastModified();
 				// Remove file if older than the ttl
