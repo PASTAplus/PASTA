@@ -51,7 +51,7 @@ public class ArchiveCleaner {
 	 */
 
 	private final Logger logger = Logger.getLogger(ArchiveCleaner.class);
-	private String tmpDir = null;
+	private String archiveDir = null;
 
 	/*
 	 * Constructors
@@ -68,9 +68,9 @@ public class ArchiveCleaner {
 			options = ConfigurationListener.getOptions();
 		}
 
-		tmpDir = options.getOption("datapackagemanager.archiveDir");
+		archiveDir = options.getOption("datapackagemanager.archiveDir");
 
-		if (tmpDir == null || tmpDir.isEmpty()) {
+		if (archiveDir == null || archiveDir.isEmpty()) {
 			String gripe = "Archive directory property not set!";
 			throw new Exception(gripe);
 		}
@@ -111,13 +111,13 @@ public class ArchiveCleaner {
 	 * @return    the number of archive files that were removed
 	 */
 	public int doClean(Long ttl) {
-		File tmpDir = new File(this.tmpDir);
+		File archiveDir = new File(this.archiveDir);
 		String[] ext = { "zip" };
 		Long time = new Date().getTime();
 		Long lastModified = null;
 		int deleteCount = 0;
 
-		Collection<File> files = FileUtils.listFiles(tmpDir, ext, false);
+		Collection<File> files = FileUtils.listFiles(archiveDir, ext, false);
 
 		for (File file : files) {
             logger.info("ArchiveCleaner: " + file.getAbsolutePath());
