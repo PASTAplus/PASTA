@@ -3928,7 +3928,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 					if (objectName != null) {
 						responseBuilder.header("Content-Disposition",
-								"attachment; filename=\"" + objectName + "\"");
+								"inline; filename=\"" + objectName + "\"");
 					}
 				}
 				else {
