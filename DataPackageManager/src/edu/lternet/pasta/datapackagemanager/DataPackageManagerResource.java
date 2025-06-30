@@ -200,6 +200,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	 */
 
 	public static final String AUTH_TOKEN = "auth-token";
+    public static final String EDI_TOKEN = "edi-token";
+
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
 	
 	// time-to-live default for tempoary data files, in milliseconds
@@ -318,7 +320,26 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
-	/**
+    /**
+     * Gets an AuthToken object from an HttpHeaders object
+     *
+     * @param headers
+     *            the HttpHeaders object
+     * @return an AuthToken token
+     */
+    public static String getEdiToken(HttpHeaders headers) {
+        Map<String, Cookie> cookiesMap = headers.getCookies();
+        String ediToken = null;
+
+        if (cookiesMap.containsKey(EDI_TOKEN)) {
+            ediToken = cookiesMap.get(EDI_TOKEN).getValue();
+        }
+
+        return ediToken;
+    }
+
+
+    /**
 	 * Gets the Robot header value, if provided in the headers
 	 * 
 	 * @param headers
@@ -3326,11 +3347,13 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "listDataPackageScopes";
 		Rule.Permission permission = Rule.Permission.read;
 		AuthToken authToken = null;
+        String ediToken = null;
 		String resourceId = null;
 		String entryText = null;
 
 		try {
 			authToken = getAuthToken(headers);
+            ediToken = getEdiToken(headers);
 			String userId = authToken.getUserId();
 
 			// Is user authorized to run the service method?
