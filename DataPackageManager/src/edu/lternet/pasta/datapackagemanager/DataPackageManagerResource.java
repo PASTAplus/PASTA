@@ -423,17 +423,16 @@ public class DataPackageManagerResource extends PastaWebService {
 	/*
 	 * Wrapper method for recording an audit when there is no robot parameter
 	 */
-	private void audit(String serviceMethodName, AuthToken authToken,
+	private void audit(String serviceMethodName, AuthToken authToken, String ediToken,
 			           Response response, String resourceId, String entryText) {
 		String robot = null;
 		String userAgent = null;
 		
-		audit(serviceMethodName, authToken, response, resourceId, entryText, 
-			  robot, userAgent);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot, userAgent);
 	}
 
 
-	private void audit(String serviceMethodName, AuthToken authToken,
+	private void audit(String serviceMethodName, AuthToken authToken, String ediToken,
 			           Response response, String resourceId, String entryText,
 			           String robot, String userAgent) {
 		String auditHost = getAuditHost();
@@ -442,10 +441,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 			int status = response.getStatus();
 			Date date = new Date();
-			AuditRecord auditRecord = 
-					new AuditRecord(date, serviceName, entryText, authToken, 
-							        status, serviceMethodName, resourceId, 
-							        robot, userAgent);
+			AuditRecord auditRecord = new AuditRecord(date, serviceName, entryText, authToken, ediToken, status, serviceMethodName, resourceId, robot, userAgent);
 			AuditManagerClient auditManagerClient = new AuditManagerClient(
 					auditHost);
 			auditManagerClient.logAudit(auditRecord);
@@ -926,7 +922,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			String transaction = generateTransactionID("create", null, null, null);
 			
 			// Perform createDataPackage in new thread
-			Creator creator = new Creator(emlFile, userId, authToken, transaction);
+			Creator creator = new Creator(emlFile, userId, authToken, ediToken, transaction);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(creator);
 			executorService.shutdown();
@@ -1050,8 +1046,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			// Perform createDataPackage in new thread
-			Archivor archivor = new Archivor(scope, identifier, revision, userId,
-					authToken, transaction);
+			Archivor archivor = new Archivor(scope, identifier, revision, userId, authToken, ediToken, transaction);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(archivor);
 			executorService.shutdown();
@@ -1198,12 +1193,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = DataPackageManager.composeResourceId(ResourceType.archive, scope, identifier, revision, null);
 
 		// Add audit record (which also increases download counter) for the download of the zip archive itself.
-		audit("readDataPackageArchive", authToken, response, resourceId, entryText);
+		audit("readDataPackageArchive", authToken, ediToken, response, resourceId, entryText);
 
 		// Add audit records (which also increases download counters) for each individual data entity in the zip file. Only data
 		// entities for which the user has permissions, and which are present in the zip file, are included.
 		for (String dataResourceId : dataResourceIdList) {
-			audit("readDataEntity", authToken, response, dataResourceId, "Downloaded as part of zip archive");
+			audit("readDataEntity", authToken, ediToken, response, dataResourceId, "Downloaded as part of zip archive");
 		}
 
 		return response;
@@ -1309,7 +1304,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -1417,7 +1412,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -1554,8 +1549,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			logger.info(msg);
 
 			// Perform evaluateDataPackage in new thread
-			Evaluator evaluator =
-					new Evaluator(emlFile, userId, authToken, transaction, useChecksum);
+			Evaluator evaluator = new Evaluator(emlFile, userId, authToken, ediToken, transaction, useChecksum);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(evaluator);
 			executorService.shutdown();
@@ -1730,7 +1724,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -1933,7 +1927,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		 response = webApplicationException.getResponse();
 		 }
 
-		 audit(serviceMethodName, authToken, response, resourceId, entryText);
+		 audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		 response = stampHeader(response);
 		 return response;
 		 }
@@ -2092,7 +2086,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -2278,7 +2272,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -2430,7 +2424,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -2571,7 +2565,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -2941,7 +2935,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -3103,7 +3097,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -3318,7 +3312,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -3460,7 +3454,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+        audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -3597,7 +3591,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -4061,7 +4055,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		cleanTemporaryDir();
 
@@ -4336,7 +4330,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -4531,7 +4525,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -4708,7 +4702,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -4883,7 +4877,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -5063,7 +5057,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -5244,7 +5238,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, entityResourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, entityResourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -5424,7 +5418,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -5633,7 +5627,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		String resourceId = resourceIdFromResourceMap(resourceMap);
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 
 		response = stampHeader(response);
@@ -5820,7 +5814,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -6003,7 +5997,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -6192,7 +6186,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		cleanTemporaryDir();
 
@@ -6364,7 +6358,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -6521,7 +6515,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -6729,7 +6723,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		String resourceId = resourceIdFromResourceMap(resourceMap);
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 
 		response = stampHeader(response);
@@ -6973,7 +6967,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -7162,7 +7156,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -7350,7 +7344,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -7521,7 +7515,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -7694,7 +7688,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		 response = webApplicationException.getResponse();
 		 }
 
-		 audit(serviceMethodName, authToken, response, resourceId, entryText);
+		 audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		 response = stampHeader(response);
 		 return response;
@@ -7923,7 +7917,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -8164,7 +8158,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -8407,7 +8401,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -8595,7 +8589,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -8782,7 +8776,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -8952,7 +8946,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -9125,7 +9119,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		 response = webApplicationException.getResponse();
 		 }
 
-		 audit(serviceMethodName, authToken, response, resourceId, entryText);
+		 audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		 response = stampHeader(response);
 		 return response;
@@ -9284,7 +9278,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -9461,7 +9455,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -9547,7 +9541,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText, robot,
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText, robot,
 				userAgent);
 		response = stampHeader(response);
 		return response;
@@ -9744,7 +9738,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -10004,7 +9998,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -10283,7 +10277,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -10423,9 +10417,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			String transaction = generateTransactionID("update", scope, identifier, null);
 
 			// Perform updateDataPackage in new thread
-			Updator updator =
-					new Updator(emlFile, scope, identifier, userId, authToken, transaction,
-							useChecksum);
+			Updator updator = new Updator(emlFile, scope, identifier, userId, authToken, ediToken, transaction, useChecksum);
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.execute(updator);
 			executorService.shutdown();
@@ -10601,7 +10593,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		}
 
 		String resourceId = null;
-		audit(serviceMethodName, authToken, response, resourceId, entryText);
+		audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 		response = stampHeader(response);
 		return response;
 	}
@@ -10752,7 +10744,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				response = webApplicationException.getResponse();
 				msg = e.getMessage();
 			} finally {
-				audit(serviceMethodName, authToken, response, null, msg);
+				audit(serviceMethodName, authToken, ediToken, response, null, msg);
 			}
 
 			return response;
@@ -10881,7 +10873,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -11048,7 +11040,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		} finally {
 			if (response != null) {
-				audit(serviceMethodName, authToken, response, null, msg);
+				audit(serviceMethodName, authToken, ediToken, response, null, msg);
 			}
 		}
 
@@ -11204,7 +11196,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -11363,7 +11355,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -11445,11 +11437,19 @@ public class DataPackageManagerResource extends PastaWebService {
 			Integer revision = null;
 			String userId = null;
 			AuthToken authToken = null;
+            String ediToken = null;
 			String transaction = null;
 
 
-			public Archivor(String scope, Integer identifier, Integer revision, String userId,
-											AuthToken authToken, String transaction)
+			public Archivor(
+                    String scope,
+                    Integer identifier,
+                    Integer revision,
+                    String userId,
+                    AuthToken authToken,
+                    String ediToken,
+                    String transaction
+            )
 			{
 
 				this.scope = scope;
@@ -11457,6 +11457,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				this.revision = revision;
 				this.userId = userId;
 				this.authToken = authToken;
+                this.ediToken = ediToken;
 				this.transaction = transaction;
 
 			}
@@ -11476,8 +11477,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				try {
 
 					dpm = new DataPackageManager();
-					archive = dpm.createDataPackageArchive(scope, identifier, revision, userId,
-							authToken, transaction);
+					archive = dpm.createDataPackageArchive(scope, identifier, revision, userId, authToken, transaction);
 
 					responseBuilder = Response.ok(archive);
 					response = responseBuilder.build();
@@ -11514,7 +11514,7 @@ public class DataPackageManagerResource extends PastaWebService {
 									e.getMessage()).getResponse();
 				}
 
-				audit(serviceMethodName, authToken, response, resourceId, gripe);
+				audit(serviceMethodName, authToken, ediToken, response, resourceId, gripe);
 
 			}
 
@@ -11532,16 +11532,23 @@ public class DataPackageManagerResource extends PastaWebService {
 			File emlFile = null;
 			String userId = null;
 			AuthToken authToken = null;
+            String ediToken = null;
 			String transaction = null;
 
 
-			public Creator(File emlFile, String userId, AuthToken authToken,
-										 String transaction)
+			public Creator(
+                    File emlFile,
+                    String userId,
+                    AuthToken authToken,
+                    String ediToken,
+                    String transaction
+            )
 			{
 
 				this.emlFile = emlFile;
 				this.userId = userId;
 				this.authToken = authToken;
+                this.ediToken = ediToken;
 				this.transaction = transaction;
 
 			}
@@ -11609,7 +11616,7 @@ public class DataPackageManagerResource extends PastaWebService {
 									e.getMessage()).getResponse();
 				}
 
-				audit(serviceMethodName, authToken, response, resourceId, gripe);
+				audit(serviceMethodName, authToken, ediToken, response, resourceId, gripe);
 
 			}
 
@@ -11628,17 +11635,24 @@ public class DataPackageManagerResource extends PastaWebService {
 			File emlFile = null;
 			String userId = null;
 			AuthToken authToken = null;
+            String ediToken = null;
 			String transaction = null;
 			boolean useChecksum = false;
 
 
-			public Evaluator(File emlFile, String userId, AuthToken authToken,
-											 String transaction, boolean useChecksum)
+			public Evaluator(
+                    File emlFile,
+                    String userId,
+                    AuthToken authToken,
+                    String ediToken,
+                    String transaction,
+                    boolean useChecksum
+            )
 			{
-
 				this.emlFile = emlFile;
 				this.userId = userId;
 				this.authToken = authToken;
+                this.ediToken = ediToken;
 				this.transaction = transaction;
 				this.useChecksum = useChecksum;
 			}
@@ -11706,7 +11720,7 @@ public class DataPackageManagerResource extends PastaWebService {
 									e.getMessage()).getResponse();
 				}
 
-				audit(serviceMethodName, authToken, response, resourceId, gripe);
+				audit(serviceMethodName, authToken, ediToken, response, resourceId, gripe);
 
 			}
 
@@ -11726,19 +11740,28 @@ public class DataPackageManagerResource extends PastaWebService {
 			Integer identifier = null;
 			String userId = null;
 			AuthToken authToken = null;
+            String ediToken = null;
 			String transaction = null;
 			boolean useChecksum = false;
 
 
-			public Updator(File emlFile, String scope, Integer identifier, String userId,
-										 AuthToken authToken, String transaction, boolean useChecksum)
+			public Updator(
+                    File emlFile,
+                    String scope,
+                    Integer identifier,
+                    String userId,
+                    AuthToken authToken,
+                    String ediToken,
+                    String transaction,
+                    boolean useChecksum
+            )
 			{
-
 				this.emlFile = emlFile;
 				this.scope = scope;
 				this.identifier = identifier;
 				this.userId = userId;
 				this.authToken = authToken;
+                this.ediToken = ediToken;
 				this.transaction = transaction;
 				this.useChecksum = useChecksum;
 			}
@@ -11746,7 +11769,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			public void run()
 			{
-
 				String map = null;
 				String gripe = null;
 				Response response = null;
@@ -11807,7 +11829,7 @@ public class DataPackageManagerResource extends PastaWebService {
 									e.getMessage()).getResponse();
 				}
 
-				audit(serviceMethodName, authToken, response, resourceId, gripe);
+				audit(serviceMethodName, authToken, ediToken, response, resourceId, gripe);
 
 			}
 
@@ -12032,7 +12054,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
-			audit(serviceMethodName, authToken, response, null, msg);
+			audit(serviceMethodName, authToken, ediToken, response, null, msg);
 		}
 
 		return response;
@@ -12193,7 +12215,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				response = webApplicationException.getResponse();
 				msg = e.getMessage();
 			} finally {
-				audit(serviceMethodName, authToken, response, null, msg);
+				audit(serviceMethodName, authToken, ediToken, response, null, msg);
 			}
 
 			return response;
@@ -12311,7 +12333,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				response = webApplicationException.getResponse();
 				msg = e.getMessage();
 			} finally {
-				audit(serviceMethodName, authToken, response, null, msg);
+				audit(serviceMethodName, authToken, ediToken, response, null, msg);
 			}
 
 			return response;
@@ -12451,7 +12473,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -12656,7 +12678,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;
@@ -12862,7 +12884,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = webApplicationException.getResponse();
 		}
 
-		// audit(serviceMethodName, authToken, response, resourceId, entryText);
+		// audit(serviceMethodName, authToken, ediToken, response, resourceId, entryText);
 
 		response = stampHeader(response);
 		return response;

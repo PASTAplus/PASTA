@@ -45,6 +45,7 @@ public class AuditRecord {
   private String authSystem;
   private String entryText;
   private AuthToken authToken;
+  private String ediToken;
 
   
   /* 
@@ -62,9 +63,18 @@ public class AuditRecord {
 
   
   public AuditRecord(
-      Date date, String service, String entryText,
-      AuthToken authToken, int httpStatusCode, String serviceMethod,
-      String resourceId, String robot, String userAgent) {
+      Date date,
+      String service,
+      String entryText,
+      AuthToken authToken,
+      String ediToken,
+      int httpStatusCode,
+      String serviceMethod,
+      String resourceId,
+      String robot,
+      String userAgent
+  )
+  {
     super();
     this.entryTime = ISO8601Utility.formatDateTime(date);
     this.category = categoryFromStatusCode(httpStatusCode);
