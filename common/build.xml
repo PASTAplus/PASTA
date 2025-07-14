@@ -70,7 +70,7 @@
           <include name="**/*.jar"/>
       </fileset>
       <fileset dir="${shared.lib.dir}/java-jwt">
-          <include name="java-jwt-4.5.0.jar"/>
+          <include name="**/*.jar"/>
       </fileset>
     </copy>
   </target>
