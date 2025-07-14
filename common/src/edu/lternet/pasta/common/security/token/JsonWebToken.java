@@ -37,7 +37,7 @@ import edu.lternet.pasta.common.security.auth.AuthSystemDef;
  * Used to represent Basic Access Authentication credentials as an
  * authorization token.
  */
-public final class JsonWebToken implements AuthTokenWithPassword {
+public final class JsonWebToken {
 
 
 }
