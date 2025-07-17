@@ -24,31 +24,31 @@
 
 package edu.lternet.pasta.common.security.token;
 
-import static org.junit.Assert.*;
-
-import javax.ws.rs.WebApplicationException;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
-public class TestJsonWebToken {
+public class TestEdiToken {
 
 private String token = null;
+private String subj = null;
+private String iss = null;
+private String principals = null;
     
     @Before
     public void init() {
         token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktMzEyZTkwZjI5ZmJlNGUzZGE3MWY1MjFlZmJmMWRlMDYiLCJjbiI6IkVESSIsImVtYWlsIjpudWxsLCJwcmluY2lwYWxzIjpbIkVESS1iMjc1N2ZlZTEyNjM0Y2NjYTQwZDJkNjg5ZjVjMDU0MyIsIkVESS1kM2ZjYTk3NjdhYzU0YzIyOTYyODk2YjAxYTFjMDFiZCJdLCJpc0VtYWlsRW5hYmxlZCI6ZmFsc2UsImlzRW1haWxWZXJpZmllZCI6ZmFsc2UsImlkZW50aXR5SWQiOjMsImlkcE5hbWUiOiJsZGFwIiwiaWRwVWlkIjoidWlkPUVESSxvPUVESSxkYz1lZGlyZXBvc2l0b3J5LGRjPW9yZyIsImlkcENuYW1lIjoiRURJIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmVkaXJlcG9zaXRvcnkub3JnIiwiaGQiOiJlZGlyZXBvc2l0b3J5Lm9yZyIsImlhdCI6MTc1MjUwNzY5MiwibmJmIjoxNzUyNTA3NjkyLCJleHAiOjE3NTI1MzY0OTJ9.syUA6NedZvSSjYakGWtq5qo4U1H8LzX-R7w0MC5p2fZE8usCqrgu-ig0kLnrYRscBQWrOcwE8E7bbp6yNPTqbQ";
+        subj = "EDI-312e90f29fbe4e3da71f521efbf1de06";
+        iss = "https://auth.edirepository.org";
+        principals = "[\"EDI-b2757fee12634ccca40d2d689f5c0543\",\"EDI-d3fca9767ac54c22962896b01a1c01bd\"]";
     }
     
     @Test
     public void testDecodeToken() {
-        DecodedJWT jwt = JWT.decode(token);
-        System.out.println("Subject: " + jwt.getSubject());
-        System.out.println("Issuer: " + jwt.getIssuer());
-        System.out.println("Expires At: " + jwt.getExpiresAt());
-        System.out.println("Issued At: " + jwt.getIssuedAt());
+        EdiToken ediToken = new EdiToken(token);
+
+        assert(ediToken.getTokenString().equals(token));
+        assert(ediToken.getSubject().equals(subj));
+        assert(ediToken.getIssuer().equals(iss));
+        assert(ediToken.getPrincipals().equals(principals));
     }
 }

@@ -24,20 +24,40 @@
 
 package edu.lternet.pasta.common.security.token;
 
-import java.util.Collections;
-import java.util.Set;
-
-import com.sun.jersey.core.util.Base64;
 import com.auth0.jwt.JWT;
-
-import edu.lternet.pasta.common.WebExceptionFactory;
-import edu.lternet.pasta.common.security.auth.AuthSystemDef;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 /**
- * Used to represent Basic Access Authentication credentials as an
- * authorization token.
+ * Provides interface to the EDI Token claims.
  */
-public final class JsonWebToken {
+public final class EdiToken {
 
+    private final String token;
+    private final DecodedJWT decodedJWT;
+
+    public EdiToken(String token) {
+        this.token = token;
+        this.decodedJWT = JWT.decode(token);
+    }
+
+    public String getTokenString() {
+        return token;
+    }
+
+    public DecodedJWT getDecodedJWT() {
+        return decodedJWT;
+    }
+
+    public String getSubject() {
+        return decodedJWT.getSubject();
+    }
+
+    public String getIssuer() {
+        return decodedJWT.getIssuer();
+    }
+
+    public String getPrincipals() {
+        return String.valueOf(decodedJWT.getClaim("principals"));
+    }
 
 }
