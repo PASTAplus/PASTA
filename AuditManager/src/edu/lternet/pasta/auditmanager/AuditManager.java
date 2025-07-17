@@ -660,7 +660,6 @@ public class AuditManager {
             String authSystem = rs.getString(12);
             java.time.Instant instant = sqlTimestamp.toInstant();
             String entryTime = DateTimeFormatter.ISO_INSTANT.format(instant);
-//            java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
             printer.printRecord(oid, entryTime, service, category, serviceMethod,
                 entryText, resourceId, Integer.toString(statusCode), userId, userAgent,
                 groups, authSystem);
