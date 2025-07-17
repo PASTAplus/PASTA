@@ -44,6 +44,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -657,7 +658,8 @@ public class AuditManager {
             String userAgent = rs.getString(10);
             String groups = rs.getString(11);
             String authSystem = rs.getString(12);
-            java.util.Date entryTime = new java.util.Date(sqlTimestamp.getTime());
+            java.time.Instant instant = sqlTimestamp.toInstant();
+            String entryTime = DateTimeFormatter.ISO_INSTANT.format(instant);
             printer.printRecord(oid, entryTime, service, category, serviceMethod,
                 entryText, resourceId, Integer.toString(statusCode), userId, userAgent,
                 groups, authSystem);
