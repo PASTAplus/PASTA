@@ -91,9 +91,6 @@ public final class BasicAuthToken implements AuthTokenWithPassword {
      * @param token
      *            the entire field value of the {@code Authorization} header.
      *
-     * @throws WebApplicationException
-     *             if the provided token string cannot be parsed according to
-     *             the Basic Access Authentication scheme.
      */
     public BasicAuthToken(String token) {
         // Storing token in its original form
