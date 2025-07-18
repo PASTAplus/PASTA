@@ -24,8 +24,10 @@
 
 package edu.lternet.pasta.common.security.token;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+
+import org.json.*;
 
 /**
  * Provides interface to the EDI Token claims.
@@ -33,31 +35,52 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public final class EdiToken {
 
     private final String token;
-    private final DecodedJWT decodedJWT;
+    private final String header;
+    private final String payload;
+    private final String signature;
+    private final JSONObject jsonHeader;
+    private final JSONObject jsonPayload;
 
-    public EdiToken(String token) {
-        this.token = token;
-        this.decodedJWT = JWT.decode(token);
+    public EdiToken(String tokenBase64) {
+        this.token = tokenBase64;
+
+        String[] jwtParts = tokenBase64.split("\\.");
+        if (jwtParts.length != 3) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+
+        byte[] header = decoder.decode(jwtParts[0]);
+        this.header = new String(header, StandardCharsets.UTF_8);
+        this.jsonHeader = new JSONObject(this.header);
+
+        byte[] payload = decoder.decode(jwtParts[1]);
+        this.payload = new String(payload, StandardCharsets.UTF_8);
+        this.jsonPayload = new JSONObject(this.payload);
+
+        byte[] signature = decoder.decode(jwtParts[2]);
+        this.signature = new String(signature, StandardCharsets.UTF_8);
+
     }
 
     public String getTokenString() {
         return token;
     }
 
-    public DecodedJWT getDecodedJWT() {
-        return decodedJWT;
+    public String getHeader() {
+        return header;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public String getSignature() {
+        return  signature;
     }
 
     public String getSubject() {
-        return decodedJWT.getSubject();
+        return jsonPayload.getString("sub");
     }
-
-    public String getIssuer() {
-        return decodedJWT.getIssuer();
-    }
-
-    public String getPrincipals() {
-        return String.valueOf(decodedJWT.getClaim("principals"));
-    }
-
 }
