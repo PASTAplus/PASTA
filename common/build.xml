@@ -69,7 +69,7 @@
       <fileset dir="${shared.lib.dir}/postgresql">
           <include name="**/*.jar"/>
       </fileset>
-      <fileset dir="${shared.lib.dir}/java-jwt">
+      <fileset dir="${shared.lib.dir}/json">
           <include name="**/*.jar"/>
       </fileset>
     </copy>
