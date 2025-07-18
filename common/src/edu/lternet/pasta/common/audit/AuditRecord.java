@@ -12,6 +12,7 @@ import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
 import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.security.token.EdiToken;
 
 
 /**
@@ -39,16 +40,14 @@ public class AuditRecord {
   private String serviceMethod;
   private int responseStatus;
   private String resourceId;
-  private String user;
+  private String user = "";
   private String userAgent;
   private String groups;
   private String authSystem;
   private String entryText;
-  private AuthToken authToken;
-  private String ediToken;
 
-  
-  /* 
+
+    /*
    * Constructors 
    */
   
@@ -67,7 +66,7 @@ public class AuditRecord {
       String service,
       String entryText,
       AuthToken authToken,
-      String ediToken,
+      String ediTokenStr,
       int httpStatusCode,
       String serviceMethod,
       String resourceId,
@@ -80,19 +79,20 @@ public class AuditRecord {
     this.category = categoryFromStatusCode(httpStatusCode);
     this.service = service;
     this.serviceMethod = serviceMethod;
-    this.authToken = authToken;
     if (authToken != null) {
       this.user = authToken.getUserId();
-      if (this.user != null && 
-    	  this.user.equals("public") && 
-    	  (robot != null)
-    	 ) {
+      if (this.user != null && this.user.equals("public") && (robot != null)) {
     	  this.user = "robot";
       }
       Set<String> groupsSet = authToken.getGroups();
       this.groups = groupsSetToGroupsString(groupsSet);
       AuthSystemDef authSystemDef = authToken.getAuthSystem();
       this.authSystem = authSystemDef.getCanonicalName();
+    }
+    if (ediTokenStr != null) {
+        EdiToken ediToken = new EdiToken(ediTokenStr);
+        String subj = ediToken.getSubject();
+        this.user += " (" + subj + ")";
     }
     this.responseStatus = httpStatusCode;
     this.resourceId = resourceId;
