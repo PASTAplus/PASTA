@@ -63,6 +63,7 @@ public class DataPackageArchiveTest {
 	private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
 	private static String testArchive = null;
 	private static String xslDir = null;
+    private static String testEdiToken = null;
 
 	/*
 	 * Instance variables
@@ -108,6 +109,13 @@ public class DataPackageArchiveTest {
 			String gripe = "Error: property 'xslDir' not set!";
 			throw new Exception(gripe);
 		}
+
+        testEdiToken = options.getOption("datapackagemanager.test.edi.token");
+
+        if (testEdiToken == null) {
+            String gripe = "Error: property 'testEdiToken' not set!";
+            throw new Exception(gripe);
+        }
 
 		// Set transaction identifier based on wall-clock time
 		Long time = new Date().getTime();
@@ -189,7 +197,7 @@ public class DataPackageArchiveTest {
 		// Test for successful creation of test archive
 		try {
 			archive = dpA.createDataPackageArchive(scope, identifier, revision,
-			    testUser, authToken, transaction, xslDir);
+			    testUser, authToken, testEdiToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -222,7 +230,7 @@ public class DataPackageArchiveTest {
 		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
-			    authToken, transaction, xslDir);
+			    authToken, testEdiToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -260,7 +268,7 @@ public class DataPackageArchiveTest {
 		String packageId = String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
 		try {
 			dpA.createDataPackageArchive(scope, identifier, revision, testUser,
-			    authToken, transaction, xslDir);
+			    authToken, testEdiToken, transaction, xslDir);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();

@@ -114,20 +114,26 @@ public final class MetadataFactory {
      * @param scope          the data package scope value, e.g. "knb-lter-and"
      * @param identifier     the data package identifier value, e.g. 1
      * @param revision       the data package revision value, e.g. "1"
-     * @param token          the authentication token
+     * @param authToken      the authentication token
+     * @param ediToken       the EDI-Token authentication token
      * @return               an XML string containing the <methodStep> element
      *                       holding the provenance metadata for this data package
      * @throws Exception
      */
-	public String generateEML(String scope, Integer identifier, String revision,
-			                    AuthToken token)
-			throws Exception {
+	public String generateEML(
+            String scope,
+            Integer identifier,
+            String revision,
+            AuthToken authToken,
+            String ediToken
+    ) throws Exception {
+
 		List<String> entityList = new ArrayList<String>();
 		String emlToModify = "<methodStep></methodStep>";
 		Document doc = XmlUtility.xmlStringToDoc(emlToModify);
-		String user = token.getUserId();
+		String user = authToken.getUserId();
 		DataPackageManager dataPackageManager = new DataPackageManager();
-		String parentEmlStr = dataPackageManager.readMetadata(scope, identifier, revision, user, token);
+		String parentEmlStr = dataPackageManager.readMetadata(scope, identifier, revision, user, authToken, ediToken);
 		if (parentEmlStr == null) {
 			String packageId = String.format("%s.%d.%s", scope, identifier, revision);
 			throw new ResourceNotFoundException(String.format(

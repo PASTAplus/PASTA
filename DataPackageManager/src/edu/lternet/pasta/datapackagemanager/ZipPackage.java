@@ -37,6 +37,7 @@ public class ZipPackage {
     Integer revision;
     String userId;
     AuthToken authToken;
+    String ediToken;
     DataPackageManager dataPackageManager;
     String xslDir;
 
@@ -46,7 +47,8 @@ public class ZipPackage {
             Integer identifier,
             Integer revision,
             String userId,
-            AuthToken authToken
+            AuthToken authToken,
+            String ediToken
     ) {
         this.dataPackageManager = dataPackageManager;
         this.scope = scope;
@@ -54,6 +56,7 @@ public class ZipPackage {
         this.revision = revision;
         this.userId = userId;
         this.authToken = authToken;
+        this.ediToken = ediToken;
 
         initConfig();
         xslDir = options.getOption("datapackagemanager.xslDir");
@@ -88,7 +91,7 @@ public class ZipPackage {
         String resourceMapStr;
         try {
             resourceMapStr = this.dataPackageManager.readDataPackage(this.scope, this.identifier,
-                    this.revision.toString(), this.authToken, this.userId, false
+                    this.revision.toString(), this.authToken, this.ediToken, this.userId, false
             );
         } catch (UnauthorizedException e) {
             logger.error(e.getMessage());
@@ -159,10 +162,8 @@ public class ZipPackage {
                 String entityName;
                 File dataFile;
                 try {
-                    metaXml = dataPackageManager.readMetadata(
-                            scope, identifier, revision.toString(), userId, authToken);
-                    entityName = dataPackageManager.readDataEntityName(
-                            dataPackageResourceId, entityResourceId, authToken);
+                    metaXml = dataPackageManager.readMetadata(scope, identifier, revision.toString(), userId, authToken, ediToken);
+                    entityName = dataPackageManager.readDataEntityName(dataPackageResourceId, entityResourceId, authToken, ediToken);
                     dataFile = getDataFile(entityId);
                 } catch (UnauthorizedException e) {
                     logger.error(e.getMessage());
@@ -215,8 +216,7 @@ public class ZipPackage {
         String resourceMapStr;
         try {
             resourceMapStr = this.dataPackageManager.readDataPackage(
-                this.scope, this.identifier, this.revision.toString(), this.authToken, this.userId, false
-            );
+                this.scope, this.identifier, this.revision.toString(), this.authToken, this.ediToken, this.userId, false);
         } catch (UnauthorizedException e) {
             return dataResourceIdList;
         }
@@ -287,9 +287,7 @@ public class ZipPackage {
     }
 
     public File getMetadataFile() throws ClassNotFoundException, SQLException, IOException {
-        return dataPackageManager.getMetadataFile(this.scope, this.identifier, this.revision.toString(),
-                this.userId, this.authToken
-        );
+        return dataPackageManager.getMetadataFile(this.scope, this.identifier, this.revision.toString(), this.userId, this.authToken, this.ediToken);
     }
 
     public String getReport(EmlPackageId emlPackageId)
@@ -300,7 +298,7 @@ public class ZipPackage {
     public File getReportFile(EmlPackageId emlPackageId)
             throws ClassNotFoundException, SQLException, IOException {
         return this.dataPackageManager.readDataPackageReport(this.scope, this.identifier,
-                this.revision.toString(), emlPackageId, this.authToken, this.userId
+                this.revision.toString(), emlPackageId, this.authToken, this.ediToken, this.userId
         );
     }
 
@@ -310,7 +308,7 @@ public class ZipPackage {
 
     public File getDataFile(String entityId) throws Exception {
         return dataPackageManager.getDataEntityFile(this.scope, this.identifier,
-                this.revision.toString(), entityId, this.authToken, this.userId
+                this.revision.toString(), entityId, this.authToken, this.ediToken, this.userId
         );
     }
 }

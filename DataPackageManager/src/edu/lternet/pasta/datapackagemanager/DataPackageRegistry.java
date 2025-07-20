@@ -76,6 +76,7 @@ public class DataPackageRegistry {
   private static final String PUBLIC = "public";
   private static final String DEFAULT_EML_VERSION = "2.2.0";
   private static final String DEFAULT_EML_NAMESPACE_PREFIX = "https://eml.";
+  private static String PUBLIC_EDI_ID = null;
   
 
   /*
@@ -130,7 +131,25 @@ public class DataPackageRegistry {
       String message = "The data package registry table was not found in the PASTA database.";
       throw new SQLException(message);
     }
-    
+
+    Options options = null;
+    options = ConfigurationListener.getOptions();
+
+    String dirPath = "WebRoot/WEB-INF/conf";
+
+    if (options == null) {
+        ConfigurationListener configurationListener = new ConfigurationListener();
+        configurationListener.initialize(dirPath);
+        options = ConfigurationListener.getOptions();
+    }
+
+    PUBLIC_EDI_ID = options.getOption("datapackagemanager.public.edi.id");
+    if (PUBLIC_EDI_ID == null) {
+        String gripe = "Error: property 'testEdiToken' not set!";
+        logger.error(gripe);
+        PUBLIC_EDI_ID = "EDI-b2757fee12634ccca40d2d689f5c0543";
+    }
+
   }
   
 
@@ -2084,9 +2103,9 @@ public class DataPackageRegistry {
 					changeDateStr = changeDateStr.replace(" ", "T");
 					String resourceId = DataPackageManager.composeResourceId(
 							ResourceType.dataPackage, scope, identifier, revision, null);
-					boolean isPublic = isPublicAccessible(resourceId);
-					
-					// Include only publicly-accessible data packages
+
+                    // Include only publicly accessible data packages
+                    boolean isPublic = this.isPublicAccessible(resourceId);
 					if (isPublic) {
 						if (serviceMethod.equals("deleteDataPackage")) {
 							DataPackageUpload deletedPackage = new DataPackageUpload(changeDateStr, serviceMethod,
@@ -2663,6 +2682,10 @@ public class DataPackageRegistry {
 		Rule.Permission permission = (Rule.Permission) Enum.valueOf(
 		    Rule.Permission.class, Rule.READ);
 		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
+
+        /*
+            TODO: add IAM isAuthorized("public", resource_id, "READ") here
+         */
 
 		return publicAccessible;
 

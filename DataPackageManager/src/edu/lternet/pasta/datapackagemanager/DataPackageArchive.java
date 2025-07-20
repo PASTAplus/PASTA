@@ -144,10 +144,16 @@ public class DataPackageArchive {
 	 * @return The file name of the data package archive
 	 * @throws Exception
 	 */
-	public String createDataPackageArchive(String scope, Integer identifier, Integer revision, 
-			                               String userId, AuthToken authToken, String transaction,
-	                                       String xslDir)
-	    		throws Exception {
+	public String createDataPackageArchive(
+            String scope,
+            Integer identifier,
+            Integer revision,
+            String userId,
+            AuthToken authToken,
+            String ediToken,
+            String transaction, String xslDir
+    ) throws Exception {
+
 		DataPackageManager dataPackageManager = null;
 		EmlPackageId emlPackageId = new EmlPackageId(scope, identifier, revision);
 		StringBuffer manifestStringBuffer = new StringBuffer();
@@ -204,7 +210,7 @@ public class DataPackageArchive {
 				try {
 					boolean oreFormat = false;
 					resourceMapStr = dataPackageManager.readDataPackage(scope, identifier, revision.toString(),
-						authToken, userId, oreFormat);
+						authToken, ediToken, userId, oreFormat);
 				}
 				catch (Exception e) {
 					logger.error(e.getMessage());
@@ -227,8 +233,7 @@ public class DataPackageArchive {
 					if (line.contains(URI_MIDDLE_METADATA)) {
 
 						try {
-							 File metadataFile = dataPackageManager.getMetadataFile(scope, identifier, revision.toString(),
-								userId, authToken);
+                            File metadataFile = dataPackageManager.getMetadataFile(scope, identifier, revision.toString(), userId, authToken, ediToken);
 							objectName = emlPackageId.toString() + ".xml";
 							txtObjectName = emlPackageId.toString() + ".txt";
 
@@ -266,7 +271,7 @@ public class DataPackageArchive {
 
 						try {
 							File reportFile = dataPackageManager.readDataPackageReport(scope, identifier,
-								revision.toString(), emlPackageId, authToken, userId);
+								revision.toString(), emlPackageId, authToken, ediToken, userId);
 							objectName = emlPackageId.toString() + ".report.xml";
 
 							if (reportFile != null) {
@@ -301,12 +306,12 @@ public class DataPackageArchive {
 
 						try {
 							entityName = dataPackageManager.readDataEntityName(dataPackageResourceId,
-								entityResourceId, authToken);
+								entityResourceId, authToken, ediToken);
 							xml = dataPackageManager.readMetadata(scope, identifier, revision.toString(),
-								userId, authToken);
+								userId, authToken, ediToken);
 							objectName = dataPackageManager.findObjectName(xml, entityName);
 							File entityFile = dataPackageManager.getDataEntityFile(scope, identifier,
-								revision.toString(), entityId, authToken, userId);
+								revision.toString(), entityId, authToken, ediToken,userId);
 
 							if (entityFile != null) {
 								try {

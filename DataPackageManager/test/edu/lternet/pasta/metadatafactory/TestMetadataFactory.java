@@ -69,6 +69,7 @@ public class TestMetadataFactory {
   private static String testRevisionStr = null;
   private static String testEntityId = null;
   private static String testEntityName = null;
+  private static String testEdiToken = null;
   
   
   /*
@@ -77,7 +78,8 @@ public class TestMetadataFactory {
 
   private Document doc;
   private MetadataFactory factory;
-  private AuthToken token;
+  private AuthToken authToken;
+  private String ediToken;
 
   
   /*
@@ -134,7 +136,11 @@ public class TestMetadataFactory {
           testEmlFile = new File(testPath, testEmlFileName);
         }
       }
-      
+      testEdiToken = options.getOption("datapackagemanager.test.edi.token");
+      if (testEdiToken == null) {
+          fail("No value found for DataPackageManager property 'datapackagemanager.test.edi.token'");
+      }
+
       testIdentifier = new Integer(testIdentifierStr);
       testRevision = new Integer(testRevisionStr);
 
@@ -176,7 +182,8 @@ public class TestMetadataFactory {
     @Before
     public void init() {
         factory = new MetadataFactory();
-        token = UserCreds.getAuthToken();
+        authToken = UserCreds.getAuthToken();
+        ediToken = testEdiToken;
     }
 
     /*
@@ -214,7 +221,7 @@ public class TestMetadataFactory {
         Integer identifier = new Integer(1);
         String revision = "1";
         
-        String xml = factory.generateEML(scope, identifier, revision, token);
+        String xml = factory.generateEML(scope, identifier, revision, authToken, ediToken);
 
         assertNotNull(xml);
         doc = XmlUtility.xmlStringToDoc(xml);

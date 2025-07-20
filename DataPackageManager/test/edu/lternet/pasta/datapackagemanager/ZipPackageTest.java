@@ -15,6 +15,7 @@ public class ZipPackageTest {
   private static final String CONFIG_PATH = "WebRoot/WEB-INF/conf";
   private static final String testUser = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   static AuthToken authToken;
+  private static final String ediToken = "ediToken";
 
   private static ConfigurationListener configurationListener = null;
   private static Options options = null;
@@ -68,9 +69,7 @@ public class ZipPackageTest {
   private ZipPackage getZipPackage() throws Exception
   {
     DataPackageManager dataPackageManager = new DataPackageManager();
-    return new ZipPackage(dataPackageManager, "knb-lter-nin", 1, 1,
-        testUser, authToken
-    );
+    return new ZipPackage(dataPackageManager, "knb-lter-nin", 1, 1, testUser, authToken, ediToken);
   }
 
   private void initConfig()

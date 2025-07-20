@@ -55,6 +55,7 @@ public class TestResourceMap {
 		private static Integer testRevision = new Integer(1);
 		private static String testRevisionStr;
 		private static String testString = null;
+        private static String testEdiToken = null;
 	
 		static {
 			testRevisionStr = testRevision.toString();
@@ -82,6 +83,10 @@ public class TestResourceMap {
 		      if (testString == null) {
 				  fail("No value found for DataPackageManager property 'datapackagemanager.test.string'");
 			  }
+              testEdiToken = options.getOption("datapackagemanager.test.edi.token");
+              if (testEdiToken == null) {
+                  fail("No value found for DataPackageManager property 'datapackagemanager.test.edi.token'");
+              }
 		    }
 		}
 
@@ -102,7 +107,7 @@ public class TestResourceMap {
 	  	  DataPackageManager dataPackageManager = new DataPackageManager();
 	      String xmlString = 
 	    		  dataPackageManager.readDataPackage(testScope, testIdentifier, testRevisionStr,
-	    				                             authToken, user, oreFormat);
+	    				                             authToken, testEdiToken, user, oreFormat);
 	      boolean containsSubstring = xmlString.contains(testString);
 	      assertTrue(containsSubstring);
 	      

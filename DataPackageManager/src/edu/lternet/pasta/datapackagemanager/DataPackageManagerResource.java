@@ -1160,7 +1160,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 		// Create streaming ZIP response
 		DataPackageManager dpm = new DataPackageManager();
-		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken);
+		ZipPackage zipPackage = new ZipPackage(dpm, scope, identifier, revision, userId, authToken, ediToken);
 		List<String> dataResourceIdList = zipPackage.getDataResourceIdList();
 
 		String entryText = null;
@@ -1702,7 +1702,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			MetadataFactory metadataFactory = new MetadataFactory();
-			eml = metadataFactory.generateEML(scope, identifier, revision, authToken);
+			eml = metadataFactory.generateEML(scope, identifier, revision, authToken, ediToken);
 			response = Response.ok(eml, MediaType.APPLICATION_XML).build();
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
@@ -3986,8 +3986,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			entryText = "Data Format: " + dataFormat.toString();
 
 			File file =
-					dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId,
-							authToken, userId);
+					dataPackageManager.getDataEntityFile(scope, identifier, revision, entityId, authToken, ediToken, userId);
 
 			if (file != null && file.exists()) {
 
@@ -4001,12 +4000,9 @@ public class DataPackageManagerResource extends PastaWebService {
 						DataPackageManager.composeResourceId(ResourceType.data, scope, identifier,
 								Integer.valueOf(revision), entityId);
 
-				String entityName = dataPackageManager.readDataEntityName(dataPackageResourceId,
-						entityResourceId, authToken);
+				String entityName = dataPackageManager.readDataEntityName(dataPackageResourceId, entityResourceId, authToken, ediToken);
 
-				String xmlMetadata =
-						dataPackageManager.readMetadata(scope, identifier, revision,
-								authToken.getUserId(), authToken);
+				String xmlMetadata = dataPackageManager.readMetadata(scope, identifier, revision, authToken.getUserId(), authToken, ediToken);
 
 				String objectName = findObjectName(xmlMetadata, entityName);
 
@@ -5198,8 +5194,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			entityName =
-					dataPackageManager.readDataEntityName(dataPackageResourceId, entityResourceId,
-							authToken);
+					dataPackageManager.readDataEntityName(dataPackageResourceId, entityResourceId, authToken, ediToken);
 
 			if (entityName != null) {
 				responseBuilder = Response.ok(entityName);
@@ -5378,8 +5373,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
 					identifier, revision, null);
 			entityNamesCSV =
-					dataPackageManager.readDataEntityNames(scope, identifier, revision,
-							authToken);
+					dataPackageManager.readDataEntityNames(scope, identifier, revision, authToken, ediToken);
 
 			if (entityNamesCSV != null) {
 				entryText = entityNamesCSV;
@@ -5587,8 +5581,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceMap =
-					dataPackageManager.readDataPackage(scope, identifier, revision, authToken,
-							userId, oreFormat);
+					dataPackageManager.readDataPackage(scope, identifier, revision, authToken, ediToken, userId, oreFormat);
 
 			if (resourceMap != null) {
 				String mediaType = oreFormat ? "application/rdf+xml" : MediaType.TEXT_PLAIN;
@@ -6685,7 +6678,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceMap =
-					dataPackageManager.readDataPackageFromDoi(doi, authToken, userId, oreFormat);
+					dataPackageManager.readDataPackageFromDoi(doi, authToken, ediToken, userId, oreFormat);
 
 			if (resourceMap != null) {
 				String mediaType = oreFormat ? "application/rdf+xml" : MediaType.TEXT_PLAIN;
@@ -6911,8 +6904,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			File xmlFile =
-					dataPackageManager.readDataPackageReport(scope, identifier, revision,
-							emlPackageId, authToken, userId);
+					dataPackageManager.readDataPackageReport(scope, identifier, revision, emlPackageId, authToken, ediToken, userId);
 
 			if (xmlFile != null && xmlFile.exists()) {
 				if (produceHTML) {
@@ -8123,8 +8115,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			}
 
 			metadataString =
-					dataPackageManager.readMetadata(scope, identifier, revision, userId,
-							authToken);
+					dataPackageManager.readMetadata(scope, identifier, revision, userId, authToken, ediToken);
 
 			if (metadataString != null) {
 				byte[] byteArray = metadataString.getBytes("UTF-8");
@@ -11477,7 +11468,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				try {
 
 					dpm = new DataPackageManager();
-					archive = dpm.createDataPackageArchive(scope, identifier, revision, userId, authToken, transaction);
+					archive = dpm.createDataPackageArchive(scope, identifier, revision, userId, authToken, ediToken, transaction);
 
 					responseBuilder = Response.ok(archive);
 					response = responseBuilder.build();
@@ -11568,7 +11559,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				try {
 
 					dpm = new DataPackageManager();
-					map = dpm.createDataPackage(emlFile, userId, authToken, transaction);
+					map = dpm.createDataPackage(emlFile, userId, authToken, ediToken, transaction);
 
 					if (map == null) {
 						gripe = "Data package create operation failed for unknown reason";
@@ -11672,8 +11663,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				try {
 
 					dpm = new DataPackageManager();
-					xmlString = dpm.evaluateDataPackage(emlFile, userId, authToken, transaction,
-							useChecksum);
+					xmlString = dpm.evaluateDataPackage(emlFile, userId, authToken, ediToken, transaction, useChecksum);
 
 					if (xmlString == null) {
 						gripe = "Data package evaluate operation failed for unknown reason";
@@ -11780,8 +11770,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				try {
 
 					dpm = new DataPackageManager();
-					map = dpm.updateDataPackage(emlFile, scope, identifier, userId, authToken,
-							transaction, useChecksum);
+					map = dpm.updateDataPackage(emlFile, scope, identifier, userId, authToken, ediToken, transaction, useChecksum);
 
 					if (map == null) {
 						gripe = "Data package update operation failed for unknown reason";

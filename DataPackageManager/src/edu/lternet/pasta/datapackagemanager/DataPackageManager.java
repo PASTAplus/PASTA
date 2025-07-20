@@ -560,9 +560,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return The resource map generated as a result of creating the data
 	 *         package.
 	 */
-	public String createDataPackage(File emlFile, String user,
-	    AuthToken authToken, String transaction) throws ClientProtocolException,
-	    FileNotFoundException, IOException, Exception {
+	public String createDataPackage(
+            File emlFile,
+            String user,
+            AuthToken authToken,
+            String ediToken,
+            String transaction
+    ) throws  Exception {
+
 		boolean isEvaluate = false;
 		String resourceMap = null;
 
@@ -573,16 +578,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			EMLDataPackage levelZeroDataPackage = new EMLDataPackage(dataPackage);
 			// Get the packageId from the EMLDataPackage object
 			String packageId = levelZeroDataPackage.getPackageId();
-
-			/* Is this a Level 1 data package?
-			if (levelZeroDataPackage.isLevelOne()) {
-				String message = "The data package you are attempting to insert, '"
-				    + packageId
-				    + "', is a Level-1 data package. Only Level-0 data packages may be "
-				    + "inserted into PASTA.";
-				throw new UserErrorException(message);
-			}
-			*/
 
 			// Is this discovery-level EML?
 			if (!levelZeroDataPackage.hasEntity()) {
@@ -598,15 +593,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String scope = levelZeroDataPackage.getScope();
 			Integer identifier = levelZeroDataPackage.getIdentifier();
 			Integer revision = levelZeroDataPackage.getRevision();
-			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
-			    dbDriver, dbURL, dbUser, dbPassword);
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 
-			/*
-			 * If we have the data package but it was previously deleted (i.e.
-			 * de-activated)
-			 */
-			boolean isDeactivatedDataPackage = dataPackageRegistry
-			    .isDeactivatedDataPackage(scope, identifier);
+            // If we have the data package but, it was previously deleted (i.e. de-activated)
+			boolean isDeactivatedDataPackage = dataPackageRegistry.isDeactivatedDataPackage(scope, identifier);
 			if (isDeactivatedDataPackage) {
 				String message = "Attempting to insert a data package that was previously deleted from PASTA: "
 				    + levelZeroDataPackage.getDocid();
@@ -636,7 +626,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean useChecksum = false;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
+			    authToken, ediToken, isUpdate, isEvaluate, transaction, useChecksum);
 		}
 		
 		// Return the resource map
@@ -752,12 +742,23 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * Implements common logic that is shared by the createDatePackage(),
 	 * evaluateDataPackage(), and updateDataPackage() methods.
 	 */
-	private String createDataPackageAux(File emlFile, EMLDataPackage levelZeroDataPackage,
-				DataPackageRegistry dataPackageRegistry, String packageId, String scope,
-				Integer identifier, Integer revision, String user, AuthToken authToken,
-				boolean isUpdate, boolean isEvaluate, String transaction, boolean useChecksum)
-			throws	ClassNotFoundException, SQLException, IOException,
-					ClientProtocolException, TransformerException, Exception {
+	private String createDataPackageAux(
+            File emlFile,
+            EMLDataPackage levelZeroDataPackage,
+            DataPackageRegistry dataPackageRegistry,
+            String packageId,
+            String scope,
+            Integer identifier,
+            Integer revision,
+            String user,
+            AuthToken authToken,
+            String ediToken,
+            boolean isUpdate,
+            boolean isEvaluate,
+            String transaction,
+            boolean useChecksum
+    ) throws Exception {
+
 		Authorizer authorizer = new Authorizer(dataPackageRegistry);
 		DataManagerClient dataManagerClient = new DataManagerClient();
 		String formatType = null;   // used for metadata resources
@@ -949,8 +950,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    revision, entityId, entityName, objectName, user, formatType, mayOverwrite);
 				
 				// Store the checksums of the data entity resource
-				File file = getDataEntityFile(scope, identifier,
-						revision.toString(), entityId, authToken, user);
+				File file = getDataEntityFile(scope, identifier, revision.toString(), entityId, authToken, ediToken, user);
 				storeChecksums(entityURI, file);
 
 				// Store the size of the data entity resource
@@ -999,8 +999,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    revision, null, null, null, user, formatType, mayOverwrite);
 
 			// Store the checksum of the report resource
-			File file = readDataPackageReport(scope, identifier,
-					revision.toString(), emlPackageId, authToken, user);
+			File file = readDataPackageReport(scope, identifier, revision.toString(), emlPackageId, authToken, ediToken, user);
 			storeChecksums(reportURI, file);
 
 			/*
@@ -1027,15 +1026,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				/*
 				 * Add the data package resource map to the Data Package Registry
 				 */
-				String dataPackageURI = composeResourceId(ResourceType.dataPackage,
-				    scope, identifier, revision, null);
+				String dataPackageURI = composeResourceId(ResourceType.dataPackage, scope, identifier, revision, null);
 				
 				dataPackageRegistry.addDataPackageResource(dataPackageURI,
 				    ResourceType.dataPackage, resourceLocation, packageId, scope,
 				    identifier, revision, null, null, null, user, formatType, mayOverwrite);
 
-				resourceMap = generateDataPackageResourceGraph(dataPackageURI,
-				    metadataURI, entityURIList, reportURI);
+				resourceMap = generateDataPackageResourceGraph(dataPackageURI, metadataURI, entityURIList, reportURI);
 
 				/*
 				 * Store the access control rules for the data package resource
@@ -1110,8 +1107,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				}
 				
 				// Store the checksum of the metadata resource
-				File file = getMetadataFile(scope, identifier, revision.toString(),
-						user, authToken);
+				File file = getMetadataFile(scope, identifier, revision.toString(), user, authToken, ediToken);
 				storeChecksums(metadataURI, file);
 				
 				/*
@@ -1421,9 +1417,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the transaction identifier
 	 * @return the quality report XML string
 	 */
-	public String evaluateDataPackage(File emlFile, String user,
-	    AuthToken authToken, String transaction, boolean useChecksum) throws ClientProtocolException,
-	    FileNotFoundException, IOException, Exception {
+	public String evaluateDataPackage(
+            File emlFile,
+            String user,
+            AuthToken authToken,
+            String ediToken,
+            String transaction,
+            boolean useChecksum
+    ) throws Exception {
+
 		DataPackage dataPackage = null;
 		final boolean isEvaluate = true;
 		String xmlString = null;
@@ -1480,7 +1482,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean isUpdate = false;
 			xmlString = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
+			    authToken, ediToken, isUpdate, isEvaluate, transaction, useChecksum);
 
 			// Clean up resources in evaluate mode
 			levelZeroDataPackage.deleteDataPackageResources(isEvaluate);
@@ -2197,10 +2199,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readDataEntityName(String dataPackageResourceId,
-	    String entityResourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
+	public String readDataEntityName(
+            String dataPackageResourceId,
+            String entityResourceId,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 
 		String entityName = null;
 		String user = authToken.getUserId();
@@ -2268,9 +2272,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readDataEntityNames(String scope, Integer identifier, Integer revision, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    	ResourceNotFoundException, Exception {
+	public String readDataEntityNames(
+            String scope,
+            Integer identifier,
+            Integer revision,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 		String entityNames = null;
 		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 		StringBuilder stringBuilder = new StringBuilder("");
@@ -2339,10 +2347,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The user name
 	 * @return a File object containing the locally stored entity data
 	 */
-	public File getDataEntityFile(String scope, Integer identifier,
-	    String revision, String entityId, AuthToken authToken, String user)
-	    throws ClassNotFoundException, SQLException, ClientProtocolException,
-	    IOException, Exception {
+	public File getDataEntityFile(
+            String scope,
+            Integer identifier,
+            String revision,
+            String entityId,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws Exception {
 
 		File file = null;
 		boolean hasDataPackage = false;
@@ -2501,9 +2514,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          If true, return the resource map in ORE formatted
 	 *          as application/rdf+xml
 	 */
-	public String readDataPackageFromDoi(String doi, AuthToken authToken, 
-	                              String user, boolean oreFormat)
-			throws Exception {
+	public String readDataPackageFromDoi(
+            String doi,
+            AuthToken authToken,
+            String ediToken,
+            String user,
+            boolean oreFormat
+    ) throws Exception {
+
 		String resourceMapStr = null;
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
 			    dbURL, dbUser, dbPassword);
@@ -2519,8 +2537,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Integer revision = emlPackageId.getRevision();
 				String revisionStr = revision.toString();
 		
-				resourceMapStr = readDataPackage(scope, identifier, revisionStr,
-				                         authToken, user, oreFormat);
+				resourceMapStr = readDataPackage(scope, identifier, revisionStr, authToken, ediToken, user, oreFormat);
 			}
 		}
 		
@@ -2545,10 +2562,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          If true, return the resource map in ORE formatted
 	 *          as application/rdf+xml
 	 */
-	public String readDataPackage(String scope, Integer identifier,
-	                              String revisionStr, AuthToken authToken, 
-	                              String user, boolean oreFormat)
-	        throws Exception {		
+	public String readDataPackage(
+            String scope,
+            Integer identifier,
+            String revisionStr,
+            AuthToken authToken,
+            String ediToken,
+            String user,
+            boolean oreFormat
+    ) throws Exception {
+
 		boolean hasDataPackage = false;
 		Integer revision = null;
 		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver,
@@ -2686,10 +2709,16 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          the user name
 	 * @return a file object containing the data package quality report XML
 	 */
-	public File readDataPackageReport(String scope, Integer identifier,
-	    String revision, EmlPackageId emlPackageId, AuthToken authToken,
-	    String user) 
-	    		throws ClassNotFoundException, SQLException, IOException {
+	public File readDataPackageReport(
+            String scope,
+            Integer identifier,
+            String revision,
+            EmlPackageId emlPackageId,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws ClassNotFoundException, SQLException, IOException {
+
 		boolean evaluate = false;
 		File xmlFile = null;
 		String transaction = null;
@@ -2782,9 +2811,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The AuthToken object
 	 * @return The metadata document, an XML string.
 	 */
-	public String readMetadata(String scope, Integer identifier, String revision,
-	    String user, AuthToken authToken) throws ClassNotFoundException,
-	    SQLException, ClientProtocolException, IOException, Exception {
+	public String readMetadata(
+            String scope,
+            Integer identifier,
+            String revision,
+            String user,
+            AuthToken authToken,
+            String ediToken
+    ) throws Exception {
 		String entityId = null;
 		String metadataXML = null;
 		boolean hasDataPackage = false;
@@ -2949,10 +2983,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The AuthToken object
 	 * @return The metadata document, an XML string.
 	 */
-	public File getMetadataFile(String scope, Integer identifier,
-	    String revision, String user, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, ClientProtocolException,
-	    IOException, UnauthorizedException {
+	public File getMetadataFile(
+            String scope,
+            Integer identifier,
+            String revision,
+            String user,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, IOException, UnauthorizedException {
+
 		String entityId = null;
 		File levelOneEMLFile = null;
 		boolean hasDataPackage = false;
@@ -3590,11 +3629,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return The resource map generated as a result of updating the data
 	 *         package.
 	 */
-	public String updateDataPackage(File emlFile, String scope,
-	    Integer identifier, String user, AuthToken authToken, String transaction,
-	    boolean useChecksum)
-	    throws ClientProtocolException, FileNotFoundException, IOException,
-	    UserErrorException, Exception {
+	public String updateDataPackage(
+            File emlFile,
+            String scope,
+            Integer identifier,
+            String user,
+            AuthToken authToken,
+            String ediToken,
+            String transaction,
+            boolean useChecksum
+    ) throws Exception {
+
 		boolean isEvaluate = false;
 		String resourceMap = null;
 
@@ -3715,7 +3760,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean isUpdate = true;
 			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
 			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, isUpdate, isEvaluate, transaction, useChecksum);
+			    authToken, ediToken, isUpdate, isEvaluate, transaction, useChecksum);
 		}
 
 		// Return the resource map
@@ -3817,9 +3862,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws Exception 
 	 * @throws IOException
 	 */
-	public String createDataPackageArchive(String scope, Integer identifier,
-	    Integer revision, String userId, AuthToken authToken, String transaction)
-	    throws Exception {
+	public String createDataPackageArchive(
+            String scope,
+            Integer identifier,
+            Integer revision,
+            String userId,
+            AuthToken authToken,
+            String ediToken,
+            String transaction
+    ) throws Exception {
 
 		String archiveName = null;
 		DataPackageArchive dataPackageArchive = null;
@@ -3831,17 +3882,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			dataPackageArchive = new DataPackageArchive();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			e.printStackTrace();
 		}
 
 		if (dataPackageArchive != null) {
-			try {
-				archiveName = dataPackageArchive.createDataPackageArchive(scope, identifier, revision, userId,
-				    authToken, transaction, xslDir);
-			} catch (Exception e) {
-				throw e;
-			}
-		}
+            archiveName = dataPackageArchive.createDataPackageArchive(scope, identifier, revision, userId, authToken, ediToken, transaction, xslDir);
+        }
 		
 		return archiveName;
 
