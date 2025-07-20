@@ -85,7 +85,7 @@ datapackagemanager.entityDir=/home/pasta/local/data
 datapackagemanager.errorDir=/home/pasta/local/error
 datapackagemanager.archiveDir=/home/pasta/local/tmp
 datapackagemanager.auditmanager.host=audit.lternet.edu
-datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=LTER,dc=ecoinformatics,dc=org
+datapackagemanager.metadatacatalog.pastaUser=uid=pasta,o=EDI,dc=edirepository,dc=org
 datapackagemanager.metadatacatalog.solrUrl=http://solr.lternet.edu:8983/solr/collection1
 datapackagemanager.pastaUriHead=https://pasta.lternet.edu/package/
 datapackagemanager.test.doi=doi:10.6073/pasta/3bcc89b2d1a410b7a2c678e3c55055e1
@@ -112,6 +112,10 @@ datapackagemanager.version.number=DataPackageManager-1.0
 datapackagemanager.xslDir=/home/pasta/local/apache-tomcat/webapps/package/xsl
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
 datapackagemanager.readOnly=false
+
+# EDI IAM properties
+datapackagemanager.test.edi.token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktMzEyZTkwZjI5ZmJlNGUzZGE3MWY1MjFlZmJmMWRlMDYiLCJjbiI6IkVESSIsImVtYWlsIjpudWxsLCJwcmluY2lwYWxzIjpbIkVESS1iMjc1N2ZlZTEyNjM0Y2NjYTQwZDJkNjg5ZjVjMDU0MyIsIkVESS1kM2ZjYTk3NjdhYzU0YzIyOTYyODk2YjAxYTFjMDFiZCJdLCJpc0VtYWlsRW5hYmxlZCI6ZmFsc2UsImlzRW1haWxWZXJpZmllZCI6ZmFsc2UsImlkZW50aXR5SWQiOjMsImlkcE5hbWUiOiJsZGFwIiwiaWRwVWlkIjoidWlkPUVESSxvPUVESSxkYz1lZGlyZXBvc2l0b3J5LGRjPW9yZyIsImlkcENuYW1lIjoiRURJIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmVkaXJlcG9zaXRvcnkub3JnIiwiaGQiOiJlZGlyZXBvc2l0b3J5Lm9yZyIsImlhdCI6MTc1MjUwNzY5MiwibmJmIjoxNzUyNTA3NjkyLCJleHAiOjE3NTI1MzY0OTJ9.syUA6NedZvSSjYakGWtq5qo4U1H8LzX-R7w0MC5p2fZE8usCqrgu-ig0kLnrYRscBQWrOcwE8E7bbp6yNPTqbQ
+datapackagemanager.public.edi.id=EDI-b2757fee12634ccca40d2d689f5c0543
 
 # For DOI processing on production:
 #  set prefix to 10.6073 (EZID and DataCite)
