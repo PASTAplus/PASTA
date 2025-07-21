@@ -22,7 +22,7 @@
  *
  */
 
-package edu.lternet.pasta.common.security.token;
+package edu.lternet.pasta.common.edi;
 
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;

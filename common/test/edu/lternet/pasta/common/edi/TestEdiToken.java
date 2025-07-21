@@ -22,7 +22,7 @@
  *
  */
 
-package edu.lternet.pasta.common.security.token;
+package edu.lternet.pasta.common.edi;
 
 import org.junit.Before;
 import org.junit.Test;

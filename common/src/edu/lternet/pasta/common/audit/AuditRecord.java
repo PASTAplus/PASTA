@@ -12,7 +12,7 @@ import edu.lternet.pasta.common.ISO8601Utility;
 import edu.lternet.pasta.common.XmlUtility;
 import edu.lternet.pasta.common.security.auth.AuthSystemDef;
 import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.EdiToken;
+import edu.lternet.pasta.common.edi.EdiToken;
 
 
 /**
