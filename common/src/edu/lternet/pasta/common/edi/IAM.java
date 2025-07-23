@@ -18,13 +18,22 @@ public class IAM {
     private final String ediToken;
 
     /**
-     * Defines the possible permission levels for a resource. Using an enum is a
-     * best practice for type safety and clarity.
+     * Defines the possible permission levels for a resource.
      */
     public enum Permission {
-        READ,
-        WRITE,
-        CHANGEPERMISSION
+        READ("read"),
+        WRITE("write"),
+        CHANGEPERMISSION("changePermission");
+
+        private final String permission;
+
+        Permission(String permission) {
+            this.permission = permission;
+        }
+
+        public String getPermission() {
+            return permission;
+        }
     }
 
     /**
@@ -56,79 +65,61 @@ public class IAM {
         this.ediToken = ediToken;
     }
 
+    /**
+     * Pings the EDI IAM service to check for connectivity and service status.
+     *
+     * @return The response from the ping endpoint, typically a confirmation message if the service is up.
+     * @throws IOException if an I/O error occurs when communicating with the auth service,
+     * or if the service returns an unexpected HTTP status code.
+     */
     public String ping() throws IOException {
         String urlString = String.format("%s/auth/v1/ping", this.baseUrl);
-        return sendRequest(urlString, "GET", "{}");
+        return sendRequest(urlString, "GET");
     }
 
     /**
      * Determines if a user is authorized to access a resource with a specific permission level.
      *
-     * @param ediToken         The identifier for the user (e.g., "uid=EDI-X,o=EDI,dc=edirepository,dc=org").
      * @param resourceId     The identifier for the resource (e.g., "edi.1.1").
      * @param permission     The permission level to check ("READ", "WRITE", or "CHANGEPERMISSION").
      * @return true if the user is authorized, false otherwise.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      * @throws IllegalArgumentException if the provided permission string is invalid.
      */
-    public boolean isAuthorized(String ediToken, String resourceId, String permission) throws IOException {
+    public boolean isAuthorized(String resourceId, String permission) throws IOException {
         Permission permissionEnum;
         try {
             permissionEnum = Permission.valueOf(permission.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid permission level specified: " + permission, e);
         }
-        return isAuthorized(ediToken, resourceId, permissionEnum);
+        return isAuthorized(resourceId, permissionEnum);
     }
 
     /**
      * Determines if a user is authorized to access a resource with a specific permission level.
      *
-     * @param userId         The identifier for the user.
      * @param resourceId     The identifier for the resource.
      * @param permission     The permission level to check as a {@link Permission} enum.
      * @return true if the user is authorized, false otherwise.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      */
-    public boolean isAuthorized(String userId, String resourceId, Permission permission) throws IOException {
-        String encodedUserId = URLEncoder.encode(userId, StandardCharsets.UTF_8.name());
+    public boolean isAuthorized(String resourceId, Permission permission) throws IOException {
+        boolean isAuthorized = true;
+
         String encodedResourceId = URLEncoder.encode(resourceId, StandardCharsets.UTF_8.name());
-        String encodedPermission = URLEncoder.encode(permission.name().toLowerCase(), StandardCharsets.UTF_8.name());
+        String encodedPermission = URLEncoder.encode(permission.getPermission(), StandardCharsets.UTF_8.name());
 
         String urlString = String.format(
-                "%s/auth/authorized?uid=%s&resource_id=%s&permission=%s",
-                this.baseUrl, encodedUserId, encodedResourceId, encodedPermission
+                "%s/auth/v1/authorized?resource_key=%s&permission=%s",
+                this.baseUrl, encodedResourceId, encodedPermission
         );
 
-        URL url = new URL(urlString);
-        HttpURLConnection connection = null;
-        boolean isAuthorized = false;
-
         try {
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000); // 5 seconds
-            connection.setReadTimeout(5000);    // 5 seconds
-
-            int responseCode = connection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                isAuthorized = true;
-            } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                isAuthorized = false;
-            } else {
-                String responseMessage = readResponse(connection);
-                throw new IOException(
-                        String.format(
-                                "Unexpected response from EDI IAM service for URL '%s': %d %s. Response body: %s",
-                                urlString, responseCode, connection.getResponseMessage(), responseMessage
-                        )
-                );
-            }
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            String response = sendRequest(urlString, "GET");
+        }
+        catch (IOException e) {
+            isAuthorized = false;
         }
 
         return isAuthorized;
@@ -154,11 +145,33 @@ public class IAM {
         }
     }
 
+    /**
+     * Gets the base URL of the EDI IAM service configured for this client.
+     *
+     * @return The base URL, e.g., "https://auth.edirepository.org:8443".
+     */
     public String getBaseUrl() {
         return baseUrl;
     }
 
-    private String sendRequest(String urlString, String method, String payload) throws IOException {
+    /**
+     * A private helper method to send an authenticated HTTP request to the EDI IAM service.
+     * <p>
+     * This method configures the connection with the necessary 'edi-token' cookie for authentication.
+     * It handles parameter validation, connection setup, and response parsing. It expects a
+     * successful response to have an HTTP 200 OK status.
+     * <p>
+     * Note: This implementation does not write the {@code payload} to the output stream,
+     * so it is currently only suitable for HTTP methods like GET that do not have a request body.
+     *
+     * @param urlString The full URL endpoint for the request.
+     * @param method    The HTTP method to use (e.g., "GET").
+     * @return The response body as a String if the request is successful (HTTP 200).
+     * @throws IOException if a network error occurs or if the server returns a non-200 status code.
+     * @throws IllegalArgumentException if the urlString, method, or payload are invalid.
+     */
+
+    private String sendRequest(String urlString, String method) throws IOException {
 
         if (urlString == null || urlString.trim().isEmpty()) {
             throw new IllegalArgumentException("URL cannot be null or empty.");
@@ -166,10 +179,6 @@ public class IAM {
 
         if (method == null || method.trim().isEmpty()) {
             throw new IllegalArgumentException("Method cannot be null or empty.");
-        }
-
-        if (payload == null) {
-            throw new IllegalArgumentException("Payload cannot be null.");
         }
 
         URL url = new URL(urlString);

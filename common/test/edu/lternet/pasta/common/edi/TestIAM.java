@@ -36,7 +36,7 @@ public class TestIAM {
 
     @Before
     public void setUp() {
-        ediToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktMzEyZTkwZjI5ZmJlNGUzZGE3MWY1MjFlZmJmMWRlMDYiLCJjbiI6IkVESSIsImVtYWlsIjpudWxsLCJwcmluY2lwYWxzIjpbIkVESS1iMjc1N2ZlZTEyNjM0Y2NjYTQwZDJkNjg5ZjVjMDU0MyIsIkVESS1kM2ZjYTk3NjdhYzU0YzIyOTYyODk2YjAxYTFjMDFiZCJdLCJpc0VtYWlsRW5hYmxlZCI6ZmFsc2UsImlzRW1haWxWZXJpZmllZCI6ZmFsc2UsImlkZW50aXR5SWQiOjMsImlkcE5hbWUiOiJsZGFwIiwiaWRwVWlkIjoidWlkPUVESSxvPUVESSxkYz1lZGlyZXBvc2l0b3J5LGRjPW9yZyIsImlkcENuYW1lIjoiRURJIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmVkaXJlcG9zaXRvcnkub3JnIiwiaGQiOiJlZGlyZXBvc2l0b3J5Lm9yZyIsImlhdCI6MTc1MjUwNzY5MiwibmJmIjoxNzUyNTA3NjkyLCJleHAiOjE3NTI1MzY0OTJ9.syUA6NedZvSSjYakGWtq5qo4U1H8LzX-R7w0MC5p2fZE8usCqrgu-ig0kLnrYRscBQWrOcwE8E7bbp6yNPTqbQ";
+        ediToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktYjI3NTdmZWUxMjYzNGNjY2E0MGQyZDY4OWY1YzA1NDMiLCJjbiI6IlB1YmxpYyBBY2Nlc3MiLCJlbWFpbCI6bnVsbCwicHJpbmNpcGFscyI6W10sImlzRW1haWxFbmFibGVkIjpmYWxzZSwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaWRlbnRpdHlJZCI6LTEsImlkcE5hbWUiOiJVbmtub3duIiwiaWRwVWlkIjoiVW5rbm93biIsImlkcENuYW1lIjoiVW5rbm93biIsImlzcyI6Imh0dHBzOi8vYXV0aC5lZGlyZXBvc2l0b3J5Lm9yZyIsImhkIjoiZWRpcmVwb3NpdG9yeS5vcmciLCJpYXQiOjE3NTMzMDIzMzYsIm5iZiI6MTc1MzMwMjMzNiwiZXhwIjoxNzUzMzMxMTM2fQ.PD3Lv1tyZUaAUHbqOQpGXAsamTU8yts51-dJuL5t_-rqbJAVMoAsZnQFKwos6uDeaa_vA7n8CGObTJ498PEPUA";
     }
 
     @Test
@@ -56,5 +56,22 @@ public class TestIAM {
             System.out.println(e.getMessage());
             assert false;
         }
+    }
+
+    @Test
+    public void testIsAuthorized() {
+        iam = new IAM("https", "localhost", 5443, ediToken);
+
+        boolean isAuthorized = false;
+
+        try {
+            isAuthorized = iam.isAuthorized("http://localhost:8088/package/metadata/eml/knb-lter-vcr/70/24", "READ");
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            assert false;
+        }
+
+        assert isAuthorized;
     }
 }
