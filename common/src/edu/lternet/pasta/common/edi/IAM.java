@@ -10,12 +10,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * The IAM (Identity and Access Management) class provides methods to interact
- * with an external authentication service to check user permissions.
+ * The IAM (Identity and Access Management) class provides methods to interact with the EDI IAM service.
  */
 public class IAM {
 
-    private static final String AUTH_HOST = "https://auth-d.edirepository.org";
+    private final String baseUrl;
+    private final String ediToken;
 
     /**
      * Defines the possible permission levels for a resource. Using an enum is a
@@ -28,48 +28,76 @@ public class IAM {
     }
 
     /**
-     * Determines if a user is authorized to access a resource with a specific permission level.
-     * This method fulfills the request to use a String for the permission level.
+     * Constructs an IAM client with a specific protocol, host, and port.
+     * This is the designated constructor for the class.
      *
-     * @param userId         The identifier for the user (e.g., "uid=EDI-X,o=EDI,dc=edirepository,dc=org").
+     * @param protocol The protocol, e.g., "http" or "https".
+     * @param host     The hostname, e.g., "auth.edirepository.org".
+     * @param port     The port number, e.g., 8443. Use a non-positive value (<=0) to omit the port from the URL.
+     */
+    public IAM(String protocol, String host, int port, String ediToken) {
+        if (protocol == null || protocol.trim().isEmpty()) {
+            throw new IllegalArgumentException("Protocol cannot be null or empty.");
+        }
+        if (host == null || host.trim().isEmpty()) {
+            throw new IllegalArgumentException("Host cannot be null or empty.");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(protocol.trim()).append("://").append(host.trim());
+        if (port > 0) {
+            sb.append(":").append(port);
+        }
+        this.baseUrl = sb.toString();
+
+        if (ediToken == null || ediToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("EDI token cannot be null or empty.");
+        }
+        this.ediToken = ediToken;
+    }
+
+    public String ping() throws IOException {
+        String urlString = String.format("%s/auth/v1/ping", this.baseUrl);
+        return sendRequest(urlString, "GET", "{}");
+    }
+
+    /**
+     * Determines if a user is authorized to access a resource with a specific permission level.
+     *
+     * @param ediToken         The identifier for the user (e.g., "uid=EDI-X,o=EDI,dc=edirepository,dc=org").
      * @param resourceId     The identifier for the resource (e.g., "edi.1.1").
      * @param permission     The permission level to check ("READ", "WRITE", or "CHANGEPERMISSION").
      * @return true if the user is authorized, false otherwise.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      * @throws IllegalArgumentException if the provided permission string is invalid.
      */
-    public boolean isAuthorized(String userId, String resourceId, String permission) throws IOException {
+    public boolean isAuthorized(String ediToken, String resourceId, String permission) throws IOException {
         Permission permissionEnum;
         try {
-            // Validate and convert string permission to the enum to ensure it's a valid value.
             permissionEnum = Permission.valueOf(permission.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid permission level specified: " + permission, e);
         }
-        // Delegate to the type-safe method
-        return isAuthorized(userId, resourceId, permissionEnum);
+        return isAuthorized(ediToken, resourceId, permissionEnum);
     }
 
     /**
      * Determines if a user is authorized to access a resource with a specific permission level.
-     * This is an overloaded, type-safe method that uses the {@link Permission} enum.
      *
-     * @param userId         The identifier for the user (e.g., "uid=EDI-X,o=EDI,dc=edirepository,dc=org").
-     * @param resourceId     The identifier for the resource (e.g., "edi.1.1").
+     * @param userId         The identifier for the user.
+     * @param resourceId     The identifier for the resource.
      * @param permission     The permission level to check as a {@link Permission} enum.
      * @return true if the user is authorized, false otherwise.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      */
     public boolean isAuthorized(String userId, String resourceId, Permission permission) throws IOException {
-        // URL-encode parameters to ensure they are safe for transit
         String encodedUserId = URLEncoder.encode(userId, StandardCharsets.UTF_8.name());
         String encodedResourceId = URLEncoder.encode(resourceId, StandardCharsets.UTF_8.name());
-        // The auth service expects lowercase permission names
         String encodedPermission = URLEncoder.encode(permission.name().toLowerCase(), StandardCharsets.UTF_8.name());
 
         String urlString = String.format(
                 "%s/auth/authorized?uid=%s&resource_id=%s&permission=%s",
-                AUTH_HOST, encodedUserId, encodedResourceId, encodedPermission
+                this.baseUrl, encodedUserId, encodedResourceId, encodedPermission
         );
 
         URL url = new URL(urlString);
@@ -84,17 +112,15 @@ public class IAM {
 
             int responseCode = connection.getResponseCode();
 
-            // The auth service returns 200 OK for authorized, 401 Unauthorized otherwise.
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 isAuthorized = true;
             } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 isAuthorized = false;
             } else {
-                // Handle other unexpected HTTP responses by throwing an exception with details.
                 String responseMessage = readResponse(connection);
                 throw new IOException(
                         String.format(
-                                "Unexpected response from auth service for URL '%s': %d %s. Response body: %s",
+                                "Unexpected response from EDI IAM service for URL '%s': %d %s. Response body: %s",
                                 urlString, responseCode, connection.getResponseMessage(), responseMessage
                         )
                 );
@@ -109,8 +135,7 @@ public class IAM {
     }
 
     /**
-     * Helper method to read the response body from an HttpURLConnection, useful for debugging.
-     * It checks both the error stream and the input stream.
+     * Helper method to read the response body from an HttpURLConnection.
      *
      * @param connection The active connection.
      * @return The response body as a String.
@@ -125,41 +150,73 @@ public class IAM {
             }
             return response.toString();
         } catch (IOException e) {
-            // This might happen if the connection is already closed. Return a diagnostic message.
             return "[Could not read response body: " + e.getMessage() + "]";
         }
     }
 
-    /**
-     * Example usage. This main method can be run to test the functionality.
-     */
-    public static void main(String[] args) {
-        IAM iam = new IAM();
-        // Note: The user ID is typically a full Distinguished Name (DN)
-        String publicUser = "public";
-        String testResourceId = "knb-lter-lno.1.1"; // A public resource
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-        System.out.println("--- Testing Authorization ---");
+    private String sendRequest(String urlString, String method, String payload) throws IOException {
+
+        if (urlString == null || urlString.trim().isEmpty()) {
+            throw new IllegalArgumentException("URL cannot be null or empty.");
+        }
+
+        if (method == null || method.trim().isEmpty()) {
+            throw new IllegalArgumentException("Method cannot be null or empty.");
+        }
+
+        if (payload == null) {
+            throw new IllegalArgumentException("Payload cannot be null.");
+        }
+
+        URL url = new URL(urlString);
+        HttpURLConnection connection = null;
+        InputStream inputStream;
+        String response = null;
+
+        String cookie = String.format("edi-token=%s", this.ediToken);
 
         try {
-            // Test Case 1: Public user trying to read a public resource (should be true)
-            boolean canRead = iam.isAuthorized(publicUser, testResourceId, "READ");
-            System.out.printf("Public user can READ '%s'? %s\n", testResourceId, canRead);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(method);
+            connection.setConnectTimeout(5000); // 5 seconds
+            connection.setReadTimeout(5000);    // 5 seconds
+            connection.setRequestProperty("Cookie", cookie);
 
-            // Test Case 2: Public user trying to write to a resource (should be false)
-            boolean canWrite = iam.isAuthorized(publicUser, testResourceId, Permission.WRITE);
-            System.out.printf("Public user can WRITE to '%s'? %s\n", testResourceId, canWrite);
+            int responseCode = connection.getResponseCode();
 
-            // Test Case 3: Invalid permission string
-            try {
-                iam.isAuthorized(publicUser, testResourceId, "DELETE");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Correctly caught invalid permission: " + e.getMessage());
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                inputStream = connection.getInputStream();
+                if (inputStream != null) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder responseBody = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        responseBody.append(line);
+                    }
+                    reader.close();
+                    response = responseBody.toString();
+                }
+
+            } else {
+                String responseMessage = readResponse(connection);
+                throw new IOException(
+                        String.format(
+                                "Unexpected response from EDI IAM service for URL '%s': %d %s. Response body: %s",
+                                urlString, responseCode, connection.getResponseMessage(), responseMessage
+                        )
+                );
             }
-
-        } catch (IOException e) {
-            System.err.println("An error occurred during the authorization check:");
-            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
+
+        return response;
     }
 }
