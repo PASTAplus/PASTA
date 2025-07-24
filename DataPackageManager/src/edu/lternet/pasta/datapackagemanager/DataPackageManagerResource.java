@@ -1385,8 +1385,10 @@ public class DataPackageManagerResource extends PastaWebService {
             DataPackageManager dpm = new DataPackageManager();
 
             dpm.setReservation(userId, scope, identifier);
+            String reservation = scope + "." + identifier.toString();
             msg = String.format("Set reservation for data package: %s.%d", scope, identifier);
             responseBuilder = Response.status(Response.Status.CREATED);
+            responseBuilder.entity(reservation);
             response = responseBuilder.build();
             response = stampHeader(response);
         } catch (UnauthorizedException e) {
