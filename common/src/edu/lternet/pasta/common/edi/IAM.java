@@ -112,8 +112,6 @@ public class IAM {
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      */
     public JSONObject isAuthorized(String resourceKey, Permission permission) throws IOException {
-        boolean isAuthorized = true;
-
         String encodedResourceId = URLEncoder.encode(resourceKey, StandardCharsets.UTF_8.name());
         String encodedPermission = URLEncoder.encode(permission.getPermission(), StandardCharsets.UTF_8.name());
 
