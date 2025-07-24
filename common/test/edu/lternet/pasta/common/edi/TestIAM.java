@@ -27,6 +27,14 @@ package edu.lternet.pasta.common.edi;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONObject;
+
 public class TestIAM {
     private IAM iam;
     private String ediToken;
@@ -34,25 +42,23 @@ public class TestIAM {
     private String permission;
     private String baseUrl = "https://localhost:5443";
 
-    @Before
-    public void setUp() {
-        ediToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktYjI3NTdmZWUxMjYzNGNjY2E0MGQyZDY4OWY1YzA1NDMiLCJjbiI6IlB1YmxpYyBBY2Nlc3MiLCJlbWFpbCI6bnVsbCwicHJpbmNpcGFscyI6W10sImlzRW1haWxFbmFibGVkIjpmYWxzZSwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaWRlbnRpdHlJZCI6LTEsImlkcE5hbWUiOiJVbmtub3duIiwiaWRwVWlkIjoiVW5rbm93biIsImlkcENuYW1lIjoiVW5rbm93biIsImlzcyI6Imh0dHBzOi8vYXV0aC5lZGlyZXBvc2l0b3J5Lm9yZyIsImhkIjoiZWRpcmVwb3NpdG9yeS5vcmciLCJpYXQiOjE3NTMzMDIzMzYsIm5iZiI6MTc1MzMwMjMzNiwiZXhwIjoxNzUzMzMxMTM2fQ.PD3Lv1tyZUaAUHbqOQpGXAsamTU8yts51-dJuL5t_-rqbJAVMoAsZnQFKwos6uDeaa_vA7n8CGObTJ498PEPUA";
-    }
-
     @Test
     public void testIAMConstructor() {
-        iam = new IAM("https", "localhost", 5443, ediToken);
+        iam = new IAM("https", "localhost", 5443);
         assert(iam.getBaseUrl().equals(baseUrl));
     }
 
     @Test
-    public void testPing() {
-        iam = new IAM("https", "localhost", 5443, ediToken);
-        String response;
+    public void testCreateEdiToken() {
+        iam = new IAM("https", "localhost", 5443);
+
+        String publicId = "EDI-b2757fee12634ccca40d2d689f5c0543";
+        String key = "2d69dda41af84bbe9b1ed4fba5479def";
+
         try {
-            response = iam.ping();
-            assert response.equals("pong");
-        } catch (Exception e) {
+            JSONObject newEdiToken = iam.createEdiToken(publicId, key);
+            System.out.println(newEdiToken.getString("token"));
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             assert false;
         }
@@ -60,18 +66,39 @@ public class TestIAM {
 
     @Test
     public void testIsAuthorized() {
-        iam = new IAM("https", "localhost", 5443, ediToken);
+        String resourceKey = "http://localhost:8088/package/metadata/eml/knb-lter-vcr/70/24";
+        String permission = "READ";
+        String publicId = "EDI-b2757fee12634ccca40d2d689f5c0543";
 
-        boolean isAuthorized = false;
+        iam = new IAM("https", "localhost", 5443);
+
+        String token = newToken(publicId);
+        iam.setEdiToken(token);
 
         try {
-            isAuthorized = iam.isAuthorized("http://localhost:8088/package/metadata/eml/knb-lter-vcr/70/24", "READ");
+            iam.isAuthorized(resourceKey, permission);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
             assert false;
         }
 
-        assert isAuthorized;
     }
+
+    private String newToken(String ediId) {
+        iam = new IAM("https", "localhost", 5443);
+
+        String key = "2d69dda41af84bbe9b1ed4fba5479def";
+        String token = null;
+
+        try {
+            JSONObject newEdiToken = iam.createEdiToken(ediId, key);
+            token = newEdiToken.getString("token");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return token;
+    }
+
 }

@@ -1,13 +1,13 @@
 package edu.lternet.pasta.common.edi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import org.json.JSONObject;
+
 
 /**
  * The IAM (Identity and Access Management) class provides methods to interact with the EDI IAM service.
@@ -15,7 +15,8 @@ import java.nio.charset.StandardCharsets;
 public class IAM {
 
     private final String baseUrl;
-    private final String ediToken;
+    private String ediToken;
+    private String ediId;
 
     /**
      * Defines the possible permission levels for a resource.
@@ -44,7 +45,7 @@ public class IAM {
      * @param host     The hostname, e.g., "auth.edirepository.org".
      * @param port     The port number, e.g., 8443. Use a non-positive value (<=0) to omit the port from the URL.
      */
-    public IAM(String protocol, String host, int port, String ediToken) {
+    public IAM(String protocol, String host, int port) {
         if (protocol == null || protocol.trim().isEmpty()) {
             throw new IllegalArgumentException("Protocol cannot be null or empty.");
         }
@@ -59,90 +60,6 @@ public class IAM {
         }
         this.baseUrl = sb.toString();
 
-        if (ediToken == null || ediToken.trim().isEmpty()) {
-            throw new IllegalArgumentException("EDI token cannot be null or empty.");
-        }
-        this.ediToken = ediToken;
-    }
-
-    /**
-     * Pings the EDI IAM service to check for connectivity and service status.
-     *
-     * @return The response from the ping endpoint, typically a confirmation message if the service is up.
-     * @throws IOException if an I/O error occurs when communicating with the auth service,
-     * or if the service returns an unexpected HTTP status code.
-     */
-    public String ping() throws IOException {
-        String urlString = String.format("%s/auth/v1/ping", this.baseUrl);
-        return sendRequest(urlString, "GET");
-    }
-
-    /**
-     * Determines if a user is authorized to access a resource with a specific permission level.
-     *
-     * @param resourceId     The identifier for the resource (e.g., "edi.1.1").
-     * @param permission     The permission level to check ("READ", "WRITE", or "CHANGEPERMISSION").
-     * @return true if the user is authorized, false otherwise.
-     * @throws IOException if an I/O error occurs when communicating with the auth service.
-     * @throws IllegalArgumentException if the provided permission string is invalid.
-     */
-    public boolean isAuthorized(String resourceId, String permission) throws IOException {
-        Permission permissionEnum;
-        try {
-            permissionEnum = Permission.valueOf(permission.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid permission level specified: " + permission, e);
-        }
-        return isAuthorized(resourceId, permissionEnum);
-    }
-
-    /**
-     * Determines if a user is authorized to access a resource with a specific permission level.
-     *
-     * @param resourceId     The identifier for the resource.
-     * @param permission     The permission level to check as a {@link Permission} enum.
-     * @return true if the user is authorized, false otherwise.
-     * @throws IOException if an I/O error occurs when communicating with the auth service.
-     */
-    public boolean isAuthorized(String resourceId, Permission permission) throws IOException {
-        boolean isAuthorized = true;
-
-        String encodedResourceId = URLEncoder.encode(resourceId, StandardCharsets.UTF_8.name());
-        String encodedPermission = URLEncoder.encode(permission.getPermission(), StandardCharsets.UTF_8.name());
-
-        String urlString = String.format(
-                "%s/auth/v1/authorized?resource_key=%s&permission=%s",
-                this.baseUrl, encodedResourceId, encodedPermission
-        );
-
-        try {
-            String response = sendRequest(urlString, "GET");
-        }
-        catch (IOException e) {
-            isAuthorized = false;
-        }
-
-        return isAuthorized;
-    }
-
-    /**
-     * Helper method to read the response body from an HttpURLConnection.
-     *
-     * @param connection The active connection.
-     * @return The response body as a String.
-     */
-    private String readResponse(HttpURLConnection connection) {
-        try (InputStream stream = connection.getErrorStream() != null ? connection.getErrorStream() : connection.getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            return response.toString();
-        } catch (IOException e) {
-            return "[Could not read response body: " + e.getMessage() + "]";
-        }
     }
 
     /**
@@ -154,24 +71,88 @@ public class IAM {
         return baseUrl;
     }
 
-    /**
-     * A private helper method to send an authenticated HTTP request to the EDI IAM service.
-     * <p>
-     * This method configures the connection with the necessary 'edi-token' cookie for authentication.
-     * It handles parameter validation, connection setup, and response parsing. It expects a
-     * successful response to have an HTTP 200 OK status.
-     * <p>
-     * Note: This implementation does not write the {@code payload} to the output stream,
-     * so it is currently only suitable for HTTP methods like GET that do not have a request body.
-     *
-     * @param urlString The full URL endpoint for the request.
-     * @param method    The HTTP method to use (e.g., "GET").
-     * @return The response body as a String if the request is successful (HTTP 200).
-     * @throws IOException if a network error occurs or if the server returns a non-200 status code.
-     * @throws IllegalArgumentException if the urlString, method, or payload are invalid.
-     */
+    public void setEdiToken(String ediToken) {
+        this.ediToken = ediToken;
+    }
 
-    private String sendRequest(String urlString, String method) throws IOException {
+    public String getEdiToken() {
+        return this.ediToken;
+    }
+
+    public void setEdiId(String ediId) {
+        this.ediId = ediId;
+    }
+
+    public String getEdiId() {
+        return this.ediId;
+    }
+
+    /**
+     * Determines if a user is authorized to access a resource with a specific permission level.
+     *
+     * @param resourceKey     The identifier for the resource (e.g., "edi.1.1").
+     * @param permission     The permission level to check ("READ", "WRITE", or "CHANGEPERMISSION").
+     * @return true if the user is authorized, false otherwise.
+     * @throws IOException if an I/O error occurs when communicating with the auth service.
+     * @throws IllegalArgumentException if the provided permission string is invalid.
+     */
+    public JSONObject isAuthorized(String resourceKey, String permission) throws IOException {
+        Permission permissionEnum;
+        try {
+            permissionEnum = Permission.valueOf(permission.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid permission level specified: " + permission, e);
+        }
+        return isAuthorized(resourceKey, permissionEnum);
+    }
+
+    /**
+     * Determines if a user is authorized to access a resource with a specific permission level.
+     *
+     * @param resourceKey     The identifier for the resource.
+     * @param permission     The permission level to check as a {@link Permission} enum.
+     * @return response message.
+     * @throws IOException if an I/O error occurs when communicating with the auth service.
+     */
+    public JSONObject isAuthorized(String resourceKey, Permission permission) throws IOException {
+        boolean isAuthorized = true;
+
+        String encodedResourceId = URLEncoder.encode(resourceKey, StandardCharsets.UTF_8.name());
+        String encodedPermission = URLEncoder.encode(permission.getPermission(), StandardCharsets.UTF_8.name());
+
+        String urlString = String.format(
+                "%s/auth/v1/authorized?resource_key=%s&permission=%s",
+                this.baseUrl, encodedResourceId, encodedPermission
+        );
+
+        return sendRequest(urlString, "GET", null);
+    }
+
+    public JSONObject createEdiToken(String ediId, String key) throws IOException {
+        String urlString = String.format("%s/auth/v1/token/%s", this.baseUrl, ediId);
+        String payload = String.format("{\"key\": \"%s\"}", key);
+
+        return sendRequest(urlString, "POST", payload);
+    }
+
+        /**
+         * A private helper method to send an authenticated HTTP request to the EDI IAM service.
+         * <p>
+         * This method configures the connection with the necessary 'edi-token' cookie for authentication.
+         * It handles parameter validation, connection setup, and response parsing. It expects a
+         * successful response to have an HTTP 200 OK status.
+         * <p>
+         * Note: This implementation does not write the {@code payload} to the output stream,
+         * so it is currently only suitable for HTTP methods like GET that do not have a request body.
+         *
+         * @param urlString The full URL endpoint for the request.
+         * @param method    The HTTP method to use (e.g., "GET").
+         * @return The response body as a String if the request is successful (HTTP 200).
+         * @throws IOException if a network error occurs or if the server returns a non-200 status code.
+         * @throws IllegalArgumentException if the urlString, method, or payload are invalid.
+         */
+
+    private JSONObject sendRequest(String urlString, String method, String payload) throws IOException {
 
         if (urlString == null || urlString.trim().isEmpty()) {
             throw new IllegalArgumentException("URL cannot be null or empty.");
@@ -181,51 +162,61 @@ public class IAM {
             throw new IllegalArgumentException("Method cannot be null or empty.");
         }
 
+        if ((method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) && payload == null) {
+            throw new IllegalArgumentException("Payload cannot be null for POST or PUT requests.");
+        }
+
         URL url = new URL(urlString);
         HttpURLConnection connection = null;
-        InputStream inputStream;
-        String response = null;
-
-        String cookie = String.format("edi-token=%s", this.ediToken);
 
         try {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method);
             connection.setConnectTimeout(5000); // 5 seconds
             connection.setReadTimeout(5000);    // 5 seconds
-            connection.setRequestProperty("Cookie", cookie);
+            connection.setRequestProperty("Accept", "application/json");
+
+            if (this.ediToken != null) {
+                String cookie = String.format("edi-token=%s", this.ediToken);
+                connection.setRequestProperty("Cookie", cookie);
+            }
+
+            if (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT")) {
+                connection.setRequestProperty("Content-Type", "application/json; utf-8");
+                connection.setDoOutput(true);
+                try (OutputStream os = connection.getOutputStream()) {
+                    byte[] input = payload.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            }
 
             int responseCode = connection.getResponseCode();
-
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                inputStream = connection.getInputStream();
-                if (inputStream != null) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder responseBody = new StringBuilder();
-                    String line;
-
-                    while ((line = reader.readLine()) != null) {
-                        responseBody.append(line);
-                    }
-                    reader.close();
-                    response = responseBody.toString();
+                StringBuilder response = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line.trim());
                 }
-
-            } else {
-                String responseMessage = readResponse(connection);
-                throw new IOException(
-                        String.format(
-                                "Unexpected response from EDI IAM service for URL '%s': %d %s. Response body: %s",
-                                urlString, responseCode, connection.getResponseMessage(), responseMessage
-                        )
-                );
+                reader.close();
+                return new JSONObject(response.toString());
             }
-        } finally {
+            else {
+                StringBuilder error = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    error.append(line.trim());
+                }
+                reader.close();
+                throw new IOException(error.toString());
+            }
+        }
+        finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
-
-        return response;
     }
+
 }
