@@ -1284,7 +1284,107 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
-		/**
+    /**
+     * <strong>Set Reservation</strong> operation, attempts to create a new
+     * reservation in PASTA for the provided scope and identifier.
+     *
+     * <h4>Responses:</h4>
+     *
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <td><b>Status</b></td>
+     * <td><b>Reason</b></td>
+     * <td><b>Entity</b></td>
+     * <td><b>MIME type</b></td>
+     * </tr>
+     * <tr>
+     * <td>201 Created</td>
+     * <td>If the set reservation request was successful.</td>
+     * <td>The integer value of the reserved identifier</td>
+     * <td>N/A</td>
+     * </tr>
+     * <tr>
+     * <td>400 Bad Request</td>
+     * <td>If the request entity contains an error, such as the scope value is not valid or if identifier
+     * is already in use.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * <tr>
+     * <td>401 Unauthorized</td>
+     * <td>If the requesting user is not authorized to create subscriptions.</td>
+     * <td>An error message.</td>
+     * <td><code>text/plain</code></td>
+     * </tr>
+     * </table>
+     *
+     * @param headers
+     *            the HTTP request headers containing the authorization token.
+     * @return an appropriate HTTP response.
+     */
+    @POST @Path("/reservations/eml/{scope}/{identifier}") @Consumes(MediaType.APPLICATION_XML)
+    public Response setReservation (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier
+    ) {
+        ResponseBuilder responseBuilder = null;
+        AuthToken authToken = null;
+        String msg = null;
+        Rule.Permission permission = Rule.Permission.write;
+        Response response = null;
+        final String serviceMethodName = "setReservation";
+
+        try {
+            if (this.readOnly) {
+                throw new ServiceUnavailableException("PASTA is now in read-only mode");
+            }
+
+            authToken = getAuthToken(headers);
+            String userId = authToken.getUserId();
+
+            // Is user authorized to run the 'createReservation' service
+            // method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+
+            if (!serviceMethodAuthorized) {
+                throw new UnauthorizedException(
+                        "User " + userId + " is not authorized to execute service method " + serviceMethodName
+                );
+            }
+
+            DataPackageManager dpm = new DataPackageManager();
+
+            dpm.setReservation(userId, scope, identifier);
+            msg = String.format("Set reservation for data package: %s.%d", scope, identifier);
+            responseBuilder = Response.status(Response.Status.CREATED);
+            response = responseBuilder.build();
+            response = stampHeader(response);
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+            msg = e.getMessage();
+        } catch (ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+            msg = e.getMessage();
+        } catch (UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+            msg = e.getMessage();
+        } catch (ServiceUnavailableException e) {
+            response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+            msg = e.getMessage();
+        } finally {
+            audit(serviceMethodName, authToken, response, null, msg);
+        }
+
+        return response;
+    }
+
+    /**
 		 * <strong>Delete Reservation</strong> operation, deletes an existing
 		 * reservation in PASTA for the specified scope and identifier.
 		 *
