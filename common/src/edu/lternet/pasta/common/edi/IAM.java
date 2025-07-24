@@ -2,7 +2,6 @@ package edu.lternet.pasta.common.edi;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -63,9 +62,7 @@ public class IAM {
     }
 
     /**
-     * Gets the base URL of the EDI IAM service configured for this client.
-     *
-     * @return The base URL, e.g., "https://auth.edirepository.org:8443".
+     * Class IAM Setters and Getters
      */
     public String getBaseUrl() {
         return baseUrl;
@@ -88,11 +85,11 @@ public class IAM {
     }
 
     /**
-     * Determines if a user is authorized to access a resource with a specific permission level.
+     * Wrapper for isAuthorized method to test for correct permissions.
      *
      * @param resourceKey     The identifier for the resource (e.g., "edi.1.1").
      * @param permission     The permission level to check ("READ", "WRITE", or "CHANGEPERMISSION").
-     * @return true if the user is authorized, false otherwise.
+     * @return JSONObject of the successful request.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      * @throws IllegalArgumentException if the provided permission string is invalid.
      */
@@ -111,7 +108,7 @@ public class IAM {
      *
      * @param resourceKey     The identifier for the resource.
      * @param permission     The permission level to check as a {@link Permission} enum.
-     * @return response message.
+     * @return JSONObject of the successful request.
      * @throws IOException if an I/O error occurs when communicating with the auth service.
      */
     public JSONObject isAuthorized(String resourceKey, Permission permission) throws IOException {
@@ -147,7 +144,7 @@ public class IAM {
          *
          * @param urlString The full URL endpoint for the request.
          * @param method    The HTTP method to use (e.g., "GET").
-         * @return The response body as a String if the request is successful (HTTP 200).
+         * @return JSONObject of the successful request.
          * @throws IOException if a network error occurs or if the server returns a non-200 status code.
          * @throws IllegalArgumentException if the urlString, method, or payload are invalid.
          */
