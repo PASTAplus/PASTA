@@ -27,7 +27,7 @@ package edu.lternet.pasta.common.edi;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 
-import org.json.*;
+import org.json.JSONObject;
 
 /**
  * Provides interface to the EDI Token claims.
