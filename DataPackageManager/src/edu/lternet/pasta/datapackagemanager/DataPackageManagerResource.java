@@ -1357,6 +1357,7 @@ public class DataPackageManagerResource extends PastaWebService {
     ) {
         ResponseBuilder responseBuilder = null;
         AuthToken authToken = null;
+        String ediToken = null;
         String msg = null;
         Rule.Permission permission = Rule.Permission.write;
         Response response = null;
@@ -1366,6 +1367,7 @@ public class DataPackageManagerResource extends PastaWebService {
             if (this.readOnly) {
                 throw new ServiceUnavailableException("PASTA is now in read-only mode");
             }
+            ediToken = getEdiToken(headers);
 
             authToken = getAuthToken(headers);
             String userId = authToken.getUserId();
@@ -1405,7 +1407,7 @@ public class DataPackageManagerResource extends PastaWebService {
             response = webApplicationException.getResponse();
             msg = e.getMessage();
         } finally {
-            audit(serviceMethodName, authToken, response, null, msg);
+            audit(serviceMethodName, authToken, ediToken, response, null, msg);
         }
 
         return response;
