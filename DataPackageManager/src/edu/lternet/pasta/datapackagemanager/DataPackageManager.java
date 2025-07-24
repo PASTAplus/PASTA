@@ -1158,13 +1158,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * next reservable identifier is determined, the reservation is placed,
 	 * and the identifier is returned as the method's value.
 	 * 
-	 * @param userId    The user who is making the reservation
-	 * @param scope     The scope of the reserved identifier, e.g. "edi"
+	 * @param userId       The user who is making the reservation
+	 * @param scope        The scope of the reserved identifier, e.g. "edi"
 	 * @return identifier  The integer value of the reserved identifier
 	 * @throws Exception
 	 */
-	public Integer createReservation(String userId, String scope) 
-			throws Exception {
+	public Integer createReservation(String userId, String scope) throws Exception {
 		boolean isValidScope = isValidScope(scope);
 		if (!isValidScope) {
 			String msg = 
@@ -1174,16 +1173,50 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		}
 		
 		Integer identifier = getNextReservableIdentifier(scope);
-		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
-			    dbDriver, dbURL, dbUser, dbPassword);
-		
+		DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 		dataPackageRegistry.addDataPackageReservation(scope, identifier, userId);
 		
 		return identifier;
 	}
-	
-	
-	/**
+
+
+    /**
+     * Creates a new reservation for the specified user and scope. The
+     * next reservable identifier is determined, the reservation is placed,
+     * and the identifier is returned as the method's value.
+     *
+     * @param userId       The user who is making the reservation
+     * @param scope        The scope of the requested reservation, e.g. "edi"
+     * @param identifier   The identifier of the requested reservation
+     * @return identifier  The integer value of the reserved identifier
+     * @throws Exception
+     */
+    public void setReservation(String userId, String scope, Integer identifier) throws Exception {
+        boolean isValidScope = isValidScope(scope);
+        if (!isValidScope) {
+            String msg = String.format(
+                    "Attempting to create a data package identifier reservation for an unknown scope: %s",
+                    scope
+            );
+            throw new UserErrorException(msg);
+        }
+
+        if (isReservable(scope, identifier)) {
+            DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+            dataPackageRegistry.addDataPackageReservation(scope, identifier, userId);
+        }
+        else {
+            String msg = String.format(
+                    "Attempting to create a data package identifier reservation for a scope and" +
+                      " identifier already in use: %s.%d", scope, identifier
+            );
+            throw new UserErrorException(msg);
+        }
+
+    }
+
+
+    /**
 	 * Deletes a reservation for the specified user and document identifier.
 	 * 
 	 * @param userId    The user who is making the reservation
@@ -1284,7 +1317,54 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
 		return nextReservable;
 	}
-	
+
+    private boolean isReservable(String scope, Integer identifier) throws Exception{
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+
+        /*
+         * First get a list of all known identifiers for this scope that exist
+         * in the resource registry. Include identifiers for data packages that
+         * were deleted since these identifier values can't be reused.
+         */
+        boolean includeDeleted = true;
+        ArrayList<String> identifierList = dataPackageRegistry.listDataPackageIdentifiers(scope, includeDeleted);
+        for (String existingIdentifier : identifierList) {
+            if (Integer.parseInt(existingIdentifier) == identifier) {
+                return false;
+            }
+        }
+
+        /*
+         * Next get a list of all known identifiers for this scope that are
+         * actively being worked on (i.e. an upload operation for this
+         * identifier is actively in progress).
+         */
+        ArrayList<Integer> identifiers = dataPackageRegistry.listWorkingOnIdentifiers(scope);
+        for (Integer workingOnIdentifier : identifiers) {
+            if (Objects.equals(workingOnIdentifier, identifier)) {
+                return false;
+            }
+        }
+
+
+        /*
+         * Finally, get a list of all active reservations for this scope.
+         */
+        String reservationString = dataPackageRegistry.listReservationIdentifiers(scope);
+        String[] reservationEntries = reservationString.split("\n");
+        for (String reservedIdentifier : reservationEntries) {
+            if (!reservedIdentifier.isEmpty()) {
+                if (Integer.parseInt(reservedIdentifier) == identifier) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
 	/*
 	 * Notifies the event manager of a change to a data package by using an
 	 * EventManagerClient object.
