@@ -24,40 +24,36 @@
 
 package edu.lternet.pasta.common.edi;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import org.json.JSONObject;
 
 public class TestIAM {
     private IAM iam;
-    private String ediToken;
-    private String resourceId;
-    private String permission;
-    private String baseUrl = "https://localhost:5443";
+    private final String protocol = "https";
+    private final String host = "localhost";
+    private final Integer port = 5443;
 
     @Test
     public void testIAMConstructor() {
-        iam = new IAM("https", "localhost", 5443);
+        String baseUrl = "https://localhost:5443";
+
+        iam = new IAM(protocol, host, port);
+
         assert(iam.getBaseUrl().equals(baseUrl));
     }
 
     @Test
     public void testCreateEdiToken() {
-        iam = new IAM("https", "localhost", 5443);
-
         String publicId = "EDI-b2757fee12634ccca40d2d689f5c0543";
         String key = "2d69dda41af84bbe9b1ed4fba5479def";
 
+        iam = new IAM(protocol, host, port);
+
         try {
             JSONObject newEdiToken = iam.createEdiToken(publicId, key);
-            System.out.println(newEdiToken.getString("token"));
+            assert (newEdiToken.getString("token") != null);
         } catch (IOException e) {
             System.out.println(e.getMessage());
             assert false;
@@ -70,7 +66,7 @@ public class TestIAM {
         String permission = "READ";
         String publicId = "EDI-b2757fee12634ccca40d2d689f5c0543";
 
-        iam = new IAM("https", "localhost", 5443);
+        iam = new IAM(protocol, host, port);
 
         String token = newToken(publicId);
         iam.setEdiToken(token);
@@ -86,10 +82,10 @@ public class TestIAM {
     }
 
     private String newToken(String ediId) {
-        iam = new IAM("https", "localhost", 5443);
-
         String key = "2d69dda41af84bbe9b1ed4fba5479def";
         String token = null;
+
+        iam = new IAM(protocol, host, port);
 
         try {
             JSONObject newEdiToken = iam.createEdiToken(ediId, key);
