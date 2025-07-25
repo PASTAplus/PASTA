@@ -32,6 +32,8 @@ import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.common.edi.EdiToken;
+import edu.lternet.pasta.common.edi.IAM;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
@@ -2696,14 +2698,25 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Check whether user is authorized to read the data package
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String message = "User " + user
-				    + " does not have permission to read this data package: "
-				    + dataPackageId;
-				throw new UnauthorizedException(message);
+				String msg = String.format("User %s does not have permission to read this data package: %s", user, dataPackageId);
+				throw new UnauthorizedException(msg);
 			}
+
+            /*
+             * EDI IAM authorization
+             */
+            if (ediToken != null) {
+                IAM iam = new IAM("https", "localhost", 5443);
+                iam.setEdiToken(ediToken);
+                try {
+                    iam.isAuthorized(dataPackageId, "READ");
+                }
+                catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+            }
 
 			String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
 			logger.warn(LogMessageFormatter.readDataPackageLogMessage(packageId, user, oreFormat));
