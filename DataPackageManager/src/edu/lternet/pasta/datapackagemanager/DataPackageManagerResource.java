@@ -5647,11 +5647,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * @return a Response object containing a data package resource graph if
 		 *         found, else returns a 404 Not Found response
 		 */
-		@GET @Path("/eml/{scope}/{identifier}/{revision}") @Produces(
-				{"application/rdf+xml", "text/plain"}) public Response readDataPackage
-		(@Context HttpHeaders headers, @PathParam("scope") String
-		scope, @PathParam("identifier") Integer identifier, @PathParam("revision") String
-		revision, @QueryParam("ore") String oreParam){
+		@GET @Path("/eml/{scope}/{identifier}/{revision}") @Produces({"application/rdf+xml", "text/plain"})
+        public Response readDataPackage (
+                @Context HttpHeaders headers,
+                @PathParam("scope") String scope,
+                @PathParam("identifier") Integer identifier,
+                @PathParam("revision") String revision,
+                @QueryParam("ore") String oreParam)
+        {
 
 		AuthToken authToken = null;
         String ediToken = null;
