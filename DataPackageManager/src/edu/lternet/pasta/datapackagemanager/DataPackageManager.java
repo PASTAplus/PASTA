@@ -1420,9 +1420,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @param authToken
 	 *          The authentication token object
 	 */
-	public boolean deleteDataPackage(String scope, Integer identifier,
-	    String user, AuthToken authToken) throws ClassNotFoundException,
-	    SQLException, ClientProtocolException, IOException, Exception {
+	public boolean deleteDataPackage(
+            String scope,
+            Integer identifier,
+            String user,
+            AuthToken authToken,
+            String ediToken
+    ) throws Exception {
+
 		boolean hasDataPackage = false;
 		boolean deleted = false;
 		Integer revision = getNewestRevision(scope, identifier);
@@ -1442,7 +1447,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String resourceId = composeResourceId(ResourceType.dataPackage, scope,
 			    identifier, revision, entityId);
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.write);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
 				String message = "User " + user
 				    + " does not have permission to delete this data package: "
@@ -1694,9 +1699,12 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @return The boolean result of the request.
 	 * @throws IllegalArgumentException, UnauthorizedException
 	 */
-	public Boolean isAuthorized(AuthToken authToken, String resourceId,
-	    Rule.Permission permission) throws IllegalArgumentException,
-	    UnauthorizedException {
+	public Boolean isAuthorized(
+            AuthToken authToken,
+            String ediToken,
+            String resourceId,
+            Rule.Permission permission
+    ) throws IllegalArgumentException, UnauthorizedException {
 
 		Boolean isAuthorized = null;
 		DataPackageRegistry dpr = null;
@@ -1719,7 +1727,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     
 		Authorizer authorizer = new Authorizer(dpr);
 		try {
-	    isAuthorized = authorizer.isAuthorized(authToken, resourceId, permission);
+	    isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, permission);
 	    
 			if (!isAuthorized) {
 				String gripe = "User \"" + userId + "\" is not authorized to "
@@ -2314,8 +2322,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * rules specified for reading the data entity.
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken,
-			    dataPackageResourceId, Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageResourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User "
 				    + user
@@ -2402,7 +2409,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 							String entityId = line.substring(0, firstCommaPosition);
 							String entityName = line.substring(firstCommaPosition + 1);
 							String resourceId = DataPackageManager.composeResourceId(ResourceType.data, scope, identifier, revision, entityId);
-							boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+							boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 							if (isAuthorized) {
 								stringBuilder.append(String.format("%s,%s\n", entityId, entityName));
 							}
@@ -2490,8 +2497,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * whether the user is authorized to read the data entity.
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String message = "User " + user
 				    + " does not have permission to read this data entity: "
@@ -2708,42 +2714,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			    identifier, revision, entityId);
 
             /*
-             * EDI IAM authorization
-             */
-            boolean ediAuthorized = false;
-            if (ediToken != null) {
-                IAM iam = new IAM("https", "localhost", 5443);
-                iam.setEdiToken(ediToken);
-                try {
-                    JSONObject response = iam.isAuthorized(dataPackageId, "READ");
-                    logger.info(response.toString());
-                    ediAuthorized = true;
-                }
-                catch (Exception e) {
-                    String msg = "EDI Authorization Error: " + e.getMessage();
-                    logger.error(msg);
-                }
-            }
-
-            /*
 			 * Check whether user is authorized to read the data package
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageId, Rule.Permission.read);
-
-            // Authorization congruence test
-            if ((ediToken != null) && (ediAuthorized != isAuthorized)) {
-                String ediId = new EdiToken(ediToken).getSubject();
-                String line;
-                StringBuilder msg = new StringBuilder();
-                line = "EDI Authorization Congruence Error: ";
-                msg.append(line);
-                line = String.format("EDI IAM.isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
-                msg.append(line);
-                line = String.format("edi_subj: %s; authtoken_subj: %s; resource: %s; permission: READ", ediId, authToken.getUserId(), dataPackageId);
-                msg.append(line);
-                logger.error(msg);
-            }
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageId, Rule.Permission.read);
 
 			if (!isAuthorized) {
 				String msg = String.format("User %s does not have permission to read this data package: %s", user, dataPackageId);
@@ -2880,8 +2854,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Check whether user is authorized to read the data package report
 				 */
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
-				boolean isAuthorized = authorizer.isAuthorized(authToken, reportId,
-				    Rule.Permission.read);
+				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, reportId, Rule.Permission.read);
 				if (!isAuthorized) {
 					String message = "User " + user
 					    + " does not have permission to read this data package report: "
@@ -2961,8 +2934,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Check whether user is authorized to read the data package metadata
 				 */
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
-				boolean isAuthorized = authorizer.isAuthorized(authToken, metadataId,
-				    Rule.Permission.read);
+				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
 					String message = "User " + user
 					    + " does not have permission to read this metadata document: "
@@ -3022,9 +2994,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 *          The AuthToken object
 	 * @return The Dublin Core metadata document, an XML string.
 	 */
-	public String readMetadataDublinCore(String scope, Integer identifier, String revision,
-		    String user, AuthToken authToken) throws ClassNotFoundException,
-		    SQLException, ClientProtocolException, IOException, Exception {
+	public String readMetadataDublinCore(
+            String scope,
+            Integer identifier,
+            String revision,
+            String user,
+            AuthToken authToken,
+            String ediToken
+    ) throws Exception {
 			String entityId = null;
 			String metadataXML = null;
 			boolean hasDataPackage = false;
@@ -3042,8 +3019,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					 * Check whether user is authorized to read the data package metadata
 					 */
 					Authorizer authorizer = new Authorizer(dataPackageRegistry);
-					boolean isAuthorized = authorizer.isAuthorized(authToken, metadataId,
-					    Rule.Permission.read);
+					boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 					if (!isAuthorized) {
 						String message = "User " + user
 						    + " does not have permission to read this metadata document: "
@@ -3134,8 +3110,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				 * Check whether user is authorized to read the data package metadata
 				 */
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
-				boolean isAuthorized = authorizer.isAuthorized(authToken, metadataId,
-				    Rule.Permission.read);
+				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
 					String message = "User " + user
 					    + " does not have permission to read this metadata document: "
@@ -3291,9 +3266,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readEntitySizes(String scope, Integer identifier, Integer revision, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    	ResourceNotFoundException, Exception {
+	public String readEntitySizes(
+            String scope,
+            Integer identifier,
+            Integer revision,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 		String entitySizes = null;
 		String packageId = String.format("%s.%d.%d", scope, identifier, revision);
 		StringBuilder stringBuilder = new StringBuilder("");
@@ -3322,7 +3301,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 							String entityId = keyValuePair[0];
 							String entitySize = keyValuePair[1];
 							String resourceId = DataPackageManager.composeResourceId(ResourceType.data, scope, identifier, revision, entityId);
-							boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.read);
+							boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 							if (isAuthorized) {
 								stringBuilder.append(String.format("%s,%s\n", entityId, entitySize));
 							}
@@ -3360,9 +3339,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readResourceChecksum(String resourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
+	public String readResourceChecksum(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 
 		String checksum = null;
 		String user = authToken.getUserId();
@@ -3375,8 +3356,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Check whether user is authorized to read the data package report
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User " + user
 				    + " does not have permission to read the checksum for this resource: "
@@ -3418,9 +3398,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public Long readResourceSize(String resourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
+	public Long readResourceSize(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 
 		Long resourceSize = null;
 		String user = authToken.getUserId();
@@ -3433,8 +3415,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Check whether user is authorized to read the data package report
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User " + user
 				    + " does not have permission to read the size value for this resource: "
@@ -3476,9 +3457,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readResourceDoi(String resourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
+	public String readResourceDoi(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 
 		String doi = null;
 		String user = authToken.getUserId();
@@ -3491,8 +3474,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Check whether user is authorized to read the data package report
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = "User " + user
 				    + " does not have permission to read the DOI for this resource: "
@@ -3534,9 +3516,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @throws ResourceNotFoundException
 	 * @throws Exception
 	 */
-	public String readResourceFormatType(String resourceId, AuthToken authToken)
-	    throws ClassNotFoundException, SQLException, UnauthorizedException,
-	    ResourceNotFoundException, Exception {
+	public String readResourceFormatType(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken
+    ) throws ClassNotFoundException, SQLException, UnauthorizedException, ResourceNotFoundException, Exception {
 
 		String formatType = null;
 		String user = authToken.getUserId();
@@ -3549,8 +3533,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Check whether user is authorized to read the resource
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.read);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
 				String gripe = String.format(
 						"User %s does not have permission to read this resource: %s", 
@@ -3867,8 +3850,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String resourceId = composeResourceId(ResourceType.dataPackage, scope,
 			    identifier, newestRevision, entityId);
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.write);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
 				String message = "User " + user
 				    + " does not have permission to update this data package: "

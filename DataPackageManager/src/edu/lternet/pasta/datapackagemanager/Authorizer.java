@@ -27,10 +27,14 @@ package edu.lternet.pasta.datapackagemanager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import edu.lternet.pasta.common.edi.EdiToken;
+import edu.lternet.pasta.common.edi.IAM;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 
 public class Authorizer {
@@ -47,9 +51,10 @@ public class Authorizer {
   /*
    * Class variables
    */
-  
-  
-  /*
+  private static final Logger logger = Logger.getLogger(Authorizer.class);
+
+
+    /*
    * Instance variables
    */
   
@@ -85,8 +90,13 @@ public class Authorizer {
    * @return true if the user (authToken) is authorized to access the resource 
    *         with the specified permission, else false
    */
-  public boolean isAuthorized(AuthToken authToken, String resourceId, Rule.Permission permission)
-          throws ClassNotFoundException, SQLException {
+  public boolean isAuthorized(
+          AuthToken authToken,
+          String ediToken,
+          String resourceId,
+          Rule.Permission permission
+  ) throws ClassNotFoundException, SQLException {
+
     boolean isAuthorized = false;
     
     boolean hasResource = dataPackageRegistry.hasResource(resourceId);
@@ -101,8 +111,40 @@ public class Authorizer {
       AccessMatrix accessMatrix = new AccessMatrix(ruleList);
       isAuthorized = accessMatrix.isAuthorized(authToken, principalOwner, permission);
     }
-    
-    return isAuthorized;
+
+      /*
+       * EDI IAM authorization
+       */
+      boolean ediAuthorized = false;
+      if (ediToken != null) {
+          IAM iam = new IAM("https", "localhost", 5443);
+          iam.setEdiToken(ediToken);
+          try {
+              JSONObject response = iam.isAuthorized(resourceId, permission.toString());
+              logger.info(response.toString());
+              ediAuthorized = true;
+          }
+          catch (Exception e) {
+              String msg = "EDI Authorization Error: " + e.getMessage();
+              logger.error(msg);
+          }
+      }
+
+      // Authorization congruence test
+      if ((ediToken != null) && (ediAuthorized != isAuthorized)) {
+          String ediId = new EdiToken(ediToken).getSubject();
+          String line;
+          StringBuilder msg = new StringBuilder();
+          line = "EDI Authorization Congruence Error: ";
+          msg.append(line);
+          line = String.format("EDI IAM.isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
+          msg.append(line);
+          line = String.format("edi_subj: %s; authtoken_subj: %s; resource: %s; permission: READ", ediId, authToken.getUserId(), resourceId);
+          msg.append(line);
+          logger.error(msg);
+      }
+
+      return isAuthorized;
   }
   
   
