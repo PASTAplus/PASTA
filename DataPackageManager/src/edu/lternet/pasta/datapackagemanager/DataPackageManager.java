@@ -627,9 +627,22 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			boolean isUpdate = false;
 			boolean useChecksum = false;
-			resourceMap = createDataPackageAux(emlFile, levelZeroDataPackage,
-			    dataPackageRegistry, packageId, scope, identifier, revision, user,
-			    authToken, ediToken, isUpdate, isEvaluate, transaction, useChecksum);
+			resourceMap = createDataPackageAux(
+                    emlFile,
+                    levelZeroDataPackage,
+                    dataPackageRegistry,
+                    packageId,
+                    scope,
+                    identifier,
+                    revision,
+                    user,
+                    authToken,
+                    ediToken,
+                    isUpdate,
+                    isEvaluate,
+                    transaction,
+                    useChecksum
+            );
 		}
 		
 		// Return the resource map
@@ -1429,8 +1442,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String resourceId = composeResourceId(ResourceType.dataPackage, scope,
 			    identifier, revision, entityId);
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId,
-			    Rule.Permission.write);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
 				String message = "User " + user
 				    + " does not have permission to delete this data package: "
