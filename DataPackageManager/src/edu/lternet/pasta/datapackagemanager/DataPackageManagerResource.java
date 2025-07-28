@@ -2147,8 +2147,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userId = authToken.getUserId();
 
 		// Is user authorized to run the service method?
-		boolean serviceMethodAuthorized =
-				isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken);
 		if (!serviceMethodAuthorized) {
 			throw new UnauthorizedException(
 					"User " + userId + " is not authorized to execute service method " +
@@ -2158,7 +2157,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 
 			DataPackageManager dpm = new DataPackageManager();
-			Boolean isAuthorized = dpm.isAuthorized(authToken, resourceId, permission);
+			Boolean isAuthorized = dpm.isAuthorized(authToken, ediToken, resourceId, permission);
 
 			if (isAuthorized != null && isAuthorized) {
 				responseBuilder = Response.ok(resourceId);
@@ -4763,7 +4762,7 @@ public class DataPackageManagerResource extends PastaWebService {
 							Integer.valueOf(revision), entityId);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken, ediToken);
 
 			if (checksum != null) {
 				responseBuilder = Response.ok(checksum);
@@ -4938,7 +4937,7 @@ public class DataPackageManagerResource extends PastaWebService {
 							Integer.valueOf(revision), entityId);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			entitySize = dataPackageManager.readResourceSize(resourceId, authToken);
+			entitySize = dataPackageManager.readResourceSize(resourceId, authToken, ediToken);
 
 			if (entitySize != null) {
 				entryText = entitySize.toString();
@@ -5084,9 +5083,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		 *         else returns a 404 Not Found response
 		 */
 		@GET @Path("/data/size/eml/{scope}/{identifier}/{revision}") @Produces("text/csv")
-		public Response readDataEntitySizes (@Context HttpHeaders
-		headers, @PathParam("scope") String scope, @PathParam("identifier") Integer
-		identifier, @PathParam("revision") Integer revision){
+		public Response readDataEntitySizes (
+                @Context HttpHeaders headers,
+                @PathParam("scope") String scope,
+                @PathParam("identifier") Integer identifier,
+                @PathParam("revision") Integer revision
+        ) {
 		
 		AuthToken authToken = null;
         String ediToken = null;
@@ -5117,8 +5119,7 @@ public class DataPackageManagerResource extends PastaWebService {
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
 					identifier, revision, null);
-			entitySizesCSV =
-					dataPackageManager.readEntitySizes(scope, identifier, revision, authToken);
+			entitySizesCSV = dataPackageManager.readEntitySizes(scope, identifier, revision, authToken, ediToken);
 
 			if (entitySizesCSV != null) {
 				entryText = entitySizesCSV;
@@ -6419,7 +6420,7 @@ public class DataPackageManagerResource extends PastaWebService {
 					identifier, Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			doi = dataPackageManager.readResourceDoi(resourceId, authToken);
+			doi = dataPackageManager.readResourceDoi(resourceId, authToken, ediToken);
 
 			if (doi != null) {
 				responseBuilder = Response.ok(doi);
@@ -7575,7 +7576,7 @@ public class DataPackageManagerResource extends PastaWebService {
 							Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken, ediToken);
 
 			if (checksum != null) {
 				responseBuilder = Response.ok(checksum);
@@ -8389,10 +8390,13 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * @return a Response object containing the Dublin Core XML metadata document in its
 		 *         message body
 		 */
-		@GET @Path("/metadata/dc/{scope}/{identifier}/{revision}") @Produces(
-				"application/xml") public Response readMetadataDublinCore (@Context HttpHeaders
-		headers, @PathParam("scope") String scope, @PathParam("identifier") Integer
-		identifier, @PathParam("revision") String revision){
+		@GET @Path("/metadata/dc/{scope}/{identifier}/{revision}") @Produces("application/xml")
+        public Response readMetadataDublinCore (
+                @Context HttpHeaders headers,
+                @PathParam("scope") String scope,
+                @PathParam("identifier") Integer identifier,
+                @PathParam("revision") String revision
+        ) {
 
         AuthToken authToken = null;
         String ediToken = null;
@@ -8463,9 +8467,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				}
 			}
 
-			metadataString =
-					dataPackageManager.readMetadataDublinCore(scope, identifier, revision, userId,
-							authToken);
+			metadataString = dataPackageManager.readMetadataDublinCore(scope, identifier, revision, userId, authToken, ediToken);
 
 			if (metadataString != null) {
 				byte[] byteArray = metadataString.getBytes("UTF-8");
@@ -9005,7 +9007,7 @@ public class DataPackageManagerResource extends PastaWebService {
 							Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken);
+			checksum = dataPackageManager.readResourceChecksum(resourceId, authToken, ediToken);
 
 			if (checksum != null) {
 				responseBuilder = Response.ok(checksum);
@@ -9346,7 +9348,7 @@ public class DataPackageManagerResource extends PastaWebService {
 							Integer.valueOf(revision), null);
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
-			formatType = dataPackageManager.readResourceFormatType(resourceId, authToken);
+			formatType = dataPackageManager.readResourceFormatType(resourceId, authToken, ediToken);
 			responseBuilder = Response.ok(formatType);
 			response = responseBuilder.build();
 			entryText = formatType;
@@ -10655,7 +10657,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			deleted =
-					dataPackageManager.deleteDataPackage(scope, identifier, userId, authToken);
+					dataPackageManager.deleteDataPackage(scope, identifier, userId, authToken, ediToken);
 
 			if (deleted) {
 				responseBuilder = Response.ok();
