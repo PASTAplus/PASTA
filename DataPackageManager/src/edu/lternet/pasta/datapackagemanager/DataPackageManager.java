@@ -58,6 +58,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2693,30 +2694,49 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			String entityId = null;
 			String dataPackageId = composeResourceId(ResourceType.dataPackage, scope,
 			    identifier, revision, entityId);
-			
-			/*
-			 * Check whether user is authorized to read the data package
-			 */
-			Authorizer authorizer = new Authorizer(dataPackageRegistry);
-			boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageId, Rule.Permission.read);
-			if (!isAuthorized) {
-				String msg = String.format("User %s does not have permission to read this data package: %s", user, dataPackageId);
-				throw new UnauthorizedException(msg);
-			}
 
             /*
              * EDI IAM authorization
              */
+            boolean ediAuthorized = false;
             if (ediToken != null) {
                 IAM iam = new IAM("https", "localhost", 5443);
                 iam.setEdiToken(ediToken);
                 try {
-                    iam.isAuthorized(dataPackageId, "READ");
+                    JSONObject response = iam.isAuthorized(dataPackageId, "READ");
+                    logger.info(response.toString());
+                    ediAuthorized = true;
                 }
                 catch (Exception e) {
-                    logger.error(e.getMessage());
+                    String msg = "EDI Authorization Error: " + e.getMessage();
+                    logger.error(msg);
                 }
             }
+
+            /*
+			 * Check whether user is authorized to read the data package
+			 */
+			Authorizer authorizer = new Authorizer(dataPackageRegistry);
+			boolean isAuthorized = authorizer.isAuthorized(authToken, dataPackageId, Rule.Permission.read);
+
+            // Authorization congruence test
+            if ((ediToken != null) && (ediAuthorized != isAuthorized)) {
+                String ediId = new EdiToken(ediToken).getSubject();
+                String line;
+                StringBuilder msg = new StringBuilder();
+                line = "EDI Authorization Congruence Error: ";
+                msg.append(line);
+                line = String.format("EDI IAM.isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
+                msg.append(line);
+                line = String.format("edi_subj: %s; authtoken_subj: %s; resource: %s; permission: READ", ediId, authToken.getUserId(), dataPackageId);
+                msg.append(line);
+                logger.error(msg);
+            }
+
+			if (!isAuthorized) {
+				String msg = String.format("User %s does not have permission to read this data package: %s", user, dataPackageId);
+				throw new UnauthorizedException(msg);
+			}
 
 			String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
 			logger.warn(LogMessageFormatter.readDataPackageLogMessage(packageId, user, oreFormat));
