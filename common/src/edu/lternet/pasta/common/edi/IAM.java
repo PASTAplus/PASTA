@@ -197,6 +197,7 @@ public class IAM {
                 return new JSONObject(response.toString());
             }
             else {
+                // Build an error message from the response message
                 StringBuilder error = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
                 String line;
