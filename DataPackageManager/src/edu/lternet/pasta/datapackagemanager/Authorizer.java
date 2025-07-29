@@ -135,11 +135,14 @@ public class Authorizer {
           String ediId = new EdiToken(ediToken).getSubject();
           String line;
           StringBuilder msg = new StringBuilder();
-          line = "EDI Authorization Congruence Error: ";
+          line = "EDI/PASTA authorization congruence error: ";
           msg.append(line);
-          line = String.format("EDI IAM.isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
+          line = String.format("EDI isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
           msg.append(line);
-          line = String.format("edi_subj: %s; authtoken_subj: %s; resource: %s; permission: READ", ediId, authToken.getUserId(), resourceId);
+          line = String.format(
+                  "edi_subj: %s; authtoken_subj: %s; resource: %s; permission: %s",
+                  ediId, authToken.getUserId(), resourceId, permission.toString()
+          );
           msg.append(line);
           logger.error(msg);
       }
