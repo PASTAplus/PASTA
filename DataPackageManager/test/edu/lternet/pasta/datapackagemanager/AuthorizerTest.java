@@ -24,10 +24,6 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.sql.SQLException;
 
@@ -40,12 +36,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.lternet.pasta.common.edi.EdiToken;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.utility.PastaUtility;
 import edu.ucsb.nceas.utilities.Options;
+
+import static org.junit.Assert.*;
 
 
 public class AuthorizerTest {
@@ -61,6 +60,7 @@ public class AuthorizerTest {
   private static final String testUserOwner = "uid=ucarroll,o=LTER,dc=ecoinformatics,dc=org";
   private static final String testUserLNO = "uid=LNO,o=LTER,dc=ecoinformatics,dc=org";
   private static final String testUserAuthenticated = "uid=dcosta,o=LTER,dc=ecoinformatics,dc=org";
+  private static final String testEdiToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktMzEyZTkwZjI5ZmJlNGUzZGE3MWY1MjFlZmJmMWRlMDYiLCJjbiI6IkVESSIsImVtYWlsIjpudWxsLCJwcmluY2lwYWxzIjpbIkVESS1iMjc1N2ZlZTEyNjM0Y2NjYTQwZDJkNjg5ZjVjMDU0MyIsIkVESS1kM2ZjYTk3NjdhYzU0YzIyOTYyODk2YjAxYTFjMDFiZCJdLCJpc0VtYWlsRW5hYmxlZCI6ZmFsc2UsImlzRW1haWxWZXJpZmllZCI6ZmFsc2UsImlkZW50aXR5SWQiOjMsImlkcE5hbWUiOiJsZGFwIiwiaWRwVWlkIjoidWlkPUVESSxvPUVESSxkYz1lZGlyZXBvc2l0b3J5LGRjPW9yZyIsImlkcENuYW1lIjoiRURJIiwiaXNzIjoiaHR0cHM6Ly9hdXRoLmVkaXJlcG9zaXRvcnkub3JnIiwiaGQiOiJlZGlyZXBvc2l0b3J5Lm9yZyIsImlhdCI6MTc1MjUwNzY5MiwibmJmIjoxNzUyNTA3NjkyLCJleHAiOjE3NTI1MzY0OTJ9.syUA6NedZvSSjYakGWtq5qo4U1H8LzX-R7w0MC5p2fZE8usCqrgu-ig0kLnrYRscBQWrOcwE8E7bbp6yNPTqbQ";
   private static Options options = null;
   private static File testEmlFile = null;
   private static String testEmlFileName = null;
@@ -262,69 +262,74 @@ public class AuthorizerTest {
     dataEntityResourceId = DataPackageManager.composeResourceId(
         ResourceType.data, testScope, testIdentifier, testRevision, testEntityId);
 
+    /*
+     * The use of the EDI TOKEN (ediToken) is as a placeholder only and full-on tests using
+     * this token will fail and true assertion as this time.
+     */
+
     // Test owner privileges
     authToken = DataPackageManagerResource.getAuthToken(httpHeadersOwner);
     // Test whether the owner can read the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.read);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.read);
     assertTrue(isAuthorized);
     // Test whether the owner can read the data entity (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.read);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.read);
     assertTrue(isAuthorized);
     // Test whether the owner can write to the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.write);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.write);
     assertTrue(isAuthorized);
     // Test whether the owner can write to the data entity (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.write);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.write);
     assertTrue(isAuthorized);
     // Test whether the owner can change permission the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.changePermission);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.changePermission);
     assertTrue(isAuthorized);
     // Test whether the owner can change permission the data entity (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.changePermission);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.changePermission);
     assertTrue(isAuthorized);
     
     // Test LNO privileges (LNO is granted all privileges to the test data package and entity)
     authToken = DataPackageManagerResource.getAuthToken(httpHeadersLNO);
     // Test whether LNO can read the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.read);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.read);
     assertTrue(isAuthorized);
     // Test whether LNO can read the data entity (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.read);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.read);
     assertTrue(isAuthorized);
     // Test whether LNO can write to the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.write);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.write);
     assertTrue(isAuthorized);
     // Test whether LNO can write to the data entity (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.write);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.write);
     assertTrue(isAuthorized);
     // Test whether LNO can change permission the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.changePermission);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.changePermission);
     assertTrue(isAuthorized);
     // Test whether LNO can change permission the data entity (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.changePermission);  
-    assertTrue(isAuthorized == false);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.changePermission);
+    assertFalse(isAuthorized);
     
 
     // Test authenticated privileges
     authToken = DataPackageManagerResource.getAuthToken(httpHeadersAuthenticated);
     // Test whether an authenticated user can read the data package (should)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.read);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.read);
     assertTrue(isAuthorized);
     // Test whether an authenticated user can read the data entity (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.read);  
-    assertTrue(isAuthorized == false);  
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.read);
+    assertFalse(isAuthorized);
     // Test whether an authenticated user can write to the data package (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.write);
-    assertTrue(isAuthorized == false);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.write);
+    assertFalse(isAuthorized);
     // Test whether an authenticated user can write to the data entity (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.write);  
-    assertTrue(isAuthorized == false);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.write);
+    assertFalse(isAuthorized);
     // Test whether an authenticated user can change permission the data package (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataPackageResourceId, Rule.Permission.changePermission);
-    assertTrue(isAuthorized == false);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataPackageResourceId, Rule.Permission.changePermission);
+    assertFalse(isAuthorized);
     // Test whether an authenticated user can change permission the data entity (should not)
-    isAuthorized = authorizer.isAuthorized(authToken, dataEntityResourceId, Rule.Permission.changePermission);  
-    assertTrue(isAuthorized == false);
+    isAuthorized = authorizer.isAuthorized(authToken, testEdiToken, dataEntityResourceId, Rule.Permission.changePermission);
+    assertFalse(isAuthorized);
     
     // Delete the test data package
     response = dataPackageManagerResource.deleteDataPackage(httpHeadersOwner, testScope, testIdentifier);
