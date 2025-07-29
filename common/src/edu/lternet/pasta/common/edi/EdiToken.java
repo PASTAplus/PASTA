@@ -83,4 +83,8 @@ public final class EdiToken {
     public String getSubject() {
         return jsonPayload.getString("sub");
     }
+
+    public String getCommonName() {
+        return jsonPayload.getString("cn");
+    }
 }
