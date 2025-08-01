@@ -33,6 +33,7 @@ import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.security.token.AuthToken;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
+import edu.ucsb.nceas.utilities.Options;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
@@ -52,6 +53,7 @@ public class Authorizer {
    * Class variables
    */
   private static final Logger logger = Logger.getLogger(Authorizer.class);
+  private static boolean EDI_AUTH_USE;
 
 
     /*
@@ -67,6 +69,10 @@ public class Authorizer {
   
   Authorizer(DataPackageRegistry dataPackageRegistry) {
     this.dataPackageRegistry = dataPackageRegistry;
+
+      Options options = ConfigurationListener.getOptions();
+      EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
+
   }
   
   
@@ -145,6 +151,10 @@ public class Authorizer {
           );
           msg.append(line);
           logger.error(msg);
+      }
+
+      if (EDI_AUTH_USE) {
+          isAuthorized = ediAuthorized;
       }
 
       return isAuthorized;
