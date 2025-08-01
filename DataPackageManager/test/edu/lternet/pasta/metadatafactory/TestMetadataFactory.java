@@ -136,9 +136,9 @@ public class TestMetadataFactory {
           testEmlFile = new File(testPath, testEmlFileName);
         }
       }
-      testEdiToken = options.getOption("datapackagemanager.test.edi.token");
+      testEdiToken = options.getOption("edi.test.edi.token");
       if (testEdiToken == null) {
-          fail("No value found for DataPackageManager property 'datapackagemanager.test.edi.token'");
+          fail("No value found for DataPackageManager property 'edi.test.edi.token'");
       }
 
       testIdentifier = new Integer(testIdentifierStr);

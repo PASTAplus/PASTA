@@ -110,7 +110,7 @@ public class DataPackageArchiveTest {
 			throw new Exception(gripe);
 		}
 
-        testEdiToken = options.getOption("datapackagemanager.test.edi.token");
+        testEdiToken = options.getOption("edi.test.edi.token");
 
         if (testEdiToken == null) {
             String gripe = "Error: property 'testEdiToken' not set!";
