@@ -106,7 +106,7 @@ public class AccessMatrix {
 		// Force principal identifier to lower case for hash table comparison.
 		String principal = authToken.getUserId().toLowerCase();
 
-		String pasta = "uid=pasta,o=edi,dc=edirepository,dc=org";
+		String pasta = "uid=pasta,o=EDI,dc=edirepository,dc=org";
 
 		if ((submitter != null && submitter.equalsIgnoreCase(principal)) || principal.equals(pasta)) {
 			// The submitter has full access.
