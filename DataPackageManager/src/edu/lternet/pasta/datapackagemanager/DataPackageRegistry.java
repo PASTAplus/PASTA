@@ -24,6 +24,7 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,8 +36,11 @@ import edu.lternet.pasta.common.*;
 import org.apache.log4j.Logger;
 
 import com.sun.jersey.api.NotFoundException;
+import org.json.JSONObject;
 import org.owasp.encoder.Encode;
 
+import edu.lternet.pasta.common.edi.IAM;
+import edu.lternet.pasta.datapackagemanager.Authorizer;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.checksum.ChecksumException;
 import edu.lternet.pasta.doi.DOIException;
@@ -76,10 +80,16 @@ public class DataPackageRegistry {
   private static final String PUBLIC = "public";
   private static final String DEFAULT_EML_VERSION = "2.2.0";
   private static final String DEFAULT_EML_NAMESPACE_PREFIX = "https://eml.";
-  private static String PUBLIC_EDI_ID = null;
-  
+  private static String EDI_PUBLIC_ID;
+  private static String EDI_AUTH_PROTOCOL;
+  private static String EDI_AUTH_HOST;
+  private static Integer EDI_AUTH_PORT;
+  private static Boolean EDI_AUTH_USE;
+  private static String EDI_PRIVATE_KEY;
 
-  /*
+
+
+    /*
    * Instance variables
    */
   
@@ -114,9 +124,12 @@ public class DataPackageRegistry {
    * @param   dbPassword    the database user password
    * @return  an EMLDataCache object
    */
-  public DataPackageRegistry(String dbDriver, String dbURL, String dbUser,
-                      String dbPassword) 
-          throws ClassNotFoundException, SQLException {
+  public DataPackageRegistry(
+          String dbDriver,
+          String dbURL,
+          String dbUser,
+          String dbPassword
+  ) throws ClassNotFoundException, SQLException {
   	
     this.dbDriver = dbDriver;
     this.dbURL = dbURL;
@@ -143,12 +156,12 @@ public class DataPackageRegistry {
         options = ConfigurationListener.getOptions();
     }
 
-    PUBLIC_EDI_ID = options.getOption("datapackagemanager.public.edi.id");
-    if (PUBLIC_EDI_ID == null) {
-        String gripe = "Error: property 'testEdiToken' not set!";
-        logger.error(gripe);
-        PUBLIC_EDI_ID = "EDI-b2757fee12634ccca40d2d689f5c0543";
-    }
+    EDI_PUBLIC_ID = options.getOption("edi.public.id");
+    EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
+    EDI_AUTH_HOST = options.getOption("edi.auth.host");
+    EDI_AUTH_PORT = Integer.valueOf(options.getOption("edi.auth.port"));
+    EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
+    EDI_PRIVATE_KEY = options.getOption("edi.private.key");
 
   }
   
@@ -2614,84 +2627,34 @@ public class DataPackageRegistry {
     
     return isDeactivated;
   }
-  
-	/**
-	 * Determines whether the given resource is publicly accessible.
-	 * 
-	 * @param resourceId
-	 * @return Is publicly accessible
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
-	 */
-	public Boolean isPublicAccessible(String resourceId) throws SQLException {
 
-		Boolean publicAccessible = false;
+    /**
+     * Determines whether the given resource is publicly accessible.
+     *
+     * @param resourceId
+     * @return Is publicly accessible
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public boolean isPublicAccessible(String resourceId) {
+        boolean isPublicAccessible = false;
 
-		ArrayList<Rule> ruleList = new ArrayList<Rule>();
+        String tokenString = BasicAuthToken.makeTokenString(PUBLIC, PUBLIC);
+        AuthToken authToken = AuthTokenFactory.makeAuthTokenWithPassword(tokenString);
 
-		Connection conn = null;
+        IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
+        try {
+            JSONObject newEdiToken = iam.createEdiToken(EDI_PUBLIC_ID, EDI_PRIVATE_KEY);
+            String ediToken = newEdiToken.getString("token");
+            Authorizer authorizer = new Authorizer(this);
+            isPublicAccessible = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.valueOf(Rule.READ));
+        } catch (Exception e) {
+            String msg = "Authorization Error: " + e.getMessage();
+            logger.error(msg);
+        }
+        return isPublicAccessible;
+    }
 
-		try {
-			conn = this.getConnection();
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-
-		String queryStr = String.format(
-        "SELECT resource_id, principal, access_type, access_order, permission " +
-            "FROM datapackagemanager.access_matrix " +
-            "WHERE resource_id=%s ",
-        SqlEscape.str(resourceId));
-
-    logger.debug("queryStr: " + queryStr);
-
-		Statement stat = null;
-
-		try {
-
-			stat = conn.createStatement();
-			ResultSet result = stat.executeQuery(queryStr);
-
-			while (result.next()) {
-
-				Rule rule = new Rule();
-
-				rule.setPrincipal(result.getString("principal"));
-				rule.setAccessType(result.getString("access_type"));
-				rule.setOrder(result.getString("access_order"));
-				rule.setPermission((Rule.Permission) Enum.valueOf(
-				    Rule.Permission.class, result.getString("permission")));
-
-				ruleList.add(rule);
-
-			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			returnConnection(conn);
-		}
-
-		String tokenString = BasicAuthToken.makeTokenString(PUBLIC, PUBLIC);
-		AuthToken authToken = AuthTokenFactory
-		    .makeAuthTokenWithPassword(tokenString);
-
-		AccessMatrix accessMatrix = new AccessMatrix(ruleList);
-		Rule.Permission permission = (Rule.Permission) Enum.valueOf(
-		    Rule.Permission.class, Rule.READ);
-		publicAccessible = accessMatrix.isAuthorized(authToken, null, permission);
-
-        /*
-            TODO: add IAM isAuthorized("public", resource_id, "READ") here
-         */
-
-		return publicAccessible;
-
-	}
-
-  
 	  /**
 	   * Lists all active (undeleted) data packages.
 	   * 
@@ -3702,18 +3665,17 @@ public class DataPackageRegistry {
 				resourceId = result.getString("resource_id");
 
 				if (this.isPublicAccessible(resourceId)) {
-
-					String packageId = result.getString("scope") + "."
-							+ result.getInt("identifier") + "."
-							+ result.getInt("revision");
-					
+					String packageId = String.format(
+                            "%s.%s.%s",
+                            result.getString("scope"),
+                            result.getInt("identifier"),
+                            result.getInt("revision")
+                    );
 					resource.setResourceId(resourceId);
 					resource.setResourceType(result.getString("resource_type"));
 					resource.setDateCreated(result.getString("date_created"));
 					resource.setPackageId(packageId);
-
 					resourceList.add(resource);
-
 				}
 
 			}
@@ -3912,16 +3874,13 @@ public class DataPackageRegistry {
 					resource.setDateCreated(result.getString("date_created"));
 					resource.setPackageId(packageId);
 					resource.setDoi(result.getString("doi"));
-					
 					if (resourceType != null && resourceType.equals("data")) {
 						resource.setResourceLocation(result.getString("resource_location"));
 						resource.setEntityId(result.getString("entity_id"));
 						resource.setSha1Checksum(result.getString("sha1_checksum"));
 						resource.setResourceSize(result.getLong("resource_size"));
 					}
-
 					resourceList.add(resource);
-
 				}
 
 			}
