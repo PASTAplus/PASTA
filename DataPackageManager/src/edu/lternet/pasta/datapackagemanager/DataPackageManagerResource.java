@@ -957,10 +957,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			if (this.readOnly) {
 				throw new ServiceUnavailableException("PASTA is now in read-only mode");
 			}
+            String userId;
+
             ediToken = getEdiToken(headers);
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
 
             authToken = getAuthToken(headers);
-			String userId = authToken.getUserId();
+			// userId = authToken.getUserId();
 			
 			// Is user authorized to run the 'createDataPackage' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
@@ -1670,11 +1674,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			if (this.readOnly) {
 				throw new ServiceUnavailableException("PASTA is now in read-only mode");
 			}
+            String userId;
 
             ediToken = getEdiToken(headers);
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
 
             authToken = getAuthToken(headers);
-			String userId = authToken.getUserId();
+            // userId = authToken.getUserId();
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
@@ -10493,11 +10500,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			if (this.readOnly) {
 				throw new ServiceUnavailableException("PASTA is now in read-only mode");
 			}
+            String userId;
 
             ediToken = getEdiToken(headers);
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
 
             authToken = getAuthToken(headers);
-			String userId = authToken.getUserId();
+            // userId = authToken.getUserId();
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
