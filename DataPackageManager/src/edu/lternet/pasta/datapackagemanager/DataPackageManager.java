@@ -907,7 +907,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		        String metadataChildDir = packageIdToMetadataPath(packageId);
 		        DublinCore dublinCore = new DublinCore();
 		        dublinCore.transformMetadata(xslDir, metadataChildDir);
-		    }
+
+                // Add EDI IAM authorization for EML data package
+                IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
+                try {
+                    JSONObject response = iam.addEml(levelOneXML);
+                    logger.info(response.toString());
+                }
+                catch (Exception e) {
+                    String msg = "EDI Authorization Error: " + e.getMessage();
+                    logger.error(msg);
+                }
+            }
 		    catch (IOException e) {
 		        throw (e);
 		    }
@@ -996,26 +1007,26 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			
 			String metadataFormatType = levelZeroDataPackage.getFormatType();
 			
-			dataPackageRegistry.addDataPackageResource(metadataURI,
-			    ResourceType.metadata, resourceLocation, packageId, scope,
-			    identifier, revision, null, null, null, user, metadataFormatType,
-				mayOverwrite);
+			dataPackageRegistry.addDataPackageResource(
+                    metadataURI,
+                    ResourceType.metadata,
+                    resourceLocation,
+                    packageId,
+                    scope,
+                    identifier,
+                    revision,
+                    null,
+                    null,
+                    null,
+                    user,
+                    metadataFormatType,
+                    mayOverwrite
+            );
 			
 			/*
 			 * Store the access control rules for the metadata resource
 			 */
 			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix, mayOverwrite);
-            IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
-            try {
-                String levelOneXML = toLevelOne(emlFile, entityURIHashMap);
-                JSONObject response = iam.addEml(levelOneXML);
-                logger.info(response.toString());
-            }
-            catch (Exception e) {
-                String msg = "EDI Authorization Error: " + e.getMessage();
-                logger.error(msg);
-            }
-
         }
 
 		/*
