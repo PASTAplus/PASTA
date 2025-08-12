@@ -494,6 +494,10 @@
                 <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
+            <allow>
+                <principal>uid=ezeml,o=EDI,dc=edirepository,dc=org</principal>
+                <permission>read</permission>
+            </allow>
         </access>
     </pasta:service-method>
 
@@ -666,6 +670,10 @@
                 <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
+            <allow>
+                <principal>uid=ezeml,o=EDI,dc=edirepository,dc=org</principal>
+                <permission>read</permission>
+            </allow>
         </access>
     </pasta:service-method>
     
@@ -798,6 +806,10 @@
                 <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
+            <allow>
+                <principal>uid=ezeml,o=EDI,dc=edirepository,dc=org</principal>
+                <permission>read</permission>
+            </allow>
         </access>
     </pasta:service-method>
 
@@ -928,6 +940,10 @@
             </allow>
             <allow>
                 <principal>uid=gmn-pasta,o=EDI,dc=edirepository,dc=org</principal>
+                <permission>read</permission>
+            </allow>
+            <allow>
+                <principal>uid=ezeml,o=EDI,dc=edirepository,dc=org</principal>
                 <permission>read</permission>
             </allow>
         </access>
