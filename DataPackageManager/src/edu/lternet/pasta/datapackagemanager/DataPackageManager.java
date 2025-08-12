@@ -110,9 +110,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	public enum ResourceType {
 		archive, data, dataPackage, metadata, report
 	}
-	
-	
-	/*
+
+    private static String EDI_AUTH_PROTOCOL;
+    private static String EDI_AUTH_HOST;
+    private static Integer EDI_AUTH_PORT;
+
+
+    /*
 	 * Class methods
 	 */
 	
@@ -1001,8 +1005,18 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 * Store the access control rules for the metadata resource
 			 */
 			authorizer.storeAccessMatrix(metadataURI, datasetAccessMatrix, mayOverwrite);
-			
-		}
+            IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
+            try {
+                String levelOneXML = toLevelOne(emlFile, entityURIHashMap);
+                JSONObject response = iam.addEml(levelOneXML);
+                logger.info(response.toString());
+            }
+            catch (Exception e) {
+                String msg = "EDI Authorization Error: " + e.getMessage();
+                logger.error(msg);
+            }
+
+        }
 
 		/*
 		 * If the data package is valid and this is not evaluate mode, add the
@@ -2214,6 +2228,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			pastaUser = options
 			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
 			xslDir = options.getOption("datapackagemanager.xslDir");
+
+            // Load EDI service options
+            EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
+            EDI_AUTH_HOST = options.getOption("edi.auth.host");
+            EDI_AUTH_PORT = Integer.parseInt(options.getOption("edi.auth.port"));
 
 			
 			// Data Manager Library (DML) options
