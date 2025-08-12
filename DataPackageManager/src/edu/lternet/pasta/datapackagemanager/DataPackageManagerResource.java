@@ -2000,7 +2000,8 @@ public class DataPackageManagerResource extends PastaWebService {
 		/**
 		 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,
 		 * determines whether the user as defined in the authentication token has
-		 * permission to read the specified data package resource.
+		 * permission to access the specified data package resource. Allowed permissions
+         * are "read", "write", or "changePermission" and must be verbatim.
 		 *
 		 * <h4>Requests:</h4>
 		 * <table border="1" cellspacing="0" cellpadding="3">
@@ -2013,7 +2014,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * <td align=center>none</td>
 		 * <td align=center>none</td>
 		 * <td><code>curl -i -X GET
-		 * http://pasta.lternet.edu/package/authz?resourceId=https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1</code>
+		 * http://pasta.lternet.edu/package/authz?resourceId=https://pasta.lternet.edu/package/eml/knb-lter-lno/1/1&permission=write</code>
 		 * </td>
 		 * </tr>
 		 * </table>
@@ -2088,23 +2089,27 @@ public class DataPackageManagerResource extends PastaWebService {
 		 * @return a Response object containing a data package resource id if
 		 *         permission is allowed, else returns a 401 Unauthorized response
 		 */
-		@GET @Path("/authz") @Produces("text/plain") public Response isAuthorized
-		(@Context HttpHeaders headers, @QueryParam("resourceId") @DefaultValue("") String
-		resourceId){
+		@GET @Path("/authz") @Produces("text/plain")
+        public Response isAuthorized (
+                @Context HttpHeaders headers,
+                @QueryParam("resourceId") @DefaultValue("") String resourceId,
+                @QueryParam("permission") @DefaultValue("read") String permission
+        ) {
 
 		AuthToken authToken = null;
-		String entryText = "/package/authz?resourceId=" + resourceId;
+		String entryText = String.format("/package/authz?resourceId=%s&permission=%s", resourceId, permission);
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
 		final String serviceMethodName = "isAuthorized";
-		Rule.Permission permission = Rule.Permission.read;
+		Rule.Permission servicePermission = Rule.Permission.read;
+        Rule.Permission resourcePermission = Rule.Permission.valueOf(permission);
 
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized =
-				isServiceMethodAuthorized(serviceMethodName, permission, authToken);
+				isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken);
 		if (!serviceMethodAuthorized) {
 			throw new UnauthorizedException(
 					"User " + userId + " is not authorized to execute service method " +
@@ -2114,7 +2119,7 @@ public class DataPackageManagerResource extends PastaWebService {
 		try {
 
 			DataPackageManager dpm = new DataPackageManager();
-			Boolean isAuthorized = dpm.isAuthorized(authToken, resourceId, permission);
+			Boolean isAuthorized = dpm.isAuthorized(authToken, resourceId, resourcePermission);
 
 			if (isAuthorized != null && isAuthorized) {
 				responseBuilder = Response.ok(resourceId);
