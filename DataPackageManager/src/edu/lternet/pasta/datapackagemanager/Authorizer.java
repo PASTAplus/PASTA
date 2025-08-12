@@ -54,7 +54,9 @@ public class Authorizer {
    */
   private static final Logger logger = Logger.getLogger(Authorizer.class);
   private static boolean EDI_AUTH_USE;
-
+  private static String EDI_AUTH_PROTOCOL;
+  private static String EDI_AUTH_HOST;
+  private static Integer EDI_AUTH_PORT;
 
     /*
    * Instance variables
@@ -72,6 +74,9 @@ public class Authorizer {
 
       Options options = ConfigurationListener.getOptions();
       EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
+      EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
+      EDI_AUTH_HOST = options.getOption("edi.auth.host");
+      EDI_AUTH_PORT = Integer.parseInt(options.getOption("edi.auth.port"));
 
   }
   
@@ -123,7 +128,7 @@ public class Authorizer {
        */
       boolean ediAuthorized = false;
       if (ediToken != null) {
-          IAM iam = new IAM("https", "localhost", 5443);
+          IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
           iam.setEdiToken(ediToken);
           try {
               JSONObject response = iam.isAuthorized(resourceId, permission.toString());
