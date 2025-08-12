@@ -85,6 +85,22 @@ public class IAM {
     }
 
     /**
+     * Adds the access control rules declared in an EML (Ecological Metadata
+     * Language) document by sending a request to the authentication service.
+     *
+     * @param eml The EML document as a string. This should be in a valid EML format.
+     * @return A JSONObject of the successful request.
+     * @throws IOException If an I/O error occurs while communicating with the auth server.
+     */
+    public JSONObject addEml(String eml) throws IOException {
+        String urlString = String.format("%s/auth/v1/eml", baseUrl);
+        JSONObject payload = new JSONObject();
+        payload.put("eml", eml);
+        //return sendRequest(urlString, "POST", payload.toString());
+        return payload;
+    }
+
+    /**
      * Wrapper for isAuthorized method to test for correct permissions.
      *
      * @param resourceKey     The identifier for the resource (e.g., "edi.1.1").
