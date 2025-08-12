@@ -171,11 +171,7 @@
                 <permission>write</permission>
             </allow>
             <allow>
-                <principal>authenticated</principal>
-                <permission>read</permission>
-            </allow>
-            <allow>
-                <principal>public</principal>
+                <principal>vetted</principal>
                 <permission>read</permission>
             </allow>
         </access>
