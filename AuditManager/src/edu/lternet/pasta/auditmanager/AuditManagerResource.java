@@ -26,10 +26,15 @@ package edu.lternet.pasta.auditmanager;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
 import edu.lternet.pasta.common.*;
+import edu.lternet.pasta.common.edi.IAM;
+import edu.lternet.pasta.common.edi.EdiToken;
 import edu.lternet.pasta.common.security.access.AccessControllerFactory;
 import edu.lternet.pasta.common.security.access.JaxRsHttpAccessController;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
+import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
+import  edu.lternet.pasta.common.security.token.AuthToken;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -179,17 +184,25 @@ public class AuditManagerResource extends PastaWebService
     private void assertAuthorizedToRead(HttpHeaders headers, String serviceMethod) {
 
         String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
-        JaxRsHttpAccessController controller =
-            AccessControllerFactory.getDefaultHttpAccessController();
+        JaxRsHttpAccessController controller = AccessControllerFactory.getDefaultHttpAccessController();
 
-        if (controller.canRead(headers, acr, SERVICE_OWNER)) {
-            return;
+        boolean isAuthorized = controller.canRead(headers, acr, SERVICE_OWNER);
+        AuthToken authToken = getAuthToken(headers);
+
+        String ediToken = getEdiToken(headers);
+        boolean ediAuthorized = isEdiAuthorized(ediToken, serviceMethod, "read");
+
+        authorizationCongruence(ediAuthorized, isAuthorized, ediToken, authToken, serviceMethod, "read");
+
+        isAuthorized = ediAuthorized;
+
+        if (!isAuthorized) {
+            String s = "This request is not authorized to retrieve entries from " +
+                    "the audit manager. Please check your authorization " +
+                    "credentials.";
+            throw WebExceptionFactory.makeUnauthorized(s);
         }
-        String s = "This request is not authorized to retreive entries from " +
-                   "the audit manager. Please check your authorization " + 
-                   "credentials.";
 
-        throw WebExceptionFactory.makeUnauthorized(s);
     }
 
 
@@ -210,6 +223,91 @@ public class AuditManagerResource extends PastaWebService
         throw WebExceptionFactory.makeUnauthorized(s);
     }
 
+
+    private boolean isEdiAuthorized(String ediToken, String serviceMethod, String permission) {
+
+        String resourceId = String.format("localhost:audit:%s", serviceMethod);
+        boolean ediAuthorized = false;
+        if (ediToken != null) {
+            IAM iam = new IAM("https", "localhost", 5443);
+            iam.setEdiToken(ediToken);
+            try {
+                JSONObject response = iam.isAuthorized(resourceId, permission);
+                logger.info(response.toString());
+                ediAuthorized = true;
+            }
+            catch (Exception e) {
+                String msg = "EDI Authorization Error: " + e.getMessage();
+                logger.error(msg);
+            }
+        }
+
+        return ediAuthorized;
+    }
+
+    /**
+     * Gets an AuthToken object from an HttpHeaders object
+     *
+     * @param headers
+     *            the HttpHeaders object
+     * @return an AuthToken token
+     */
+    public static AuthToken getAuthToken(HttpHeaders headers) {
+        Map<String, Cookie> cookiesMap = headers.getCookies();
+        AuthToken authToken = null;
+
+        if (cookiesMap.containsKey("auth-token")) {
+            String cookieToken = cookiesMap.get("auth-token").getValue();
+            authToken = new AttrListAuthTokenV1(cookieToken);
+        }
+
+        return authToken;
+    }
+
+
+    /**
+     * Gets an EDI-TOKEN from HttpHeaders object
+     *
+     * @param headers
+     *            the HttpHeaders object
+     * @return an EDI-TOKEN token
+     */
+    private static String getEdiToken(HttpHeaders headers) {
+        Map<String, Cookie> cookiesMap = headers.getCookies();
+        String ediToken = null;
+
+        if (cookiesMap.containsKey("edi-token")) {
+            ediToken = cookiesMap.get("edi-token").getValue();
+        }
+
+        return ediToken;
+    }
+
+    private void authorizationCongruence(
+            boolean ediAuthorized,
+            boolean isAuthorized,
+            String ediToken,
+            AuthToken authToken,
+            String serviceMethod,
+            String permission
+) {
+
+        if (ediAuthorized != isAuthorized) {
+            String ediId = new EdiToken(ediToken).getSubject();
+            String line;
+            StringBuilder msg = new StringBuilder();
+            line = "EDI/PASTA authorization congruence error: ";
+            msg.append(line);
+            line = String.format("EDI isAuthorized (%b); PASTA isAuthorized (%b); ", ediAuthorized, isAuthorized);
+            msg.append(line);
+            line = String.format(
+                    "edi_subj: %s; authtoken_subj: %s; resource: %s; permission: %s",
+                    ediId, authToken.getUserId(), serviceMethod, permission
+            );
+            msg.append(line);
+            logger.error(msg);
+        }
+    }
 
     /**
 	 * <strong>Create Audit Record</strong> operation, 
