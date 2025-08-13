@@ -328,11 +328,11 @@ public class DataPackageManagerResource extends PastaWebService {
 
 
     /**
-     * Gets an AuthToken object from an HttpHeaders object
+     * Gets an EDI-TOKEN from HttpHeaders object
      *
      * @param headers
      *            the HttpHeaders object
-     * @return an AuthToken token
+     * @return an EDI-TOKEN token
      */
     public static String getEdiToken(HttpHeaders headers) {
         Map<String, Cookie> cookiesMap = headers.getCookies();
