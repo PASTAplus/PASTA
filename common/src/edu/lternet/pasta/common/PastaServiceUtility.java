@@ -113,11 +113,9 @@ public final class PastaServiceUtility {
         throw new IllegalStateException(s);
     }
 
-    public static String getAccessTypeString(String serviceMethod,
-                                             String pastaService) {
+    public static String getAccessTypeString(String serviceMethod, String pastaService) {
         Service service = PastaServiceUtility.getPastaService_0(pastaService);
-        ServiceMethod servMeth =
-                PastaServiceUtility.matchSM(serviceMethod, service);
+        ServiceMethod servMeth = PastaServiceUtility.matchSM(serviceMethod, service);
         AccessType at = servMeth.getAccess();
         return PastaServiceUtility.accessTypeToString(at);
     }
