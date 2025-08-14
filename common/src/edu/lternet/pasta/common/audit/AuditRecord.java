@@ -86,6 +86,11 @@ public class AuditRecord {
       }
       Set<String> groupsSet = authToken.getGroups();
       this.groups = groupsSetToGroupsString(groupsSet);
+      if (ediTokenStr != null) {
+          EdiToken ediToken = new EdiToken(ediTokenStr);
+          String principals = ediToken.getPrincipals();
+          this.groups += " (" + principals + ")";
+      }
       AuthSystemDef authSystemDef = authToken.getAuthSystem();
       this.authSystem = authSystemDef.getCanonicalName();
     }
