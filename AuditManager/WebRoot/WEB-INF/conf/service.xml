@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <pasta:service
-    xmlns:pasta="pasta://pasta.edirepository.org/service-0.1"
+    xmlns:pasta="pasta://pasta.lternet.edu/service-0.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="pasta://pasta.edirepository.org/service-0.1 http://nis.lternet.edu/schemas/pasta/pasta-service.xsd"
+    xsi:schemaLocation="pasta://pasta.lternet.edu/service-0.1 http://nis.lternet.edu/schemas/pasta/pasta-service.xsd"
     >
 
     <pasta:service-method name="create">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -23,8 +23,8 @@
 
     <pasta:service-method name="getOids">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -39,8 +39,8 @@
 
     <pasta:service-method name="getAuditRecord">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -55,8 +55,8 @@
 
     <pasta:service-method name="getAuditReport">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -71,8 +71,8 @@
 
     <pasta:service-method name="getAuditReportCsv">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -87,8 +87,8 @@
 
     <pasta:service-method name="getAuditCount">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -103,8 +103,8 @@
 
     <pasta:service-method name="getDocIdReads">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -119,8 +119,8 @@
 
     <pasta:service-method name="getPackageIdReads">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
@@ -135,8 +135,8 @@
 
     <pasta:service-method name="getRecentUploads">
         <access
-            system="https://pasta.edirepository.org"
-            authSystem="https://pasta.edirepository.org/authentication"
+            system="https://pasta.lternet.edu"
+            authSystem="https://pasta.lternet.edu/authentication"
             order="allowFirst">
             <allow>
                 <principal>pasta</principal>
