@@ -183,18 +183,27 @@ public class AuditManagerResource extends PastaWebService
     
     private void assertAuthorizedToRead(HttpHeaders headers, String serviceMethod) {
 
+        Properties properties = ConfigurationListener.getProperties();
+        boolean useEdiAuth = Boolean.parseBoolean(properties.getProperty("edi.auth.use"));
+
         String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
         JaxRsHttpAccessController controller = AccessControllerFactory.getDefaultHttpAccessController();
 
-        boolean isAuthorized = controller.canRead(headers, acr, SERVICE_OWNER);
         AuthToken authToken = getAuthToken(headers);
-
         String ediToken = getEdiToken(headers);
-        boolean ediAuthorized = isEdiAuthorized(ediToken, serviceMethod, "read");
 
-        authorizationCongruence(ediAuthorized, isAuthorized, ediToken, authToken, serviceMethod, "read");
+        boolean isAuthorized = false;
+        boolean ediAuthorized = false;
+        String permission = "read";
+        if (authToken != null && ediToken != null) {
+            isAuthorized = controller.canRead(headers, acr, SERVICE_OWNER);
+            ediAuthorized = isEdiAuthorized(ediToken, serviceMethod, permission);
+            authorizationCongruence(ediAuthorized, isAuthorized, ediToken, authToken, serviceMethod, permission);
+        }
 
-        isAuthorized = ediAuthorized;
+        if (useEdiAuth) {
+            isAuthorized = ediAuthorized;
+        }
 
         if (!isAuthorized) {
             String s = "This request is not authorized to retrieve entries from " +
@@ -207,29 +216,49 @@ public class AuditManagerResource extends PastaWebService
 
 
     private void assertAuthorizedToWrite(HttpHeaders headers, String serviceMethod) {
+        Properties properties = ConfigurationListener.getProperties();
+        boolean useEdiAuth = Boolean.parseBoolean(properties.getProperty("edi.auth.use"));
 
         String acr = AccessControlRuleFactory.getServiceAcr(serviceMethod);
-        JaxRsHttpAccessController controller =
-                AccessControllerFactory.getDefaultHttpAccessController();
+        JaxRsHttpAccessController controller = AccessControllerFactory.getDefaultHttpAccessController();
 
-        if (controller.canWrite(headers, acr, SERVICE_OWNER)) {
-            return;
+
+        AuthToken authToken = getAuthToken(headers);
+        String ediToken = getEdiToken(headers);
+
+        boolean isAuthorized = false;
+        boolean ediAuthorized = false;
+        String permission = "write";
+        if (authToken != null && ediToken != null) {
+            isAuthorized = controller.canWrite(headers, acr, SERVICE_OWNER);
+            ediAuthorized = isEdiAuthorized(ediToken, serviceMethod, permission);
+            authorizationCongruence(ediAuthorized, isAuthorized, ediToken, authToken, serviceMethod, permission);
         }
 
-        String s = "This request is not authorized to submit entries to the " +
-                   "audit manager. Please check your authorization " + 
-                   "credentials.";
+        if (useEdiAuth) {
+            isAuthorized = ediAuthorized;
+        }
 
-        throw WebExceptionFactory.makeUnauthorized(s);
+        if (!isAuthorized) {
+            String s = "This request is not authorized to submit entries to the " +
+                    "audit manager. Please check your authorization " +
+                    "credentials.";
+            throw WebExceptionFactory.makeUnauthorized(s);
+        }
+
     }
 
 
     private boolean isEdiAuthorized(String ediToken, String serviceMethod, String permission) {
 
-        String resourceId = String.format("localhost:audit:%s", serviceMethod);
+        Properties properties = ConfigurationListener.getProperties();
+        String protocol = properties.getProperty("edi.auth.protocol");
+        String host = properties.getProperty("edi.auth.host");
+        int port = Integer.parseInt(properties.getProperty("edi.auth.port"));
+        String resourceId = String.format("%s:audit:%s", host, serviceMethod);
         boolean ediAuthorized = false;
         if (ediToken != null) {
-            IAM iam = new IAM("https", "localhost", 5443);
+            IAM iam = new IAM(protocol, host, port);
             iam.setEdiToken(ediToken);
             try {
                 JSONObject response = iam.isAuthorized(resourceId, permission);
