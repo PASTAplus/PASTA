@@ -204,8 +204,12 @@ public class DataPackageManagerResource extends PastaWebService {
 
 	public static final String AUTH_TOKEN = "auth-token";
     public static final String EDI_TOKEN = "edi-token";
+    public static String EDI_AUTH_PROTOCOL;
     public static String EDI_AUTH_HOST;
+    public static Integer EDI_AUTH_PORT;
     public static boolean EDI_AUTH_USE;
+    public static String EDI_AUTHENTICATED_ID;
+    public static String EDI_PRIVATE_KEY;
 
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
 	
@@ -295,7 +299,11 @@ public class DataPackageManagerResource extends PastaWebService {
 					this.ttl = TTL_DEFAULT;
 				}
 			}
+            EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
             EDI_AUTH_HOST = options.getOption("edi.auth.host");
+            EDI_AUTH_PORT = Integer.parseInt(options.getOption("edi.auth.port"));
+            EDI_AUTHENTICATED_ID = options.getOption("edi.authenticated.id");
+            EDI_PRIVATE_KEY = options.getOption("edi.private.key");
             EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
 		}
 	}
@@ -439,19 +447,37 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
 
-	private void audit(String serviceMethodName, AuthToken authToken, String ediToken,
-			           Response response, String resourceId, String entryText,
-			           String robot, String userAgent) {
+	private void audit(
+            String serviceMethodName,
+            AuthToken authToken,
+            String ediToken,
+            Response response,
+            String resourceId,
+            String entryText,
+            String robot,
+            String userAgent
+    ) {
 		String auditHost = getAuditHost();
 		String serviceName = getVersionString();
 
-		try {
+        // Create EDI-TOKEN for authenticated
+        IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
+        String ediAuthenticatedToken = null;
+        try {
+            JSONObject newEdiToken = iam.createEdiToken(EDI_AUTHENTICATED_ID, EDI_PRIVATE_KEY);
+            ediAuthenticatedToken = newEdiToken.getString("token");
+        }
+        catch (Exception e) {
+            String msg = String.format("Error (%s) occurred when creating EDI TOKEN for the authenticated id.",e.getMessage());
+            logger.error(msg);
+        }
+
+        try {
 			int status = response.getStatus();
 			Date date = new Date();
 			AuditRecord auditRecord = new AuditRecord(date, serviceName, entryText, authToken, ediToken, status, serviceMethodName, resourceId, robot, userAgent);
-			AuditManagerClient auditManagerClient = new AuditManagerClient(
-					auditHost);
-			auditManagerClient.logAudit(auditRecord);
+			AuditManagerClient auditManagerClient = new AuditManagerClient(auditHost);
+			auditManagerClient.logAudit(auditRecord, ediAuthenticatedToken);
 		}
 		catch (Exception e) {
 			logger.error("Error occurred while auditing Data Package Manager "

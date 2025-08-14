@@ -76,6 +76,7 @@ public class AuditManagerClient implements Runnable {
 
  private AuditRecord auditRecord = null;
  private AuthToken authToken = null;
+ private String ediToken = null;
 
  
  /*
@@ -148,15 +149,16 @@ public class AuditManagerClient implements Runnable {
   * @param auditRecord  an object holding the audit record information
   * 
   */
- public void logAudit(AuditRecord auditRecord) {
-   this.auditRecord = auditRecord;
+ public void logAudit(AuditRecord auditRecord, String ediToken) {
+    this.auditRecord = auditRecord;
+    this.ediToken = ediToken;
 
-   Set<String> s = new TreeSet<String>();
-   s.add("authenticated");
-   this.authToken = AuthTokenFactory.makeCookieAuthToken("pasta", AuthSystemDef.KNB, 2000000000, s);
-  
-   Thread thread = new Thread(this);
-   thread.start();
+    Set<String> s = new TreeSet<String>();
+    s.add("authenticated");
+    this.authToken = AuthTokenFactory.makeCookieAuthToken("pasta", AuthSystemDef.KNB, 2000000000, s);
+
+    Thread thread = new Thread(this);
+    thread.start();
  }
 
 
@@ -169,8 +171,10 @@ public class AuditManagerClient implements Runnable {
    String url = this.urlHead;
    HttpPost httpPost = new HttpPost(url);
    
-   BasicHttpContext localcontext = new BasicHttpContext();
-   httpPost.setHeader("Cookie", "auth-token=" + authToken.getTokenString());
+   BasicHttpContext localContext = new BasicHttpContext();
+
+   String cookie = String.format("auth-token=%s; edi-token=%s", authToken.getTokenString(), this.ediToken);
+   httpPost.setHeader("Cookie", cookie);
    
    try {
      logger.debug("Posting to Audit Manager at URL: " + url);
@@ -180,7 +184,7 @@ public class AuditManagerClient implements Runnable {
      HttpEntity stringEntity = new StringEntity(auditEntryXML);
      httpPost.setEntity(stringEntity);
      HttpHost httpHost = new HttpHost(this.host, 8080, "http");
-     HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, localcontext);
+     HttpResponse httpResponse = httpClient.execute(httpHost, httpPost, localContext);
      int statusCode = httpResponse.getStatusLine().getStatusCode();
      logger.debug("Response Code from Audit Manager: " + statusCode);
      HttpEntity httpEntity = httpResponse.getEntity();

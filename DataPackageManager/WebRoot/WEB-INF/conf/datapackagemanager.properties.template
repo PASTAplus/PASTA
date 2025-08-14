@@ -116,6 +116,7 @@ datapackagemanager.readOnly=false
 # EDI IAM properties
 edi.test.edi.token=EDI_TEST_TOKEN
 edi.public.edi.id=EDI_PUBLIC_ID
+edi.authenticated.id=EDI_AUTHENTICATED_ID
 edi.auth.protocol=https
 edi.auth.host=auth.edirepository.org
 edi.auth.port=443
