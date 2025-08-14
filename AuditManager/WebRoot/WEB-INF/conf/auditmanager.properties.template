@@ -20,6 +20,12 @@ api.document=../doc/edu.lternet.pasta.auditmanager.AuditManagerResource.html
 tutorial.document=../doc/tutorial.html
 demo.directory=../demo
 
+## EDI IAM
+edi.auth.protocol=https
+edi.auth.host=localhost
+edi.auth.port=5443
+edi.auth.use=true
+
 auditmanager.tmpDir=/home/pasta/local/tmp/audit
 
 auditmanagerresource.test.testResourceId=https://pasta-d.lternet.edu/package/data/eml/knb-lter-nwk
