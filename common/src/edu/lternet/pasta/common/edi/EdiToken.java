@@ -91,13 +91,13 @@ public final class EdiToken {
         return jsonPayload.getString("cn");
     }
 
-    public String getPrincipals() {
-        JSONArray principals =  jsonPayload.getJSONArray("principals");
+    public List<String> getPrincipals() {
+        JSONArray principals = jsonPayload.getJSONArray("principals");
         List<String> principalsList = new ArrayList<>();
         for (int i = 0; i < principals.length(); i++) {
             principalsList.add(principals.getString(i));
         }
-        return String.join(", ", principalsList);
+        return principalsList;
     }
 
 }

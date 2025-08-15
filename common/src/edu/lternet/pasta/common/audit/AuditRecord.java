@@ -2,6 +2,7 @@ package edu.lternet.pasta.common.audit;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -88,8 +89,8 @@ public class AuditRecord {
       this.groups = groupsSetToGroupsString(groupsSet);
       if (ediTokenStr != null) {
           EdiToken ediToken = new EdiToken(ediTokenStr);
-          String principals = ediToken.getPrincipals();
-          this.groups += " (" + principals + ")";
+          List<String> principals = ediToken.getPrincipals();
+          this.groups += " (" + String.join(", ", principals) + ")";
       }
       AuthSystemDef authSystemDef = authToken.getAuthSystem();
       this.authSystem = authSystemDef.getCanonicalName();
