@@ -92,12 +92,12 @@ public class IAM {
      * @return A JSONObject of the successful request.
      * @throws IOException If an I/O error occurs while communicating with the auth server.
      */
-    public JSONObject addEml(String eml) throws IOException {
+    public JSONObject addEml(String eml, String keyPrefix) throws IOException {
         String urlString = String.format("%s/auth/v1/eml", baseUrl);
         JSONObject payload = new JSONObject();
         payload.put("eml", eml);
-        //return sendRequest(urlString, "POST", payload.toString());
-        return payload;
+        payload.put("key_prefix", keyPrefix);
+        return sendRequest(urlString, "POST", payload.toString());
     }
 
     /**

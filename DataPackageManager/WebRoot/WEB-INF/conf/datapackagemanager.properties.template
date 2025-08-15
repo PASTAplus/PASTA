@@ -122,6 +122,8 @@ edi.auth.host=auth.edirepository.org
 edi.auth.port=443
 edi.auth.use=true
 edi.private.key=EDI_PRIVATE_KEY
+edi.resource.key.prefix=EDI_RESOURCE_KEY_PREFIX
+
 
 # For DOI processing on production:
 #  set prefix to 10.6073 (EZID and DataCite)
