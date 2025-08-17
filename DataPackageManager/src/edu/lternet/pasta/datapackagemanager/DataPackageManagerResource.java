@@ -736,7 +736,7 @@ public class DataPackageManagerResource extends PastaWebService {
         String resourceId = String.format("%s:package:%s", EDI_AUTH_HOST, serviceMethodName);
         boolean ediAuthorized = false;
         if (ediToken != null) {
-            IAM iam = new IAM("https", "localhost", 5443);
+            IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
             iam.setEdiToken(ediToken);
             try {
                 JSONObject response = iam.isAuthorized(resourceId, permission.toString());
