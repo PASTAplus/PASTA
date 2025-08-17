@@ -112,6 +112,9 @@ datapackagemanager.version.number=DataPackageManager-1.0
 datapackagemanager.xslDir=/home/pasta/local/apache-tomcat/webapps/package/xsl
 datapackagemanager.xslPath=/home/pasta/local/apache-tomcat/webapps/package/xsl/qualityReport.xsl
 datapackagemanager.readOnly=false
+datapackagemanager.protocol=http
+datapackagemanager.host=package.lternet.edu
+datapackagemanager.port=8080
 
 # EDI IAM properties
 edi.test.edi.token=EDI_TEST_TOKEN

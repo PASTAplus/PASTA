@@ -210,6 +210,7 @@ public class DataPackageManagerResource extends PastaWebService {
     public static boolean EDI_AUTH_USE;
     public static String EDI_AUTHENTICATED_ID;
     public static String EDI_PRIVATE_KEY;
+    public static String DATAPACKAGEMANAGER_HOST;
 
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
 	
@@ -305,6 +306,7 @@ public class DataPackageManagerResource extends PastaWebService {
             EDI_AUTHENTICATED_ID = options.getOption("edi.authenticated.id");
             EDI_PRIVATE_KEY = options.getOption("edi.private.key");
             EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
+            DATAPACKAGEMANAGER_HOST = options.getOption("datapackagemanager.host");
 		}
 	}
 
@@ -733,7 +735,7 @@ public class DataPackageManagerResource extends PastaWebService {
         /*
          * EDI IAM authorization
          */
-        String resourceId = String.format("%s:package:%s", EDI_AUTH_HOST, serviceMethodName);
+        String resourceId = String.format("%s:package:%s", DATAPACKAGEMANAGER_HOST, serviceMethodName);
         boolean ediAuthorized = false;
         if (ediToken != null) {
             IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
