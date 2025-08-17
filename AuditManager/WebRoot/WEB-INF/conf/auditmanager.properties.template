@@ -19,11 +19,14 @@ welcome.page=../doc/welcome.html
 api.document=../doc/edu.lternet.pasta.auditmanager.AuditManagerResource.html
 tutorial.document=../doc/tutorial.html
 demo.directory=../demo
+audit.protocol=AUDIT_PROTOCOL
+audit.host=AUDIT_HOST
+audit.port=AUDIT_PORT
 
 ## EDI IAM
-edi.auth.protocol=https
-edi.auth.host=localhost
-edi.auth.port=5443
+edi.auth.protocol=AUTH_PROTOCOL
+edi.auth.host=AUTH_HOST
+edi.auth.port=AUTH_PORT
 edi.auth.use=true
 
 auditmanager.tmpDir=/home/pasta/local/tmp/audit

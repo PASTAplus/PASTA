@@ -252,16 +252,17 @@ public class AuditManagerResource extends PastaWebService
     private boolean isEdiAuthorized(String ediToken, String serviceMethod, String permission) {
 
         Properties properties = ConfigurationListener.getProperties();
-        String protocol = properties.getProperty("edi.auth.protocol");
-        String host = properties.getProperty("edi.auth.host");
-        int port = Integer.parseInt(properties.getProperty("edi.auth.port"));
-        String resourceId = String.format("%s:audit:%s", host, serviceMethod);
         boolean ediAuthorized = false;
         if (ediToken != null) {
+            String protocol = properties.getProperty("edi.auth.protocol");
+            String host = properties.getProperty("edi.auth.host");
+            int port = Integer.parseInt(properties.getProperty("edi.auth.port"));
             IAM iam = new IAM(protocol, host, port);
             iam.setEdiToken(ediToken);
+            String auditHost = properties.getProperty("audit.host");
+            String resourceKey = String.format("%s:audit:%s", auditHost, serviceMethod);
             try {
-                JSONObject response = iam.isAuthorized(resourceId, permission);
+                JSONObject response = iam.isAuthorized(resourceKey, permission);
                 logger.info(response.toString());
                 ediAuthorized = true;
             }
