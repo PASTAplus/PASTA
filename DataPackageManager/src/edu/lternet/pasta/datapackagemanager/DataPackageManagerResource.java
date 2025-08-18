@@ -988,11 +988,15 @@ public class DataPackageManagerResource extends PastaWebService {
             String userId;
 
             ediToken = getEdiToken(headers);
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-
             authToken = getAuthToken(headers);
-			// userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 			
 			// Is user authorized to run the 'createDataPackage' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
@@ -1340,10 +1344,18 @@ public class DataPackageManagerResource extends PastaWebService {
 			if (this.readOnly) {
 				throw new ServiceUnavailableException("PASTA is now in read-only mode");
 			}
-            ediToken = getEdiToken(headers);
+            String userId;
 
+            ediToken = getEdiToken(headers);
             authToken = getAuthToken(headers);
-            String userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 
 			// Is user authorized to run the 'createReservation' service
 			// method?
@@ -1448,10 +1460,18 @@ public class DataPackageManagerResource extends PastaWebService {
             if (this.readOnly) {
                 throw new ServiceUnavailableException("PASTA is now in read-only mode");
             }
-            ediToken = getEdiToken(headers);
+            String userId;
 
+            ediToken = getEdiToken(headers);
             authToken = getAuthToken(headers);
-            String userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 
             // Is user authorized to run the 'createReservation' service
             // method?
@@ -1705,11 +1725,15 @@ public class DataPackageManagerResource extends PastaWebService {
             String userId;
 
             ediToken = getEdiToken(headers);
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-
             authToken = getAuthToken(headers);
-            // userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
@@ -2576,17 +2600,26 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
 		try {
-		    ediToken = getEdiToken(headers);
+            String userId;
 
+            ediToken = getEdiToken(headers);
             authToken = getAuthToken(headers);
-			String userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
+                String msg = String.format(
+                        "User %s is not authorized to execute service method %s", userId, serviceMethodName
+                );
+				throw new UnauthorizedException(msg);
 			}
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
@@ -10535,11 +10568,15 @@ public class DataPackageManagerResource extends PastaWebService {
             String userId;
 
             ediToken = getEdiToken(headers);
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-
             authToken = getAuthToken(headers);
-            // userId = authToken.getUserId();
+
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                userId = et.getSubject();
+            }
+            else {
+                userId = authToken.getUserId();
+            }
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
