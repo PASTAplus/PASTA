@@ -153,6 +153,20 @@ public final class WebExceptionFactory {
     }
 
     /**
+     * Returns a '401 Unauthorized' web application exception with the message
+     * of the provided cause as the entity.
+     *
+     * @param cause the cause.
+     *
+     * @return a '403 Forbidden' web application exception.
+     *
+     * @see Throwable#getMessage()
+     */
+    public static WebApplicationException makeForbidden(Throwable cause) {
+        return make(Response.Status.FORBIDDEN, cause, cause.getMessage());
+    }
+
+    /**
      * Returns a '410 Gone' web application exception with the provided
      * message as the entity. The provided {@code Throwable} is the cause.
      *
