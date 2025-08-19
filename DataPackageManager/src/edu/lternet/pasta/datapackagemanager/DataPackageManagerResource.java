@@ -2144,9 +2144,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		 */
 
 		/**
-		 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,
-		 * determines whether the user as defined in the authentication token has
-		 * permission to read the specified data package resource.
+		 * <strong>Is Authorized</strong> operation, determines whether the user as, defined in the
+         * authentication token, has the provided permission (read, write, or changePermission) on the
+         * specified data package resource.
 		 *
 		 * <h4>Requests:</h4>
 		 * <table border="1" cellspacing="0" cellpadding="3">
