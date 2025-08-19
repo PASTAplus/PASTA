@@ -28,6 +28,7 @@ import edu.lternet.pasta.common.*;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
 import edu.lternet.pasta.common.eml.EMLParser;
+import edu.lternet.pasta.common.security.access.ForbiddenException;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.Rule;
@@ -1675,11 +1676,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	 * @param permission
 	 *          The requested permission for accessing the resource (e.g., READ).
 	 * @return The boolean result of the request.
-	 * @throws IllegalArgumentException, UnauthorizedException
+	 * @throws IllegalArgumentException, ForbiddenException
 	 */
-	public Boolean isAuthorized(AuthToken authToken, String resourceId,
-	    Rule.Permission permission) throws IllegalArgumentException,
-	    UnauthorizedException {
+	public Boolean isAuthorized(
+            AuthToken authToken,
+            String resourceId,
+            Rule.Permission permission
+    ) throws IllegalArgumentException, ForbiddenException {
 
 		Boolean isAuthorized = null;
 		DataPackageRegistry dpr = null;
@@ -1692,34 +1695,21 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		
     try {
 	    dpr = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException | SQLException e) {
 	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    } catch (SQLException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
     }
-    
-		Authorizer authorizer = new Authorizer(dpr);
-		try {
-	    isAuthorized = authorizer.isAuthorized(authToken, resourceId, permission);
-	    
-			if (!isAuthorized) {
-				String gripe = "User \"" + userId + "\" is not authorized to "
-				    + permission + " this " + resourceId + " resource!";
-				throw new UnauthorizedException(gripe);
-			}
-	    
-    } catch (ClassNotFoundException e) {
+
+    Authorizer authorizer = new Authorizer(dpr);
+    try {
+        isAuthorized = authorizer.isAuthorized(authToken, resourceId, permission);
+        if (!isAuthorized) {
+            String msg = String.format("User %s is not authorized at the requested level to %s", userId, resourceId);
+            throw new ForbiddenException(msg);
+        }
+    } catch (ClassNotFoundException | SQLException e) {
 	    logger.error(e.getMessage());
-	    e.printStackTrace();
-    } catch (SQLException e) {
-	    logger.error(e.getMessage());
-	    e.printStackTrace();
     }
-		
-		return isAuthorized;
-		
+        return isAuthorized;
 	}
 	
 	

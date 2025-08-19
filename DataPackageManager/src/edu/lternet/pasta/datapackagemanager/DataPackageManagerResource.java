@@ -30,6 +30,7 @@ import edu.lternet.pasta.common.audit.AuditManagerClient;
 import edu.lternet.pasta.common.audit.AuditRecord;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
+import edu.lternet.pasta.common.security.access.ForbiddenException;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.InvalidPermissionException;
@@ -1997,12 +1998,10 @@ public class DataPackageManagerResource extends PastaWebService {
 		 }
 		 */
 
-		/**
-		 * <strong>Is Authorized</strong> (to <em>READ</em> resource) operation,
-		 * determines whether the user as defined in the authentication token has
-		 * permission to access the specified data package resource. Allowed permissions
-         * are "read", "write", or "changePermission" and must be verbatim.
-		 *
+        /**
+         * <strong>Is Authorized</strong> operation, determines whether the user as, defined in the
+         * authentication token, has the provided permission (read, write, or changePermission) on the
+         * specified data package resource.		 *
 		 * <h4>Requests:</h4>
 		 * <table border="1" cellspacing="0" cellpadding="3">
 		 * <tr>
@@ -2097,6 +2096,7 @@ public class DataPackageManagerResource extends PastaWebService {
         ) {
 
 		AuthToken authToken = null;
+
 		String entryText = String.format("/package/authz?resourceId=%s&permission=%s", resourceId, permission);
 		ResponseBuilder responseBuilder = null;
 		Response response = null;
@@ -2107,37 +2107,32 @@ public class DataPackageManagerResource extends PastaWebService {
 		authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
-		// Is user authorized to run the service method?
-		boolean serviceMethodAuthorized =
-				isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
-
 		try {
+            // Is user authorized to run the service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken);
+            if (!serviceMethodAuthorized) {
+                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dpm = new DataPackageManager();
-			Boolean isAuthorized = dpm.isAuthorized(authToken, resourceId, resourcePermission);
+			dpm.isAuthorized(authToken, resourceId, resourcePermission);
 
-			if (isAuthorized != null && isAuthorized) {
-				responseBuilder = Response.ok(resourceId);
-				response = responseBuilder.build();
-			}
+            responseBuilder = Response.ok(resourceId);
+            response = responseBuilder.build();
 		} catch (IllegalArgumentException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            entryText = e.getMessage();
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
-		} catch (ResourceDeletedException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeConflict(e).getResponse();
-		} catch (ResourceExistsException e) {
+		} catch (ResourceDeletedException | ResourceExistsException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeConflict(e).getResponse();
 		} catch (UserErrorException e) {
