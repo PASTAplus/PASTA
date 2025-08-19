@@ -1920,14 +1920,6 @@ public class DataPackageManagerResource extends PastaWebService {
 
  		try {
 
-           if (EDI_AUTH_USE) {
-                EdiToken et = new EdiToken(ediToken);
-                userId = et.getSubject();
-            }
-            else {
-                userId = authToken.getUserId();
-            }
-
             // Is user authorized to run the 'appendProvenance' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
@@ -6469,14 +6461,6 @@ public class DataPackageManagerResource extends PastaWebService {
         String userId;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
-
-        if (EDI_AUTH_USE) {
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-        }
-        else {
-            userId = authToken.getUserId();
-        }
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
@@ -11198,14 +11182,6 @@ public class DataPackageManagerResource extends PastaWebService {
 					throw new ServiceUnavailableException("PASTA is now in read-only mode");
 				}
 
-                if (EDI_AUTH_USE) {
-                    EdiToken et = new EdiToken(ediToken);
-                    userId = et.getSubject();
-                }
-                else {
-                    userId = authToken.getUserId();
-                }
-
                 // Is user authorized to run the 'createSubscription' service
 				// method?
 				boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
@@ -12694,14 +12670,6 @@ public class DataPackageManagerResource extends PastaWebService {
 					throw new ServiceUnavailableException("PASTA is now in read-only mode");
 				}
 
-                if (EDI_AUTH_USE) {
-                    EdiToken et = new EdiToken(ediToken);
-                    userId = et.getSubject();
-                }
-                else {
-                    userId = authToken.getUserId();
-                }
-
                 // Is user authorized to run the 'updateJournalCitation' service method?
 				boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
@@ -12842,14 +12810,6 @@ public class DataPackageManagerResource extends PastaWebService {
 				if (this.readOnly) {
 					throw new ServiceUnavailableException("PASTA is now in read-only mode");
 				}
-
-                if (EDI_AUTH_USE) {
-                    EdiToken et = new EdiToken(ediToken);
-                    userId = et.getSubject();
-                }
-                else {
-                    userId = authToken.getUserId();
-                }
 
                 // Is user authorized to run the 'deleteJournalCitation' service
 				// method?
