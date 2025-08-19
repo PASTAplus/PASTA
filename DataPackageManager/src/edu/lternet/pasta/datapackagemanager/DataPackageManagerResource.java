@@ -32,6 +32,7 @@ import edu.lternet.pasta.common.edi.EdiToken;
 import edu.lternet.pasta.common.edi.IAM;
 import edu.lternet.pasta.common.eml.DataPackage;
 import edu.lternet.pasta.common.eml.EMLParser;
+import edu.lternet.pasta.common.security.access.ForbiddenException;
 import edu.lternet.pasta.common.security.access.UnauthorizedException;
 import edu.lternet.pasta.common.security.authorization.AccessMatrix;
 import edu.lternet.pasta.common.security.authorization.InvalidPermissionException;
@@ -2260,29 +2261,28 @@ public class DataPackageManagerResource extends PastaWebService {
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken, ediToken);
         	if (!serviceMethodAuthorized) {
                 String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
-			    throw new UnauthorizedException(msg);
+			    throw new ForbiddenException(msg);
 		    }
 
+            // dpm.isAuthorized will either throw an exception or complete successfully - it should never return false.
 			DataPackageManager dpm = new DataPackageManager();
-			Boolean isAuthorized = dpm.isAuthorized(authToken, ediToken, resourceId, resourcePermission);
+			dpm.isAuthorized(authToken, ediToken, resourceId, resourcePermission);
 
-			if (isAuthorized != null && isAuthorized) {
-				responseBuilder = Response.ok(resourceId);
-				response = responseBuilder.build();
-			}
+            responseBuilder = Response.ok(resourceId);
+            response = responseBuilder.build();
 		} catch (IllegalArgumentException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
-		} catch (ResourceDeletedException e) {
-			entryText = e.getMessage();
-			response = WebExceptionFactory.makeConflict(e).getResponse();
-		} catch (ResourceExistsException e) {
+		} catch (ResourceDeletedException | ResourceExistsException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeConflict(e).getResponse();
 		} catch (UserErrorException e) {
