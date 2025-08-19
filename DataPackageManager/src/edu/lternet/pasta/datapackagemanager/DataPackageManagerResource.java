@@ -2255,15 +2255,13 @@ public class DataPackageManagerResource extends PastaWebService {
         authToken = getAuthToken(headers);
 		String userId = authToken.getUserId();
 
-		// Is user authorized to run the service method?
-		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken, ediToken);
-		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
-
-		try {
+        try {
+            // Is user authorized to run the service method?
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken, ediToken);
+        	if (!serviceMethodAuthorized) {
+                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+			    throw new UnauthorizedException(msg);
+		    }
 
 			DataPackageManager dpm = new DataPackageManager();
 			Boolean isAuthorized = dpm.isAuthorized(authToken, ediToken, resourceId, resourcePermission);
