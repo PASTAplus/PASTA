@@ -1001,9 +1001,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-					String.format("User %s is not authorized to execute service method %s", 
-							      userId, serviceMethodName));
+                String msg = String.format("User '%s' is not authorized to execute service method %s", userId, serviceMethodName);
+				throw new UnauthorizedException(msg);
 			}
 
 			String transaction = generateTransactionID("create", null, null, null);
@@ -1276,6 +1275,10 @@ public class DataPackageManagerResource extends PastaWebService {
 			responseBuilder = Response.status(Response.Status.UNAUTHORIZED);
 			entryText = e.getMessage();
 			responseBuilder.entity(entryText);
+		} catch (ForbiddenException e) {
+			responseBuilder = Response.status(Response.Status.FORBIDDEN);
+			entryText = e.getMessage();
+			responseBuilder.entity(entryText);
 		} catch (Exception e) {
 			responseBuilder = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
 			entryText = e.getMessage();
@@ -1388,6 +1391,9 @@ public class DataPackageManagerResource extends PastaWebService {
 			msg = e.getMessage();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+			msg = e.getMessage();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 			msg = e.getMessage();
 		} catch (ResourceExistsException e) {
 			response = WebExceptionFactory.makeConflict(e).getResponse();
@@ -1502,6 +1508,9 @@ public class DataPackageManagerResource extends PastaWebService {
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
             msg = e.getMessage();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+            msg = e.getMessage();
         } catch (ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
             msg = e.getMessage();
@@ -1609,24 +1618,23 @@ public class DataPackageManagerResource extends PastaWebService {
 			responseBuilder.entity(deletedIdentifier.toString());
 			response = responseBuilder.build();
 			response = stampHeader(response);
-		} catch (NotActiveException e) {
-			response = WebExceptionFactory.makeBadRequest(e).getResponse();
-			msg = e.getMessage();
 		} catch (ResourceNotFoundException e) {
 			msg = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
-		} catch (ServiceUnavailableException e) {
-			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
-		} catch (UserErrorException e) {
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+			msg = e.getMessage();
+		} catch (NotActiveException | UserErrorException e) {
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 			msg = e.getMessage();
+		} catch (ServiceUnavailableException e) {
+			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		} catch (Exception e) {
 			WebApplicationException webApplicationException =
-					WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-							e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
 			response = webApplicationException.getResponse();
 			msg = e.getMessage();
 		} finally {
@@ -1934,6 +1942,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeUnauthorized(e);
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (XmlParsingException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -2498,6 +2509,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -2655,6 +2669,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -2801,6 +2818,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -8478,9 +8498,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
+                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
+			    throw new ForbiddenException(msg);
 			}
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
@@ -8503,8 +8522,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				}
 			}
 
-			EmlPackageId emlPackageId =
-					emlPackageIdFormat.parse(scope, identifier.toString(), revision);
+			EmlPackageId emlPackageId = emlPackageIdFormat.parse(scope, identifier.toString(), revision);
 			String packageId = emlPackageIdFormat.format(emlPackageId);
 
 			/*
@@ -8522,8 +8540,7 @@ public class DataPackageManagerResource extends PastaWebService {
 				}
 			}
 
-			metadataString =
-					dataPackageManager.readMetadata(scope, identifier, revision, userId, authToken, ediToken);
+			metadataString = dataPackageManager.readMetadata(scope, identifier, revision, userId, authToken, ediToken);
 
 			if (metadataString != null) {
 				byte[] byteArray = metadataString.getBytes("UTF-8");
@@ -8533,9 +8550,8 @@ public class DataPackageManagerResource extends PastaWebService {
 				response = responseBuilder.build();
 			}
 			else {
-				ResourceNotFoundException e = new ResourceNotFoundException(
-						"Unable to access metadata for packageId: " + packageId.toString());
-				throw (e);
+                String msg = String.format("Unable to access metadata for '%s'.", packageId);
+                throw (new ResourceNotFoundException(msg));
 			}
 		} catch (IllegalArgumentException e) {
 			entryText = e.getMessage();
