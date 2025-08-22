@@ -1476,10 +1476,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
-				String message = "User " + user
-				    + " does not have permission to delete this data package: "
-				    + resourceId;
-				throw new UnauthorizedException(message);
+				String msg = String.format("User '%s' is not authorized to delete '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			/*
@@ -1491,9 +1489,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				    .isDeactivatedDataPackage(scope, identifier);
 				if (isDeactivatedDataPackage) {
 					String docid = EMLDataPackage.composeDocid(scope, identifier);
-					String message = "Attempting to delete a data package that was previously deleted from PASTA: "
-					    + docid;
-					throw new ResourceDeletedException(message);
+					String msg = String.format("Attempting to delete data package '%s', which was previously deleted from PASTA: ", docid);
+					throw new ResourceDeletedException(msg);
 				}
 
 				String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
@@ -1752,7 +1749,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     try {
         isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, permission);
         if (!isAuthorized) {
-            String msg = String.format("User %s is not authorized at the requested level to %s", userId, resourceId);
+            String msg = String.format("User '%s' is not authorized to access '%s'.", userId, resourceId);
             throw new ForbiddenException(msg);
         }
     } catch (ClassNotFoundException | SQLException e) {
@@ -2344,19 +2341,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageResourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String gripe = "User "
-				    + user
-				    + " does not have permission to read the entity name for this resource: "
-				    + entityResourceId;
-				throw new UnauthorizedException(gripe);
+				String msg = String.format("User '%s' is not authorized to read entity names for '%s'.", user, entityResourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			entityName = dataPackageRegistry.getDataEntityName(entityResourceId);
 
 			if (entityName == null) {
-				String gripe = "An entityName value does not exist for this resource: "
-				    + entityResourceId;
-				throw new ResourceNotFoundException(gripe);
+				String msg = String.format("An entityName value does not exist for '%s'.'", entityResourceId);
+				throw new ResourceNotFoundException(msg);
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -2519,10 +2512,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String message = "User " + user
-				    + " does not have permission to read this data entity: "
-				    + resourceId;
-				throw new UnauthorizedException(message);
+				String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			DataManagerClient dataManagerClient = new DataManagerClient();
@@ -2740,8 +2731,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageId, Rule.Permission.read);
 
 			if (!isAuthorized) {
-				String msg = String.format("User %s does not have permission to read this data package: %s", user, dataPackageId);
-				throw new UnauthorizedException(msg);
+				String msg = String.format("User '%s' is not authorized to access '%s'.", user, dataPackageId);
+				throw new ForbiddenException(msg);
 			}
 
 			String packageId = LogMessageFormatter.formatPackageId(scope, identifier, revision);
@@ -2876,19 +2867,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, reportId, Rule.Permission.read);
 				if (!isAuthorized) {
-					String message = "User " + user
-					    + " does not have permission to read this data package report: "
-					    + reportId;
-					throw new UnauthorizedException(message);
+					String msg = String.format("User '%s' is not authorized to read '%s'.'", user, reportId);
+					throw new ForbiddenException(msg);
 				}
 
 				DataPackageReport dataPackageReport = new DataPackageReport(
 				    emlPackageId);
 
-				if (dataPackageReport != null) {
-					xmlFile = dataPackageReport.getReport(evaluate, transaction);
-				}
-			}
+                xmlFile = dataPackageReport.getReport(evaluate, transaction);
+            }
 		} 
 		finally {
 		}
@@ -2956,10 +2943,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
-					String message = "User " + user
-					    + " does not have permission to read this metadata document: "
-					    + metadataId;
-					throw new UnauthorizedException(message);
+                    String msg = String.format("User '%s' is not authorized to execute '%s'.", user, metadataId);
+                    throw new ForbiddenException(msg);
 				}
 
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
@@ -3041,10 +3026,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					Authorizer authorizer = new Authorizer(dataPackageRegistry);
 					boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 					if (!isAuthorized) {
-						String message = "User " + user
-						    + " does not have permission to read this metadata document: "
-						    + metadataId;
-						throw new UnauthorizedException(message);
+						String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
+						throw new ForbiddenException(msg);
 					}
 
 					EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
@@ -3132,10 +3115,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
-					String message = "User " + user
-					    + " does not have permission to read this metadata document: "
-					    + metadataId;
-					throw new UnauthorizedException(message);
+					String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
+					throw new ForbiddenException(msg);
 				}
 
 				EmlPackageIdFormat emlPackageIdFormat = new EmlPackageIdFormat();
@@ -3378,10 +3359,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String gripe = "User " + user
-				    + " does not have permission to read the checksum for this resource: "
-				    + resourceId;
-				throw new UnauthorizedException(gripe);
+				String msg = String.format("User '%s' is not authorized to read the checksum for '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			checksum = dataPackageRegistry.getResourceShaChecksum(resourceId);
@@ -3437,17 +3416,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String gripe = "User " + user
-				    + " does not have permission to read the size value for this resource: "
-				    + resourceId;
-				throw new UnauthorizedException(gripe);
+				String msg = String.format("User '%s' is not authorized to read the size value for '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			resourceSize = dataPackageRegistry.getResourceSize(resourceId);
 
 			if (resourceSize == null) {
-				String gripe = "A size value does not exist for this resource: " + resourceId;
-				throw new ResourceNotFoundException(gripe);
+				String msg = String.format("A size value does not exist for '%s'.", resourceId);
+				throw new ResourceNotFoundException(msg);
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -3496,17 +3473,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String gripe = "User " + user
-				    + " does not have permission to read the DOI for this resource: "
-				    + resourceId;
-				throw new UnauthorizedException(gripe);
+				String msg = String.format("User '%s' is not authorized to read the DOI for '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			doi = dataPackageRegistry.getDoi(resourceId);
 
 			if (doi == null) {
-				String gripe = "A DOI does not exist for this resource: " + resourceId;
-				throw new ResourceNotFoundException(gripe);
+				String msg = String.format("A DOI does not exist for '%s'.", resourceId);
+				throw new ResourceNotFoundException(msg);
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -3555,19 +3530,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
-				String gripe = String.format(
-						"User %s does not have permission to read this resource: %s", 
-						user, resourceId);
-				throw new UnauthorizedException(gripe);
+				String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+				throw new ForbiddenException(msg);
 			}
 
 			formatType = dataPackageRegistry.getFormatType(resourceId);
 
 			if (formatType == null) {
-				String gripe = String.format(
-						"A formatType does not exist for this resource: %s",
-						resourceId);
-				throw new ResourceNotFoundException(gripe);
+				String msg = String.format("A formatType does not exist for '%s'.", resourceId);
+				throw new ResourceNotFoundException(msg);
 			}
 
 		} 
