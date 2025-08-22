@@ -2943,7 +2943,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
-                    String msg = String.format("User '%s' is not authorized to execute '%s'.", user, metadataId);
+                    String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
                     throw new ForbiddenException(msg);
 				}
 
