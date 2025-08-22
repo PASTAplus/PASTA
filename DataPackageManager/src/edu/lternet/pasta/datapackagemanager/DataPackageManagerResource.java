@@ -39,7 +39,6 @@ import edu.lternet.pasta.common.security.authorization.InvalidPermissionExceptio
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
-import edu.lternet.pasta.common.security.token.AuthTokenFactory;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
@@ -1021,6 +1020,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 		}
+		catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+		}
 		catch (ServiceUnavailableException e) {
 			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
@@ -1791,6 +1793,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = stampHeader(response);
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ServiceUnavailableException e) {
 			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
@@ -3011,6 +3015,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			response = WebResponseFactory.makeBadRequest(e);
 		} catch (Exception e) {
@@ -3202,6 +3208,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -3368,6 +3377,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -3588,6 +3600,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -3736,6 +3751,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -3879,6 +3897,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -4069,6 +4090,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			response = WebResponseFactory.makeBadRequest(e);
 		} catch (Exception e) {
@@ -4352,6 +4375,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -4624,6 +4650,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -4825,6 +4854,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5008,6 +5040,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5189,6 +5224,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5376,6 +5414,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5562,6 +5603,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5747,6 +5791,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -5963,6 +6010,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -6157,6 +6207,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -6346,6 +6399,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -6540,6 +6596,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -6718,6 +6777,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -6879,6 +6941,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -7092,6 +7157,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -7352,6 +7420,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (Exception e) {
 			entryText = e.getMessage();
 			WebApplicationException webApplicationException =
@@ -7535,6 +7606,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -7729,6 +7803,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -7906,6 +7983,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -8324,6 +8404,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (Exception e) {
 			entryText = e.getMessage();
 			WebApplicationException webApplicationException =
@@ -8562,6 +8645,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -8812,6 +8898,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -8997,6 +9086,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -9190,6 +9282,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -9366,6 +9461,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -9704,6 +9802,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -9896,6 +9997,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText += "; " + e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText += "; " + e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText += "; " + e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -9989,6 +10093,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText += "; " + e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText += "; " + e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText += "; " + e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -10192,6 +10299,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -10458,6 +10568,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -10596,6 +10709,8 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			response = WebResponseFactory.makeBadRequest(e);
 		} catch (Exception e) {
@@ -10749,6 +10864,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -10917,6 +11035,9 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = stampHeader(response);
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+
 		} catch (ServiceUnavailableException e) {
 			response = WebExceptionFactory.makeServiceUnavailable(e).getResponse();
 		}
@@ -11067,6 +11188,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (ResourceNotFoundException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
@@ -11359,7 +11483,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
-		} catch (ResourceNotFoundException e) {
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+			msg = e.getMessage();		} catch (ResourceNotFoundException e) {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 			msg = e.getMessage();
 		} catch (ResourceDeletedException e) {
@@ -11702,7 +11828,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
-		} catch (WebApplicationException e) {
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+			msg = e.getMessage();		} catch (WebApplicationException e) {
 			response = e.getResponse();
 			msg = e.getMessage();
 		} catch (Exception e) {
@@ -11861,7 +11989,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
-		} catch (ResourceNotFoundException e) {
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+			msg = e.getMessage();		} catch (ResourceNotFoundException e) {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 			msg = e.getMessage();
 		} catch (ResourceDeletedException e) {
@@ -12561,7 +12691,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
 			msg = e.getMessage();
-		} catch (ResourceNotFoundException e) {
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+			msg = e.getMessage();		} catch (ResourceNotFoundException e) {
 			msg = e.getMessage();
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (ResourceDeletedException e) {
@@ -13001,6 +13133,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -13212,6 +13347,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
@@ -13273,6 +13411,9 @@ public class DataPackageManagerResource extends PastaWebService {
 			response = WebExceptionFactory.makeNotFound(e).getResponse();
 		} catch (UnauthorizedException e) {
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
+
 		} catch (UserErrorException e) {
 			response = WebResponseFactory.makeBadRequest(e);
 		} catch (Exception e) {
@@ -13429,6 +13570,9 @@ public class DataPackageManagerResource extends PastaWebService {
 		} catch (UnauthorizedException e) {
 			entryText = e.getMessage();
 			response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+		} catch (ForbiddenException e) {
+			entryText = e.getMessage();
+			response = WebExceptionFactory.makeForbidden(e).getResponse();
 		} catch (UserErrorException e) {
 			entryText = e.getMessage();
 			response = WebResponseFactory.makeBadRequest(e);
