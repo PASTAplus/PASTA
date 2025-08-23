@@ -116,6 +116,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     private static String EDI_AUTH_HOST;
     private static Integer EDI_AUTH_PORT;
     private static String EDI_RESOURCE_KEY_PREFIX;
+    private static boolean EDI_AUTH_USE;
 
     /*
 	 * Class methods
@@ -1161,9 +1162,8 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					storageManager.optimizeStorage();
 				}
 				catch (Exception e) {
-					logger.error(
-							String.format("Exception optimizing data storage for data package %s: %s",
-									      packageId, e.getMessage()));
+                    String msg = String.format("Exception optimizing data storage for data package %s: %s", packageId, e.getMessage());
+					logger.error(msg);
 				}
 
 				/*
@@ -1476,6 +1476,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to delete '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -1749,6 +1756,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
     try {
         isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, permission);
         if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
+                }
+            }
             String msg = String.format("User '%s' is not authorized to access '%s'.", userId, resourceId);
             throw new ForbiddenException(msg);
         }
@@ -2231,6 +2245,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             EDI_AUTH_HOST = options.getOption("edi.auth.host");
             EDI_AUTH_PORT = Integer.parseInt(options.getOption("edi.auth.port"));
             EDI_RESOURCE_KEY_PREFIX = options.getOption("edi.resource.key.prefix");
+            EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
 
 			
 			// Data Manager Library (DML) options
@@ -2341,6 +2356,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageResourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read entity names for '%s'.", user, entityResourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -2512,6 +2534,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -2729,8 +2758,14 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			 */
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, dataPackageId, Rule.Permission.read);
-
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to access '%s'.", user, dataPackageId);
 				throw new ForbiddenException(msg);
 			}
@@ -2867,6 +2902,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, reportId, Rule.Permission.read);
 				if (!isAuthorized) {
+                    if (EDI_AUTH_USE) {
+                        EdiToken et = new EdiToken(ediToken);
+                        String cn = et.getCommonName();
+                        if (cn != null) {
+                            user = user + String.format(" (%s)", cn);
+                        }
+                    }
 					String msg = String.format("User '%s' is not authorized to read '%s'.'", user, reportId);
 					throw new ForbiddenException(msg);
 				}
@@ -2943,6 +2985,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
+                    if (EDI_AUTH_USE) {
+                        EdiToken et = new EdiToken(ediToken);
+                        String cn = et.getCommonName();
+                        if (cn != null) {
+                            user = user + String.format(" (%s)", cn);
+                        }
+                    }
                     String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
                     throw new ForbiddenException(msg);
 				}
@@ -3026,6 +3075,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 					Authorizer authorizer = new Authorizer(dataPackageRegistry);
 					boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 					if (!isAuthorized) {
+                        if (EDI_AUTH_USE) {
+                            EdiToken et = new EdiToken(ediToken);
+                            String cn = et.getCommonName();
+                            if (cn != null) {
+                                user = user + String.format(" (%s)", cn);
+                            }
+                        }
 						String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
 						throw new ForbiddenException(msg);
 					}
@@ -3115,6 +3171,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				Authorizer authorizer = new Authorizer(dataPackageRegistry);
 				boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, metadataId, Rule.Permission.read);
 				if (!isAuthorized) {
+                    if (EDI_AUTH_USE) {
+                        EdiToken et = new EdiToken(ediToken);
+                        String cn = et.getCommonName();
+                        if (cn != null) {
+                            user = user + String.format(" (%s)", cn);
+                        }
+                    }
 					String msg = String.format("User '%s' is not authorized to read '%s'.", user, metadataId);
 					throw new ForbiddenException(msg);
 				}
@@ -3359,6 +3422,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read the checksum for '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -3416,6 +3486,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read the size value for '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -3473,6 +3550,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read the DOI for '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -3530,6 +3614,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
 			if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
 				String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
 				throw new ForbiddenException(msg);
 			}
@@ -3843,10 +3934,15 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 			Authorizer authorizer = new Authorizer(dataPackageRegistry);
 			boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
 			if (!isAuthorized) {
-				String message = "User " + user
-				    + " does not have permission to update this data package: "
-				    + resourceId;
-				throw new UnauthorizedException(message);
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
+				String msg = String.format("User '%s' is not authorized to update '%s'.", user, resourceId);
+				throw new UnauthorizedException(msg);
 			}
 			
             // Is this data package actively being worked on in PASTA?
