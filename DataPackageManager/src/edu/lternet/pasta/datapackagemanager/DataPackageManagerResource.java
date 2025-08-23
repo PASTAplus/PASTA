@@ -980,12 +980,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1000,8 +1002,11 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-                String msg = String.format("User '%s' is not authorized to execute service method %s", userId, serviceMethodName);
-				throw new UnauthorizedException(msg);
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+				throw new ForbiddenException(msg);
 			}
 
 			String transaction = generateTransactionID("create", null, null, null);
@@ -1113,12 +1118,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String transaction = generateTransactionID("archive", scope, identifier, revision);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1132,10 +1139,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the 'createDataPackage' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException("User " + userId
-						+ " is not authorized to execute service method "
-						+ serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			// Perform createDataPackage in new thread
 			Archivor archivor = new Archivor(scope, identifier, revision, userId, authToken, ediToken, transaction);
@@ -1227,12 +1236,14 @@ public class DataPackageManagerResource extends PastaWebService {
 	{
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1243,9 +1254,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Is user authorized to run the 'createDataPackage' service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, Rule.Permission.write, authToken, ediToken);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(String.format(
-					"User %s is not authorized to execute service method %s", serviceMethodName, userId));
-		}
+            if (cn != null) {
+                userId = userId + String.format(" (%s)", cn);
+            }
+            String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+            throw new ForbiddenException(msg);
+        }
 
 		if (this.readOnly) {
 			throw new ServiceUnavailableException("PASTA is now in read-only mode");
@@ -1352,12 +1366,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "createReservation";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1374,10 +1390,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dpm = new DataPackageManager();
 
@@ -1470,12 +1488,14 @@ public class DataPackageManagerResource extends PastaWebService {
         final String serviceMethodName = "setReservation";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1493,9 +1513,11 @@ public class DataPackageManagerResource extends PastaWebService {
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
             if (!serviceMethodAuthorized) {
-                throw new UnauthorizedException(
-                        "User " + userId + " is not authorized to execute service method " + serviceMethodName
-                );
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
             }
 
             DataPackageManager dpm = new DataPackageManager();
@@ -1584,12 +1606,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "deleteReservation";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1606,10 +1630,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dpm = new DataPackageManager();
 
@@ -1741,12 +1767,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1772,10 +1800,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the 'evaluateDataPackage' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			String transaction = generateTransactionID("evaluate", null, null, null);
 			String msg = String.format("Evaluate (transaction: %s)", transaction);
@@ -1919,12 +1949,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String eml = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -1935,10 +1967,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the 'appendProvenance' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			MetadataFactory metadataFactory = new MetadataFactory();
 			eml = metadataFactory.generateEML(scope, identifier, revision, authToken, ediToken);
@@ -2280,12 +2314,14 @@ public class DataPackageManagerResource extends PastaWebService {
         Rule.Permission resourcePermission = Rule.Permission.valueOf(permission);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -2297,9 +2333,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, servicePermission, authToken, ediToken);
         	if (!serviceMethodAuthorized) {
-                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
-			    throw new ForbiddenException(msg);
-		    }
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
             // dpm.isAuthorized will either throw an exception or complete successfully - it should never return false.
 			DataPackageManager dpm = new DataPackageManager();
@@ -2450,12 +2489,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -2467,10 +2508,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -2640,12 +2683,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -2657,11 +2702,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-                String msg = String.format(
-                        "User %s is not authorized to execute service method %s", userId, serviceMethodName
-                );
-				throw new UnauthorizedException(msg);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			String xml = dataPackageManager.listActiveReservations();
@@ -2790,12 +2836,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -2807,10 +2855,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			String reservations = dataPackageManager.listReservationIdentifiers(scope);
@@ -2954,12 +3004,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -2971,10 +3023,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -3145,12 +3199,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -3162,10 +3218,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -3332,12 +3390,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
 		String entryText = null;
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -3349,10 +3409,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -3532,12 +3594,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -3558,10 +3622,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			String revisionList = "";
 			DataPackageManager dataPackageManager = new DataPackageManager();
@@ -3708,12 +3774,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -3725,10 +3793,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -3857,12 +3927,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -3874,10 +3946,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -4020,12 +4094,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -4037,10 +4113,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			String serviceMethods = "";
 			StringBuffer stringBuffer = new StringBuffer();
@@ -4244,12 +4322,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userAgent = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -4271,10 +4351,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -4604,12 +4686,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -4621,10 +4705,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.data, scope, identifier,
@@ -4807,12 +4893,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
         
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -4824,10 +4912,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.data, scope, identifier,
@@ -4994,12 +5084,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
         
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5011,10 +5103,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.data, scope, identifier,
@@ -5178,12 +5272,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
         
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5195,10 +5291,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.data, scope, identifier,
@@ -5370,12 +5468,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
         
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5387,10 +5487,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
@@ -5552,12 +5654,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5569,10 +5673,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			dataPackageResourceId =
 					DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
@@ -5746,12 +5852,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String resourceId = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5763,10 +5871,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
@@ -5965,12 +6075,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		boolean oreFormat = (oreParam != null);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -5985,10 +6097,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			resourceMap =
@@ -6162,12 +6276,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -6179,10 +6295,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
 					identifier, Integer.valueOf(revision), null);
@@ -6353,12 +6471,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -6370,10 +6490,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
 					identifier, Integer.valueOf(revision), null);
@@ -6535,12 +6657,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
         
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -6552,10 +6676,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
+            if (cn != null) {
+                userId = userId + String.format(" (%s)", cn);
+            }
+            String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+            throw new ForbiddenException(msg);
+        }
 
 		String packageId =
 				String.format("%s.%s.%s", scope, identifier.toString(), revision.toString());
@@ -6732,12 +6858,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -6749,10 +6877,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId = DataPackageManager.composeResourceId(ResourceType.dataPackage, scope,
 					identifier, Integer.valueOf(revision), null);
@@ -6911,12 +7041,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -6925,10 +7057,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
+            if (cn != null) {
+                userId = userId + String.format(" (%s)", cn);
+            }
+            String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+            throw new ForbiddenException(msg);
+        }
 
 		try {
 			DataPackageManager dpm = new DataPackageManager();
@@ -7100,12 +7234,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		boolean oreFormat = (oreParam != null);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -7120,10 +7256,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			if (shoulder != null && !shoulder.isEmpty()) {
 				if (!shoulder.startsWith("doi:")) {
@@ -7314,12 +7452,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -7346,10 +7486,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
+            if (cn != null) {
+                userId = userId + String.format(" (%s)", cn);
+            }
+            String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+            throw new ForbiddenException(msg);
+        }
 
 		try {
 			DataPackageManager dataPackageManager = new DataPackageManager();
@@ -7560,12 +7702,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -7577,10 +7721,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.report, scope, identifier,
@@ -7756,12 +7902,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -7773,10 +7921,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.report, scope, identifier,
@@ -7937,12 +8087,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -7954,10 +8106,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.report, scope, identifier,
@@ -8317,12 +8471,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -8349,10 +8505,12 @@ public class DataPackageManagerResource extends PastaWebService {
 		// Is user authorized to run the service method?
 		boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 		if (!serviceMethodAuthorized) {
-			throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " +
-							serviceMethodName);
-		}
+            if (cn != null) {
+                userId = userId + String.format(" (%s)", cn);
+            }
+            String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+            throw new ForbiddenException(msg);
+        }
 
 		try {
 			DataPackageManager dataPackageManager = new DataPackageManager();
@@ -8561,12 +8719,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userAgent = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -8581,9 +8741,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-                String msg = String.format("User %s is not authorized to execute service method %s", userId, serviceMethodName);
-			    throw new ForbiddenException(msg);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -8812,12 +8975,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userAgent = getUserAgent(headers);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -8831,10 +8996,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -9040,12 +9207,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -9057,10 +9226,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.metadata, scope, identifier,
@@ -9235,12 +9406,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -9252,10 +9425,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.metadata, scope, identifier,
@@ -9415,12 +9590,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -9432,10 +9609,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.metadata, scope, identifier,
@@ -9765,12 +9944,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -9782,10 +9963,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			resourceId =
 					DataPackageManager.composeResourceId(ResourceType.metadata, scope, identifier,
@@ -9939,12 +10122,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userAgent = getUserAgent(headers);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -9958,10 +10143,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			try {
 				URI uri = uriInfo.getRequestUri();
@@ -10032,12 +10219,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String userAgent = getUserAgent(headers);
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -10235,12 +10424,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -10252,10 +10443,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
@@ -10484,12 +10677,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -10501,10 +10696,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			QueryString queryStr = new QueryString(uriInfo);
 			Map<String, List<String>> queryParams = queryStr.getParams();
@@ -10669,12 +10866,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -10686,10 +10885,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -10832,12 +11033,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.read;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -10849,10 +11052,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			String xml = dataPackageManager.listWorkingOn();
@@ -10984,12 +11189,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Rule.Permission permission = Rule.Permission.write;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11016,10 +11223,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			// Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						String.format("User %s is not authorized to execute service method %s",
-								userId, serviceMethodName));
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			String transaction = generateTransactionID("update", scope, identifier, null);
 
@@ -11143,12 +11352,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11163,10 +11374,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the 'deleteDataPackage' service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			entryText = "Deleted " + scope + "." + identifier.toString();
 
@@ -11306,12 +11519,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			final String serviceMethodName = "createSubscription";
 
             String userId;
+        String cn = null;
             String ediToken = getEdiToken(headers);
             AuthToken authToken = getAuthToken(headers);
 
             if (EDI_AUTH_USE) {
                 EdiToken et = new EdiToken(ediToken);
                 userId = et.getSubject();
+            	cn = et.getCommonName();
             }
             else {
                 userId = authToken.getUserId();
@@ -11327,10 +11542,12 @@ public class DataPackageManagerResource extends PastaWebService {
 				boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 				if (!serviceMethodAuthorized) {
-					throw new UnauthorizedException(
-							"User " + userId + " is not authorized to execute service method " +
-									serviceMethodName);
-				}
+                    if (cn != null) {
+                        userId = userId + String.format(" (%s)", cn);
+                    }
+                    msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                    throw new ForbiddenException(msg);
+                }
 
 				EmlSubscription emlSubscription = xmlSubscriptionFormatV1.parse(requestBody);
 				emlSubscription.setCreator(userId);
@@ -11443,12 +11660,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "deleteSubscription";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11465,10 +11684,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			Integer id = parseSubscriptionId(subscriptionId);
 			SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
@@ -11620,12 +11841,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String serviceMethodName = MethodNameUtility.methodName();
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11639,11 +11862,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				String errorMsg =
-						String.format("User %s is not authorized to execute service method %s.",
-								userId, serviceMethodName);
-				throw new UnauthorizedException(errorMsg);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			EmlSubscription emlSubscription = getSubscription(subscriptionId, userId);
 			msg = String.format("Executed subscription with the following attributes: %s",
@@ -11792,12 +12016,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "getMatchingSubscriptions";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11811,11 +12037,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				String errorMsg =
-						String.format("User %s is not authorized to execute service method %s.",
-								userId, serviceMethodName);
-				throw new UnauthorizedException(errorMsg);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			QueryString queryStr = new QueryString(uriInfo);
 			queryStr.checkForIllegalKeys(VALID_EVENT_QUERY_KEYS);
@@ -11948,12 +12175,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "getSubscriptionWithId";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -11967,11 +12196,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				String errorMsg =
-						String.format("User %s is not authorized to execute service method %s.",
-								userId, serviceMethodName);
-				throw new UnauthorizedException(errorMsg);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			Integer id = parseSubscriptionId(subscriptionId);
 			SubscriptionRegistry subscriptionRegistry = new SubscriptionRegistry();
@@ -12643,12 +12873,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		final String serviceMethodName = "createJournalCitation";
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -12664,10 +12896,12 @@ public class DataPackageManagerResource extends PastaWebService {
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dpm = new DataPackageManager();
 
@@ -12802,12 +13036,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			final String serviceMethodName = "updateJournalCitation";
 
             String userId;
+        String cn = null;
             String ediToken = getEdiToken(headers);
             AuthToken authToken = getAuthToken(headers);
 
             if (EDI_AUTH_USE) {
                 EdiToken et = new EdiToken(ediToken);
                 userId = et.getSubject();
+            	cn = et.getCommonName();
             }
             else {
                 userId = authToken.getUserId();
@@ -12822,10 +13058,12 @@ public class DataPackageManagerResource extends PastaWebService {
 				boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 				if (!serviceMethodAuthorized) {
-					throw new UnauthorizedException(
-							"User " + userId + " is not authorized to execute service method " +
-									serviceMethodName);
-				}
+                    if (cn != null) {
+                        userId = userId + String.format(" (%s)", cn);
+                    }
+                    msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                    throw new ForbiddenException(msg);
+                }
 
 				JournalCitation journalCitation = new JournalCitation(citationXml);
 
@@ -12943,12 +13181,14 @@ public class DataPackageManagerResource extends PastaWebService {
 			final String serviceMethodName = "deleteJournalCitation";
 
             String userId;
+        String cn = null;
             String ediToken = getEdiToken(headers);
             AuthToken authToken = getAuthToken(headers);
 
             if (EDI_AUTH_USE) {
                 EdiToken et = new EdiToken(ediToken);
                 userId = et.getSubject();
+            	cn = et.getCommonName();
             }
             else {
                 userId = authToken.getUserId();
@@ -12964,10 +13204,12 @@ public class DataPackageManagerResource extends PastaWebService {
 				boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 
 				if (!serviceMethodAuthorized) {
-					throw new UnauthorizedException(
-							"User " + userId + " is not authorized to execute service method " +
-									serviceMethodName);
-				}
+                    if (cn != null) {
+                        userId = userId + String.format(" (%s)", cn);
+                    }
+                    msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                    throw new ForbiddenException(msg);
+                }
 
 				Integer id = parseJournalCitationId(journalCitationId);
 				DataPackageManager dpm = new DataPackageManager();
@@ -13089,12 +13331,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -13106,10 +13350,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -13283,12 +13529,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -13300,10 +13548,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
@@ -13379,12 +13629,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		Response response;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -13398,13 +13650,18 @@ public class DataPackageManagerResource extends PastaWebService {
 			final String serviceMethodName = "listDataPackagesCitedBy";
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-					"User " + userId + " is not authorized to execute service method " + serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+
 			DataPackageManager dataPackageManager = new DataPackageManager();
 			String packageListXml = dataPackageManager.listDataPackagesCitedBy(articleDoi, authToken);
 			ResponseBuilder responseBuilder = Response.ok(packageListXml);
 			response = responseBuilder.build();
+
 		} catch (IllegalArgumentException e) {
 			response = WebExceptionFactory.makeBadRequest(e).getResponse();
 		} catch (ResourceNotFoundException e) {
@@ -13527,12 +13784,14 @@ public class DataPackageManagerResource extends PastaWebService {
 		String entryText = null;
 
         String userId;
+        String cn = null;
         String ediToken = getEdiToken(headers);
         AuthToken authToken = getAuthToken(headers);
 
         if (EDI_AUTH_USE) {
             EdiToken et = new EdiToken(ediToken);
             userId = et.getSubject();
+            cn = et.getCommonName();
         }
         else {
             userId = authToken.getUserId();
@@ -13543,10 +13802,12 @@ public class DataPackageManagerResource extends PastaWebService {
             // Is user authorized to run the service method?
 			boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
 			if (!serviceMethodAuthorized) {
-				throw new UnauthorizedException(
-						"User " + userId + " is not authorized to execute service method " +
-								serviceMethodName);
-			}
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
 
 			DataPackageManager dataPackageManager = new DataPackageManager();
 
