@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import edu.lternet.pasta.common.proxy.BufferedClientResponse;
+import edu.lternet.pasta.common.DataTimeFormatter;
 
 
 /**
@@ -58,11 +59,10 @@ public final class WebExceptionFactory {
      * @return a web application exception with the provided response status,
      *         cause, and message.
      */
-    public static WebApplicationException make(Response.StatusType status,
-                                               Throwable cause,
-                                               String message) {
-
+    public static WebApplicationException make(Response.StatusType status, Throwable cause, String message) {
         ResponseBuilder rb = Response.status(status);
+        String datetime = DataTimeFormatter.getDateTime();
+        message = String.format("%s (%s)", message, datetime);
         rb.entity(message);
         if (status == Response.Status.UNAUTHORIZED) {
         	rb.header("WWW-Authenticate", UNAUTHORIZED_CHALLENGE);
@@ -87,11 +87,10 @@ public final class WebExceptionFactory {
      * @return a web application exception with the provided response status,
      *         cause, and message.
      */
-    public static WebApplicationException make(int status,
-                                               Throwable cause,
-                                               String message) {
-
+    public static WebApplicationException make(int status, Throwable cause, String message) {
         ResponseBuilder rb = Response.status(status);
+        String datetime = DataTimeFormatter.getDateTime();
+        message = String.format("%s (%s)", message, datetime);
         rb.entity(message);
         if (status == Response.Status.UNAUTHORIZED.getStatusCode()) {
         	rb.header("WWW-Authenticate", UNAUTHORIZED_CHALLENGE);
@@ -238,7 +237,7 @@ public final class WebExceptionFactory {
     /**
      * Returns a '503 Service Unavailable', the server is not ready to handle the request.
      *
-     * @param message the entity.
+     * @param cause the entity.
      *
      * @return a '503 Service Unavailable' web application exception.
      */
