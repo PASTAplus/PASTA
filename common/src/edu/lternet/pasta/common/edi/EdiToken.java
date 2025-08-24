@@ -45,11 +45,15 @@ public final class EdiToken {
     private final JSONObject jsonPayload;
 
     public EdiToken(String tokenBase64) {
+        if (tokenBase64 == null) {
+            throw new NullPointerException("EDI Token is null");
+        }
+
         this.token = tokenBase64;
 
         String[] jwtParts = tokenBase64.split("\\.");
         if (jwtParts.length != 3) {
-            throw new IllegalArgumentException("Invalid token");
+            throw new IllegalArgumentException("Invalid EDI Token structure");
         }
 
         Base64.Decoder decoder = Base64.getUrlDecoder();
