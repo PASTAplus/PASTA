@@ -106,7 +106,7 @@ public class Authorizer {
           String ediToken,
           String resourceId,
           Rule.Permission permission
-  ) throws ClassNotFoundException, SQLException {
+  ) throws ClassNotFoundException, SQLException, ResourceNotFoundException {
 
     boolean isAuthorized = false;
     
