@@ -2565,7 +2565,53 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return file;
 
 	}
-	
+
+    /**
+     * Reads a data entity and returns it as a byte array. The specified user must
+     * be authorized to read the data entity resource.
+     *
+     * @param resourceId
+     *            The unique and fully qualified resource (URL) identifier
+     * @param user
+     *          The user name
+     * @return a File object containing the locally stored entity data
+     */
+    public File getResourceThumbnailFile(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws Exception {
+
+        File file = null;
+        DataPackageRegistry dataPackageRegistry = null;
+        try {
+            dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+            String location = dataPackageRegistry.getResourceLocation(resourceId);
+
+            Authorizer authorizer = new Authorizer(dataPackageRegistry);
+            boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+            if (!isAuthorized) {
+                if (EDI_AUTH_USE) {
+                    EdiToken et = new EdiToken(ediToken);
+                    String cn = et.getCommonName();
+                    if (cn != null) {
+                        user = user + String.format(" (%s)", cn);
+                    }
+                }
+                String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+                throw new ForbiddenException(msg);
+            }
+
+        }
+        catch (ClassNotFoundException | SQLException e) {
+            String msg = String.format("The thumbnail image resource '%s' could not be found.", resourceId);
+            throw new UserErrorException(msg);
+        }
+
+        return file;
+
+    }
 
 	/**
 	 * Get the resource location for a metadata or report resource as stored
