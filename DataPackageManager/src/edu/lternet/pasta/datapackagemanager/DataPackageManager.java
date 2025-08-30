@@ -2586,9 +2586,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         File file = null;
         DataPackageRegistry dataPackageRegistry = null;
         try {
-            dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-            String location = dataPackageRegistry.getResourceLocation(resourceId);
-
             Authorizer authorizer = new Authorizer(dataPackageRegistry);
             boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
             if (!isAuthorized) {
@@ -2602,7 +2599,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                 String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
                 throw new ForbiddenException(msg);
             }
-
         }
         catch (ClassNotFoundException | SQLException e) {
             String msg = String.format("The thumbnail image resource '%s' could not be found.", resourceId);
