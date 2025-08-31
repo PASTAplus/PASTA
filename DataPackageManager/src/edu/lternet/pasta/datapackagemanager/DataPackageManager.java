@@ -2567,14 +2567,17 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
     /**
-     * Reads a data entity and returns it as a byte array. The specified user must
-     * be authorized to read the data entity resource.
+     * Returns a data package resource thumbnail image file.
      *
      * @param resourceId
      *            The unique and fully qualified resource (URL) identifier
+     * @param authToken
+     *            The PASTA authentication token
+     * @param ediToken
+     *            The EDI IAM token
      * @param user
-     *          The user name
-     * @return a File object containing the locally stored entity data
+     *            The username
+     * @return a File object
      */
     public File getResourceThumbnailFile(
             String resourceId,
@@ -2600,6 +2603,43 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         }
        ThumbnailManager thumbnailManager = new ThumbnailManager(resourceId);
        return thumbnailManager.getThumbnailFile();
+    }
+
+    /**
+     * Deletes a data package resource thumbnail image file.
+     *
+     * @param resourceId
+     *            The unique and fully qualified resource (URL) identifier
+     * @param authToken
+     *            The PASTA authentication token
+     * @param ediToken
+     *            The EDI IAM token
+     * @param user
+     *            The username
+     */
+    public void deleteResourceThumbnailFile(
+            String resourceId,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws Exception {
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        Authorizer authorizer = new Authorizer(dataPackageRegistry);
+        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.write);
+        if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
+                }
+            }
+            String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+            throw new ForbiddenException(msg);
+        }
+       ThumbnailManager thumbnailManager = new ThumbnailManager(resourceId);
+       thumbnailManager.deleteThumbnailFile();
     }
 
 	/**

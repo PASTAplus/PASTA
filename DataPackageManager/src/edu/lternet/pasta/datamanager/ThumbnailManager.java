@@ -20,6 +20,7 @@ public class ThumbnailManager {
     private final String resourceHash;
     private final String resourceId;
     private final String thumbnailDir;
+    private final String thumbnailFile;
 
     private static Logger logger = Logger.getLogger(DataPackageManager.class);
 
@@ -37,6 +38,7 @@ public class ThumbnailManager {
         try {
             DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
             resourceHash = getResourceHash(resourceId);
+            thumbnailFile  = String.format("%s/%s.png", thumbnailDir, resourceHash);
             if (!dataPackageRegistry.hasResource(resourceId)) {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
                 logger.error(msg);
@@ -49,7 +51,6 @@ public class ThumbnailManager {
     }
 
     public File getThumbnailFile() throws ResourceNotFoundException {
-        String thumbnailFile  = String.format("%s/%s.png", thumbnailDir, resourceHash);
         File file = new File(thumbnailFile);
         if (!file.exists()) {
             String msg = String.format("Thumbnail for resource '%s' not found.", resourceId);
@@ -57,6 +58,19 @@ public class ThumbnailManager {
             throw new ResourceNotFoundException(msg);
         }
         return file;
+    }
+
+    public void deleteThumbnailFile() throws ResourceNotFoundException {
+        File file = new File(thumbnailFile);
+        boolean deleted;
+        if (file.exists()) {
+            deleted = file.delete();
+            if (!deleted) {
+                String msg = String.format("Thumbnail for resource '%s' was not deleted.", resourceId);
+                logger.error(msg);
+                throw new RuntimeException(msg);
+            }
+        }
     }
 
     private String getResourceHash(String resourceId) throws RuntimeException {
