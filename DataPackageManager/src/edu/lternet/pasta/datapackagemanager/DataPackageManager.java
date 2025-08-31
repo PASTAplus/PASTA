@@ -37,6 +37,7 @@ import edu.lternet.pasta.common.edi.EdiToken;
 import edu.lternet.pasta.common.edi.IAM;
 import edu.lternet.pasta.datamanager.EMLDataManager;
 import edu.lternet.pasta.datamanager.StorageManager;
+import edu.lternet.pasta.datamanager.ThumbnailManager;
 import edu.lternet.pasta.datapackagemanager.checksum.DigestUtilsWrapper;
 import edu.lternet.pasta.datapackagemanager.dc.DublinCore;
 import edu.lternet.pasta.datapackagemanager.ore.ResourceMap;
@@ -2501,8 +2502,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		    revisionInt, entityId);
 
 		try {
-			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(
-			    dbDriver, dbURL, dbUser, dbPassword);
+			DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
 			hasDataPackage = dataPackageRegistry.hasDataPackage(scope, identifier,
 			    revision);
 
@@ -2583,30 +2583,23 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             String user
     ) throws Exception {
 
-        File file = null;
-        DataPackageRegistry dataPackageRegistry = null;
-        try {
-            Authorizer authorizer = new Authorizer(dataPackageRegistry);
-            boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
-            if (!isAuthorized) {
-                if (EDI_AUTH_USE) {
-                    EdiToken et = new EdiToken(ediToken);
-                    String cn = et.getCommonName();
-                    if (cn != null) {
-                        user = user + String.format(" (%s)", cn);
-                    }
+        File file;
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        Authorizer authorizer = new Authorizer(dataPackageRegistry);
+        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
                 }
-                String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
-                throw new ForbiddenException(msg);
             }
+            String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+            throw new ForbiddenException(msg);
         }
-        catch (ClassNotFoundException | SQLException e) {
-            String msg = String.format("The thumbnail image resource '%s' could not be found.", resourceId);
-            throw new UserErrorException(msg);
-        }
-
-        return file;
-
+       ThumbnailManager thumbnailManager = new ThumbnailManager(resourceId);
+       return thumbnailManager.getThumbnailFile();
     }
 
 	/**

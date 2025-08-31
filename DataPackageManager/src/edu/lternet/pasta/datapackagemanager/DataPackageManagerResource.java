@@ -2087,7 +2087,7 @@ public class DataPackageManagerResource extends PastaWebService {
      *         else returns a 404 Not Found response
      */
 
-    @GET @Path("/thumbnail/{resourceId}")
+    @GET @Path("/thumbnail/{resourceId: .*}")
     @Produces("image/png")
     public Response readResourceThumbnail (@Context HttpHeaders headers, @PathParam("resourceId") String resourceId) {
 
@@ -2122,7 +2122,6 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
                 throw new ForbiddenException(msg);
             }
-
 
             MediaType mediaType = MediaType.valueOf("image/png");
 
