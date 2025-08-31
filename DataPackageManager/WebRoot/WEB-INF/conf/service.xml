@@ -825,6 +825,74 @@
         </access>
     </pasta:service-method>
     
+    <pasta:service-method name="createResourceThumbnail">
+        <access
+            system="https://pasta.edirepository.org"
+            authSystem="https://pasta.edirepository.org/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>vetted</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="readResourceThumbnail">
+        <access
+            system="https://pasta.edirepository.org"
+            authSystem="https://pasta.edirepository.org/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>vetted</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>public</principal>
+                <permission>read</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="updateResourceThumbnail">
+        <access
+            system="https://pasta.edirepository.org"
+            authSystem="https://pasta.edirepository.org/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>vetted</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
+    <pasta:service-method name="deleteResourceThumbnail">
+        <access
+            system="https://pasta.edirepository.org"
+            authSystem="https://pasta.edirepository.org/authentication"
+            order="allowFirst">
+            <allow>
+                <principal>pasta</principal>
+                <permission>write</permission>
+            </allow>
+            <allow>
+                <principal>vetted</principal>
+                <permission>write</permission>
+            </allow>
+        </access>
+    </pasta:service-method>
+
     <pasta:service-method name="readDataPackageReportChecksum">
         <access
             system="https://pasta.edirepository.org"
