@@ -2008,8 +2008,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
     /**
      *
-     * <strong>Read Resource Thumbnail</strong> operation, specifying the resource (URL)
-     * identifier in the path.
+     * <strong>Read Resource Thumbnail</strong> operation, specifying the resource scope, identifier, revision, and
+     * optional entityId.
      *
      * <h4>Requests:</h4>
      * <table border="1" cellspacing="0" cellpadding="3">
@@ -2022,7 +2022,7 @@ public class DataPackageManagerResource extends PastaWebService {
      * <td align=center>none</td>
      * <td align=center>none</td>
      * <td><code>curl -i -X GET
-     * https://pasta.lternet.edu/package/thumbnail/https%3A%2F%2Fpasta.lternet.edu%2Fpackage%2Fdata%2Feml%2Fedi%2F100%2F1%2F23c8f9cce5a41d84ce7c2847a67070c2</code>
+     * https://pasta.lternet.edu/package/thumbnail/eml/edi/100/1/23c8f9cce5a41d84ce7c2847a67070c2</code>
      * </td>
      * </tr>
      * </table>
@@ -2087,9 +2087,13 @@ public class DataPackageManagerResource extends PastaWebService {
      *         else returns a 404 Not Found response
      */
 
-    @GET @Path("/thumbnail/{resourceId: .*}")
+    @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
     @Produces("image/png")
-    public Response readResourceThumbnail (@Context HttpHeaders headers, @PathParam("resourceId") String resourceId) {
+    public Response readResourceThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+
+    ) {
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
