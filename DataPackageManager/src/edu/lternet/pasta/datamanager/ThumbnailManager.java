@@ -15,31 +15,37 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
+/**
+ * The ThumbnailManager class is responsible for managing thumbnail files
+ * associated with specific resources. It interacts with a data package registry
+ * to retrieve resource details and manages thumbnail-related operations such as
+ * locating, retrieving, and deleting thumbnail files.
+ */
 public class ThumbnailManager {
 
-    private final String resourceHash;
     private final String resourceId;
-    private final String thumbnailDir;
     private final String thumbnailFile;
 
-    private static Logger logger = Logger.getLogger(DataPackageManager.class);
+    private static final Logger logger = Logger.getLogger(ThumbnailManager.class);
 
-    public  ThumbnailManager(String resourceId) throws UserErrorException, RuntimeException {
+    public  ThumbnailManager(String packageId, String resourceId) throws UserErrorException, RuntimeException {
 
         Options options = ConfigurationListener.getOptions();
         String dbDriver = options.getOption("dbDriver");
         String dbURL = options.getOption("dbURL");
         String dbUser = options.getOption("dbUser");
         String dbPassword = options.getOption("dbPassword");
-        thumbnailDir = options.getOption("datapackagemanager.thumbnailDir");
 
         this.resourceId = resourceId;
 
         try {
             DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
-            resourceHash = getResourceHash(resourceId);
-            thumbnailFile  = String.format("%s/%s.png", thumbnailDir, resourceHash);
-            if (!dataPackageRegistry.hasResource(resourceId)) {
+            if (dataPackageRegistry.hasResource(resourceId)) {
+                String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
+                String resourceHash = getResourceHash(resourceId);
+                thumbnailFile  = String.format("%s/%s/thumbnails/%s.png", resourceLocation, packageId, resourceHash);
+            }
+            else {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
                 logger.error(msg);
                 throw new UserErrorException(msg);

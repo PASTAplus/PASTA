@@ -2580,6 +2580,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
      * @return a File object
      */
     public File getResourceThumbnailFile(
+            String packageId,
             String resourceId,
             AuthToken authToken,
             String ediToken,
@@ -2601,7 +2602,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
             throw new ForbiddenException(msg);
         }
-       ThumbnailManager thumbnailManager = new ThumbnailManager(resourceId);
+       ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
        return thumbnailManager.getThumbnailFile();
     }
 
@@ -2618,6 +2619,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
      *            The username
      */
     public void deleteResourceThumbnailFile(
+            String packageId,
             String resourceId,
             AuthToken authToken,
             String ediToken,
@@ -2638,7 +2640,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
             throw new ForbiddenException(msg);
         }
-       ThumbnailManager thumbnailManager = new ThumbnailManager(resourceId);
+       ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
        thumbnailManager.deleteThumbnailFile();
     }
 

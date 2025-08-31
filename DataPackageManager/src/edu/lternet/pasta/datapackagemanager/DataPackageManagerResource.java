@@ -2081,8 +2081,14 @@ public class DataPackageManagerResource extends PastaWebService {
      * </tr>
      * </table>
      *
-     * @param resourceId
-     *            The unique and fully qualified resource (URL) identifier
+     * @param scope
+     *      The data package scope value
+     * @param identifier
+     *      The data package identifier value
+     * @param revision
+     *      The data package revision value
+     * @param entityId
+     *      The data package entity identifier value (optional)
      * @return a Response object containing a data entity size value if found,
      *         else returns a 404 Not Found response
      */
@@ -2092,7 +2098,9 @@ public class DataPackageManagerResource extends PastaWebService {
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
-
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision,
+            @PathParam("entityId") String entityId
     ) {
 
         ResponseBuilder responseBuilder = null;
@@ -2123,12 +2131,14 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
                 throw new ForbiddenException(msg);
             }
-            MediaType mediaType = MediaType.valueOf("image/png");
+            ResourceType resourceType = ResourceType.data;
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
-            File file = dataPackageManager.getResourceThumbnailFile(resourceId, authToken, ediToken, userId);
+            File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             if (file != null && file.exists()) {
                 long size = FileUtils.sizeOf(file);
-                responseBuilder = Response.ok(file, mediaType);
+                responseBuilder = Response.ok(file, "image/png");
                 responseBuilder.header("Content-Length", Long.toString(size));
                 response = responseBuilder.build();
             }
@@ -2154,7 +2164,80 @@ public class DataPackageManagerResource extends PastaWebService {
                             e.getMessage());
             response = webApplicationException.getResponse();
         }
+        response = stampHeader(response);
+        return response;
+    }
 
+    @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    @Produces("image/png")
+    public Response readResourceThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision
+    ) {
+
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "readResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.read;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            ResourceType resourceType = ResourceType.metadata;
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
+            DataPackageManager dataPackageManager = new DataPackageManager();
+            File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            if (file != null && file.exists()) {
+                long size = FileUtils.sizeOf(file);
+                responseBuilder = Response.ok(file, "image/png");
+                responseBuilder.header("Content-Length", Long.toString(size));
+                response = responseBuilder.build();
+            }
+            else {
+                String msg = String.format("A thumbnail for '%s' does not exist.", resourceId);
+                throw (new ResourceNotFoundException(msg));
+            }
+        } catch (IllegalArgumentException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (UserErrorException e) {
+            response = WebResponseFactory.makeBadRequest(e);
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+        }
         response = stampHeader(response);
         return response;
     }
@@ -2234,15 +2317,27 @@ public class DataPackageManagerResource extends PastaWebService {
      * </tr>
      * </table>
      *
-     * @param resourceId
-     *            The unique and fully qualified resource (URL) identifier
+     * @param scope
+     *      The data package scope value
+     * @param identifier
+     *      The data package identifier value
+     * @param revision
+     *      The data package revision value
+     * @param entityId
+     *      The data package entity identifier value (optional)
      * @return a Response object containing a data entity size value if found,
      *         else returns a 404 Not Found response
      */
 
-    @DELETE @Path("/thumbnail/{resourceId: .*}")
+    @DELETE @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
     @Produces("text/plain")
-    public Response deleteResourceThumbnail (@Context HttpHeaders headers, @PathParam("resourceId") String resourceId) {
+    public Response deleteResourceThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision,
+            @PathParam("entityId") String entityId
+    ) {
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2272,8 +2367,81 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
                 throw new ForbiddenException(msg);
             }
+            ResourceType resourceType = ResourceType.dataPackage;
+            if (entityId != null) {
+                resourceType = ResourceType.data;
+            }
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
-            dataPackageManager.deleteResourceThumbnailFile(resourceId, authToken, ediToken, userId);
+            dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
+            responseBuilder = Response.ok(responseMsg);
+            response = responseBuilder.build();
+        } catch (IllegalArgumentException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (UserErrorException e) {
+            response = WebResponseFactory.makeBadRequest(e);
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
+                            e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+        response = stampHeader(response);
+        return response;
+    }
+
+    @DELETE @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    @Produces("text/plain")
+    public Response deleteResourceThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision
+    ) {
+
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "deleteResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.write;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            ResourceType resourceType = ResourceType.metadata;
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
+            DataPackageManager dataPackageManager = new DataPackageManager();
+            dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             response = responseBuilder.build();
