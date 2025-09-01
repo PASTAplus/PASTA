@@ -2567,6 +2567,45 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	}
 
     /**
+     * Creates a data package resource thumbnail image file.
+     *
+     * @param resourceId
+     *            The unique and fully qualified resource (URL) identifier
+     * @param authToken
+     *            The PASTA authentication token
+     * @param ediToken
+     *            The EDI IAM token
+     * @param user
+     *            The username
+     * @return a File object
+     */
+    public void createResourceThumbnailFile(
+            String packageId,
+            String resourceId,
+            InputStream imageStream,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws Exception {
+
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        Authorizer authorizer = new Authorizer(dataPackageRegistry);
+        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
+                }
+            }
+            String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+            throw new ForbiddenException(msg);
+        }
+        ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
+        thumbnailManager.createThumbnailFile(imageStream);
+    }
+    /**
      * Returns a data package resource thumbnail image file.
      *
      * @param resourceId
@@ -2586,7 +2625,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             String ediToken,
             String user
     ) throws Exception {
-
         File file;
         DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
         Authorizer authorizer = new Authorizer(dataPackageRegistry);
@@ -2602,8 +2640,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
             String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
             throw new ForbiddenException(msg);
         }
-       ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
-       return thumbnailManager.getThumbnailFile();
+        ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
+        file = thumbnailManager.getThumbnailFile();
+        return file;
     }
 
     /**

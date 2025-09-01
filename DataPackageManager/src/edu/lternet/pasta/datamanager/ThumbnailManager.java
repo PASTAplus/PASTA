@@ -1,5 +1,6 @@
 package edu.lternet.pasta.datamanager;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
@@ -9,7 +10,7 @@ import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 import edu.ucsb.nceas.utilities.Options;
 import org.apache.log4j.Logger;
 
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,6 +25,7 @@ import java.sql.SQLException;
 public class ThumbnailManager {
 
     private final String resourceId;
+    private final String thumbnailDir;
     private final String thumbnailFile;
 
     private static final Logger logger = Logger.getLogger(ThumbnailManager.class);
@@ -43,7 +45,8 @@ public class ThumbnailManager {
             if (dataPackageRegistry.hasResource(resourceId)) {
                 String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
                 String resourceHash = getResourceHash(resourceId);
-                thumbnailFile  = String.format("%s/%s/thumbnails/%s.png", resourceLocation, packageId, resourceHash);
+                thumbnailDir = String.format("%s/%s/thumbnails", resourceLocation, packageId);
+                thumbnailFile  = String.format("%s/%s.png", thumbnailDir, resourceHash);
             }
             else {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
@@ -53,6 +56,26 @@ public class ThumbnailManager {
         } catch (SQLException | ClassNotFoundException e) {
             logger.error(e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public void createThumbnailFile(InputStream imageStream) throws RuntimeException {
+        File thumbnailDir = new File(this.thumbnailDir);
+        if (!thumbnailDir.exists()) {
+            if (!thumbnailDir.mkdirs()) {
+                String msg = String.format("Failed to create thumbnail directory '%s'.", this.thumbnailDir);
+                throw new RuntimeException(msg);
+            }
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(thumbnailFile)) {
+            byte[] thumbnailPng = readAllBytes(imageStream);
+            fos.write(thumbnailPng);
+        }
+        catch (IOException e) {
+            logger.error(e);
+            String msg = String.format("Thumbnail for resource '%s' failed to be created.", resourceId);
+            throw new RuntimeException(msg);
         }
     }
 
@@ -66,7 +89,7 @@ public class ThumbnailManager {
         return file;
     }
 
-    public void deleteThumbnailFile() throws ResourceNotFoundException {
+    public void deleteThumbnailFile() throws RuntimeException {
         File file = new File(thumbnailFile);
         boolean deleted;
         if (file.exists()) {
@@ -98,6 +121,21 @@ public class ThumbnailManager {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        final int BUFFER_SIZE = 4096;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[BUFFER_SIZE];
+
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+
+        buffer.flush();
+        return buffer.toByteArray();
     }
     
 }
