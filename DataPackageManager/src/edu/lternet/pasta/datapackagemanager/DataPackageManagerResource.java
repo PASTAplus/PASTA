@@ -2142,8 +2142,6 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             response = responseBuilder.build();
-        } catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
         } catch (ForbiddenException e) {
@@ -2152,17 +2150,82 @@ public class DataPackageManagerResource extends PastaWebService {
             response = WebExceptionFactory.makeNotFound(e).getResponse();
         } catch (ResourceDeletedException | ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (UserErrorException e) {
-            response = WebResponseFactory.makeBadRequest(e);
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (Exception e) {
             WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+        response = stampHeader(response);
+        return response;
+    }    @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    @Consumes("image/png")
+    @Produces("text/plain")
+    public Response createResourceThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision,
+            InputStream imageStream
+    ) {
+
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "readResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.read;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            ResourceType resourceType = ResourceType.metadata;
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
+            DataPackageManager dataPackageManager = new DataPackageManager();
+            dataPackageManager.createResourceThumbnailFile(packageId, resourceId, imageStream, authToken, ediToken, userId);
+            String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
+            responseBuilder = Response.ok(responseMsg);
+            response = responseBuilder.build();
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
             response = webApplicationException.getResponse();
         }
         response = stampHeader(response);
         return response;
     }
+
+
     /**
      *
      * <strong>Read Resource Thumbnail</strong> operation, specifying the resource scope, identifier, revision, and
@@ -2303,8 +2366,6 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("A thumbnail for '%s' does not exist.", resourceId);
                 throw (new ResourceNotFoundException(msg));
             }
-        } catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
         } catch (ForbiddenException e) {
@@ -2313,12 +2374,11 @@ public class DataPackageManagerResource extends PastaWebService {
             response = WebExceptionFactory.makeNotFound(e).getResponse();
         } catch (ResourceDeletedException | ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (UserErrorException e) {
-            response = WebResponseFactory.makeBadRequest(e);
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (Exception e) {
             WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
             response = webApplicationException.getResponse();
         }
         response = stampHeader(response);
@@ -2377,8 +2437,6 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("A thumbnail for '%s' does not exist.", resourceId);
                 throw (new ResourceNotFoundException(msg));
             }
-        } catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
         } catch (ForbiddenException e) {
@@ -2387,12 +2445,11 @@ public class DataPackageManagerResource extends PastaWebService {
             response = WebExceptionFactory.makeNotFound(e).getResponse();
         } catch (ResourceDeletedException | ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (UserErrorException e) {
-            response = WebResponseFactory.makeBadRequest(e);
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (Exception e) {
             WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
             response = webApplicationException.getResponse();
         }
         response = stampHeader(response);
@@ -2535,8 +2592,6 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             response = responseBuilder.build();
-        } catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
         } catch (ForbiddenException e) {
@@ -2545,12 +2600,11 @@ public class DataPackageManagerResource extends PastaWebService {
             response = WebExceptionFactory.makeNotFound(e).getResponse();
         } catch (ResourceDeletedException | ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (UserErrorException e) {
-            response = WebResponseFactory.makeBadRequest(e);
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (Exception e) {
             WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
             response = webApplicationException.getResponse();
         }
         response = stampHeader(response);
@@ -2602,8 +2656,6 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             response = responseBuilder.build();
-        } catch (IllegalArgumentException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
         } catch (ForbiddenException e) {
@@ -2612,15 +2664,13 @@ public class DataPackageManagerResource extends PastaWebService {
             response = WebExceptionFactory.makeNotFound(e).getResponse();
         } catch (ResourceDeletedException | ResourceExistsException e) {
             response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (UserErrorException e) {
-            response = WebResponseFactory.makeBadRequest(e);
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
         } catch (Exception e) {
             WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e,
-                            e.getMessage());
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
             response = webApplicationException.getResponse();
         }
-
         response = stampHeader(response);
         return response;
     }
