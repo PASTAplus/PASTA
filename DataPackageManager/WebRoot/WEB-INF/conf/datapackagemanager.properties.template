@@ -115,6 +115,8 @@ datapackagemanager.readOnly=false
 datapackagemanager.protocol=http
 datapackagemanager.host=package.lternet.edu
 datapackagemanager.port=8080
+datapackagemanager.maxThumbnailSize=204800
+
 
 # EDI IAM properties
 edi.test.edi.token=EDI_TEST_TOKEN
