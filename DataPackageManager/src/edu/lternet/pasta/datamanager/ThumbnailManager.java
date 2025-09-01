@@ -27,6 +27,7 @@ public class ThumbnailManager {
     private final String resourceId;
     private final String thumbnailDir;
     private final String thumbnailFile;
+    private final Integer maxThumbnailSize;
 
     private static final Logger logger = Logger.getLogger(ThumbnailManager.class);
 
@@ -37,6 +38,7 @@ public class ThumbnailManager {
         String dbURL = options.getOption("dbURL");
         String dbUser = options.getOption("dbUser");
         String dbPassword = options.getOption("dbPassword");
+        maxThumbnailSize = Integer.valueOf(options.getOption("datapackagemanager.maxThumbnailSize"));
 
         this.resourceId = resourceId;
 
@@ -67,9 +69,12 @@ public class ThumbnailManager {
                 throw new RuntimeException(msg);
             }
         }
-
         try (FileOutputStream fos = new FileOutputStream(thumbnailFile)) {
             byte[] thumbnailPng = readAllBytes(imageStream);
+            if (thumbnailPng.length > maxThumbnailSize) {
+                String msg = String.format("Thumbnail image size (%db) exceeds max allowed thumbnail size (%db). ", thumbnailPng.length, maxThumbnailSize);
+                throw new UserErrorException(msg);
+            }
             fos.write(thumbnailPng);
         }
         catch (IOException e) {
