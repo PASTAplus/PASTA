@@ -921,6 +921,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
                 catch (Exception e) {
                     String msg = "EDI Authorization Error: " + e.getMessage();
                     logger.error(msg);
+                    throw new UserErrorException(msg);
                 }
             }
 		    catch (IOException e) {
