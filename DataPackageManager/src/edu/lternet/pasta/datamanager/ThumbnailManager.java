@@ -13,6 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 /**
  * The ThumbnailManager class is responsible for managing thumbnail files
@@ -29,7 +33,7 @@ public class ThumbnailManager {
 
     private static final Logger logger = Logger.getLogger(ThumbnailManager.class);
 
-    public  ThumbnailManager(String packageId, String resourceId) throws UserErrorException, RuntimeException {
+    public  ThumbnailManager(String packageId, String resourceId) throws RuntimeException {
 
         Options options = ConfigurationListener.getOptions();
         String dbDriver = options.getOption("dbDriver");
@@ -46,7 +50,7 @@ public class ThumbnailManager {
                 String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
                 String resourceHash = getResourceHash(resourceId);
                 thumbnailDir = String.format("%s/%s/thumbnails", resourceLocation, packageId);
-                thumbnailFile  = String.format("%s/%s.jpeg", thumbnailDir, resourceHash);
+                thumbnailFile = String.format("%s/%s", thumbnailDir, resourceHash);
             }
             else {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
@@ -68,12 +72,18 @@ public class ThumbnailManager {
             }
         }
         try (FileOutputStream fos = new FileOutputStream(thumbnailFile)) {
-            byte[] thumbnailPng = readAllBytes(imageStream);
-            if (thumbnailPng.length > maxThumbnailSize) {
-                String msg = String.format("Thumbnail image size (%db) exceeds max allowed thumbnail size (%db). ", thumbnailPng.length, maxThumbnailSize);
+            byte[] thumbnailImage = readAllBytes(imageStream);
+            if (thumbnailImage.length > maxThumbnailSize) {
+                String msg = String.format("Thumbnail image size (%db) exceeds max allowed thumbnail size (%db).", thumbnailImage.length, maxThumbnailSize);
                 throw new UserErrorException(msg);
             }
-            fos.write(thumbnailPng);
+            fos.write(thumbnailImage);
+            String imageType = getImageType(new File(thumbnailFile));
+            if (!imageType.equals("jpeg") && !imageType.equals("png")) {
+                // deleteThumbnailFile();
+                String msg = String.format("Image type '%s' is not supported.", imageType);
+                throw new UserErrorException(msg);
+            }
         }
         catch (IOException e) {
             logger.error(e);
@@ -129,16 +139,24 @@ public class ThumbnailManager {
     private byte[] readAllBytes(InputStream inputStream) throws IOException {
         final int BUFFER_SIZE = 4096;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
         int nRead;
         byte[] data = new byte[BUFFER_SIZE];
-
         while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
             buffer.write(data, 0, nRead);
         }
-
         buffer.flush();
         return buffer.toByteArray();
     }
-    
+
+    public static String getImageType(File file) throws IOException {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (readers.hasNext()) {
+                ImageReader reader = readers.next();
+                reader.dispose();
+                return reader.getFormatName();
+            }
+        }
+        return "unknown";
+    }
 }

@@ -39,6 +39,7 @@ import edu.lternet.pasta.common.security.authorization.InvalidPermissionExceptio
 import edu.lternet.pasta.common.security.authorization.Rule;
 import edu.lternet.pasta.common.security.token.AttrListAuthTokenV1;
 import edu.lternet.pasta.common.security.token.AuthToken;
+import edu.lternet.pasta.datamanager.ThumbnailManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageManager.ResourceType;
 import edu.lternet.pasta.datapackagemanager.xslt.XsltUtil;
 import edu.lternet.pasta.eventmanager.EmlSubscription;
@@ -2095,7 +2096,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
 
     @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Consumes("image/jpeg")
+    @Consumes({"image/jpeg", "image/png"})
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2134,6 +2135,11 @@ public class DataPackageManagerResource extends PastaWebService {
                 String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
                 throw new ForbiddenException(msg);
             }
+            String contentType = String.valueOf(headers.getMediaType());
+            if (!contentType.equalsIgnoreCase("image/jpeg") && !contentType.equalsIgnoreCase("image/png")) {
+                String msg = String.format("Content-type '%s' must be either 'image/jpeg' or 'image/png'.",  contentType);
+                throw new UserErrorException(msg);
+            }
             ResourceType resourceType = ResourceType.data;
             String packageId = String.format("%s.%d.%d", scope, identifier, revision);
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
@@ -2159,8 +2165,10 @@ public class DataPackageManagerResource extends PastaWebService {
         }
         response = stampHeader(response);
         return response;
-    }    @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Consumes("image/jpeg")
+    }
+
+    @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    @Consumes({"image/jpeg", "image/png"})
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2197,6 +2205,11 @@ public class DataPackageManagerResource extends PastaWebService {
                 }
                 String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
                 throw new ForbiddenException(msg);
+            }
+            String contentType = String.valueOf(headers.getMediaType());
+            if (!contentType.equalsIgnoreCase("image/jpeg") && !contentType.equalsIgnoreCase("image/png")) {
+                String msg = String.format("Content-type '%s' must be either 'image/jpeg' or 'image/png'.",  contentType);
+                throw new UserErrorException(msg);
             }
             ResourceType resourceType = ResourceType.metadata;
             String packageId = String.format("%s.%d.%d", scope, identifier, revision);
@@ -2314,7 +2327,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Produces("image/jpeg")
+    @Produces({"image/jpeg", "image/png"})
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2356,9 +2369,15 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            String imageType = ThumbnailManager.getImageType(file);
+            if (!imageType.equalsIgnoreCase("png") && !imageType.equalsIgnoreCase("jpeg")) {
+                String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
+                throw new RuntimeException(msg);
+            }
+            String mimeType = String.format("image/%s", imageType);
             if (file != null && file.exists()) {
                 long size = FileUtils.sizeOf(file);
-                responseBuilder = Response.ok(file, "image/png");
+                responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
                 response = responseBuilder.build();
             }
@@ -2386,7 +2405,7 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Produces("image/jpeg")
+    @Produces({"image/jpeg", "image/png"})
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2427,9 +2446,15 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            String imageType = ThumbnailManager.getImageType(file);
+            if (!imageType.equalsIgnoreCase("png") && !imageType.equalsIgnoreCase("jpeg")) {
+                String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
+                throw new RuntimeException(msg);
+            }
+            String mimeType = String.format("image/%s", imageType);
             if (file != null && file.exists()) {
                 long size = FileUtils.sizeOf(file);
-                responseBuilder = Response.ok(file, "image/png");
+                responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
                 response = responseBuilder.build();
             }
