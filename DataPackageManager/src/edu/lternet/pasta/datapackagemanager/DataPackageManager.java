@@ -305,8 +305,13 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	/**
 	 * Composes a resource identifier for a given resource type.
 	 */
-	public static String composeResourceId(ResourceType resourceType,
-	    String scope, Integer identifier, Integer revision, String entityId) {
+	public static String composeResourceId(
+            ResourceType resourceType,
+            String scope,
+            Integer identifier,
+            Integer revision,
+            String entityId
+    ) {
 		String resourceId = null;
 		String uriDocidPart = scope + SLASH + identifier + SLASH + revision;
 
@@ -2606,6 +2611,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
         thumbnailManager.createThumbnailFile(imageStream);
     }
+    
     /**
      * Returns a data package resource thumbnail image file.
      *
