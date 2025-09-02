@@ -2108,8 +2108,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
-        final String serviceMethodName = "readResourceThumbnail";
-        Rule.Permission permission = Rule.Permission.read;
+        final String serviceMethodName = "createResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.write;
 
         String userId;
         String cn = null;
@@ -2172,8 +2172,8 @@ public class DataPackageManagerResource extends PastaWebService {
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
-        final String serviceMethodName = "readResourceThumbnail";
-        Rule.Permission permission = Rule.Permission.read;
+        final String serviceMethodName = "createResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.write;
 
         String userId;
         String cn = null;
