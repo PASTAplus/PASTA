@@ -79,8 +79,8 @@ public class ThumbnailManager {
             }
             fos.write(thumbnailImage);
             String imageType = getImageType(new File(thumbnailFile));
-            if (!imageType.equals("jpeg") && !imageType.equals("png")) {
-                // deleteThumbnailFile();
+            if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
+                deleteThumbnailFile();
                 String msg = String.format("Image type '%s' is not supported.", imageType);
                 throw new UserErrorException(msg);
             }
