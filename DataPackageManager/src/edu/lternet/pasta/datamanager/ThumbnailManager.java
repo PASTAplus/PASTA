@@ -1,10 +1,8 @@
 package edu.lternet.pasta.datamanager;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import edu.lternet.pasta.common.ResourceNotFoundException;
 import edu.lternet.pasta.common.UserErrorException;
 import edu.lternet.pasta.datapackagemanager.ConfigurationListener;
-import edu.lternet.pasta.datapackagemanager.DataPackageManager;
 import edu.lternet.pasta.datapackagemanager.DataPackageRegistry;
 
 import edu.ucsb.nceas.utilities.Options;
