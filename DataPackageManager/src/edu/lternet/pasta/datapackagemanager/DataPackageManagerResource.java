@@ -2095,7 +2095,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
 
     @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Consumes("image/png")
+    @Consumes("image/jpeg")
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2160,7 +2160,7 @@ public class DataPackageManagerResource extends PastaWebService {
         response = stampHeader(response);
         return response;
     }    @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Consumes("image/png")
+    @Consumes("image/jpeg")
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2314,7 +2314,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Produces("image/png")
+    @Produces("image/jpeg")
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2386,7 +2386,7 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Produces("image/png")
+    @Produces("image/jpeg")
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,

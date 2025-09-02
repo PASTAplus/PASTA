@@ -48,7 +48,7 @@ public class ThumbnailManager {
                 String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
                 String resourceHash = getResourceHash(resourceId);
                 thumbnailDir = String.format("%s/%s/thumbnails", resourceLocation, packageId);
-                thumbnailFile  = String.format("%s/%s.png", thumbnailDir, resourceHash);
+                thumbnailFile  = String.format("%s/%s.jpeg", thumbnailDir, resourceHash);
             }
             else {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
