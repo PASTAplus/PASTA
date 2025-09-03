@@ -115,6 +115,7 @@ datapackagemanager.readOnly=false
 datapackagemanager.protocol=http
 datapackagemanager.host=package.lternet.edu
 datapackagemanager.port=8080
+datapackagemanager.thumbnailsDir=/home/pasta/local/thumbnails
 datapackagemanager.maxThumbnailSize=204800
 
 

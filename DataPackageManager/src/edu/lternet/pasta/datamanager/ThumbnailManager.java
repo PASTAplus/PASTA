@@ -28,6 +28,7 @@ import javax.imageio.stream.ImageInputStream;
  */
 public class ThumbnailManager {
 
+    private final String packageId;
     private final String resourceId;
     private final String thumbnailDir;
     private final String thumbnailFile;
@@ -38,21 +39,21 @@ public class ThumbnailManager {
     public  ThumbnailManager(String packageId, String resourceId) throws RuntimeException {
 
         Options options = ConfigurationListener.getOptions();
+        thumbnailDir = options.getOption("datapackagemanager.thumbnailsDir");
+        maxThumbnailSize = Integer.valueOf(options.getOption("datapackagemanager.maxThumbnailSize"));
         String dbDriver = options.getOption("dbDriver");
         String dbURL = options.getOption("dbURL");
         String dbUser = options.getOption("dbUser");
         String dbPassword = options.getOption("dbPassword");
-        maxThumbnailSize = Integer.valueOf(options.getOption("datapackagemanager.maxThumbnailSize"));
 
+        this.packageId = packageId;
         this.resourceId = resourceId;
 
         try {
             DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
             if (dataPackageRegistry.hasResource(resourceId)) {
-                String resourceLocation = dataPackageRegistry.getResourceLocation(resourceId);
                 String resourceHash = getResourceHash(resourceId);
-                thumbnailDir = String.format("%s/%s/thumbnails", resourceLocation, packageId);
-                thumbnailFile = String.format("%s/%s", thumbnailDir, resourceHash);
+                thumbnailFile = String.format("%s/%s/%s", thumbnailDir, packageId, resourceHash);
             }
             else {
                 String msg = String.format("Resource '%s' not found in resource registry.", resourceId);
@@ -66,10 +67,11 @@ public class ThumbnailManager {
     }
 
     public void createThumbnailFile(InputStream imageStream) throws RuntimeException {
-        File thumbnailDir = new File(this.thumbnailDir);
+        String thumbnailDirPath = String.format("%s/%s", this.thumbnailDir, packageId);
+        File thumbnailDir = new File(thumbnailDirPath);
         if (!thumbnailDir.exists()) {
             if (!thumbnailDir.mkdirs()) {
-                String msg = String.format("Failed to create thumbnail directory '%s'.", this.thumbnailDir);
+                String msg = String.format("Failed to create thumbnail directory '%s'.", thumbnailDirPath);
                 throw new RuntimeException(msg);
             }
         }
@@ -80,8 +82,8 @@ public class ThumbnailManager {
                 throw new UserErrorException(msg);
             }
             fos.write(thumbnailImage);
-            String imageType = getImageType(thumbnailFile);
-            if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
+            String imageType = getImageType(thumbnailFile).toLowerCase();
+            if (!imageType.equals("jpeg") && !imageType.equals("png")) {
                 deleteThumbnailFile();
                 String msg = String.format("Image type '%s' is not supported.", imageType);
                 throw new UserErrorException(msg);
