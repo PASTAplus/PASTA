@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -78,8 +80,7 @@ public class ThumbnailManager {
                 throw new UserErrorException(msg);
             }
             fos.write(thumbnailImage);
-            File file = new File(thumbnailFile);
-            String imageType = getImageType(file);
+            String imageType = getImageType(thumbnailFile);
             if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
                 deleteThumbnailFile();
                 String msg = String.format("Image type '%s' is not supported.", imageType);
@@ -116,6 +117,22 @@ public class ThumbnailManager {
         }
     }
 
+    public String getThumbnailFileType() {
+        String imageType = "unknown";
+        try {
+            imageType = getImageType(thumbnailFile);
+            if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
+                deleteThumbnailFile();
+                String msg = String.format("Image type '%s' is not supported.", imageType);
+                throw new UserErrorException(msg);
+            }
+        }
+        catch (IOException e) {
+          logger.error(e);
+        }
+        return imageType;
+    }
+
     private String getResourceHash(String resourceId) throws RuntimeException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -149,8 +166,9 @@ public class ThumbnailManager {
         return buffer.toByteArray();
     }
 
-    public static String getImageType(File file) throws IOException {
-        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+    private static String getImageType(String file) throws IOException {
+        InputStream fileInputStream = Files.newInputStream(Paths.get(file));
+        try (ImageInputStream iis = ImageIO.createImageInputStream(fileInputStream)) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
             if (readers.hasNext()) {
                 ImageReader reader = readers.next();

@@ -2611,7 +2611,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
         thumbnailManager.createThumbnailFile(imageStream);
     }
-    
+
     /**
      * Returns a data package resource thumbnail image file.
      *
@@ -2688,6 +2688,46 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         }
        ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
        thumbnailManager.deleteThumbnailFile();
+    }
+
+    /**
+     * Returns a data package resource thumbnail image file type.
+     *
+     * @param resourceId
+     *            The unique and fully qualified resource (URL) identifier
+     * @param authToken
+     *            The PASTA authentication token
+     * @param ediToken
+     *            The EDI IAM token
+     * @param user
+     *            The username
+     * @return a File object
+     */
+    public String getResourceThumbnailType(
+            String packageId,
+            String resourceId,
+            AuthToken authToken,
+            String ediToken,
+            String user
+    ) throws Exception {
+        String imageType;
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        Authorizer authorizer = new Authorizer(dataPackageRegistry);
+        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
+                }
+            }
+            String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+            throw new ForbiddenException(msg);
+        }
+        ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
+        imageType = thumbnailManager.getThumbnailFileType();
+        return imageType;
     }
 
 	/**

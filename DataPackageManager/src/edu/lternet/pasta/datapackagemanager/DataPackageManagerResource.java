@@ -2369,7 +2369,7 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
-            String imageType = ThumbnailManager.getImageType(file).toLowerCase();
+            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId).toLowerCase();
             if (!imageType.equals("png") && !imageType.equals("jpeg")) {
                 String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
                 throw new RuntimeException(msg);
@@ -2446,7 +2446,7 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
-            String imageType = ThumbnailManager.getImageType(file).toLowerCase();
+            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId).toLowerCase();
             if (!imageType.equals("png") && !imageType.equals("jpeg")) {
                 String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
                 throw new RuntimeException(msg);
