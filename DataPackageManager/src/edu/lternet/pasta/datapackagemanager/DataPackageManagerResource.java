@@ -2006,94 +2006,210 @@ public class DataPackageManagerResource extends PastaWebService {
 		return response;
 	}
 
-    /**
-     *
-     * <strong>Create Resource Thumbnail</strong> operation, specifying the resource scope, identifier, revision, and
-     * optional entityId, providing the thumbnail PNG image in the message body as multipart/form-data.
-     *
-     * <h4>Requests:</h4>
-     * <table border="1" cellspacing="0" cellpadding="3">
-     * <tr>
-     * <th><b>Message Body</b></th>
-     * <th><b>MIME type</b></th>
-     * <th><b>Sample Request</b></th>
-     * </tr>
-     * <tr>
-     * <td align=center>none</td>
-     * <td align=center>none</td>
-     * <td><code>curl -i -X POST
-     * https://pasta.lternet.edu/package/thumbnail/eml/edi/100/1/23c8f9cce5a41d84ce7c2847a67070c2
-     * -H "Content-Type: image/png" --data-binary @/path/to/png/image.png
-     * </code>
-     * </td>
-     * </tr>
-     * </table>
-     *
-     * <h4>Responses:</h4>
-     * <table border="1" cellspacing="0" cellpadding="3">
-     * <tr>
-     * <th><b>Status</b></th>
-     * <th><b>Reason</b></th>
-     * <th><b>Message Body</b></th>
-     * <th><b>MIME type</b></th>
-     * <th><b>Sample Message Body</b></th>
-     * </tr>
-     * <tr>
-     * <td align=center>200 OK</td>
-     * <td align=center>The request to upload the thumbnail image was successful</td>
-     * <td align=center>The thumbnail image data.</td>
-     * <td align=center><code>image/png</code></td>
-     * <td><code>base64-encoded image data</code></td>
-     * </tr>
-     * <tr>
-     * <td align=center>400 Bad Request</td>
-     * <td align=center>The resource (URL) identifier does not match an existing resource</td>
-     * <td align=center>An error message</td>
-     * <td align=center><code>text/plain</code></td>
-     * <td align=center><code>Error message</code></td>
-     * </tr>
-     * <tr>
-     * <td align=center>401 Unauthorized</td>
-     * <td align=center>The requesting user is not authorized to read the thumbnail image</td>
-     * <td align=center>An error message</td>
-     * <td align=center><code>text/plain</code></td>
-     * <td align=center><code>Error message</code></td>
-     * </tr>
-     * <tr>
-     * <td align=center>404 Not Found</td>
-     * <td align=center>The data package resource thumbnail was not found</td>
-     * <td align=center>An error message</td>
-     * <td align=center><code>text/plain</code></td>
-     * <td align=center><code>Error message</code></td>
-     * </tr>
-     * <tr>
-     * <td align=center>405 Method Not Allowed</td>
-     * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
-     * <td align=center>An error message</td>
-     * <td align=center><code>text/plain</code></td>
-     * <td align=center><code>Error message</code></td>
-     * </tr>
-     * <tr>
-     * <td align=center>500 Internal Server Error</td>
-     * <td align=center>The server encountered an unexpected condition which
-     * prevented it from fulfilling the request</td>
-     * <td align=center>An error message</td>
-     * <td align=center><code>text/plain</code></td>
-     * <td align=center><code>Error message</code></td>
-     * </tr>
-     * </table>
-     *
-     * @param scope
-     *      The data package scope value
-     * @param identifier
-     *      The data package identifier value
-     * @param revision
-     *      The data package revision value
-     * @param entityId
-     *      The data package entity identifier value (optional)
-     * @return a Response object containing a data entity size value if found,
-     *         else returns a 404 Not Found response
-     */
+    @OPTIONS @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
+    public Response thumbnailPreflight (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision,
+            @PathParam("entityId") String entityId
+    ) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "thumbnailPreflight";
+        Rule.Permission permission = Rule.Permission.read;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            responseBuilder = Response.ok();
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            response = responseBuilder.build();
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+        response = stampHeader(response);
+        return response;
+    }
+
+    @OPTIONS @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    public Response thumbnailPreflight (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision
+    ) {
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "thumbnailPreflight";
+        Rule.Permission permission = Rule.Permission.read;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            responseBuilder = Response.ok();
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            response = responseBuilder.build();
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+        response = stampHeader(response);
+        return response;
+    }
+
+
+        /**
+         *
+         * <strong>Create Resource Thumbnail</strong> operation, specifying the resource scope, identifier, revision, and
+         * optional entityId, providing the thumbnail PNG image in the message body as multipart/form-data.
+         *
+         * <h4>Requests:</h4>
+         * <table border="1" cellspacing="0" cellpadding="3">
+         * <tr>
+         * <th><b>Message Body</b></th>
+         * <th><b>MIME type</b></th>
+         * <th><b>Sample Request</b></th>
+         * </tr>
+         * <tr>
+         * <td align=center>none</td>
+         * <td align=center>none</td>
+         * <td><code>curl -i -X POST
+         * https://pasta.lternet.edu/package/thumbnail/eml/edi/100/1/23c8f9cce5a41d84ce7c2847a67070c2
+         * -H "Content-Type: image/png" --data-binary @/path/to/png/image.png
+         * </code>
+         * </td>
+         * </tr>
+         * </table>
+         *
+         * <h4>Responses:</h4>
+         * <table border="1" cellspacing="0" cellpadding="3">
+         * <tr>
+         * <th><b>Status</b></th>
+         * <th><b>Reason</b></th>
+         * <th><b>Message Body</b></th>
+         * <th><b>MIME type</b></th>
+         * <th><b>Sample Message Body</b></th>
+         * </tr>
+         * <tr>
+         * <td align=center>200 OK</td>
+         * <td align=center>The request to upload the thumbnail image was successful</td>
+         * <td align=center>The thumbnail image data.</td>
+         * <td align=center><code>image/png</code></td>
+         * <td><code>base64-encoded image data</code></td>
+         * </tr>
+         * <tr>
+         * <td align=center>400 Bad Request</td>
+         * <td align=center>The resource (URL) identifier does not match an existing resource</td>
+         * <td align=center>An error message</td>
+         * <td align=center><code>text/plain</code></td>
+         * <td align=center><code>Error message</code></td>
+         * </tr>
+         * <tr>
+         * <td align=center>401 Unauthorized</td>
+         * <td align=center>The requesting user is not authorized to read the thumbnail image</td>
+         * <td align=center>An error message</td>
+         * <td align=center><code>text/plain</code></td>
+         * <td align=center><code>Error message</code></td>
+         * </tr>
+         * <tr>
+         * <td align=center>404 Not Found</td>
+         * <td align=center>The data package resource thumbnail was not found</td>
+         * <td align=center>An error message</td>
+         * <td align=center><code>text/plain</code></td>
+         * <td align=center><code>Error message</code></td>
+         * </tr>
+         * <tr>
+         * <td align=center>405 Method Not Allowed</td>
+         * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+         * <td align=center>An error message</td>
+         * <td align=center><code>text/plain</code></td>
+         * <td align=center><code>Error message</code></td>
+         * </tr>
+         * <tr>
+         * <td align=center>500 Internal Server Error</td>
+         * <td align=center>The server encountered an unexpected condition which
+         * prevented it from fulfilling the request</td>
+         * <td align=center>An error message</td>
+         * <td align=center><code>text/plain</code></td>
+         * <td align=center><code>Error message</code></td>
+         * </tr>
+         * </table>
+         *
+         * @param scope
+         *      The data package scope value
+         * @param identifier
+         *      The data package identifier value
+         * @param revision
+         *      The data package revision value
+         * @param entityId
+         *      The data package entity identifier value (optional)
+         * @return a Response object containing a data entity size value if found,
+         *         else returns a 404 Not Found response
+         */
 
     @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
     @Consumes({"image/jpeg", "image/png"})
@@ -2147,6 +2263,7 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.createResourceThumbnailFile(packageId, resourceId, imageStream, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2218,6 +2335,7 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.createResourceThumbnailFile(packageId, resourceId, imageStream, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2379,6 +2497,7 @@ public class DataPackageManagerResource extends PastaWebService {
                 long size = FileUtils.sizeOf(file);
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
+                responseBuilder.header("Access-Control-Allow-Origin", "*");
                 response = responseBuilder.build();
             }
             else {
@@ -2456,6 +2575,7 @@ public class DataPackageManagerResource extends PastaWebService {
                 long size = FileUtils.sizeOf(file);
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
+                responseBuilder.header("Access-Control-Allow-Origin", "*");
                 response = responseBuilder.build();
             }
             else {
@@ -2616,6 +2736,7 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2680,6 +2801,7 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
