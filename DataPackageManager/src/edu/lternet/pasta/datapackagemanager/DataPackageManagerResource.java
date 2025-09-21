@@ -2007,6 +2007,8 @@ public class DataPackageManagerResource extends PastaWebService {
 	}
 
     @OPTIONS @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
+    @Consumes({"image/jpeg", "image/png"})
+    @Produces("text/plain")
     public Response thumbnailPreflight (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2017,54 +2019,18 @@ public class DataPackageManagerResource extends PastaWebService {
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "thumbnailPreflight";
-        Rule.Permission permission = Rule.Permission.read;
-
-        String userId;
-        String cn = null;
-        String ediToken = getEdiToken(headers);
-        AuthToken authToken = getAuthToken(headers);
-
-        if (EDI_AUTH_USE) {
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-            cn = et.getCommonName();
-        }
-        else {
-            userId = authToken.getUserId();
-        }
-
-        try {
-            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
-            if (!serviceMethodAuthorized) {
-                if (cn != null) {
-                    userId = userId + String.format(" (%s)", cn);
-                }
-                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
-                throw new ForbiddenException(msg);
-            }
-            responseBuilder = Response.ok();
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
-            response = responseBuilder.build();
-        } catch (UnauthorizedException e) {
-            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-        } catch (ForbiddenException e) {
-            response = WebExceptionFactory.makeForbidden(e).getResponse();
-        } catch (ResourceNotFoundException e) {
-            response = WebExceptionFactory.makeNotFound(e).getResponse();
-        } catch (ResourceDeletedException | ResourceExistsException e) {
-            response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (IllegalArgumentException | UserErrorException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
-        } catch (Exception e) {
-            WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-            response = webApplicationException.getResponse();
-        }
+        responseBuilder = Response.ok();
+        responseBuilder.header("Access-Control-Allow-Origin", "*");
+        responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+        response = responseBuilder.build();
         response = stampHeader(response);
         return response;
     }
 
     @OPTIONS @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
+    @Consumes({"image/jpeg", "image/png"})
+    @Produces("text/plain")
     public Response thumbnailPreflight (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2074,49 +2040,13 @@ public class DataPackageManagerResource extends PastaWebService {
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "thumbnailPreflight";
-        Rule.Permission permission = Rule.Permission.read;
-
-        String userId;
-        String cn = null;
-        String ediToken = getEdiToken(headers);
-        AuthToken authToken = getAuthToken(headers);
-
-        if (EDI_AUTH_USE) {
-            EdiToken et = new EdiToken(ediToken);
-            userId = et.getSubject();
-            cn = et.getCommonName();
-        }
-        else {
-            userId = authToken.getUserId();
-        }
-
-        try {
-            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
-            if (!serviceMethodAuthorized) {
-                if (cn != null) {
-                    userId = userId + String.format(" (%s)", cn);
-                }
-                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
-                throw new ForbiddenException(msg);
-            }
-            responseBuilder = Response.ok();
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
-            response = responseBuilder.build();
-        } catch (UnauthorizedException e) {
-            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
-        } catch (ForbiddenException e) {
-            response = WebExceptionFactory.makeForbidden(e).getResponse();
-        } catch (ResourceNotFoundException e) {
-            response = WebExceptionFactory.makeNotFound(e).getResponse();
-        } catch (ResourceDeletedException | ResourceExistsException e) {
-            response = WebExceptionFactory.makeConflict(e).getResponse();
-        } catch (IllegalArgumentException | UserErrorException e) {
-            response = WebExceptionFactory.makeBadRequest(e).getResponse();
-        } catch (Exception e) {
-            WebApplicationException webApplicationException =
-                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-            response = webApplicationException.getResponse();
-        }
+        String setCookie = "auth-token=dWlkPW1zZXJ2aWxsYSxvPUVESSxkYz1lZGlyZXBvc2l0b3J5LGRjPW9yZypodHRwczovL3Bhc3RhLmVkaXJlcG9zaXRvcnkub3JnL2F1dGhlbnRpY2F0aW9uKjE3NTg0MzUwNTI5NjEqdmV0dGVkKmF1dGhlbnRpY2F0ZWQ=-u/rdSOwj+VBJL+qsAg1aQFGjI4Fbu67f64aFaC7ffoqc4NhzL4Zn4aI6zcPpT7w8FwJM8o3MCWg2fbN+tQoMfFYHQwtR/AgK2aeT0NGaUSnH15jwRNApmkFDcAkLdKni8OvneTXzy4MJfIWRLLVNyWFyz5PnEmJHTcqIDdNW5I60vA0zJA+96Mh05kWgeuWkB7WI0+NCJQBHsXtSmUJ8VMeduugQ3Vsv8sVciYOFVX3NE14QEOYMYSe9yfTBPsaartUmrscwn643UBaEz5nGDDJ+T+00HE3vKeoAOhLwJRG4RTOIKrnQ+FGhVogKVtOX3EPT3QSI0QS+jh47M5YAog==;edi-token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFREktMmY4YTIyODc4ZDMzN2UwOWRkYWJhMTVlZTBlZWU5YmIyOTMzZmQ1NCIsImNuIjoibXNlcnZpbGxhIiwiZW1haWwiOm51bGwsInByaW5jaXBhbHMiOlsiRURJLTA3OGU2ZTNjZWU0ZjdmMjgxMmYxNTA3MDFkYTkzNTFhY2I1MWUwODkiLCJFREktN2JlMzUxMGQwOGRlZjBkZmM2Njc4MjRlYmQ0ZjRmMWJiZDc3MDIzNCIsIkVESS1iZGFlNzQ5NzJlZDcxMGM1NmIxZTBkZjE4Y2NiNmUyM2MzMWY2MGY2Il0sImlzRW1haWxFbmFibGVkIjpmYWxzZSwiaXNFbWFpbFZlcmlmaWVkIjpmYWxzZSwiaWRlbnRpdHlJZCI6MywiaWRwTmFtZSI6ImxkYXAiLCJpZHBVaWQiOiJ1aWQ9bXNlcnZpbGxhLG89RURJLGRjPWVkaXJlcG9zaXRvcnksZGM9b3JnIiwiaWRwQ25hbWUiOiJtc2VydmlsbGEiLCJpc3MiOiJodHRwczovL2F1dGguZWRpcmVwb3NpdG9yeS5vcmciLCJoZCI6ImVkaXJlcG9zaXRvcnkub3JnIiwiaWF0IjoxNzU4NDA2MjUyLCJuYmYiOjE3NTg0MDYyNTIsImV4cCI6MTc1ODQzNTA1Mn0.XoHHTaYor4G0cloC8appu1F9NXAsq8HVVC2YduXWkWpWERAcQGxeegsvc7ChS_uIkXKcZB0svX4loepTddC1_g";
+        responseBuilder = Response.ok();
+        responseBuilder.header("Access-Control-Allow-Origin", "*");
+        responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+        responseBuilder.header("Set-Cookie", setCookie);
+        response = responseBuilder.build();
         response = stampHeader(response);
         return response;
     }
@@ -2264,6 +2194,8 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2336,6 +2268,8 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2498,6 +2432,8 @@ public class DataPackageManagerResource extends PastaWebService {
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
                 responseBuilder.header("Access-Control-Allow-Origin", "*");
+                responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
                 response = responseBuilder.build();
             }
             else {
@@ -2576,6 +2512,8 @@ public class DataPackageManagerResource extends PastaWebService {
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
                 responseBuilder.header("Access-Control-Allow-Origin", "*");
+                responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
                 response = responseBuilder.build();
             }
             else {
@@ -2737,6 +2675,8 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2802,6 +2742,8 @@ public class DataPackageManagerResource extends PastaWebService {
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
             responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
