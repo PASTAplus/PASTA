@@ -53,7 +53,7 @@ public class TestIAM {
 
         try {
             JSONObject newEdiToken = iam.createEdiToken(publicId, key);
-            assert (newEdiToken.getString("token") != null);
+            assert (newEdiToken.getString("edi-token") != null);
         } catch (IOException e) {
             System.out.println(e.getMessage());
             assert false;
@@ -89,7 +89,7 @@ public class TestIAM {
 
         try {
             JSONObject newEdiToken = iam.createEdiToken(ediId, key);
-            token = newEdiToken.getString("token");
+            token = newEdiToken.getString("edi-token");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
