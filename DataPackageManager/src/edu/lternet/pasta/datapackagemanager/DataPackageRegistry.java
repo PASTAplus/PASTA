@@ -2645,7 +2645,7 @@ public class DataPackageRegistry {
         IAM iam = new IAM(EDI_AUTH_PROTOCOL, EDI_AUTH_HOST, EDI_AUTH_PORT);
         try {
             JSONObject newEdiToken = iam.createEdiToken(EDI_PUBLIC_ID, EDI_PRIVATE_KEY);
-            String ediToken = newEdiToken.getString("token");
+            String ediToken = newEdiToken.getString("edi-token");
             Authorizer authorizer = new Authorizer(this);
             isPublicAccessible = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.valueOf(Rule.READ));
         } catch (Exception e) {
