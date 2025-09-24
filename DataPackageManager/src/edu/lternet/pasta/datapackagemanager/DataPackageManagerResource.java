@@ -2016,13 +2016,20 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("revision") Integer revision,
             @PathParam("entityId") String entityId
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
+
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "thumbnailPreflight";
         responseBuilder = Response.ok();
-        responseBuilder.header("Access-Control-Allow-Origin", "*");
+        responseBuilder.header("Access-Control-Allow-Origin", origin);
         responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+        responseBuilder.header("Access-Control-Allow-Credentials", "true");
         response = responseBuilder.build();
         response = stampHeader(response);
         return response;
@@ -2037,13 +2044,20 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("identifier") Integer identifier,
             @PathParam("revision") Integer revision
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
+
         ResponseBuilder responseBuilder = null;
         Response response = null;
         final String serviceMethodName = "thumbnailPreflight";
         responseBuilder = Response.ok();
-        responseBuilder.header("Access-Control-Allow-Origin", "*");
+        responseBuilder.header("Access-Control-Allow-Origin", origin);
         responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+        responseBuilder.header("Access-Control-Allow-Credentials", "true");
         response = responseBuilder.build();
         response = stampHeader(response);
         return response;
@@ -2150,6 +2164,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("entityId") String entityId,
             InputStream imageStream
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2191,9 +2210,10 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.createResourceThumbnailFile(packageId, resourceId, imageStream, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Origin", origin);
             responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+            responseBuilder.header("Access-Control-Allow-Credentials", "true");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2224,6 +2244,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("revision") Integer revision,
             InputStream imageStream
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2265,9 +2290,10 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.createResourceThumbnailFile(packageId, resourceId, imageStream, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully created.", resourceId);
             responseBuilder = Response.ok(responseMsg);
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Origin", origin);
             responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+            responseBuilder.header("Access-Control-Allow-Credentials", "true");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2385,6 +2411,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("revision") Integer revision,
             @PathParam("entityId") String entityId
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2429,9 +2460,10 @@ public class DataPackageManagerResource extends PastaWebService {
                 long size = FileUtils.sizeOf(file);
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
-                responseBuilder.header("Access-Control-Allow-Origin", "*");
+                responseBuilder.header("Access-Control-Allow-Origin", origin);
                 responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+                responseBuilder.header("Access-Control-Allow-Credentials", "true");
                 response = responseBuilder.build();
             }
             else {
@@ -2465,6 +2497,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("identifier") Integer identifier,
             @PathParam("revision") Integer revision
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2509,9 +2546,10 @@ public class DataPackageManagerResource extends PastaWebService {
                 long size = FileUtils.sizeOf(file);
                 responseBuilder = Response.ok(file, mimeType);
                 responseBuilder.header("Content-Length", Long.toString(size));
-                responseBuilder.header("Access-Control-Allow-Origin", "*");
+                responseBuilder.header("Access-Control-Allow-Origin", origin);
                 responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+                responseBuilder.header("Access-Control-Allow-Credentials", "true");
                 response = responseBuilder.build();
             }
             else {
@@ -2633,6 +2671,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("revision") Integer revision,
             @PathParam("entityId") String entityId
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2672,9 +2715,10 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Origin", origin);
             responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+            responseBuilder.header("Access-Control-Allow-Credentials", "true");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
@@ -2703,6 +2747,11 @@ public class DataPackageManagerResource extends PastaWebService {
             @PathParam("identifier") Integer identifier,
             @PathParam("revision") Integer revision
     ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2739,9 +2788,10 @@ public class DataPackageManagerResource extends PastaWebService {
             dataPackageManager.deleteResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
             String responseMsg = String.format("Thumbnail for resource '%s' successfully deleted.", resourceId);
             responseBuilder = Response.ok(responseMsg);
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Access-Control-Allow-Origin", origin);
             responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+            responseBuilder.header("Access-Control-Allow-Credentials", "true");
             response = responseBuilder.build();
         } catch (UnauthorizedException e) {
             response = WebExceptionFactory.makeUnauthorized(e).getResponse();
