@@ -2635,7 +2635,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         File file;
         DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
         Authorizer authorizer = new Authorizer(dataPackageRegistry);
-        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+//      Disregard authorization to facilitate "Public Access" reads when resource is blocked
+//      boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        boolean isAuthorized = true;
         if (!isAuthorized) {
             if (EDI_AUTH_USE) {
                 EdiToken et = new EdiToken(ediToken);
@@ -2713,7 +2715,9 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
         String imageType;
         DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
         Authorizer authorizer = new Authorizer(dataPackageRegistry);
-        boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+//      Disregard authorization to facilitate "Public Access" reads when resource is blocked
+//      boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        boolean isAuthorized = true;
         if (!isAuthorized) {
             if (EDI_AUTH_USE) {
                 EdiToken et = new EdiToken(ediToken);
