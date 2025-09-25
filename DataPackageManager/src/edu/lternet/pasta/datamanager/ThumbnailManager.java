@@ -72,26 +72,33 @@ public class ThumbnailManager {
         if (!thumbnailDir.exists()) {
             if (!thumbnailDir.mkdirs()) {
                 String msg = String.format("Failed to create thumbnail directory '%s'.", thumbnailDirPath);
+                logger.error(msg);
                 throw new RuntimeException(msg);
             }
         }
         try (FileOutputStream fos = new FileOutputStream(thumbnailFile)) {
             byte[] thumbnailImage = readAllBytes(imageStream);
             if (thumbnailImage.length > maxThumbnailSize) {
-                String msg = String.format("Thumbnail image size (%db) exceeds max allowed thumbnail size (%db).", thumbnailImage.length, maxThumbnailSize);
+                fos.close();
+                deleteThumbnailFile();
+                String msg = String.format("Thumbnail image size (%db) exceeds max allowed thumbnail size (%db) for `%s`.", thumbnailImage.length, maxThumbnailSize, resourceId);
+                logger.error(msg);
                 throw new UserErrorException(msg);
             }
             fos.write(thumbnailImage);
             String imageType = getImageType(thumbnailFile).toLowerCase();
             if (!imageType.equals("jpeg") && !imageType.equals("png")) {
+                fos.close();
                 deleteThumbnailFile();
-                String msg = String.format("Image type '%s' is not supported.", imageType);
+                String msg = String.format("Image type '%s' is not supported for '%s'.", imageType, resourceId);
+                logger.error(msg);
                 throw new UserErrorException(msg);
             }
         }
         catch (IOException e) {
             logger.error(e);
             String msg = String.format("Thumbnail for resource '%s' failed to be created.", resourceId);
+            logger.error(msg);
             throw new RuntimeException(msg);
         }
     }
@@ -125,7 +132,8 @@ public class ThumbnailManager {
             imageType = getImageType(thumbnailFile);
             if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
                 deleteThumbnailFile();
-                String msg = String.format("Image type '%s' is not supported.", imageType);
+                String msg = String.format("Image type '%s' is not supported for '%s'.", imageType, resourceId);
+                logger.error(msg);
                 throw new UserErrorException(msg);
             }
         }
