@@ -11,11 +11,15 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -86,8 +90,9 @@ public class ThumbnailManager {
                 throw new UserErrorException(msg);
             }
             fos.write(thumbnailImage);
-            String imageType = getImageType(thumbnailFile).toLowerCase();
-            if (!imageType.equals("jpeg") && !imageType.equals("png")) {
+            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
+            String imageType = getImageType(thumbnailFile);
+            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
                 fos.close();
                 deleteThumbnailFile();
                 String msg = String.format("Image type '%s' is not supported for '%s'.", imageType, resourceId);
@@ -129,8 +134,9 @@ public class ThumbnailManager {
     public String getThumbnailFileType() {
         String imageType = "unknown";
         try {
+            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
             imageType = getImageType(thumbnailFile);
-            if (!imageType.equalsIgnoreCase("jpeg") && !imageType.equalsIgnoreCase("png")) {
+            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
                 deleteThumbnailFile();
                 String msg = String.format("Image type '%s' is not supported for '%s'.", imageType, resourceId);
                 logger.error(msg);
@@ -186,6 +192,32 @@ public class ThumbnailManager {
                 return reader.getFormatName();
             }
         }
+        catch (IOException e) {
+            String msg = String.format("Error reading file: %s", e.getMessage());
+            throw new IOException(msg);
+        }
+        if (isSvg(file)) {  // Not detectable image format, see if SVG
+            return "svg+xml";
+        }
         return "unknown";
     }
+
+    private static boolean isSvg(String file) throws IOException {
+        Path path = Paths.get(file);
+        try (InputStream inputStream = Files.newInputStream(path);
+             InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(isr))
+        {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().contains("<svg")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error reading file: " + e.getMessage());
+        }
+        return false;
+    }
+
 }

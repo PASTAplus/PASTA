@@ -2154,7 +2154,7 @@ public class DataPackageManagerResource extends PastaWebService {
          */
 
     @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Consumes({"image/jpeg", "image/png"})
+    @Consumes({"image/jpeg", "image/png", "image/svg+xml"})
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2169,6 +2169,8 @@ public class DataPackageManagerResource extends PastaWebService {
         if (originList != null && !originList.isEmpty()) {
             origin = originList.get(0);
         }
+
+        Set<String> consumes = new HashSet<>(Arrays.asList("image/jpeg", "image/png", "image/svg+xml"));
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
@@ -2199,8 +2201,8 @@ public class DataPackageManagerResource extends PastaWebService {
                 throw new ForbiddenException(msg);
             }
             String contentType = String.valueOf(headers.getMediaType());
-            if (!contentType.equalsIgnoreCase("image/jpeg") && !contentType.equalsIgnoreCase("image/png")) {
-                String msg = String.format("Content-type '%s' must be either 'image/jpeg' or 'image/png'.",  contentType);
+            if (!consumes.contains(contentType)) {
+                String msg = String.format("Content-type '%s' must be 'image/jpeg' or 'image/png' or 'image/svg+xml'.",  contentType);
                 throw new UserErrorException(msg);
             }
             ResourceType resourceType = ResourceType.data;
@@ -2235,7 +2237,7 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
     @POST @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Consumes({"image/jpeg", "image/png"})
+    @Consumes({"image/jpeg", "image/png", "image/svg+xml"})
     @Produces("text/plain")
     public Response createResourceThumbnail (
             @Context HttpHeaders headers,
@@ -2269,6 +2271,8 @@ public class DataPackageManagerResource extends PastaWebService {
             userId = authToken.getUserId();
         }
 
+        Set<String> consumes = new HashSet<>(Arrays.asList("image/jpeg", "image/png", "image/svg+xml"));
+
         try {
             boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
             if (!serviceMethodAuthorized) {
@@ -2279,8 +2283,8 @@ public class DataPackageManagerResource extends PastaWebService {
                 throw new ForbiddenException(msg);
             }
             String contentType = String.valueOf(headers.getMediaType());
-            if (!contentType.equalsIgnoreCase("image/jpeg") && !contentType.equalsIgnoreCase("image/png")) {
-                String msg = String.format("Content-type '%s' must be either 'image/jpeg' or 'image/png'.",  contentType);
+            if (!consumes.contains(contentType)) {
+                String msg = String.format("Content-type '%s' must be 'image/jpeg' or 'image/png' or 'image/svg+xml'.",  contentType);
                 throw new UserErrorException(msg);
             }
             ResourceType resourceType = ResourceType.metadata;
@@ -2403,7 +2407,7 @@ public class DataPackageManagerResource extends PastaWebService {
      */
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}/{entityId}")
-    @Produces({"image/jpeg", "image/png"})
+    @Produces({"image/jpeg", "image/png", "image/svg+xml"})
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2450,8 +2454,9 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
-            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId).toLowerCase();
-            if (!imageType.equals("png") && !imageType.equals("jpeg")) {
+            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
+            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId);
+            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
                 String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
                 throw new RuntimeException(msg);
             }
@@ -2490,7 +2495,7 @@ public class DataPackageManagerResource extends PastaWebService {
     }
 
     @GET @Path("/thumbnail/eml/{scope}/{identifier}/{revision}")
-    @Produces({"image/jpeg", "image/png"})
+    @Produces({"image/jpeg", "image/png", "image/svg+xml"})
     public Response readResourceThumbnail (
             @Context HttpHeaders headers,
             @PathParam("scope") String scope,
@@ -2536,8 +2541,9 @@ public class DataPackageManagerResource extends PastaWebService {
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, null);
             DataPackageManager dataPackageManager = new DataPackageManager();
             File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
-            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId).toLowerCase();
-            if (!imageType.equals("png") && !imageType.equals("jpeg")) {
+            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
+            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId);
+            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
                 String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
                 throw new RuntimeException(msg);
             }
