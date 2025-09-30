@@ -117,6 +117,7 @@ datapackagemanager.host=package.lternet.edu
 datapackagemanager.port=8080
 datapackagemanager.thumbnailsDir=/home/pasta/local/thumbnails
 datapackagemanager.maxThumbnailSize=204800
+datapackagemanager.thumbnailAssets=/home/pasta/local/assets/thumbnails
 
 
 # EDI IAM properties

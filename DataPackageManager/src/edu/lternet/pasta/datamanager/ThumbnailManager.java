@@ -107,6 +107,28 @@ public class ThumbnailManager {
             throw new RuntimeException(msg);
         }
     }
+    public void linkThumbnailFile(String thumbnailLink) throws RuntimeException {
+        String thumbnailDirPath = String.format("%s/%s", this.thumbnailDir, packageId);
+        File thumbnailDir = new File(thumbnailDirPath);
+        if (!thumbnailDir.exists()) {
+            if (!thumbnailDir.mkdirs()) {
+                String msg = String.format("Failed to create thumbnail directory '%s'.", thumbnailDirPath);
+                logger.error(msg);
+                throw new RuntimeException(msg);
+            }
+        }
+        Path thumbnailLinkPath = Paths.get(thumbnailLink);
+        Path thumbnailFilePath = Paths.get(thumbnailFile);
+        try {
+            Files.createSymbolicLink(thumbnailFilePath, thumbnailLinkPath);
+        }
+        catch (IOException e) {
+            logger.error(e);
+            String msg = String.format("Thumbnail for resource '%s' failed to be created.", resourceId);
+            logger.error(msg);
+            throw new RuntimeException(msg);
+        }
+    }
 
     public File getThumbnailFile() throws ResourceNotFoundException {
         File file = new File(thumbnailFile);

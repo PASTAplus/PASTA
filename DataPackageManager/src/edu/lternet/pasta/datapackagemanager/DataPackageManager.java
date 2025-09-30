@@ -24,6 +24,44 @@
 
 package edu.lternet.pasta.datapackagemanager;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import edu.ucsb.nceas.utilities.IOUtil;
+import edu.ucsb.nceas.utilities.Options;
+import edu.ucsb.nceas.utilities.XMLUtilities;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 import edu.lternet.pasta.common.*;
 import edu.lternet.pasta.common.eml.DataPackage.DataDescendant;
 import edu.lternet.pasta.common.eml.DataPackage.DataSource;
@@ -53,41 +91,6 @@ import edu.lternet.pasta.doi.DOIScanner;
 import edu.lternet.pasta.doi.Resource;
 import edu.lternet.pasta.metadatamanager.MetadataCatalog;
 import edu.lternet.pasta.metadatamanager.SolrMetadataCatalog;
-import edu.ucsb.nceas.utilities.IOUtil;
-import edu.ucsb.nceas.utilities.Options;
-import edu.ucsb.nceas.utilities.XMLUtilities;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -257,6 +260,7 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 	private static String pastaUser = null;
 	private static String solrUrl = null;
 	private static String xslDir = null;
+    private static String thumbnailAssets = null;
 
 	
 	private static Logger logger = Logger.getLogger(DataPackageManager.class);
@@ -999,7 +1003,10 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 				// Store the data format of the data entity resource, as derived by the EML parser
 				String dataFormat = emlEntity.getDataFormat();
-				if (dataFormat != null) storeDataFormat(entityURI, dataFormat);
+				if (dataFormat != null) {
+                    storeDataFormat(entityURI, dataFormat);
+                    createEntityThumbnail(packageId, entityURI, dataFormat);
+                }
 
 				/*
 				 * Get the <access> XML block for this data entity and store the
@@ -2240,12 +2247,11 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 
 			// Load PASTA service options
 			metadataDir = options.getOption("datapackagemanager.metadataDir");
-			solrUrl = options
-				 .getOption("datapackagemanager.metadatacatalog.solrUrl");
+			solrUrl = options.getOption("datapackagemanager.metadatacatalog.solrUrl");
 			pastaUriHead = options.getOption("datapackagemanager.pastaUriHead");
-			pastaUser = options
-			    .getOption("datapackagemanager.metadatacatalog.pastaUser");
+			pastaUser = options.getOption("datapackagemanager.metadatacatalog.pastaUser");
 			xslDir = options.getOption("datapackagemanager.xslDir");
+            thumbnailAssets = options.getOption("datapackagemanager.thumbnailAssets");
 
             // Load EDI service options
             EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
@@ -4706,6 +4712,158 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		journalCitationsXML = stringBuilder.toString();
 		return journalCitationsXML;
 	}
+
+    private void createEntityThumbnail(String packageId, String resourceId, String dataFormat) throws IOException {
+        String thumbnailFile = selectThumbnail(dataFormat);
+        ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
+        thumbnailManager.linkThumbnailFile(thumbnailFile);
+    }
+
+    private String selectThumbnail(String dataFormat) {
+        Set<String> archiveTypes = new HashSet<>(Arrays.asList("zip", "tar", "gzip", "tgz", "gz"));
+        Set<String> audioTypes = new HashSet<>(Arrays.asList("audio", "wave", "wav", "mp3", "aiff", "au ", "ogg", "flac"));
+        Set<String> databaseTypes = new HashSet<>(Arrays.asList("database", "dbf", "access", "sql"));
+        Set<String> gisTypes = new HashSet<>(Arrays.asList("shapefile", "shape file", "kml", "geojson", "shp", "google-earth", "arcinfo", "arc/info", "arcgis", "geopackage"));
+        Set<String> htmlTypes = new HashSet<>(Arrays.asList("html", "hypertext"));
+        Set<String> imageTypes = new HashSet<>(Arrays.asList("jpeg", "jpg", "tiff", "tif", "gif", "bmp", "png", "img", "raster", "geotiff", "erdas", "imagine", "portable network"));
+        Set<String> javaTypes = new HashSet<>(Arrays.asList("java", "jsp", "jar", "war", "class"));
+        Set<String> javascriptTypes = new HashSet<>(Arrays.asList("javascript", "js"));
+        Set<String> pdfTypes = new HashSet<>(Arrays.asList("pdf", "portable document format"));
+        Set<String> pythonTypes = new HashSet<>(Arrays.asList("python", "py"));
+        Set<String> rTypes = new HashSet<>(Arrays.asList("rds", "rmd", "rmarkdown", "r-markdown", "rdata", "r-", "r "));
+        Set<String> shellTypes = new HashSet<>(Arrays.asList("sh ", "fish", "csh", "bash"));
+        Set<String> tableTypes = new HashSet<>(Arrays.asList("csv", "excel", "xlxs", "sheet", "comma", "tab", "ods"));
+        Set<String> textTypes = new HashSet<>(Arrays.asList("text", "txt", "plain", "markdown", "md ", "doc ", ".doc", "docx", "odt"));
+        Set<String> xmlTypes = new HashSet<>(Arrays.asList("xml", "sgml"));
+
+        String thumbnailFile;
+
+        for (String archiveType : archiveTypes) {
+            if (dataFormat.toLowerCase().contains(archiveType)) {
+                thumbnailFile = String.format("%s/archive.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String audioType : audioTypes) {
+            if (dataFormat.toLowerCase().contains(audioType)) {
+                thumbnailFile = String.format("%s/audio.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String databaseType : databaseTypes) {
+            if (dataFormat.toLowerCase().contains(databaseType)) {
+                thumbnailFile = String.format("%s/database.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String gisType : gisTypes) {
+            if (dataFormat.toLowerCase().contains(gisType)) {
+                thumbnailFile = String.format("%s/gis.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String htmlType : htmlTypes) {
+            if (dataFormat.toLowerCase().contains(htmlType)) {
+                thumbnailFile = String.format("%s/html.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String imageType : imageTypes) {
+            if (dataFormat.toLowerCase().contains(imageType)) {
+                thumbnailFile = String.format("%s/image.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String javaType : javaTypes) {
+            if (dataFormat.toLowerCase().contains(javaType)) {
+                thumbnailFile = String.format("%s/java.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String pdfType : pdfTypes) {
+            if (dataFormat.toLowerCase().contains(pdfType)) {
+                thumbnailFile = String.format("%s/pdf.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String pythonType : pythonTypes) {
+            if (dataFormat.toLowerCase().contains(pythonType)) {
+                thumbnailFile = String.format("%s/python.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String javascriptType : javascriptTypes) {
+            if (dataFormat.toLowerCase().contains(javascriptType)) {
+                thumbnailFile = String.format("%s/javascript.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String rType : rTypes) {
+            if (dataFormat.toLowerCase().contains(rType)) {
+                thumbnailFile = String.format("%s/r.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+            if (dataFormat.equalsIgnoreCase("r")) {  // Case where dataFormat is exactly "R" or "r"
+                thumbnailFile = String.format("%s/r.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String shellType : shellTypes) {
+            if (dataFormat.toLowerCase().contains(shellType)) {
+                thumbnailFile = String.format("%s/shell.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+            if (dataFormat.equalsIgnoreCase("sh")) {  // Case where dataFormat is exactly "SH" or "sh"
+                thumbnailFile = String.format("%s/shell.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+            if (dataFormat.endsWith(".sh")) {  // Case where dataFormat is exactly ".SH" or ".sh"
+                thumbnailFile = String.format("%s/shell.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String tableType : tableTypes) {
+            if (dataFormat.toLowerCase().contains(tableType)) {
+                thumbnailFile = String.format("%s/table.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String textType : textTypes) {
+            if (dataFormat.toLowerCase().contains(textType)) {
+                thumbnailFile = String.format("%s/text.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+            if (dataFormat.endsWith("doc")) {  // Case where dataFormat is exactly "DOC" or "doc"
+                thumbnailFile = String.format("%s/text.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        for (String xmlType : xmlTypes) {
+            if (dataFormat.toLowerCase().contains(xmlType)) {
+                thumbnailFile = String.format("%s/xml.svg", thumbnailAssets);
+                return thumbnailFile;
+            }
+        }
+
+        thumbnailFile = String.format("%s/unknown.svg", thumbnailAssets);
+        return thumbnailFile;
+
+    }
+
 }
 
 class LogMessageFormatter
