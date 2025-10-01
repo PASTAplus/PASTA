@@ -2583,6 +2583,181 @@ public class DataPackageManagerResource extends PastaWebService {
 
     /**
      *
+     * <strong>Read Resource Thumbnail</strong> operation, specifying the resource scope, identifier, revision, and
+     * optional entityId.
+     *
+     * <h4>Requests:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Request</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>none</td>
+     * <td align=center>none</td>
+     * <td><code>curl -i -X GET
+     * https://pasta.lternet.edu/package/thumbnail/eml/edi/100/1/23c8f9cce5a41d84ce7c2847a67070c2</code>
+     * </td>
+     * </tr>
+     * </table>
+     *
+     * <h4>Responses:</h4>
+     * <table border="1" cellspacing="0" cellpadding="3">
+     * <tr>
+     * <th><b>Status</b></th>
+     * <th><b>Reason</b></th>
+     * <th><b>Message Body</b></th>
+     * <th><b>MIME type</b></th>
+     * <th><b>Sample Message Body</b></th>
+     * </tr>
+     * <tr>
+     * <td align=center>200 OK</td>
+     * <td align=center>The request to read the thumbnail image was successful</td>
+     * <td align=center>The thumbnail image data.</td>
+     * <td align=center><code>image/png</code></td>
+     * <td><code>base64-encoded image data</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>400 Bad Request</td>
+     * <td align=center>The resource (URL) identifier does not match an existing resource</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>401 Unauthorized</td>
+     * <td align=center>The requesting user is not authorized to read the thumbnail image</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>404 Not Found</td>
+     * <td align=center>The data package resource thumbnail was not found</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>405 Method Not Allowed</td>
+     * <td align=center>The specified HTTP method is not allowed for the requested resource</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * <tr>
+     * <td align=center>500 Internal Server Error</td>
+     * <td align=center>The server encountered an unexpected condition which
+     * prevented it from fulfilling the request</td>
+     * <td align=center>An error message</td>
+     * <td align=center><code>text/plain</code></td>
+     * <td align=center><code>Error message</code></td>
+     * </tr>
+     * </table>
+     *
+     * @param scope
+     *      The data package scope value
+     * @param identifier
+     *      The data package identifier value
+     * @param revision
+     *      The data package revision value
+     * @param entityId
+     *      The data package entity identifier value (optional)
+     * @return a Response object containing a data entity size value if found,
+     *         else returns a 404 Not Found response
+     */
+
+    @GET @Path("/thumbnail/system/{scope}/{identifier}/{revision}/{entityId}")
+    @Produces({"image/jpeg", "image/png", "image/svg+xml"})
+    public Response readSystemThumbnail (
+            @Context HttpHeaders headers,
+            @PathParam("scope") String scope,
+            @PathParam("identifier") Integer identifier,
+            @PathParam("revision") Integer revision,
+            @PathParam("entityId") String entityId
+    ) {
+        String origin = "*";
+        List<String> originList = headers.getRequestHeader("origin");
+        if (originList != null && !originList.isEmpty()) {
+            origin = originList.get(0);
+        }
+
+        ResponseBuilder responseBuilder = null;
+        Response response = null;
+        final String serviceMethodName = "readResourceThumbnail";
+        Rule.Permission permission = Rule.Permission.read;
+
+        String userId;
+        String cn = null;
+        String ediToken = getEdiToken(headers);
+        AuthToken authToken = getAuthToken(headers);
+
+        if (EDI_AUTH_USE) {
+            EdiToken et = new EdiToken(ediToken);
+            userId = et.getSubject();
+            cn = et.getCommonName();
+        }
+        else {
+            userId = authToken.getUserId();
+        }
+
+        try {
+            boolean serviceMethodAuthorized = isServiceMethodAuthorized(serviceMethodName, permission, authToken, ediToken);
+            if (!serviceMethodAuthorized) {
+                if (cn != null) {
+                    userId = userId + String.format(" (%s)", cn);
+                }
+                String msg = String.format("User '%s' is not authorized to execute service method '%s'.", userId, serviceMethodName);
+                throw new ForbiddenException(msg);
+            }
+            ResourceType resourceType = ResourceType.data;
+            String packageId = String.format("%s.%d.%d", scope, identifier, revision);
+            String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
+            DataPackageManager dataPackageManager = new DataPackageManager();
+            File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
+            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId);
+            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
+                String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
+                throw new RuntimeException(msg);
+            }
+            String mimeType = String.format("image/%s", imageType);
+            if (file != null && file.exists()) {
+                long size = FileUtils.sizeOf(file);
+                responseBuilder = Response.ok(file, mimeType);
+                responseBuilder.header("Content-Length", Long.toString(size));
+                responseBuilder.header("Access-Control-Allow-Origin", origin);
+                responseBuilder.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                responseBuilder.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-New-Auth-Token");
+                responseBuilder.header("Access-Control-Allow-Credentials", "true");
+                response = responseBuilder.build();
+            }
+            else {
+                String msg = String.format("A thumbnail for '%s' does not exist.", resourceId);
+                throw (new ResourceNotFoundException(msg));
+            }
+        } catch (UnauthorizedException e) {
+            response = WebExceptionFactory.makeUnauthorized(e).getResponse();
+        } catch (ForbiddenException e) {
+            response = WebExceptionFactory.makeForbidden(e).getResponse();
+        } catch (ResourceNotFoundException e) {
+            response = WebExceptionFactory.makeNotFound(e).getResponse();
+        } catch (ResourceDeletedException | ResourceExistsException e) {
+            response = WebExceptionFactory.makeConflict(e).getResponse();
+        } catch (IllegalArgumentException | UserErrorException e) {
+            response = WebExceptionFactory.makeBadRequest(e).getResponse();
+        } catch (Exception e) {
+            WebApplicationException webApplicationException =
+                    WebExceptionFactory.make(Response.Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+            response = webApplicationException.getResponse();
+        }
+        response = stampHeader(response);
+        return response;
+    }
+
+    /**
+     *
      * <strong>Delete Resource Thumbnail</strong> operation, specifying the resource (URL)
      * identifier in the path.
      *

@@ -120,7 +120,7 @@ public class ThumbnailManager {
         Path thumbnailLinkPath = Paths.get(thumbnailLink);
         Path thumbnailFilePath = Paths.get(thumbnailFile);
         try {
-            Files.createSymbolicLink(thumbnailFilePath, thumbnailLinkPath);
+            Files.createLink(thumbnailFilePath, thumbnailLinkPath);
         }
         catch (IOException e) {
             logger.error(e);
