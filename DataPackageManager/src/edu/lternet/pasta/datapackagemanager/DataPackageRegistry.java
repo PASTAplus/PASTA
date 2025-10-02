@@ -1844,8 +1844,56 @@ public class DataPackageRegistry {
 		return entitySizes;
 	}
 
-  
-	  /**
+
+    /**
+     * Gets the file name for the given entity resourceId.
+     *
+     * @param resourceId
+     *            the resource identifier
+     * @return the value of the 'format_type' field matching the specified
+     *         resourceId ('resource_id') value
+     */
+    public String getEntityFileName(String resourceId) throws ClassNotFoundException, SQLException {
+        String fileName = null;
+        Connection connection = null;
+        String queryStr = String.format(
+                "SELECT filename FROM %s WHERE resource_id=%s",
+                SqlEscape.name(RESOURCE_REGISTRY),
+                SqlEscape.str(resourceId)
+        );
+        logger.debug("queryStr: " + queryStr);
+
+        Statement stmt = null;
+        try {
+            connection = getConnection();
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(queryStr);
+            while (rs.next()) {
+                fileName = rs.getString(1);
+                if (fileName != null) {
+                    fileName = Encode.forXml(fileName.trim());
+                }
+            }
+            stmt.close();
+        }
+        catch (ClassNotFoundException e) {
+            logger.error("ClassNotFoundException: " + e.getMessage());
+            e.printStackTrace();
+            throw (e);
+        }
+        catch (SQLException e) {
+            logger.error("SQLException: " + e.getMessage());
+            e.printStackTrace();
+            throw (e);
+        }
+        finally {
+            returnConnection(connection);
+        }
+        return fileName;
+    }
+
+
+    /**
 	   * Gets a list of entity names for a specified data package.
 	   * 
 	   * @param scope

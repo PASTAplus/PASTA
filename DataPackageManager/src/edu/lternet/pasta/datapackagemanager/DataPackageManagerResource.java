@@ -2685,7 +2685,7 @@ public class DataPackageManagerResource extends PastaWebService {
 
         ResponseBuilder responseBuilder = null;
         Response response = null;
-        final String serviceMethodName = "readResourceThumbnail";
+        final String serviceMethodName = "readSystemThumbnail";
         Rule.Permission permission = Rule.Permission.read;
 
         String userId;
@@ -2715,14 +2715,8 @@ public class DataPackageManagerResource extends PastaWebService {
             String packageId = String.format("%s.%d.%d", scope, identifier, revision);
             String resourceId =  DataPackageManager.composeResourceId(resourceType, scope, identifier, revision, entityId);
             DataPackageManager dataPackageManager = new DataPackageManager();
-            File file = dataPackageManager.getResourceThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
-            Set<String> allowedImageTypes = new HashSet<>(Arrays.asList("jpeg", "png", "svg+xml"));
-            String imageType = dataPackageManager.getResourceThumbnailType(packageId, resourceId, authToken, ediToken, userId);
-            if (!allowedImageTypes.contains(imageType.toLowerCase())) {
-                String msg = String.format("Error when reading thumbnail image type '%s'.", imageType);
-                throw new RuntimeException(msg);
-            }
-            String mimeType = String.format("image/%s", imageType);
+            File file = dataPackageManager.getSystemThumbnailFile(packageId, resourceId, authToken, ediToken, userId);
+            String mimeType = "image/svg+xml";
             if (file != null && file.exists()) {
                 long size = FileUtils.sizeOf(file);
                 responseBuilder = Response.ok(file, mimeType);

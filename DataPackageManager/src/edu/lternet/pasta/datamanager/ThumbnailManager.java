@@ -36,6 +36,7 @@ public class ThumbnailManager {
     private final String resourceId;
     private final String thumbnailDir;
     private final String thumbnailFile;
+    private final String thumbnailAssets;
     private final Integer maxThumbnailSize;
 
     private static final Logger logger = Logger.getLogger(ThumbnailManager.class);
@@ -44,6 +45,7 @@ public class ThumbnailManager {
 
         Options options = ConfigurationListener.getOptions();
         thumbnailDir = options.getOption("datapackagemanager.thumbnailsDir");
+        thumbnailAssets = options.getOption("datapackagemanager.thumbnailAssets");
         maxThumbnailSize = Integer.valueOf(options.getOption("datapackagemanager.maxThumbnailSize"));
         String dbDriver = options.getOption("dbDriver");
         String dbURL = options.getOption("dbURL");
@@ -140,6 +142,16 @@ public class ThumbnailManager {
         return file;
     }
 
+    public File getSystemThumbnailFile(String systemThumbnail) throws ResourceNotFoundException {
+        File file = new File(systemThumbnail);
+        if (!file.exists()) {
+            String msg = String.format("Thumbnail for resource '%s' not found.", resourceId);
+            logger.error(msg);
+            throw new ResourceNotFoundException(msg);
+        }
+        return file;
+    }
+
     public void deleteThumbnailFile() throws RuntimeException {
         File file = new File(thumbnailFile);
         boolean deleted;
@@ -169,6 +181,155 @@ public class ThumbnailManager {
           logger.error(e);
         }
         return imageType;
+    }
+
+    public String selectSystemThumbnail(String fileName) {
+
+        Set<String> archiveTypes = new HashSet<>(Arrays.asList("zip", "tar", "gzip", "tgz", "gz", "7z", "rar"));
+        Set<String> audioTypes = new HashSet<>(Arrays.asList("mp3", "m4a", "aac", "ogg", "wma", "flac", "alac", "wav", "aiff", "aif"));
+        Set<String> databaseTypes = new HashSet<>(Arrays.asList("db", "sqlite", "mdb", "accdb", "sql", "frm", "myd", "myi", "dbx"));
+        Set<String> gisTypes = new HashSet<>(Arrays.asList("shp", "dbf", "shx", "geojson", "gpkg", "kml", "kmz", "gpx", "asc", "sid", "ecw", "las", "dem", "geotiff", "geotif"));
+        Set<String> htmlTypes = new HashSet<>(Arrays.asList("html", "htm"));
+        Set<String> imageTypes = new HashSet<>(Arrays.asList("jpg", "jpeg", "png", "gif", "tiff", "webp", "bmp", "svg", "raw", "ico", "tif", "img"));
+        Set<String> javaTypes = new HashSet<>(Arrays.asList("java", "jsp", "jar", "war", "class"));
+        Set<String> javascriptTypes = new HashSet<>(Arrays.asList("js", "jsx", "ts", "tsx", "mjs", "cjs"));
+        Set<String> pdfTypes = new HashSet<>(Arrays.asList("pdf", "pdfx", "fdf", "xfdf", "pdx"));
+        Set<String> pythonTypes = new HashSet<>(Arrays.asList("py", "pyc", "pyo", "pyd", "pyw", "ipynb"));
+        Set<String> rTypes = new HashSet<>(Arrays.asList("r", "rds", "rmd", "rdata"));
+        Set<String> shellTypes = new HashSet<>(Arrays.asList("sh", "bash", "zsh", "csh", "ksh", "fish", "bat", "cmd", "ps1"));
+        Set<String> tableTypes = new HashSet<>(Arrays.asList("csv", "tsv", "txt", "xls", "xlsx", "ods", "dbf"));
+        Set<String> textTypes = new HashSet<>(Arrays.asList("txt", "log", "ini", "cfg", "conf", "nfo", "rtf", "me", "doc", "docx", "odt", "pages", "wps"));
+        Set<String> xmlTypes = new HashSet<>(Arrays.asList("xml", "xsl", "xslt", "dtd", "xsd"));
+
+        String extension = getFileExtension(fileName).toLowerCase();
+        String thumbnailFile = String.format("%s/unknown.svg", thumbnailAssets);
+
+        if (!extension.isEmpty()) {
+            for (String archiveType : archiveTypes) {
+                if (extension.equals(archiveType)) {
+                    thumbnailFile = String.format("%s/archive.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String audioType : audioTypes) {
+                if (extension.equals(audioType)) {
+                    thumbnailFile = String.format("%s/audio.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String databaseType : databaseTypes) {
+                if (extension.equals(databaseType)) {
+                    thumbnailFile = String.format("%s/database.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String gisType : gisTypes) {
+                if (extension.equals(gisType)) {
+                    thumbnailFile = String.format("%s/gis.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String htmlType : htmlTypes) {
+                if (extension.equals(htmlType)) {
+                    thumbnailFile = String.format("%s/html.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String imageType : imageTypes) {
+                if (extension.equals(imageType)) {
+                    thumbnailFile = String.format("%s/image.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String javaType : javaTypes) {
+                if (extension.equals(javaType)) {
+                    thumbnailFile = String.format("%s/java.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String pdfType : pdfTypes) {
+                if (extension.equals(pdfType)) {
+                    thumbnailFile = String.format("%s/pdf.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String pythonType : pythonTypes) {
+                if (extension.equals(pythonType)) {
+                    thumbnailFile = String.format("%s/python.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String javascriptType : javascriptTypes) {
+                if (extension.equals(javascriptType)) {
+                    thumbnailFile = String.format("%s/javascript.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String rType : rTypes) {
+                if (extension.equals(rType)) {
+                    thumbnailFile = String.format("%s/r.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String shellType : shellTypes) {
+                if (extension.equals(shellType)) {
+                    thumbnailFile = String.format("%s/shell.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String tableType : tableTypes) {
+                if (extension.equals(tableType)) {
+                    thumbnailFile = String.format("%s/table.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String textType : textTypes) {
+                if (extension.equals(textType)) {
+                    thumbnailFile = String.format("%s/text.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+
+            for (String xmlType : xmlTypes) {
+                if (extension.equals(xmlType)) {
+                    thumbnailFile = String.format("%s/xml.svg", thumbnailAssets);
+                    return thumbnailFile;
+                }
+            }
+        }
+
+        return thumbnailFile;
+    }
+
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return "";
+        }
+
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {  // No dot
+            return "";
+        }
+        if (lastDotIndex == 0) {  // Starts with dot
+            return fileName.substring(1);
+        }
+        if (lastDotIndex == fileName.length() - 1) {  // Ends with dot
+            return "";
+        }
+        return fileName.substring(lastDotIndex + 1);  // Filename with dot extension
     }
 
     private String getResourceHash(String resourceId) throws RuntimeException {

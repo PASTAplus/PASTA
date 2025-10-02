@@ -1005,7 +1005,6 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 				String dataFormat = emlEntity.getDataFormat();
 				if (dataFormat != null) {
                     storeDataFormat(entityURI, dataFormat);
-                    createEntityThumbnail(packageId, entityURI, objectName);
                 }
 
 				/*
@@ -4713,160 +4712,37 @@ public class DataPackageManager implements DatabaseConnectionPoolInterface {
 		return journalCitationsXML;
 	}
 
-    private void createEntityThumbnail(String packageId, String resourceId, String objectName) throws IOException {
-        String thumbnailFile = selectThumbnail(objectName);
+    public File getSystemThumbnailFile(
+            String packageId,
+            String resourceId,
+            AuthToken authToken,
+            String ediToken,
+            String userId
+    ) throws Exception {
+        File file;
+        DataPackageRegistry dataPackageRegistry = new DataPackageRegistry(dbDriver, dbURL, dbUser, dbPassword);
+        Authorizer authorizer = new Authorizer(dataPackageRegistry);
+//      Disregard authorization to facilitate "Public Access" reads when resource is blocked
+//      boolean isAuthorized = authorizer.isAuthorized(authToken, ediToken, resourceId, Rule.Permission.read);
+        boolean isAuthorized = true;
+        if (!isAuthorized) {
+            if (EDI_AUTH_USE) {
+                EdiToken et = new EdiToken(ediToken);
+                String cn = et.getCommonName();
+                if (cn != null) {
+                    user = user + String.format(" (%s)", cn);
+                }
+            }
+            String msg = String.format("User '%s' is not authorized to read '%s'.", user, resourceId);
+            throw new ForbiddenException(msg);
+        }
+        String fileName = dataPackageRegistry.getEntityFileName(resourceId);
         ThumbnailManager thumbnailManager = new ThumbnailManager(packageId, resourceId);
-        thumbnailManager.linkThumbnailFile(thumbnailFile);
+        String systemThumbnail = thumbnailManager.selectSystemThumbnail(fileName);
+        file = thumbnailManager.getSystemThumbnailFile(systemThumbnail);
+        return file;
     }
 
-    private String selectThumbnail(String objectName) {
-
-        Set<String> archiveTypes = new HashSet<>(Arrays.asList("zip", "tar", "gzip", "tgz", "gz", "7z", "rar"));
-        Set<String> audioTypes = new HashSet<>(Arrays.asList("mp3", "m4a", "aac", "ogg", "wma", "flac", "alac", "wav", "aiff", "aif"));
-        Set<String> databaseTypes = new HashSet<>(Arrays.asList("db", "sqlite", "mdb", "accdb", "sql", "frm", "myd", "myi", "dbx"));
-        Set<String> gisTypes = new HashSet<>(Arrays.asList("shp", "dbf", "shx", "geojson", "gpkg", "kml", "kmz", "gpx", "asc", "sid", "ecw", "las", "dem", "geotiff", "geotif"));
-        Set<String> htmlTypes = new HashSet<>(Arrays.asList("html", "htm"));
-        Set<String> imageTypes = new HashSet<>(Arrays.asList("jpg", "jpeg", "png", "gif", "tiff", "webp", "bmp", "svg", "raw", "ico", "tif", "img"));
-        Set<String> javaTypes = new HashSet<>(Arrays.asList("java", "jsp", "jar", "war", "class"));
-        Set<String> javascriptTypes = new HashSet<>(Arrays.asList("js", "jsx", "ts", "tsx", "mjs", "cjs"));
-        Set<String> pdfTypes = new HashSet<>(Arrays.asList("pdf", "pdfx", "fdf", "xfdf", "pdx"));
-        Set<String> pythonTypes = new HashSet<>(Arrays.asList("py", "pyc", "pyo", "pyd", "pyw", "ipynb"));
-        Set<String> rTypes = new HashSet<>(Arrays.asList("r", "rds", "rmd", "rdata"));
-        Set<String> shellTypes = new HashSet<>(Arrays.asList("sh", "bash", "zsh", "csh", "ksh", "fish", "bat", "cmd", "ps1"));
-        Set<String> tableTypes = new HashSet<>(Arrays.asList("csv", "tsv", "txt", "xls", "xlsx", "ods", "dbf"));
-        Set<String> textTypes = new HashSet<>(Arrays.asList("txt", "log", "ini", "cfg", "conf", "nfo", "rtf", "me", "doc", "docx", "odt", "pages", "wps"));
-        Set<String> xmlTypes = new HashSet<>(Arrays.asList("xml", "xsl", "xslt", "dtd", "xsd"));
-
-        String extension = getFileExtension(objectName).toLowerCase();
-        String thumbnailFile = String.format("%s/unknown.svg", thumbnailAssets);
-
-        if (!extension.isEmpty()) {
-            for (String archiveType : archiveTypes) {
-                if (extension.equals(archiveType)) {
-                    thumbnailFile = String.format("%s/archive.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String audioType : audioTypes) {
-                if (extension.equals(audioType)) {
-                    thumbnailFile = String.format("%s/audio.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String databaseType : databaseTypes) {
-                if (extension.equals(databaseType)) {
-                    thumbnailFile = String.format("%s/database.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String gisType : gisTypes) {
-                if (extension.equals(gisType)) {
-                    thumbnailFile = String.format("%s/gis.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String htmlType : htmlTypes) {
-                if (extension.equals(htmlType)) {
-                    thumbnailFile = String.format("%s/html.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String imageType : imageTypes) {
-                if (extension.equals(imageType)) {
-                    thumbnailFile = String.format("%s/image.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String javaType : javaTypes) {
-                if (extension.equals(javaType)) {
-                    thumbnailFile = String.format("%s/java.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String pdfType : pdfTypes) {
-                if (extension.equals(pdfType)) {
-                    thumbnailFile = String.format("%s/pdf.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String pythonType : pythonTypes) {
-                if (extension.equals(pythonType)) {
-                    thumbnailFile = String.format("%s/python.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String javascriptType : javascriptTypes) {
-                if (extension.equals(javascriptType)) {
-                    thumbnailFile = String.format("%s/javascript.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String rType : rTypes) {
-                if (extension.equals(rType)) {
-                    thumbnailFile = String.format("%s/r.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String shellType : shellTypes) {
-                if (extension.equals(shellType)) {
-                    thumbnailFile = String.format("%s/shell.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String tableType : tableTypes) {
-                if (extension.equals(tableType)) {
-                    thumbnailFile = String.format("%s/table.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String textType : textTypes) {
-                if (extension.equals(textType)) {
-                    thumbnailFile = String.format("%s/text.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-
-            for (String xmlType : xmlTypes) {
-                if (extension.equals(xmlType)) {
-                    thumbnailFile = String.format("%s/xml.svg", thumbnailAssets);
-                    return thumbnailFile;
-                }
-            }
-        }
-
-        return thumbnailFile;
-    }
-
-    private String getFileExtension(String fileName) {
-        if (fileName == null || fileName.isEmpty()) {
-            return "";
-        }
-
-        int lastDotIndex = fileName.lastIndexOf('.');
-        if (lastDotIndex == -1) {  // No dot
-            return "";
-        }
-        if (lastDotIndex == 0) {  // Starts with dot
-            return fileName.substring(1);
-        }
-        if (lastDotIndex == fileName.length() - 1) {  // Ends with dot
-            return "";
-        }
-        return fileName.substring(lastDotIndex + 1);  // Filename with dot extension
-    }
 
 }
 
