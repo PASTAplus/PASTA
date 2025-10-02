@@ -197,7 +197,7 @@ public class ThumbnailManager {
         Set<String> pythonTypes = new HashSet<>(Arrays.asList("py", "pyc", "pyo", "pyd", "pyw", "ipynb"));
         Set<String> rTypes = new HashSet<>(Arrays.asList("r", "rds", "rmd", "rdata"));
         Set<String> shellTypes = new HashSet<>(Arrays.asList("sh", "bash", "zsh", "csh", "ksh", "fish", "bat", "cmd", "ps1"));
-        Set<String> tableTypes = new HashSet<>(Arrays.asList("csv", "tsv", "txt", "xls", "xlsx", "ods", "dbf"));
+        Set<String> tableTypes = new HashSet<>(Arrays.asList("csv", "tsv", "xls", "xlsx", "ods", "dbf"));
         Set<String> textTypes = new HashSet<>(Arrays.asList("txt", "log", "ini", "cfg", "conf", "nfo", "rtf", "me", "doc", "docx", "odt", "pages", "wps"));
         Set<String> xmlTypes = new HashSet<>(Arrays.asList("xml", "xsl", "xslt", "dtd", "xsd"));
 
