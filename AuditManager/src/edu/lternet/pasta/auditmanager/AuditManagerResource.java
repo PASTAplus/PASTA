@@ -1129,7 +1129,7 @@ public class AuditManagerResource extends PastaWebService
             assertAuthorizedToRead(headers, MethodNameUtility.methodName());
             AuditManager auditManager = new AuditManager(properties);
             QueryString queryStr = new QueryString(uriInfo);
-           queryStr.checkForIllegalKeys(VALID_RECENT_UPLOADS_KEYS);
+            queryStr.checkForIllegalKeys(VALID_RECENT_UPLOADS_KEYS);
             Map<String, List<String>> queryParams = queryStr.getParams();
             String xmlString = auditManager.getRecentUploads(queryParams);
             return Response.ok(xmlString).build();
