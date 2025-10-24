@@ -45,11 +45,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import edu.lternet.pasta.common.SqlEscape;
 /**
@@ -698,8 +694,17 @@ public class AuditManager {
    */
   public String getRecentUploads(Map<String, List<String>> queryParams)
            throws ClassNotFoundException, SQLException, IllegalArgumentException {
-	StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
-    String xmlString = null;
+      StringBuffer stringBuffer = new StringBuffer(AUDIT_OPENING_TAG);
+      String xmlString = null;
+
+      String limitKey = "limit";
+      String limitValue = "10";
+
+      // Enforce limit when none is provided
+      List<String> limitValues = queryParams.computeIfAbsent(
+              limitKey,
+              k -> new ArrayList<String>() {{ add(limitValue); }}
+      );
 
       Connection connection = null;
 
