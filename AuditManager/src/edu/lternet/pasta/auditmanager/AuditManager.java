@@ -1014,6 +1014,15 @@ public class AuditManager {
     if (queryParams != null) {
       Connection connection = null;
 
+      String limitKey = "limit";
+      String limitValue = "100";
+
+      // Enforce limit when none is provided
+      List<String> limitValues = queryParams.computeIfAbsent(
+          limitKey,
+          k -> new ArrayList<String>() {{ add(limitValue); }}
+      );
+
       String queryStr = String.format(
           "SELECT oid, entrytime, service, category, servicemethod, entrytext, " +
               "resourceid, statuscode, userid, useragent, groups, authsystem " +
