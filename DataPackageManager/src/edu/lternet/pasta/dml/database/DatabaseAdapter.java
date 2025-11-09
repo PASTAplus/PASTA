@@ -528,9 +528,10 @@ public abstract class DatabaseAdapter {
                          ) {
                   attributeType = "integer";
                 }
-                else if (textValue.equalsIgnoreCase("float") || 
-                         textValue.equalsIgnoreCase("double")) {
-                  attributeType = "real";
+                else if (textValue.equalsIgnoreCase("float") ||
+                        textValue.equalsIgnoreCase("double")||
+                        textValue.equalsIgnoreCase("decimal")) {
+                    attributeType = "real";
                 }
                 else if (textValue.equalsIgnoreCase("date") || 
                          textValue.equalsIgnoreCase("datetime")) {
