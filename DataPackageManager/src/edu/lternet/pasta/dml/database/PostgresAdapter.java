@@ -634,11 +634,7 @@ public class PostgresAdapter extends DatabaseAdapter {
           throws SQLException {
    String attributeSQL;
    StringBuffer stringBuffer = new StringBuffer();
-   //String textFileName   = table.getFileName();
-   //int    headLineNumber = table.getNumHeaderLines();
-   //String orientation    = table.getOrientation();
-   //String delimiter      = table.getDelimiter();
-   
+
    stringBuffer.append(CREATETABLE);
    stringBuffer.append(SPACE);
    stringBuffer.append(tableName);
@@ -649,9 +645,6 @@ public class PostgresAdapter extends DatabaseAdapter {
    stringBuffer.append(SEMICOLON);
    String sqlStr = stringBuffer.toString();
 
-   //if (isDebugging) { 
-   //  log.debug("The command to create tables is "+sqlStr);
-   // }
    return sqlStr;
   }
 
