@@ -63,7 +63,6 @@ public class DatabaseLoader implements DataStorageInterface, Runnable
    * Constructor of this class. In constructor, it will create a pair of
    * PipedOutputStream object and PipedInputStream object.
    * 
-   * @param dbConnection    Connection to database
    * @param dbAdapterName   Name of database adapter
    * @param entity          Metadata information associated with the loader
    * @throws IOException
