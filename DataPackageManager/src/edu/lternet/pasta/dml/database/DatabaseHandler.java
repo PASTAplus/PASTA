@@ -265,8 +265,7 @@ public class DatabaseHandler
          * Report database table quality check status as failed
          */
         databaseTableQualityCheck.setFailedStatus();
-        databaseTableQualityCheck.setFound(
-          "An error occurred while creating the database table");
+        databaseTableQualityCheck.setFound("An error occurred while creating the database table");
         databaseTableQualityCheck.setExplanation(message);
         entity.addQualityCheck(databaseTableQualityCheck);
       }
