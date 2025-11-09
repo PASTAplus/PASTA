@@ -106,7 +106,7 @@ public class DelimitedReader extends TextDataReader
    * This constructor will read delimited data from stream rather a string.
    * 
    * @param dataStream     The input stream
-   * @param enity          the entity metadata to describe the data stream
+   * @param entity          the entity metadata to describe the data stream
    * @param numCols        int the number of columns
    * @param fieldDelimiter String the field delimiter to tokenize on
    * @param numHeaderLines int numHeaderLines the number of lines to skip at the
