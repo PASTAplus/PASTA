@@ -211,6 +211,7 @@ public class DataPackageManagerResource extends PastaWebService {
     public static boolean EDI_AUTH_USE;
     public static String EDI_AUTHENTICATED_ID;
     public static String EDI_PRIVATE_KEY;
+    private static String EDI_PUBLIC_ID;
     public static String DATAPACKAGEMANAGER_HOST;
 
 	private static final long SIZE_THRESHOLD_DEFAULT = 1024000L;
@@ -307,6 +308,7 @@ public class DataPackageManagerResource extends PastaWebService {
             EDI_AUTHENTICATED_ID = options.getOption("edi.authenticated.id");
             EDI_PRIVATE_KEY = options.getOption("edi.private.key");
             EDI_AUTH_USE = Boolean.parseBoolean(options.getOption("edi.auth.use"));
+            EDI_PUBLIC_ID = options.getOption("edi.public.id");
             DATAPACKAGEMANAGER_HOST = options.getOption("datapackagemanager.host");
 		}
 	}
@@ -766,7 +768,12 @@ public class DataPackageManagerResource extends PastaWebService {
                     ediId, authToken.getUserId(), resourceId, permission.toString()
             );
             msg.append(line);
-            logger.error(msg);
+            // Reduce severity if EDI ID resulted from API Key for group access
+            if (authToken.getUserId().equals("public") && !ediId.equals(EDI_PUBLIC_ID)) {
+                logger.warn(msg);
+            } else {
+                logger.error(msg);
+            }
         }
 
         if (EDI_AUTH_USE) {

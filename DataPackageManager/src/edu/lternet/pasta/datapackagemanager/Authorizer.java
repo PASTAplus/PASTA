@@ -57,6 +57,7 @@ public class Authorizer {
   private static String EDI_AUTH_PROTOCOL;
   private static String EDI_AUTH_HOST;
   private static Integer EDI_AUTH_PORT;
+  private static String EDI_PUBLIC_ID;
 
     /*
    * Instance variables
@@ -77,6 +78,7 @@ public class Authorizer {
       EDI_AUTH_PROTOCOL = options.getOption("edi.auth.protocol");
       EDI_AUTH_HOST = options.getOption("edi.auth.host");
       EDI_AUTH_PORT = Integer.parseInt(options.getOption("edi.auth.port"));
+      EDI_PUBLIC_ID = options.getOption("edi.public.id");
 
   }
   
@@ -155,7 +157,12 @@ public class Authorizer {
                   ediId, authToken.getUserId(), resourceId, permission.toString()
           );
           msg.append(line);
-          logger.error(msg);
+          // Reduce severity if EDI ID resulted from API Key for group access
+          if (authToken.getUserId().equals("public") && !ediId.equals(EDI_PUBLIC_ID)) {
+              logger.warn(msg);
+          } else {
+              logger.error(msg);
+          }
       }
 
       if (EDI_AUTH_USE) {

@@ -323,6 +323,8 @@ public class AuditManagerResource extends PastaWebService
 ) {
 
         if (ediAuthorized != isAuthorized) {
+            Properties properties = ConfigurationListener.getProperties();
+            String ediPublicId = properties.getProperty("edi.public.id");
             String ediId = new EdiToken(ediToken).getSubject();
             String line;
             StringBuilder msg = new StringBuilder();
@@ -335,7 +337,12 @@ public class AuditManagerResource extends PastaWebService
                     ediId, authToken.getUserId(), serviceMethod, permission
             );
             msg.append(line);
-            logger.error(msg);
+            // Reduce severity if EDI ID resulted from API Key for group access
+            if (authToken.getUserId().equals("public") && !ediId.equals(ediPublicId)) {
+                logger.warn(msg);
+            } else {
+                logger.error(msg);
+            }
         }
     }
 
